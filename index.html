@@ -1,1 +1,62 @@
 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palavra & Série — Portal em Manutenção</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #d4af37; --bg: #0b0b0b; --text: #eaeaea; --glass: rgba(255,255,255,0.03); }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: radial-gradient(circle at center, #1a1a1a, #0b0b0b); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .container { max-width: 500px; width: 90%; padding: 40px 20px; text-align: center; }
+        .brand { color: var(--gold); letter-spacing: 4px; font-size: 11px; text-transform: uppercase; margin-bottom: 10px; }
+        .line { width: 40px; height: 1px; background: var(--gold); margin: 0 auto 30px; }
+        .search-box { background: var(--glass); border: 1px solid rgba(212,175,55,0.3); padding: 18px; border-radius: 50px; width: 100%; color: white; font-size: 16px; outline: none; text-align: center; transition: 0.3s; box-sizing: border-box; }
+        .search-box:focus { border-color: var(--gold); background: rgba(255,255,255,0.07); }
+        .result-card { margin-top: 30px; padding: 25px; border-radius: 12px; background: var(--glass); border: 1px solid rgba(255,255,255,0.05); min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 10px; }
+        .highlight { color: var(--gold); }
+        .verse { font-style: italic; color: #fff; margin-bottom: 15px; font-family: 'Playfair Display', serif; }
+        .status-msg { font-size: 12px; color: #666; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-pro { display: inline-block; background: var(--gold); color: #000; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 13px; margin-top: 30px; letter-spacing: 1px; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="brand">Palavra & Série</div>
+    <div class="line"></div>
+    
+    <input type="text" id="mainSearch" class="search-box" placeholder="Investigue um tema (Ex: Salmos)..." onkeyup="pesquisar(event)">
+
+    <div id="displayArea" class="result-card">
+        <h1 id="titulo">Portal em <span class="highlight">Manutenção</span></h1>
+        <p id="texto">Estamos processando os temas teológicos. Digite 'Salmos' para testar a exegese inicial.</p>
+    </div>
+
+    <a href="https://pay.kiwify.com.br/o6G6k0p" class="btn-pro">ACESSAR ESTUDO EXEGÉTICO PRO</a>
+    <div class="status-msg">Base de dados sendo atualizada em tempo real</div>
+</div>
+
+<script>
+    const estudos = {
+        "salmos": { t: "Salmo <span class='highlight'>23</span>", c: "<p class='verse'>'O Senhor é meu pastor...'</p><p>A exegese inicial revela uma relação de dependência absoluta e provisão contínua.</p>" },
+        "graça": { t: "<span class='highlight'>Graça</span>", c: "<p class='verse'>'Favor imerecido'</p><p>A base bíblica da graça foca na benevolência divina independente do esforço humano.</p>" }
+    };
+
+    function pesquisar(e) {
+        const busca = document.getElementById("mainSearch").value.toLowerCase();
+        const t = document.getElementById("titulo");
+        const c = document.getElementById("displayArea");
+
+        if (estudos[busca]) {
+            c.innerHTML = `<h1>${estudos[busca].t}</h1>` + estudos[busca].c;
+        } else if (busca !== "") {
+            c.innerHTML = `<h1><span style='color:#666'>Processando...</span></h1><p>Este tema está em fase de manutenção exegética. Tente 'Salmos' ou 'Graça'.</p>`;
+        }
+    }
+</script>
+
+</body>
+</html>
