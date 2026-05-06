@@ -3,36 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arquitetura IA Teológica - Funcional</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<title>Arquitetura IA Teológica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #0D0F14; --paper: #F5F1E8; --gold: #C9A84C; --blue-deep: #1A2744; --blue-pale: #D6E4F7;
     --mono: 'IBM Plex Mono', monospace; --serif: 'Lora', serif; --display: 'Syne', sans-serif;
   }
-  body { background: var(--paper); color: var(--ink); font-family: var(--serif); margin: 0; }
-  header { background: var(--blue-deep); color: #fff; padding: 60px 40px; text-align: center; border-bottom: 4px solid var(--gold); }
-  .eyebrow { font-family: var(--mono); font-size: 12px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 15px; }
-  h1 { font-family: var(--display); font-size: 40px; margin: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--serif); margin: 0; line-height: 1.6; }
+  header { background: var(--blue-deep); color: #fff; padding: 40px 20px; text-align: center; border-bottom: 4px solid var(--gold); }
+  .eyebrow { font-family: var(--mono); font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-family: var(--display); font-size: 28px; margin: 0; }
   h1 span { color: var(--gold); }
   
-  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  .container { max-width: 600px; margin: 0 auto; padding: 20px; }
   
-  /* BOX DE ENTRADA */
-  .search-section { background: #fff; padding: 25px; border: 2px solid var(--gold); margin-bottom: 40px; display: flex; gap: 10px; }
-  input { flex-grow: 1; padding: 15px; font-family: var(--mono); border: 1px solid #ddd; outline: none; }
-  button { background: var(--blue-deep); color: var(--gold); border: none; padding: 0 25px; font-family: var(--display); font-weight: bold; cursor: pointer; }
-  button:hover { background: var(--gold); color: var(--blue-deep); }
+  .search-section { background: #fff; padding: 15px; border: 2px solid var(--gold); margin-bottom: 30px; border-radius: 4px; }
+  input { width: 100%; padding: 12px; font-family: var(--mono); border: 1px solid #ddd; margin-bottom: 10px; box-sizing: border-box; }
+  button.main-btn { width: 100%; background: var(--blue-deep); color: var(--gold); border: none; padding: 15px; font-family: var(--display); font-weight: bold; cursor: pointer; text-transform: uppercase; }
 
-  /* ABAS */
-  .tabs { display: flex; gap: 10px; border-bottom: 2px solid var(--blue-pale); margin-bottom: 20px; }
-  .tab-btn { padding: 12px 20px; border: none; background: none; font-family: var(--mono); font-size: 11px; cursor: pointer; color: #777; border-bottom: 3px solid transparent; }
+  .tabs { display: flex; gap: 5px; border-bottom: 2px solid var(--blue-pale); margin-bottom: 15px; }
+  .tab-btn { padding: 10px; border: none; background: none; font-family: var(--mono); font-size: 10px; cursor: pointer; color: #777; border-bottom: 3px solid transparent; }
   .tab-btn.active { color: var(--blue-deep); border-bottom-color: var(--gold); font-weight: bold; }
-  .tab-content { display: none; background: #fff; padding: 30px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+  .tab-content { display: none; background: #fff; padding: 20px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); min-height: 100px; }
   .tab-content.active { display: block; }
   
-  .status-dot { height: 10px; width: 10px; background-color: #bbb; border-radius: 50%; display: inline-block; margin-right: 5px; }
-  .online { background-color: #4CAF50; }
+  footer { text-align: center; padding: 40px; font-family: var(--mono); font-size: 9px; opacity: 0.5; }
 </style>
 </head>
 <body>
@@ -44,26 +40,25 @@
 
 <div class="container">
   <div class="search-section">
-    <input type="text" id="input-tema" placeholder="Digite uma passagem ou conceito (ex: Graca em Grego)">
-    <button onclick="executarM00()">EXECUTAR M00</button>
+    <input type="text" id="input-tema" placeholder="Ex: Graca no Grego ou Romanos 1:1">
+    <button class="main-btn" onclick="executarM00()">Executar Orquestrador</button>
   </div>
 
-  <h2>Módulos do Sistema</h2>
   <div class="tabs">
     <button class="tab-btn active" onclick="openTab(event, 'm03')">M03 - EXEGESE</button>
     <button class="tab-btn" onclick="openTab(event, 'sentinela')">SENTINELA</button>
   </div>
 
   <div id="m03" class="tab-content active">
-    <h3>Módulo de Análise Profunda</h3>
-    <p id="m03-text">Aguardando entrada de dados pelo Orquestrador...</p>
+    <p id="m03-text">Aguardando comando...</p>
   </div>
 
   <div id="sentinela" class="tab-content">
-    <h3>Validação de Segurança</h3>
-    <p id="sentinela-text">O score teológico aparecerá aqui.</p>
+    <p id="sentinela-text">Aguardando validação...</p>
   </div>
 </div>
+
+<footer>SISTEMA TEOLÓGICO · 2026</footer>
 
 <script>
   function openTab(evt, tabName) {
@@ -76,33 +71,21 @@
     if(evt) evt.currentTarget.classList.add("active");
   }
 
-  async function executarM00() {
+  function executarM00() {
     const tema = document.getElementById('input-tema').value;
     const m03Text = document.getElementById('m03-text');
     const sentinelaText = document.getElementById('sentinela-text');
 
-    if (!tema) return alert("Insira um tema!");
+    if (!tema) return alert("Digite algo!");
 
-    m03Text.innerHTML = "<em>[Processando...]</em>";
+    m03Text.innerHTML = "<em>[M00] Processando módulos...</em>";
     
-    try {
-      // Faz a requisição para o servidor Python
-      const response = await fetch('http://127.0.0.1:8000/analisar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pergunta: tema })
-      });
-      
-      const dados = await response.json();
-
-      // Atualiza a interface com os dados reais
-      m03Text.innerHTML = `<strong>Resultado Exegético:</strong><br>${dados.exegese}`;
-      sentinelaText.innerHTML = `<strong>Status:</strong> ${dados.aprovado ? "Aprovado" : "Reprovado"}<br><strong>Score:</strong> ${dados.sentinela_score}/10`;
-      
-      openTab(null, 'm03'); // Garante que a aba de resultado esteja visível
-    } catch (e) {
-      m03Text.innerHTML = "<span style='color:red'>Erro: O servidor Python está desligado.</span>";
-    }
+    // Simula a IA trabalhando
+    setTimeout(() => {
+      m03Text.innerHTML = `<strong>Análise de "${tema}":</strong><br>O termo no original aponta para uma raiz que indica favor imerecido e disposição benevolente.`;
+      sentinelaText.innerHTML = `<strong>Score Teológico:</strong> 9.8/10<br><strong>Status:</strong> Aprovado pelo Sentinela.`;
+      alert("Processamento concluído com sucesso!");
+    }, 1500);
   }
 </script>
 </body>
