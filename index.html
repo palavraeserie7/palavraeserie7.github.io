@@ -1,104 +1,124 @@
-<!DOCTYPE html><html lang="pt-BR">
+
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistema Palavra em Série V3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sistema Palavra em Série</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       background: #0f172a;
       color: #e2e8f0;
-      line-height: 1.6;
     }
+
     header {
       background: #1e293b;
       padding: 20px;
       text-align: center;
     }
+
     header h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 22px;
     }
+
     .container {
-      max-width: 900px;
+      max-width: 800px;
       margin: auto;
       padding: 20px;
     }
-    input, textarea {
+
+    input {
       width: 100%;
       padding: 12px;
       margin-top: 10px;
-      margin-bottom: 10px;
       border-radius: 8px;
       border: none;
     }
+
     button {
-      padding: 12px 20px;
-      background: #38bdf8;
+      margin-top: 10px;
+      padding: 12px;
+      width: 100%;
       border: none;
       border-radius: 8px;
-      cursor: pointer;
+      background: #38bdf8;
       font-weight: bold;
+      cursor: pointer;
     }
+
     button:hover {
       background: #0ea5e9;
     }
+
     .card {
-      background: #1e293b;
       margin-top: 20px;
+      background: #1e293b;
       padding: 15px;
       border-radius: 10px;
     }
+
     .title {
-      font-size: 18px;
-      margin-bottom: 10px;
       color: #38bdf8;
+      margin-bottom: 10px;
+      font-weight: bold;
     }
+
     .section {
       margin-bottom: 15px;
     }
-    .label {
-      font-weight: bold;
-      color: #94a3b8;
-    }
   </style>
 </head>
-<body><header>
-  <h1>Sistema Palavra em Série V3</h1>
-  <p>Estudo Bíblico em 3 Camadas Estruturadas</p>
-</header><div class="container"><label>Insira o termo bíblico ou tema:</label> <input type="text" id="input" placeholder="Ex: Amor, Fé, Gênesis 1:1" />
 
-<button onclick="processar()">Analisar</button>
+<body>
 
-  <div id="resultado"></div></div><script>
-function processar() {
-  const termo = document.getElementById('input').value;
+<header>
+  <h1>Sistema Palavra em Série</h1>
+  <p>Estudo Bíblico em 3 Camadas</p>
+</header>
 
-  if (!termo) return;
+<div class="container">
 
-  const output = `
-  <div class="card">
-    <div class="title">🔎 Tema: ${termo}</div>
+  <input type="text" id="input" placeholder="Digite um tema bíblico (ex: Fé, Amor, Gênesis 1)"/>
+  <button onclick="analisar()">Analisar</button>
 
-    <div class="section">
-      <div class="label">🟢 Camada 1 — Aplicação (Ética e Vida Prática)</div>
-      <p>O conceito de "${termo}" é aplicado como princípio de integridade, responsabilidade e formação do caráter humano. Ele influencia decisões morais e comportamento cotidiano.</p>
+  <div id="resultado"></div>
+
+</div>
+
+<script>
+function analisar() {
+  const texto = document.getElementById("input").value;
+
+  if (!texto) return;
+
+  document.getElementById("resultado").innerHTML = `
+    <div class="card">
+
+      <div class="title">🔎 Tema: ${texto}</div>
+
+      <div class="section">
+        <strong>🟢 Camada 1 — Aplicação</strong>
+        <p>O tema "${texto}" pode ser entendido como princípio de conduta, ética e desenvolvimento do caráter humano, influenciando decisões e valores diários.</p>
+      </div>
+
+      <div class="section">
+        <strong>🟡 Camada 2 — Contexto Histórico</strong>
+        <p>Esse conceito deve ser entendido dentro do contexto histórico e cultural do texto bíblico, considerando práticas, linguagem e sociedade da época.</p>
+      </div>
+
+      <div class="section">
+        <strong>🔵 Camada 3 — Linguagem Original</strong>
+        <p>O termo original em hebraico ou grego possui nuances que vão além da tradução simples, revelando significados mais profundos no texto original.</p>
+      </div>
+
     </div>
-
-    <div class="section">
-      <div class="label">🟡 Camada 2 — Contexto Histórico e Cultural</div>
-      <p>O termo está inserido em um contexto histórico antigo, relacionado à cultura hebraica ou do mundo do Oriente Médio antigo, onde linguagem simbólica e narrativa eram fundamentais para transmissão de valores.</p>
-    </div>
-
-    <div class="section">
-      <div class="label">🔵 Camada 3 — Análise Linguística</div>
-      <p>O termo original pode derivar de palavras hebraicas ou gregas com significados mais amplos do que a tradução portuguesa permite, revelando nuances semânticas profundas ligadas ao texto original.</p>
-    </div>
-  </div>
   `;
-
-  document.getElementById('resultado').innerHTML = output;
 }
-</script></body>
+</script>
+
+</body>
 </html>
