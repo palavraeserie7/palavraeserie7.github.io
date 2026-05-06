@@ -1,92 +1,104 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arquitetura IA Teológica</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink: #0D0F14; --paper: #F5F1E8; --gold: #C9A84C; --blue-deep: #1A2744; --blue-pale: #D6E4F7;
-    --mono: 'IBM Plex Mono', monospace; --serif: 'Lora', serif; --display: 'Syne', sans-serif;
-  }
-  body { background: var(--paper); color: var(--ink); font-family: var(--serif); margin: 0; line-height: 1.6; }
-  header { background: var(--blue-deep); color: #fff; padding: 40px 20px; text-align: center; border-bottom: 4px solid var(--gold); }
-  .eyebrow { font-family: var(--mono); font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
-  h1 { font-family: var(--display); font-size: 28px; margin: 0; }
-  h1 span { color: var(--gold); }
-  
-  .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-  
-  .search-section { background: #fff; padding: 15px; border: 2px solid var(--gold); margin-bottom: 30px; border-radius: 4px; }
-  input { width: 100%; padding: 12px; font-family: var(--mono); border: 1px solid #ddd; margin-bottom: 10px; box-sizing: border-box; }
-  button.main-btn { width: 100%; background: var(--blue-deep); color: var(--gold); border: none; padding: 15px; font-family: var(--display); font-weight: bold; cursor: pointer; text-transform: uppercase; }
-
-  .tabs { display: flex; gap: 5px; border-bottom: 2px solid var(--blue-pale); margin-bottom: 15px; }
-  .tab-btn { padding: 10px; border: none; background: none; font-family: var(--mono); font-size: 10px; cursor: pointer; color: #777; border-bottom: 3px solid transparent; }
-  .tab-btn.active { color: var(--blue-deep); border-bottom-color: var(--gold); font-weight: bold; }
-  .tab-content { display: none; background: #fff; padding: 20px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); min-height: 100px; }
-  .tab-content.active { display: block; }
-  
-  footer { text-align: center; padding: 40px; font-family: var(--mono); font-size: 9px; opacity: 0.5; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema Palavra em Série V3</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+    header {
+      background: #1e293b;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      padding: 12px 20px;
+      background: #38bdf8;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #0ea5e9;
+    }
+    .card {
+      background: #1e293b;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .title {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #38bdf8;
+    }
+    .section {
+      margin-bottom: 15px;
+    }
+    .label {
+      font-weight: bold;
+      color: #94a3b8;
+    }
+  </style>
 </head>
-<body>
+<body><header>
+  <h1>Sistema Palavra em Série V3</h1>
+  <p>Estudo Bíblico em 3 Camadas Estruturadas</p>
+</header><div class="container"><label>Insira o termo bíblico ou tema:</label> <input type="text" id="input" placeholder="Ex: Amor, Fé, Gênesis 1:1" />
 
-<header>
-  <div class="eyebrow">Sistema Teológico Estruturado</div>
-  <h1>Arquitetura <span>IA v2.0</span></h1>
-</header>
+<button onclick="processar()">Analisar</button>
 
-<div class="container">
-  <div class="search-section">
-    <input type="text" id="input-tema" placeholder="Ex: Graca no Grego ou Romanos 1:1">
-    <button class="main-btn" onclick="executarM00()">Executar Orquestrador</button>
+  <div id="resultado"></div></div><script>
+function processar() {
+  const termo = document.getElementById('input').value;
+
+  if (!termo) return;
+
+  const output = `
+  <div class="card">
+    <div class="title">🔎 Tema: ${termo}</div>
+
+    <div class="section">
+      <div class="label">🟢 Camada 1 — Aplicação (Ética e Vida Prática)</div>
+      <p>O conceito de "${termo}" é aplicado como princípio de integridade, responsabilidade e formação do caráter humano. Ele influencia decisões morais e comportamento cotidiano.</p>
+    </div>
+
+    <div class="section">
+      <div class="label">🟡 Camada 2 — Contexto Histórico e Cultural</div>
+      <p>O termo está inserido em um contexto histórico antigo, relacionado à cultura hebraica ou do mundo do Oriente Médio antigo, onde linguagem simbólica e narrativa eram fundamentais para transmissão de valores.</p>
+    </div>
+
+    <div class="section">
+      <div class="label">🔵 Camada 3 — Análise Linguística</div>
+      <p>O termo original pode derivar de palavras hebraicas ou gregas com significados mais amplos do que a tradução portuguesa permite, revelando nuances semânticas profundas ligadas ao texto original.</p>
+    </div>
   </div>
+  `;
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="openTab(event, 'm03')">M03 - EXEGESE</button>
-    <button class="tab-btn" onclick="openTab(event, 'sentinela')">SENTINELA</button>
-  </div>
-
-  <div id="m03" class="tab-content active">
-    <p id="m03-text">Aguardando comando...</p>
-  </div>
-
-  <div id="sentinela" class="tab-content">
-    <p id="sentinela-text">Aguardando validação...</p>
-  </div>
-</div>
-
-<footer>SISTEMA TEOLÓGICO · 2026</footer>
-
-<script>
-  function openTab(evt, tabName) {
-    let i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tab-content");
-    for (i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
-    tablinks = document.getElementsByClassName("tab-btn");
-    for (i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
-    document.getElementById(tabName).style.display = "block";
-    if(evt) evt.currentTarget.classList.add("active");
-  }
-
-  function executarM00() {
-    const tema = document.getElementById('input-tema').value;
-    const m03Text = document.getElementById('m03-text');
-    const sentinelaText = document.getElementById('sentinela-text');
-
-    if (!tema) return alert("Digite algo!");
-
-    m03Text.innerHTML = "<em>[M00] Processando módulos...</em>";
-    
-    // Simula a IA trabalhando
-    setTimeout(() => {
-      m03Text.innerHTML = `<strong>Análise de "${tema}":</strong><br>O termo no original aponta para uma raiz que indica favor imerecido e disposição benevolente.`;
-      sentinelaText.innerHTML = `<strong>Score Teológico:</strong> 9.8/10<br><strong>Status:</strong> Aprovado pelo Sentinela.`;
-      alert("Processamento concluído com sucesso!");
-    }, 1500);
-  }
-</script>
-</body>
+  document.getElementById('resultado').innerHTML = output;
+}
+</script></body>
 </html>
