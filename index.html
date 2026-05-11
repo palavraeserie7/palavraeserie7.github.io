@@ -1,14 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palavra em Série - Biblioteca</title>
+    <title>Palavra em Série - Operacional</title>
     <style>
         :root { --ouro: #e2b96f; --fundo: #0f0f0f; }
         body { background: var(--fundo); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        h1 { color: var(--ouro); letter-spacing: 2px; margin-bottom: 30px; }
-        .btn-group { margin-bottom: 30px; display: flex; justify-content: center; gap: 10px; }
+        h1 { color: var(--ouro); letter-spacing: 2px; text-transform: uppercase; }
+        .btn-group { margin: 30px 0; display: flex; justify-content: center; gap: 15px; }
         button { 
             padding: 12px 25px; cursor: pointer; border: 2px solid var(--ouro); 
             border-radius: 30px; background: transparent; color: var(--ouro); 
@@ -21,7 +22,6 @@
             border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--ouro);
         }
         .livro-item h3 { margin-top: 0; color: var(--ouro); }
-        .loading { color: var(--ouro); font-style: italic; }
     </style>
 </head>
 <body>
@@ -33,45 +33,41 @@
         <button id="btn-pro" onclick="filtrar('Pro')">LIVROS PRO</button>
     </div>
 
-    <div id="estante" class="loading">Conectando à biblioteca operacional...</div>
+    <div id="estante">Iniciando infraestrutura modular...</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script>
-        // --- CONFIGURAÇÃO OBRIGATÓRIA ---
-        // Pegue estes dados no Supabase: Settings > API
-        const supabaseUrl = 'COLE_AQUI_SEU_URL';
-        const supabaseKey = 'COLE_AQUI_SUA_KEY';
-        // --------------------------------
+        // CONFIGURAÇÃO CONSOLIDADA VIA LINKS FORNECIDOS
+        const supabaseUrl = 'https://qmhdbuxomozdczgvpvcc.supabase.co'; 
+        const supabaseKey = 'sb_publishable_5jVrLp2kFpndH6_N7pT6H6B2'; // Extraída do link manus.im
 
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         let livrosCache = [];
 
         async function buscarLivros() {
-            const { data, error } = await supabase
-                .from('livros')
-                .select('title, content, category');
+            // CONFIRMAÇÃO DA LINHA 115: Usando a tabela 'livros'
+            const { data, error } = await supabase.from('livros').select('*');
 
             if (error) {
-                document.getElementById('estante').innerHTML = "Erro de conexão com a infraestrutura.";
+                document.getElementById('estante').innerHTML = "Erro na Memória Persistente. Verifique a tabela.";
                 console.error(error);
                 return;
             }
 
             livrosCache = data;
-            filtrar('Free'); // Inicia no plano Free por padrão
+            filtrar('Free'); // Inicia no plano FREE conforme regra fundamental
         }
 
         function filtrar(plano) {
             const estante = document.getElementById('estante');
-            
-            // Atualiza visual dos botões
             document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-${plano.toLowerCase()}`).classList.add('active');
+            const btnId = plano === 'Free' ? 'btn-free' : 'btn-pro';
+            document.getElementById(btnId).classList.add('active');
 
             const filtrados = livrosCache.filter(l => l.category === plano);
             
             if (filtrados.length === 0) {
-                estante.innerHTML = `<p style="text-align:center">Nenhum conteúdo ${plano} disponível no momento.</p>`;
+                estante.innerHTML = `<p style="text-align:center">Nenhum conteúdo ${plano} disponível.</p>`;
                 return;
             }
 
