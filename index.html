@@ -1,82 +1,144 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Em Breve | Palavra em Série</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Em Breve | Palavra em Série</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      background: linear-gradient(135deg, #0f0f0f, #1a1a2e);
-      color: #fff;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 20px;
-    }
+        body {
+            background: linear-gradient(135deg, #0f0f0f, #1a1a2e);
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
 
-    .container {
-      max-width: 600px;
-    }
+        .container {
+            max-width: 600px;
+        }
 
-    .logo {
-      font-size: 3rem;
-      margin-bottom: 10px;
-    }
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
 
-    h1 {
-      font-size: 2rem;
-      color: #e2b96f;
-      margin-bottom: 10px;
-      letter-spacing: 2px;
-    }
+        h1 {
+            font-size: 2rem;
+            color: #e2b96f;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
 
-    .linha {
-      width: 60px;
-      height: 3px;
-      background: #e2b96f;
-      margin: 15px auto;
-      border-radius: 2px;
-    }
+        .linha {
+            width: 60px;
+            height: 3px;
+            background: #e2b96f;
+            margin: 15px auto;
+            border-radius: 2px;
+        }
 
-    p {
-      font-size: 1.1rem;
-      color: #ccc;
-      line-height: 1.7;
-      margin-bottom: 10px;
-    }
+        p {
+            font-size: 1.1rem;
+            color: #ccc;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
 
-    .badge {
-      display: inline-block;
-      margin-top: 25px;
-      padding: 10px 25px;
-      border: 2px solid #e2b96f;
-      border-radius: 30px;
-      color: #e2b96f;
-      font-size: 0.95rem;
-      letter-spacing: 1px;
-    }
+        .badge {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 10px 25px;
+            border: 2px solid #e2b96f;
+            border-radius: 30px;
+            color: #e2b96f;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
 
-    .rodape {
-      margin-top: 40px;
-      font-size: 0.8rem;
-      color: #555;
-    }
-  </style>
+        /* ESTILO DA ESTANTE DINÂMICA */
+        #minha-estante {
+            margin-top: 40px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .livro-item {
+            margin-bottom: 15px;
+            border-left: 3px solid #e2b96f;
+            padding-left: 15px;
+        }
+
+        .rodape {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo">📖</div>
-    <h1>PALAVRA EM SÉRIE</h1>
-    <div class="linha"></div>
-    <p>Estamos preparando algo ainda melhor para você.</p>
-    <p>O site voltará em breve com novidades.</p>
-    <div class="badge">⚙️ Atualização em andamento</div>
-    <div class="rodape">© 2025 Palavra em Série — Todos os direitos reservados</div>
-  </div>
+    <div class="container">
+        <div class="logo">📖</div>
+        <h1>PALAVRA EM SÉRIE</h1>
+        <div class="linha"></div>
+        
+        <p>Estamos preparando algo ainda melhor para você.</p>
+        <p>O site voltará em breve com novidades.</p>
+        
+        <div class="badge">⚙️ Atualização em andamento</div>
+
+        <div id="minha-estante">
+            <p style="color: #e2b96f;">Conectando à biblioteca...</p>
+        </div>
+
+        <div class="rodape">© 2025 Palavra em Série – Todos os direitos reservados</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+        // SUBSTITUA PELOS SEUS DADOS REAIS ABAIXO
+        const supabaseUrl = 'SUA_URL_DO_SUPABASE_AQUI'
+        const supabaseKey = 'SUA_CHAVE_ANON_AQUI'
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+
+        async function carregarBiblioteca() {
+            const { data, error } = await supabase
+                .from('biblioteca')
+                .select('*')
+
+            const estante = document.getElementById('minha-estante')
+
+            if (error) {
+                console.error("Erro:", error.message)
+                estante.innerHTML = "<p>Erro ao carregar dados.</p>"
+                return
+            }
+
+            // Se não houver erro, limpa e mostra os livros
+            estante.innerHTML = '<h3 style="color:#e2b96f; margin-bottom:15px;">Estante Real:</h3>'
+
+            data.forEach(item => {
+                const div = document.createElement('div')
+                div.className = 'livro-item'
+                div.innerHTML = `
+                    <strong style="color: #fff;">${item.titulo}</strong><br>
+                    <small style="color: #ccc;">${item.autor || 'Autor da Série'}</small>
+                `
+                estante.appendChild(div)
+            })
+        }
+
+        // Executa a função
+        carregarBiblioteca()
+    </script>
 </body>
 </html>
+
