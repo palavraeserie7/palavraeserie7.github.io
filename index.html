@@ -1,85 +1,155 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palavra em Série - Operacional</title>
-    <style>
-        :root { --ouro: #e2b96f; --fundo: #0f0f0f; }
-        body { background: var(--fundo); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        h1 { color: var(--ouro); letter-spacing: 2px; text-transform: uppercase; }
-        .btn-group { margin: 30px 0; display: flex; justify-content: center; gap: 15px; }
-        button { 
-            padding: 12px 25px; cursor: pointer; border: 2px solid var(--ouro); 
-            border-radius: 30px; background: transparent; color: var(--ouro); 
-            font-weight: bold; transition: 0.3s;
-        }
-        button:hover, button.active { background: var(--ouro); color: black; }
-        #id-estante { max-width: 600px; margin: 0 auto; text-align: left; }
-        .livro-item { 
-            background: rgba(255,255,255,0.05); padding: 20px; 
-            border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--ouro);
-        }
-        .livro-item h3 { margin-top: 0; color: var(--ouro); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Palavra em Série</title>
+
+<style>
+
+body{
+background:#0f0f0f;
+color:white;
+font-family:Arial;
+padding:20px;
+}
+
+h1{
+text-align:center;
+color:#e2b96f;
+}
+
+button{
+
+padding:10px 20px;
+margin:10px;
+border:none;
+border-radius:10px;
+background:#1a1a1a;
+color:#e2b96f;
+cursor:pointer;
+
+}
+
+#estante{
+margin-top:30px;
+}
+
+.livro{
+
+background:#1c1c1c;
+padding:15px;
+margin-bottom:15px;
+border-left:5px solid #e2b96f;
+border-radius:10px;
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-    <h1>PALAVRA EM SÉRIE</h1>
-    
-    <div class="btn-group">
-        <button id="btn-free" onclick="filtrar('Free')">LIVROS FREE</button>
-        <button id="btn-pro" onclick="filtrar('Pro')">LIVROS PRO</button>
-    </div>
+<h1>PALAVRA EM SÉRIE</h1>
 
-    <div id="id-estante">Iniciando infraestrutura modular...</div>
+<div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script>
-        // CONFIGURAÇÃO TÉCNICA CORRIGIDA
-        const supabaseUrl = 'https://qmhdbuxomozdczgvpvcc.supabase.co'; 
-        const supabaseKey = 'sb_publishable_5jVrLp2kFpndH6_N7pT6H6B2'; 
+<button onclick="filtrar('Free')">
+LIVROS FREE
+</button>
 
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-        let livrosCache = [];
+<button onclick="filtrar('Pro')">
+LIVROS PRO
+</button>
 
-        async function buscarLivros() {
-            // CONFIRMAÇÃO DA TABELA: 'livros' conforme solicitado
-            const { data, error } = await supabase.from('livros').select('*');
+</div>
 
-            if (error) {
-                document.getElementById('id-estante').innerHTML = "Erro de conexão com a base de dados.";
-                console.error("Erro Supabase:", error);
-                return;
-            }
+<div id="estante">
+Carregando biblioteca...
+</div>
 
-            livrosCache = data;
-            filtrar('Free'); // Inicia exibindo o conteúdo FREE
-        }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-        function filtrar(plano) {
-            const estante = document.getElementById('id-estante');
-            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            const btnId = plano === 'Free' ? 'btn-free' : 'btn-pro';
-            document.getElementById(btnId).classList.add('active');
+<script>
 
-            const filtrados = livrosCache.filter(l => l.category === plano);
-            
-            if (filtrados.length === 0) {
-                estante.innerHTML = `<p style="text-align:center">Nenhum conteúdo ${plano} disponível.</p>`;
-                return;
-            }
+const supabaseUrl =
+'https://qmhdbuxomozdczgvpvcc.supabase.co';
 
-            estante.innerHTML = filtrados.map(l => `
-                <div class="livro-item">
-                    <h3>${l.title}</h3>
-                    <p>${l.content}</p>
-                </div>
-            `).join('');
-        }
+const supabaseKey =
+'SUA_CHAVE_SUPABASE';
 
-        buscarLivros();
-    </script>
+const supabase =
+window.supabase.createClient(
+supabaseUrl,
+supabaseKey
+);
+
+let livrosCache = [];
+
+async function buscarLivros(){
+
+const { data, error } =
+await supabase
+.from('livros')
+.select('*');
+
+if(error){
+
+document.getElementById('estante')
+.innerHTML =
+'Erro ao conectar banco de dados';
+
+console.log(error);
+
+return;
+}
+
+livrosCache = data;
+
+filtrar('Free');
+
+}
+
+function filtrar(plano){
+
+const estante =
+document.getElementById('estante');
+
+const filtrados =
+livrosCache.filter(
+l => l.categoria === plano
+);
+
+if(filtrados.length === 0){
+
+estante.innerHTML =
+'Nenhum conteúdo encontrado';
+
+return;
+}
+
+estante.innerHTML =
+filtrados.map(l => `
+
+<div class="livro">
+
+<h3>${l.titulo}</h3>
+
+<p>${l.descricao}</p>
+
+</div>
+
+`).join('');
+
+}
+
+buscarLivros();
+
+</script>
+
 </body>
 </html>
