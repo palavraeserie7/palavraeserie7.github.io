@@ -2,153 +2,126 @@
 <html lang="pt-BR">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palavra em Série</title>
+    <style>
+        body {
+            background: #0f0f0f;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
 
-<title>Palavra em Série</title>
+        h1 {
+            text-align: center;
+            color: #e2b96f;
+        }
 
-<style>
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            background: #1a1a1a;
+            color: #e2b96f;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-body{
-background:#0f0f0f;
-color:white;
-font-family:Arial;
-padding:20px;
-}
+        button:hover {
+            background: #2a2a2a;
+        }
 
-h1{
-text-align:center;
-color:#e2b96f;
-}
+        #estante {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-button{
+        .livro {
+            background: #1c1c1c;
+            padding: 15px;
+            border-left: 5px solid #e2b96f;
+            border-radius: 10px;
+        }
 
-padding:10px 20px;
-margin:10px;
-border:none;
-border-radius:10px;
-background:#1a1a1a;
-color:#e2b96f;
-cursor:pointer;
-
-}
-
-#estante{
-margin-top:30px;
-}
-
-.livro{
-
-background:#1c1c1c;
-padding:15px;
-margin-bottom:15px;
-border-left:5px solid #e2b96f;
-border-radius:10px;
-
-}
-
-</style>
-
+        .erro {
+            color: #ff6b6b;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
 
-<h1>PALAVRA EM SÉRIE</h1>
+    <h1>PALAVRA EM SÉRIE</h1>
 
-<div>
+    <div style="text-align: center;">
+        <button onclick="filtrar('Free')">LIVROS FREE</button>
+        <button onclick="filtrar('Pro')">LIVROS PRO</button>
+    </div>
 
-<button onclick="filtrar('Free')">
-LIVROS FREE
-</button>
+    <div id="estante">
+        Carregando biblioteca...
+    </div>
 
-<button onclick="filtrar('Pro')">
-LIVROS PRO
-</button>
+    <!-- SDK do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-</div>
+    <script>
+        const supabaseUrl = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
+        // CORREÇÃO: Adicionada a aspa simples que faltava no início da chave
+        const supabaseKey = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
 
-<div id="estante">
-Carregando biblioteca...
-</div>
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+        let livrosCache = [];
 
-<script>
+        async function buscarLivros() {
+            try {
+                const { data, error } = await supabase
+                    .from('livros')
+                    .select('*');
 
-const supabaseUrl =
-'https://qmhdbuxomozdczgvpvcc.supabase.co';
+                if (error) throw error;
 
-const supabaseKey =
-sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
+                livrosCache = data;
+                filtrar('Free');
+            } catch (error) {
+                document.getElementById('estante').innerHTML = 
+                    '<p class="erro">Erro ao conectar ao banco de dados. Verifique as credenciais.</p>';
+                console.error('Erro Supabase:', error);
+            }
+        }
 
-const supabase =
-window.supabase.createClient(
-supabaseUrl,
-supabaseKey
-);
+        function filtrar(plano) {
+            const estante = document.getElementById('estante');
+            
+            if (!livrosCache || livrosCache.length === 0) {
+                estante.innerHTML = 'Nenhum conteúdo carregado.';
+                return;
+            }
 
-let livrosCache = [];
+            const filtrados = livrosCache.filter(l => l.categoria === plano);
 
-async function buscarLivros(){
+            if (filtrados.length === 0) {
+                estante.innerHTML = `<p style="text-align:center">Nenhum livro ${plano} encontrado.</p>`;
+                return;
+            }
 
-const { data, error } =
-await supabase
-.from('livros')
-.select('*');
+            estante.innerHTML = filtrados.map(l => `
+                <div class="livro">
+                    <h3>${l.titulo}</h3>
+                    <p>${l.descricao}</p>
+                </div>
+            `).join('');
+        }
 
-if(error){
-
-document.getElementById('estante')
-.innerHTML =
-'Erro ao conectar banco de dados';
-
-console.log(error);
-
-return;
-}
-
-livrosCache = data;
-
-filtrar('Free');
-
-}
-
-function filtrar(plano){
-
-const estante =
-document.getElementById('estante');
-
-const filtrados =
-livrosCache.filter(
-l => l.categoria === plano
-);
-
-if(filtrados.length === 0){
-
-estante.innerHTML =
-'Nenhum conteúdo encontrado';
-
-return;
-}
-
-estante.innerHTML =
-filtrados.map(l => `
-
-<div class="livro">
-
-<h3>${l.titulo}</h3>
-
-<p>${l.descricao}</p>
-
-</div>
-
-`).join('');
-
-}
-
-buscarLivros();
-
-</script>
+        // Inicia a busca ao carregar a página
+        buscarLivros();
+    </script>
 
 </body>
 </html>
