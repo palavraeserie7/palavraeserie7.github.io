@@ -1,55 +1,103 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palavra em Série</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --color-background: #0B1628; /* Azul */
+            --color-primary: #C9A84C; /* Ouro */
+            --color-text: #F8F4EC; /* Creme */
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'IBM Plex Sans', sans-serif;
+        }
+
         body {
-            background: #0f0f0f;
-            color: white;
-            font-family: Arial, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text);
+            font-family: var(--font-body);
             padding: 20px;
+            margin: 0;
+            line-height: 1.6;
         }
 
         h1 {
             text-align: center;
-            color: #e2b96f;
+            color: var(--color-primary);
+            font-family: var(--font-heading);
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        div.buttons-container {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         button {
-            padding: 10px 20px;
-            margin: 10px;
+            padding: 12px 25px;
+            margin: 0 10px;
             border: none;
-            border-radius: 10px;
-            background: #1a1a1a;
-            color: #e2b96f;
+            border-radius: 8px;
+            background: var(--color-primary);
+            color: var(--color-background);
+            font-family: var(--font-body);
+            font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         button:hover {
-            background: #2a2a2a;
+            background-color: #b39543; /* Um tom um pouco mais escuro de ouro */
+            transform: translateY(-2px);
         }
 
         #estante {
-            margin-top: 30px;
+            margin: 30px auto;
+            max-width: 800px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .livro {
-            background: #1c1c1c;
-            padding: 15px;
-            border-left: 5px solid #e2b96f;
+            background: #1c2a3d; /* Um tom mais escuro do azul de fundo */
+            padding: 20px;
+            border-left: 6px solid var(--color-primary);
             border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .erro {
-            color: #ff6b6b;
+        .livro h3 {
+            color: var(--color-primary);
+            font-family: var(--font-heading);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .livro p {
+            color: var(--color-text);
+            font-size: 1em;
+            margin-bottom: 0;
+        }
+
+        .message-info {
             text-align: center;
+            color: var(--color-text);
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #ff6b6b; /* Vermelho para erros */
+            font-weight: bold;
+            padding: 20px;
         }
     </style>
 </head>
@@ -58,13 +106,13 @@
 
     <h1>PALAVRA EM SÉRIE</h1>
 
-    <div style="text-align: center;">
+    <div class="buttons-container">
         <button onclick="filtrar('Free')">LIVROS FREE</button>
         <button onclick="filtrar('Pro')">LIVROS PRO</button>
     </div>
 
     <div id="estante">
-        Carregando biblioteca...
+        <p class="message-info">Carregando biblioteca...</p>
     </div>
 
     <!-- SDK do Supabase -->
@@ -72,7 +120,7 @@
 
     <script>
         const supabaseUrl = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
-        // CORREÇÃO: Adicionada a aspa simples que faltava no início da chave
+        // CORREÇÃO: Aspa simples adicionada para a chave do Supabase
         const supabaseKey = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
 
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -85,14 +133,29 @@
                     .from('livros')
                     .select('*');
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Erro Supabase:', error);
+                    document.getElementById('estante').innerHTML = 
+                        '<p class="error-message">Erro ao conectar ao banco de dados. Verifique as credenciais ou as políticas de RLS.</p>';
+                    return;
+                }
 
-                livrosCache = data;
-                filtrar('Free');
-            } catch (error) {
+                // Se o banco estiver vazio, carrega dados de exemplo para demonstração
+                if (!data || data.length === 0) {
+                    console.log("Banco de dados 'livros' vazio. Carregando dados de exemplo.");
+                    livrosCache = [
+                        { titulo: "A Jornada do Herói (Exemplo Free)", descricao: "Uma aventura épica para todos.", categoria: "Free" },
+                        { titulo: "Segredos Antigos (Exemplo Pro)", descricao: "Conteúdo exclusivo para assinantes Pro.", categoria: "Pro" },
+                        { titulo: "Sabedoria Milenar (Exemplo Free)", descricao: "Textos inspiradores para o dia a dia.", categoria: "Free" }
+                    ];
+                } else {
+                    livrosCache = data;
+                }
+                filtrar('Free'); // Exibe os livros 'Free' por padrão ao carregar a página
+            } catch (err) {
+                console.error('Erro inesperado ao buscar livros:', err);
                 document.getElementById('estante').innerHTML = 
-                    '<p class="erro">Erro ao conectar ao banco de dados. Verifique as credenciais.</p>';
-                console.error('Erro Supabase:', error);
+                    '<p class="error-message">Ocorreu um erro inesperado. Tente novamente mais tarde.</p>';
             }
         }
 
@@ -100,14 +163,14 @@
             const estante = document.getElementById('estante');
             
             if (!livrosCache || livrosCache.length === 0) {
-                estante.innerHTML = 'Nenhum conteúdo carregado.';
+                estante.innerHTML = '<p class="message-info">Nenhum conteúdo disponível no momento.</p>';
                 return;
             }
 
             const filtrados = livrosCache.filter(l => l.categoria === plano);
 
             if (filtrados.length === 0) {
-                estante.innerHTML = `<p style="text-align:center">Nenhum livro ${plano} encontrado.</p>`;
+                estante.innerHTML = `<p class="message-info">Nenhum livro ${plano} encontrado.</p>`;
                 return;
             }
 
@@ -119,9 +182,10 @@
             `).join('');
         }
 
-        // Inicia a busca ao carregar a página
+        // Inicia a busca de livros ao carregar a página
         buscarLivros();
     </script>
 
 </body>
+
 </html>
