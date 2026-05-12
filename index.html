@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palavra em Série</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0B1628; --gold: #C9A84C; --text: #F8F4EC; }
+        body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; padding: 20px; text-align: center; }
+        h1 { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 2.5em; }
+        .btn { padding: 12px 25px; margin: 10px; border: none; border-radius: 8px; background: var(--gold); color: var(--bg); font-weight: bold; cursor: pointer; }
+        #estante { margin-top: 30px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+        .livro { background: #1c2a3d; padding: 15px; border-left: 5px solid var(--gold); border-radius: 8px; margin-bottom: 15px; }
+        .livro h3 { color: var(--gold); margin: 0 0 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>PALAVRA EM SÉRIE</h1>
+    <button class="btn" onclick="window.filtrarPlano('Free')">LIVROS FREE</button>
+    <button class="btn" onclick="window.filtrarPlano('Pro')">LIVROS PRO</button>
+    <div id="estante">Carregando biblioteca...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+        // Usando window para garantir que as funções fiquem globais e visíveis
+        window.livrosCache = [
+            {titulo: "A Jornada (Free)", descricao: "Conteúdo de teste gratuito.", categoria: "Free"},
+            {titulo: "Segredos (Pro)", descricao: "Conteúdo de teste Pro.", categoria: "Pro"}
+        ];
+
+        window.filtrarPlano = function(plano) {
+            const estante = document.getElementById('estante');
+            const filtrados = window.livrosCache.filter(l => l.categoria === plano);
+            estante.innerHTML = filtrados.map(l => `
+                <div class="livro">
+                    <h3>${l.titulo}</h3>
+                    <p>${l.descricao}</p>
+                </div>
+            `).join('');
+        };
+
+        async function inicializar() {
+            const url = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
+            const key = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
+            try {
+                const supabase = window.supabase.createClient(url, key);
+                const { data, error } = await supabase.from('livros').select('*');
+                if (!error && data && data.length > 0) {
+                    window.livrosCache = data;
+                }
+            } catch (e) {
+                console.log("Usando dados de reserva.");
+            }
+            window.filtrarPlano('Free');
+        }
+
+        // Garante que o script rode após carregar tudo
+        window.onload = inicializar;
+    </script>
+</body>
+</html>
 
