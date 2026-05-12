@@ -1,63 +1,304 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palavra em Série</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <title>Palavra em Série | Plataforma Operacional V9.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0B1628; --gold: #C9A84C; --text: #F8F4EC; }
-        body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; padding: 20px; text-align: center; }
-        h1 { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 2.5em; }
-        .btn { padding: 12px 25px; margin: 10px; border: none; border-radius: 8px; background: var(--gold); color: var(--bg); font-weight: bold; cursor: pointer; }
-        #estante { margin-top: 30px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
-        .livro { background: #1c2a3d; padding: 15px; border-left: 5px solid var(--gold); border-radius: 8px; margin-bottom: 15px; }
-        .livro h3 { color: var(--gold); margin: 0 0 10px 0; }
+        :root {
+            --bg: #0B1628; /* Azul Profundo */
+            --gold: #C9A84C; /* Ouro Canônico */
+            --text: #F8F4EC; /* Creme */
+            --sentinel: #2ECC71; /* Verde Segurança */
+            --font-h: 'Playfair Display', serif;
+            --font-b: 'IBM Plex Sans', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-b);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Camada C1: Sentinela & Header */
+        header {
+            border-bottom: 1px solid var(--gold);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(11, 22, 40, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .sentinel-status {
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--sentinel);
+        }
+
+        .sentinel-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--sentinel);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--sentinel);
+        }
+
+        h1 {
+            font-family: var(--font-h);
+            color: var(--gold);
+            margin: 0;
+            font-size: 1.5em;
+            letter-spacing: 2px;
+        }
+
+        /* Camada C2/C3: Navegação de Planos */
+        .plan-selector {
+            background: rgba(201, 168, 76, 0.1);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(201, 168, 76, 0.3);
+        }
+
+        .btn-plan {
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: 2px solid var(--gold);
+            background: transparent;
+            color: var(--gold);
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-plan.active {
+            background: var(--gold);
+            color: var(--bg);
+        }
+
+        /* Módulos da Plataforma (Engines) */
+        main {
+            flex: 1;
+            padding: 30px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .engine-section {
+            margin-bottom: 40px;
+        }
+
+        .engine-title {
+            font-family: var(--font-h);
+            color: var(--gold);
+            border-bottom: 2px solid var(--gold);
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #16243a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--gold);
+            font-family: var(--font-h);
+        }
+
+        .tag-pro {
+            background: var(--gold);
+            color: var(--bg);
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            float: right;
+            font-weight: bold;
+        }
+
+        /* Camada C6: Jurídico & Rodapé */
+        footer {
+            background: #050b15;
+            padding: 30px 20px;
+            border-top: 1px solid var(--gold);
+            font-size: 0.8em;
+            color: rgba(248, 244, 236, 0.6);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .footer-link {
+            color: var(--gold);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .legal-notice {
+            text-align: center;
+            margin-top: 30px;
+            border-top: 1px solid rgba(201, 168, 76, 0.1);
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>PALAVRA EM SÉRIE</h1>
-    <button class="btn" onclick="window.filtrarPlano('Free')">LIVROS FREE</button>
-    <button class="btn" onclick="window.filtrarPlano('Pro')">LIVROS PRO</button>
-    <div id="estante">Carregando biblioteca...</div>
+
+    <!-- Camada C1: Sentinela -->
+    <header>
+        <h1>PALAVRA EM SÉRIE</h1>
+        <div class="sentinel-status">
+            <div class="sentinel-dot"></div>
+            SENTINELA ATIVO: V9.0
+        </div>
+    </header>
+
+    <!-- Camada C2: Seletor de Acesso -->
+    <div class="plan-selector">
+        <button id="btn-free" class="btn-plan active" onclick="setPlano('Free')">Módulo Free</button>
+        <button id="btn-pro" class="btn-plan" onclick="setPlano('Pro')">Módulo Pro (Enterprise)</button>
+    </div>
+
+    <main id="app-content">
+        <!-- O conteúdo será injetado aqui via JavaScript -->
+        <div style="text-align: center; padding: 50px;">
+            Carregando Camadas da Plataforma...
+        </div>
+    </main>
+
+    <!-- Camada C6: Jurídico & Governança -->
+    <footer>
+        <div class="footer-grid">
+            <div>
+                <strong style="color: var(--gold);">ARQUITETURA</strong>
+                <p>Plataforma Operacional Cristã<br>Versão 9.0 Enterprise Global</p>
+            </div>
+            <div>
+                <strong style="color: var(--gold);">CONFORMIDADE</strong>
+                <a href="#" class="footer-link">Termos de Uso</a>
+                <a href="#" class="footer-link">Privacidade & Dados</a>
+                <a href="#" class="footer-link">Governança Eclesiástica</a>
+            </div>
+            <div>
+                <strong style="color: var(--gold);">SUPORTE</strong>
+                <a href="#" class="footer-link">Sentinela Help</a>
+                <a href="#" class="footer-link">Documentação Canônica</a>
+            </div>
+        </div>
+        <div class="legal-notice">
+            &copy; 2026 PALAVRA EM SÉRIE. Todos os direitos reservados conforme a Lei de Propriedade Intelectual.
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script>
-        // Usando window para garantir que as funções fiquem globais e visíveis
-        window.livrosCache = [
-            {titulo: "A Jornada (Free)", descricao: "Conteúdo de teste gratuito.", categoria: "Free"},
-            {titulo: "Segredos (Pro)", descricao: "Conteúdo de teste Pro.", categoria: "Pro"}
+        // Dados Estruturados por Engines (E01, E02, E03)
+        let plataformaDados = [
+            {id: 1, engine: "E01: EXEGESE", titulo: "Análise Hermenêutica", desc: "Estudo profundo das raízes bíblicas.", plano: "Pro"},
+            {id: 2, engine: "E01: EXEGESE", titulo: "Introdução ao Texto", desc: "Visão geral dos livros canônicos.", plano: "Free"},
+            {id: 3, engine: "E02: SERMÕES", titulo: "Esboço de Domingo", desc: "Sugestões para pregações expositivas.", plano: "Free"},
+            {id: 4, engine: "E02: SERMÕES", titulo: "Série Enterprise", desc: "Sermões estruturados para liderança.", plano: "Pro"},
+            {id: 5, engine: "E03: ESTANTE", titulo: "O Caminho do Justo", desc: "Ebook digital completo.", plano: "Free"},
+            {id: 6, engine: "E03: ESTANTE", titulo: "Teologia Sistemática", desc: "Volume I: Doutrina de Deus.", plano: "Pro"}
         ];
 
-        window.filtrarPlano = function(plano) {
-            const estante = document.getElementById('estante');
-            const filtrados = window.livrosCache.filter(l => l.categoria === plano);
-            estante.innerHTML = filtrados.map(l => `
-                <div class="livro">
-                    <h3>${l.titulo}</h3>
-                    <p>${l.descricao}</p>
-                </div>
-            `).join('');
-        };
+        let currentPlano = 'Free';
 
-        async function inicializar() {
-            const url = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
-            const key = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
-            try {
-                const supabase = window.supabase.createClient(url, key);
-                const { data, error } = await supabase.from('livros').select('*');
-                if (!error && data && data.length > 0) {
-                    window.livrosCache = data;
-                }
-            } catch (e) {
-                console.log("Usando dados de reserva.");
+        function renderizar() {
+            const container = document.getElementById('app-content');
+            const filtrados = plataformaDados.filter(item => item.plano === currentPlano);
+            
+            // Agrupar por Engine
+            const engines = [...new Set(filtrados.map(item => item.engine))];
+            
+            if (engines.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:50px;">Nenhum conteúdo ${currentPlano} disponível no momento.</div>`;
+                return;
             }
-            window.filtrarPlano('Free');
+
+            container.innerHTML = engines.map(eng => `
+                <section class="engine-section">
+                    <div class="engine-title">${eng}</div>
+                    <div class="grid-container">
+                        ${filtrados.filter(i => i.engine === eng).map(i => `
+                            <div class="card">
+                                ${i.plano === 'Pro' ? '<span class="tag-pro">PRO</span>' : ''}
+                                <h3>${i.titulo}</h3>
+                                <p>${i.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+            `).join('');
         }
 
-        // Garante que o script rode após carregar tudo
-        window.onload = inicializar;
+        function setPlano(p) {
+            currentPlano = p;
+            document.getElementById('btn-free').classList.toggle('active', p === 'Free');
+            document.getElementById('btn-pro').classList.toggle('active', p === 'Pro');
+            renderizar();
+        }
+
+        async function syncSupabase() {
+            const URL = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
+            const KEY = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
+            try {
+                const supabase = window.supabase.createClient(URL, KEY);
+                const { data, error } = await supabase.from('livros').select('*');
+                if (!error && data && data.length > 0) {
+                    // Mapear dados do Supabase para o formato da plataforma
+                    const novosDados = data.map(d => ({
+                        id: d.id,
+                        engine: "E03: ESTANTE",
+                        titulo: d.titulo,
+                        desc: d.descricao,
+                        plano: d.categoria
+                    }));
+                    plataformaDados = [...plataformaDados, ...novosDados];
+                }
+            } catch (e) { console.log("Offline Mode"); }
+            renderizar();
+        }
+
+        window.onload = syncSupabase;
     </script>
 </body>
 </html>
-
