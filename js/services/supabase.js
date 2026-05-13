@@ -1,7 +1,18 @@
-// js/services/supabase.js
-const supabaseUrl = 'SUA_URL_AQUI';
-const supabaseKey = 'SUA_CHAVE_ANONIMA_AQUI';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+// ================================
+// SUPABASE CLIENT GLOBAL
+// Palavra em Série V9
+// ================================
 
-// Torna o supabase disponível para outros scripts
-window.supabaseClient = supabase; 
+const SUPABASE_URL = 'SUA_URL_AQUI';
+const SUPABASE_ANON_KEY = 'SUA_CHAVE_ANONIMA_AQUI';
+
+// Cria cliente Supabase corretamente
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+// Disponibiliza globalmente
+window.supabaseClient = supabaseClient;
+
+console.log("✅ Supabase conectado.");
