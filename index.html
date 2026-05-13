@@ -12,6 +12,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Configuração de Acesso Restrito
+  const MODO_MANUTENCAO = true; 
+  const SEU_EMAIL_ADMIN = "seu-email@exemplo.com"; // Substitua pelo seu e-mail
+
+  async function verificarAcesso() {
+    // Tenta obter o usuário logado via Supabase
+    if (typeof supabase !== 'undefined') {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (MODO_MANUTENCAO) {
+        // Se não for você, bloqueia a visualização do site
+        if (!user || user.email !== SEU_EMAIL_ADMIN) {
+          document.documentElement.innerHTML = `
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Curadoria Teológica - Palavra em Série</title>
+              <style>
+                body { background: #081628; color: #F8F4EC; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+                .container { border: 1px solid rgba(201,168,76,0.3); padding: 40px; border-radius: 15px; max-width: 500px; }
+                h1 { color: #C5A04C; font-family: serif; }
+                .btn { display: inline-block; margin-top: 20px; padding: 12px 24px; background: #C5A04C; color: #081628; text-decoration: none; border-radius: 8px; font-weight: bold; }
+                .admin-btn { margin-top: 15px; background: transparent; border: 1px solid #C5A04C; color: #C5A04C; padding: 8px 16px; border-radius: 8px; cursor: pointer; display: block; width: 100%; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <h1>Curadoria Teológica</h1>
+                <p>Nossa estante está sendo organizada e as Engines de Exegese estão em fase de calibragem final.</p>
+                <a href="https://wa.me/SEUNUMERO" class="btn">Entrar na Lista de Espera</a>
+                <button onclick="location.href='/login'" class="admin-btn">Acesso para Convidados</button>
+              </div>
+            </body>`;
+        }
+      }
+    }
+  }
+
+  // Executa a trava imediatamente
+  verificarAcesso();
+</script>
 
   <style>
 
