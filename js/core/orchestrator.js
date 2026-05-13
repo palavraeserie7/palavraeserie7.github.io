@@ -6,9 +6,8 @@ async function iniciarSistema() {
 }
 
 async function carregarLivros() {
-    // Certifique-se que o nome da tabela no .from é exatamente 'livros'
     const { data, error } = await supabaseClient
-        .from('livros') 
+        .from('livros')
         .select('*');
 
     if (error) {
@@ -21,14 +20,16 @@ async function carregarLivros() {
     if (container) {
         if (data && data.length > 0) {
             container.innerHTML = data.map(livro => `
-                <div class="book-card">
-                    <div class="tag ${livro.nivel === 'PRO' ? 'pro' : 'free'}">
-                        ${livro.nivel ? livro.nivel.toUpperCase() : 'FREE'}
+                <a href="${livro.pdf}" target="_blank" style="text-decoration: none; color: inherit;">
+                    <div class="book-card">
+                        <div class="tag ${livro.nivel === 'PRO' ? 'pro' : 'free'}">
+                            ${livro.nivel ? livro.nivel.toUpperCase() : 'FREE'}
+                        </div>
+                        <img src="${livro.capa}" alt="${livro.titulo}" style="width:100%; border-radius:15px; margin-bottom:15px; display:block;">
+                        <h4>${livro.titulo}</h4>
+                        <p>${livro.descricao}</p>
                     </div>
-                    <img src="${livro.capa}" alt="${livro.titulo}" style="width:100%; border-radius:15px; margin-bottom:15px; display:block;">
-                    <h4>${livro.titulo}</h4>
-                    <p>${livro.descricao}</p>
-                </div>
+                </a>
             `).join('');
         } else {
             container.innerHTML = `<p style='padding:20px; opacity:0.7;'>Conexão Estabelecida. Aguardando novos estudos no Supabase.</p>`;
