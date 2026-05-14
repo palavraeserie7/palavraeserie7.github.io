@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -23,12 +24,12 @@
         </div>
     </div>
 
-    <script>
+    <!-- Importante: O type="module" é necessário para importar o supabaseClient de outro arquivo -->
+    <script type="module">
+        import { supabaseClient as supabase } from './supabase.js';
+
         // CONFIGURAÇÃO DO SENTINELA
         const SEU_EMAIL_ADMIN = "Palavraeserie@gmail.com"; 
-        const supabaseUrl = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
-        const supabaseKey = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         async function tentarAcesso() {
             const { data: { user } } = await supabase.auth.getUser();
@@ -42,6 +43,9 @@
                 window.location.href = "pages/login.html";
             }
         }
+
+        // Torna a função global para que o onclick do botão continue funcionando com o type="module"
+        window.tentarAcesso = tentarAcesso;
 
         // Verifica automaticamente se você já está logado
         window.onload = async () => {
