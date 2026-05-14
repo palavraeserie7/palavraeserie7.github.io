@@ -1,53 +1,149 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palavra em Série - Sentinela V9.0</title>
+
+    <title>Palavra em Série - Manutenção</title>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="js/services/supabase.js"></script>
+
     <style>
-        body { background: #0B1628; color: #F8F4EC; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .lock-screen { border: 1px solid #C9A84C; padding: 40px; border-radius: 15px; max-width: 400px; text-align: center; }
-        h1 { color: #C9A84C; }
-        .btn-admin { background: #C9A84C; color: #0B1628; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; border: none; cursor: pointer; font-size: 16px; }
+
+        body{
+            background:#0B1628;
+            color:#F8F4EC;
+            font-family:Arial;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            margin:0;
+        }
+
+        .lock-screen{
+            border:1px solid #C9A84C;
+            padding:40px;
+            border-radius:15px;
+            max-width:450px;
+            text-align:center;
+            background:#111827;
+        }
+
+        h1{
+            color:#C9A84C;
+        }
+
+        .btn-admin{
+            background:#C9A84C;
+            color:#0B1628;
+            border:none;
+            padding:12px 20px;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:bold;
+            margin-top:20px;
+        }
+
     </style>
+
 </head>
+
 <body>
+
     <div id="app">
+
         <div class="lock-screen">
+
             <h1>🔒 MODO MANUTENÇÃO</h1>
-            <p>Plataforma V9.0 Enterprise Global</p>
-            <p style="font-size: 0.8em; opacity: 0.7;">O acesso é restrito apenas ao Administrador Canônico.</p>
-            <button onclick="tentarAcesso()" class="btn-admin">ENTRAR COMO ADMIN</button>
+
+            <p>Palavra em Série V9</p>
+
+            <p>
+                Plataforma temporariamente restrita ao administrador.
+            </p>
+
+            <button onclick="entrarAdmin()" class="btn-admin">
+                ENTRAR COMO ADMIN
+            </button>
+
         </div>
+
     </div>
 
     <script>
-        const SEU_EMAIL_ADMIN = "Palavraeserie@gmail.com";
 
-        async function tentarAcesso() {
-            const { data: { user } } = await window.supabaseClient.auth.getUser();
-            if (user && user.email === SEU_EMAIL_ADMIN) {
-                window.location.href = "pages/dashboard.html";
-            } else {
-                alert("Acesso Negado. Identifique-se como Administrador.");
+        const ADMIN_EMAIL = "palavraeserie@gmail.com";
+
+        async function entrarAdmin() {
+
+            const {
+                data: { user }
+            } = await window.supabaseClient.auth.getUser();
+
+            if (!user) {
+
                 window.location.href = "pages/login.html";
+
+                return;
             }
+
+            if (user.email.toLowerCase() === ADMIN_EMAIL) {
+
+                window.location.href = "pages/dashboard.html";
+
+                return;
+            }
+
+            alert("Acesso negado.");
+
+            await window.supabaseClient.auth.signOut();
+
+            window.location.href = "pages/login.html";
         }
 
+        // Verifica automaticamente
         window.onload = async () => {
-            const { data: { user } } = await window.supabaseClient.auth.getUser();
-            if (user && user.email === SEU_EMAIL_ADMIN) {
-                document.getElementById('app').innerHTML = `
+
+            const {
+                data: { user }
+            } = await window.supabaseClient.auth.getUser();
+
+            if (
+                user &&
+                user.email.toLowerCase() === ADMIN_EMAIL
+            ) {
+
+                document.getElementById("app").innerHTML = `
+
                     <div class="lock-screen">
+
                         <h1>✅ ADMIN RECONHECIDO</h1>
-                        <p>Bem-vindo, ${user.email}</p>
-                        <a href="pages/dashboard.html" class="btn-admin">ACESSAR PAINEL</a>
+
+                        <p>${user.email}</p>
+
+                        <button
+                            onclick="window.location.href='pages/dashboard.html'"
+                            class="btn-admin">
+
+                            ACESSAR PAINEL
+
+                        </button>
+
                     </div>
+
                 `;
             }
+
         };
+
     </script>
+
 </body>
+
 </html>
