@@ -5,8 +5,7 @@
 
 const SUPABASE_URL = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
 
-// SUBSTITUA PELA NOVA CHAVE PUBLICÁVEL
-const SUPABASE_ANON_KEY = 'COLE_SUA_NOVA_CHAVE_AQUI';
+const SUPABASE_ANON_KEY = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
 
 const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
