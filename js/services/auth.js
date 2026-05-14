@@ -1,55 +1,73 @@
-const authClient = supabaseClient;
+const authClient = window.supabaseClient;
+
+// ==============================
+// CADASTRO
+// ==============================
 
 async function fazerCadastro() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
     const msg = document.getElementById('msg');
 
     if (!email || !password) {
-        msg.innerText = "Preencha todos os campos!";
+        msg.innerText = "Preencha todos os campos.";
         msg.style.color = "yellow";
         return;
     }
 
-    msg.innerText = "Criando sua conta grátis...";
+    msg.innerText = "Criando conta...";
     msg.style.color = "white";
 
-    const { data, error } = await authClient.auth.signUp({
-        email: email,
-        password: password,
+    const { error } = await authClient.auth.signUp({
+        email,
+        password
     });
 
     if (error) {
+        msg.innerText = error.message;
         msg.style.color = "red";
-        msg.innerText = "Erro ao cadastrar: " + error.message;
-    } else {
-        msg.style.color = "green";
-        msg.innerText = "Conta criada! Verifique seu e-mail para confirmar.";
+        return;
     }
+
+    msg.innerText = "Conta criada com sucesso!";
+    msg.style.color = "#00ff88";
 }
 
+// ==============================
+// LOGIN
+// ==============================
+
 async function fazerLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
     const msg = document.getElementById('msg');
+
+    if (!email || !password) {
+        msg.innerText = "Informe email e senha.";
+        msg.style.color = "yellow";
+        return;
+    }
 
     msg.innerText = "Entrando...";
     msg.style.color = "white";
 
-    const { data, error } = await authClient.auth.signInWithPassword({
-        email: email,
-        password: password,
+    const { error } = await authClient.auth.signInWithPassword({
+        email,
+        password
     });
 
     if (error) {
+        msg.innerText = error.message;
         msg.style.color = "red";
-        msg.innerText = "Erro: " + error.message;
-    } else {
-        msg.style.color = "green";
-        msg.innerText = "Sucesso! Entrando...";
-        
-        setTimeout(() => {
-            window.location.href = "../pages/dashboard.html";
-        }, 1000);
+        return;
     }
+
+    msg.innerText = "Login realizado!";
+    msg.style.color = "#00ff88";
+
+    setTimeout(() => {
+        window.location.href = "../pages/dashboard.html";
+    }, 1000);
 }
