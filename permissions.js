@@ -1,40 +1,75 @@
+// ======================================
+// CONTROLE DE ACESSO
+// Palavra em Série V9
+// ======================================
+
+// SEU EMAIL ADMIN
+const ADMIN_EMAIL = "palavraeserie@gmail.com";
+
 async function verificarAcesso() {
-    // 1. Pega o usuário logado
-    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    const {
+        data: { user }
+    } = await window.supabaseClient.auth.getUser();
+
+    // ======================================
+    // SEM LOGIN
+    // ======================================
 
     if (!user) {
-        // Se não tiver logado, volta para o login
+
+        // Se estiver na dashboard sem login
+        if (window.location.pathname.includes("dashboard")) {
+            window.location.href = "login.html";
+        }
+
+        return;
+    }
+
+    // ======================================
+    // SOMENTE ADMIN TEM ACESSO
+    // ======================================
+
+    if (user.email.toLowerCase() !== ADMIN_EMAIL) {
+
+        alert("Sistema em manutenção. Acesso restrito.");
+
+        await window.supabaseClient.auth.signOut();
+
         window.location.href = "login.html";
+
         return;
     }
 
-    // 2. Busca o plano do usuário na tabela 'profiles' que criamos
-    const { data: profile, error } = await supabaseClient
-        .from('profiles')
-        .select('plano')
-        .eq('id', user.id)
-        .single();
+    // ======================================
+    // DEFINE PLANO ADMIN
+    // ======================================
 
-    if (error || !profile) {
-        console.error("Erro ao carregar perfil:", error);
-        return;
+    window.userPlan = "PRO";
+
+    // ======================================
+    // ATUALIZA DASHBOARD
+    // ======================================
+
+    const welcomeMsg = document.getElementById("welcome-msg");
+    const userPlan = document.getElementById("user-plan");
+
+    if (welcomeMsg) {
+        welcomeMsg.innerText = `Bem-vindo, Administrador`;
     }
 
-    // 3. Atualiza a interface da Dashboard
-    const planDisplay = document.getElementById('user-plan');
-    const welcomeMsg = document.getElementById('welcome-msg');
-    
-    if (planDisplay) planDisplay.innerText = `Seu plano atual: ${profile.plano}`;
-    if (welcomeMsg) welcomeMsg.innerText = `Bem-vindo, ${user.email.split('@')[0]}!`;
+    if (userPlan) {
+        userPlan.innerText = `Plano Atual: PRO`;
+    }
 
-    // 4. Salva o plano globalmente para o Orchestrator usar
-    window.userPlan = profile.plano;
-    
-    // 5. Manda o Orchestrator carregar os livros baseados no plano
+    // ======================================
+    // CARREGA LIVROS
+    // ======================================
+
     if (typeof carregarLivros === "function") {
         carregarLivros();
     }
 }
 
-// Executa a verificação assim que a página carrega
+// Executa automaticamente
 verificarAcesso();
