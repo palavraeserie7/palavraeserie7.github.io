@@ -1,151 +1,48 @@
 
-<!DOCTYPE html>
-<html lang="pt-BR">
+async function fazerLogin() {
 
-<head>
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const msg = document.getElementById("msg");
 
-    <meta charset="UTF-8">
+    msg.innerText = "Entrando...";
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
 
-    <title>Login - Palavra em Série</title>
+    if (error) {
+        msg.style.color = "red";
+        msg.innerText = error.message;
+        return;
+    }
 
-    <link rel="stylesheet" href="../css/style.css">
+    msg.style.color = "green";
+    msg.innerText = "OK! Entrando...";
 
-    <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    setTimeout(() => {
+        window.location.href = "/pages/dashboard.html";
+    }, 800);
+}
 
-    <!-- CLIENT -->
-    <script src="../js/services/supabase.js"></script>
+async function fazerCadastro() {
 
-    <style>
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const msg = document.getElementById("msg");
 
-        body{
-            margin:0;
-            padding:0;
-            background:#0B1628;
-            color:#F8F4EC;
-            font-family:Arial, sans-serif;
-        }
+    const { error } = await window.supabaseClient.auth.signUp({
+        email,
+        password
+    });
 
-        .container{
-            width:100%;
-            min-height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            padding:20px;
-            box-sizing:border-box;
-        }
+    if (error) {
+        msg.style.color = "red";
+        msg.innerText = error.message;
+        return;
+    }
 
-        .login-card{
-            width:100%;
-            max-width:400px;
-            background:#111827;
-            border:1px solid #1f2937;
-            border-radius:16px;
-            padding:30px;
-            box-sizing:border-box;
-            text-align:center;
-        }
-
-        h1{
-            color:#C9A84C;
-            margin-bottom:10px;
-        }
-
-        p{
-            opacity:0.8;
-        }
-
-        input{
-            width:100%;
-            padding:14px;
-            margin-top:15px;
-            border:none;
-            border-radius:10px;
-            box-sizing:border-box;
-            background:#1f2937;
-            color:white;
-            font-size:16px;
-        }
-
-        button{
-            width:100%;
-            padding:14px;
-            margin-top:15px;
-            border:none;
-            border-radius:10px;
-            font-size:16px;
-            font-weight:bold;
-            cursor:pointer;
-        }
-
-        .btn-login{
-            background:#00cc66;
-            color:white;
-        }
-
-        .btn-register{
-            background:#C9A84C;
-            color:#111827;
-        }
-
-        #msg{
-            margin-top:20px;
-            min-height:20px;
-            font-weight:bold;
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <div class="container">
-
-        <div class="login-card">
-
-            <h1>Palavra em Série</h1>
-
-            <p>Acesso Administrativo</p>
-
-            <input
-                type="email"
-                id="email"
-                placeholder="Seu email"
-            >
-
-            <input
-                type="password"
-                id="password"
-                placeholder="Sua senha"
-            >
-
-            <button
-                onclick="fazerLogin()"
-                class="btn-login"
-            >
-                Entrar
-            </button>
-
-            <button
-                onclick="fazerCadastro()"
-                class="btn-register"
-            >
-                Criar Conta
-            </button>
-
-            <p id="msg"></p>
-
-        </div>
-
-    </div>
-
-    <!-- AUTH -->
-    <script src="../js/services/auth.js"></script>
-
-</body>
-
-</html>
+    msg.style.color = "green";
+    msg.innerText = "Conta criada. Agora faça login.";
+}
