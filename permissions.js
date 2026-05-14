@@ -1,53 +1,56 @@
-// ======================================
-// CONTROLE DE ACESSO (CORRIGIDO)
-// ======================================
+// ================================
+// ACCESS FIX TOTAL (ESTÁVEL)
+// ================================
 
-async function verificarAcesso() {
+window.addEventListener("DOMContentLoaded", async () => {
 
     try {
 
-        const { data: { user }, error } =
-            await window.supabaseClient.auth.getUser();
+        const supabase = window.supabaseClient;
 
-        if (error) {
-            console.error(error);
+        if (!supabase) {
+            console.error("Supabase não carregou");
+            return;
         }
 
-        // Se não estiver logado
+        const { data, error } = await supabase.auth.getUser();
+
+        const user = data?.user;
+
+        if (error) console.error(error);
+
+        // NÃO LOGADO
         if (!user) {
             window.location.href = "/pages/login.html";
             return;
         }
 
-        // Atualiza UI com segurança
-        const welcomeMsg = document.getElementById("welcome-msg");
-        const userPlan = document.getElementById("user-plan");
+        // ELEMENTOS
+        const welcome = document.getElementById("welcome-msg");
+        const plan = document.getElementById("user-plan");
 
-        if (welcomeMsg) {
-            welcomeMsg.innerText = `Bem-vindo, ${user.email}`;
+        if (welcome) {
+            welcome.innerText = "Bem-vindo, " + user.email;
         }
 
-        if (userPlan) {
-            userPlan.innerText = "Plano: PRO";
+        if (plan) {
+            plan.innerText = "Plano: PRO";
         }
 
-        // Define plano global
         window.userPlan = "PRO";
 
-        // Carrega livros
         if (typeof carregarLivros === "function") {
             carregarLivros();
         }
 
-    } catch (err) {
-        console.error("Erro no acesso:", err);
+    } catch (e) {
+        console.error("FALHA GERAL:", e);
 
         document.body.innerHTML = `
-            <h2 style="color:red; text-align:center;">
-                Erro ao carregar sistema
-            </h2>
+            <div style="color:white; text-align:center; padding:40px;">
+                <h2>Erro ao carregar sistema</h2>
+                <p>Verifique console</p>
+            </div>
         `;
     }
-}
-
-verificarAcesso();
+});
