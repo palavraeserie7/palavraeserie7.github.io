@@ -49,7 +49,7 @@ async function fazerLogin() {
         msg.innerText = "Sucesso! Entrando...";
         
         setTimeout(() => {
-            window.location.href = "Javascript";
+            window.location.href = "../pages/dashboard.html";
         }, 1000);
     }
 }
