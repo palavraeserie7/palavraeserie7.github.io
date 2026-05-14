@@ -1,56 +1,27 @@
-// ================================
-// ACCESS FIX TOTAL (ESTÁVEL)
-// ================================
+async function verificarAcesso() {
 
-window.addEventListener("DOMContentLoaded", async () => {
+    const supabase = window.supabaseClient;
 
-    try {
+    const { data } = await supabase.auth.getUser();
 
-        const supabase = window.supabaseClient;
+    const user = data?.user;
 
-        if (!supabase) {
-            console.error("Supabase não carregou");
-            return;
-        }
-
-        const { data, error } = await supabase.auth.getUser();
-
-        const user = data?.user;
-
-        if (error) console.error(error);
-
-        // NÃO LOGADO
-        if (!user) {
-            window.location.href = "/pages/login.html";
-            return;
-        }
-
-        // ELEMENTOS
-        const welcome = document.getElementById("welcome-msg");
-        const plan = document.getElementById("user-plan");
-
-        if (welcome) {
-            welcome.innerText = "Bem-vindo, " + user.email;
-        }
-
-        if (plan) {
-            plan.innerText = "Plano: PRO";
-        }
-
-        window.userPlan = "PRO";
-
-        if (typeof carregarLivros === "function") {
-            carregarLivros();
-        }
-
-    } catch (e) {
-        console.error("FALHA GERAL:", e);
-
-        document.body.innerHTML = `
-            <div style="color:white; text-align:center; padding:40px;">
-                <h2>Erro ao carregar sistema</h2>
-                <p>Verifique console</p>
-            </div>
-        `;
+    if (!user) {
+        window.location.href = "/pages/login.html";
+        return;
     }
-});
+
+    document.getElementById("welcome-msg").innerText =
+        "Bem-vindo, " + user.email;
+
+    document.getElementById("user-plan").innerText =
+        "Plano: FREE";
+
+    window.userPlan = "FREE";
+
+    if (typeof carregarLivros === "function") {
+        carregarLivros();
+    }
+}
+
+verificarAcesso();
