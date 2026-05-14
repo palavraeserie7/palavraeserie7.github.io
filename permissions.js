@@ -1,75 +1,53 @@
 // ======================================
-// CONTROLE DE ACESSO
-// Palavra em Série V9
+// CONTROLE DE ACESSO (CORRIGIDO)
 // ======================================
-
-// SEU EMAIL ADMIN
-const ADMIN_EMAIL = "palavraeserie@gmail.com";
 
 async function verificarAcesso() {
 
-    const {
-        data: { user }
-    } = await window.supabaseClient.auth.getUser();
+    try {
 
-    // ======================================
-    // SEM LOGIN
-    // ======================================
+        const { data: { user }, error } =
+            await window.supabaseClient.auth.getUser();
 
-    if (!user) {
-
-        // Se estiver na dashboard sem login
-        if (window.location.pathname.includes("dashboard")) {
-            window.location.href = "login.html";
+        if (error) {
+            console.error(error);
         }
 
-        return;
-    }
+        // Se não estiver logado
+        if (!user) {
+            window.location.href = "/pages/login.html";
+            return;
+        }
 
-    // ======================================
-    // SOMENTE ADMIN TEM ACESSO
-    // ======================================
+        // Atualiza UI com segurança
+        const welcomeMsg = document.getElementById("welcome-msg");
+        const userPlan = document.getElementById("user-plan");
 
-    if (user.email.toLowerCase() !== ADMIN_EMAIL) {
+        if (welcomeMsg) {
+            welcomeMsg.innerText = `Bem-vindo, ${user.email}`;
+        }
 
-        alert("Sistema em manutenção. Acesso restrito.");
+        if (userPlan) {
+            userPlan.innerText = "Plano: PRO";
+        }
 
-        await window.supabaseClient.auth.signOut();
+        // Define plano global
+        window.userPlan = "PRO";
 
-        window.location.href = "login.html";
+        // Carrega livros
+        if (typeof carregarLivros === "function") {
+            carregarLivros();
+        }
 
-        return;
-    }
+    } catch (err) {
+        console.error("Erro no acesso:", err);
 
-    // ======================================
-    // DEFINE PLANO ADMIN
-    // ======================================
-
-    window.userPlan = "PRO";
-
-    // ======================================
-    // ATUALIZA DASHBOARD
-    // ======================================
-
-    const welcomeMsg = document.getElementById("welcome-msg");
-    const userPlan = document.getElementById("user-plan");
-
-    if (welcomeMsg) {
-        welcomeMsg.innerText = `Bem-vindo, Administrador`;
-    }
-
-    if (userPlan) {
-        userPlan.innerText = `Plano Atual: PRO`;
-    }
-
-    // ======================================
-    // CARREGA LIVROS
-    // ======================================
-
-    if (typeof carregarLivros === "function") {
-        carregarLivros();
+        document.body.innerHTML = `
+            <h2 style="color:red; text-align:center;">
+                Erro ao carregar sistema
+            </h2>
+        `;
     }
 }
 
-// Executa automaticamente
 verificarAcesso();
