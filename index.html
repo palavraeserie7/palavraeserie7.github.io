@@ -1,149 +1,86 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-br">
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manutenção - Palavra em Série</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background-color: #0a0a0a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        .lock-screen { border: 1px solid #333; padding: 40px; border-radius: 15px; background: #111; }
+        h1 { color: #00ff88; margin-bottom: 10px; }
+        p { color: #888; margin-bottom: 20px; }
+        button, a { background: #00ff88; color: black; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; text-decoration: none; font-weight: bold; display: inline-block; }
+        button:hover, a:hover { background: #00cc6e; }
+    </style>
+</head>
+<body>
 
-    <title>Palavra em Série - Manutenção</title>
+    <div id="app">
+        <div class="lock-screen">
+            <h1>Manutenção</h1>
+            <p>O sistema está passando por atualizações.</p>
+            <button onclick="tentarAcesso()">ENTRAR COMO ADMIN</button>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="js/services/supabase.js"></script>
 
-    <style>
-
-        body{
-            background:#0B1628;
-            color:#F8F4EC;
-            font-family:Arial;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-            margin:0;
-        }
-
-        .lock-screen{
-            border:1px solid #C9A84C;
-            padding:40px;
-            border-radius:15px;
-            max-width:450px;
-            text-align:center;
-            background:#111827;
-        }
-
-        h1{
-            color:#C9A84C;
-        }
-
-        .btn-admin{
-            background:#C9A84C;
-            color:#0B1628;
-            border:none;
-            padding:12px 20px;
-            border-radius:8px;
-            cursor:pointer;
-            font-weight:bold;
-            margin-top:20px;
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <div id="app">
-
-        <div class="lock-screen">
-
-            <h1>🔒 MODO MANUTENÇÃO</h1>
-
-            <p>Palavra em Série V9</p>
-
-            <p>
-                Plataforma temporariamente restrita ao administrador.
-            </p>
-
-            <button onclick="entrarAdmin()" class="btn-admin">
-                ENTRAR COMO ADMIN
-            </button>
-
-        </div>
-
-    </div>
-
     <script>
+        const SEU_EMAIL_ADMIN = "palavraeserie@gmail.com";
 
-        const ADMIN_EMAIL = "palavraeserie@gmail.com";
+        // ============================
+        // TENTAR ACESSO COMO ADMIN
+        // ============================
+        async function tentarAcesso() {
+            try {
+                const supabase = window.supabaseClient;
 
-        async function entrarAdmin() {
+                if (!supabase) {
+                    alert("Sistema ainda não carregou.");
+                    return;
+                }
 
-            const {
-                data: { user }
-            } = await window.supabaseClient.auth.getUser();
+                const { data: { user } } = await supabase.auth.getUser();
 
-            if (!user) {
-
-                window.location.href = "pages/login.html";
-
-                return;
+                if (user && user.email === SEU_EMAIL_ADMIN) {
+                    window.location.href = "/pages/dashboard.html";
+                } else {
+                    alert("Acesso negado.");
+                    window.location.href = "/pages/login.html";
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                alert("Erro no sistema.");
             }
-
-            if (user.email.toLowerCase() === ADMIN_EMAIL) {
-
-                window.location.href = "pages/dashboard.html";
-
-                return;
-            }
-
-            alert("Acesso negado.");
-
-            await window.supabaseClient.auth.signOut();
-
-            window.location.href = "pages/login.html";
         }
 
-        // Verifica automaticamente
-        window.onload = async () => {
+        // ============================
+        // AUTO VERIFICAÇÃO AO CARREGAR
+        // ============================
+        window.onload = async function () {
+            try {
+                const supabase = window.supabaseClient;
 
-            const {
-                data: { user }
-            } = await window.supabaseClient.auth.getUser();
+                if (!supabase) return;
 
-            if (
-                user &&
-                user.email.toLowerCase() === ADMIN_EMAIL
-            ) {
+                const { data: { user } } = await supabase.auth.getUser();
 
-                document.getElementById("app").innerHTML = `
-
-                    <div class="lock-screen">
-
-                        <h1>✅ ADMIN RECONHECIDO</h1>
-
-                        <p>${user.email}</p>
-
-                        <button
-                            onclick="window.location.href='pages/dashboard.html'"
-                            class="btn-admin">
-
-                            ACESSAR PAINEL
-
-                        </button>
-
-                    </div>
-
-                `;
+                if (user && user.email === SEU_EMAIL_ADMIN) {
+                    document.getElementById("app").innerHTML = `
+                        <div class="lock-screen">
+                            <h1>ADMIN RECONHECIDO</h1>
+                            <p>${user.email}</p>
+                            <a href="/pages/dashboard.html">ENTRAR NO PAINEL</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
             }
-
         };
-
     </script>
-
 </body>
-
 </html>
