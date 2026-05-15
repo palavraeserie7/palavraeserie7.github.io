@@ -2,57 +2,49 @@
 <html lang="pt-BR">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Dashboard - Palavra em Série</title>
-
     <link rel="stylesheet" href="../css/style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script src="../js/services/supabase.js"></script>
-
 </head>
 
 <body>
 
     <header class="header">
-
         <h2>Palavra em Série</h2>
-
         <button
             onclick="supabaseClient.auth.signOut().then(() => window.location.href='login.html')"
             class="btn-sair">
-
             Sair
-
         </button>
-
     </header>
 
     <main class="container">
-
         <section class="dashboard-box">
-
             <h2 id="welcome-msg">Verificando acesso...</h2>
-
             <p id="user-plan">Carregando plano...</p>
-
         </section>
 
         <section id="books-container" class="books-grid">
-
+            <!-- Livros serão inseridos aqui -->
         </section>
-
     </main>
 
-    <script src="../js/core/orchestrator.js"></script>
+    <!-- =========================================================
+         ORDEM OBRIGATÓRIA DOS SCRIPTS
+         ========================================================= -->
+    
+    <!-- 1. Biblioteca externa do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <!-- 2. Sua conexão e inicialização do Supabase -->
+    <script src="../js/services/supabase.js"></script>
+
+    <!-- 3. Regras de permissões (precisa do Supabase pronto) -->
     <script src="../js/core/permissions.js"></script>
 
-</body>
+    <!-- 4. Orchestrator (o motor que usa o Supabase e as Permissões) -->
+    <script src="../js/core/orchestrator.js"></script>
 
+</body>
 </html>
