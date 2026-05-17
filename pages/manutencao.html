@@ -1,34 +1,45 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<title>Manutenção</title>
+const ADMIN_EMAIL =
+"palavraeserie@gmail.com";
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/js/app.js"></script>
-</head>
+async function verificarAcesso() {
 
-<body>
+    const supabase =
+        window.supabaseClient;
 
-<h2>Modo Manutenção</h2>
+    const {
+        data: { user }
+    } = await supabase.auth.getUser();
 
-<button onclick="admin()">Entrar como admin</button>
+    // NÃO LOGADO
+    if (!user) {
 
-<script>
-const ADMIN_EMAIL = "palavraeserie@gmail.com";
+        if (
+            !window.location.pathname.includes(
+                "maintenance.html"
+            )
+        ) {
+            window.location.href =
+                "/maintenance.html";
+        }
 
-async function admin() {
-
-    const { data: { user } } =
-        await supabaseClient.auth.getUser();
-
-    if (user && user.email === ADMIN_EMAIL) {
-        location.href = "/pages/dashboard.html";
-    } else {
-        alert("Acesso negado");
+        return;
     }
-}
-</script>
 
-</body>
-</html>
+    // NÃO É ADMIN
+    if (user.email !== ADMIN_EMAIL) {
+
+        await supabase.auth.signOut();
+
+        window.location.href =
+            "/maintenance.html";
+
+        return;
+    }
+
+    console.log("ADMIN LIBERADO");
+}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    verificarAcesso
+);
