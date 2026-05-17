@@ -1,120 +1,51 @@
-// ======================================
-// AUTH SYSTEM
-// Palavra em Série
-// ======================================
-
-const authClient = window.supabaseClient;
-
-// ======================================
-// CADASTRO
-// ======================================
-
-async function fazerCadastro() {
-
-    const email = document.getElementById('email').value.trim();
-
-    const password = document.getElementById('password').value.trim();
-
-    const msg = document.getElementById('msg');
-
-    if (!email || !password) {
-
-        msg.style.color = "orange";
-
-        msg.innerText = "Preencha email e senha.";
-
-        return;
-    }
-
-    msg.style.color = "white";
-
-    msg.innerText = "Criando conta...";
-
-    const { data, error } = await authClient.auth.signUp({
-
-        email,
-        password
-
-    });
-
-    if (error) {
-
-        if (error.message.includes("already registered")) {
-
-            msg.style.color = "yellow";
-
-            msg.innerText = "Usuário já cadastrado. Faça login.";
-
-            return;
-        }
-
-        msg.style.color = "red";
-
-        msg.innerText = error.message;
-
-        return;
-    }
-
-    msg.style.color = "#00ff88";
-
-    msg.innerText = "Conta criada com sucesso!";
-}
-
-// ======================================
-// LOGIN
-// ======================================
 
 async function fazerLogin() {
 
-    const email = document.getElementById('email').value.trim();
+    const email =
+        document.getElementById(
+            "email"
+        ).value;
 
-    const password = document.getElementById('password').value.trim();
+    const password =
+        document.getElementById(
+            "password"
+        ).value;
 
-    const msg = document.getElementById('msg');
-
-    if (!email || !password) {
-
-        msg.style.color = "orange";
-
-        msg.innerText = "Preencha email e senha.";
-
-        return;
-    }
-
-    msg.style.color = "white";
+    const msg =
+        document.getElementById(
+            "msg"
+        );
 
     msg.innerText = "Entrando...";
 
-    const { data, error } = await authClient.auth.signInWithPassword({
-
-        email,
-        password
-
-    });
+    const { error } =
+        await window.supabaseClient
+        .auth
+        .signInWithPassword({
+            email,
+            password
+        });
 
     if (error) {
 
         msg.style.color = "red";
-
-        msg.innerText = "Email ou senha inválidos.";
-
-        console.error(error);
+        msg.innerText =
+            "Login inválido";
 
         return;
     }
 
     msg.style.color = "#00ff88";
 
-    msg.innerText = "Login realizado!";
+    msg.innerText =
+        "Acesso liberado";
 
-    // REDIRECIONA
     setTimeout(() => {
 
-        window.location.href = "../pages/dashboard.html";
+        window.location.href =
+            "/pages/dashboard.html";
 
     }, 1000);
 }
 
-// GLOBAL
-window.fazerCadastro = fazerCadastro;
 window.fazerLogin = fazerLogin;
