@@ -1,7 +1,8 @@
+
 import { checkMaintenanceStatus }
 from "./maintenance.js";
 
-document.addEventListener(
+window.addEventListener(
     "DOMContentLoaded",
     async () => {
 
