@@ -1,49 +1,65 @@
-async function fazerLogin() {
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const msg = document.getElementById("msg");
+    <meta charset="UTF-8">
 
-    msg.innerText = "Entrando...";
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
-    const { data, error } =
-        await window.supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
+    <title>Login</title>
 
-    if (error) {
-        msg.style.color = "red";
-        msg.innerText = error.message;
-        return;
-    }
+    <link rel="stylesheet"
+    href="/css/style.css">
 
-    msg.style.color = "green";
-    msg.innerText = "OK! Entrando...";
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    setTimeout(() => {
-        window.location.href = "/pages/dashboard.html";
-    }, 800);
-}
+    <script type="module"
+    src="/js/core/orchestrator.js"></script>
 
-async function fazerCadastro() {
+</head>
+<body>
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const msg = document.getElementById("msg");
+    <div class="container">
 
-    const { error } =
-        await window.supabaseClient.auth.signUp({
-            email,
-            password
-        });
+        <div class="book-card login-card">
 
-    if (error) {
-        msg.style.color = "red";
-        msg.innerText = error.message;
-        return;
-    }
+            <h2>Entrar</h2>
 
-    msg.style.color = "green";
-    msg.innerText = "Conta criada! Confirme o email.";
-}
+            <input
+                type="email"
+                id="email"
+                placeholder="Seu email"
+            >
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Sua senha"
+            >
+
+            <button
+                class="btn-liberado"
+                onclick="fazerLogin()"
+            >
+                Entrar
+            </button>
+
+            <button
+                class="btn-bloqueado"
+                onclick="fazerCadastro()"
+            >
+                Criar Conta
+            </button>
+
+            <p id="msg"></p>
+
+        </div>
+
+    </div>
+
+    <script type="module"
+    src="/js/pages/login.js"></script>
+
+</body>
+</html>
