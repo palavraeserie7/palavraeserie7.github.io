@@ -1,5 +1,8 @@
 import supabase from "./supabase.js";
 
+const ADMIN_EMAIL =
+  "palavraeserie@gmail.com";
+
 export async function checkMaintenanceStatus() {
 
     try {
@@ -17,33 +20,39 @@ export async function checkMaintenanceStatus() {
             data?.valor === true ||
             data?.valor === "true";
 
-        const path =
+        const currentPath =
             window.location.pathname;
 
-        // ADMIN PODE PASSAR
         const {
             data: { user }
         } = await supabase.auth.getUser();
 
-        const admin =
-            user?.email ===
-            "palavraeserie@gmail.com";
+        const isAdmin =
+            user?.email === ADMIN_EMAIL;
 
-        if (manutencao && !admin) {
+        if (manutencao && !isAdmin) {
 
-            if (
-                !path.includes("manutencao.html")
-            ) {
-                window.location.href =
-                    "/pages/manutencao.html";
+            if (!currentPath.includes("manutencao.html")) {
+
+                window.location.replace(
+                    "/pages/manutencao.html"
+                );
             }
         }
 
-    } catch (err) {
+        if (!manutencao &&
+            currentPath.includes("manutencao.html")) {
+
+            window.location.replace(
+                "/index.html"
+            );
+        }
+
+    } catch (error) {
 
         console.error(
             "Erro manutenção:",
-            err.message
+            error.message
         );
     }
 }
