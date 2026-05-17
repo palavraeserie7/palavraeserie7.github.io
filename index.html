@@ -1,13 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manutenção - Palavra em Série</title>
-    <link rel="stylesheet" href="css/style.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="/js/core/maintenance.js"></script>
+    <script type="module" src="/js/core/orchestrator.js"></script>
 
     <style>
         body { background-color: #0a0a0a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
@@ -22,8 +24,8 @@
 
     <div id="app">
         <div class="lock-screen">
-            <h1>Manutenção</h1>
-            <p>O sistema está passando por atualizações.</p>
+            <h1>🛠️ Manutenção</h1>
+            <p>O sistema está passando por atualizações importantes.</p>
             <button onclick="tentarAcesso()">ENTRAR COMO ADMIN</button>
         </div>
     </div>
@@ -31,15 +33,13 @@
     <script>
         const SEU_EMAIL_ADMIN = "palavraeserie@gmail.com";
 
-        // ============================
-        // TENTAR ACESSO COMO ADMIN
-        // ============================
+        // VERIFICA SE O USUÁRIO LOGADO É O ADMIN PARA LIBERAR O BOTÃO
         async function tentarAcesso() {
             try {
                 const supabase = window.supabaseClient;
 
                 if (!supabase) {
-                    alert("Sistema ainda não carregou.");
+                    alert("Aguarde um momento, o sistema ainda está carregando...");
                     return;
                 }
 
@@ -48,39 +48,39 @@
                 if (user && user.email === SEU_EMAIL_ADMIN) {
                     window.location.href = "/pages/dashboard.html";
                 } else {
-                    alert("Acesso negado.");
+                    alert("Acesso restrito para administradores durante a manutenção.");
                     window.location.href = "/pages/login.html";
                 }
             } catch (error) {
-                console.error("Erro:", error);
-                alert("Erro no sistema.");
+                console.error("Erro na autenticação:", error);
+                alert("Erro ao verificar credenciais.");
             }
         }
 
-        // ============================
-        // AUTO VERIFICAÇÃO AO CARREGAR
-        // ============================
-        window.onload = async function () {
-            try {
-                const supabase = window.supabaseClient;
+        // AUTO-RECONHECIMENTO CASO VOCÊ JÁ ESTEJA LOGADO NO NAVEGADOR
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Pequena espera para garantir que o supabaseClient foi montado pelo orchestrator/supabase.js
+            setTimeout(async () => {
+                try {
+                    const supabase = window.supabaseClient;
+                    if (!supabase) return;
 
-                if (!supabase) return;
+                    const { data: { user } } = await supabase.auth.getUser();
 
-                const { data: { user } } = await supabase.auth.getUser();
-
-                if (user && user.email === SEU_EMAIL_ADMIN) {
-                    document.getElementById("app").innerHTML = `
-                        <div class="lock-screen">
-                            <h1>ADMIN RECONHECIDO</h1>
-                            <p>${user.email}</p>
-                            <a href="/pages/dashboard.html">ENTRAR NO PAINEL</a>
-                        </div>
-                    `;
+                    if (user && user.email === SEU_EMAIL_ADMIN) {
+                        document.getElementById("app").innerHTML = `
+                            <div class="lock-screen">
+                                <h1>👑 ADMIN RECONHECIDO</h1>
+                                <p style="color: #00ff88;">${user.email}</p>
+                                <a href="/pages/dashboard.html">ENTRAR NO PAINEL</a>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error("Erro no auto-reconhecimento:", error);
                 }
-            } catch (error) {
-                console.error(error);
-            }
-        };
+            }, 500);
+        });
     </script>
 </body>
 </html>
