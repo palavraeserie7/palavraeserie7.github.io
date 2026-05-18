@@ -1,6 +1,5 @@
 
-import supabase
-from "../core/supabase.js";
+import supabase from "../core/supabase.js";
 
 async function fazerLogin() {
 
@@ -37,7 +36,7 @@ async function fazerLogin() {
     setTimeout(() => {
 
         window.location.replace(
-            "/pages/dashboard.html"
+            "./dashboard.html"
         );
 
     }, 800);
