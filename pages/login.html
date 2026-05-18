@@ -1,28 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 
 <head>
-    <title>TESTE</title>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+    <title>Login</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 
-<body>
+<body style="
+background:#0B1628;
+color:white;
+font-family:Arial;
+padding:40px;
+">
 
-    <h1>TESTE SITE</h1>
+    <h1>LOGIN TESTE</h1>
 
-    <button onclick="teste()">
-        CLICAR
+    <input
+        id="email"
+        type="email"
+        placeholder="Email"
+        style="
+        display:block;
+        margin-bottom:10px;
+        padding:10px;
+        width:300px;
+    "
+    >
+
+    <input
+        id="password"
+        type="password"
+        placeholder="Senha"
+        style="
+        display:block;
+        margin-bottom:10px;
+        padding:10px;
+        width:300px;
+    "
+    >
+
+    <button
+        onclick="login()"
+        style="
+        padding:10px 20px;
+    "
+    >
+        Entrar
     </button>
+
+    <p id="msg"></p>
 
     <script>
 
-        function teste() {
+        const SUPABASE_URL =
+        "https://qmhdbuxomozdczgvpvcc.supabase.co";
 
-            alert("SITE FUNCIONANDO");
+        const SUPABASE_KEY =
+        "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+
+        const supabase =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+        async function login() {
+
+            const email =
+            document.getElementById("email").value;
+
+            const password =
+            document.getElementById("password").value;
+
+            const msg =
+            document.getElementById("msg");
+
+            msg.innerText = "Entrando...";
+
+            const { error } =
+            await supabase.auth.signInWithPassword({
+
+                email,
+                password
+
+            });
+
+            if (error) {
+
+                msg.style.color = "red";
+
+                msg.innerText = error.message;
+
+                return;
+            }
+
+            msg.style.color = "#00ff88";
+
+            msg.innerText =
+            "LOGIN FUNCIONOU";
 
         }
 
     </script>
 
 </body>
-
 </html>
