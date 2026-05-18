@@ -3,7 +3,7 @@ const SUPABASE_URL =
   "https://qmhdbuxomozdczgvpvcc.supabase.co";
 
 const SUPABASE_KEY =
-  "SUA_CHAVE_PUBLICA_ANON_AQUI";
+  "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
 
 const supabase = window.supabase.createClient(
     SUPABASE_URL,
