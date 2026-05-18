@@ -4,14 +4,14 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport"
-    content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-    <title>LOGIN TESTE</title>
+<title>LOGIN TESTE</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </head>
 
@@ -22,95 +22,102 @@ font-family:Arial;
 padding:40px;
 ">
 
-    <h1>LOGIN TESTE</h1>
+<h1>LOGIN TESTE</h1>
 
-    <input
-        id="email"
-        type="email"
-        placeholder="Email"
-        style="
-        display:block;
-        margin-bottom:10px;
-        padding:10px;
-        width:300px;
-    "
-    >
+<input
+id="email"
+type="email"
+placeholder="Email"
+style="
+display:block;
+margin-bottom:10px;
+padding:10px;
+width:300px;
+"
+>
 
-    <input
-        id="password"
-        type="password"
-        placeholder="Senha"
-        style="
-        display:block;
-        margin-bottom:10px;
-        padding:10px;
-        width:300px;
-    "
-    >
+<input
+id="password"
+type="password"
+placeholder="Senha"
+style="
+display:block;
+margin-bottom:10px;
+padding:10px;
+width:300px;
+"
+>
 
-    <button
-        onclick="login()"
-        style="
-        padding:10px 20px;
-    "
-    >
-        Entrar
-    </button>
+<button
+id="btnLogin"
+style="
+padding:10px 20px;
+"
+>
+Entrar
+</button>
 
-    <p id="msg"></p>
+<p id="msg"></p>
 
-    <script>
+<script>
 
-        const SUPABASE_URL =
-        "https://qmhdbuxomozdczgvpvcc.supabase.co";
+const SUPABASE_URL =
+"https://qmhdbuxomozdczgvpvcc.supabase.co";
 
-        const SUPABASE_KEY =
-        "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+const SUPABASE_KEY =
+"sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
 
-        const supabase =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
+const supabase =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
-        async function login() {
+const botao =
+document.getElementById("btnLogin");
 
-            const email =
-            document.getElementById("email").value;
+botao.addEventListener(
+"click",
+async () => {
 
-            const password =
-            document.getElementById("password").value;
+const email =
+document.getElementById("email").value;
 
-            const msg =
-            document.getElementById("msg");
+const password =
+document.getElementById("password").value;
 
-            msg.innerText = "Entrando...";
+const msg =
+document.getElementById("msg");
 
-            const { error } =
-            await supabase.auth.signInWithPassword({
+msg.innerText = "Entrando...";
 
-                email,
-                password
+const { error } =
+await supabase.auth.signInWithPassword({
 
-            });
+email,
+password
 
-            if (error) {
+});
 
-                msg.style.color = "red";
+if (error) {
 
-                msg.innerText = error.message;
+msg.style.color = "red";
 
-                return;
-            }
+msg.innerText =
+error.message;
 
-            msg.style.color = "#00ff88";
+return;
+}
 
-            msg.innerText =
-            "LOGIN FUNCIONOU";
+msg.style.color = "#00ff88";
 
-        }
+msg.innerText =
+"LOGIN FUNCIONOU";
 
-    </script>
+}
+);
+
+</script>
 
 </body>
 </html>
