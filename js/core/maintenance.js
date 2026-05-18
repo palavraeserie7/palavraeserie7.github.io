@@ -30,21 +30,25 @@ export async function checkMaintenanceStatus() {
         const isAdmin =
             user?.email === ADMIN_EMAIL;
 
+        // BLOQUEIA VISITANTES
         if (manutencao && !isAdmin) {
 
             if (!currentPath.includes("manutencao.html")) {
 
                 window.location.replace(
-                    "/pages/manutencao.html"
+                    "./manutencao.html"
                 );
             }
         }
 
-        if (!manutencao &&
-            currentPath.includes("manutencao.html")) {
+        // LIBERA SISTEMA
+        if (
+            !manutencao &&
+            currentPath.includes("manutencao.html")
+        ) {
 
             window.location.replace(
-                "/index.html"
+                "../index.html"
             );
         }
 
