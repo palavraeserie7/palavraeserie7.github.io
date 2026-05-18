@@ -9,7 +9,7 @@ export async function checkAuth() {
     if (!user) {
 
         window.location.replace(
-            "/pages/login.html"
+            "./login.html"
         );
 
         return null;
