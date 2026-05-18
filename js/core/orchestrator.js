@@ -1,6 +1,4 @@
-
-import { checkMaintenanceStatus }
-from "./maintenance.js";
+import { checkMaintenanceStatus } from "./maintenance.js";
 
 window.addEventListener(
     "DOMContentLoaded",
