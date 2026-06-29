@@ -1,4 +1,4 @@
-
+console.log("LOGIN JS CARREGOU");
 import { supabase } from "./supabase.js";
 
 window.login = async function () {
