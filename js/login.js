@@ -1,19 +1,26 @@
 async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const msg = document.getElementById("msg");
 
-  const msg = document.getElementById("msg");
-  msg.innerText = "Entrando...";
+    if (!email || !password) {
+        msg.innerText = "Por favor, preencha todos os campos.";
+        return;
+    }
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
+    msg.innerText = "Validando acesso...";
+    msg.style.color = "white";
 
-  if (error) {
-    msg.innerText = error.message;
-    return;
-  }
+    const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
 
-  window.location.href = "./dashboard.html";
+    if (error) {
+        msg.innerText = "Erro: " + error.message;
+        msg.style.color = "#ff4444";
+        return;
+    }
+
+    window.location.href = "./dashboard.html";
 }
