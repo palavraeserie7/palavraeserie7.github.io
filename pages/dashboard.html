@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecossistema Palavra & Série</title>
-    <!-- Link para forçar o carregamento do visual -->
-    <link rel="stylesheet" href="../style.css?v=2">
+    <title>Estante - Ecossistema Palavra & Série</title>
+    <link rel="stylesheet" href="../style.css?v=4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -14,50 +13,50 @@
         <div class="sidebar-header">
             <span style="font-size: 1.8rem;">📚</span>
             <div class="logo-text">
-                <span class="brand-main">PALAVRA & SÉRIE</span>
-                <span class="brand-sub">SEMENTE DO CORAÇÃO</span>
+                <span style="font-weight: 800; font-size: 0.9rem; display: block;">PALAVRA & SÉRIE</span>
+                <span style="font-size: 0.65rem; color: #00cc66; font-weight: bold;">SEMENTE DO CORAÇÃO</span>
             </div>
         </div>
         <ul class="nav-links">
-            <li class="nav-item active" onclick="switchTab('home' )"><i class="fas fa-home"></i> <span>Início</span></li>
-            <li class="nav-section">PALAVRA & SÉRIE</li>
-            <li class="nav-item" onclick="switchTab('estudos')"><i class="fas fa-bible"></i> <span>Temas Bíblicos</span></li>
-            <li class="nav-section">SEMENTE DO CORAÇÃO</li>
-            <li class="nav-item" onclick="switchTab('biblioteca')"><i class="fas fa-book-open"></i> <span>Biblioteca</span></li>
+            <li class="nav-item active" onclick="switchTab('all' )"><i class="fas fa-th-large"></i> <span>Toda a Estante</span></li>
+            <li class="nav-section">GÊNEROS</li>
+            <li class="nav-item" onclick="switchTab('Devocional')"><i class="fas fa-pray"></i> <span>Devocionais</span></li>
+            <li class="nav-item" onclick="switchTab('Histórias Bíblicas')"><i class="fas fa-scroll"></i> <span>Histórias</span></li>
+            <li class="nav-item" onclick="switchTab('Autoajuda')"><i class="fas fa-heart"></i> <span>Autoajuda</span></li>
+            <li class="nav-item" onclick="switchTab('Estudo')"><i class="fas fa-bible"></i> <span>Estudos</span></li>
+            <li class="nav-section">CONTA</li>
+            <li class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></li>
         </ul>
-        <div class="sidebar-footer">
-            <button class="btn-sair-sidebar" onclick="logout()" style="background:#ef4444; color:white; border:none; width:100%; padding:10px; border-radius:8px; cursor:pointer;">Sair</button>
-        </div>
     </nav>
-
     <main class="main-content">
         <header class="top-bar">
             <div class="search-container">
                 <i class="fas fa-search"></i>
-                <input type="text" id="theme-search" placeholder="Consultar tema..." onkeyup="searchTheme()">
+                <input type="text" id="theme-search" placeholder="Buscar na estante..." onkeyup="searchTheme()">
             </div>
-            <div id="user-email" style="font-size: 0.9rem; opacity: 0.7;"></div>
+            <div id="user-email" style="font-size: 0.85rem; opacity: 0.7;"></div>
         </header>
         <div class="content-body">
-            <section class="spiritual-status dashboard-box">
-                <h3><i class="fas fa-seedling"></i> Estado Espiritual (E08)</h3>
-                <div class="status-grid">
-                    <div class="status-card"><span class="label">Nível</span><span class="value" id="user-level">N1</span></div>
-                    <div class="status-card"><span class="label">Fé</span><span class="value" id="stat-faith">0%</span></div>
-                    <div class="status-card"><span class="label">Oração</span><span class="value" id="stat-prayer">0%</span></div>
-                </div>
-            </section>
-            <div class="shelf" style="margin-top:40px;">
-                <h2>Biblioteca Aberta (FREE)</h2>
+            <h1 id="page-title">Toda a Estante</h1>
+            <div id="section-free" class="shelf-section">
+                <div class="shelf-title"><i class="fas fa-unlock"></i> Biblioteca Aberta (FREE)</div>
                 <div id="books-free" class="books-grid"></div>
             </div>
-            <div class="shelf" style="margin-top:40px;">
-                <h2 style="color:#C9A84C;">Acesso Profundo (PRO)</h2>
+            <div id="section-pro" class="shelf-section" style="margin-top: 50px;">
+                <div class="shelf-title" style="color: #C9A84C;"><i class="fas fa-crown"></i> Acesso Profundo (PRO)</div>
                 <div id="books-pro" class="books-grid"></div>
             </div>
         </div>
     </main>
-
+    <div id="pro-modal" class="modal" style="display:none;">
+        <div class="lock-screen">
+            <i class="fas fa-lock" style="font-size: 3rem; color: #C9A84C; margin-bottom: 20px;"></i>
+            <h1>Conteúdo PRO</h1>
+            <p>Este material exige o plano PRO.</p>
+            <button class="btn-liberado" style="background:#C9A84C;color:#000;" onclick="window.location.href='https://dashboard.kiwify.com.br/products'">QUERO SER PRO</button>
+            <button class="btn-bloqueado" style="margin-top:10px" onclick="document.getElementById('pro-modal' ).style.display='none'">Voltar</button>
+        </div>
+    </div>
     <script src="../js/supabase.js"></script>
     <script src="../js/core/orchestrator.js"></script>
     <script src="../js/dashboard.js"></script>
