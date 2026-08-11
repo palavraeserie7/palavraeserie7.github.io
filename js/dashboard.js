@@ -1,75 +1,73 @@
-async function initDashboard() {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (!user || authError) {
-        window.location.href = "./login.html";
-        return;
-    }
-
+async function init() {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (!user || error) { window.location.href = "./login.html"; return; }
     document.getElementById("user-email").innerText = user.email;
-    await loadSpiritualProfile(user.id);
-    await loadBooks();
-}
 
-async function loadSpiritualProfile(userId) {
     try {
-        const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
-        if (data) {
-            document.getElementById("stat-faith").innerText = (data.faith || 0) + "%";
-            document.getElementById("stat-prayer").innerText = (data.prayer || 0) + "%";
-            document.getElementById("stat-maturity").innerText = (data.maturity || 0) + "%";
-            const levels = ["N1 - Despertar", "N2 - Palavra", "N3 - Voz", "N4 - Caminho", "N5 - Fundamentos"];
-            document.getElementById("user-level").innerText = levels[Math.min((data.level || 1) - 1, 4)];
-        }
-    } catch (e) { console.log("Perfil pendente."); }
+        const response = await M00.execute('load_dashboard', { userId: user.id });
+        renderProfile(response.profile);
+        window.allBooks = response.books; // Salva todos os livros para filtrar depois
+        renderBooks(response.books);
+    } catch (err) { console.error("Erro M00:", err); }
 }
 
-async function loadBooks() {
+function renderBooks(books) {
     const freeContainer = document.getElementById("books-free");
     const proContainer = document.getElementById("books-pro");
+    freeContainer.innerHTML = ""; proContainer.innerHTML = "";
 
-    try {
-        const { data: livros } = await supabase.from('livros').select('*');
-        freeContainer.innerHTML = "";
-        proContainer.innerHTML = "";
+    books.forEach(book => {
+        const div = document.createElement("div");
+        div.className = "book-card";
+        
+        // Tenta ler vários nomes de colunas (Inglês ou Português)
+        const title = book.title || book.titulo || "Sem Título";
+        const category = book.category || book.categoria || "Geral";
+        const cover = book.content_path || book.capa || book.imagem_url || "";
+        const level = book.level || book.nivel || 1;
+        
+        const isPro = level > 1;
+        const coverUrl = cover || `https://via.placeholder.com/200x300/111827/00cc66?text=${encodeURIComponent(title )}`;
 
-        if (!livros || livros.length === 0) {
-            freeContainer.innerHTML = "<p style='opacity:0.5'>Biblioteca em atualização...</p>";
-            return;
-        }
-
-        livros.forEach(livro => {
-            const card = createBookCard(livro);
-            if (livro.level <= 1) freeContainer.appendChild(card);
-            else proContainer.appendChild(card);
-        });
-    } catch (err) { freeContainer.innerHTML = "Erro ao carregar."; }
+        div.innerHTML = `
+            <div class="tag ${isPro ? 'pro-tag' : 'free-tag'}">${isPro ? 'PRO' : 'FREE'}</div>
+            <img src="${coverUrl}" alt="${title}">
+            <h3>${title}</h3>
+            <p>${category}</p>
+            <button class="${isPro ? 'btn-bloqueado' : 'btn-liberado'}" onclick="handleBookClick('${book.id}', ${isPro})">
+                <i class="fas ${isPro ? 'fa-lock' : 'fa-play'}"></i> ${isPro ? 'Bloqueado' : 'Ler Agora'}
+            </button>`;
+        
+        if (level <= 1) freeContainer.appendChild(div);
+        else proContainer.appendChild(div);
+    });
 }
 
-function createBookCard(livro) {
-    const div = document.createElement("div");
-    div.className = "book-card";
-    const isPro = livro.level > 1;
-    const coverUrl = livro.content_path || `https://via.placeholder.com/200x300/111827/00cc66?text=${encodeURIComponent(livro.title )}`;
-    div.innerHTML = `
-        <div class="tag ${isPro ? 'pro-tag' : 'free-tag'}">${isPro ? 'PRO' : 'FREE'}</div>
-        <img src="${coverUrl}" style="width:100%; border-radius:10px; margin-bottom:15px; aspect-ratio:2/3; object-fit:cover;">
-        <h3 style="margin:0; font-size:1.1rem;">${livro.title}</h3>
-        <p style="font-size:0.8rem; opacity:0.6;">${livro.category || 'Geral'}</p>
-        <button class="${isPro ? 'btn-bloqueado' : 'btn-liberado'}" onclick="openBook('${livro.id}', ${isPro})">
-            <i class="fas ${isPro ? 'fa-lock' : 'fa-play'}"></i> ${isPro ? 'Bloqueado' : 'Ler Agora'}
-        </button>`;
-    return div;
+function switchTab(tabName) {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    
+    const titles = {
+        'home': 'Bem-vindo à sua Jornada',
+        'estudos': 'Temas e Passagens Bíblicas',
+        'biblioteca': 'Semente do Coração - Livros',
+        'jornadas': 'Jornadas de Maturidade N1-N5'
+    };
+    document.getElementById("page-title").innerText = titles[tabName] || "Dashboard";
+
+    // Lógica de Filtro: Se clicar em "Estudos", mostra só categoria "Estudo"
+    if (tabName === 'estudos') {
+        const filtered = window.allBooks.filter(b => (b.category || b.categoria) === 'Estudo');
+        renderBooks(filtered);
+    } else {
+        renderBooks(window.allBooks);
+    }
 }
 
-function openBook(id, isPro) {
+function handleBookClick(id, isPro) {
     if (isPro) document.getElementById("pro-modal").style.display = "flex";
-    else alert("Iniciando leitura do livro: " + id);
+    else alert("Abrindo Estudo/Livro: " + id + "\n(O próximo passo é criar a tela de leitura E11)");
 }
 
-async function logout() {
-    await supabase.auth.signOut();
-    window.location.href = "./login.html";
-}
-
-initDashboard();
+async function logout() { await supabase.auth.signOut(); window.location.href = "./login.html"; }
+window.addEventListener('DOMContentLoaded', () => setTimeout(init, 500));
