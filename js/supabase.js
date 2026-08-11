@@ -1,6 +1,6 @@
 // Configuração do Supabase
 var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
-var SUPABASE_KEY = "SUA_ANON_KEY_AQUI"; // <-- COLE SUA CHAVE 'anon public' AQUI
+var SUPABASE_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8"; // <-- COLE SUA CHAVE 'anon public' AQUI
 
 // Previne erro de redeclaração caso o script carregue duas vezes
 if (!window.supabaseClientInstance ) {
