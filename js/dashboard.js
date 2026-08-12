@@ -194,3 +194,167 @@ async function fazerLogout() {
     } catch(e) {}
     window.location.href = "./login.html";
 }
+/**
+ * MENU DE PESQUISA
+ */
+
+function abrirPesquisa() {
+
+    const container =
+        document.getElementById("research-modes-container");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    PS_RESEARCH_MODES.forEach(mode => {
+
+        const card = document.createElement("button");
+
+        card.type = "button";
+
+        card.className = "research-mode-card";
+
+        card.innerHTML = `
+            <div class="research-mode-title">
+                ${mode.nome}
+                ${mode.acesso === "pro" ? " 🔒" : ""}
+            </div>
+
+            <div class="research-mode-description">
+                ${mode.descricao}
+            </div>
+        `;
+
+        card.addEventListener("click", () => {
+
+            iniciarPesquisa(mode.id);
+
+        });
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+async function iniciarPesquisa(modeId) {
+
+    const input =
+        document.getElementById("global-search");
+
+    const query =
+        input ? input.value.trim() : "";
+
+    if (!query) {
+
+        alert("Digite uma pergunta ou passagem para pesquisar.");
+
+        return;
+
+    }
+
+    /*
+     * Aqui futuramente verificaremos
+     * a assinatura do usuário.
+     */
+
+    const resultado =
+        await PSOrchestrator.executeResearch({
+
+            query: query,
+
+            mode: modeId
+
+        });
+
+    mostrarPlanoPesquisa(resultado);
+
+}
+
+
+function mostrarPlanoPesquisa(resultado) {
+
+    const area =
+        document.getElementById("results-area");
+
+    if (!area) return;
+
+    if (!resultado.sucesso) {
+
+        area.innerHTML = `
+            <div class="research-error">
+                ${resultado.erro}
+            </div>
+        `;
+
+        return;
+
+    }
+
+    let etapasHTML = "";
+
+    resultado.plano.forEach(etapa => {
+
+        etapasHTML += `
+            <div class="research-stage">
+
+                <div class="research-stage-number">
+                    ${String(etapa.numero).padStart(2, "0")}
+                </div>
+
+                <div class="research-stage-content">
+
+                    <strong>
+                        ${etapa.nome}
+                    </strong>
+
+                    <p>
+                        ${etapa.descricao}
+                    </p>
+
+                </div>
+
+            </div>
+        `;
+
+    });
+
+    area.innerHTML = `
+
+        <section class="research-result">
+
+            <div class="research-result-header">
+
+                <span>
+                    ${resultado.modo.nome}
+                </span>
+
+                ${resultado.pro
+                    ? "<span>PRO</span>"
+                    : ""}
+
+            </div>
+
+            <h2>
+                ${resultado.consulta}
+            </h2>
+
+            <p>
+                O sistema preparou uma pesquisa com
+                <strong>${resultado.totalEtapas}</strong>
+                etapas de análise.
+            </p>
+
+            <div class="research-stages">
+
+                ${etapasHTML}
+
+            </div>
+
+        </section>
+
+    `;
+
+}
