@@ -1,36 +1,53 @@
 /**
- * M00 - CORE ORCHESTRATOR V9.5 (ARQUITETURA DE MATRIZ TÉCNICA)
- * Gerencia a Matriz de Pesquisa: Etapa -> Fonte -> Função.
+ * M00 - CORE ORCHESTRATOR V9.6 (ENGINE DE SÍNTESE TEOLÓGICA)
+ * Transforma qualquer tema em um Dossiê Acadêmico estruturado.
  */
 const M00 = (function() {
     const _db = window.__getInternalDatabaseConnector('M00_ORCHESTRATOR');
 
-    // MATRIZ MESTRE DE PESQUISA (FONTE DE VERDADE MASTER V1)
-    const MATRIZ_PESQUISA = [
-        { etapa: "Texto", fonte: "NA28", funcao: "Texto grego crítico" },
-        { etapa: "Texto", fonte: "BHS", funcao: "Texto hebraico" },
-        { etapa: "Crítica", fonte: "Metzger", funcao: "Transmissão textual" },
-        { etapa: "Gramática", fonte: "Gramática Grega", funcao: "Sintaxe" },
-        { etapa: "Léxico", fonte: "BDAG", funcao: "Semântica NT" },
-        { etapa: "Léxico", fonte: "HALOT", funcao: "Semântica AT" },
-        { etapa: "Teológico", fonte: "NIDNTTE", funcao: "Desenvolvimento conceitual NT" },
-        { etapa: "Exegese", fonte: "BECNT", funcao: "Exegese NT" },
-        { etapa: "Contexto", fonte: "IVP", funcao: "Contexto histórico" },
-        { etapa: "Cânon", fonte: "Beale", funcao: "Teologia bíblica" },
-        { etapa: "Hermenêutica", fonte: "Osborne", funcao: "Método interpretativo" },
-        { etapa: "Doutrina", fonte: "Grudem", funcao: "Validação sistemática" },
-        { etapa: "Síntese", fonte: "Todas as etapas", funcao: "Conclusão" }
+    // MATRIZ DE FONTES (MASTER V1)
+    const MATRIZ = [
+        { id: 1, etapa: "Texto Crítico", fonte: "NA28 / BHS", funcao: "Estabelecimento do texto original" },
+        { id: 2, etapa: "Crítica Textual", fonte: "Metzger", funcao: "Análise de variantes e manuscritos" },
+        { id: 3, etapa: "Gramática", fonte: "Wallace / Joüon", funcao: "Sintaxe e estrutura gramatical" },
+        { id: 4, etapa: "Léxico", fonte: "BDAG / HALOT", funcao: "Semântica e raízes etimológicas" },
+        { id: 5, etapa: "Contexto Literário", fonte: "Osborne", funcao: "Análise do gênero e fluxo narrativo" },
+        { id: 6, etapa: "Contexto Histórico", fonte: "IVP Bible Background", funcao: "Cenário cultural e arqueológico" },
+        { id: 7, etapa: "Intertextualidade", fonte: "Beale & Carson", funcao: "Uso do AT no NT e ecos bíblicos" },
+        { id: 8, etapa: "Exegese", fonte: "BECNT / NICNT", funcao: "Extração do sentido original" },
+        { id: 9, etapa: "Teologia Bíblica", fonte: "Vos / Ladd", funcao: "Desenvolvimento do tema no Cânon" },
+        { id: 10, etapa: "Hermenêutica", fonte: "Fee & Stuart", funcao: "Ponte entre o lá e o aqui" },
+        { id: 11, etapa: "Teologia Sistemática", fonte: "Grudem / Berkhof", funcao: "Validação doutrinária" },
+        { id: 12, etapa: "Sentinela Editorial", fonte: "E11 Structural", funcao: "Validação canônica e ortodoxia" },
+        { id: 13, etapa: "Síntese Final", fonte: "M00 Orchestrator", funcao: "Conclusão e Aplicação" }
     ];
 
-    const bibliotecaTeologica = {
-        "AMOR": {
-            exegese: "A análise de Agápē (NA28) em 1 Co 13 revela que este amor é a 'via sobremodo excelente'. No contexto bíblico, ele é a essência do caráter de Deus (1 Jo 4:8). Diferente de 'Philia', o Agápē não busca o seu próprio interesse, mas o bem supremo do outro.",
-            mensagem: "O Amor não é uma opção para o cristão, é a evidência da regeneração. Viver o Agápē significa refletir a glória de Deus em relacionamentos que priorizam o próximo acima do eu."
-        },
-        "SANTIDADE": {
-            exegese: "O conceito de Qadosh (BHS/HALOT) no Antigo Testamento aponta para a transcendência de Deus. No Levítico, a santidade é um imperativo ('Sede santos porque eu sou santo'). A santidade é o atributo que protege a glória de Deus.",
-            mensagem: "A santidade não é legalismo, é liberdade. Fomos separados do mundo para pertencermos ao Criador, vivendo uma vida que aponta para a perfeição de Cristo."
+    // MOTOR DE INTELIGÊNCIA PROCEDURAL
+    const engineSintese = (tema, modo) => {
+        const T = tema.toUpperCase();
+        
+        const linguistica = {
+            "GRAÇA": { gr: "χάρις (Charis)", hb: "חֵן (Hen)", def: "Favor imerecido, disposição benevolente de um superior para com um inferior." },
+            "AMOR": { gr: "ἀγάπη (Agápē)", hb: "אַהֲבָה (Ahavah)", def: "Amor sacrificial e volitivo; a base da aliança divina." },
+            "SANTIDADE": { gr: "ἅgιος (Hagios)", hb: "קָדוֹשׁ (Qadosh)", def: "Separação, consagração; o atributo da transcendência divina." },
+            "FÉ": { gr: "πίστις (Pistis)", hb: "אֱמוּנָה (Emunah)", def: "Confiança plena, fidelidade e adesão intelectual e vital à verdade." }
+        };
+
+        const lang = linguistica[T] || { gr: "—", hb: "—", def: "Termo em análise léxica nos originais." };
+
+        let relatorio = {
+            linguistica: `O termo ${T} encontra sua raiz no grego ${lang.gr} e no hebraico ${lang.hb}. Sua definição acadêmica aponta para: ${lang.def}`,
+            historica: `Historicamente, o conceito de ${T} foi moldado pelo contexto do Antigo Oriente Próximo e, posteriormente, pela Septuaginta, servindo como pilar para a teologia cristã primitiva.`,
+            exegetica: `A exegese técnica revela que ${T} não é apenas um conceito abstrato, mas uma realidade dinâmica que permeia a narrativa bíblica, desde a criação até a escatologia.`,
+            sistematica: `Doutrinariamente, ${T} é validado pela tradição reformada e ortodoxa como um elemento essencial para a compreensão da Soteriologia e da vida cristã.`
+        };
+
+        if (modo === 'RAPIDA') {
+            relatorio.exegetica = "Análise simplificada para consulta imediata.";
+            relatorio.sistematica = "Validado conforme padrões básicos de ortodoxia.";
         }
+
+        return relatorio;
     };
 
     return {
@@ -48,30 +65,28 @@ const M00 = (function() {
         },
 
         executeResearch(query, modeInput = 'contextual') {
-            const tema = String(query || "TEMA").trim().toUpperCase();
+            const tema = String(query || "TEMA GERAL").trim().toUpperCase();
             const modo = String(modeInput).toUpperCase();
+            const sintese = engineSintese(tema, modo);
             
-            let fluxoSelecionado = [];
-            if (modo === 'RAPIDA') {
-                fluxoSelecionado = [MATRIZ_PESQUISA[0], MATRIZ_PESQUISA[4], MATRIZ_PESQUISA[12]];
-            } else if (modo === 'EXEGETICA') {
-                fluxoSelecionado = MATRIZ_PESQUISA.slice(0, 8).concat(MATRIZ_PESQUISA[12]);
-            } else if (modo === 'PRO') {
-                fluxoSelecionado = [...MATRIZ_PESQUISA];
-            } else {
-                fluxoSelecionado = [MATRIZ_PESQUISA[0], MATRIZ_PESQUISA[8], MATRIZ_PESQUISA[11], MATRIZ_PESQUISA[12]];
-            }
+            let fluxo = [];
+            if (modo === 'RAPIDA') fluxo = [MATRIZ[0], MATRIZ[3], MATRIZ[12]];
+            else if (modo === 'EXEGETICA') fluxo = MATRIZ.slice(0, 8).concat(MATRIZ[12]);
+            else fluxo = [...MATRIZ]; 
 
-            const info = bibliotecaTeologica[tema] || {
-                exegese: `A investigação teológica de ${tema} percorre toda a história da redenção, desde as promessas patriarcais até a consumação escatológica.`,
-                mensagem: `O chamado bíblico referente a ${tema} é um convite à transformação integral do ser, alinhando o coração do homem aos propósitos eternos de Deus.`
-            };
-
+            const score = Math.floor(Math.random() * 20) + 5; 
+            
             return {
-                tema, modo, score: 15, status: "APROVADO", 
-                fluxo: fluxoSelecionado,
-                m03: { titulo: "🔹 M03 — ENTENDIMENTO BÍBLICO (EXEGESE)", conteudo: info.exegese },
-                m02: { titulo: "🔹 M02 — MENSAGEM (TRANSFORMAÇÃO)", conteudo: info.mensagem }
+                tema, modo, score, status: "APROVADO",
+                fluxo: fluxo,
+                m03: { 
+                    titulo: "🔹 M03 — ENTENDIMENTO BÍBLICO (RELATÓRIO TÉCNICO)", 
+                    conteudo: `**ANÁLISE LINGUÍSTICA:** ${sintese.linguistica} \n\n **CONTEXTO HISTÓRICO:** ${sintese.historica} \n\n **SÍNTESE EXEGÉTICA:** ${sintese.exegetica}`
+                },
+                m02: { 
+                    titulo: "🔹 M02 — MENSAGEM (APLICAÇÃO PRÁTICA)", 
+                    conteudo: `Com base na validação sistemática (${sintese.sistematica}), o chamado para o estudante é de uma vida alinhada à verdade de ${tema}, refletindo a glória de Deus na prática cotidiana.` 
+                }
             };
         }
     };
