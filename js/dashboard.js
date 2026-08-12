@@ -1,6 +1,6 @@
 /**
- * DASHBOARD ULTRA-ROBUSTO V7
- * Sistema de segurança contra travamentos de menu
+ * DASHBOARD ULTRA-ROBUSTO V7.1
+ * Sistema de segurança com limpeza automática de busca
  */
 
 async function init() {
@@ -12,7 +12,6 @@ async function init() {
         const emailEl = document.getElementById("user-email");
         if (emailEl) emailEl.innerText = user.email;
 
-        // Carrega dados do Orquestrador M00 com segurança
         if (typeof M00 !== 'undefined') {
             window.libraryData = await M00.execute('BIBLIOTECA_AVANCADA');
             renderCamadas(window.libraryData?.camadas);
@@ -22,18 +21,18 @@ async function init() {
             renderBooks(books);
         }
     } catch (err) {
-        console.error("Erro no carregamento inicial:", err);
+        console.error("Erro no carregamento:", err);
     }
 }
 
-// FUNÇÃO DE TROCA DE TELAS - VERSÃO À PROVA DE ERROS
+// FUNÇÃO DE TROCA DE TELAS - AGORA LIMPA A BUSCA AUTOMATICAMENTE
 function switchTab(view) {
-    console.log("Navegando para:", view);
-    
-    // 1. Atualiza visual do menu
+    // 1. LIMPA A BARRA DE BUSCA PARA MOSTRAR TUDO DE NOVO
+    const searchBox = document.getElementById("global-search");
+    if (searchBox) searchBox.value = "";
+
+    // 2. Atualiza visual do menu
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    
-    // Tenta achar o item do menu de várias formas para não travar
     const items = document.querySelectorAll('.nav-item');
     items.forEach(item => {
         if (item.getAttribute('onclick')?.includes(`'${view}'`)) {
@@ -41,7 +40,7 @@ function switchTab(view) {
         }
     });
 
-    // 2. Mapeamento de IDs de seções (Garanta que estes IDs existam no seu HTML)
+    // 3. Mapeamento de IDs
     const sections = {
         'home': 'home-view',
         'biblioteca': 'biblioteca-view',
@@ -51,23 +50,21 @@ function switchTab(view) {
         'consulta': 'consulta-view'
     };
 
-    // 3. Esconde TUDO primeiro
+    // 4. Esconde TUDO
     const allSectionIds = ['home-view', 'biblioteca-view', 'fluxo-view', 'estante-view', 'consulta-view'];
     allSectionIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
     });
 
-    // 4. Mostra apenas a seção desejada
+    // 5. Mostra a tela certa
     const targetId = sections[view];
     const targetEl = document.getElementById(targetId);
     if (targetEl) {
         targetEl.style.display = 'block';
     } else {
-        // Se não achar a seção, volta para a home para não ficar branco
         const home = document.getElementById('home-view');
         if (home) home.style.display = 'block';
-        console.warn("Seção não encontrada no HTML:", targetId);
     }
 }
 
@@ -76,35 +73,33 @@ async function handleGlobalSearch() {
     const query = document.getElementById("global-search")?.value;
     if (!query || query.length < 2) return;
 
-    switchTab('consulta');
+    // Não limpa a busca aqui, apenas muda de aba
+    const allSectionIds = ['home-view', 'biblioteca-view', 'fluxo-view', 'estante-view'];
+    allSectionIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+    const consulta = document.getElementById('consulta-view');
+    if (consulta) consulta.style.display = 'block';
+
     const container = document.getElementById("results-area");
     if (!container) return;
-    
-    container.innerHTML = "<div style='color:#00cc66'>Processando consulta...</div>";
+    container.innerHTML = "<div style='color:#00cc66'>Sentinela processando consulta...</div>";
 
     try {
         const results = await M00.execute('SENTINELA', { query });
         container.innerHTML = "";
-        
         if (!results || results.length === 0) {
             container.innerHTML = `<p style='opacity:0.5'>Nenhum registro para "${query}".</p>`;
             return;
         }
-
         results.forEach(res => {
             const div = document.createElement("div");
-            div.className = "theology-card";
             div.style = "background:#111827; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #1f2937;";
-            div.innerHTML = `
-                <h3 style="margin:0 0 10px 0; color:#00cc66;">${res.nome || res.title}</h3>
-                <p style="font-size:1rem; line-height:1.6;">${res.resolve || res.text}</p>
-                <div style="margin-top:15px; font-size:0.7rem; opacity:0.5;">Nível: ${res.nivel || 'Geral'}</div>
-            `;
+            div.innerHTML = `<h3 style="margin:0; color:#00cc66;">${res.nome || res.title}</h3><p>${res.resolve || res.text}</p>`;
             container.appendChild(div);
         });
-    } catch (e) {
-        container.innerHTML = "Erro na busca.";
-    }
+    } catch (e) { container.innerHTML = "Erro na busca."; }
 }
 
 function renderCamadas(camadas) {
@@ -113,14 +108,13 @@ function renderCamadas(camadas) {
     container.innerHTML = "";
     camadas.forEach(c => {
         const div = document.createElement("div");
-        div.innerHTML = `<div style="background:#1f2937; padding:10px; margin-top:20px;"><h3>${c.nome}</h3></div>`;
-        const table = document.createElement("table");
-        table.style.width = "100%";
+        div.style = "margin-bottom:30px; border:1px solid #1f2937; border-radius:10px; overflow:hidden;";
+        let html = `<div style="background:#1f2937; padding:15px;"><h3>${c.nome}</h3></div><table style="width:100%; border-collapse:collapse;">`;
         c.recursos.forEach(r => {
-            const row = table.insertRow();
-            row.innerHTML = `<td style="padding:10px; border-bottom:1px solid #1f2937;"><strong>${r.nome}</strong></td><td style="padding:10px; border-bottom:1px solid #1f2937;">${r.resolve}</td>`;
+            html += `<tr style="border-bottom:1px solid #1f2937;"><td style="padding:10px;"><strong>${r.nome}</strong></td><td style="padding:10px;">${r.resolve}</td><td style="padding:10px; color:#00cc66;">${r.nivel}</td></tr>`;
         });
-        div.appendChild(table);
+        html += `</table>`;
+        div.innerHTML = html;
         container.appendChild(div);
     });
 }
@@ -131,8 +125,8 @@ function renderFluxo(fluxo) {
     container.innerHTML = "";
     fluxo.forEach((passo, i) => {
         const div = document.createElement("div");
-        div.style = "background:#111827; padding:15px; margin-bottom:10px; border-radius:8px;";
-        div.innerHTML = `<strong>${i+1}.</strong> ${passo}`;
+        div.style = "background:#111827; padding:15px; margin-bottom:10px; border-radius:8px; display:flex; gap:15px;";
+        div.innerHTML = `<span style="background:#00cc66; width:25px; height:25px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">${i+1}</span><p style="margin:0;">${passo}</p>`;
         container.appendChild(div);
     });
 }
