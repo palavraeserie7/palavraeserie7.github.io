@@ -1,52 +1,36 @@
 /**
- * M00 - CORE ORCHESTRATOR V9.4 (SÍNTESE TEOLÓGICA AVANÇADA)
- * Gera relatórios automáticos e ricos baseados no nível de profundidade.
+ * M00 - CORE ORCHESTRATOR V9.5 (ARQUITETURA DE MATRIZ TÉCNICA)
+ * Gerencia a Matriz de Pesquisa: Etapa -> Fonte -> Função.
  */
 const M00 = (function() {
     const _db = window.__getInternalDatabaseConnector('M00_ORCHESTRATOR');
 
-    // Motor de Inteligência para Geração de Conteúdo
-    const gerarConteudoRico = (tema, modo) => {
-        const t = tema.toUpperCase();
-        
-        // Base de dados de conhecimento para temas principais
-        const conhecimento = {
-            "AMOR": {
-                original: "Agápē (Grego)",
-                definicao: "Amor sacrificial, incondicional e baseado na vontade, não apenas na emoção.",
-                exegese_pro: "A análise de Agápē em 1 Co 13 revela que este amor é a 'via sobremodo excelente'. No contexto bíblico, ele é a essência do caráter de Deus (1 Jo 4:8). Diferente de 'Philia', o Agápē não busca o seu próprio interesse, mas o bem supremo do outro, culminando na Kenosis (esvaziamento) de Cristo em Fp 2.",
-                mensagem: "O Amor não é uma opção para o cristão, é a evidência da regeneração. Viver o Agápē significa refletir a glória de Deus em relacionamentos que priorizam o próximo acima do eu."
-            },
-            "SANTIDADE": {
-                original: "Qadosh (Hebraico) / Hagios (Grego)",
-                definicao: "Separação total para o uso exclusivo de Deus; pureza absoluta.",
-                exegese_pro: "O conceito de Qadosh no Antigo Testamento aponta para a transcendência de Deus. No Levítico, a santidade é um imperativo ('Sede santos porque eu sou santo'). A exegese profunda mostra que a santidade é o atributo que protege a glória de Deus, exigindo medição e sacrifício para a aproximação humana.",
-                mensagem: "A santidade não é legalismo, é liberdade. Fomos separados do mundo para pertencermos ao Criador, vivendo uma vida que aponta para a perfeição de Cristo."
-            }
-        };
+    // MATRIZ MESTRE DE PESQUISA (FONTE DE VERDADE MASTER V1)
+    const MATRIZ_PESQUISA = [
+        { etapa: "Texto", fonte: "NA28", funcao: "Texto grego crítico" },
+        { etapa: "Texto", fonte: "BHS", funcao: "Texto hebraico" },
+        { etapa: "Crítica", fonte: "Metzger", funcao: "Transmissão textual" },
+        { etapa: "Gramática", fonte: "Gramática Grega", funcao: "Sintaxe" },
+        { etapa: "Léxico", fonte: "BDAG", funcao: "Semântica NT" },
+        { etapa: "Léxico", fonte: "HALOT", funcao: "Semântica AT" },
+        { etapa: "Teológico", fonte: "NIDNTTE", funcao: "Desenvolvimento conceitual NT" },
+        { etapa: "Exegese", fonte: "BECNT", funcao: "Exegese NT" },
+        { etapa: "Contexto", fonte: "IVP", funcao: "Contexto histórico" },
+        { etapa: "Cânon", fonte: "Beale", funcao: "Teologia bíblica" },
+        { etapa: "Hermenêutica", fonte: "Osborne", funcao: "Método interpretativo" },
+        { etapa: "Doutrina", fonte: "Grudem", funcao: "Validação sistemática" },
+        { etapa: "Síntese", fonte: "Todas as etapas", funcao: "Conclusão" }
+    ];
 
-        const base = conhecimento[t] || {
-            original: "Termo Original em Análise",
-            definicao: `Estudo sistemático sobre o conceito de ${t} nas Escrituras.`,
-            exegese_pro: `A investigação teológica de ${t} percorre toda a história da redenção, desde as promessas patriarcais até a consumação escatológica. Este tema é central para a compreensão da vontade divina para a humanidade.`,
-            mensagem: `O chamado bíblico referente a ${t} é um convite à transformação integral do ser, alinhando o coração do homem aos propósitos eternos de Deus.`
-        };
-
-        // Personaliza o conteúdo com base no Nível (Modo)
-        let m03_final = "";
-        let m02_final = base.mensagem;
-
-        if (modo === 'RAPIDA') {
-            m03_final = `**Definição:** ${base.definicao} \n\n **Original:** ${base.original}`;
-        } else if (modo === 'EXEGETICA' || modo === 'PROFUNDA') {
-            m03_final = `**Análise Exegética:** ${base.exegese_pro.substring(0, 200)}... \n\n **Contexto:** O termo ${base.original} é fundamental para esta compreensão.`;
-        } else if (modo === 'PRO') {
-            m03_final = `**DOSSIÊ COMPLETO:** \n\n ${base.exegese_pro} \n\n **Raiz Linguística:** ${base.original} \n\n **Impacto Teológico:** Este tema altera a nossa percepção da Soteriologia e Eclesiologia.`;
-        } else {
-            m03_final = `**Contexto Geral:** ${base.definicao}`;
+    const bibliotecaTeologica = {
+        "AMOR": {
+            exegese: "A análise de Agápē (NA28) em 1 Co 13 revela que este amor é a 'via sobremodo excelente'. No contexto bíblico, ele é a essência do caráter de Deus (1 Jo 4:8). Diferente de 'Philia', o Agápē não busca o seu próprio interesse, mas o bem supremo do outro.",
+            mensagem: "O Amor não é uma opção para o cristão, é a evidência da regeneração. Viver o Agápē significa refletir a glória de Deus em relacionamentos que priorizam o próximo acima do eu."
+        },
+        "SANTIDADE": {
+            exegese: "O conceito de Qadosh (BHS/HALOT) no Antigo Testamento aponta para a transcendência de Deus. No Levítico, a santidade é um imperativo ('Sede santos porque eu sou santo'). A santidade é o atributo que protege a glória de Deus.",
+            mensagem: "A santidade não é legalismo, é liberdade. Fomos separados do mundo para pertencermos ao Criador, vivendo uma vida que aponta para a perfeição de Cristo."
         }
-
-        return { m03: m03_final, m02: m02_final };
     };
 
     return {
@@ -67,16 +51,27 @@ const M00 = (function() {
             const tema = String(query || "TEMA").trim().toUpperCase();
             const modo = String(modeInput).toUpperCase();
             
-            const conteudo = gerarConteudoRico(tema, modo);
+            let fluxoSelecionado = [];
+            if (modo === 'RAPIDA') {
+                fluxoSelecionado = [MATRIZ_PESQUISA[0], MATRIZ_PESQUISA[4], MATRIZ_PESQUISA[12]];
+            } else if (modo === 'EXEGETICA') {
+                fluxoSelecionado = MATRIZ_PESQUISA.slice(0, 8).concat(MATRIZ_PESQUISA[12]);
+            } else if (modo === 'PRO') {
+                fluxoSelecionado = [...MATRIZ_PESQUISA];
+            } else {
+                fluxoSelecionado = [MATRIZ_PESQUISA[0], MATRIZ_PESQUISA[8], MATRIZ_PESQUISA[11], MATRIZ_PESQUISA[12]];
+            }
 
-            let etapas = ["Texto", "Contexto", "Evidências", "Síntese"];
-            if (modo === 'EXEGETICA') etapas = ["Texto Original", "Morfologia", "Sintaxe", "Léxico", "Exegese"];
-            if (modo === 'PRO') etapas = ["Crítica Textual", "Gramática", "Semântica", "Contexto", "Intertextualidade", "Exegese", "Teologia", "Hermenêutica", "Sistemática", "Validação", "Síntese"];
+            const info = bibliotecaTeologica[tema] || {
+                exegese: `A investigação teológica de ${tema} percorre toda a história da redenção, desde as promessas patriarcais até a consumação escatológica.`,
+                mensagem: `O chamado bíblico referente a ${tema} é um convite à transformação integral do ser, alinhando o coração do homem aos propósitos eternos de Deus.`
+            };
 
             return {
-                tema, modo, score: 15, status: "APROVADO", etapas,
-                m03: { titulo: "🔹 M03 — ENTENDIMENTO BÍBLICO", conteudo: conteudo.m03 },
-                m02: { titulo: "🔹 M02 — MENSAGEM", conteudo: conteudo.m02 }
+                tema, modo, score: 15, status: "APROVADO", 
+                fluxo: fluxoSelecionado,
+                m03: { titulo: "🔹 M03 — ENTENDIMENTO BÍBLICO (EXEGESE)", conteudo: info.exegese },
+                m02: { titulo: "🔹 M02 — MENSAGEM (TRANSFORMAÇÃO)", conteudo: info.mensagem }
             };
         }
     };
