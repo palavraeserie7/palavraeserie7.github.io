@@ -10,31 +10,63 @@
     --sidebar-width: 280px;
 }
 
-body { margin: 0; background: var(--bg-dark); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+body {
+    margin: 0; padding: 0;
+    background: var(--bg-dark);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
 .dashboard-layout { display: flex; min-height: 100vh; }
 
-.sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border); position: fixed; height: 100vh; z-index: 1000; display: flex; flex-direction: column; }
+/* SIDEBAR HIERÁRQUICA */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; height: 100vh; z-index: 1000;
+}
+
 .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border); }
 
-.nav-links { list-style: none; padding: 20px 0; margin: 0; }
+.nav-links { list-style: none; padding: 20px 0; margin: 0; flex-grow: 1; overflow-y: auto; }
 .nav-section { padding: 20px 25px 10px; font-size: 0.65rem; letter-spacing: 2px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; }
 
-.nav-item, .nav-item-parent { padding: 12px 25px; display: flex; align-items: center; gap: 15px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem; }
-.nav-item:hover, .nav-item.active { background: rgba(0, 204, 102, 0.1); color: var(--primary); }
+.nav-item, .nav-item-parent {
+    padding: 12px 25px; display: flex; align-items: center; gap: 15px;
+    cursor: pointer; transition: 0.2s; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;
+}
+
+.nav-item:hover, .nav-item-parent:hover, .nav-item.active { background: rgba(0, 204, 102, 0.1); color: var(--primary); }
 
 .nav-sub-links { list-style: none; padding: 5px 0 15px 55px; margin: 0; }
-.nav-item.sub { padding: 8px 10px; font-size: 0.8rem; cursor: pointer; color: var(--text-muted); }
+.nav-item.sub { padding: 8px 10px; font-size: 0.8rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
 .nav-item.sub:hover { color: var(--secondary); }
 
-.main-content { margin-left: var(--sidebar-width); flex: 1; padding: 0; }
-.top-bar { padding: 15px 40px; background: rgba(11, 22, 40, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+/* MAIN CONTENT */
+.main-content { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; }
+.top-bar { padding: 15px 40px; background: rgba(11, 22, 40, 0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 900; }
+
 .search-container { background: rgba(255,255,255,0.05); padding: 8px 20px; border-radius: 30px; border: 1px solid var(--border); width: 450px; display: flex; align-items: center; gap: 10px; }
 .search-container input { background: transparent; border: none; color: white; width: 100%; outline: none; }
+
 .content-body { padding: 40px; }
 
-.status-card { background: var(--bg-card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); text-align: center; }
-.status-card .label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; }
-.status-card .value { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
-
 .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
-.book-card { background: var(--bg-card); border-radius: 12px; padding: 15px; border: 1px solid var(--border); position: relative; }
+.book-card { background: var(--bg-card); border-radius: 12px; padding: 15px; border: 1px solid var(--border); transition: 0.3s; position: relative; }
+.book-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+.book-card img { width: 100%; border-radius: 8px; aspect-ratio: 2/3; object-fit: cover; margin-bottom: 15px; }
+.book-card h4 { margin: 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.tag { position: absolute; top: 10px; right: 10px; font-size: 9px; padding: 3px 10px; border-radius: 20px; font-weight: bold; z-index: 10; }
+.free-tag { background: var(--primary); color: white; }
+.pro-tag { background: var(--secondary); color: black; }
+
+.btn-liberado { background: var(--primary); color: white; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+.btn-liberado:hover { opacity: 0.9; transform: scale(1.05); }
+
+.status-card { background: var(--bg-card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); text-align: center; }
+.status-card .label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; }
+.status-card .value { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
