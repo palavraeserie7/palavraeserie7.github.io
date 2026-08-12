@@ -6,12 +6,13 @@ async function init() {
         if (emailEl) emailEl.innerText = user.email;
 
         const data = await M00.execute('LOAD_DASHBOARD', { userId: user.id });
-        if (data.profile) renderSpiritualProfile(data.profile);
-        if (data.books) renderBooks(data.books);
-
+        if (data) {
+            renderSpiritualProfile(data.profile);
+            renderBooks(data.books);
+        }
         const lib = await M00.execute('BIBLIOTECA_AVANCADA');
-        if (lib.camadas) renderCamadas(lib.camadas);
-    } catch (e) { console.error("Erro no Dashboard:", e); }
+        if (lib) renderCamadas(lib.camadas);
+    } catch (e) { console.error("Erro no init:", e); }
 }
 
 function renderSpiritualProfile(p) {
@@ -37,22 +38,21 @@ async function handleGlobalSearch() {
 
     switchTab('consulta', false);
     const container = document.getElementById("results-area");
-    if (!container) return;
     container.innerHTML = `<div style='text-align:center; padding:50px; color:#00cc66;'><i class='fas fa-sync fa-spin'></i> M00 Sintetizando Dossiê...</div>`;
 
     try {
         const d = await M00.execute('QUERY_THEME', { query });
-        if (!d || !d.m03) throw new Error("Falha na síntese");
+        if (!d) throw new Error("M00 não retornou dados");
 
         container.innerHTML = `
-            <div style="background:#fdfcf0; color:#1a202c; border-radius:15px; padding:45px; max-width:950px; margin:auto; border:2px solid #1a202c; font-family:serif;">
+            <div style="background:#fdfcf0; color:#1a202c; border-radius:15px; padding:45px; max-width:950px; margin:auto; border:2px solid #1a202c; font-family:serif; box-shadow: 0 30px 60px rgba(0,0,0,0.4);">
                 <div style="border-bottom: 4px solid #1a202c; padding-bottom:20px; text-align:center; margin-bottom:40px;">
                     <h1 style="margin:0; font-size:2.5rem; text-transform:uppercase;">${d.tema}</h1>
                     <div style="background:#065f46; color:white; padding:6px 20px; border-radius:50px; font-size:0.75rem; font-weight:bold; display:inline-block;">SENTINELA: ${d.score}/100</div>
                 </div>
                 <div style="margin-bottom:40px; background:white; padding:30px; border-radius:10px; border-left:10px solid #00cc66;">
                     <h3 style="color:#00cc66;">${d.m03.titulo}</h3>
-                    <p style="font-size:1.3rem; color:#b45309; font-weight:bold;">${d.m03.originais}</p>
+                    <p style="font-size:1.3rem; color:#b45309; font-weight:bold; margin:20px 0;">${d.m03.originais}</p>
                     <p style="font-size:1.1rem; line-height:1.7;">${d.m03.conteudo}</p>
                 </div>
                 <div style="margin-bottom:40px; background:#fffbeb; padding:30px; border-radius:10px; border-left:10px solid #C9A84C;">
@@ -63,7 +63,10 @@ async function handleGlobalSearch() {
                     <button class="btn-liberado" style="background:#00cc66; color:white; width:auto; padding:15px 60px;" onclick="window.location.href='https://pay.kiwify.com.br/SEU_CHECKOUT'">ACESSAR PRO</button>
                 </div>
             </div>`;
-    } catch (err ) { container.innerHTML = "<div style='color:red; text-align:center;'>O M00 encontrou um erro na conexão. Tente novamente em instantes.</div>"; }
+    } catch (err ) { 
+        console.error(err);
+        container.innerHTML = "<div style='color:red; text-align:center;'>O M00 encontrou um erro. Verifique os arquivos no GitHub.</div>"; 
+    }
 }
 
 function renderCamadas(c) {
