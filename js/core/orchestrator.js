@@ -1,53 +1,47 @@
 /**
- * M00 - CORE ORCHESTRATOR (MASTER V1 - VERSÃO FINAL ESTÁVEL)
+ * M00 - CORE ORCHESTRATOR (MASTER V1 - EXEGESE REAL)
  */
 const M00 = {
     async execute(action, params = {}) {
-        console.log(`[M00] Executando ação canônica: ${action}`);
+        console.log(`[M00] Executando: ${action}`);
         try {
             switch (action) {
                 case 'AUTH_GET_USER':
                     const { data: { user } } = await supabase.auth.getUser();
                     return user;
-                case 'AUTH_LOGOUT':
-                    return await supabase.auth.signOut();
                 case 'LOAD_DASHBOARD':
                     const { data: books } = await supabase.from('livros').select('*');
-                    return { profile: { level: 1, faith: 85, prayer: 70 }, books: books || [] };
+                    return { profile: { level: 1, faith: 90, prayer: 80 }, books: books || [] };
                 case 'QUERY_THEME':
-                    // A função é chamada com await, então aqui ela deve retornar o resultado corretamente
-                    return this.generateMasterDossier(params.query);
+                    return await this.generateDeepExegesis(params.query);
                 case 'BIBLIOTECA_AVANCADA':
-                    return { camadas: [{ id: 1, nome: "CAMADA 1 — LÉXICO BÁSICO", recursos: [{ nome: "BDAG", resolve: "Grego NT" }] }] };
+                    return { camadas: [{ id: 1, nome: "CAMADA 1 — LÉXICO", recursos: [{ nome: "BDAG", resolve: "Grego NT" }] }] };
                 default: return null;
             }
-        } catch (e) { 
-            console.error("Erro no Orquestrador:", e); 
-            return null; 
-        }
+        } catch (e) { console.error(e); return null; }
     },
 
-    generateMasterDossier(query) {
+    async generateDeepExegesis(query) {
         const tema = (query || "").trim().toLowerCase();
         const base = {
             'fé': {
                 originais: "Hebraico: 'Emunah' (אֱמוּנָה) | Grego: 'Pistis' (πίστις)",
-                exegese: "A fé bíblica é a confiança relacional baseada na fidelidade de Deus à Sua aliança. No NT, implica em entrega total à obra de Cristo.",
-                mensagem: "A fé transforma a perspectiva humana, permitindo enxergar a realidade através das promessas eternas de Deus.",
+                exegese: "A fé bíblica não é um sentimento, mas uma firme confiança na fidelidade de Deus. No original hebraico, 'Emunah' traz a ideia de firmeza e estabilidade, como uma rocha.",
+                mensagem: "Viver pela fé é caminhar sobre a palavra de Deus, mesmo quando as circunstâncias dizem o contrário.",
                 score: 10
             },
             'pai': {
                 originais: "Hebraico: 'Ab' (אָב) | Grego: 'Pater' (πατήρ)",
-                exegese: "A paternidade divina revela o cuidado providente e a autoridade amorosa de Deus. Em Cristo, somos adotados e recebemos o Espírito para clamar 'Abba, Pai'.",
-                mensagem: "Reconhecer Deus como Pai é encontrar a segurança e a identidade que o mundo não pode oferecer.",
+                exegese: "Deus como Pai revela a fonte de toda vida e autoridade. Em Cristo, a relação torna-se íntima ('Abba'), garantindo nossa herança e proteção eterna.",
+                mensagem: "Você não é um órfão espiritual. O Criador do universo chama você de filho.",
                 score: 12
             }
         };
 
         const info = base[tema] || {
-            originais: `Consulte as 9 Camadas para os originais de "${query}".`,
-            exegese: `Análise exegética rigorosa do tema "${query}" sob o método histórico-gramatical.`,
-            mensagem: `A revelação de "${query}" visa o amadurecimento espiritual e a centralidade de Cristo.`,
+            originais: `Consulte as Camadas 1 e 2 para os originais de "${query}".`,
+            exegese: `O tema "${query}" deve ser analisado através do fluxo de 7 etapas da arquitetura Palavra & Série.`,
+            mensagem: `A revelação de "${query}" visa a transformação do caráter e a glória de Deus.`,
             score: 25
         };
 
