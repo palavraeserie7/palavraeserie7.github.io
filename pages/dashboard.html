@@ -1,1 +1,29 @@
 
+<script type="module">
+    import { matrizCompleta } from '../etapas/index.js';
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const container = document.querySelector('.container') || document.body;
+
+        const wrapper = document.createElement('div');
+        wrapper.style.padding = "20px";
+        wrapper.style.color = "#f1f5f9";
+
+        let htmlContent = "<h2 style='color:#22c55e; margin-bottom:20px;'>Matriz de Análise Bíblica (12 Etapas)</h2>";
+
+        Object.keys(matrizCompleta).forEach(key => {
+            const etapa = matrizCompleta[key];
+            htmlContent += `
+                <div style="background:#1e293b; padding:15px; margin-bottom:15px; border-radius:8px; border:1px solid #334155;">
+                    <h3 style="color:#38bdf8; margin-bottom:10px;">${etapa.id} — ${etapa.titulo}</h3>
+                    <ul style="margin-left:20px; line-height:1.5;">
+                        ${etapa.itens.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        });
+
+        wrapper.innerHTML = htmlContent;
+        container.appendChild(wrapper);
+    });
+</script>
