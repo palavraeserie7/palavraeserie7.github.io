@@ -1,93 +1,120 @@
 
 /**
- * DASHBOARD V10.1 - NAVEGAÇÃO E CONTROLE DE PESQUISA
+ * DASHBOARD VIEW CONTROLLER V11 (DYNAMIC EXEGETICAL UI)
  */
 
-// Inicialização segura
-window.onload = async () => {
-    console.log("Sistema Nexus Ativo");
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(init, 300);
+});
+
+async function init() {
     try {
         const user = await M00.execute('AUTH_GET_USER');
         if (user) document.getElementById("user-email").innerText = user.email;
         const data = await M00.execute('LOAD_DASHBOARD');
-        if (data && data.books) renderizarEstante(data.books);
+        if (data && data.books) renderBooks(data.books);
     } catch (e) {
         document.getElementById("user-email").innerText = "Modo Pesquisador";
     }
-};
+}
 
-// NAVEGAÇÃO INFALÍVEL
 function mudarAba(aba) {
     const views = ['view-home', 'view-fluxo', 'view-estante', 'view-consulta'];
     views.forEach(v => {
         const el = document.getElementById(v);
         if (el) el.style.display = 'none';
     });
-    
     const target = document.getElementById('view-' + aba);
     if (target) target.style.display = 'block';
-
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     const btn = document.getElementById('btn-' + aba);
     if (btn) btn.classList.add('active');
 }
 
-// DISPARO DE PESQUISA PROFUNDA
 async function executarPesquisa(modo) {
-    const input = document.getElementById("global-search");
-    const tema = input ? input.value.trim() : "";
-    
-    if (!tema || tema.length < 2) {
-        alert("Por favor, digite um tema teológico na barra superior.");
+    const query = document.getElementById("global-search").value.trim();
+    if (!query || query.length < 2) {
+        alert("Por favor, digite sua pergunta teológica primeiro.");
         return;
     }
 
     mudarAba('consulta');
     document.getElementById("results-area").innerHTML = `
-        <div style="text-align:center; padding:50px; color:#00cc66;">
-            <i class="fas fa-cross fa-spin fa-3x"></i>
-            <p style="margin-top:20px; color:#f8f4ec;">M00 Orchestrator processando investigação profunda...</p>
+        <div style="text-align:center; padding:100px;">
+            <i class="fas fa-microchip fa-spin fa-3x" style="color:#00cc66; margin-bottom:20px;"></i>
+            <h2 style="color:white;">M00 Roteando Fontes...</h2>
+            <p style="color:#94a3b8;">Acionando Matriz de 12 Etapas para: "${query}"</p>
         </div>`;
 
-    const d = await M00.execute('EXECUTE_RESEARCH', { query: tema, mode: modo });
-    if (d) {
-        renderizarDossie(d);
-        atualizarFluxo(d.matrizFluxo, d.modo);
+    try {
+        const d = await M00.execute('EXECUTE_RESEARCH', { query, mode });
+        if (d) {
+            renderDossier(d);
+            atualizarFluxo(d.roteiro, d.modo);
+        }
+    } catch (e) {
+        console.error(e);
     }
 }
 
-function atualizarFluxo(matriz, modo) {
+function atualizarFluxo(roteiro, modo) {
     const container = document.getElementById("fluxo-container");
-    document.getElementById("fluxo-subtitle").innerText = `Matriz Técnica de Evidências - Nível: ${modo}`;
-    container.innerHTML = matriz.map(item => `
-        <div style="background:#111827; padding:12px; margin-bottom:8px; border-radius:8px; border-left:4px solid #00cc66; font-size:0.85rem;">
-            <strong style="color:#00cc66;">${item.etapa}:</strong> <span style="color:#C9A84C;">${item.fonte}</span> - ${item.funcao}
-        </div>`).join('');
+    const subtitle = document.getElementById("fluxo-subtitle");
+    if(!container) return;
+
+    subtitle.innerText = `Matriz Dinâmica Master V1 — Nível: ${modo}`;
+    
+    let html = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-top: 20px;">
+    `;
+
+    roteiro.forEach(item => {
+        html += `
+            <div style="background:#111827; padding:15px; border-radius:10px; border:1px solid #1f2937; border-left:4px solid #00cc66;">
+                <div style="font-size:0.65rem; color:#00cc66; font-weight:800; text-transform:uppercase; margin-bottom:5px;">ETAPA ${item.id} — ${item.nome}</div>
+                <div style="color:#C9A84C; font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${item.fontesAtivas.join(" / ")}</div>
+                <div style="font-size:0.75rem; color:#94a3b8;">${item.funcao}</div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
 }
 
-function renderizarDossie(d) {
-    document.getElementById("results-area").innerHTML = `
-        <div style="background:#fdfcf0; color:#1a202c; border-radius:15px; padding:40px; border:3px solid #1a202c; font-family:serif; max-width:850px; margin:auto; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
-            <div style="border-bottom:4px double #1a202c; text-align:center; padding-bottom:20px; margin-bottom:30px;">
-                <h1 style="font-size:2.8rem; margin:0;">${d.tema}</h1>
-                <span style="background:#065f46; color:white; padding:5px 15px; border-radius:20px; font-size:0.8rem;">SENTINELA: ${d.score}/100 [APROVADO]</span>
+function renderDossier(d) {
+    const area = document.getElementById("results-area");
+    if(!area) return;
+
+    area.innerHTML = `
+        <div style="background:#fdfcf0; color:#1a202c; border-radius:15px; padding:50px; border:3px solid #1a202c; font-family:serif; max-width:900px; margin:auto; box-shadow:0 30px 60px rgba(0,0,0,0.5);">
+            <div style="border-bottom:5px double #1a202c; text-align:center; padding-bottom:20px; margin-bottom:40px;">
+                <h2 style="margin:0; font-size:0.7rem; letter-spacing:5px; color:#4a5568; font-weight:800;">ARQUITETURA DE INTELIGÊNCIA V11</h2>
+                <h1 style="margin:15px 0; font-size:2.8rem; text-transform:uppercase;">${d.tema}</h1>
+                <div style="background:#065f46; color:white; padding:8px 25px; border-radius:50px; font-size:0.8rem; font-weight:bold; display:inline-block; border:2px solid #1a202c;">
+                    NÍVEL: ${d.modo} | SENTINELA: ${d.score}/100 [APROVADO]
+                </div>
             </div>
-            <div style="background:white; padding:25px; border-left:12px solid #00cc66; margin-bottom:25px;">
-                <h3 style="color:#00cc66; margin-top:0;">M03 — INVESTIGAÇÃO EXEGÉTICA</h3>
-                <div style="line-height:1.8; font-size:1.1rem;">${d.m03.conteudo.replace(/\n/g, '  
-')}</div>
+
+            <div style="background:white; padding:30px; border-radius:10px; border-left:12px solid #00cc66; margin-bottom:30px; border:1px solid #e2e8f0;">
+                <h3 style="color:#00cc66; margin-top:0;">${d.m03.titulo}</h3>
+                <div style="font-size:1.1rem; line-height:1.8; color:#2d3748;">
+                    ${d.m03.conteudo.split('\n\n').map(p => `<p style="margin-bottom:15px;">${p}</p>`).join('')}
+                </div>
             </div>
-            <div style="background:#fffbeb; padding:25px; border-left:12px solid #C9A84C;">
-                <h3 style="color:#92400e; margin-top:0;">M02 — SÍNTESE E MENSAGEM</h3>
-                <p style="line-height:1.8; font-size:1.1rem; font-style:italic;">${d.m02.conteudo}</p>
+
+            <div style="background:#fffbeb; padding:30px; border-radius:10px; border-left:12px solid #C9A84C; border:1px solid #fef3c7;">
+                <h3 style="color:#92400e; margin-top:0;">${d.m02.titulo}</h3>
+                <p style="font-size:1.1rem; line-height:1.8; color:#451a03; font-style:italic;">"${d.m02.conteudo}"</p>
             </div>
-            <div style="text-align:center; margin-top:30px;">
-                <button class="btn-liberado" style="background:#00cc66; color:white; padding:15px 40px;" onclick="mudarAba('fluxo')">VER MATRIZ DE FONTES</button>
+
+            <div style="text-align:center; margin-top:40px; border-top:1px dashed #cbd5e0; padding-top:30px;">
+                <button class="btn-liberado" style="background:#00cc66; color:white; padding:15px 50px; font-size:1rem;" onclick="mudarAba('fluxo')">VER MATRIZ DINÂMICA DE FONTES</button>
             </div>
         </div>`;
 }
 
-function renderizarEstante(books) {
+function renderBooks(books) {
     const grid = document.getElementById("books-grid");
     if(!grid) return;
     grid.innerHTML = books.map(b => `
