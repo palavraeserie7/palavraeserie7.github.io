@@ -2,68 +2,51 @@ async function init() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = "./login.html"; return; }
     document.getElementById("user-email").innerText = user.email;
-    try {
-        const response = await M00.execute('load_dashboard', { userId: user.id });
-        window.allBooks = response.books || [];
-        renderBooks(window.allBooks);
-    } catch (err) { console.error(err); }
+
+    // Carrega dados do Orquestrador M00
+    window.libraryData = await M00.execute('BIBLIOTECA_AVANCADA');
+    renderCamadas(window.libraryData.camadas);
+    
+    const books = await M00.execute('PRO', { userId: user.id });
+    renderBooks(books);
+}
+
+function renderCamadas(camadas) {
+    const container = document.getElementById("camadas-container");
+    container.innerHTML = "";
+    camadas.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "layer-box";
+        let html = `<div class="layer-header"><h2>${c.nome}</h2><p>${c.sub}</p></div><table class="library-table"><thead><tr><th>RECURSO</th><th>RESOLVE</th><th>NÍVEL</th></tr></thead><tbody>`;
+        c.recursos.forEach(r => {
+            html += `<tr><td><strong>${r.nome}</strong></td><td>${r.resolve}</td><td><span class="level-badge ${r.nivel.toLowerCase().replace('+', 'plus')}">${r.nivel}</span></td></tr>`;
+        });
+        html += `</tbody></table>`;
+        div.innerHTML = html;
+        container.appendChild(div);
+    });
+}
+
+function switchTab(view) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    
+    document.getElementById('home-view').style.display = view === 'home' || view === 'all' ? 'block' : 'none';
+    document.getElementById('biblioteca-view').style.display = view === 'biblioteca' ? 'block' : 'none';
+    document.getElementById('fluxo-view').style.display = view === 'fluxo' ? 'block' : 'none';
 }
 
 function renderBooks(books) {
-    const freeContainer = document.getElementById("books-free");
-    const proContainer = document.getElementById("books-pro");
-    const secFree = document.getElementById("section-free");
-    const secPro = document.getElementById("section-pro");
-    
-    freeContainer.innerHTML = ""; proContainer.innerHTML = "";
-    const free = books.filter(b => (b.level || b.nivel || 1) <= 1);
-    const pro = books.filter(b => (b.level || b.nivel || 1) > 1);
-
-    secFree.style.display = free.length > 0 ? "block" : "none";
-    secPro.style.display = pro.length > 0 ? "block" : "none";
-
-    free.forEach(b => freeContainer.appendChild(createBookCard(b)));
-    pro.forEach(b => proContainer.appendChild(createBookCard(b)));
-}
-
-function createBookCard(book) {
-    const div = document.createElement("div");
-    div.className = "book-card";
-    const title = book.title || book.titulo || "Sem Título";
-    const cat = book.category || book.categoria || "Geral";
-    const isPro = (book.level || book.nivel || 1) > 1;
-    const cover = book.content_path || book.capa || `https://via.placeholder.com/200x300/111827/00cc66?text=${encodeURIComponent(title )}`;
-    
-    div.innerHTML = `
-        <div class="tag ${isPro ? 'pro-tag' : 'free-tag'}">${isPro ? 'PRO' : 'FREE'}</div>
-        <img src="${cover}">
-        <div class="book-info">
-            <h3>${title}</h3>
-            <p>${cat}</p>
-            <button class="${isPro ? 'btn-bloqueado' : 'btn-liberado'}" onclick="handleBookClick('${book.id}', ${isPro})">
-                <i class="fas ${isPro ? 'fa-lock' : 'fa-play'}"></i> ${isPro ? 'Bloqueado' : 'Ler Agora'}
-            </button>
-        </div>`;
-    return div;
-}
-
-function switchTab(cat) {
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    document.getElementById("page-title").innerText = cat === 'all' ? "Toda a Estante" : cat;
-    const filtered = cat === 'all' ? window.allBooks : window.allBooks.filter(b => (b.category || b.categoria || "").toLowerCase() === cat.toLowerCase());
-    renderBooks(filtered);
-}
-
-function searchTheme() {
-    const term = document.getElementById("theme-search").value.toLowerCase();
-    const filtered = window.allBooks.filter(b => (b.title || b.titulo || "").toLowerCase().includes(term));
-    renderBooks(filtered);
-}
-
-function handleBookClick(id, isPro) {
-    if (isPro) document.getElementById("pro-modal").style.display = "flex";
-    else alert("Abrindo livro: " + id);
+    const free = document.getElementById("books-free");
+    const pro = document.getElementById("books-pro");
+    free.innerHTML = ""; pro.innerHTML = "";
+    books.forEach(b => {
+        const div = document.createElement("div");
+        div.className = "book-card";
+        const isPro = (b.level || 1) > 1;
+        div.innerHTML = `<div class="tag ${isPro ? 'pro-tag' : 'free-tag'}">${isPro ? 'PRO' : 'FREE'}</div><img src="${b.content_path || 'https://via.placeholder.com/150'}"><div class="book-info"><h3>${b.title || b.titulo}</h3></div>`;
+        if (isPro ) pro.appendChild(div); else free.appendChild(div);
+    });
 }
 
 async function logout() { await supabase.auth.signOut(); window.location.href = "./login.html"; }
