@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard V7 - Palavra & Série</title>
-    <link rel="stylesheet" href="../style.css?v=7">
+    <title>Ecossistema V7 - Palavra & Série</title>
+    <link rel="stylesheet" href="../style.css?v=8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -19,14 +19,11 @@
         </div>
         <ul class="nav-links">
             <li class="nav-item active" onclick="switchTab('home' )"><i class="fas fa-home"></i> <span>Início</span></li>
-            
             <li class="nav-section">BIBLIOTECA AVANÇADA</li>
             <li class="nav-item" onclick="switchTab('biblioteca')"><i class="fas fa-layer-group"></i> <span>As 9 Camadas</span></li>
             <li class="nav-item" onclick="switchTab('fluxo')"><i class="fas fa-stream"></i> <span>Fluxo de Estudo</span></li>
-            
             <li class="nav-section">ESTANTE</li>
-            <li class="nav-item" onclick="switchTab('all')"><i class="fas fa-book-open"></i> <span>Toda a Estante</span></li>
-            
+            <li class="nav-item" onclick="switchTab('estante')"><i class="fas fa-book-open"></i> <span>Livros e Séries</span></li>
             <li class="nav-section">CONTA</li>
             <li class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></li>
         </ul>
@@ -35,29 +32,40 @@
         <header class="top-bar">
             <div class="search-container">
                 <i class="fas fa-search"></i>
-                <input type="text" id="global-search" placeholder="Pesquisar recurso teológico..." onkeyup="handleGlobalSearch()">
+                <input type="text" id="global-search" placeholder="Pesquisar qualquer tema teológico..." onkeyup="handleGlobalSearch()">
             </div>
             <div id="user-email" style="font-size: 0.85rem; opacity: 0.7;"></div>
         </header>
         <div class="content-body">
-            <!-- TELA DE INÍCIO / ESTANTE -->
+            <!-- TELA DE INÍCIO -->
             <div id="home-view">
-                <h1 id="page-title">Bem-vindo à sua Jornada</h1>
-                <div id="books-free" class="books-grid"></div>
-                <div id="books-pro" class="books-grid" style="margin-top:40px;"></div>
+                <h1>Bem-vindo à sua Jornada</h1>
+                <p>Use o menu lateral para navegar ou a busca acima para consultas profundas.</p>
             </div>
 
             <!-- TELA DAS 9 CAMADAS -->
             <div id="biblioteca-view" style="display:none;">
                 <h1 style="color: var(--secondary);">Biblioteca Bíblica Avançada</h1>
-                <p style="color: var(--text-muted); margin-bottom: 30px;">9 Camadas Teológicas - Nível Acadêmico</p>
                 <div id="camadas-container"></div>
             </div>
 
             <!-- TELA DO FLUXO -->
             <div id="fluxo-view" style="display:none;">
                 <h1>Fluxo de Estudo Avançado</h1>
-                <div id="fluxo-container" class="fluxo-box"></div>
+                <div id="fluxo-container"></div>
+            </div>
+
+            <!-- TELA DA ESTANTE -->
+            <div id="estante-view" style="display:none;">
+                <h1>Sua Estante de Livros</h1>
+                <div id="books-free" class="books-grid"></div>
+                <div id="books-pro" class="books-grid" style="margin-top:30px;"></div>
+            </div>
+
+            <!-- TELA DE CONSULTA (A QUE ESTAVA FALTANDO!) -->
+            <div id="consulta-view" style="display:none;">
+                <h1 style="color: #00cc66;">Resultados da Consulta Teológica</h1>
+                <div id="results-area"></div>
             </div>
         </div>
     </main>
