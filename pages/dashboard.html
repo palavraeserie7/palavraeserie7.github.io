@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard V10 - Palavra & Série</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>Palavra & Série - Oficial</title>
+    <link rel="stylesheet" href="../style.css?v=FINAL">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -19,52 +18,38 @@
             </div>
         </div>
         <ul class="nav-links">
-            <li class="nav-item active" id="btn-home" onclick="mudarAba('home' )"><i class="fas fa-home"></i> <span>INÍCIO</span></li>
+            <li class="nav-item active" id="btn-home" onclick="NEXUS_NAVEGAR('home' )"><i class="fas fa-home"></i> <span>INÍCIO</span></li>
             <li class="nav-section">INTELIGÊNCIA</li>
             <li class="nav-item-parent"><i class="fas fa-search"></i> <span>PESQUISA</span></li>
             <ul class="nav-sub-links">
-                <li class="nav-item sub" onclick="executarPesquisa('rapida')"><span>01 Pesquisa Rápida</span></li>
-                <li class="nav-item sub" onclick="executarPesquisa('contextual')"><span>02 Pesquisa Contextual</span></li>
-                <li class="nav-item sub" onclick="executarPesquisa('exegetica')"><span>03 Pesquisa Exegética</span></li>
-                <li class="nav-item sub" onclick="executarPesquisa('profunda')"><span>04 Pesquisa Profunda</span></li>
-                <li class="nav-item sub" onclick="executarPesquisa('pro')"><span>05 Pesquisa PRO 🔒</span></li>
+                <li class="nav-item sub" onclick="NEXUS_PESQUISAR('rapida')"><span>01 Pesquisa Rápida</span></li>
+                <li class="nav-item sub" onclick="NEXUS_PESQUISAR('contextual')"><span>02 Pesquisa Contextual</span></li>
+                <li class="nav-item sub" onclick="NEXUS_PESQUISAR('exegetica')"><span>03 Pesquisa Exegética</span></li>
+                <li class="nav-item sub" onclick="NEXUS_PESQUISAR('profunda')"><span>04 Pesquisa Profunda</span></li>
+                <li class="nav-item sub" onclick="NEXUS_PESQUISAR('pro')"><span>05 Pesquisa PRO 🔒</span></li>
             </ul>
-            <li class="nav-item" id="btn-fluxo" onclick="mudarAba('fluxo')"><i class="fas fa-stream"></i> <span>FLUXO DE ESTUDO</span></li>
-            <li class="nav-section">ESTANTE</li>
-            <li class="nav-item" id="btn-estante" onclick="mudarAba('estante')"><i class="fas fa-book-open"></i> <span>Recursos Disponíveis</span></li>
-            <li class="nav-section">CONTA</li>
-            <li class="nav-item" onclick="fazerLogout()"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></li>
+            <li class="nav-item" id="btn-fluxo" onclick="NEXUS_NAVEGAR('fluxo')"><i class="fas fa-stream"></i> <span>FLUXO DE ESTUDO</span></li>
+            <li class="nav-item" id="btn-estante" onclick="NEXUS_NAVEGAR('estante')"><i class="fas fa-book-open"></i> <span>ESTANTE</span></li>
+            <li class="nav-item" onclick="location.href='login.html'"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></li>
         </ul>
     </nav>
     <main class="main-content">
         <header class="top-bar">
             <div class="search-container">
                 <i class="fas fa-search"></i>
-                <input type="text" id="global-search" placeholder="Qual tema teológico deseja investigar?..." onkeyup="if(event.key==='Enter')executarPesquisa('contextual')">
+                <input type="text" id="global-search" placeholder="Qual o tema da sua pesquisa?..." onkeyup="if(event.key==='Enter')NEXUS_PESQUISAR('contextual')">
             </div>
-            <div id="user-email" style="font-size: 0.85rem; color: #94a3b8;"></div>
+            <div id="user-email" style="font-size: 0.85rem; color: #94a3b8;">Modo Convidado</div>
         </header>
         <div class="content-body">
-            <div id="view-home">
-                <h1>Centro de Inteligência Teológica</h1>
-                <p style="color: #94a3b8;">Selecione o nível de profundidade no menu para iniciar sua investigação.</p>
-            </div>
-            <div id="view-fluxo" style="display:none;">
-                <h1>Matriz de Fluxo de Estudo</h1>
-                <p id="fluxo-subtitle" style="color: #94a3b8;"></p>
-                <div id="fluxo-container"></div>
-            </div>
-            <div id="view-estante" style="display:none;">
-                <h1>Estante de Publicações</h1>
-                <div id="books-grid" class="books-grid"></div>
-            </div>
-            <div id="view-consulta" style="display:none;">
-                <div id="results-area"></div>
-            </div>
+            <div id="view-home"><h1>Bem-vindo ao Centro de Inteligência</h1><p>Selecione um nível de pesquisa para começar.</p></div>
+            <div id="view-fluxo" style="display:none;"><h1>Matriz de Evidências</h1><div id="fluxo-container"></div></div>
+            <div id="view-estante" style="display:none;"><h1>Estante Digital</h1><div id="books-grid" class="books-grid"></div></div>
+            <div id="view-consulta" style="display:none;"><div id="results-area"></div></div>
         </div>
     </main>
-    <script src="../js/supabase.js"></script>
-    <script src="../js/core/orchestrator.js"></script>
-    <script src="../js/dashboard.js"></script>
+    <script src="../js/supabase.js?v=FINAL"></script>
+    <script src="../js/core/orchestrator.js?v=FINAL"></script>
+    <script src="../js/dashboard.js?v=FINAL"></script>
 </body>
 </html>
