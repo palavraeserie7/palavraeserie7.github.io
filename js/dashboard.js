@@ -14,27 +14,40 @@ async function init() {
 }
 
 function switchTab(view, isManual = true) {
+    // Só limpa a busca se você clicar manualmente no menu
     if (isManual) { document.getElementById("global-search").value = ""; }
+    
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     const sections = ['home-view', 'biblioteca-view', 'fluxo-view', 'estante-view', 'consulta-view'];
-    sections.forEach(id => { if(document.getElementById(id)) document.getElementById(id).style.display = 'none'; });
+    sections.forEach(id => { 
+        const el = document.getElementById(id);
+        if(el) el.style.display = 'none'; 
+    });
     
-    const target = { 'home':'home-view', 'biblioteca':'biblioteca-view', 'fluxo':'fluxo-view', 'estante':'estante-view', 'consulta':'consulta-view' }[view];
-    if (document.getElementById(target)) document.getElementById(target).style.display = 'block';
+    const targetId = { 'home':'home-view', 'biblioteca':'biblioteca-view', 'fluxo':'fluxo-view', 'estante':'estante-view', 'consulta':'consulta-view' }[view];
+    const targetEl = document.getElementById(targetId);
+    if (targetEl) targetEl.style.display = 'block';
 }
 
 async function handleGlobalSearch() {
     const query = document.getElementById("global-search").value;
     if (query.length < 2) return;
-    switchTab('consulta', false); // Troca de aba SEM limpar o texto
+
+    // Muda para a tela de consulta SEM limpar o texto
+    switchTab('consulta', false); 
+    
     const container = document.getElementById("results-area");
+    if (!container) return;
     container.innerHTML = "<div style='color:#00cc66'>Sentinela processando...</div>";
+
     const results = await M00.execute('SENTINELA', { query });
     container.innerHTML = "";
+    
     if (!results || results.length === 0) {
         container.innerHTML = `<p style='opacity:0.5'>Nenhum registro para "${query}".</p>`;
         return;
     }
+
     results.forEach(res => {
         const div = document.createElement("div");
         div.style = "background:#111827; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #1f2937;";
