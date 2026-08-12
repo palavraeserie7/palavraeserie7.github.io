@@ -1,375 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Palavra & Série — Pesquisa Bíblica
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="../style.css?v=11"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard V9.1 - Palavra & Série</title>
+    <link rel="stylesheet" href="../style.css?v=11">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
-
 <body class="dashboard-layout">
-
-
-    <!-- =====================================================
-         MENU LATERAL
-         ===================================================== -->
-
     <nav class="sidebar">
-
         <div class="sidebar-header">
-
-            <div class="logo-symbol">
-                📚
-            </div>
-
+            <span style="font-size: 1.8rem;">📚</span>
             <div class="logo-text">
-
-                <span class="logo-title">
-                    PALAVRA & SÉRIE
-                </span>
-
-                <span class="logo-subtitle">
-                    SEMENTE DO CORAÇÃO
-                </span>
-
+                <span style="font-weight: 800; font-size: 0.9rem; display: block;">PALAVRA & SÉRIE</span>
+                <span style="font-size: 0.65rem; color: #00cc66; font-weight: bold;">SEMENTE DO CORAÇÃO</span>
             </div>
-
         </div>
-
-
         <ul class="nav-links">
-
-
-            <li
-                class="nav-item active"
-                data-view="home"
-                onclick="switchTab('home')"
-            >
-
-                <span>⌂</span>
-                <span>Início</span>
-
-            </li>
-
-
-            <li class="nav-section">
-                INTELIGÊNCIA
-            </li>
-
-
-            <li
-                class="nav-item"
-                data-view="pesquisa"
-                onclick="switchTab('pesquisa')"
-            >
-
-                <span>⌕</span>
-                <span>Pesquisa</span>
-
-            </li>
-
-
-            <li
-                class="nav-item"
-                data-view="fluxo"
-                onclick="switchTab('fluxo')"
-            >
-
-                <span>☷</span>
-                <span>Fluxo de Estudo</span>
-
-            </li>
-
-
-            <li class="nav-section">
-                ESTANTE
-            </li>
-
-
-            <li
-                class="nav-item"
-                data-view="estante"
-                onclick="switchTab('estante')"
-            >
-
-                <span>▣</span>
-                <span>Livros e Séries</span>
-
-            </li>
-
-
-            <li class="nav-section">
-                CONTA
-            </li>
-
-
-            <li
-                class="nav-item"
-                onclick="logout()"
-            >
-
-                <span>⇥</span>
-                <span>Sair</span>
-
-            </li>
-
+            <li class="nav-item active" onclick="switchTab('home' )"><i class="fas fa-home"></i> <span>INÍCIO</span></li>
+            
+            <li class="nav-section">INTELIGÊNCIA</li>
+            <li class="nav-item-parent"><i class="fas fa-search"></i> <span>PESQUISA</span></li>
+            <ul class="nav-sub-links">
+                <li class="nav-item sub" onclick="executeSearchWithMode('rapida')"><span>01 Pesquisa Rápida</span></li>
+                <li class="nav-item sub" onclick="executeSearchWithMode('contextual')"><span>02 Pesquisa Contextual</span></li>
+                <li class="nav-item sub" onclick="executeSearchWithMode('exegetica')"><span>03 Pesquisa Exegética</span></li>
+                <li class="nav-item sub" onclick="executeSearchWithMode('profunda')"><span>04 Pesquisa Profunda</span></li>
+                <li class="nav-item sub" onclick="executeSearchWithMode('pro')"><span>05 Pesquisa PRO 🔒</span></li>
+            </ul>
+            
+            <li class="nav-item" onclick="switchTab('fluxo')"><i class="fas fa-stream"></i> <span>FLUXO DE ESTUDO</span></li>
+            
+            <li class="nav-section">ESTANTE</li>
+            <li class="nav-item" onclick="switchTab('estante')"><i class="fas fa-book-open"></i> <span>Recursos Disponíveis</span></li>
+            
+            <li class="nav-section">CONTA</li>
+            <li class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></li>
         </ul>
-
     </nav>
 
-
-
-    <!-- =====================================================
-         CONTEÚDO PRINCIPAL
-         ===================================================== -->
-
     <main class="main-content">
-
-
-        <!-- BARRA SUPERIOR -->
-
         <header class="top-bar">
-
             <div class="search-container">
-
-                <span class="search-icon">
-                    ⌕
-                </span>
-
-                <input
-                    type="text"
-                    id="global-search"
-                    placeholder="Pesquisar qualquer tema..."
-                    onkeydown="handleGlobalSearch(event)"
-                >
-
+                <i class="fas fa-search"></i>
+                <input type="text" id="global-search" placeholder="Qual a sua pergunta bíblica?..." onkeyup="if(event.key==='Enter')executeSearchWithMode('contextual')">
             </div>
-
-
-            <div
-                id="user-email"
-                class="user-email"
-            ></div>
-
+            <div id="user-email" style="font-size: 0.85rem; opacity: 0.7;"></div>
         </header>
 
-
-
         <div class="content-body">
-
-
-            <!-- =================================================
-                 INÍCIO
-                 ================================================= -->
-
-            <section
-                id="home-view"
-                class="page-view"
-            >
-
-                <h1>
-                    Bem-vindo à sua Jornada
-                </h1>
-
-                <p>
-                    Escolha o nível de profundidade
-                    para sua pesquisa bíblica.
-                </p>
-
-            </section>
-
-
-
-            <!-- =================================================
-                 PESQUISA
-                 ================================================= -->
-
-            <section
-                id="pesquisa-view"
-                class="page-view"
-                style="display:none;"
-            >
-
-                <div class="page-heading">
-
-                    <span class="section-label">
-                        INTELIGÊNCIA BÍBLICA
-                    </span>
-
-                    <h1>
-                        Pesquisa Bíblica
-                    </h1>
-
-                    <p>
-                        Escolha quanto deseja aprofundar
-                        sua investigação.
-                    </p>
-
+            <div id="home-view">
+                <h1>Bem-vindo à sua Jornada</h1>
+                <p>Selecione o nível de profundidade no menu lateral para iniciar sua investigação.</p>
+                <div class="status-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:20px; margin-top:30px;">
+                    <div class="status-card"><span class="label">Fé</span><span class="value" id="stat-faith">95%</span></div>
+                    <div class="status-card"><span class="label">Oração</span><span class="value" id="stat-prayer">90%</span></div>
                 </div>
+            </div>
 
+            <div id="fluxo-view" style="display:none;">
+                <h1>Fluxo de Estudo</h1>
+                <p id="fluxo-subtitle" style="color: #94a3b8;">Selecione uma pesquisa para visualizar as etapas.</p>
+                <div id="fluxo-container" style="margin-top:20px;"></div>
+            </div>
 
-                <div
-                    id="research-modes-container"
-                    class="research-modes"
-                ></div>
+            <div id="estante-view" style="display:none;">
+                <h1>Sua Estante</h1>
+                <div id="books-free" class="books-grid"></div>
+                <div id="books-pro" class="books-grid" style="margin-top:30px; border-top:1px solid #1f2937; padding-top:30px;"></div>
+            </div>
 
-            </section>
-
-
-
-            <!-- =================================================
-                 FLUXO DE ESTUDO
-                 ================================================= -->
-
-            <section
-                id="fluxo-view"
-                class="page-view"
-                style="display:none;"
-            >
-
-                <div class="page-heading">
-
-                    <span class="section-label">
-                        METODOLOGIA
-                    </span>
-
-                    <h1>
-                        Fluxo de Estudo
-                    </h1>
-
-                    <p>
-                        Visualize as etapas ativadas
-                        pelo nível de pesquisa escolhido.
-                    </p>
-
-                </div>
-
-
-                <div
-                    id="fluxo-container"
-                    class="flow-container"
-                ></div>
-
-            </section>
-
-
-
-            <!-- =================================================
-                 ESTANTE
-                 ================================================= -->
-
-            <section
-                id="estante-view"
-                class="page-view"
-                style="display:none;"
-            >
-
-                <div class="page-heading">
-
-                    <span class="section-label">
-                        BIBLIOTECA
-                    </span>
-
-                    <h1>
-                        Sua Estante
-                    </h1>
-
-                    <p>
-                        Recursos documentais disponíveis
-                        para a infraestrutura de pesquisa.
-                    </p>
-
-                </div>
-
-
-                <h2>
-                    Recursos disponíveis
-                </h2>
-
-                <div
-                    id="books-free"
-                    class="books-grid"
-                ></div>
-
-
-                <h2 class="pro-library-title">
-                    Recursos PRO
-                </h2>
-
-                <div
-                    id="books-pro"
-                    class="books-grid"
-                ></div>
-
-            </section>
-
-
-
-            <!-- =================================================
-                 RESULTADO
-                 ================================================= -->
-
-            <section
-                id="consulta-view"
-                class="page-view"
-                style="display:none;"
-            >
-
-                <div class="page-heading">
-
-                    <span class="section-label">
-                        RESULTADO
-                    </span>
-
-                    <h1>
-                        Resultado da Pesquisa
-                    </h1>
-
-                </div>
-
-
+            <div id="consulta-view" style="display:none;">
+                <h1 style="color: #00cc66; text-align:center;">Resultados da Consulta</h1>
                 <div id="results-area"></div>
-
-            </section>
-
-
+            </div>
         </div>
-
     </main>
 
-
-
-    <!-- =====================================================
-         SCRIPTS LOCAIS
-         ===================================================== -->
-
-    <!--
-        Mantenha aqui o carregamento local do Supabase
-        que o projeto já utiliza.
-    -->
-
     <script src="../js/supabase.js"></script>
-
     <script src="../js/core/orchestrator.js"></script>
-
     <script src="../js/dashboard.js"></script>
-
-
 </body>
-
 </html>
