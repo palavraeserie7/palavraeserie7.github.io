@@ -6,6 +6,7 @@ async function init() {
     // Carrega dados do Orquestrador M00
     window.libraryData = await M00.execute('BIBLIOTECA_AVANCADA');
     renderCamadas(window.libraryData.camadas);
+    renderFluxo(window.libraryData.fluxo);
     
     const books = await M00.execute('PRO', { userId: user.id });
     renderBooks(books);
@@ -23,6 +24,18 @@ function renderCamadas(camadas) {
         });
         html += `</tbody></table>`;
         div.innerHTML = html;
+        container.appendChild(div);
+    });
+}
+
+function renderFluxo(fluxo) {
+    const container = document.getElementById("fluxo-container");
+    container.innerHTML = "";
+    if (!fluxo) return;
+    fluxo.forEach((passo, i) => {
+        const div = document.createElement("div");
+        div.className = "fluxo-step";
+        div.innerHTML = `<span class="step-num">${i+1}</span><p>${passo}</p>`;
         container.appendChild(div);
     });
 }
