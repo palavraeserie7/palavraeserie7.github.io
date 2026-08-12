@@ -3,7 +3,7 @@
  */
 
 // 1. CONFIGURAÇÃO DA IA (Obtenha sua chave em: https://aistudio.google.com/app/apikey )
-const GEMINI_API_KEY = "COLE_SUA_CHAVE_AQUI"; 
+const GEMINI_API_KEY = "AQ.Ab8RN6Iy6_8ECP5Fyr5HMHuRuAF0whBOEKW67Vgh4CSgEUSq8w"; 
 
 // 2. MATRIZ DE ETAPAS E FONTES
 const MATRIZ_FONTES = {
