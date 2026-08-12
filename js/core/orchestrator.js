@@ -1,28 +1,52 @@
 /**
- * M00 - CORE ORCHESTRATOR V9.3 (INTELECTO TEOLÓGICO)
- * Gerencia a geração de relatórios ricos baseados em temas bíblicos.
+ * M00 - CORE ORCHESTRATOR V9.4 (SÍNTESE TEOLÓGICA AVANÇADA)
+ * Gera relatórios automáticos e ricos baseados no nível de profundidade.
  */
 const M00 = (function() {
     const _db = window.__getInternalDatabaseConnector('M00_ORCHESTRATOR');
 
-    // Base de Conhecimento Teológico para Síntese Automática
-    const bibliotecaTeologica = {
-        "AMOR": {
-            exegese: "No grego, o termo 'Agápē' descreve o amor incondicional e sacrificial de Deus. Diferente de 'Philia' (amizade) ou 'Eros' (romântico), o Agápē é uma decisão da vontade em favor do outro, exemplificado perfeitamente no sacrifício de Cristo na cruz (Jo 3:16).",
-            mensagem: "O amor cristão não é um sentimento passageiro, mas a base da ética do Reino. Somos chamados a amar como fomos amados, transformando nossas relações em reflexos da graça divina."
-        },
-        "GRAÇA": {
-            exegese: "O termo 'Charis' aponta para o favor imerecido de Deus. Na teologia paulina, a graça é a força motriz da salvação (Ef 2:8-9), operando independentemente das obras humanas para restaurar a comunhão com o Criador.",
-            mensagem: "Viver na graça significa abandonar a autossuficiência. É o descanso na obra consumada de Cristo, que nos capacita a viver uma vida de santidade não por medo, mas por gratidão."
-        },
-        "SANTIDADE": {
-            exegese: "Do hebraico 'Qadosh', significa separação ou consagração. Não é apenas ausência de pecado, mas a dedicação total ao serviço de Deus. No AT, a santidade de Deus é o padrão que exige pureza ritual e moral do povo da aliança.",
-            mensagem: "A santidade hoje é a nossa resposta ao chamado de sermos 'luz do mundo'. É um processo de santificação contínuo onde o Espírito Santo molda nosso caráter à imagem de Jesus."
-        },
-        "JUSTIFICAÇÃO": {
-            exegese: "O termo jurídico 'Dikaiosyne' refere-se ao ato de Deus declarar o pecador como justo. Não é um processo de tornar alguém bom, mas uma mudança de status legal diante do tribunal divino, baseada na justiça imputada de Cristo.",
-            mensagem: "Saber que fomos justificados traz paz com Deus. Não precisamos mais provar nosso valor; nossa aceitação está garantida naquele que morreu em nosso lugar."
+    // Motor de Inteligência para Geração de Conteúdo
+    const gerarConteudoRico = (tema, modo) => {
+        const t = tema.toUpperCase();
+        
+        // Base de dados de conhecimento para temas principais
+        const conhecimento = {
+            "AMOR": {
+                original: "Agápē (Grego)",
+                definicao: "Amor sacrificial, incondicional e baseado na vontade, não apenas na emoção.",
+                exegese_pro: "A análise de Agápē em 1 Co 13 revela que este amor é a 'via sobremodo excelente'. No contexto bíblico, ele é a essência do caráter de Deus (1 Jo 4:8). Diferente de 'Philia', o Agápē não busca o seu próprio interesse, mas o bem supremo do outro, culminando na Kenosis (esvaziamento) de Cristo em Fp 2.",
+                mensagem: "O Amor não é uma opção para o cristão, é a evidência da regeneração. Viver o Agápē significa refletir a glória de Deus em relacionamentos que priorizam o próximo acima do eu."
+            },
+            "SANTIDADE": {
+                original: "Qadosh (Hebraico) / Hagios (Grego)",
+                definicao: "Separação total para o uso exclusivo de Deus; pureza absoluta.",
+                exegese_pro: "O conceito de Qadosh no Antigo Testamento aponta para a transcendência de Deus. No Levítico, a santidade é um imperativo ('Sede santos porque eu sou santo'). A exegese profunda mostra que a santidade é o atributo que protege a glória de Deus, exigindo medição e sacrifício para a aproximação humana.",
+                mensagem: "A santidade não é legalismo, é liberdade. Fomos separados do mundo para pertencermos ao Criador, vivendo uma vida que aponta para a perfeição de Cristo."
+            }
+        };
+
+        const base = conhecimento[t] || {
+            original: "Termo Original em Análise",
+            definicao: `Estudo sistemático sobre o conceito de ${t} nas Escrituras.`,
+            exegese_pro: `A investigação teológica de ${t} percorre toda a história da redenção, desde as promessas patriarcais até a consumação escatológica. Este tema é central para a compreensão da vontade divina para a humanidade.`,
+            mensagem: `O chamado bíblico referente a ${t} é um convite à transformação integral do ser, alinhando o coração do homem aos propósitos eternos de Deus.`
+        };
+
+        // Personaliza o conteúdo com base no Nível (Modo)
+        let m03_final = "";
+        let m02_final = base.mensagem;
+
+        if (modo === 'RAPIDA') {
+            m03_final = `**Definição:** ${base.definicao} \n\n **Original:** ${base.original}`;
+        } else if (modo === 'EXEGETICA' || modo === 'PROFUNDA') {
+            m03_final = `**Análise Exegética:** ${base.exegese_pro.substring(0, 200)}... \n\n **Contexto:** O termo ${base.original} é fundamental para esta compreensão.`;
+        } else if (modo === 'PRO') {
+            m03_final = `**DOSSIÊ COMPLETO:** \n\n ${base.exegese_pro} \n\n **Raiz Linguística:** ${base.original} \n\n **Impacto Teológico:** Este tema altera a nossa percepção da Soteriologia e Eclesiologia.`;
+        } else {
+            m03_final = `**Contexto Geral:** ${base.definicao}`;
         }
+
+        return { m03: m03_final, m02: m02_final };
     };
 
     return {
@@ -40,33 +64,19 @@ const M00 = (function() {
         },
 
         executeResearch(query, modeInput = 'contextual') {
-            const temaBusca = String(query || "").trim().toUpperCase();
-            const mode = String(modeInput).toLowerCase();
+            const tema = String(query || "TEMA").trim().toUpperCase();
+            const modo = String(modeInput).toUpperCase();
             
-            // Busca o conteúdo rico na biblioteca ou gera um padrão se não encontrar
-            const info = bibliotecaTeologica[temaBusca] || {
-                exegese: `A investigação exegética sobre "${temaBusca}" no nível ${mode.toUpperCase()} revela uma estrutura semântica profunda nos originais bíblicos, conectando este tema ao cerne da revelação progressiva das Escrituras.`,
-                mensagem: `O tema "${temaBusca}" convida o leitor a uma reflexão prática sobre sua caminhada cristã, exigindo uma aplicação que harmonize a doutrina bíblica com a vida cotidiana.`
-            };
+            const conteudo = gerarConteudoRico(tema, modo);
 
-            let etapas = ["Análise de Texto", "Contexto Histórico", "Evidências", "Validação", "Síntese Final"];
-            if (mode === 'exegetica') etapas = ["Texto Original", "Morfologia", "Sintaxe", "Léxico", "Exegese"];
-            if (mode === 'pro') etapas = ["Crítica Textual", "Gramática", "Semântica", "Contexto", "Intertextualidade", "Exegese", "Teologia", "Hermenêutica", "Sistemática", "Validação", "Síntese"];
+            let etapas = ["Texto", "Contexto", "Evidências", "Síntese"];
+            if (modo === 'EXEGETICA') etapas = ["Texto Original", "Morfologia", "Sintaxe", "Léxico", "Exegese"];
+            if (modo === 'PRO') etapas = ["Crítica Textual", "Gramática", "Semântica", "Contexto", "Intertextualidade", "Exegese", "Teologia", "Hermenêutica", "Sistemática", "Validação", "Síntese"];
 
             return {
-                tema: temaBusca,
-                modo: mode.toUpperCase(),
-                score: 15,
-                status: "APROVADO",
-                etapas: etapas,
-                m03: {
-                    titulo: "🔹 M03 — ENTENDIMENTO BÍBLICO (EXEGESE)",
-                    conteudo: info.exegese
-                },
-                m02: {
-                    titulo: "🔹 M02 — MENSAGEM (TRANSFORMAÇÃO)",
-                    conteudo: info.mensagem
-                }
+                tema, modo, score: 15, status: "APROVADO", etapas,
+                m03: { titulo: "🔹 M03 — ENTENDIMENTO BÍBLICO", conteudo: conteudo.m03 },
+                m02: { titulo: "🔹 M02 — MENSAGEM", conteudo: conteudo.m02 }
             };
         }
     };
