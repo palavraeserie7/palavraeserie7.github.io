@@ -1,37 +1,62 @@
+/**
+ * M00 - CORE ORCHESTRATOR (ARQUITETURA MASTER V1 - INTELIGÊNCIA EXPANDIDA)
+ * Único ponto de entrada e detentor da inteligência teológica.
+ */
 const M00 = (function() {
     const _db = window.supabaseClientInstance;
 
     return {
         async execute(action, params = {}) {
             if (action === 'BIBLIOTECA_AVANCADA') return this.getLibraryData();
-            if (action === 'QUERY_THEME') return this.generateUniversalExegesis(params.query);
+            if (action === 'QUERY_THEME') return this.generateDeepTheologicalDossier(params.query);
             if (action === 'AUTH_GET_USER') { const {data} = await _db.auth.getUser(); return data.user; }
             if (action === 'LOAD_DASHBOARD') {
                 const {data: books} = await _db.from('livros').select('*');
-                return { profile: { level: 1, faith: 92, prayer: 88 }, books: books || [] };
+                return { profile: { level: 1, faith: 95, prayer: 90 }, books: books || [] };
             }
+            if (action === 'AUTH_LOGOUT') return await _db.auth.signOut();
             return null;
         },
 
-        generateUniversalExegesis(query) {
-            const q = query.toUpperCase();
-            const lib = this.getLibraryData();
+        generateDeepTheologicalDossier(query) {
+            const tema = (query || "").trim().toLowerCase();
             
-            // MOTOR GERATIVO: Cria análise para QUALQUER palavra baseada nas 9 camadas
+            const baseMaster = {
+                'senhor': {
+                    originais: "Hebraico: 'Adonai' (אֲדֹנָי) | Grego: 'Kyrios' (κύριος)",
+                    exegese: "O termo 'Adonai' enfatiza a soberania absoluta de Deus. No NT, a aplicação de 'Kyrios' a Jesus (Fp 2:11) é a declaração máxima de Sua divindade, identificando-O com o Yahweh do AT. O senhorio de Cristo exige rendição total da vontade.",
+                    mensagem: "Reconhecer Jesus como Senhor transforma cada área da vida. Ele não é apenas Salvador, mas o Governante supremo de nossos pensamentos e ações.",
+                    score: 10
+                },
+                'fé': {
+                    originais: "Hebraico: 'Emunah' (אֱמוּנָה) | Grego: 'Pistis' (πίστις)",
+                    exegese: "A fé bíblica ('Emunah') significa firmeza e fidelidade à aliança. Não é mera crença intelectual, mas uma confiança relacional inabalável no caráter de Deus, mesmo em meio às provas.",
+                    mensagem: "Viver pela fé é caminhar na certeza das promessas divinas. É o motor da santificação e a base da nossa justificação diante de Deus.",
+                    score: 8
+                },
+                'justiça': {
+                    originais: "Hebraico: 'Tsedeq' (צֶדֶק) | Grego: 'Dikaiosyne' (δικαιοσύνη)",
+                    exegese: "Refere-se à conformidade com o padrão moral de Deus. Na cruz, a justiça punitiva e restauradora de Deus se encontram, permitindo que Ele seja justo e justificador.",
+                    mensagem: "Em Cristo, a justiça de Deus nos é imputada. Somos declarados justos pela graça para vivermos de forma íntegra e santa.",
+                    score: 15
+                }
+            };
+
+            const info = baseMaster[tema] || {
+                originais: `Consulte as Camadas 1 e 2 para os originais de "${query}".`,
+                exegese: `Análise exegética do tema "${query}" sob o método histórico-gramatical através das 9 camadas.`,
+                mensagem: `A revelação de "${query}" visa a edificação do corpo de Cristo e a glória de Deus.`,
+                score: 25
+            };
+
             return {
-                tema: q,
-                score: 15,
+                tema: query.toUpperCase(),
+                score: info.score,
                 status: "APROVADO",
-                m03: {
-                    titulo: "🔹 M03 — ENTENDIMENTO BÍBLICO (EXEGESE)",
-                    originais: `Análise de Originais para "${q}": Consulte a Camada 1 (Léxico) para identificar a raiz no Hebraico/Grego.`,
-                    conteudo: `Para o tema "${q}", a exegese exige observar o contexto histórico-gramatical. Inicie pela Camada 3 para verificar como os principais comentaristas (NICNT/BECNT) tratam a ocorrência deste termo no arco canônico.`
-                },
-                m02: {
-                    titulo: "🔹 M02 — MENSAGEM (TRANSFORMAÇÃO)",
-                    conteudo: `A revelação central de "${q}" aponta para a soberania de Deus. A aplicação prática deve transformar o entendimento em vida, focando na centralidade de Cristo e na edificação da igreja conforme o fluxo de 7 etapas.`
-                },
-                camadas: lib.camadas
+                m03: { titulo: "🔹 M03 — ENTENDIMENTO BÍBLICO (EXEGESE)", originais: info.originais, conteudo: info.exegese },
+                m02: { titulo: "🔹 M02 — MENSAGEM (TRANSFORMAÇÃO)", conteudo: info.mensagem },
+                cta: { v1: "O que você leu aqui é apenas a superfície exegética.", v2: "Avance para o estudo completo no plano PRO." },
+                camadas: this.getLibraryData().camadas
             };
         },
 
