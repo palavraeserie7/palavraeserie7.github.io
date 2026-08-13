@@ -2,184 +2,310 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Matriz de Análise Bíblica — Motor Exegético Avançado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Matriz de Análise Bíblica</title>
+
+    <style>
+        :root {
+            --bg: #0b1428;
+            --panel: #172238;
+            --panel-2: #101a2e;
+            --border: #263653;
+            --text: #e8eef8;
+            --muted: #8fa1ba;
+            --blue: #08b8ff;
+            --green: #18d66b;
+            --yellow: #f5c542;
+            --red: #ff6678;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .container {
+            width: min(1100px, 94%);
+            margin: 30px auto 80px;
+        }
+
+        .header {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            color: var(--green);
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 0 0 18px;
+            color: var(--muted);
+        }
+
+        .search {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            background: #0b1529;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: white;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--blue);
+        }
+
+        button {
+            border: 0;
+            border-radius: 5px;
+            padding: 0 22px;
+            background: var(--green);
+            color: #07120d;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+        }
+
+        .section {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .section-title {
+            padding: 14px;
+            color: var(--blue);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .section-content {
+            display: none;
+            padding: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .section.open .section-content {
+            display: block;
+        }
+
+        .diagnostic {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .diagnostic-card {
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 12px;
+        }
+
+        .diagnostic-card small {
+            display: block;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .diagnostic-card strong {
+            color: var(--text);
+        }
+
+        .module {
+            margin-bottom: 8px;
+            padding: 12px;
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .module-name {
+            color: var(--blue);
+            font-weight: bold;
+        }
+
+        .module-status {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px 8px;
+            border-radius: 4px;
+        }
+
+        .principal {
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
+
+        .relevante {
+            color: var(--blue);
+            border: 1px solid var(--blue);
+        }
+
+        .condicional {
+            color: var(--yellow);
+            border: 1px solid var(--yellow);
+        }
+
+        .nao-aplicavel {
+            color: var(--red);
+            border: 1px solid var(--red);
+        }
+
+        .module-body {
+            margin-top: 10px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .criteria {
+            margin-top: 10px;
+        }
+
+        .criteria span {
+            display: inline-block;
+            padding: 5px 8px;
+            margin: 3px;
+            background: #0a1427;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .result {
+            background: #0b172b;
+            border-left: 3px solid var(--green);
+            padding: 14px;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        .empty {
+            color: var(--muted);
+            text-align: center;
+            padding: 30px;
+        }
+
+        @media (max-width: 700px) {
+            .search {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                height: 44px;
+            }
+        }
+    </style>
 </head>
-<body style="background:#0f172a; color:#f1f5f9; font-family:sans-serif; margin:0; padding:20px;">
 
-    <div class="container" style="max-width: 950px; margin: 0 auto;"></div>
+<body>
 
-    <script>
-        const matrizCompleta = {
-            "ANL-01": {
-                id: "ANL-01",
-                titulo: "TEXTO E MANUSCRITOS",
-                itens: ["Texto hebraico", "Texto aramaico", "Texto grego", "Manuscritos", "Testemunhos textuais", "Variantes textuais", "Crítica textual", "NA28", "BHS / BHQ", "SBLGNT", "Septuaginta"]
-            },
-            "ANL-02": {
-                id: "ANL-02",
-                titulo: "TRADUÇÃO E TEXTO ORIGINAL",
-                itens: ["Hebraico", "Aramaico", "Grego", "Septuaginta", "Traduções bíblicas", "Comparação de traduções", "Equivalências de tradução", "Diferenças significativas entre traduções"]
-            },
-            "ANL-03": {
-                id: "ANL-03",
-                titulo: "GRAMÁTICA E SINTAXE",
-                itens: ["Morfologia", "Gramática hebraica", "Gramática aramaica", "Gramática grega", "Sintaxe hebraica", "Sintaxe grega", "Estrutura das frases", "Verbos", "Tempos e aspectos", "Voz", "Modo", "Relações sintáticas", "Conectivos"]
-            },
-            "ANL-04": {
-                id: "ANL-04",
-                titulo: "PALAVRAS E SEMÂNTICA",
-                itens: ["Palavras-chave", "Lemas", "Formas lexicais", "Campo semântico", "Sentido contextual", "Uso no AT", "Uso no NT", "BDAG", "HALOT", "BDB", "LSJ"]
-            },
-            "ANL-05": {
-                id: "ANL-05",
-                titulo: "SIGNIFICADO TEOLÓGICO",
-                itens: ["Desenvolvimento dos conceitos", "Vocabulário teológico", "Uso teológico no AT", "Uso teológico no NT", "Relação com a LXX", "NIDNTTE", "NIDOTTE", "TDNT", "TDOT"]
-            },
-            "ANL-06": {
-                id: "ANL-06",
-                titulo: "EXEGESE E CONTEXTO LITERÁRIO",
-                itens: ["Contexto imediato", "Contexto da passagem", "Estrutura literária", "Argumento do autor", "Intenção comunicativa", "Gênero literário", "Relação entre versículos", "Exegese versículo a versículo", "Comentários bíblicos", "BECNT", "NIGTC", "NICNT", "Pillar", "WBC", "NICOT", "AOTC", "Baker OT"]
-            },
-            "ANL-07": {
-                id: "ANL-07",
-                titulo: "CONTEXTO HISTÓRICO, CULTURAL E RELIGIOSO",
-                itens: ["Contexto histórico", "Período histórico", "Cultura", "Costumes", "Sociedade", "Instituições", "Religião", "Práticas religiosas", "Grupos religiosos", "Templos", "Sacerdócio", "Festas", "Crenças", "Zondervan Encyclopedia", "IVP Bible Background Commentary", "New Bible Dictionary", "ANET", "Context of Scripture", "Manners and Customs"]
-            },
-            "ANL-08": {
-                id: "ANL-08",
-                titulo: "CONTEXTO GEOGRÁFICO E POLÍTICO",
-                itens: ["Localização geográfica", "Cidades", "Regiões", "Territórios", "Fronteiras", "Rotas", "Montanhas", "Rios", "Reinos", "Impérios", "Governantes", "Estruturas políticas", "Guerras", "Conflitos", "Relações de poder", "Arqueologia", "Atlas bíblico", "Zondervan Atlas"]
-            },
-            "ANL-09": {
-                id: "ANL-09",
-                titulo: "RELAÇÃO COM O RESTANTE DA ESCRITURA",
-                itens: ["Relações AT–NT", "Citações", "Alusões", "Ecos", "Paralelos", "Uso do AT no NT", "LXX e NT", "Relações canônicas", "Desenvolvimento da revelação", "História da redenção", "Beale", "Beale & Carson", "Vos", "Goldsworthy", "Schreiner"]
-            },
-            "ANL-10": {
-                id: "ANL-10",
-                titulo: "HERMENÊUTICA E CONTROLE",
-                itens: ["Controle interpretativo", "Pressupostos", "Eisegese", "Falácias lexicais", "Descontextualização", "Anacronismo", "Alegorização indevida", "Generalizações", "Descrição × prescrição", "Grant Osborne", "D. A. Carson — Exegetical Fallacies", "Carson & Moo", "Dillard & Longman", "Fee & Stuart"]
-            },
-            "ANL-11": {
-                id: "ANL-11",
-                titulo: "TEOLOGIA & COMPARAÇÃO",
-                itens: ["Teologia sistemática", "Coerência doutrinária", "Comparação de interpretações", "Concordâncias entre fontes", "Divergências entre fontes", "Argumentos das diferentes interpretações", "Consenso acadêmico", "Posições minoritárias", "Evidências favoráveis e contrárias", "Grudem", "Berkhof", "Frame", "Evangelical Dictionary of Theology", "Comentários bíblicos em comparação"]
-            },
-            "ANL-12": {
-                id: "ANL-12",
-                titulo: "SÍNTESE",
-                itens: ["Integração das evidências", "Conclusão exegética", "O que o texto afirma", "O que o texto implica", "O que é interpretação", "O que é inferência", "O que é aplicação", "Questões ainda debatidas", "Grau de segurança da conclusão", "Síntese final para geração de conteúdo"]
-            }
-        };
+<div class="container">
 
-        // Base de Conhecimento Exegético Específico (Exemplos Prontos)
-        const baseExegetica = {
-            "verbo_joao": {
-                "ANL-01": "No SBLGNT e NA28, o texto de João 1:1 utiliza a forma 'Ἐν ἀρχῇ ἦν ὁ λόγος'. Os manuscritos ununciais precários (como P66 e P75) confirmam a estabilidade desta abertura sem variantes textuais críticas relevantes que afetem o substantivo principal.",
-                "ANL-03": "O verbo ἦν (imperfeito de εἰμί) indica existência contínua, atemporal e sem início pontual no passado, contrapondo-se ao verbo ἐγένεto ('passou a existir') usado para a criação no verso 3.",
-                "ANL-04": "Segundo o BDAG, o termo *logos* (λόγος) carrega tanto o pano de fundo filosófico grego (razão/ordem cósmica) quanto a raiz veterotestamentária da Palavra criadora de Deus (מֵמْرָא / *davar*).",
-                "ANL-06": "O prólogo de João (1:1-18) funciona como a 'abertura sinfônica' do evangelho, estruturado poeticamente para ecoar o vocabulário de Gênesis 1:1 ('No princípio')."
-            },
-            "temor_gn28": {
-                "ANL-03": "Em Gênesis 28:17, o texto hebraico emprega o adjetivo *norá* (נוֹרָא - niphal particípio de *yarah*), indicando algo que inspira terror sagrado e assombro legítimo.",
-                "ANL-04": "O campo semântico oscila entre *paḥad* (tremor/medo súbito) e *yir'ah* (reverência cultual). Em Betel, Jacó não expressa fobia secular, mas o choque ontológico diante da presença da 'Casa de Deus'.",
-                "ANL-07": "No Antigo Oriente Próximo, locais de manifestação divina (teofanias) eram sacralizados como portais liminares entre o cosmos e o divino, exigindo ritos de acatamento.",
-                "ANL-10": "Controle hermenêutico: Evitar o anaconismo de ler o 'temor' patriarcal sob a ótica de pânico psicológico moderno; trata-se da categoria teológica de respeito absoluto à santidade."
-            }
-        };
+    <header class="header">
+        <h1>Matriz de Análise Bíblica — Motor Exegético Avançado</h1>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const container = document.querySelector('.container');
-            let htmlContent = `
-                <div style="margin-bottom:25px; background:#1e293b; padding:20px; border-radius:8px; border:1px solid #334155;">
-                    <h2 style="color:#22c55e; margin-bottom:10px;">Matriz de Análise Bíblica — Motor Exegético Avançado</h2>
-                    <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Defina o termo e a passagem para acionar a investigação técnica detalhada:</p>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <input type="text" id="inputTermo" placeholder="Termo (ex: verbo, temor...)" style="flex: 2; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:15px;">
-                        <input type="text" id="inputPassagem" placeholder="Passagem (ex: joao 1, gn 28)" style="flex: 1; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:15px;">
-                    </div>
-                </div>
-                <div id="listaEtapas">
-            `;
+        <p>
+            Informe o termo e a passagem. O sistema determinará quais critérios
+            são pertinentes antes de executar a análise.
+        </p>
 
-            Object.keys(matrizCompleta).forEach(key => {
-                const etapa = matrizCompleta[key];
-                htmlContent += `
-                    <div class="etapa-card" data-etapa="${etapa.id}" style="background:#1e293b; margin-bottom:12px; border-radius:8px; border:1px solid #334155; overflow:hidden;">
-                        <div class="etapa-header" style="padding:15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:#0f172a;">
-                            <h3 style="color:#38bdf8; margin:0; font-size:16px;">${etapa.id} — ${etapa.titulo}</h3>
-                            <span class="seta-icone" style="color:#22c55e; font-weight:bold; transition:transform 0.3s ease;">▼</span>
-                        </div>
-                        <div class="etapa-body" style="display:none; padding:15px; border-top:1px solid #334155; background:#1e293b;">
-                            <p style="color:#94a3b8; font-size:13px; margin-bottom:10px;">Clique em um critério técnico abaixo para gerar a análise exegética:</p>
-                            <div style="display: flex; flex-direction: column; gap: 6px;">
-                                ${etapa.itens.map(item => `
-                                    <button class="btn-criterio" data-etapa="${etapa.id}" data-item="${item}" style="background:#0f172a; color:#cbd5e1; border:1px solid #475569; text-align:left; padding:10px; border-radius:5px; cursor:pointer; font-size:14px; transition:all 0.2s;">
-                                        🔍 <strong>${item}</strong>
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div class="resultado-criterio" style="margin-top:15px; display:none;"></div>
-                        </div>
-                    </div>
-                `;
-            });
+        <div class="search">
+            <input
+                id="termInput"
+                type="text"
+                placeholder="Termo (ex.: Deus)"
+                value="Deus"
+            >
 
-            htmlContent += `</div>`;
-            container.innerHTML = htmlContent;
+            <input
+                id="passageInput"
+                type="text"
+                placeholder="Passagem (ex.: João 1:1-18)"
+            >
 
-            document.querySelectorAll('.etapa-header').forEach(header => {
-                header.addEventListener('click', () => {
-                    const card = header.closest('.etapa-card');
-                    const body = card.querySelector('.etapa-body');
-                    const arrow = card.querySelector('.seta-icone');
-                    
-                    const isOpen = body.style.display === "block";
-                    body.style.display = isOpen ? "none" : "block";
-                    arrow.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)";
-                    card.style.borderColor = isOpen ? "#334155" : "#22c55e";
-                });
-            });
+            <button id="analyzeButton">
+                ANALISAR
+            </button>
+        </div>
+    </header>
 
-            document.querySelectorAll('.btn-criterio').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const termo = document.getElementById('inputTermo').value.trim().toLowerCase();
-                    const passagem = document.getElementById('inputPassagem').value.trim().toLowerCase();
-                    const etapaId = btn.getAttribute('data-etapa');
-                    const criterio = btn.getAttribute('data-item');
+    <section class="section open">
+        <div class="section-title">
+            <span>ANL-00 — DIAGNÓSTICO E ROTEAMENTO</span>
+            <span>▲</span>
+        </div>
 
-                    if (!termo) {
-                        alert("Por favor, preencha o campo 'Termo' no topo primeiro.");
-                        document.getElementById('inputTermo').focus();
-                        return;
-                    }
+        <div class="section-content">
+            <div id="diagnostic" class="empty">
+                Informe uma passagem para iniciar.
+            </div>
+        </div>
+    </section>
 
-                    const card = btn.closest('.etapa-card');
-                    const resBox = card.querySelector('.resultado-criterio');
+    <section class="section open">
+        <div class="section-title">
+            <span>MÓDULOS EXEGÉTICOS</span>
+            <span>▲</span>
+        </div>
 
-                    let textoAnalise = "";
+        <div class="section-content">
+            <div id="modules" class="empty">
+                Nenhuma análise executada.
+            </div>
+        </div>
+    </section>
 
-                    // Identifica se bate com os casos cadastrados na base profunda
-                    if (termo.includes("verbo") && (passagem.includes("joao") || passagem.includes("joão") || passagem.includes("1"))) {
-                        textoAnalise = baseExegetica.verbo_joao[etapaId] || `Investigação lexical e sintática aplicada ao conceito de <strong>"${termo}"</strong> em João 1 sob o critério de <strong>${criterio}</strong>.`;
-                    } else if (termo.includes("temor") && (passagem.includes("gn") || passagem.includes("genesis") || passagem.includes("gênesis") || passagem.includes("28"))) {
-                        textoAnalise = baseExegetica.temor_gn28[etapaId] || `Análise exegética do hebraico para <strong>"${termo}"</strong> no episódio da escada de Jacó focando em <strong>${criterio}</strong>.`;
-                    } else {
-                        textoAnalise = `Diretriz metodológica para o termo <strong>"${termo}"</strong> ${passagem ? 'na passagem ' + passagem : ''} sob a ótica de <strong>${criterio}</strong> (${etapaId}): O sistema examina a morfologia, o contexto literário imediato e os léxicos de referência correspondentes.`;
-                    }
+    <section class="section open">
+        <div class="section-title">
+            <span>ANL-12 — SÍNTESE</span>
+            <span>▲</span>
+        </div>
 
-                    resBox.style.display = "block";
-                    resBox.style.background = "#0f172a";
-                    resBox.style.padding = "14px";
-                    resBox.style.borderLeft = "4px solid #22c55e";
-                    resBox.style.borderRadius = "4px";
-                    resBox.style.color = "#e2e8f0";
-                    resBox.style.lineHeight = "1.6";
-                    resBox.innerHTML = `🔬 <strong>${etapaId} — ${criterio}:</strong><br><br>${textoAnalise}`;
-                });
-            });
-        });
-    </script>
+        <div class="section-content">
+            <div id="synthesis" class="empty">
+                A síntese será gerada após o diagnóstico.
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script type="module" src="../js/app.js"></script>
+
 </body>
 </html>
