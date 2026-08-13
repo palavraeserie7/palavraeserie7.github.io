@@ -11,23 +11,36 @@
         let htmlContent = `
             <div style="margin-bottom:25px; background:#1e293b; padding:20px; border-radius:8px; border:1px solid #334155;">
                 <h2 style="color:#22c55e; margin-bottom:10px;">Matriz de Análise Bíblica (12 Etapas)</h2>
-                <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Digite o termo ou conceito para gerar a exegese completa e conclusões por etapa:</p>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="inputBuscaBiblica" placeholder="Ex: quem é deus, amor, regeneração..." style="flex:1; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px;">
-                    <button id="btnExecutarBusca" style="background:#22c55e; color:#000; border:none; padding:0 20px; font-weight:bold; border-radius:6px; cursor:pointer;">Executar Exegese</button>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Digite o termo e selecione qual etapa deseja consultar individualmente:</p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <input type="text" id="inputBuscaBiblica" placeholder="Ex: regeneração, amor, deus..." style="flex:1; min-width:250px; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px;">
                 </div>
                 <div id="resultadoBuscaInfo" style="margin-top:12px; color:#38bdf8; font-size:14px; font-weight:bold;"></div>
             </div>
             <div id="listaEtapasContainer">
         `;
 
+        // Defina aqui quais etapas são PRO (exemplo: ANL-11 e ANL-12 bloqueadas)
+        const etapasProConfig = {
+            "ANL-11": false,
+            "ANL-12": true // Exemplo de etapa restrita
+        };
+
         Object.keys(matrizCompleta).forEach(key => {
             const etapa = matrizCompleta[key];
+            const isPro = etapasProConfig[etapa.id] || false;
+
             htmlContent += `
                 <div class="etapa-card" data-etapa="${etapa.id}" style="background:#1e293b; margin-bottom:12px; border-radius:8px; border:1px solid #334155; overflow:hidden;">
                     <div class="etapa-header" style="padding:15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:#0f172a;">
-                        <h3 style="color:#38bdf8; margin:0; font-size:16px;">${etapa.id} — ${etapa.titulo}</h3>
-                        <span style="color:#22c55e; font-weight:bold;">▼</span>
+                        <h3 style="color:#38bdf8; margin:0; font-size:16px;">
+                            ${etapa.id} — ${etapa.titulo} 
+                            ${isPro ? '<span style="background:#f59e0b; color:#000; font-size:11px; padding:2px 6px; border-radius:4px; margin-left:8px; vertical-align:middle;">PRO</span>' : ''}
+                        </h3>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <button class="btn-consultar-etapa" data-etapa-id="${etapa.id}" style="background:#22c55e; color:#000; border:none; padding:6px 12px; font-size:12px; font-weight:bold; border-radius:4px; cursor:pointer;">Consultar Etapa</button>
+                            <span style="color:#22c55e; font-weight:bold;">▼</span>
+                        </div>
                     </div>
                     <div class="etapa-body" style="padding:0 15px; max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease;">
                         <div class="etapa-conteudo-dinamico" style="margin:15px 0; line-height:1.6;">
@@ -45,97 +58,95 @@
         wrapper.innerHTML = htmlContent;
         container.appendChild(wrapper);
 
-        // Comportamento de clique (sanfona)
+        // Comportamento de sanfona ao clicar no cabeçalho
         document.querySelectorAll('.etapa-header').forEach(header => {
-            header.addEventListener('click', () => {
+            header.addEventListener('click', (e) => {
+                // Evita abrir se o clique foi diretamente no botão de consulta
+                if(e.target.classList.contains('btn-consultar-etapa')) return;
+
                 const body = header.nextElementSibling;
-                const arrow = header.querySelector('span');
+                const arrow = header.querySelector('span:last-child');
                 if (body.style.maxHeight && body.style.maxHeight !== "0px") {
                     body.style.maxHeight = "0px";
                     body.style.padding = "0 15px";
                     arrow.style.transform = "rotate(0deg)";
                 } else {
-                    body.style.maxHeight = body.scrollHeight + 50 + "px";
+                    body.style.maxHeight = body.scrollHeight + 300 + "px";
                     body.style.padding = "15px";
                     arrow.style.transform = "rotate(180deg)";
                 }
             });
         });
 
-        // Função geradora de conteúdo analítico real por termo e etapa
-        document.getElementById('btnExecutarBusca').addEventListener('click', () => {
-            const termoBruto = document.getElementById('inputBuscaBiblica').value.trim();
-            const info = document.getElementById('resultadoBuscaInfo');
-            
-            if(!termoBruto) {
-                info.innerHTML = `⚠️ Digite um termo para executar a exegese.`;
-                return;
-            }
+        // Consulta manual e individual por botão de cada etapa
+        document.querySelectorAll('.btn-consultar-etapa').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Impede fechar/abrir a sanfona indesejadamente
+                const etapaId = btn.getAttribute('data-etapa-id');
+                const termoBruto = document.getElementById('inputBuscaBiblica').value.trim();
+                const info = document.getElementById('resultadoBuscaInfo');
+                const isPro = etapasProConfig[etapaId] || false;
 
-            const termo = termoBruto.toLowerCase();
+                if(!termoBruto) {
+                    info.innerHTML = `⚠️ Digite um termo no campo acima antes de consultar a etapa ${etapaId}.`;
+                    document.getElementById('inputBuscaBiblica').focus();
+                    return;
+                }
 
-            document.querySelectorAll('.etapa-card').forEach(card => {
-                const etapaId = card.getAttribute('data-etapa');
+                // SIMulação de verificação de permissão PRO (aqui você pode integrar com seu sistema de login/Supabase/Kiwify)
+                const usuarioLogadoEhPro = false; // Mude para true se o usuário tiver acesso
+
+                if (isPro && !usuarioLogadoEhPro) {
+                    alert(`🔒 A etapa ${etapaId} é exclusiva para assinantes PRO. Faça login para desbloquear.`);
+                    return;
+                }
+
+                const termo = termoBruto.toLowerCase();
+                const card = document.querySelector(`.etapa-card[data-etapa="${etapaId}"]`);
                 const body = card.querySelector('.etapa-body');
-                const arrow = card.querySelector('.etapa-header span');
+                const arrow = card.querySelector('.etapa-header span:last-child');
                 const conteudoDinamico = card.querySelector('.etapa-conteudo-dinamico');
 
-                let analiseGerada = "";
+                let analiseGerada = `Investigação pontual para o termo <strong>"${termoBruto}"</strong> na etapa ${etapaId}.`;
 
-                // Lógica de conteúdo customizado baseada no termo investigado
                 if (termo.includes("deus")) {
-                    const dadosDeus = {
-                        "ANL-01": "Nos manuscritos originais, os termos centrais são *Elohim* (hebraico - força/soberania) e *Theos* (grego - divindade suprema). Não há variantes textuais expressivas que comprometam a identidade divina nos autógrafos principais.",
-                        "ANL-02": "A tradução preserva o rigor dos originais. *Elohim* é substantivo plural com sentido singular qualitativo, apontando para plenitude de poder, traduzido de forma consistente como 'Deus' nas versões clássicas.",
-                        "ANL-03": "Morfologicamente, *Elohim* possui terminação de plural (*-im*), mas rege verbos no singular, indicando majestade e unicidade opercional na sintaxe hebraica.",
-                        "ANL-04": "O campo semântico abrange o Criador supremo, juiz e salvador, diferenciando-se radicalmente das divindades politeístas do Oriente Próximo antigo.",
-                        "ANL-05": "Teologicamente, Deus é revelado como auto-existente (Yahweh), transcendente, imutável e soberano sobre toda a criação.",
-                        "ANL-06": "No contexto literário das passagens fundamentais, a autoria sagrada aponta diretamente para a origem de todas as coisas e a autoridade absoluta do Criador sobre o homem.",
-                        "ANL-07": "Historicamente, o conceito rompe com o politeísmo henoteísta dos povos vizinhos (Canaã, Egito e Mesopotâmia), estabelecendo o monoteísmo ético estrito.",
-                        "ANL-08": "O cenário geopolítico antigo colocava Israel cercado por impérios com panteões de deuses locais; a revelação de Deus afirma Seu domínio universal e transnacional.",
-                        "ANL-09": "Em toda a Escritura (de Gênesis a Apocalipse), a revelação de Deus progride culminando na encarnação de Cristo, que expressa perfeitamente a substância divina (Hebreus 1:3).",
-                        "ANL-10": "Hermenêuticeamente, evita-se o antropomorfismo literal exagerado, interpretando passagens descritivas à luz das declarações explícitas de Sua natureza espiritual.",
-                        "ANL-11": "Em diálogo com a teologia sistemática, os atributos de Deus dividem-se em comunicáveis (amor, justiça) e incomunicáveis (onipotência, onipresença, eternidade).",
-                        "ANL-12": "<strong>Conclusão Exegética:</strong> Deus não é uma força abstrata, mas a prístina Realidade pessoal, soberana e relacional, cuja glória é o centro de toda a existência e finalidade da história."
+                    const mapDeus = {
+                        "ANL-01": "Análise Textual de Deus: *Elohim* e *Theos* nos originais.",
+                        "ANL-02": "Tradução de Deus: Sentido singular qualitativo preservado.",
+                        "ANL-03": "Gramática de Deus: Substantivo plural com verbos no singular.",
+                        "ANL-04": "Semântica de Deus: O Criador supremo e soberano.",
+                        "ANL-05": "Teologia de Deus: Auto-existente e transcendente.",
+                        "ANL-06": "Contexto Literário de Deus: Origem de todas as coisas.",
+                        "ANL-07": "Contexto Histórico de Deus: Ruptura com o politeísmo.",
+                        "ANL-08": "Contexto Geográfico de Deus: Domínio universal sobre panteões locais.",
+                        "ANL-09": "Escritura e Deus: Revelação progressiva culminando em Cristo.",
+                        "ANL-10": "Hermenêutica de Deus: Controle contra antropomorfismos literais.",
+                        "ANL-11": "Sistemática de Deus: Atributos comunicáveis e incomunicáveis.",
+                        "ANL-12": "<strong>Conclusão Exegética:</strong> Deus é a Realidade pessoal e central da história."
                     };
-                    analiseGerada = dadosDeus[etapaId] || "Análise detalhada sobre o conceito divino nesta etapa.";
-                } else if (termo.includes("amor")) {
-                    const dadosAmor = {
-                        "ANL-01": "Uso predominante de *Ahavah* (hebraico) e *Agape* / *Phileo* (grego) nos textos autógrafos, sem variantes críticas que alterem o conceito do amor sacrificial.",
-                        "ANL-02": "As traduções refletem bem, mas o grego diferencia o amor sacrificial e incondicional (*agape*) do afeto fraternal (*phileo*).",
-                        "ANL-03": "Análise sintática dos verbos de amor no Novo Testamento (frequentemente no particípio ou presente contínuo), indicando uma ação contínua e volitiva, e não apenas emocional.",
-                        "ANL-04": "O campo semântico de *agape* denota entrega incondicional, benevolência ativa e escolha deliberada de buscar o bem do outro.",
-                        "ANL-05": "Teologicamente, 'Deus é amor' define a própria essência de Sua conduta relacional com a humanidade caída.",
-                        "ANL-06": "No contexto literário, o amor é contrastado com o egoísmo mundano e apresentado como o cumprimento da lei.",
-                        "ANL-07": "No contexto greco-romano e judaico do século I, *agape* ganhou um relevo revolucionário, pois o amor era visto habitualmente como mérito ou reciprocidade.",
-                        "ANL-08": "A aplicação cultural desafiava diretamente as estruturas hierárquicas e divisionistas do mundo antigo mediterrâneo.",
-                        "ANL-09": "Conectado diretamente ao mandamento supremo da lei e aos profetas, consumado na cruz do Calvário.",
-                        "ANL-10": "Controle hermenêutico: o amor bíblico não anula a justiça ou a santidade divina, mas opera em perfeita harmonia com elas.",
-                        "ANL-11": "A teologia sistemática classifica o amor como um atributo moral e comunicável de Deus.",
-                        "ANL-12": "<strong>Conclusão Exegética:</strong> O amor na Escritura é essencialmente volitivo e sacrificial, exemplificado na doação do próprio Filho para a redenção."
-                    };
-                    analiseGerada = dadosAmor[etapaId] || "Análise detalhada sobre o amor nesta etapa.";
-                } else {
-                    analiseGerada = `Investigação aprofundada para o termo <strong>"${termoBruto}"</strong> focada nos parâmetros específicos desta etapa exegética.`;
+                    analiseGerada = mapDeus[etapaId] || analiseGerada;
+                } else if (termo.includes("regeneração") || termo.includes("amor")) {
+                    analiseGerada = `<strong>Conclusão analítica (${etapaId})</strong> para o conceito pesquisado: O termo exibe profundas raízes exegéticas alinhadas aos critérios desta seção específica.`;
                 }
 
                 conteudoDinamico.innerHTML = `
                     <div style="background:#0f172a; padding:15px; border-left:4px solid #22c55e; border-radius:6px; margin-bottom:15px; color:#e2e8f0; font-size:15px;">
-                        ${analiseGerada}
+                        🎯 <strong>Consulta Individual (${etapaId}):</strong> ${analiseGerada}
                     </div>
-                    <p style="color:#94a3b8; font-style:italic; margin-bottom:5px; font-size:13px;">Critérios de suporte técnico da etapa:</p>
+                    <p style="color:#94a3b8; font-style:italic; margin-bottom:5px; font-size:13px;">Critérios de suporte técnico:</p>
                     <ul style="margin-bottom:10px; padding-left:20px; font-size:14px;">
                         ${matrizCompleta[etapaId].itens.map(item => `<li>${item}</li>`).join('')}
                     </ul>
                 `;
 
-                body.style.maxHeight = body.scrollHeight + 250 + "px";
+                // Abre automaticamente apenas esta caixa consultada
+                body.style.maxHeight = body.scrollHeight + 300 + "px";
                 body.style.padding = "15px";
                 arrow.style.transform = "rotate(180deg)";
                 card.style.borderColor = "#22c55e";
-            });
 
-            info.innerHTML = `✨ Exegese executada com sucesso para: "<span style="color:#22c55e;">${termoBruto}</span>".`;
+                info.innerHTML = `✅ Etapa <strong>${etapaId}</strong> consultada individualmente para o termo "${termoBruto}".`;
+            });
         });
     });
 </script>
