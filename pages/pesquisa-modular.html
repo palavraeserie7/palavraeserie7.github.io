@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pesquisa Modular — Palavra & Série</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b1426;
+            color: #e8eef7;
+        }
+
+        .page {
+            min-height: 100vh;
+        }
+
+        /* CABEÇALHO */
+
+        .top {
+            border-bottom: 1px solid #1d2b43;
+            background: #0d172a;
+            padding: 18px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            font-size: 30px;
+        }
+
+        .brand-title {
+            font-weight: 800;
+            font-size: 17px;
+        }
+
+        .brand-subtitle {
+            color: #00d66b;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+
+        .back-button {
+            color: #a9b8d0;
+            text-decoration: none;
+            border: 1px solid #263653;
+            padding: 9px 14px;
+            border-radius: 7px;
+            font-size: 13px;
+        }
+
+        .back-button:hover {
+            border-color: #00d66b;
+            color: #00d66b;
+        }
+
+        /* CONTEÚDO */
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 35px 25px 70px;
+        }
+
+        .title {
+            color: #00d66b;
+            font-size: 29px;
+            margin: 0 0 8px;
+        }
+
+        .description {
+            color: #91a3bd;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        /* PAINEL DE ENTRADA */
+
+        .research-box {
+            background: #17233a;
+            border: 1px solid #263653;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .research-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field label {
+            font-size: 12px;
+            color: #9fb0c9;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: #0d172a;
+            color: #edf3fb;
+            border: 1px solid #30415f;
+            border-radius: 6px;
+            padding: 13px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #00d66b;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        .start-area {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .analyze-button {
+            border: 0;
+            background: #00c968;
+            color: #07130d;
+            font-weight: 800;
+            padding: 13px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .analyze-button:hover {
+            background: #16e47c;
+        }
+
+        /* PROFUNDIDADE */
+
+        .depth-box {
+            background: #111c30;
+            border: 1px solid #253550;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #d5ad45;
+            font-size: 16px;
+            margin: 0 0 15px;
+        }
+
+        .depth-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 9px;
+        }
+
+        .depth {
+            border: 1px solid #2a3b58;
+            background: #0d172a;
+            color: #aab8ce;
+            padding: 12px 6px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .depth strong {
+            display: block;
+            color: #e7edf6;
+            margin-bottom: 4px;
+        }
+
+        .depth.active {
+            border-color: #00d66b;
+            background: #102d27;
+            color: #00d66b;
+        }
+
+        /* RESULTADO */
+
+        #result {
+            display: none;
+        }
+
+        .result-header {
+            background: #17233a;
+            border: 1px solid #263653;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+
+        .result-header h2 {
+            margin: 0 0 8px;
+            color: #00d66b;
+        }
+
+        .result-meta {
+            color: #91a3bd;
+            font-size: 13px;
+        }
+
+        /* ÁRVORE */
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tree-node {
+            border: 1px solid #263653;
+            background: #101b2e;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .node-header {
+            padding: 14px 17px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .node-header:hover {
+            background: #15243b;
+        }
+
+        .node-title {
+            color: #dce7f6;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .node-arrow {
+            color: #00d66b;
+        }
+
+        .node-content {
+            display: none;
+            border-top: 1px solid #24344e;
+            padding: 17px;
+            background: #0d172a;
+        }
+
+        .node-content.open {
+            display: block;
+        }
+
+        .subnode {
+            margin: 8px 0;
+            border-left: 2px solid #30415f;
+            padding-left: 14px;
+        }
+
+        .subnode-title {
+            color: #aebed5;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .research-instruction {
+            margin-top: 15px;
+            background: #101d31;
+            border-left: 3px solid #00d66b;
+            padding: 13px;
+            color: #93a7c2;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .empty {
+            text-align: center;
+            color: #7487a3;
+            padding: 30px;
+        }
+
+        @media (max-width: 800px) {
+
+            .research-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .depth-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .start-area {
+                justify-content: stretch;
+            }
+
+            .analyze-button {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="top">
+
+        <div class="brand">
+
+            <div class="brand-icon">📚</div>
+
+            <div>
+                <div class="brand-title">
+                    PALAVRA & SÉRIE
+                </div>
+
+                <div class="brand-subtitle">
+                    SEMENTE DO CORAÇÃO
+                </div>
+            </div>
+
+        </div>
+
+        <a class="back-button" href="./dashboard.html">
+            <i class="fas fa-arrow-left"></i>
+            Voltar
+        </a>
+
+    </header>
+
+
+    <main class="container">
+
+        <h1 class="title">
+            Pesquisa Modular
+        </h1>
+
+        <p class="description">
+            Explore um tema ou texto bíblico penetrando progressivamente
+            nos submódulos de uma área específica da investigação.
+        </p>
+
+
+        <!-- ENTRADA -->
+
+        <section class="research-box">
+
+            <div class="research-grid">
+
+                <div class="field">
+
+                    <label for="theme">
+                        TEMA / TERMO
+                    </label>
+
+                    <input
+                        id="theme"
+                        type="text"
+                        placeholder="Ex.: santidade, fé, reino de Deus..."
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="passage">
+                        TEXTO / PASSAGEM
+                    </label>
+
+                    <input
+                        id="passage"
+                        type="text"
+                        placeholder="Ex.: 1 Pedro 1:16"
+                    >
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label for="module">
+                        MÓDULO DE INVESTIGAÇÃO
+                    </label>
+
+                    <select id="module"></select>
+
+                </div>
+
+            </div>
+
+
+            <div class="start-area">
+
+                <button
+                    class="analyze-button"
+                    onclick="ModularUI.startResearch()">
+
+                    <i class="fas fa-microscope"></i>
+                    INICIAR PESQUISA
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- PROFUNDIDADE -->
+
+        <section class="depth-box">
+
+            <h3 class="section-title">
+                PROFUNDIDADE DA INVESTIGAÇÃO
+            </h3>
+
+            <div
+                id="depth-container"
+                class="depth-grid">
+            </div>
+
+        </section>
+
+
+        <!-- RESULTADO -->
+
+        <section id="result">
+
+            <div
+                id="result-header"
+                class="result-header">
+            </div>
+
+            <div
+                id="tree"
+                class="tree">
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="../js/modular/modular-engine.js"></script>
+<script src="../js/modular/modular-ui.js"></script>
+
+</body>
+</html>
