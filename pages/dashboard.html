@@ -11,10 +11,10 @@
         let htmlContent = `
             <div style="margin-bottom:25px; background:#1e293b; padding:20px; border-radius:8px; border:1px solid #334155;">
                 <h2 style="color:#22c55e; margin-bottom:10px;">Matriz de Análise Bíblica (12 Etapas)</h2>
-                <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Digite o texto ou tema que deseja investigar (ex: João 1:1, fé, regeneração):</p>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Digite o termo, texto ou conceito para gerar a exploração analítica em cada etapa:</p>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="inputBuscaBiblica" placeholder="Digite o tema ou passagem..." style="flex:1; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px;">
-                    <button id="btnExecutarBusca" style="background:#22c55e; color:#000; border:none; padding:0 20px; font-weight:bold; border-radius:6px; cursor:pointer;">Ativar Matriz</button>
+                    <input type="text" id="inputBuscaBiblica" placeholder="Ex: amor, regeneração, João 1:1..." style="flex:1; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px;">
+                    <button id="btnExecutarBusca" style="background:#22c55e; color:#000; border:none; padding:0 20px; font-weight:bold; border-radius:6px; cursor:pointer;">Executar Análise</button>
                 </div>
                 <div id="resultadoBuscaInfo" style="margin-top:12px; color:#38bdf8; font-size:14px; font-weight:bold;"></div>
             </div>
@@ -30,9 +30,12 @@
                         <span style="color:#22c55e; font-weight:bold;">▼</span>
                     </div>
                     <div class="etapa-body" style="padding:0 15px; max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease;">
-                        <ul style="margin:15px 0; line-height:1.6; padding-left:20px;">
-                            ${etapa.itens.map(item => `<li class="item-analise">${item}</li>`).join('')}
-                        </ul>
+                        <div class="etapa-conteudo-dinamico" style="margin:15px 0; line-height:1.6;">
+                            <p style="color:#94a3b8; font-style:italic; margin-bottom:10px;">Critérios base da etapa:</p>
+                            <ul style="margin-bottom:15px; padding-left:20px;">
+                                ${etapa.itens.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             `;
@@ -59,27 +62,82 @@
             });
         });
 
-        // Função que ativa o direcionamento da matriz com base no tema digitado
+        // Função que gera a exploração analítica por etapa com base no termo buscado
         document.getElementById('btnExecutarBusca').addEventListener('click', () => {
             const termo = document.getElementById('inputBuscaBiblica').value.trim();
             const info = document.getElementById('resultadoBuscaInfo');
             
             if(!termo) {
-                info.innerHTML = `⚠️ Digite um texto ou tema para iniciar a análise.`;
+                info.innerHTML = `⚠️ Digite um termo para executar a análise.`;
                 return;
             }
 
-            // Abre todas as etapas para o estudo completo do tema inserido
             document.querySelectorAll('.etapa-card').forEach(card => {
+                const etapaId = card.getAttribute('data-etapa');
                 const body = card.querySelector('.etapa-body');
                 const arrow = card.querySelector('.etapa-header span');
-                body.style.maxHeight = body.scrollHeight + 100 + "px";
+                const conteudoDinamico = card.querySelector('.etapa-conteudo-dinamico');
+
+                // Gera uma diretriz/conclusão analítica direcionada para cada ANL
+                let conclusaoEspecifica = "";
+                switch(etapaId) {
+                    v: "ANL-01":
+                        conclusaoEspecifica = `🔍 <strong>Investigação Textual para "${termo}":</strong> Verificar como o termo aparece nos manuscritos originais (hebraico/grego) e se existem variantes textuais relevantes que alterem o sentido.`;
+                        break;
+                    case "ANL-02":
+                        conclusaoEspecifica = `📖 <strong>Tradução e Original para "${termo}":</strong> Comparar o tratamento dado ao conceito em traduções clássicas (como ARA, ARC, NVI) em contraste com os textos originais.`;
+                        break;
+                    case "ANL-03":
+                        conclusaoEspecifica = `✍️ <strong>Gramática e Sintaxe para "${termo}":</strong> Analisar a morfologia, os tempos verbais e a estrutura sintática onde o termo se insere para capturar a ênfase original do autor.`;
+                        break;
+                    case "ANL-04":
+                        conclusaoespecifica = `💡 <strong>Palavras e Semântica para "${termo}":</strong> Mapear o campo semântico da raiz da palavra, checando léxicos (como BAGD, HALOT) para definir o raio de significado.`;
+                        break;
+                    case "ANL-05":
+                        conclusaoEspecifica = ` theology <strong>Significado Teológico para "${termo}":</strong> Identificar a teologia bíblica subjacente ao conceito, avaliando seu uso no Antigo e Novo Testamento.`;
+                        break;
+                    case "ANL-06":
+                        conclusaoEspecifica = `📜 <strong>Exegese e Contexto Literário para "${termo}":</strong> Compreender o argumento imediato do autor, o gênero literário e a intenção comunicativa do texto.`;
+                        break;
+                    case "ANL-07":
+                        conclusaoEspecifica = `🏛️ <strong>Contexto Histórico e Cultural para "${termo}":</strong> Investigar o pano de fundo histórico, os costumes e o ambiente sociocultural da época da redação.`;
+                        break;
+                    case "ANL-08":
+                        conclusaoEspecifica = `🗺️ <strong>Contexto Geográfico e Político para "${termo}":</strong> Analisar as influências de cenários geográficos, rotas ou estruturas de poder presentes no pano de fundo.`;
+                        break;
+                    case "ANL-09":
+                        conclusaoEspecifica = `🔗 <strong>Relação com o Restante da Escritura para "${termo}":</strong> Cruzar o tema com referências paralelas (analogia da fé) e o fio condutor da história da redenção.`;
+                        break;
+                    case "ANL-10":
+                        conclusaoEspecifica = `⚖️ <strong>Hermenêutica e Controle para "${termo}":</strong> Aplicar as regras de controle exegético para evitar anacronismos ou distorções doutrinárias.`;
+                        break;
+                    case "ANL-11":
+                        conclusaoEspecifica = `📚 <strong>Teologia e Comparação para "${termo}":</strong> Contrastar com perspectivas da teologia sistemática e comentários bíblicos de referência.`;
+                        break;
+                    case "ANL-12":
+                        conclusaoEspecifica = `🎯 <strong>Síntese e Conclusão para "${termo}":</strong> Consolidar os achados exegéticos em uma tese clara, respondendo o que o texto significa e sua aplicação prática.`;
+                        break;
+                    default:
+                        conclusaoEspecifica = `Análise estruturada para "${termo}".`;
+                }
+
+                conteudoDinamico.innerHTML = `
+                    <div style="background:#0f172a; padding:12px; border-left:4px solid #22c55e; border-radius:4px; margin-bottom:12px; color:#e2e8f0;">
+                        ${conclusaoEspecifica}
+                    </div>
+                    <p style="color:#94a3b8; font-style:italic; margin-bottom:5px; font-size:13px;">Itens padrão de suporte da etapa:</p>
+                    <ul style="margin-bottom:10px; padding-left:20px; font-size:14px;">
+                        ${matrizCompleta[etapaId].itens.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                `;
+
+                body.style.maxHeight = body.scrollHeight + 150 + "px";
                 body.style.padding = "15px";
                 arrow.style.transform = "rotate(180deg)";
                 card.style.borderColor = "#22c55e";
             });
 
-            info.innerHTML = `🎯 Matriz ativada para o estudo de: "<span style="color:#22c55e;">${termo}</span>". Utilize os critérios abaixo para a exegese completa.`;
+            info.innerHTML = `🚀 Análise gerada para o tema: "<span style="color:#22c55e;">${termo}</span>". Cada etapa agora direciona a investigação e entrega conclusões específicas!`;
         });
     });
 </script>
