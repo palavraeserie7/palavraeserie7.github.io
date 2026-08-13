@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Matriz de Análise Bíblica</title>
+    <title>Matriz de Análise Bíblica — Motor Exegético</title>
 
     <style>
 
         :root {
             --bg: #0b1428;
             --panel: #172238;
-            --panel-dark: #0f172a;
+            --dark: #0f172a;
             --border: #263653;
             --text: #e8eef8;
             --muted: #94a3b8;
@@ -37,6 +37,8 @@
             width: min(1100px, 94%);
             margin: 30px auto 80px;
         }
+
+        /* CABEÇALHO */
 
         .topo {
             background: var(--panel);
@@ -66,7 +68,7 @@
         input {
             width: 100%;
             padding: 13px;
-            background: #0b1529;
+            background: var(--dark);
             border: 1px solid var(--border);
             border-radius: 5px;
             color: white;
@@ -75,6 +77,10 @@
 
         input:focus {
             border-color: var(--blue);
+        }
+
+        button {
+            font-family: inherit;
         }
 
         .btn-analisar {
@@ -90,6 +96,8 @@
             filter: brightness(1.1);
         }
 
+        /* PAINÉIS */
+
         .painel {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -103,6 +111,7 @@
             color: var(--blue);
             font-weight: bold;
             cursor: pointer;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -118,17 +127,18 @@
             display: block;
         }
 
+        /* DIAGNÓSTICO */
+
         .diagnostico-grid {
             display: grid;
-            grid-template-columns: repeat(
-                auto-fit,
-                minmax(180px, 1fr)
-            );
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
+
             gap: 10px;
         }
 
         .diagnostico-card {
-            background: var(--panel-dark);
+            background: var(--dark);
             border: 1px solid var(--border);
             border-radius: 5px;
             padding: 12px;
@@ -140,12 +150,10 @@
             margin-bottom: 6px;
         }
 
-        .diagnostico-card strong {
-            color: var(--text);
-        }
+        /* MÓDULOS */
 
         .modulo {
-            background: var(--panel-dark);
+            background: var(--dark);
             border: 1px solid var(--border);
             border-radius: 6px;
             margin-bottom: 8px;
@@ -154,9 +162,11 @@
 
         .modulo-cabecalho {
             padding: 13px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
+
             cursor: pointer;
         }
 
@@ -170,7 +180,7 @@
         }
 
         .modulo-status {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             padding: 5px 8px;
             border-radius: 4px;
@@ -206,16 +216,23 @@
             display: block;
         }
 
+        /* CRITÉRIOS */
+
         .criterio {
             width: 100%;
             display: block;
+
             text-align: left;
+
             margin-bottom: 6px;
             padding: 10px;
+
             background: #0b1529;
             color: #cbd5e1;
+
             border: 1px solid var(--border);
             border-radius: 5px;
+
             cursor: pointer;
         }
 
@@ -224,12 +241,18 @@
             color: white;
         }
 
+        /* RESULTADO */
+
         .resultado {
             display: none;
+
             margin-top: 12px;
             padding: 13px;
+
             background: #091426;
+
             border-left: 3px solid var(--green);
+
             line-height: 1.6;
         }
 
@@ -239,7 +262,9 @@
             text-align: center;
         }
 
-        @media(max-width: 700px) {
+        /* MOBILE */
+
+        @media (max-width: 700px) {
 
             .busca {
                 grid-template-columns: 1fr;
@@ -248,14 +273,19 @@
             .btn-analisar {
                 height: 44px;
             }
+
         }
 
     </style>
+
 </head>
+
 
 <body>
 
 <div class="container">
+
+    <!-- CABEÇALHO -->
 
     <header class="topo">
 
@@ -264,8 +294,8 @@
         </h1>
 
         <p>
-            Informe o termo e a passagem para selecionar os critérios
-            exegéticos pertinentes.
+            Defina o termo e a passagem para acionar
+            a investigação técnica detalhada.
         </p>
 
         <div class="busca">
@@ -274,7 +304,6 @@
                 id="termo"
                 type="text"
                 placeholder="Termo (ex.: Deus)"
-                value="Deus"
             >
 
             <input
@@ -305,7 +334,9 @@
                 ANL-00 — DIAGNÓSTICO E ROTEAMENTO
             </span>
 
-            <span>▲</span>
+            <span class="seta">
+                ▲
+            </span>
 
         </div>
 
@@ -323,7 +354,7 @@
     </section>
 
 
-    <!-- ANL 01-11 -->
+    <!-- ANL-01 ATÉ ANL-11 -->
 
     <section class="painel aberto">
 
@@ -333,7 +364,9 @@
                 MÓDULOS EXEGÉTICOS
             </span>
 
-            <span>▲</span>
+            <span class="seta">
+                ▲
+            </span>
 
         </div>
 
@@ -343,7 +376,8 @@
                 id="modulos"
                 class="vazio"
             >
-                Nenhuma análise executada.
+                Clique em ANALISAR para carregar
+                os 12 módulos.
             </div>
 
         </div>
@@ -361,7 +395,9 @@
                 ANL-12 — SÍNTESE
             </span>
 
-            <span>▲</span>
+            <span class="seta">
+                ▲
+            </span>
 
         </div>
 
@@ -383,37 +419,10 @@
 
 <script type="module">
 
-    import {
-        anl01,
-        anl02,
-        anl03,
-        anl04,
-        anl05,
-        anl06,
-        anl07,
-        anl08,
-        anl09,
-        anl10,
-        anl11,
-        anl12
-    } from "../etapas/index.js";
+    import { etapas } from "../etapas/index.js";
 
 
-    const etapas = [
-        anl01,
-        anl02,
-        anl03,
-        anl04,
-        anl05,
-        anl06,
-        anl07,
-        anl08,
-        anl09,
-        anl10,
-        anl11,
-        anl12
-    ];
-
+    /* ELEMENTOS */
 
     const termoInput =
         document.getElementById("termo");
@@ -421,7 +430,7 @@
     const passagemInput =
         document.getElementById("passagem");
 
-    const btn =
+    const btnAnalisar =
         document.getElementById("btnAnalisar");
 
     const diagnostico =
@@ -434,9 +443,11 @@
         document.getElementById("sintese");
 
 
-    function escapeHTML(texto) {
+    /* SEGURANÇA HTML */
 
-        return String(texto)
+    function escapeHTML(valor) {
+
+        return String(valor)
             .replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;")
@@ -446,88 +457,71 @@
     }
 
 
+    /* IDENTIFICAÇÃO DO TESTAMENTO */
+
     function identificarPassagem(passagem) {
 
-        const p =
+        const texto =
             passagem
                 .toLowerCase()
-                .trim();
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
 
 
-        const NT = [
+        const livrosNT = [
             "mateus",
             "marcos",
             "lucas",
-            "joão",
             "joao",
             "atos",
             "romanos",
-            "coríntios",
             "corintios",
-            "gálatas",
             "galatas",
-            "efésios",
             "efesios",
             "filipenses",
             "colossenses",
             "tessalonicenses",
-            "timóteo",
             "timoteo",
             "tito",
             "filemom",
             "hebreus",
             "tiago",
             "pedro",
-            "joão",
             "judas",
             "apocalipse"
         ];
 
 
-        const AT = [
-            "gênesis",
+        const livrosAT = [
             "genesis",
-            "êxodo",
             "exodo",
-            "levítico",
             "levitico",
-            "números",
             "numeros",
-            "deuteronômio",
             "deuteronomio",
-            "josué",
             "josue",
-            "juízes",
             "juizes",
             "rute",
             "samuel",
             "reis",
-            "crônicas",
             "cronicas",
             "esdras",
             "neemias",
             "ester",
-            "jó",
+            "jo",
             "salmos",
-            "provérbios",
             "proverbios",
             "eclesiastes",
             "cantares",
-            "isaías",
             "isaias",
             "jeremias",
-            "lamentações",
             "lamentacoes",
             "ezequiel",
             "daniel",
-            "oséias",
             "oseias",
             "joel",
-            "amós",
             "amos",
             "obadias",
             "jonas",
-            "miquéias",
             "miqueias",
             "naum",
             "habacuque",
@@ -538,18 +532,11 @@
         ];
 
 
-        const livroNT =
-            NT.find(
-                livro => p.includes(livro)
-            );
-
-        const livroAT =
-            AT.find(
-                livro => p.includes(livro)
-            );
-
-
-        if (livroNT) {
+        if (
+            livrosNT.some(
+                livro => texto.includes(livro)
+            )
+        ) {
 
             return {
                 testamento: "Novo Testamento",
@@ -566,7 +553,11 @@
         }
 
 
-        if (livroAT) {
+        if (
+            livrosAT.some(
+                livro => texto.includes(livro)
+            )
+        ) {
 
             return {
                 testamento: "Antigo Testamento",
@@ -598,72 +589,57 @@
     }
 
 
-    function classificarModulo(
-        etapa,
-        diagnostico
-    ) {
+    /* CLASSIFICAÇÃO DOS MÓDULOS */
 
-        if (etapa.id === "ANL-01") {
+    function classificarModulo(etapa, diagnostico) {
 
-            return diagnostico.testamento ===
-                "Novo Testamento"
-                ? "principal"
-                : diagnostico.testamento ===
-                    "Antigo Testamento"
-                    ? "principal"
-                    : "condicional";
+        switch (etapa.id) {
+
+            case "ANL-01":
+                return "principal";
+
+            case "ANL-02":
+                return "principal";
+
+            case "ANL-03":
+                return "principal";
+
+            case "ANL-04":
+                return "principal";
+
+            case "ANL-05":
+                return "relevante";
+
+            case "ANL-06":
+                return "principal";
+
+            case "ANL-07":
+                return "relevante";
+
+            case "ANL-08":
+                return "condicional";
+
+            case "ANL-09":
+                return "relevante";
+
+            case "ANL-10":
+                return "relevante";
+
+            case "ANL-11":
+                return "relevante";
+
+            case "ANL-12":
+                return "principal";
+
+            default:
+                return "condicional";
 
         }
 
-
-        if (etapa.id === "ANL-02")
-            return "principal";
-
-
-        if (etapa.id === "ANL-03")
-            return "principal";
-
-
-        if (etapa.id === "ANL-04")
-            return "principal";
-
-
-        if (etapa.id === "ANL-05")
-            return "relevante";
-
-
-        if (etapa.id === "ANL-06")
-            return "principal";
-
-
-        if (etapa.id === "ANL-07")
-            return "relevante";
-
-
-        if (etapa.id === "ANL-08")
-            return "condicional";
-
-
-        if (etapa.id === "ANL-09")
-            return "relevante";
-
-
-        if (etapa.id === "ANL-10")
-            return "relevante";
-
-
-        if (etapa.id === "ANL-11")
-            return "relevante";
-
-
-        if (etapa.id === "ANL-12")
-            return "principal";
-
-
-        return "condicional";
-
     }
 
+
+    /* DIAGNÓSTICO */
 
     function renderizarDiagnostico(
         passagem,
@@ -689,7 +665,7 @@
                 </div>
 
                 <div class="diagnostico-card">
-                    <small>Idioma principal</small>
+                    <small>Idioma-base</small>
                     <strong>
                         ${d.idioma}
                     </strong>
@@ -698,28 +674,40 @@
                 <div class="diagnostico-card">
                     <small>Texto grego</small>
                     <strong>
-                        ${d.grego ? "PRINCIPAL" : "—"}
+                        ${
+                            d.grego
+                                ? "PRINCIPAL"
+                                : "NÃO APLICÁVEL"
+                        }
                     </strong>
                 </div>
 
                 <div class="diagnostico-card">
                     <small>BHS / BHQ</small>
                     <strong>
-                        ${d.bhs ? "PRINCIPAL" : "CONDICIONAL"}
+                        ${
+                            d.bhs
+                                ? "PRINCIPAL"
+                                : "INTERTEXTUAL / CONDICIONAL"
+                        }
                     </strong>
                 </div>
 
                 <div class="diagnostico-card">
                     <small>NA28 / SBLGNT</small>
                     <strong>
-                        ${d.na28 ? "PRINCIPAL" : "NÃO APLICÁVEL"}
+                        ${
+                            d.na28
+                                ? "PRINCIPAL"
+                                : "NÃO APLICÁVEL"
+                        }
                     </strong>
                 </div>
 
                 <div class="diagnostico-card">
                     <small>Septuaginta</small>
                     <strong>
-                        RECURSO INTERTEXTUAL
+                        COMPLEMENTAR
                     </strong>
                 </div>
 
@@ -729,9 +717,11 @@
     }
 
 
+    /* RENDERIZAÇÃO DOS 12 MÓDULOS */
+
     function renderizarModulos(
         termo,
-        d
+        diagnosticoAtual
     ) {
 
         modulos.innerHTML = "";
@@ -742,30 +732,31 @@
             const status =
                 classificarModulo(
                     etapa,
-                    d
+                    diagnosticoAtual
                 );
 
 
-            const div =
+            const modulo =
                 document.createElement("div");
 
-
-            div.className = "modulo";
-
-
-            const criterios =
-                etapa.itens || [];
+            modulo.className = "modulo";
 
 
-            div.innerHTML = `
+            const itens =
+                Array.isArray(etapa.itens)
+                    ? etapa.itens
+                    : [];
+
+
+            modulo.innerHTML = `
 
                 <div class="modulo-cabecalho">
 
                     <span class="modulo-nome">
 
-                        ${etapa.id}
+                        ${escapeHTML(etapa.id)}
                         —
-                        ${etapa.titulo}
+                        ${escapeHTML(etapa.titulo)}
 
                     </span>
 
@@ -779,54 +770,48 @@
 
                 </div>
 
+
                 <div class="modulo-conteudo">
 
-                    ${
-                        status === "nao-aplicavel"
+                    <p style="color:#94a3b8;">
+                        Critérios técnicos:
+                    </p>
 
-                        ? `
-                            <p>
-                                Este módulo não possui
-                                pertinência suficiente para
-                                esta pesquisa.
-                            </p>
-                          `
+                    <div class="lista-criterios">
 
-                        : `
-                            <p>
-                                Critérios técnicos:
-                            </p>
+                        ${
+                            itens
+                                .map(
+                                    criterio => `
 
-                            <div class="lista-criterios">
+                                        <button
+                                            type="button"
+                                            class="criterio"
+                                            data-criterio="${escapeHTML(criterio)}"
+                                        >
+                                            🔍
+                                            ${escapeHTML(criterio)}
+                                        </button>
 
-                                ${
-                                    criterios
-                                    .map(
-                                        criterio => `
-                                            <button
-                                                class="criterio"
-                                                data-criterio="${escapeHTML(criterio)}"
-                                            >
-                                                🔍 ${escapeHTML(criterio)}
-                                            </button>
-                                        `
-                                    )
-                                    .join("")
-                                }
+                                    `
+                                )
+                                .join("")
+                        }
 
-                            </div>
+                    </div>
 
-                            <div class="resultado"></div>
-                          `
-                    }
+
+                    <div class="resultado"></div>
 
                 </div>
 
             `;
 
 
+            /* ABRIR / FECHAR MÓDULO */
+
             const cabecalho =
-                div.querySelector(
+                modulo.querySelector(
                     ".modulo-cabecalho"
                 );
 
@@ -835,7 +820,7 @@
                 "click",
                 () => {
 
-                    div.classList.toggle(
+                    modulo.classList.toggle(
                         "aberto"
                     );
 
@@ -843,83 +828,85 @@
             );
 
 
-            div.querySelectorAll(
-                ".criterio"
-            ).forEach(botao => {
+            /* CRITÉRIOS */
 
-                botao.addEventListener(
-                    "click",
-                    event => {
+            modulo
+                .querySelectorAll(".criterio")
+                .forEach(botao => {
 
-                        event.stopPropagation();
+                    botao.addEventListener(
+                        "click",
+                        event => {
 
-                        const resultado =
-                            div.querySelector(
-                                ".resultado"
-                            );
+                            event.stopPropagation();
 
 
-                        const criterio =
-                            botao.dataset.criterio;
+                            const criterio =
+                                botao.dataset.criterio;
 
 
-                        if (
-                            typeof etapa.analisar ===
-                            "function"
-                        ) {
-
-                            resultado.innerHTML =
-                                etapa.analisar(
-                                    termo,
-                                    criterio
+                            const resultado =
+                                modulo.querySelector(
+                                    ".resultado"
                                 );
 
-                        } else {
 
-                            resultado.innerHTML = `
+                            if (
+                                typeof etapa.analisar ===
+                                "function"
+                            ) {
 
-                                <strong>
-                                    ${escapeHTML(
-                                        etapa.id
-                                    )}
-                                </strong>
-
-                                <p>
-                                    Critério:
-                                    ${escapeHTML(
+                                resultado.innerHTML =
+                                    etapa.analisar(
+                                        termo,
                                         criterio
-                                    )}
-                                </p>
+                                    );
 
-                                <p>
-                                    Este módulo está
-                                    aguardando sua
-                                    implementação
-                                    exegética.
-                                </p>
+                            } else {
 
-                            `;
+                                resultado.innerHTML = `
+
+                                    <strong>
+                                        ${escapeHTML(etapa.id)}
+                                    </strong>
+
+                                    <p>
+                                        Critério:
+                                        ${escapeHTML(criterio)}
+                                    </p>
+
+                                    <p>
+                                        Este módulo ainda
+                                        não possui um motor
+                                        de análise implementado.
+                                    </p>
+
+                                `;
+
+                            }
+
+
+                            resultado.style.display =
+                                "block";
 
                         }
+                    );
+
+                });
 
 
-                        resultado.style.display =
-                            "block";
-
-                    }
-                );
-
-            });
-
-
-            modulos.appendChild(div);
+            modulos.appendChild(
+                modulo
+            );
 
         });
 
     }
 
 
-    function gerarSintese(
+    /* SÍNTESE */
+
+    function renderizarSintese(
         termo,
         passagem,
         d
@@ -937,13 +924,15 @@
             >
 
                 <strong>
-                    Pesquisa iniciada
+                    Pesquisa exegética iniciada
                 </strong>
 
                 <br><br>
 
                 <strong>Termo:</strong>
-                ${escapeHTML(termo || "não informado")}
+                ${escapeHTML(
+                    termo || "não informado"
+                )}
 
                 <br>
 
@@ -962,10 +951,8 @@
 
                 <br><br>
 
-                O sistema selecionou os módulos
-                conforme a natureza da passagem.
-                Critérios incompatíveis não são
-                utilizados como texto-base.
+                A matriz carregou os
+                ANL-01 até ANL-12.
 
             </div>
 
@@ -973,6 +960,8 @@
 
     }
 
+
+    /* EXECUTAR PESQUISA */
 
     function analisar() {
 
@@ -996,7 +985,7 @@
         }
 
 
-        const d =
+        const diagnosticoAtual =
             identificarPassagem(
                 passagem
             );
@@ -1004,26 +993,26 @@
 
         renderizarDiagnostico(
             passagem,
-            d
+            diagnosticoAtual
         );
 
 
         renderizarModulos(
             termo,
-            d
+            diagnosticoAtual
         );
 
 
-        gerarSintese(
+        renderizarSintese(
             termo,
             passagem,
-            d
+            diagnosticoAtual
         );
 
     }
 
 
-    btn.addEventListener(
+    btnAnalisar.addEventListener(
         "click",
         analisar
     );
@@ -1041,10 +1030,10 @@
     );
 
 
+    /* ACORDEÕES PRINCIPAIS */
+
     document
-        .querySelectorAll(
-            ".painel-titulo"
-        )
+        .querySelectorAll(".painel-titulo")
         .forEach(titulo => {
 
             titulo.addEventListener(
@@ -1060,15 +1049,19 @@
 
                     const seta =
                         titulo.querySelector(
-                            "span:last-child"
+                            ".seta"
                         );
 
-                    seta.textContent =
-                        painel.classList.contains(
-                            "aberto"
-                        )
-                            ? "▲"
-                            : "▼";
+                    if (seta) {
+
+                        seta.textContent =
+                            painel.classList.contains(
+                                "aberto"
+                            )
+                                ? "▲"
+                                : "▼";
+
+                    }
 
                 }
             );
@@ -1078,4 +1071,5 @@
 </script>
 
 </body>
+
 </html>
