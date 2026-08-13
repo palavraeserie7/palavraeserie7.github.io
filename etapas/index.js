@@ -11,7 +11,6 @@ import { anl10 } from "./anl-10.js";
 import { anl11 } from "./anl-11.js";
 import { anl12 } from "./anl-12.js";
 
-
 export const etapas = [
     anl01,
     anl02,
@@ -26,19 +25,3 @@ export const etapas = [
     anl11,
     anl12
 ];
-
-
-export {
-    anl01,
-    anl02,
-    anl03,
-    anl04,
-    anl05,
-    anl06,
-    anl07,
-    anl08,
-    anl09,
-    anl10,
-    anl11,
-    anl12
-};
