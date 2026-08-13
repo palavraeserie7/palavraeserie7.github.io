@@ -11,32 +11,34 @@
         let htmlContent = `
             <div style="margin-bottom:25px; background:#1e293b; padding:20px; border-radius:8px; border:1px solid #334155;">
                 <h2 style="color:#22c55e; margin-bottom:10px;">Matriz de Análise Bíblica (12 Etapas)</h2>
-                <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Digite o texto ou tema bíblico para conduzir a investigação técnica com suporte das etapas:</p>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Digite um termo ou conceito para pesquisar nas 12 etapas:</p>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="inputBuscaBiblica" placeholder="Ex: João 1:1 ou Graça..." style="flex:1; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px;">
+                    <input type="text" id="inputBuscaBiblica" placeholder="Ex: regeneração, hebraico, contexto..." style="flex:1; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px;">
                     <button id="btnExecutarBusca" style="background:#22c55e; color:#000; border:none; padding:0 20px; font-weight:bold; border-radius:6px; cursor:pointer;">Pesquisar na Matriz</button>
                 </div>
                 <div id="resultadoBuscaInfo" style="margin-top:12px; color:#38bdf8; font-size:14px; font-weight:bold;"></div>
             </div>
+            <div id="listaEtapasContainer">
         `;
 
         Object.keys(matrizCompleta).forEach(key => {
             const etapa = matrizCompleta[key];
             htmlContent += `
-                <div class="etapa-card" style="background:#1e293b; margin-bottom:12px; border-radius:8px; border:1px solid #334155; overflow:hidden;">
+                <div class="etapa-card" data-etapa="${etapa.id}" style="background:#1e293b; margin-bottom:12px; border-radius:8px; border:1px solid #334155; overflow:hidden;">
                     <div class="etapa-header" style="padding:15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:#0f172a;">
                         <h3 style="color:#38bdf8; margin:0; font-size:16px;">${etapa.id} — ${etapa.titulo}</h3>
                         <span style="color:#22c55e; font-weight:bold;">▼</span>
                     </div>
                     <div class="etapa-body" style="padding:0 15px; max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease;">
                         <ul style="margin:15px 0; line-height:1.6; padding-left:20px;">
-                            ${etapa.itens.map(item => `<li>${item}</li>`).join('')}
+                            ${etapa.itens.map(item => `<li class="item-analise">${item}</li>`).join('')}
                         </ul>
                     </div>
                 </div>
             `;
         });
 
+        htmlContent += `</div>`;
         wrapper.innerHTML = htmlContent;
         container.appendChild(wrapper);
 
@@ -57,15 +59,57 @@
             });
         });
 
-        // Ação do botão de pesquisa integrada
+        // Mecanismo real de busca nos itens
         document.getElementById('btnExecutarBusca').addEventListener('click', () => {
-            const termo = document.getElementById('inputBuscaBiblica').value.trim();
+            const termo = document.getElementById('inputBuscaBiblica').value.trim().toLowerCase();
             const info = document.getElementById('resultadoBuscaInfo');
-            if(termo) {
-                info.innerHTML = `🔍 Analisando "${termo}" através das 12 etapas da Matriz Master V1...`;
-            } else {
-                info.innerHTML = `⚠️ Por favor, digite um texto ou tema para iniciar a pesquisa.`;
+            
+            if(!termo) {
+                info.innerHTML = `⚠️ Digite um termo para pesquisar.`;
+                return;
             }
+
+            let encontrados = 0;
+
+            document.querySelectorAll('.etapa-card').forEach(card => {
+                let matchEtapa = false;
+                const itensLi = card.querySelectorAll('.item-analise');
+                const tituloEtapa = card.querySelector('.etapa-header h3').textContent.toLowerCase();
+
+                if (tituloEtapa.includes(termo)) {
+                    matchEtapa = true;
+                }
+
+                itensLi.forEach(li => {
+                    const textoItem = li.textContent.toLowerCase();
+                    if (textoItem.includes(termo)) {
+                        li.style.background = "#334155";
+                        li.style.color = "#22c55e";
+                        li.style.fontWeight = "bold";
+                        matchEtapa = true;
+                        encontrados++;
+                    } else {
+                        li.style.background = "transparent";
+                        li.style.color = "#f1f5f9";
+                        li.style.fontWeight = "normal";
+                    }
+                });
+
+                const body = card.querySelector('.etapa-body');
+                const arrow = card.querySelector('.etapa-header span');
+
+                // Se encontrou algo nesta etapa, abre automaticamente o card para o usuário ver
+                if (matchEtapa) {
+                    body.style.maxHeight = body.scrollHeight + 100 + "px";
+                    body.style.padding = "15px";
+                    arrow.style.transform = "rotate(180deg)";
+                    card.style.borderColor = "#22c55e";
+                } else {
+                    card.style.borderColor = "#334155";
+                }
+            });
+
+            info.innerHTML = `🔍 Termo "${termo}" localizado em ${encontrados} pontos de pesquisa nas etapas destacadas em verde.`;
         });
     });
 </script>
