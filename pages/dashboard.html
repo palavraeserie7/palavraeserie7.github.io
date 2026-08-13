@@ -12,7 +12,7 @@
             <div style="margin-bottom:25px; background:#1e293b; padding:20px; border-radius:8px; border:1px solid #334155;">
                 <h2 style="color:#22c55e; margin-bottom:10px;">Matriz de Análise Bíblica (12 Etapas)</h2>
                 <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Digite o termo e consulte individualmente cada etapa:</p>
-                <input type="text" id="inputBuscaBiblica" placeholder="Ex: regeneração, fé, aliança..." style="width:100%; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px; margin-bottom:10px;">
+                <input type="text" id="inputBuscaBiblica" placeholder="Ex: amor, regeneração, fé..." style="width:100%; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px; margin-bottom:10px;">
                 <div id="resultadoBuscaInfo" style="color:#38bdf8; font-size:14px; font-weight:bold;"></div>
             </div>
             <div id="listaEtapasContainer">
@@ -28,7 +28,7 @@
                         <h3 style="color:#38bdf8; margin:0; font-size:16px;">${etapa.id} — ${etapa.titulo} ${badgePro}</h3>
                         <div style="display:flex; align-items:center; gap:10px;">
                             <button class="btn-consultar" data-id="${etapa.id}" style="background:#22c55e; color:#000; border:none; padding:6px 12px; font-size:12px; font-weight:bold; border-radius:4px; cursor:pointer;">Consultar Etapa</button>
-                            <span style="color:#22c55e; font-weight:bold;">▼</span>
+                            <span style="color:#22c55e; font-weight:bold; transition:transform 0.3s ease;">▼</span>
                         </div>
                     </div>
                     <div class="etapa-body" style="padding:0 15px; max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease;">
@@ -44,7 +44,7 @@
         wrapper.innerHTML = htmlContent;
         container.appendChild(wrapper);
 
-        // Ações de clique individual por botão
+        // Ações de clique individual por botão com controle de abrir/fechar (Toggle)
         document.querySelectorAll('.btn-consultar').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -58,32 +58,36 @@
                     return;
                 }
 
-                // Trava de segurança PRO
-                const usuarioEhPro = false; // Altere para true se houver integração de login ativa
-                if (etapaObj.isPro && !usuarioEhPro) {
-                    alert(`A etapa ${id} é exclusiva para assinantes PRO.`);
-                    return;
-                }
-
                 const card = document.querySelector(`.etapa-card[data-etapa="${id}"]`);
                 const body = card.querySelector('.etapa-body');
                 const arrow = card.querySelector('.etapa-header span:last-child');
                 const conteudo = card.querySelector('.etapa-conteudo-dinamico');
 
-                // Executa a função nativa do módulo da etapa para gerar o conteúdo
-                const resultadoGerado = etapaObj.analisar ? etapaObj.analisar(termo) : "Análise padrão da etapa.";
+                // Se já estiver aberto, fecha
+                if (body.style.maxHeight && body.style.maxHeight !== "0px") {
+                    body.style.maxHeight = "0px";
+                    body.style.padding = "0 15px";
+                    arrow.style.transform = "rotate(0deg)";
+                    return;
+                }
+
+                // Verifica se a etapa possui o método de análise próprio ou usa o genérico estruturado
+                const resultadoGerado = etapaObj.analisar 
+                    ? etapaObj.analisar(termo) 
+                    O: `Diretriz metodológica aplicada ao termo <strong>"${termo}"</strong> nos critérios desta seção.`;
 
                 conteudo.innerHTML = `
                     <div style="background:#0f172a; padding:12px; border-left:4px solid #22c55e; border-radius:4px; margin-bottom:12px; color:#e2e8f0;">
-                        🎯 <strong>Resultado para "${termo}":</strong><br>${resultadoGerado}
+                        🎯 <strong>Análise para "${termo}":</strong><br>${resultadoGerado}
                     </div>
-                    <p style="color:#94a3b8; font-style:italic; font-size:13px;">Critérios técnicos:</p>
-                    <ul style="padding-left:20px; font-size:14px;">
+                    <p style="color:#94a3b8; font-style:italic; font-size:13px;">Critérios técnicos da etapa:</p>
+                    <ul style="padding-left:20px; font-size:14px; margin-top:5px;">
                         ${etapaObj.itens.map(i => `<li>${i}</li>`).join('')}
                     </ul>
                 `;
 
-                body.style.maxHeight = body.scrollHeight + 300 + "px";
+                // Abre a caixa com altura dinâmica
+                body.style.maxHeight = body.scrollHeight + 400 + "px";
                 body.style.padding = "15px";
                 arrow.style.transform = "rotate(180deg)";
                 card.style.borderColor = "#22c55e";
