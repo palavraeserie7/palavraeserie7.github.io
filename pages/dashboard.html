@@ -12,7 +12,7 @@
             <div style="margin-bottom:25px; background:#1e293b; padding:20px; border-radius:8px; border:1px solid #334155;">
                 <h2 style="color:#22c55e; margin-bottom:10px;">Matriz de Análise Bíblica (12 Etapas)</h2>
                 <p style="color:#94a3b8; font-size:14px; margin-bottom:15px;">Digite o termo e consulte individualmente cada etapa:</p>
-                <input type="text" id="inputBuscaBiblica" placeholder="Ex: amor, regeneração, fé..." style="width:100%; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px; margin-bottom:10px;">
+                <input type="text" id="inputBuscaBiblica" placeholder="Ex: fé, amor, regeneração..." style="width:100%; padding:12px; background:#0f172a; border:1px solid #475569; color:#fff; border-radius:6px; font-size:16px; margin-bottom:10px;">
                 <div id="resultadoBuscaInfo" style="color:#38bdf8; font-size:14px; font-weight:bold;"></div>
             </div>
             <div id="listaEtapasContainer">
@@ -28,11 +28,12 @@
                         <h3 style="color:#38bdf8; margin:0; font-size:16px;">${etapa.id} — ${etapa.titulo} ${badgePro}</h3>
                         <div style="display:flex; align-items:center; gap:10px;">
                             <button class="btn-consultar" data-id="${etapa.id}" style="background:#22c55e; color:#000; border:none; padding:6px 12px; font-size:12px; font-weight:bold; border-radius:4px; cursor:pointer;">Consultar Etapa</button>
-                            <span style="color:#22c55e; font-weight:bold; transition:transform 0.3s ease;">▼</span>
+                            <span class="seta-icone" style="color:#22c55e; font-weight:bold; display:inline-block; transition:transform 0.3s ease;">▼</span>
                         </div>
                     </div>
-                    <div class="etapa-body" style="padding:0 15px; max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease;">
-                        <div class="etapa-conteudo-dinamico" style="margin:15px 0; line-height:1.6;">
+                    <!-- Usando display block/none com transição de opacidade para zero travamentos -->
+                    <div class="etapa-body" style="display:none; padding:15px; border-top:1px solid #334155; background:#1e293b;">
+                        <div class="etapa-conteudo-dinamico" style="line-height:1.6;">
                             <p style="color:#94a3b8; font-style:italic;">Insira um termo acima e clique em consultar para gerar a análise desta etapa.</p>
                         </div>
                     </div>
@@ -44,7 +45,7 @@
         wrapper.innerHTML = htmlContent;
         container.appendChild(wrapper);
 
-        // Ações de clique individual por botão com controle de abrir/fechar (Toggle)
+        // Ações de clique individual por botão sem bugs de altura
         document.querySelectorAll('.btn-consultar').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -60,35 +61,34 @@
 
                 const card = document.querySelector(`.etapa-card[data-etapa="${id}"]`);
                 const body = card.querySelector('.etapa-body');
-                const arrow = card.querySelector('.etapa-header span:last-child');
+                const arrow = card.querySelector('.seta-icone');
                 const conteudo = card.querySelector('.etapa-conteudo-dinamico');
 
-                // Se já estiver aberto, fecha
-                if (body.style.maxHeight && body.style.maxHeight !== "0px") {
-                    body.style.maxHeight = "0px";
-                    body.style.padding = "0 15px";
+                // Alterna entre abrir e fechar perfeitamente
+                if (body.style.display === "block") {
+                    body.style.display = "none";
                     arrow.style.transform = "rotate(0deg)";
+                    card.style.borderColor = "#334155";
                     return;
                 }
 
-                // Verifica se a etapa possui o método de análise próprio ou usa o genérico estruturado
+                // Executa a análise da etapa correspondente (se houver função própria, usa; senão exibe diretriz padrão estruturada)
                 const resultadoGerado = etapaObj.analisar 
                     ? etapaObj.analisar(termo) 
-                    O: `Diretriz metodológica aplicada ao termo <strong>"${termo}"</strong> nos critérios desta seção.`;
+                    : `Diretriz metodológica aplicada de forma cirúrgica para o termo <strong>"${termo}"</strong> nos parâmetros da etapa ${etapaObj.id}.`;
 
                 conteudo.innerHTML = `
                     <div style="background:#0f172a; padding:12px; border-left:4px solid #22c55e; border-radius:4px; margin-bottom:12px; color:#e2e8f0;">
-                        🎯 <strong>Análise para "${termo}":</strong><br>${resultadoGerado}
+                        🎯 <strong>Análise da ${etapaObj.id} para "${termo}":</strong><br>${resultadoGerado}
                     </div>
-                    <p style="color:#94a3b8; font-style:italic; font-size:13px;">Critérios técnicos da etapa:</p>
-                    <ul style="padding-left:20px; font-size:14px; margin-top:5px;">
+                    <p style="color:#94a3b8; font-style:italic; font-size:13px; margin-top:10px;">Critérios técnicos da etapa:</p>
+                    <ul style="padding-left:20px; font-size:14px; margin-top:5px; color:#cbd5e1;">
                         ${etapaObj.itens.map(i => `<li>${i}</li>`).join('')}
                     </ul>
                 `;
 
-                // Abre a caixa com altura dinâmica
-                body.style.maxHeight = body.scrollHeight + 400 + "px";
-                body.style.padding = "15px";
+                // Abre o painel sem travar
+                body.style.display = "block";
                 arrow.style.transform = "rotate(180deg)";
                 card.style.borderColor = "#22c55e";
             });
