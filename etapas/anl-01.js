@@ -8,18 +8,31 @@ export const anl01 = {
         "Testemunhos textuais (Papiros, Unciais, Minúsculos)",
         "Consulta a aparatos críticos (NA28 / BHS / SBLGNT)"
     ],
-    // Motor de execução eficiente para a ANL-01
-    analisar(termo) {
+    // Motor granular que responde especificamente ao critério técnico clicado
+    analisar(termo, criterio) {
         return `
             <div style="margin-bottom: 10px;">
-                <strong style="color: #38bdf8;">Diretriz de Crítica Textual para: "${termo}"</strong>
+                <strong style="color: #38bdf8;">Diretriz ANL-01 para "${termo}"</strong><br>
+                <span style="font-size: 13px; color: #94a3b8;">Foco no critério técnico: <em>${criterio}</em></span>
             </div>
-            <p style="margin-bottom: 8px;">Para executar a ANL-01 com eficiência sobre este termo ou passagem, siga esta verificação:</p>
-            <ul style="padding-left: 20px; color: #cbd5e1; display: flex; flex-direction: column; gap: 6px;">
-                <li><strong>1. Autógrafos e Manuscritos:</strong> Verifique no NA28 (Novo Testamento) ou BHS/BHQ (Antigo Testamento) se há divergências significativas entre as famílias textuais (Alexandrina, Bizantina, Ocidental).</li>
-                <li><strong>2. Variantes Relevantes:</strong> Identifique se a variação altera a morfologia ou o sentido teológico ou se é apenas um erro ortográfico (itacismo).</li>
-                <li><strong>3. Testemunhos Primários:</strong> Liste os principais suportes que sustentam a leitura original adotada.</li>
-            </ul>
+            <div style="background: #0f172a; padding: 12px; border-radius: 6px; border-left: 3px solid #22c55e; color: #e2e8f0; font-size: 14px; line-height: 1.5;">
+                ${this.obterConteudoCriterio(criterio, termo)}
+            </div>
         `;
+    },
+    
+    obterConteudoCriterio(criterio, termo) {
+        switch(criterio) {
+            case "Identificação do texto base (Hebraico/Grego)":
+                return `Verifique se o termo <strong>"${termo}"</strong> ocorre no Texto Massorético (BHS) para o Antigo Testamento ou no SBLGNT/NA28 para o Novo Testamento, isolando o lema original.`;
+            case "Mapeamento de variantes textuais críticas":
+                return `Consulte os aparatos textuais para identificar se existem divergências significativas nos manuscritos antigos para o termo <strong>"${termo}"</strong>.`;
+            case "Testemunhos textuais (Papiros, Unciais, Minúsculos)":
+                return `Liste os principais suportes manuscritos que sustentam a leitura original onde <strong>"${termo}"</strong> aparece (ex: P66, P75, Codex Sinaiticus).`;
+            case "Consulta a aparatos críticos (NA28 / BHS / SBLGNT)":
+                return `Analise as notas críticas de rodapé no NA28 ou BHS/BHQ para certificar o grau de certeza textual da ocorrência de <strong>"${termo}"</strong>.`;
+            default:
+                return `Aplicação da diretriz técnica de Crítica Textual para o termo <strong>"${termo}"</strong> com base nos padrões acadêmicos da ANL-01.`;
+        }
     }
 };
