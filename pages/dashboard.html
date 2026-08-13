@@ -2,18 +2,6 @@
     import { matrizCompleta } from '../etapas/index.js';
 
     document.addEventListener("DOMContentLoaded", () => {
-        try {
-            const container = document.querySelector('.container') || document.body;
-            // ... restante do código ...
-        } catch (erro) {
-            console.error("Erro ao carregar a matriz:", erro);
-            document.body.innerHTML += `<div style="color:red; padding:20px; background:#fee2e2; margin:20px; border-radius:5px;">⚠️ Erro de carregamento: ${erro.message}</div>`;
-        }
-    });
-</script>
-    import { matrizCompleta } from '../etapas/index.js';
-
-    document.addEventListener("DOMContentLoaded", () => {
         const container = document.querySelector('.container') || document.body;
 
         const wrapper = document.createElement('div');
@@ -43,7 +31,6 @@
                             <span class="seta-icone" style="color:#22c55e; font-weight:bold; display:inline-block; transition:transform 0.3s ease;">▼</span>
                         </div>
                     </div>
-                    <!-- Usando display block/none com transição de opacidade para zero travamentos -->
                     <div class="etapa-body" style="display:none; padding:15px; border-top:1px solid #334155; background:#1e293b;">
                         <div class="etapa-conteudo-dinamico" style="line-height:1.6;">
                             <p style="color:#94a3b8; font-style:italic;">Insira um termo acima e clique em consultar para gerar a análise desta etapa.</p>
@@ -57,7 +44,6 @@
         wrapper.innerHTML = htmlContent;
         container.appendChild(wrapper);
 
-        // Ações de clique individual por botão sem bugs de altura
         document.querySelectorAll('.btn-consultar').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -76,7 +62,6 @@
                 const arrow = card.querySelector('.seta-icone');
                 const conteudo = card.querySelector('.etapa-conteudo-dinamico');
 
-                // Alterna entre abrir e fechar perfeitamente
                 if (body.style.display === "block") {
                     body.style.display = "none";
                     arrow.style.transform = "rotate(0deg)";
@@ -84,7 +69,6 @@
                     return;
                 }
 
-                // Executa a análise da etapa correspondente (se houver função própria, usa; senão exibe diretriz padrão estruturada)
                 const resultadoGerado = etapaObj.analisar 
                     ? etapaObj.analisar(termo) 
                     : `Diretriz metodológica aplicada de forma cirúrgica para o termo <strong>"${termo}"</strong> nos parâmetros da etapa ${etapaObj.id}.`;
@@ -93,13 +77,12 @@
                     <div style="background:#0f172a; padding:12px; border-left:4px solid #22c55e; border-radius:4px; margin-bottom:12px; color:#e2e8f0;">
                         🎯 <strong>Análise da ${etapaObj.id} para "${termo}":</strong><br>${resultadoGerado}
                     </div>
-                    <p style="color:#94a3b8; font-style:italic; font-size:13px; margin-top:10px;">Critérios técnicos da etapa:</p>
+                    <p style="color:#94a38b; font-style:italic; font-size:13px; margin-top:10px;">Critérios técnicos da etapa:</p>
                     <ul style="padding-left:20px; font-size:14px; margin-top:5px; color:#cbd5e1;">
                         ${etapaObj.itens.map(i => `<li>${i}</li>`).join('')}
                     </ul>
                 `;
 
-                // Abre o painel sem travar
                 body.style.display = "block";
                 arrow.style.transform = "rotate(180deg)";
                 card.style.borderColor = "#22c55e";
