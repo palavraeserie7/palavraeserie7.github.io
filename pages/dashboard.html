@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,17 +8,18 @@
     <title>Matriz de Análise Bíblica</title>
 
     <style>
+
         :root {
             --bg: #0b1428;
             --panel: #172238;
-            --panel-2: #101a2e;
+            --panel-dark: #0f172a;
             --border: #263653;
             --text: #e8eef8;
-            --muted: #8fa1ba;
+            --muted: #94a3b8;
             --blue: #08b8ff;
-            --green: #18d66b;
+            --green: #22c55e;
             --yellow: #f5c542;
-            --red: #ff6678;
+            --red: #ef4444;
         }
 
         * {
@@ -36,28 +38,28 @@
             margin: 30px auto 80px;
         }
 
-        .header {
+        .topo {
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 20px;
+            padding: 22px;
+            margin-bottom: 18px;
         }
 
-        .header h1 {
+        .topo h1 {
             margin: 0 0 8px;
             color: var(--green);
-            font-size: 24px;
+            font-size: 23px;
         }
 
-        .header p {
+        .topo p {
             margin: 0 0 18px;
             color: var(--muted);
         }
 
-        .search {
+        .busca {
             display: grid;
-            grid-template-columns: 1fr 1fr auto;
+            grid-template-columns: 1fr 1fr 130px;
             gap: 10px;
         }
 
@@ -75,21 +77,20 @@
             border-color: var(--blue);
         }
 
-        button {
+        .btn-analisar {
             border: 0;
             border-radius: 5px;
-            padding: 0 22px;
             background: var(--green);
-            color: #07120d;
+            color: #06130b;
             font-weight: bold;
             cursor: pointer;
         }
 
-        button:hover {
+        .btn-analisar:hover {
             filter: brightness(1.1);
         }
 
-        .section {
+        .painel {
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 7px;
@@ -97,70 +98,79 @@
             overflow: hidden;
         }
 
-        .section-title {
+        .painel-titulo {
             padding: 14px;
             color: var(--blue);
             font-weight: bold;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
-        .section-content {
+        .painel-conteudo {
             display: none;
-            padding: 12px;
+            padding: 14px;
             border-top: 1px solid var(--border);
         }
 
-        .section.open .section-content {
+        .painel.aberto .painel-conteudo {
             display: block;
         }
 
-        .diagnostic {
+        .diagnostico-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(180px, 1fr)
+            );
             gap: 10px;
         }
 
-        .diagnostic-card {
-            background: var(--panel-2);
+        .diagnostico-card {
+            background: var(--panel-dark);
             border: 1px solid var(--border);
             border-radius: 5px;
             padding: 12px;
         }
 
-        .diagnostic-card small {
+        .diagnostico-card small {
             display: block;
             color: var(--muted);
             margin-bottom: 6px;
         }
 
-        .diagnostic-card strong {
+        .diagnostico-card strong {
             color: var(--text);
         }
 
-        .module {
-            margin-bottom: 8px;
-            padding: 12px;
-            background: var(--panel-2);
+        .modulo {
+            background: var(--panel-dark);
             border: 1px solid var(--border);
-            border-radius: 5px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
         }
 
-        .module-header {
+        .modulo-cabecalho {
+            padding: 13px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            cursor: pointer;
         }
 
-        .module-name {
+        .modulo-cabecalho:hover {
+            background: #142039;
+        }
+
+        .modulo-nome {
             color: var(--blue);
             font-weight: bold;
         }
 
-        .module-status {
-            font-size: 12px;
+        .modulo-status {
+            font-size: 11px;
             font-weight: bold;
             padding: 5px 8px;
             border-radius: 4px;
@@ -186,49 +196,60 @@
             border: 1px solid var(--red);
         }
 
-        .module-body {
-            margin-top: 10px;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        .criteria {
-            margin-top: 10px;
-        }
-
-        .criteria span {
-            display: inline-block;
-            padding: 5px 8px;
-            margin: 3px;
-            background: #0a1427;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .result {
-            background: #0b172b;
-            border-left: 3px solid var(--green);
+        .modulo-conteudo {
+            display: none;
             padding: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .modulo.aberto .modulo-conteudo {
+            display: block;
+        }
+
+        .criterio {
+            width: 100%;
+            display: block;
+            text-align: left;
+            margin-bottom: 6px;
+            padding: 10px;
+            background: #0b1529;
+            color: #cbd5e1;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .criterio:hover {
+            border-color: var(--blue);
+            color: white;
+        }
+
+        .resultado {
+            display: none;
             margin-top: 12px;
+            padding: 13px;
+            background: #091426;
+            border-left: 3px solid var(--green);
             line-height: 1.6;
         }
 
-        .empty {
+        .vazio {
+            padding: 25px;
             color: var(--muted);
             text-align: center;
-            padding: 30px;
         }
 
-        @media (max-width: 700px) {
-            .search {
+        @media(max-width: 700px) {
+
+            .busca {
                 grid-template-columns: 1fr;
             }
 
-            button {
+            .btn-analisar {
                 height: 44px;
             }
         }
+
     </style>
 </head>
 
@@ -236,76 +257,825 @@
 
 <div class="container">
 
-    <header class="header">
-        <h1>Matriz de Análise Bíblica — Motor Exegético Avançado</h1>
+    <header class="topo">
+
+        <h1>
+            Matriz de Análise Bíblica — Motor Exegético Avançado
+        </h1>
 
         <p>
-            Informe o termo e a passagem. O sistema determinará quais critérios
-            são pertinentes antes de executar a análise.
+            Informe o termo e a passagem para selecionar os critérios
+            exegéticos pertinentes.
         </p>
 
-        <div class="search">
+        <div class="busca">
+
             <input
-                id="termInput"
+                id="termo"
                 type="text"
                 placeholder="Termo (ex.: Deus)"
                 value="Deus"
             >
 
             <input
-                id="passageInput"
+                id="passagem"
                 type="text"
-                placeholder="Passagem (ex.: João 1:1-18)"
+                placeholder="Passagem (ex.: João 1:1)"
             >
 
-            <button id="analyzeButton">
+            <button
+                id="btnAnalisar"
+                class="btn-analisar"
+            >
                 ANALISAR
             </button>
+
         </div>
+
     </header>
 
-    <section class="section open">
-        <div class="section-title">
-            <span>ANL-00 — DIAGNÓSTICO E ROTEAMENTO</span>
+
+    <!-- ANL-00 -->
+
+    <section class="painel aberto">
+
+        <div class="painel-titulo">
+
+            <span>
+                ANL-00 — DIAGNÓSTICO E ROTEAMENTO
+            </span>
+
             <span>▲</span>
+
         </div>
 
-        <div class="section-content">
-            <div id="diagnostic" class="empty">
+        <div class="painel-conteudo">
+
+            <div
+                id="diagnostico"
+                class="vazio"
+            >
                 Informe uma passagem para iniciar.
             </div>
+
         </div>
+
     </section>
 
-    <section class="section open">
-        <div class="section-title">
-            <span>MÓDULOS EXEGÉTICOS</span>
+
+    <!-- ANL 01-11 -->
+
+    <section class="painel aberto">
+
+        <div class="painel-titulo">
+
+            <span>
+                MÓDULOS EXEGÉTICOS
+            </span>
+
             <span>▲</span>
+
         </div>
 
-        <div class="section-content">
-            <div id="modules" class="empty">
+        <div class="painel-conteudo">
+
+            <div
+                id="modulos"
+                class="vazio"
+            >
                 Nenhuma análise executada.
             </div>
+
         </div>
+
     </section>
 
-    <section class="section open">
-        <div class="section-title">
-            <span>ANL-12 — SÍNTESE</span>
+
+    <!-- ANL-12 -->
+
+    <section class="painel aberto">
+
+        <div class="painel-titulo">
+
+            <span>
+                ANL-12 — SÍNTESE
+            </span>
+
             <span>▲</span>
+
         </div>
 
-        <div class="section-content">
-            <div id="synthesis" class="empty">
-                A síntese será gerada após o diagnóstico.
+        <div class="painel-conteudo">
+
+            <div
+                id="sintese"
+                class="vazio"
+            >
+                A síntese aparecerá após a análise.
             </div>
+
         </div>
+
     </section>
 
 </div>
 
-<script type="module" src="../js/app.js"></script>
+
+<script type="module">
+
+    import {
+        anl01,
+        anl02,
+        anl03,
+        anl04,
+        anl05,
+        anl06,
+        anl07,
+        anl08,
+        anl09,
+        anl10,
+        anl11,
+        anl12
+    } from "../etapas/index.js";
+
+
+    const etapas = [
+        anl01,
+        anl02,
+        anl03,
+        anl04,
+        anl05,
+        anl06,
+        anl07,
+        anl08,
+        anl09,
+        anl10,
+        anl11,
+        anl12
+    ];
+
+
+    const termoInput =
+        document.getElementById("termo");
+
+    const passagemInput =
+        document.getElementById("passagem");
+
+    const btn =
+        document.getElementById("btnAnalisar");
+
+    const diagnostico =
+        document.getElementById("diagnostico");
+
+    const modulos =
+        document.getElementById("modulos");
+
+    const sintese =
+        document.getElementById("sintese");
+
+
+    function escapeHTML(texto) {
+
+        return String(texto)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    function identificarPassagem(passagem) {
+
+        const p =
+            passagem
+                .toLowerCase()
+                .trim();
+
+
+        const NT = [
+            "mateus",
+            "marcos",
+            "lucas",
+            "joão",
+            "joao",
+            "atos",
+            "romanos",
+            "coríntios",
+            "corintios",
+            "gálatas",
+            "galatas",
+            "efésios",
+            "efesios",
+            "filipenses",
+            "colossenses",
+            "tessalonicenses",
+            "timóteo",
+            "timoteo",
+            "tito",
+            "filemom",
+            "hebreus",
+            "tiago",
+            "pedro",
+            "joão",
+            "judas",
+            "apocalipse"
+        ];
+
+
+        const AT = [
+            "gênesis",
+            "genesis",
+            "êxodo",
+            "exodo",
+            "levítico",
+            "levitico",
+            "números",
+            "numeros",
+            "deuteronômio",
+            "deuteronomio",
+            "josué",
+            "josue",
+            "juízes",
+            "juizes",
+            "rute",
+            "samuel",
+            "reis",
+            "crônicas",
+            "cronicas",
+            "esdras",
+            "neemias",
+            "ester",
+            "jó",
+            "salmos",
+            "provérbios",
+            "proverbios",
+            "eclesiastes",
+            "cantares",
+            "isaías",
+            "isaias",
+            "jeremias",
+            "lamentações",
+            "lamentacoes",
+            "ezequiel",
+            "daniel",
+            "oséias",
+            "oseias",
+            "joel",
+            "amós",
+            "amos",
+            "obadias",
+            "jonas",
+            "miquéias",
+            "miqueias",
+            "naum",
+            "habacuque",
+            "sofonias",
+            "ageu",
+            "zacarias",
+            "malaquias"
+        ];
+
+
+        const livroNT =
+            NT.find(
+                livro => p.includes(livro)
+            );
+
+        const livroAT =
+            AT.find(
+                livro => p.includes(livro)
+            );
+
+
+        if (livroNT) {
+
+            return {
+                testamento: "Novo Testamento",
+                idioma: "Grego",
+                grego: true,
+                hebraico: false,
+                na28: true,
+                sblgnt: true,
+                bhs: false,
+                bhq: false,
+                lxx: true
+            };
+
+        }
+
+
+        if (livroAT) {
+
+            return {
+                testamento: "Antigo Testamento",
+                idioma: "Hebraico",
+                grego: false,
+                hebraico: true,
+                na28: false,
+                sblgnt: false,
+                bhs: true,
+                bhq: true,
+                lxx: true
+            };
+
+        }
+
+
+        return {
+            testamento: "Não identificado",
+            idioma: "Indeterminado",
+            grego: false,
+            hebraico: false,
+            na28: false,
+            sblgnt: false,
+            bhs: false,
+            bhq: false,
+            lxx: true
+        };
+
+    }
+
+
+    function classificarModulo(
+        etapa,
+        diagnostico
+    ) {
+
+        if (etapa.id === "ANL-01") {
+
+            return diagnostico.testamento ===
+                "Novo Testamento"
+                ? "principal"
+                : diagnostico.testamento ===
+                    "Antigo Testamento"
+                    ? "principal"
+                    : "condicional";
+
+        }
+
+
+        if (etapa.id === "ANL-02")
+            return "principal";
+
+
+        if (etapa.id === "ANL-03")
+            return "principal";
+
+
+        if (etapa.id === "ANL-04")
+            return "principal";
+
+
+        if (etapa.id === "ANL-05")
+            return "relevante";
+
+
+        if (etapa.id === "ANL-06")
+            return "principal";
+
+
+        if (etapa.id === "ANL-07")
+            return "relevante";
+
+
+        if (etapa.id === "ANL-08")
+            return "condicional";
+
+
+        if (etapa.id === "ANL-09")
+            return "relevante";
+
+
+        if (etapa.id === "ANL-10")
+            return "relevante";
+
+
+        if (etapa.id === "ANL-11")
+            return "relevante";
+
+
+        if (etapa.id === "ANL-12")
+            return "principal";
+
+
+        return "condicional";
+
+    }
+
+
+    function renderizarDiagnostico(
+        passagem,
+        d
+    ) {
+
+        diagnostico.innerHTML = `
+
+            <div class="diagnostico-grid">
+
+                <div class="diagnostico-card">
+                    <small>Passagem</small>
+                    <strong>
+                        ${escapeHTML(passagem)}
+                    </strong>
+                </div>
+
+                <div class="diagnostico-card">
+                    <small>Testamento</small>
+                    <strong>
+                        ${d.testamento}
+                    </strong>
+                </div>
+
+                <div class="diagnostico-card">
+                    <small>Idioma principal</small>
+                    <strong>
+                        ${d.idioma}
+                    </strong>
+                </div>
+
+                <div class="diagnostico-card">
+                    <small>Texto grego</small>
+                    <strong>
+                        ${d.grego ? "PRINCIPAL" : "—"}
+                    </strong>
+                </div>
+
+                <div class="diagnostico-card">
+                    <small>BHS / BHQ</small>
+                    <strong>
+                        ${d.bhs ? "PRINCIPAL" : "CONDICIONAL"}
+                    </strong>
+                </div>
+
+                <div class="diagnostico-card">
+                    <small>NA28 / SBLGNT</small>
+                    <strong>
+                        ${d.na28 ? "PRINCIPAL" : "NÃO APLICÁVEL"}
+                    </strong>
+                </div>
+
+                <div class="diagnostico-card">
+                    <small>Septuaginta</small>
+                    <strong>
+                        RECURSO INTERTEXTUAL
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+    }
+
+
+    function renderizarModulos(
+        termo,
+        d
+    ) {
+
+        modulos.innerHTML = "";
+
+
+        etapas.forEach(etapa => {
+
+            const status =
+                classificarModulo(
+                    etapa,
+                    d
+                );
+
+
+            const div =
+                document.createElement("div");
+
+
+            div.className = "modulo";
+
+
+            const criterios =
+                etapa.itens || [];
+
+
+            div.innerHTML = `
+
+                <div class="modulo-cabecalho">
+
+                    <span class="modulo-nome">
+
+                        ${etapa.id}
+                        —
+                        ${etapa.titulo}
+
+                    </span>
+
+                    <span
+                        class="modulo-status ${status}"
+                    >
+
+                        ${status.toUpperCase()}
+
+                    </span>
+
+                </div>
+
+                <div class="modulo-conteudo">
+
+                    ${
+                        status === "nao-aplicavel"
+
+                        ? `
+                            <p>
+                                Este módulo não possui
+                                pertinência suficiente para
+                                esta pesquisa.
+                            </p>
+                          `
+
+                        : `
+                            <p>
+                                Critérios técnicos:
+                            </p>
+
+                            <div class="lista-criterios">
+
+                                ${
+                                    criterios
+                                    .map(
+                                        criterio => `
+                                            <button
+                                                class="criterio"
+                                                data-criterio="${escapeHTML(criterio)}"
+                                            >
+                                                🔍 ${escapeHTML(criterio)}
+                                            </button>
+                                        `
+                                    )
+                                    .join("")
+                                }
+
+                            </div>
+
+                            <div class="resultado"></div>
+                          `
+                    }
+
+                </div>
+
+            `;
+
+
+            const cabecalho =
+                div.querySelector(
+                    ".modulo-cabecalho"
+                );
+
+
+            cabecalho.addEventListener(
+                "click",
+                () => {
+
+                    div.classList.toggle(
+                        "aberto"
+                    );
+
+                }
+            );
+
+
+            div.querySelectorAll(
+                ".criterio"
+            ).forEach(botao => {
+
+                botao.addEventListener(
+                    "click",
+                    event => {
+
+                        event.stopPropagation();
+
+                        const resultado =
+                            div.querySelector(
+                                ".resultado"
+                            );
+
+
+                        const criterio =
+                            botao.dataset.criterio;
+
+
+                        if (
+                            typeof etapa.analisar ===
+                            "function"
+                        ) {
+
+                            resultado.innerHTML =
+                                etapa.analisar(
+                                    termo,
+                                    criterio
+                                );
+
+                        } else {
+
+                            resultado.innerHTML = `
+
+                                <strong>
+                                    ${escapeHTML(
+                                        etapa.id
+                                    )}
+                                </strong>
+
+                                <p>
+                                    Critério:
+                                    ${escapeHTML(
+                                        criterio
+                                    )}
+                                </p>
+
+                                <p>
+                                    Este módulo está
+                                    aguardando sua
+                                    implementação
+                                    exegética.
+                                </p>
+
+                            `;
+
+                        }
+
+
+                        resultado.style.display =
+                            "block";
+
+                    }
+                );
+
+            });
+
+
+            modulos.appendChild(div);
+
+        });
+
+    }
+
+
+    function gerarSintese(
+        termo,
+        passagem,
+        d
+    ) {
+
+        sintese.innerHTML = `
+
+            <div
+                style="
+                    background:#091426;
+                    border-left:3px solid #22c55e;
+                    padding:15px;
+                    line-height:1.6;
+                "
+            >
+
+                <strong>
+                    Pesquisa iniciada
+                </strong>
+
+                <br><br>
+
+                <strong>Termo:</strong>
+                ${escapeHTML(termo || "não informado")}
+
+                <br>
+
+                <strong>Passagem:</strong>
+                ${escapeHTML(passagem)}
+
+                <br>
+
+                <strong>Testamento:</strong>
+                ${d.testamento}
+
+                <br>
+
+                <strong>Idioma-base:</strong>
+                ${d.idioma}
+
+                <br><br>
+
+                O sistema selecionou os módulos
+                conforme a natureza da passagem.
+                Critérios incompatíveis não são
+                utilizados como texto-base.
+
+            </div>
+
+        `;
+
+    }
+
+
+    function analisar() {
+
+        const termo =
+            termoInput.value.trim();
+
+        const passagem =
+            passagemInput.value.trim();
+
+
+        if (!passagem) {
+
+            alert(
+                "Informe uma passagem bíblica."
+            );
+
+            passagemInput.focus();
+
+            return;
+
+        }
+
+
+        const d =
+            identificarPassagem(
+                passagem
+            );
+
+
+        renderizarDiagnostico(
+            passagem,
+            d
+        );
+
+
+        renderizarModulos(
+            termo,
+            d
+        );
+
+
+        gerarSintese(
+            termo,
+            passagem,
+            d
+        );
+
+    }
+
+
+    btn.addEventListener(
+        "click",
+        analisar
+    );
+
+
+    passagemInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Enter") {
+                analisar();
+            }
+
+        }
+    );
+
+
+    document
+        .querySelectorAll(
+            ".painel-titulo"
+        )
+        .forEach(titulo => {
+
+            titulo.addEventListener(
+                "click",
+                () => {
+
+                    const painel =
+                        titulo.parentElement;
+
+                    painel.classList.toggle(
+                        "aberto"
+                    );
+
+                    const seta =
+                        titulo.querySelector(
+                            "span:last-child"
+                        );
+
+                    seta.textContent =
+                        painel.classList.contains(
+                            "aberto"
+                        )
+                            ? "▲"
+                            : "▼";
+
+                }
+            );
+
+        });
+
+</script>
 
 </body>
 </html>
