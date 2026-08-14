@@ -1,1 +1,4 @@
-import { executarANL } from '../pages/pesquisa/js/engine.js'; export async function run03(alvo, contexto) { return await executarANL("ANL-03", "Gramática e Sintaxe", ["Wallace", "Joüon"], "Analise a morfologia e sintaxe para: " + alvo, contexto); }
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function run01(alvo, contexto) {
+    return await executarANL("ANL-01", "Texto", ["NA28", "BHS"], "Analise o texto para: " + alvo, contexto);
+}
