@@ -1,2 +1,4 @@
-
-import { executarANL } from '../pages/pesquisa/js/engine.js'; export async function run11(alvo, contexto) { return await executarANL("ANL-11", "Teologia e Comparação", ["Grudem", "Berkhof"], "Confronte evidências com a teologia sistemática de: " + alvo, contexto); }
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function run01(alvo, contexto) {
+    return await executarANL("ANL-01", "Texto", ["NA28", "BHS"], "Analise o texto para: " + alvo, contexto);
+}
