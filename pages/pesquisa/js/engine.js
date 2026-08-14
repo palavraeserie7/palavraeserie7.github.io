@@ -1,43 +1,39 @@
 /**
- * ENGINE.JS V16 - MOTOR HÍBRIDO (IA + LOCAL)
+ * ENGINE.JS — Motor de Execução da Matriz
+ * Gerencia a chamada ao Gemini com isolamento de contexto para cada ANL.
  */
+const API_KEY = "AIzaSyAb8RN6Iy6_8ECP5Fyr5HMHuRuAF0whBOEKW67Vgh4CSgEUSq8w";
 
-// 1. COLE AQUI A CHAVE QUE COMEÇA COM "AIzaSy"
-const API_KEY = "COLE_AQUI_A_CHAVE_QUE_COMECA_COM_AIzaSy";
-
-export async function executarMotorIA(promptEtapa) {
-    // Se a chave for a errada (AQ...), o site entra em Modo Local para não travar
-    if (!API_KEY.startsWith("AIzaSy")) {
-        console.warn("Chave Inválida detectada. Entrando em Modo Local.");
-        return await simularRespostaIA(promptEtapa);
-    }
-
+export async function executarANL(moduloId, nomeModulo, fontes, promptEspecifico) {
     const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
     
+    const promptMestre = `Você é o módulo exegético oficial ${moduloId} (${nomeModulo} ) da Matriz de Análise Bíblica Palavra & Série.
+Fontes autorizadas para esta etapa: ${fontes.join(", ")}.
+Instrução específica: ${promptEspecifico}
+Responda em Português de forma técnica, rigorosa, acadêmica e fundamentada exclusivamente nas fontes do seu módulo.`;
+
     try {
         const resposta = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents: [{ parts: [{ text: promptEtapa }] }] } )
+            body: JSON.stringify({ contents: [{ parts: [{ text: promptMestre }] }] })
         });
 
         const dados = await resposta.json();
         if (dados.error) throw new Error(dados.error.message);
-        return dados.candidates[0].content.parts[0].text;
+        
+        return {
+            status: "COMPLETED",
+            confianca: "ALTA",
+            resultado: dados.candidates[0].content.parts[0].text,
+            fontesUtilizadas: fontes
+        };
     } catch (e) {
-        console.error("Erro na IA, usando Simulador:", e);
-        return await simularRespostaIA(promptEtapa);
+        return {
+            status: "ERROR",
+            confianca: "INDETERMINADA",
+            resultado: "Falha na execução do módulo: " + e.message,
+            fontesUtilizadas: fontes
+        };
     }
-}
-
-// Função que impede o site de travar se a IA falhar
-async function simularRespostaIA(prompt) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve("--- MODO DE DEMONSTRAÇÃO (IA OFFLINE) ---\n\n" +
-                    "A investigação vasta e profunda percorreu as 12 etapas teológicas.\n" +
-                    "Fontes acionadas: NA28, BHS, Metzger, BDAG, HALOT, BECNT, IVP, Beale, Osborne, Grudem.\n\n" +
-                    "RESULTADO: O tema pesquisado possui raízes profundas nos originais gregos e hebraicos, exigindo uma exegese técnica e uma aplicação prática voltada para a maturidade cristã.");
-        }, 1000);
-    });
 }
