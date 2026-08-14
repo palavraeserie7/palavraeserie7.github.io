@@ -1,1 +1,4 @@
-import { executarANL } from '../pages/pesquisa/js/engine.js'; export async function run02(alvo, contexto) { return await executarANL("ANL-02", "Tradução e Texto Original", ["LXX", "Equivalências"], "Analise o idioma original e traduções para: " + alvo, contexto); }
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function run01(alvo, contexto) {
+    return await executarANL("ANL-01", "Texto", ["NA28", "BHS"], "Analise o texto para: " + alvo, contexto);
+}
