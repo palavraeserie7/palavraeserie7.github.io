@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pesquisa Bíblica — Motor de Investigação</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #0b1428;
+            color: #dbe7f5;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .app {
+            width: min(1200px, 94%);
+            margin: 35px auto 70px;
+        }
+
+        .header {
+            background: #18243a;
+            border: 1px solid #263754;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            color: #20d66b;
+            font-size: 25px;
+        }
+
+        .header p {
+            margin: 0 0 22px;
+            color: #91a4bd;
+            font-size: 14px;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+        }
+
+        input {
+            width: 100%;
+            background: #0d172b;
+            border: 1px solid #30415f;
+            color: white;
+            padding: 13px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #20d66b;
+        }
+
+        button {
+            border: 0;
+            border-radius: 6px;
+            padding: 13px 24px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-analisar {
+            background: #20c96b;
+            color: #06130b;
+        }
+
+        .btn-analisar:hover {
+            background: #27e57a;
+        }
+
+        .diagnostico {
+            background: #17243a;
+            border: 1px solid #263754;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .titulo-secao {
+            color: #18bfff;
+            font-weight: bold;
+            margin-bottom: 18px;
+        }
+
+        .diagnostico-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .diagnostico-item {
+            background: #0d172b;
+            border: 1px solid #263754;
+            border-radius: 6px;
+            padding: 13px;
+            text-align: center;
+        }
+
+        .diagnostico-item small {
+            display: block;
+            color: #778ba5;
+            margin-bottom: 5px;
+        }
+
+        .diagnostico-item strong {
+            color: #dce8f7;
+            font-size: 13px;
+        }
+
+        .modulos {
+            background: #17243a;
+            border: 1px solid #263754;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .module {
+            background: #0d172b;
+            border: 1px solid #253650;
+            border-radius: 7px;
+            margin-bottom: 9px;
+            overflow: hidden;
+        }
+
+        .module-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .module-header:hover {
+            background: #111e35;
+        }
+
+        .module-title {
+            color: #18bfff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .module-status {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #20d66b;
+            color: #20d66b;
+        }
+
+        .module-body {
+            display: none;
+            border-top: 1px solid #253650;
+            padding: 18px;
+        }
+
+        .module.open .module-body {
+            display: block;
+        }
+
+        .submodules {
+            display: grid;
+            gap: 8px;
+        }
+
+        .submodule {
+            background: #111d32;
+            border: 1px solid #263754;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #b9c9db;
+            font-size: 13px;
+        }
+
+        .submodule:hover {
+            border-color: #18bfff;
+            color: white;
+        }
+
+        .submodule.active {
+            border-color: #20d66b;
+            background: #10263a;
+        }
+
+        .research-area {
+            margin-top: 20px;
+            background: #17243a;
+            border: 1px solid #263754;
+            border-radius: 10px;
+            padding: 24px;
+        }
+
+        .research-area h2 {
+            margin-top: 0;
+            color: #20d66b;
+        }
+
+        .research-box {
+            background: #0a1426;
+            border-left: 3px solid #20d66b;
+            padding: 18px;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .research-box h3 {
+            color: #18bfff;
+            margin-top: 0;
+        }
+
+        .empty {
+            color: #71849c;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 850px) {
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .diagnostico-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header class="header">
+        <h1>Pesquisa Bíblica — Motor de Investigação</h1>
+
+        <p>
+            Defina um tema ou texto bíblico e explore cada módulo
+            independentemente, penetrando progressivamente em seus submódulos.
+        </p>
+
+        <div class="search-grid">
+            <input
+                id="tema"
+                type="text"
+                placeholder="Tema ou termo — ex.: santidade"
+            >
+
+            <input
+                id="passagem"
+                type="text"
+                placeholder="Passagem — ex.: 1 Pedro 1:15-16"
+            >
+
+            <button
+                class="btn-analisar"
+                id="btn-analisar"
+            >
+                ANALISAR
+            </button>
+        </div>
+    </header>
+
+    <section class="diagnostico">
+
+        <div class="titulo-secao">
+            ANL-00 — DIAGNÓSTICO E ROTEAMENTO
+        </div>
+
+        <div
+            class="diagnostico-grid"
+            id="diagnostico"
+        >
+            <div class="empty">
+                Informe um tema ou passagem para iniciar.
+            </div>
+        </div>
+
+    </section>
+
+    <section class="modulos">
+
+        <div class="titulo-secao">
+            MÓDULOS DE INVESTIGAÇÃO
+        </div>
+
+        <div id="modules-container"></div>
+
+    </section>
+
+    <section
+        class="research-area"
+        id="research-area"
+    >
+        <h2>Área de Pesquisa</h2>
+
+        <div class="empty">
+            Escolha um módulo e depois um submódulo.
+        </div>
+    </section>
+
+</div>
+
+<script src="./js/stages.js"></script>
+<script src="./js/engine.js"></script>
+<script src="./js/router.js"></script>
+<script src="./js/ui.js"></script>
+
+</body>
+</html>
