@@ -1,20 +1,7 @@
-export const anl10 = {
-    id: "ANL-10",
-    titulo: "HERMENÊUTICA E CONTROLE",
-    itens: [
-        "Controle interpretativo",
-        "Pressupostos",
-        "Eisegese",
-        "Falácias lexicais",
-        "Descontextualização",
-        "Anacronismo",
-        "Alegorização indevida",
-        "Generalizações",
-        "Descrição × prescrição",
-        "Grant Osborne",
-        "D. A. Carson — Exegetical Fallacies",
-        "Carson & Moo",
-        "Dillard & Longman",
-        "Fee & Stuart"
-    ]
+export const ANL_10 = {
+    etapa: 10,
+    nome: "Teologia Sistemática",
+    fontes: ["Grudem", "Berkhof", "Frame", "EDT"],
+    funcao: "Validação doutrinária e síntese sistemática.",
+    prompt: (tema) => `Etapa 10: Realize uma síntese de teologia sistemática sobre '${tema}' usando Grudem ou Berkhof.`
 };
