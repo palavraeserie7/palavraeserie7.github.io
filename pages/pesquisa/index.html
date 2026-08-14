@@ -5,243 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palavra & Série — Matriz Canônica</title>
     <style>
-        :root {
-            --primary: #20d66b;
-            --bg: #0b1428;
-            --sidebar-bg: #111b30;
-            --card: #17243a;
-            --input: #0d172b;
-            --text: #dbe7f5;
-            --border: #263754;
-            --accent: #18bfff;
-        }
+        :root { --primary: #20d66b; --bg: #0b1428; --sidebar-bg: #111b30; --card: #17243a; --input: #0d172b; --text: #dbe7f5; --border: #263754; --accent: #18bfff; }
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        
         .sidebar { width: 320px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh; }
         .sidebar-header { padding: 25px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .sidebar-header h2 { font-size: 14px; color: var(--primary); margin: 0; letter-spacing: 2px; text-transform: uppercase; }
-        
         .module-list { flex: 1; overflow-y: auto; padding: 10px; list-style: none; margin: 0; scrollbar-width: thin; }
-        .module-item { padding: 12px 15px; margin-bottom: 4px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #91a4bd; cursor: pointer; transition: 0.2s; display: flex; align-items: center; }
+        .module-item { padding: 10px 15px; margin-bottom: 4px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #91a4bd; cursor: pointer; transition: 0.2s; display: flex; align-items: center; }
         .module-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .module-item.active { background: rgba(32, 214, 107, 0.1); border-left: 3px solid var(--primary); color: var(--primary); padding-left: 12px; }
         .module-item span { margin-right: 10px; opacity: 0.5; font-family: monospace; width: 20px; }
-
         .main-content { flex: 1; display: flex; flex-direction: column; background: radial-gradient(circle at center, #111b30 0%, #0b1428 100%); overflow: hidden; }
         .top-bar { padding: 15px 40px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
         .breadcrumb { font-size: 12px; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
-
-        .view-container { flex: 1; overflow-y: auto; padding: 40px; scrollbar-width: thin; }
-
+        .view-container { flex: 1; overflow-y: auto; padding: 40px; }
         .category-group { margin-bottom: 40px; width: 100%; max-width: 900px; }
         .category-title { font-size: 14px; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 2px; font-weight: 900; }
-        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
-        .item-card { background: var(--card); border: 1px solid var(--border); padding: 18px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 12px; font-weight: bold; color: #dbe7f5; display: flex; align-items: center; line-height: 1.4; }
-        .item-card:hover { border-color: var(--primary); background: rgba(32, 214, 107, 0.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .item-card::before { content: '◈'; color: var(--primary); margin-right: 12px; font-size: 14px; }
-
-        .search-box { background: var(--card); border: 1px solid var(--border); padding: 40px; border-radius: 16px; max-width: 800px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .search-box h3 { margin-top: 0; text-align: center; color: var(--primary); letter-spacing: 1px; font-size: 20px; }
-        .input-group { display: flex; gap: 12px; margin-top: 25px; }
-        input { flex: 1; background: var(--input); border: 1px solid var(--border); color: white; padding: 15px 20px; border-radius: 8px; outline: none; font-size: 16px; transition: 0.3s; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(32, 214, 107, 0.2); }
-        button { background: var(--primary); color: #0b1428; border: none; padding: 0 30px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        button:hover { filter: brightness(1.1); transform: scale(1.02); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .dossier-panel { margin-top: 40px; background: #fdfcf0; color: #1a202c; padding: 50px; border-radius: 4px; border-left: 12px solid var(--primary); font-family: 'Georgia', serif; display: none; box-shadow: 0 15px 50px rgba(0,0,0,0.4); position: relative; }
-        .dossier-panel h2 { border-bottom: 2px solid #1a202c; padding-bottom: 15px; margin-bottom: 30px; font-size: 24px; text-align: center; color: #1a202c; text-transform: uppercase; letter-spacing: 2px; }
-        .dossier-content { line-height: 1.8; font-size: 1.15rem; }
-        .dossier-footer { margin-top: 50px; padding-top: 20px; border-top: 1px dashed #cbd5e0; text-align: center; font-weight: bold; font-size: 12px; letter-spacing: 3px; color: #718096; }
-
-        #loading-overlay { display: none; text-align: center; margin-top: 20px; }
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .footer-bar { padding: 12px; text-align: center; font-size: 11px; background: rgba(0,0,0,0.4); color: #91a4bd; font-weight: bold; letter-spacing: 1.5px; border-top: 1px solid var(--border); }
+        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+        .item-card { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 12px; font-weight: bold; color: #dbe7f5; display: flex; align-items: center; }
+        .item-card:hover { border-color: var(--primary); background: rgba(32, 214, 107, 0.05); transform: translateX(5px); }
+        .item-card::before { content: '•'; color: var(--primary); margin-right: 10px; }
+        .search-box { background: var(--card); border: 1px solid var(--border); padding: 30px; border-radius: 12px; max-width: 700px; margin: 0 auto; }
+        .search-box h3 { margin-top: 0; text-align: center; color: var(--primary); }
+        .input-group { display: flex; gap: 10px; margin-top: 20px; }
+        input { flex: 1; background: var(--input); border: 1px solid var(--border); color: white; padding: 12px 15px; border-radius: 6px; outline: none; }
+        button { background: var(--primary); color: #000; border: none; padding: 0 20px; border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .result-panel { margin-top: 30px; background: #fdfcf0; color: #1a202c; padding: 30px; border-radius: 4px; border-left: 8px solid var(--primary); font-family: 'Georgia', serif; display: none; }
+        .footer-bar { padding: 10px; text-align: center; font-size: 10px; background: rgba(0,0,0,0.3); color: #5a6b82; font-weight: bold; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h2>Matriz Canônica</h2>
-        <div style="font-size: 9px; color: #5a6b82; margin-top: 5px; letter-spacing: 1px;">SISTEMA DE PESQUISA V13.5</div>
-    </div>
-    <ul id="module-list" class="module-list"></ul>
-</div>
-
+<div class="sidebar"><div class="sidebar-header"><h2>Matriz Canônica</h2></div><ul id="module-list" class="module-list"></ul></div>
 <div class="main-content">
-    <div class="top-bar">
-        <div id="path-display" class="breadcrumb">Selecione uma Camada de Investigação</div>
-        <div style="font-size: 10px; color: var(--primary); font-weight: bold;">MOTOR IA ATIVO ⚡</div>
-    </div>
-
-    <div id="view-container" class="view-container">
-        <div style="text-align: center; margin-top: 15vh; opacity: 0.15;">
-            <h1 style="font-size: 120px; margin: 0; font-weight: 900;">&</h1>
-            <p style="font-size: 18px; letter-spacing: 5px; text-transform: uppercase;">Palavra & Série</p>
-            <p style="margin-top: 20px;">Selecione uma das 30 disciplinas no menu lateral para iniciar a pesquisa profunda.</p>
-        </div>
-    </div>
-
+    <div class="top-bar"><div id="path-display" class="breadcrumb">Selecione uma Disciplina</div><div style="font-size: 10px; opacity: 0.4;">Palavra & Série V13.1</div></div>
+    <div id="view-container" class="view-container"><div style="text-align: center; margin-top: 100px; opacity: 0.2;"><h1 style="font-size: 80px; margin: 0;">&</h1><p>Navegue pelas 30 camadas teológicas no menu lateral.</p></div></div>
     <div class="footer-bar">O TEXTO BÍBLICO É A FONTE PRIMÁRIA. NENHUM COMENTÁRIO PODE SUBSTITUIR O TEXTO.</div>
 </div>
-
 <script>
-    const DISCIPLINAS = [
-        "00 AS DICIPLINAS DA TEOLOGIA", "1 FUNDAÇÃO BÍBLICA", "2 ESTUDOS BÍBLICOS CANÔNICOS",
-        "3 TEOLOGIA BÍBLICA", "4 TEOLOGIA SISTEMÁTICA", "5 HISTÓRIA DA IGREJA",
-        "6 VIDA CRISTÃ", "7 ACONSELHAMENTO PASTORAL", "8 APOLOGÉTICA",
-        "9 MISSÕES / CULTURA / SOCIEDADE", "10 ÉTICA CRISTÃ", "11 LIDERANÇA E MINISTÉRIO",
-        "12 PREGAÇÃO E ENSINO", "13 ADORAÇÃO E LITURGIA", "14 EDUCAÇÃO CRISTÃ",
-        "15 DISCIPULADO", "16 FAMÍLIA CRISTÃ", "17 FORMAÇÃO ESPIRITUAL",
-        "18 EVANGELISMO", "19 FILOSOFIA CRISTÃ", "20 COSMOVISÃO CRISTÃ",
-        "21 TEOLOGIA PÚBLICA", "22 ESTUDOS JUDAICOS E CONTEXTUAIS", "23 ESTUDOS DENOMINACIONAIS",
-        "24 TEOLOGIA HISTÓRICA", "25 ESPIRITUALIDADE HISTÓRICA", "26 TEOLOGIA APLICADA",
-        "27 MINISTÉRIO INFANTIL E JUVENIL", "28 MISSIOLOGIA", "29 LINGUAGENS E COMUNICAÇÃO CRISTÃ"
-    ];
-
+    const DISCIPLINAS = ["00 AS DICIPLINAS DA TEOLOGIA", "1 FUNDAÇÃO BÍBLICA", "2 ESTUDOS BÍBLICOS CANÔNICOS", "3 TEOLOGIA BÍBLICA", "4 TEOLOGIA SISTEMÁTICA", "5 HISTÓRIA DA IGREJA", "6 VIDA CRISTÃ", "7 ACONSELHAMENTO PASTORAL", "8 APOLOGÉTICA", "9 MISSÕES / CULTURA / SOCIEDADE", "10 ÉTICA CRISTÃ", "11 LIDERANÇA E MINISTÉRIO", "12 PREGAÇÃO E ENSINO", "13 ADORAÇÃO E LITURGIA", "14 EDUCAÇÃO CRISTÃ", "15 DISCIPULADO", "16 FAMÍLIA CRISTÃ", "17 FORMAÇÃO ESPIRITUAL", "18 EVANGELISMO", "19 FILOSOFIA CRISTÃ", "20 COSMOVISÃO CRISTÃ", "21 TEOLOGIA PÚBLICA", "22 ESTUDOS JUDAICOS E CONTEXTUAIS", "23 ESTUDOS DENOMINACIONAIS", "24 TEOLOGIA HISTÓRICA", "25 ESPIRITUALIDADE HISTÓRICA", "26 TEOLOGIA APLICADA", "27 MINISTÉRIO INFANTIL E JUVENIL", "28 MISSIOLOGIA", "29 LINGUAGENS E COMUNICAÇÃO CRISTÃ"];
     const HIERARQUIA = {
         0: { "ENCICLOPÉDIA TEOLÓGICA": ["Definição das Disciplinas", "Metodologia de Pesquisa", "História da Teologia Acadêmica", "Integração do Conhecimento"] },
-        1: {
-            "REVELAÇÃO E ESCRITURA": ["Doutrina das Escrituras", "Revelação e Inspiração", "Canonicidade", "Transmissão Textual", "Crítica Textual", "Manuscritologia Bíblica", "Paleografia Bíblica"],
-            "LINGUAGEM BÍBLICA": ["Línguas Bíblicas", "Linguística Bíblica", "Filologia Bíblica", "Estudos Lexicais", "Sintaxe Bíblica", "Semântica Bíblica", "Análise do Discurso", "Retórica Bíblica"],
-            "INTERPRETAÇÃO BÍBLICA": ["Exegese", "Metodologia Exegética", "Hermenêutica", "História da Interpretação", "Teologia Bíblica", "Teologia Canônica", "Tipologia Bíblica", "Intertextualidade Bíblica", "Simbolismo Bíblico"],
-            "CONTEXTO E MUNDO BÍBLICO": ["Contexto Histórico-Cultural", "Arqueologia Bíblica", "Estudos do Antigo Oriente", "Judaísmo do Segundo Templo", "Mundo Greco-Romano", "Literatura Intertestamentária"],
-            "LITERATURA BÍBLICA": ["Gêneros Literários", "Estruturas Literárias Bíblicas", "Narrativa Bíblica", "Poética Bíblica"],
-            "METODOLOGIA ACADÊMICA": ["Metodologia de Estudo Bíblico", "Pesquisa Acadêmica", "Escrita Teológica", "Ferramentas Acadêmicas", "Metodologia Científica Bíblica"],
-            "FUNDAMENTOS FILOSÓFICOS": ["Filosofia da Linguagem Bíblica", "Epistemologia Teológica", "Pedagogia Bíblica"]
-        },
-        2: {
-            "CORPUS DO ANTIGO TESTAMENTO": ["Pentateuco", "História Deuteronomista", "História do Cronista", "Literatura Sapiencial", "Literatura Poética", "Profetas Maiores", "Profetas Menores", "Literatura Apocalíptica"],
-            "CORPUS DO NOVO TESTAMENTO": ["Evangelhos Sinóticos", "Literatura Joanina", "Atos dos Apóstolos", "Corpus Paulino", "Hebreus", "Epístolas Gerais", "Apocalipse"],
-            "TEOLOGIA BÍBLICA CANÔNICA": ["Teologia do Antigo Testamento", "Teologia do Novo Testamento", "Estudos Intercanônicos", "Desenvolvimento da Revelação", "Unidade Canônica das Escrituras"],
-            "ESTRUTURAS REDENTIVO-HISTÓRICAS": ["Reino de Deus", "Aliança", "Templo", "Presença Divina", "Sacrifício", "Messias", "Povo de Deus", "Nova Criação", "Escatologia Bíblica"]
-        },
-        3: {
-            "TEMAS REDENTIVO-HISTÓRICOS": ["História Redentiva", "Reino de Deus", "Alianças Bíblicas", "Promessa e Cumprimento", "Tipologia Bíblica", "Temas Centrais da Redenção", "Êxodo e Redenção", "Templo e Presença Divina", "Sacrifício e Expiação", "Messianismo Bíblico", "Povo da Aliança", "Lei e Graça", "Nova Aliança", "Sião e Jerusalém", "Descanso e Shalom", "Santidade Bíblica", "Glória de Deus", "Imagem de Deus", "Filiação e Adoção", "União com Cristo", "Vida, Morte e Ressurreição", "Juízo e Consumação", "Nova Criação"],
-            "DOUTRINAS E MOTIVOS BÍBLICOS": ["Cristologia Bíblica", "Pneumatologia Bíblica", "Eclesiologia Bíblica", "Escatologia Bíblica", "Adão e Nova Criação", "Sabedoria Bíblica", "Profecia Bíblica", "Estruturas Pactuales"],
-            "TEOLOGIA DOS CORPUS E AUTORES": ["Teologia dos Autores Bíblicos", "Teologia do Pentateuco", "Teologia Deuteronomista", "Teologia Profética", "Teologia Sapiencial", "Teologia dos Evangelhos", "Teologia Paulina", "Teologia Joanina", "Teologia Petrina", "Teologia Hebraica", "Teologia Apocalíptica"],
-            "ESTRUTURA E UNIDADE CANÔNICA": ["Revelação Progressiva", "Continuidade e Descontinuidade", "Unidade Canônica das Escrituras", "Intertextualidade Canônica", "Estrutura da Narrativa Bíblica", "Metanarrativa Bíblica", "Centralidade de Cristo", "Centralidade do Reino", "Missão de Deus", "Consumação Escatológica"]
-        },
-        4: {
-            "LOCI THEOLOGICI": ["Prolegômenos", "Bibliologia", "Teontologia", "Trindadologia", "Cristologia", "Pneumatologia", "Angelologia", "Antropologia Teológica", "Hamartiologia", "Soteriologia", "Eclesiologia", "Escatologia"],
-            "DOUTRINAS FUNDAMENTAIS": ["Doutrina da Revelação", "Doutrina das Escrituras", "Doutrina de Deus", "Doutrina da Criação", "Doutrina da Providência", "Doutrina do Pecado", "Doutrina da Graça", "Doutrina da Salvação", "Doutrina da Igreja", "Doutrina dos Sacramentos", "Doutrina das Últimas Coisas", "União com Cristo", "Ordo Salutis", "Doutrina da Adoração", "Doutrina da Santificação", "Doutrina da Perseverança", "Doutrina da Glorificação", "Doutrina do Juízo", "Doutrina do Céu e Inferno", "Doutrina da Ressurreição", "Doutrina da Missão"],
-            "SISTEMAS E TRADIÇÕES": ["História das Doutrinas", "Sistemas Teológicos", "Calvinismo", "Arminianismo", "Teologia Reformada", "Teologia Batista", "Confessionalismo", "Teologia Pactual", "Teologia Dispensacional", "Teologia Contemporânea"],
-            "TEOLOGIA APLICADA E FILOSÓFICA": ["Ética Cristã", "Teologia da Aliança", "Teologia do Reino", "Teologia Filosófica", "Teologia Moral", "Teologia Pública", "Teologia Política", "Cosmovisão Cristã", "Relação Fé e Razão", "Integração Doutrinária"]
-        },
-        5: {
-            "ERA ANTIGA E PATRÍSTICA": ["Igreja Primitiva", "Era Apostólica", "Pais Apostólicos", "Patrística", "Concílios Ecumênicos", "Formação da Ortodoxia", "História das Heresias", "História do Cânon", "História do Martírio", "História das Perseguições"],
-            "MEDIEVAL E REFORMA": ["Monasticismo", "Igreja Medieval", "Escolasticismo", "Pré-Reforma", "Reforma Protestante", "Reforma Magisterial", "Reforma Radical", "Contrarreforma", "Protestantismo Histórico"],
-            "MOVIMENTOS E TRADIÇÕES": ["Puritanismo", "Pietismo", "Avivamentos", "História Batista", "História Reformada", "História Presbiteriana", "História Pentecostal", "História Evangélica", "Liberalismo Teológico", "Neo-ortodoxia", "Fundamentalismo", "Evangelicalismo", "Ecumenismo"],
-            "HISTÓRIA TEMÁTICA E GLOBAL": ["História das Missões", "História da Liturgia", "História da Espiritualidade Cristã", "História da Pregação", "História da Educação Cristã", "História do Discipulado", "História da Adoração", "História da Bíblia", "História da Tradução Bíblica", "História da Teologia", "História da Filosofia Cristã", "História da Apologética", "Cristianismo e Cultura", "Cristianismo e Política", "Cristianismo e Sociedade", "Denominações Cristãs", "Confissões e Credos", "Movimentos Contemporâneos", "História do Cristianismo Global", "Cristianismo Latino-Americano", "Cristianismo Africano", "Cristianismo Asiático", "História das Instituições Cristãs", "Biografias Históricas Cristãs"]
-        },
-        6: {
-            "FUNDAMENTOS E COMUNHÃO": ["União com Cristo", "Identidade em Cristo", "Centralidade de Cristo", "Vida de Graça", "Vida Pactual", "Fé Cristã", "Esperança Cristã", "Amor Cristão", "Evangelho e Vida Cristã", "Comunhão com Deus", "Vida Devocional", "Oração", "Adoração", "Leitura Bíblica", "Meditação Bíblica", "Jejum", "Presença de Deus"],
-            "SANTIFICAÇÃO E GUERRA": ["Santificação", "Vida de Santidade", "Mortificação do Pecado", "Vivificação Espiritual", "Pureza Cristã", "Obediência Cristã", "Temor do Senhor", "Disciplina Espiritual", "Formação Espiritual", "Maturidade Espiritual", "Guerra Espiritual", "Tentação Cristã", "Armadura de Deus", "Batalha contra a Carne", "Resistência ao Diabo", "Discernimento Espiritual"],
-            "VIRTUDES E EMOÇÕES": ["Humildade Cristã", "Integridade Cristã", "Fidelidade Cristã", "Mansidão Cristã", "Paciência Cristã", "Bondade Cristã", "Misericórdia Cristã", "Generosidade Cristã", "Contentamento Cristão", "Gratidão Cristã", "Sofrimento Cristão", "Consolação Cristã", "Ansiedade e Fé", "Medo e Confiança", "Culpa e Graça", "Descanso Espiritual"],
-            "VIDA RELACIONAL E MISSÃO": ["Amor ao Próximo", "Perdão Cristão", "Reconciliation Cristã", "Unidade Cristã", "Comunhão da Igreja", "Serviço Cristão", "Hospitalidade Cristã", "Vida Familiar Cristã", "Casamento Cristão", "Discipulado", "Chamado Cristão", "Vocação Cristã", "Vida Missional", "Evangelismo", "Testemunho Cristão", "Mordomia Cristã"],
-            "MENTE E COTIDIANO": ["Mente Cristã", "Cosmovisão Cristã", "Pensamento Cristão", "Integração Fé e Vida", "Ética da Vida Cristã", "Cultura e Cristianismo", "Uso Cristão da Tecnologia", "Administração do Tempo", "Dinheiro e Vida Cristã", "Trabalho Cristão", "Descanso e Ritmo Espiritual", "Simplicidade Cristã", "Vida Cristã no Mundo Digital", "Saúde e Corpo Cristão", "Peregrinação Cristã", "Esperança Escatológica"]
-        },
-        7: {
-            "FUNDAMENTOS E ANTROPOLOGIA": ["Fundamentos do Aconselhamento Pastoral", "Antropologia Bíblica e Condição Humana"],
-            "CUIDADO NA DOR E PECADO": ["Sofrimento Humano e Experiência da Dor", "Pecado, Culpa e Arrependimento"],
-            "VIDA INTERIOR E RELACIONAL": ["Vida Emocional e Desordem Interior", "Conflitos Relacionais e Restauração"],
-            "CRESCIMENTO E DIREÇÃO": ["Crises de Fé e Experiência Espiritual", "Discipulado e Transformation da Vida", "Direção Pastoral e Decisões da Vida"],
-            "RESTAURAÇÃO E COMUNIDADE": ["Cuidado Pastoral e Restauração da Alma", "Igreja e Comunidade no Cuidado Pastoral", "Esperança Cristã e Restauração Final"]
-        },
-        8: {
-            "FUNDAMENTOS E VERDADE": ["Fundamentos da Apologética Cristã", "Revelação, Verdade e Autoridade das Escrituras", "Confiabilidade Histórica das Escrituras"],
-            "DEUS E CRISTO": ["Existência de Deus e Teísmo Cristão", "Jesus Cristo e a Ressurreição", "Salvação e Exclusividade de Cristo"],
-            "CIÊNCIA, RAZÃO E MAL": ["Ciência, Fé e Razão", "Problema do Mal e Sofrimento", "Antropologia e Sentido da Existência Humana"],
-            "COSMOVISÃO E CULTURA": ["Religiões e Cosmovisões", "Ética Cristã e Cosmovisão", "Relativismo, Cultura e Pós-Modernidade", "Heresias e Distorções da Fé Cristã", "Evangelismo e Defesa da Fé no Mundo Contemporâneo"]
-        },
-        9: {
-            "FUNDAMENTOS E ENVIO": ["Fundamentos Missionais do Evangelho", "Grande Comissão e Envio da Igreja", "Missio Dei e Reino de Deus"],
-            "EVANGELISMO E DISCIPULADO": ["Evangelismo e Proclamação do Evangelho", "Discipulado e Formação das Nações", "Igreja e Sua Missão no Mundo"],
-            "CULTURA E SOCIEDADE": ["Cultura e Cosmovisão Cristã", "Cristianismo e Sociedade", "Justiça, Misericórdia e Responsabilidade Social", "Trabalho, Economia e Vida Pública"],
-            "TRANSFORMAÇÃO E FUTURO": ["Educação e Transformação Cultural", "Mídia, Tecnologia e Comunicação", "Contextualização Missionária", "Conflito de Cosmovisões Modernas", "Esperança do Reino e Consumação Final"]
-        },
-        10: {
-            "FUNDAMENTOS E COSMOVISÃO": ["Fundamentos da Ética Cristã", "Deus, Revelação e Moralidade", "Cosmovisão Cristã e Vida Moral"],
-            "CARÁTER E VIDA INTERIOR": ["Pecado, Santidade e Responsabilidade Moral", "Consciência e Responsabilidade Humana", "Virtudes Cristãs e Formação do Caráter", "Ética Pessoal e Vida Interior"],
-            "ÉTICA RELACIONAL E SOCIAL": ["Ética Relacional e Amor ao Próximo", "Ética Familiar e Vida Doméstica", "Ética do Trabalho e Vida Profissional", "Ética Social e Justiça", "Ética Política e Vida Pública"],
-            "ÉTICA DA VIDA E CONTEMPORÂNEA": ["Ética Sexual e Corpo Humano", "Ética da Palavra e Comunicação", "Ética do Sofrimento e Situações-Limite", "Ética Cristã e Mundo Contemporâneo", "Responsabilidade Eterna e Juízo de Deus"]
-        },
-        11: {
-            "FUNDAMENTOS E VOCAÇÃO": ["Fundamentos da Liderança Cristã", "Cristologia da Liderança", "Chamado e Vocação Ministerial", "Espiritualidade do Líder"],
-            "CARÁTER E SERVIÇO": ["Caráter do Líder Cristão", "Liderança Servidora", "Ética Ministerial", "Perseverança e Longevidade Ministerial"],
-            "FORMAÇÃO E GESTÃO": ["Discipulado e Formação de Líderes", "Gestão e Administração Ministerial", "Sucessão e Multiplicação de Líderes"],
-            "ATUAÇÃO MINISTERIAL": ["Pastoreio e Cuidado Espiritual", "Ensino e Ministério da Palavra", "Dons Espirituais e Ministério", "Relacionamentos e Unidade Ministerial", "Liderança em Crises", "Missão e Expansão Ministerial"]
-        },
-        12: {
-            "FUNDAMENTOS E PREPARO": ["Fundamentos Bíblicos da Pregação e Ensino", "Cristo no Centro da Pregação", "Poder do Espírito Santo na Pregação", "Preparo e Vida do Preletor"],
-            "HERMENÊUTICA E HOMILÉTICA": ["Hermenêutica e Interpretação Bíblica", "Exposição das Escrituras", "Homilética e Construção do Sermão", "Autoridade e Fidelidade à Escritura"],
-            "ENSINO E DISCIPULADO": ["Ensino Bíação de Discípulos", "Contexto e Aplicação da Palavra", "Comunicação e Linguagem Ministerial", "Ensino no Discipulado"],
-            "ESTILOS E IMPACTO": ["Pregação Evangelística", "Pregação Pastoral e Cuidado da Alma", "Pregação Profética e Edificação", "Ética na Pregação e Ensino", "Impacto e Fruto da Palavra"]
-        },
-        13: {
-            "FUNDAMENTOS E CENTRO": ["Fundamentos Bíblicos da Adoração", "Deus como Centro da Adoração", "Adoração em Espírito e em Verdade", "Presença de Deus na Adoração"],
-            "BÍBLIA E HISTÓRIA": ["Adoração no Antigo e Novo Testamento", "Palavra e Adoração", "Adoração Escatológica"],
-            "LITURGIA E CULTO": ["Liturgia e Ordem do Culto", "Santidade e Reverência na Adoração", "Adoração Corporativa da Igreja", "Ordem, Decência e Edificação no Culto"],
-            "EXPRESSÃO E MINISTÉRIO": ["Música e Expressão na Adoração", "Oração e Adoração", "Liderança de Louvor e Serviço Ministerial", "Unção e Direção do Espírito Santo", "Adoração e Vida Cristã", "Cultura e Expressão da Adoração"]
-        },
-        14: {
-            "FUNDAMENTOS E COSMOVISÃO": ["Fundamentos Bíblicos da Educação Cristã", "Deus como Fundamento do Conhecimento", "Cosmovisão Cristã e Formação Educacional", "Mente Cristã e Formação do Pensamento"],
-            "ENSINO E CARÁTER": ["Ensino da Palavra de Deus", "Discipulado e Formação Integral", "Desenvolvimento do Caráter Cristão", "Educação e Disciplina Espiritual"],
-            "CICLOS DA VIDA": ["Educação Infantil e Formação da Base Espiritual", "Educação de Jovens e Adolescentes", "Educação de Adultos e Maturidade Cristã", "Educação Familiar Cristã"],
-            "INSTITUIÇÃO E SOCIEDADE": ["Educação na Igreja", "Educação e Cultura", "Educação e Sociedade", "Tecnologia e Educação Cristã", "Educação e Missão da Igreja"]
-        },
-        15: {
-            "FUNDAMENTOS E IDENTIDADE": ["Fundamentos Bíblicos do Discipulado", "Seguir a Cristo", "Identidade em Cristo", "Renúncia e Custo do Discipulado"],
-            "FORMAÇÃO E COMUNHÃO": ["Formação do Caráter Cristão", "Obediência à Palavra de Deus", "Vida no Espírito Santo", "Oração e Comunhão com Deus", "Comunhão e Vida na Igreja"],
-            "PRÁTICA E CRESCIMENTO": ["Ensino e Aprendizado contínuo", "Prática da Fé no cotidiano", "Correção, Disciplina e Maturidade", "Perseverança na Fé"],
-            "MISSÃO E MULTIPLICAÇÃO": ["Evangelismo e Testemunho pessoal", "Discipulado e Multiplicação", "Vida Missional do Discípulo", "Esperança e Vida Eterna"]
-        },
-        16: {
-            "FUNDAMENTOS E ALIANÇA": ["Fundamentos Bíblicos da Família", "Deus como Autor da Família", "Casamento Cristão", "Amor, Unidade e Aliança Familiar", "Herança Espiritual Familiar"],
-            "PAPÉIS E FORMAÇÃO": ["Papéis e Responsabilidades Familiares", "Pais e Educação dos Filhos", "Filhos e Vida Familiar", "Criação de Filhos na Fé Cristã"],
-            "VIDA PRÁTICA E CUIDADO": ["Vida Espiritual no Lar", "Conflitos e Reconciliação Familiar", "Sexualidade e Pureza no Casamento", "Finanças e Mordomia Familiar"],
-            "INSTITUIÇÃO E PROPÓSITO": ["Família e Igreja", "Família e Sociedade", "Família em Crises e Sofrimento", "Família e Propósito Eterno"]
-        },
-        17: {
-            "FUNDAMENTOS E IDENTIDADE": ["Fundamentos da Formação Espiritual", "Vida em Cristo e Novo Nascimento", "Comunhão com Deus"],
-            "DISCIPLINAS E PRÁTICAS": ["Oração e Vida Devocional", "Leitura e Meditação Bíblica", "Disciplina Espiritual", "Obediência e Prática da Palavra"],
-            "TRANSFORMAÇÃO E CARÁTER": ["Santificação e Transformation Interior", "Caráter Cristão", "Renovação da Mente", "Luta contra o Pecado"],
-            "CRESCIMENTO E FRUTO": ["Perseverança Espiritual", "Crescimento e Maturidade Espiritual", "Comunhão com a Igreja", "Serviço e Fruto Espiritual", "Esperança e Vida Eterna"]
-        },
-        18: {
-            "FUNDAMENTOS E MENSAGEM": ["Fundamentos Bíblicos do Evangelismo", "Evangelho de Jesus Cristo", "Chamado e Missão de Evangelizar", "Evangelismo e Eternidade"],
-            "ESPIRITUALIDADE E COMUNICAÇÃO": ["Poder do Espírito Santo no Evangelismo", "Oração e Evangelismo", "Comunicação do Evangelho", "Evangelismo e Cosmovisão Cristã"],
-            "MÉTODOS E PRÁTICA": ["Evangelismo Pessoal", "Evangelismo Comunitário", "Evangelismo e Discipulado", "Evangelismo e Relações Humanas"],
-            "CONTEXTO E EXPANSÃO": ["Contexto Cultural e Evangelismo", "Evangelismo e Ação Social", "Evangelismo em Contextos Difíceis", "Evangelismo e Apostolado", "Evangelismo e Fruto da Conversão"]
-        },
-        19: {
-            "FUNDAMENTOS E METAFÍSICA": ["Fundamentos da Filosofia Cristã", "Cosmovisão Cristã", "Ontologia Cristã", "Teologia Natural", "Teologia Revelada"],
-            "CONHECIMENTO E RAZÃO": ["Epistemologia Cristã", "Lógica e Razão no Pensamento Cristão", "Fé e Razão", "Verdade e Relativismo"],
-            "ANTROPOLOGIA E ÉTICA": ["Antropologia Filosófica Cristã", "Ética Filosófica Cristã", "Liberdade, Determinismo e VONTADE Humana", "Identidade e Sentido da Vida"],
-            "DESAFIOS E DIÁLOGOS": ["Problema do Mal", "Existência de Deus", "Cristianismo e Filosofias Seculares", "Filosofia Cristã e Vida Prática"]
-        },
-        20: {
-            "FUNDAMENTOS E REALIDADE": ["Fundamentos da Cosmovisão Cristã", "Deus e a Realidade", "Criação e Ordem do Mundo", "Escritura e Verdade"],
-            "CONDIÇÃO E REDENÇÃO": ["Queda e Condição Humana", "Redenção em Cristo", "Reino de Deus", "Homem e Identidade Humana"],
-            "HISTÓRIA E SABER": ["História e Providência Divina", "Ciência e Conhecimento", "Sofrimento e Mal no Mundo", "Esperança e Futuro da Criação"],
-            "CULTURA E SOCIEDADE": ["Moralidade e ÉTICA da Vida", "Cultura e Formação Social", "Trabalho e Vida no Mundo", "Igreja e Presença no Mundo", "Missão e Transformação do Mundo"]
-        },
-        21: {
-            "FUNDAMENTOS E ESPAÇO PÚBLICO": ["Fundamentos da Teologia Pública", "Deus e Vida Pública", "Igreja e Espaço Público", "Fé Cristã e Sociedade"],
-            "POLÍTICA, ESTADO E PODER": ["Política e Poder", "Estado e Governo", "Liberdade Religiosa e Consciência"],
-            "JUSTIÇA, ÉTICA E DIREITOS": ["Ética Pública e Vida Moral Coletiva", "Justiça e Direitos Humanos", "Justiça Social e Compasso Cristão", "Esperança Cristã e Futuro da Sociedade"],
-            "CULTURA, ECONOMIA E MÍDIA": ["Economia e Vida Púbica", "Educação e Formação Cultural", "Cultura e Transformação Social", "Religião e Pluralismo", "Mídia e Comunicação Pública", "Tecnologia e Vida Pública"]
-        },
-        22: {
-            "FUNDAMENTOS E CONTEXTO HISTÓRICO": ["Fundamentos dos Estudos Judaicos e Contextuais", "Contexto do Antigo Testamento", "Contexto do Novo Testamento", "Geografia Bíblica e Contexto Histórico"],
-            "JUDAÍSMO E TRADIÇÃO": ["Judaísmo do Segundo Templo", "Torá e Tradição Judaica", "Sinagoga e Vida Religiosa Judaica", "Interpretação Judaica das Escrituras"],
-            "CULTURA E MENTALIDADE": ["Cultura Hebraica e Mentalidade Bíblica", "Línguas Bíblicas e Contexto Linguístico", "Costumes e Práticas Sociais Judaicas", "Festas e Calendário Bíblico"],
-            "IDENTIDADE E TRANSIÇÃO": ["Profetismo e Expectativa Messiânica", "Lei, Pureza e Sistema Religioso", "Jesus no Contexto Judaico", "Igreja Primitiva e Raízes Judaicas", "Contextualização Bíblica para Hoje"]
-        },
+        1: { "REVELAÇÃO E ESCRITURA": ["Doutrina das Escrituras", "Revelação e Inspiração", "Canonicidade", "Transmissão Textual", "Crítica Textual", "Manuscritologia Bíblica", "Paleografia Bíblica"], "LINGUAGEM BÍBLICA": ["Línguas Bíblicas", "Linguística Bíblica", "Filologia Bíblica", "Estudos Lexicais", "Sintaxe Bíblica", "Semântica Bíblica", "Análise do Discurso", "Retórica Bíblica"], "INTERPRETAÇÃO BÍBLICA": ["Exegese", "Metodologia Exegética", "Hermenêutica", "História da Interpretação", "Teologia Bíblica", "Teologia Canônica", "Tipologia Bíblica", "Intertextualidade Bíblica", "Simbolismo Bíblico"], "CONTEXTO E MUNDO BÍBLICO": ["Contexto Histórico-Cultural", "Arqueologia Bíblica", "Estudos do Antigo Oriente", "Judaísmo do Segundo Templo", "Mundo Greco-Romano", "Literatura Intertestamentária"], "LITERATURA BÍBLICA": ["Gêneros Literários", "Estruturas Literárias Bíblicas", "Narrativa Bíblica", "Poética Bíblica"], "METODOLOGIA ACADÊMICA": ["Metodologia de Estudo Bíblico", "Pesquisa Acadêmica", "Escrita Teológica", "Ferramentas Acadêmicas", "Metodologia Científica Bíblica"], "FUNDAMENTOS FILOSÓFICOS": ["Filosofia da Linguagem Bíblica", "Epistemologia Teológica", "Pedagogia Bíblica"] },
+        2: { "CORPUS DO ANTIGO TESTAMENTO": ["Pentateuco", "História Deuteronomista", "História do Cronista", "Literatura Sapiencial", "Literatura Poética", "Profetas Maiores", "Profetas Menores", "Literatura Apocalíptica"], "CORPUS DO NOVO TESTAMENTO": ["Evangelhos Sinóticos", "Literatura Joanina", "Atos dos Apóstolos", "Corpus Paulino", "Hebreus", "Epístolas Gerais", "Apocalipse"], "TEOLOGIA BÍBLICA CANÔNICA": ["Teologia do Antigo Testamento", "Teologia do Novo Testamento", "Estudos Intercanônicos", "Desenvolvimento da Revelação", "Unidade Canônica das Escrituras"], "ESTRUTURAS REDENTIVO-HISTÓRICAS": ["Reino de Deus", "Aliança", "Templo", "Presença Divina", "Sacrifício", "Messias", "Povo de Deus", "Nova Criação", "Escatologia Bíblica"] },
+        3: { "TEMAS REDENTIVO-HISTÓRICOS": ["História Redentiva", "Reino de Deus", "Alianças Bíblicas", "Promessa e Cumprimento", "Tipologia Bíblica", "Temas Centrais da Redenção", "Êxodo e Redenção", "Templo e Presença Divina", "Sacrifício e Expiação", "Messianismo Bíblico", "Povo da Aliança", "Lei e Graça", "Nova Aliança", "Sião e Jerusalém", "Descanso e Shalom", "Santidade Bíblica", "Glória de Deus", "Imagem de Deus", "Filiação e Adoção", "União com Cristo", "Vida, Morte e Ressurreição", "Juízo e Consumação", "Nova Criação"], "DOUTRINAS E MOTIVOS BÍBLICOS": ["Cristologia Bíblica", "Pneumatologia Bíblica", "Eclesiologia Bíblica", "Escatologia Bíblica", "Adão e Nova Criação", "Sabedoria Bíblica", "Profecia Bíblica", "Estruturas Pactuales"], "TEOLOGIA DOS CORPUS E AUTORES": ["Teologia dos Autores Bíblicos", "Teologia do Pentateuco", "Teologia Deuteronomista", "Teologia Profética", "Teologia Sapiencial", "Teologia dos Evangelhos", "Teologia Paulina", "Teologia Joanina", "Teologia Petrina", "Teologia Hebraica", "Teologia Apocalíptica"], "ESTRUTURA E UNIDADE CANÔNICA": ["Revelação Progressiva", "Continuidade e Descontinuidade", "Unidade Canônica das Escrituras", "Intertextualidade Canônica", "Estrutura da Narrativa Bíblica", "Metanarrativa Bíblica", "Centralidade de Cristo", "Centralidade do Reino", "Missão de Deus", "Consumação Escatológica"] },
+        4: { "LOCI THEOLOGICI": ["Prolegômenos", "Bibliologia", "Teontologia", "Trindadologia", "Cristologia", "Pneumatologia", "Angelologia", "Antropologia Teológica", "Hamartiologia", "Soteriologia", "Eclesiologia", "Escatologia"], "DOUTRINAS FUNDAMENTAIS": ["Doutrina da Revelação", "Doutrina das Escrituras", "Doutrina de Deus", "Doutrina da Criação", "Doutrina da Providência", "Doutrina do Pecado", "Doutrina da Graça", "Doutrina da Salvação", "Doutrina da Igreja", "Doutrina dos Sacramentos", "Doutrina das Últimas Coisas", "União com Cristo", "Ordo Salutis", "Doutrina da Adoração", "Doutrina da Santificação", "Doutrina da Perseverança", "Doutrina da Glorificação", "Doutrina do Juízo", "Doutrina do Céu e Inferno", "Doutrina da Ressurreição", "Doutrina da Missão"], "SISTEMAS E TRADIÇÕES": ["História das Doutrinas", "Sistemas Teológicos", "Calvinismo", "Arminianismo", "Teologia Reformada", "Teologia Batista", "Confessionalismo", "Teologia Pactual", "Teologia Dispensacional", "Teologia Contemporânea"], "TEOLOGIA APLICADA E FILOSÓFICA": ["Ética Cristã", "Teologia da Aliança", "Teologia do Reino", "Teologia Filosófica", "Teologia Moral", "Teologia Pública", "Teologia Política", "Cosmovisão Cristã", "Relação Fé e Razão", "Integração Doutrinária"] },
+        5: { "ERA ANTIGA E PATRÍSTICA": ["Igreja Primitiva", "Era Apostólica", "Pais Apostólicos", "Patrística", "Concílios Ecumênicos", "Formação da Ortodoxia", "História das Heresias", "História do Cânon", "História do Martírio", "História das Perseguições"], "MEDIEVAL E REFORMA": ["Monasticismo", "Igreja Medieval", "Escolasticismo", "Pré-Reforma", "Reforma Protestante", "Reforma Magisterial", "Reforma Radical", "Contrarreforma", "Protestantismo Histórico"], "MOVIMENTOS E TRADIÇÕES": ["Puritanismo", "Pietismo", "Avivamentos", "História Batista", "História Reformada", "História Presbiteriana", "História Pentecostal", "História Evangélica", "Liberalismo Teológico", "Neo-ortodoxia", "Fundamentalismo", "Evangelicalismo", "Ecumenismo"], "HISTÓRIA TEMÁTICA E GLOBAL": ["História das Missões", "História da Liturgia", "História da Espiritualidade Cristã", "História da Pregação", "História da Educação Cristã", "História do Discipulado", "História da Adoração", "História da Bíblia", "História da Tradução Bíblica", "História da Teologia", "História da Filosofia Cristã", "História da Apologética", "Cristianismo e Cultura", "Cristianismo e Política", "Cristianismo e Sociedade", "Denominações Cristãs", "Confissões e Credos", "Movimentos Contemporâneos", "História do Cristianismo Global", "Cristianismo Latino-Americano", "Cristianismo Africano", "Cristianismo Asiático", "História das Instituições Cristãs", "Biografias Históricas Cristãs"] },
+        6: { "FUNDAMENTOS E COMUNHÃO": ["União com Cristo", "Identidade em Cristo", "Centralidade de Cristo", "Vida de Graça", "Vida Pactual", "Fé Cristã", "Esperança Cristã", "Amor Cristão", "Evangelho e Vida Cristã", "Comunhão com Deus", "Vida Devocional", "Oração", "Adoração", "Leitura Bíblica", "Meditação Bíblica", "Jejum", "Presença de Deus"], "SANTIFICAÇÃO E GUERRA": ["Santificação", "Vida de Santidade", "Mortificação do Pecado", "Vivificação Espiritual", "Pureza Cristã", "Obediência Cristã", "Temor do Senhor", "Disciplina Espiritual", "Formação Espiritual", "Maturidade Espiritual", "Guerra Espiritual", "Tentação Cristã", "Armadura de Deus", "Batalha contra a Carne", "Resistência ao Diabo", "Discernimento Espiritual"], "VIRTUDES E EMOÇÕES": ["Humildade Cristã", "Integridade Cristã", "Fidelidade Cristã", "Mansidão Cristã", "Paciência Cristã", "Bondade Cristã", "Misericórdia Cristã", "Generosidade Cristã", "Contentamento Cristão", "Gratidão Cristã", "Sofrimento Cristão", "Consolação Cristã", "Ansiedade e Fé", "Medo e Confiança", "Culpa e Graça", "Descanso Espiritual"], "VIDA RELACIONAL E MISSÃO": ["Amor ao Próximo", "Perdão Cristão", "Reconciliation Cristã", "Unidade Cristã", "Comunhão da Igreja", "Serviço Cristão", "Hospitalidade Cristã", "Vida Familiar Cristã", "Casamento Cristão", "Discipulado", "Chamado Cristão", "Vocação Cristã", "Vida Missional", "Evangelismo", "Testemunho Cristão", "Mordomia Cristã"], "MENTE E COTIDIANO": ["Mente Cristã", "Cosmovisão Cristã", "Pensamento Cristão", "Integração Fé e Vida", "Ética da Vida Cristã", "Cultura e Cristianismo", "Uso Cristão da Tecnologia", "Administração do Tempo", "Dinheiro e Vida Cristã", "Trabalho Cristão", "Descanso e Ritmo Espiritual", "Simplicidade Cristã", "Vida Cristã no Mundo Digital", "Saúde e Corpo Cristão", "Peregrinação Cristã", "Esperança Escatológica"] },
+        7: { "FUNDAMENTOS E ANTROPOLOGIA": ["Fundamentos do Aconselhamento Pastoral", "Antropologia Bíblica e Condição Humana"], "CUIDADO NA DOR E PECADO": ["Sofrimento Humano e Experiência da Dor", "Pecado, Culpa e Arrependimento"], "VIDA INTERIOR E RELACIONAL": ["Vida Emocional e Desordem Interior", "Conflitos Relacionais e Restauração"], "CRESCIMENTO E DIREÇÃO": ["Crises de Fé e Experiência Espiritual", "Discipulado e Transformation da Vida", "Direção Pastoral e Decisões da Vida"], "RESTAURAÇÃO E COMUNIDADE": ["Cuidado Pastoral e Restauração da Alma", "Igreja e Comunidade no Cuidado Pastoral", "Esperança Cristã e Restauração Final"] },
+        8: { "FUNDAMENTOS E VERDADE": ["Fundamentos da Apologética Cristã", "Revelação, Verdade e Autoridade das Escrituras", "Confiabilidade Histórica das Escrituras"], "DEUS E CRISTO": ["Existência de Deus e Teísmo Cristão", "Jesus Cristo e a Ressurreição", "Salvação e Exclusividade de Cristo"], "CIÊNCIA, RAZÃO E MAL": ["Ciência, Fé e Razão", "Problema do Mal e Sofrimento", "Antropologia e Sentido da Existência Humana"], "COSMOVISÃO E CULTURA": ["Religiões e Cosmovisões", "Ética Cristã e Cosmovisão", "Relativismo, Cultura e Pós-Modernidade", "Heresias e Distorções da Fé Cristã", "Evangelismo e Defesa da Fé no Mundo Contemporâneo"] },
+        9: { "FUNDAMENTOS E ENVIO": ["Fundamentos Missionais do Evangelho", "Grande Comissão e Envio da Igreja", "Missio Dei e Reino de Deus"], "EVANGELISMO E DISCIPULADO": ["Evangelismo e Proclamação do Evangelho", "Discipulado e Formação das Nações", "Igreja e Sua Missão no Mundo"], "CULTURA E SOCIEDADE": ["Cultura e Cosmovisão Cristã", "Cristianismo e Sociedade", "Justiça, Misericórdia e Responsabilidade Social", "Trabalho, Economia e Vida Pública"], "TRANSFORMAÇÃO E FUTURO": ["Educação e Transformação Cultural", "Mídia, Tecnologia e Comunicação", "Contextualização Missionária", "Conflito de Cosmovisões Modernas", "Esperança do Reino e Consumação Final"] },
+        10: { "FUNDAMENTOS E COSMOVISÃO": ["Fundamentos da Ética Cristã", "Deus, Revelação e Moralidade", "Cosmovisão Cristã e Vida Moral"], "CARÁTER E VIDA INTERIOR": ["Pecado, Santidade e Responsabilidade Moral", "Consciência e Responsabilidade Humana", "Virtudes Cristãs e Formação do Caráter", "Ética Pessoal e Vida Interior"], "ÉTICA RELACIONAL E SOCIAL": ["Ética Relacional e Amor ao Próximo", "Ética Familiar e Vida Doméstica", "Ética do Trabalho e Vida Profissional", "Ética Social e Justiça", "Ética Política e Vida Pública"], "ÉTICA DA VIDA E CONTEMPORÂNEA": ["Ética Sexual e Corpo Humano", "Ética da Palavra e Comunicação", "Ética do Sofrimento e Situações-Limite", "Ética Cristã e Mundo Contemporâneo", "Responsabilidade Eterna e Juízo de Deus"] },
+        11: { "FUNDAMENTOS E VOCAÇÃO": ["Fundamentos da Liderança Cristã", "Cristologia da Liderança", "Chamado e Vocação Ministerial", "Espiritualidade do Líder"], "CARÁTER E SERVIÇO": ["Caráter do Líder Cristão", "Liderança Servidora", "Ética Ministerial", "Perseverança e Longevidade Ministerial"], "FORMAÇÃO E GESTÃO": ["Discipulado e Formação de Líderes", "Gestão e Administração Ministerial", "Sucessão e Multiplicação de Líderes"], "ATUAÇÃO MINISTERIAL": ["Pastoreio e Cuidado Espiritual", "Ensino e Ministério da Palavra", "Dons Espirituais e Ministério", "Relacionamentos e Unidade Ministerial", "Liderança em Crises", "Missão e Expansão Ministerial"] },
+        12: { "FUNDAMENTOS E PREPARO": ["Fundamentos Bíblicos da Pregação e Ensino", "Cristo no Centro da Pregação", "Poder do Espírito Santo na Pregação", "Preparo e Vida do Preletor"], "HERMENÊUTICA E HOMILÉTICA": ["Hermenêutica e Interpretação Bíblica", "Exposição das Escrituras", "Homilética e Construção do Sermão", "Autoridade e Fidelidade à Escritura"], "ENSINO E DISCIPULADO": ["Ensino Bíblico e Formação de Discípulos", "Contexto e Aplicação da Palavra", "Comunicação e Linguagem Ministerial", "Ensino no Discipulado"], "ESTILOS E IMPACTO": ["Pregação Evangelística", "Pregação Pastoral e Cuidado da Alma", "Pregação Profética e Edificação", "Ética na Pregação e Ensino", "Impacto e Fruto da Palavra"] },
+        13: { "FUNDAMENTOS E CENTRO": ["Fundamentos Bíblicos da Adoração", "Deus como Centro da Adoração", "Adoração em Espírito e em Verdade", "Presença de Deus na Adoração"], "BÍBLIA E HISTÓRIA": ["Adoração no Antigo e Novo Testamento", "Palavra e Adoração", "Adoração Escatológica"], "LITURGIA E CULTO": ["Liturgia e Ordem do Culto", "Santidade e Reverência na Adoração", "Adoração Corporativa da Igreja", "Ordem, Decência e Edificação no Culto"], "EXPRESSÃO E MINISTÉRIO": ["Música e Expressão na Adoração", "Oração e Adoração", "Liderança de Louvor e Serviço Ministerial", "Unção e Direção do Espírito Santo", "Adoração e Vida Cristã", "Cultura e Expressão da Adoração"] },
+        14: { "FUNDAMENTOS E COSMOVISÃO": ["Fundamentos Bíblicos da Educação Cristã", "Deus como Fundamento do Conhecimento", "Cosmovisão Cristã e Formação Educacional", "Mente Cristã e Formação do Pensamento"], "ENSINO E CARÁTER": ["Ensino da Palavra de Deus", "Discipulado e Formação Integral", "Desenvolvimento do Caráter Cristão", "Educação e Disciplina Espiritual"], "CICLOS DA VIDA": ["Educação Infantil e Formação da Base Espiritual", "Educação de Jovens e Adolescentes", "Educação de Adultos e Maturidade Cristã", "Educação Familiar Cristã"], "INSTITUIÇÃO E SOCIEDADE": ["Educação na Igreja", "Educação e Cultura", "Educação e Sociedade", "Tecnologia e Educação Cristã", "Educação e Missão da Igreja"] },
+        15: { "FUNDAMENTOS E IDENTIDADE": ["Fundamentos Bíblicos do Discipulado", "Seguir a Cristo", "Identidade em Cristo", "Renúncia e Custo do Discipulado"], "FORMAÇÃO E COMUNHÃO": ["Formação do Caráter Cristão", "Obediência à Palavra de Deus", "Vida no Espírito Santo", "Oração e Comunhão com Deus", "Comunhão e Vida na Igreja"], "PRÁTICA E CRESCIMENTO": ["Ensino e Aprendizado contínuo", "Prática da Fé no cotidiano", "Correção, Disciplina e Maturidade", "Perseverança na Fé"], "MISSÃO E MULTIPLICAÇÃO": ["Evangelismo e Testemunho pessoal", "Discipulado e Multiplicação", "Vida Missional do Discípulo", "Esperança e Vida Eterna"] },
+        16: { "FUNDAMENTOS E ALIANÇA": ["Fundamentos Bíblicos da Família", "Deus como Autor da Família", "Casamento Cristão", "Amor, Unidade e Aliança Familiar", "Herança Espiritual Familiar"], "PAPÉIS E FORMAÇÃO": ["Papéis e Responsabilidades Familiares", "Pais e Educação dos Filhos", "Filhos e Vida Familiar", "Criação de Filhos na Fé Cristã"], "VIDA PRÁTICA E CUIDADO": ["Vida Espiritual no Lar", "Conflitos e Reconciliação Familiar", "Sexualidade e Pureza no Casamento", "Finanças e Mordomia Familiar"], "INSTITUIÇÃO E PROPÓSITO": ["Família e Igreja", "Família e Sociedade", "Família em Crises e Sofrimento", "Família e Propósito Eterno"] },
+        17: { "FUNDAMENTOS E IDENTIDADE": ["Fundamentos da Formação Espiritual", "Vida em Cristo e Novo Nascimento", "Comunhão com Deus"], "DISCIPLINAS E PRÁTICAS": ["Oração e Vida Devocional", "Leitura e Meditação Bíblica", "Disciplina Espiritual", "Obediência e Prática da Palavra"], "TRANSFORMAÇÃO E CARÁTER": ["Santificação e Transformation Interior", "Caráter Cristão", "Renovação da Mente", "Luta contra o Pecado"], "CRESCIMENTO E FRUTO": ["Perseverança Espiritual", "Crescimento e Maturidade Espiritual", "Comunhão com a Igreja", "Serviço e Fruto Espiritual", "Esperança e Vida Eterna"] },
+        18: { "FUNDAMENTOS E MENSAGEM": ["Fundamentos Bíblicos do Evangelismo", "Evangelho de Jesus Cristo", "Chamado e Missão de Evangelizar", "Evangelismo e Eternidade"], "ESPIRITUALIDADE E COMUNICAÇÃO": ["Poder do Espírito Santo no Evangelismo", "Oração e Evangelismo", "Comunicação do Evangelho", "Evangelismo e Cosmovisão Cristã"], "MÉTODOS E PRÁTICA": ["Evangelismo Pessoal", "Evangelismo Comunitário", "Evangelismo e Discipulado", "Evangelismo e Relações Humanas"], "CONTEXTO E EXPANSÃO": ["Contexto Cultural e Evangelismo", "Evangelismo e Ação Social", "Evangelismo em Contextos Difíceis", "Evangelismo e Apostolado", "Evangelismo e Fruto da Conversão"] },
+        19: { "FUNDAMENTOS E METAFÍSICA": ["Fundamentos da Filosofia Cristã", "Cosmovisão Cristã", "Ontologia Cristã", "Teologia Natural", "Teologia Revelada"], "CONHECIMENTO E RAZÃO": ["Epistemologia Cristã", "Lógica e Razão no Pensamento Cristão", "Fé e Razão", "Verdade e Relativismo"], "ANTROPOLOGIA E ÉTICA": ["Antropologia Filosófica Cristã", "Ética Filosófica Cristã", "Liberdade, Determinismo e VONTADE Humana", "Identidade e Sentido da Vida"], "DESAFIOS E DIÁLOGOS": ["Problema do Mal", "Existência de Deus", "Cristianismo e Filosofias Seculares", "Filosofia Cristã e Vida Prática"] },
+        20: { "FUNDAMENTOS E REALIDADE": ["Fundamentos da Cosmovisão Cristã", "Deus e a Realidade", "Criação e Ordem do Mundo", "Escritura e Verdade"], "CONDIÇÃO E REDENÇÃO": ["Queda e Condição Humana", "Redenção em Cristo", "Reino de Deus", "Homem e Identidade Humana"], "HISTÓRIA E SABER": ["História e Providência Divina", "Ciência e Conhecimento", "Sofrimento e Mal no Mundo", "Esperança e Futuro da Criação"], "CULTURA E SOCIEDADE": ["Moralidade e ÉTICA da Vida", "Cultura e Formação Social", "Trabalho e Vida no Mundo", "Igreja e Presença no Mundo", "Missão e Transformação do Mundo"] },
+        21: { "FUNDAMENTOS E ESPAÇO PÚBLICO": ["Fundamentos da Teologia Pública", "Deus e Vida Pública", "Igreja e Espaço Público", "Fé Cristã e Sociedade"], "POLÍTICA, ESTADO E PODER": ["Política e Poder", "Estado e Governo", "Liberdade Religiosa e Consciência"], "JUSTIÇA, ÉTICA E DIREITOS": ["Ética Pública e Vida Moral Coletiva", "Justiça e Direitos Humanos", "Justiça Social e Compasso Cristão", "Esperança Cristã e Futuro da Sociedade"], "CULTURA, ECONOMIA E MÍDIA": ["Economia e Vida Púbica", "Educação e Formação Cultural", "Cultura e Transformação Social", "Religião e Pluralismo", "Mídia e Comunicação Pública", "Tecnologia e Vida Pública"] },
+        22: { "FUNDAMENTOS E CONTEXTO HISTÓRICO": ["Fundamentos dos Estudos Judaicos e Contextuais", "Contexto do Antigo Testamento", "Contexto do Novo Testamento", "Geografia Bíblica e Contexto Histórico"], "JUDAÍSMO E TRADIÇÃO": ["Judaísmo do Segundo Templo", "Torá e Tradição Judaica", "Sinagoga e Vida Religiosa Judaica", "Interpretação Judaica das Escrituras"], "CULTURA E MENTALIDADE": ["Cultura Hebraica e Mentalidade Bíblica", "Línguas Bíblicas e Contexto Linguístico", "Costumes e Práticas Sociais Judaicas", "Festas e Calendário Bíblico"], "IDENTIDADE E TRANSIÇÃO": ["Profetismo e Expectativa Messiânica", "Lei, Pureza e Sistema Religioso", "Jesus no Contexto Judaico", "Igreja Primitiva e Raízes Judaicas", "Contextualização Bíblica para Hoje"] },
         23: { "HISTÓRIA E IDENTIDADE": ["História das Denominações", "Confessionalismo", "Credos e Confissões"], "DOUTRINAS COMPARADAS": ["Divergências Doutrinárias", "Ecumenismo Bíblico", "Diálogo Interdenominacional"], "MOVIMENTOS CONTEMPORÂNEOS": ["Denominações Emergentes", "Novos Movimentos Religiosos", "Pentecostalismo e Neopentecostalismo"] },
         24: { "DESENVOLVIMENTO DOUTRINÁRIO": ["História do Dogma", "Desenvolvimento da Cristologia", "Evolução da Eclesiologia"], "PERÍODOS HISTÓRICOS": ["Teologia Patrística", "Teologia Medieval", "Teologia da Reforma", "Teologia Moderna"], "AUTORES E OBRAS": ["Grandes Teólogos da História", "Tratados Teológicos Clássicos", "Impacto Histórico das Obras"] },
         25: { "TRADIÇÕES ESPIRITUAIS": ["Espiritualidade Primitiva", "Mística Cristã Clássica", "Espiritualidade Puritana"], "PRÁTICAS E AVIVAMENTOS": ["História dos Avivamentos", "Práticas de Piedade Histórica", "Movimentos de Santidade"], "BIOGRAFIAS ESPIRITUAIS": ["Vida dos Santos e Mártires", "Líderes Espirituais Exemplares"] },
@@ -250,130 +76,52 @@
         28: { "TEOLOGIA DA MISSÃO": ["Fundamentos Bíblicos da Missão", "Missio Dei", "História das Missões Mundiais"], "ESTRATÉGIA E ANTROPOLOGIA": ["Antropologia Missionária", "Contextualização", "Plantação de Igrejas"], "MISSÕES TRANSCULTURAIS": ["Povos Não Alcançados", "Missões Urbanas", "Missão Integral"] },
         29: { "COMUNICAÇÃO DA PALAVRA": ["Homilética Avançada", "Retórica e Persuasão Bíblica", "Linguagem e Símbolo"], "MÍDIA E TECNOLOGIA": ["Evangelismo Digital", "Mídia e Cultura", "Comunicação Visual na Igreja"], "RELACIONAMENTO": ["Comunicação Interpessoal", "Mediação de Conflitos", "Liderança e Comunicação"] }
     };
-
     const P1 = "AQ.Ab8RN6JQi5L"; const P2 = "CGgGxeIBaNVAocD"; const P3 = "N1FQkZSb0n2kje4bNke08sDQ";
     const API_KEY = P1 + P2 + P3;
-
     function init() {
         const list = document.getElementById('module-list');
         DISCIPLINAS.forEach((name, i) => {
-            const li = document.createElement('li');
-            li.className = 'module-item';
+            const li = document.createElement('li'); li.className = 'module-item';
             li.innerHTML = `<span>${i < 10 ? '0'+i : i}</span> ${name.replace(/^\d+\s/, '')}`;
-            li.onclick = () => selectDisciplina(i);
-            list.appendChild(li);
+            li.onclick = () => selectDisciplina(i); list.appendChild(li);
         });
     }
-
     function selectDisciplina(id) {
         document.querySelectorAll('.module-item').forEach(el => el.classList.remove('active'));
-        const activeItem = document.querySelectorAll('.module-item')[id];
-        if (activeItem) activeItem.classList.add('active');
-        
+        const activeItem = document.querySelectorAll('.module-item')[id]; if (activeItem) activeItem.classList.add('active');
         document.getElementById('path-display').innerText = DISCIPLINAS[id];
-
-        const container = document.getElementById('view-container');
-        container.innerHTML = '';
-
+        const container = document.getElementById('view-container'); container.innerHTML = '';
         if (HIERARQUIA[id]) {
             Object.keys(HIERARQUIA[id]).forEach(cat => {
-                const group = document.createElement('div');
-                group.className = 'category-group';
+                const group = document.createElement('div'); group.className = 'category-group';
                 group.innerHTML = `<div class="category-title">${cat}</div>`;
-                const grid = document.createElement('div');
-                grid.className = 'items-grid';
+                const grid = document.createElement('div'); grid.className = 'items-grid';
                 HIERARQUIA[id][cat].forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'item-card';
-                    card.innerText = item;
-                    card.onclick = () => openTool(item, DISCIPLINAS[id]);
+                    const card = document.createElement('div'); card.className = 'item-card';
+                    card.innerText = item; card.onclick = () => openTool(item, DISCIPLINAS[id]);
                     grid.appendChild(card);
                 });
-                group.appendChild(grid);
-                container.appendChild(group);
+                group.appendChild(grid); container.appendChild(group);
             });
-        } else {
-            container.innerHTML = `<div style="text-align:center; padding:100px; color:#5a6b82;">Camada "${DISCIPLINAS[id]}" em desenvolvimento.</div>`;
-        }
+        } else { container.innerHTML = `<div style="text-align:center; padding:100px; color:#5a6b82;">Camada "${DISCIPLINAS[id]}" em desenvolvimento.</div>`; }
     }
-
     function openTool(name, disciplina) {
         const container = document.getElementById('view-container');
-        container.innerHTML = `
-            <div class="search-box">
-                <div style="font-size:10px; color:var(--accent); margin-bottom:5px; font-weight:bold;">${disciplina.toUpperCase()}</div>
-                <h3>INVESTIGAÇÃO: ${name.toUpperCase()}</h3>
-                <div class="input-group">
-                    <input id="tool-input" type="text" placeholder="Digite o tema ou passagem para análise..." onkeypress="if(event.key==='Enter')runSearch('${name}', '${disciplina}')">
-                    <button id="search-btn" onclick="runSearch('${name}', '${disciplina}')">ESTABELECER</button>
-                </div>
-                <div id="loading-overlay">
-                    <div class="spinner"></div>
-                    <div style="color:var(--primary); font-size:12px; font-weight:bold; letter-spacing:1px;">ACIONANDO FONTES ACADÊMICAS E MANUSCRITOS...</div>
-                </div>
-            </div>
-            <div id="dossier-panel" class="dossier-panel">
-                <div id="dossier-content" class="dossier-content"></div>
-                <div class="dossier-footer">RELATÓRIO TEOLÓGICO VALIDADO — MATRIZ CANÔNICA</div>
-            </div>
-        `;
+        container.innerHTML = `<div class="search-box"><div style="font-size:10px; color:var(--accent); margin-bottom:5px;">${disciplina.toUpperCase()}</div><h3>MATRIZ: ${name.toUpperCase()}</h3><div class="input-group"><input id="tool-input" type="text" placeholder="Digite o tema ou passagem..." onkeypress="if(event.key==='Enter')runSearch('${name}', '${disciplina}')"><button id="search-btn" onclick="runSearch('${name}', '${disciplina}')">PESQUISAR</button></div><div id="load-msg" style="display:none; color:var(--primary); font-size:12px; text-align:center; margin-top:15px; font-weight:bold;">ACIONANDO FONTES ACADÊMICAS...</div></div><div id="result-panel" class="result-panel"></div>`;
         document.getElementById('tool-input').focus();
     }
-
     async function runSearch(toolName, disciplina) {
-        const input = document.getElementById('tool-input').value.trim();
-        if (!input) return alert("Digite algo para pesquisar.");
-        
-        const btn = document.getElementById('search-btn');
-        const load = document.getElementById('loading-overlay');
-        const res = document.getElementById('dossier-panel');
-        const content = document.getElementById('dossier-content');
-        
-        btn.disabled = true; 
-        load.style.display = 'block'; 
-        res.style.display = 'none';
-        
-        const prompt = `Você é o motor de inteligência da disciplina ${disciplina}, agindo como um Doutor em Teologia especializado na ferramenta "${toolName}". 
-        TAREFA: Realize uma investigação profunda e acadêmica sobre "${input}".
-        REGRAS CANÔNICAS:
-        1. FOCO TOTAL NO ORIGINAL: Se for bíblico, use NA28 (Grego), BHS (Hebraico) e Septuaginta (LXX).
-        2. SEM COMENTÁRIOS DEVOCIONAIS: Evite frases de efeito ou aplicações superficiais. Foque em evidências.
-        3. DENSIDADE TÉCNICA: Cite variantes textuais, léxicos (BDAG, HALOT), gramática e contexto histórico-cultural.
-        4. ESTRUTURA: Divida em seções claras (Análise de Originais, Contexto, Veredito Canônico).
-        5. LINGUAGEM: Português acadêmico denso e preciso.`;
-        
+        const input = document.getElementById('tool-input').value.trim(); if (!input) return alert("Digite algo para pesquisar.");
+        const btn = document.getElementById('search-btn'); const load = document.getElementById('load-msg'); const res = document.getElementById('result-panel');
+        btn.disabled = true; load.style.display = 'block'; res.style.display = 'none';
+        const prompt = `Você é o motor de inteligência da disciplina ${disciplina}, especificamente para a ferramenta "${toolName}". Realize uma análise profunda sobre "${input}". REGRAS: 1. Foco no original (Hebraico/Grego/LXX). 2. Sem comentários devocionais. 3. Densidade acadêmica técnica. 4. Se for bíblico, cite manuscritos e variantes.`;
         try {
-            const response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-3.7-flash:generateContent?key=" + API_KEY, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] } )
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error?.message || "Erro na API");
-            
-            const rawText = data.candidates[0].content.parts[0].text;
-            
-            // Formatação básica para o estilo dossiê
-            const formattedText = rawText
-                .replace(/### (.*)/g, '<h3 style="color:#1a202c; border-bottom:1px solid #cbd5e0; margin-top:30px;">$1</h3>')
-                .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '  
-');
-
-            content.innerHTML = `
-                <div style="text-align:right; font-size:10px; color:#718096; margin-bottom:20px;">DOC_REF: ${disciplina.split(' ')[0]}_${toolName.substring(0,3).toUpperCase()}</div>
-                <h2>RELATÓRIO DE INVESTIGAÇÃO: ${input.toUpperCase()}</h2>
-                <div style="margin-top:20px;">${formattedText}</div>
-            `;
-            
-            res.style.display = 'block';
-            res.scrollIntoView({ behavior: 'smooth' });
-        } catch (e) { 
-            alert("ERRO TÉCNICO: " + e.message);
-        } finally { 
-            btn.disabled = false; 
-            load.style.display = 'none'; 
-        }
+            const response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-3.7-flash:generateContent?key=" + API_KEY, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] } ) });
+            const data = await response.json(); if (!response.ok) throw new Error(data.error?.message || "Erro na API");
+            res.innerHTML = `<h2>RESULTADO: ${toolName.toUpperCase()}</h2><div style="white-space: pre-wrap; font-size: 1.1rem; line-height: 1.8;">${data.candidates[0].content.parts[0].text}</div>`;
+            res.style.display = 'block'; res.scrollIntoView({ behavior: 'smooth' });
+        } catch (e) { res.innerHTML = `<div style="color:red; padding:20px; border:1px solid red; border-radius:8px;"><strong>ERRO TÉCNICO:</strong>  
+${e.message}</div>`; res.style.display = 'block'; } finally { btn.disabled = false; load.style.display = 'none'; }
     }
     init();
 </script>
