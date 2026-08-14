@@ -1,15 +1,7 @@
-export const anl05 = {
-    id: "ANL-05",
-    titulo: "SIGNIFICADO TEOLÓGICO",
-    itens: [
-        "Desenvolvimento dos conceitos",
-        "Vocabulário teológico",
-        "Uso teológico no AT",
-        "Uso teológico no NT",
-        "Relação com a LXX",
-        "NIDNTTE",
-        "NIDOTTE",
-        "TDNT",
-        "TDOT"
-    ]
+export const ANL_05 = {
+    etapa: 5,
+    nome: "Significado Teológico",
+    fontes: ["NIDNTTE", "NIDOTTE", "TDNT", "TDOT"],
+    funcao: "Desenvolvimento conceitual e teológico dos termos.",
+    prompt: (tema) => `Etapa 5: Explore o desenvolvimento teológico dos conceitos de '${tema}' usando dicionários como NIDNTTE ou TDNT.`
 };
