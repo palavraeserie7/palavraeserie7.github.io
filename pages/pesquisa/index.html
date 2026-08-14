@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Matriz de Análise Bíblica — Palavra & Série</title>
+    <title>Matriz de Análise Bíblica</title>
 
     <style>
         * {
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -16,7 +20,7 @@
             background: #0b1428;
             color: #dbe7f5;
             font-family:
-                'Segoe UI',
+                "Segoe UI",
                 Tahoma,
                 Geneva,
                 Verdana,
@@ -28,9 +32,9 @@
             margin: 35px auto 70px;
         }
 
-        /* ==============================
+        /* =========================
            CABEÇALHO
-           ============================== */
+           ========================= */
 
         .header {
             background: #18243a;
@@ -44,13 +48,13 @@
             margin: 0 0 8px;
             color: #20d66b;
             font-size: 25px;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
-        .header p {
-            margin: 0 0 18px;
-            color: #94a8c2;
+        .subtitle {
+            color: #71849c;
             font-size: 0.85rem;
+            margin-bottom: 18px;
         }
 
         .search-grid {
@@ -63,18 +67,19 @@
             width: 100%;
             background: #0d172b;
             border: 1px solid #30415f;
-            color: white;
+            color: #ffffff;
             padding: 13px;
             border-radius: 6px;
             outline: none;
+            font-size: 14px;
+        }
+
+        input::placeholder {
+            color: #667993;
         }
 
         input:focus {
             border-color: #20d66b;
-        }
-
-        input::placeholder {
-            color: #71849c;
         }
 
         button {
@@ -85,7 +90,6 @@
             font-weight: bold;
             background: #20c96b;
             color: #06130b;
-            transition: 0.2s;
         }
 
         button:hover {
@@ -93,13 +97,13 @@
         }
 
         button:disabled {
+            opacity: 0.55;
             cursor: wait;
-            opacity: 0.6;
         }
 
-        /* ==============================
+        /* =========================
            SEÇÕES
-           ============================== */
+           ========================= */
 
         .secao {
             background: #17243a;
@@ -114,20 +118,19 @@
             font-weight: bold;
             margin-bottom: 15px;
             font-size: 0.9rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            letter-spacing: 0.3px;
             border-bottom: 1px solid #263754;
             padding-bottom: 10px;
         }
 
-        /* ==============================
+        /* =========================
            DIAGNÓSTICO
-           ============================== */
+           ========================= */
 
         .diagnostico-grid {
             display: grid;
             grid-template-columns:
-                repeat(auto-fill, minmax(150px, 1fr));
+                repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
         }
 
@@ -143,7 +146,7 @@
             display: block;
             color: #778ba5;
             font-size: 0.7rem;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .diag-item strong {
@@ -151,16 +154,15 @@
             font-size: 0.85rem;
         }
 
-        /* ==============================
+        /* =========================
            MATRIZ
-           ============================== */
+           ========================= */
 
         .matriz-grid {
             display: grid;
             grid-template-columns:
-                repeat(auto-fill, minmax(250px, 1fr));
+                repeat(auto-fit, minmax(250px, 1fr));
             gap: 10px;
-            margin-top: 15px;
         }
 
         .matriz-item {
@@ -168,70 +170,39 @@
             padding: 14px;
             border-radius: 6px;
             border-left: 3px solid #18bfff;
-            font-size: 0.8rem;
+            min-height: 105px;
         }
 
-        .matriz-item strong {
+        .matriz-item .anl-id {
             color: #20d66b;
-        }
-
-        /* ==============================
-           FLUXO DOS ANLs
-           ============================== */
-
-        .anl-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .anl-card {
-            background: #0d172b;
-            border: 1px solid #263754;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .anl-header {
-            padding: 13px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .anl-title {
-            color: #18bfff;
             font-weight: bold;
             font-size: 0.8rem;
         }
 
-        .anl-status {
+        .matriz-item .anl-title {
+            color: #dce8f7;
+            font-weight: bold;
+            margin-top: 5px;
+            font-size: 0.82rem;
+        }
+
+        .matriz-item .anl-status {
+            margin-top: 10px;
             color: #71849c;
-            font-size: 0.65rem;
-            white-space: nowrap;
+            font-size: 0.7rem;
         }
 
-        .anl-body {
-            padding: 13px 15px;
-            border-top: 1px solid #263754;
-            color: #c2d0e0;
-            font-size: 0.78rem;
-            line-height: 1.6;
-        }
-
-        /* ==============================
-           RESULTADO
-           ============================== */
+        /* =========================
+           DOSSIÊ
+           ========================= */
 
         .research-box {
             background: #0a1426;
             border-left: 4px solid #20d66b;
             padding: 25px;
             margin-top: 15px;
-            line-height: 1.8;
+            line-height: 1.7;
             font-size: 1rem;
-            border-radius: 4px;
         }
 
         .research-box h2 {
@@ -241,16 +212,57 @@
             padding-bottom: 10px;
         }
 
-        /* ==============================
+        /* =========================
+           RESULTADOS DOS ANLs
+           ========================= */
+
+        .anl-result {
+            background: #0d172b;
+            border: 1px solid #263754;
+            border-left: 3px solid #18bfff;
+            border-radius: 6px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .anl-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 14px;
+            border-bottom: 1px solid #263754;
+        }
+
+        .anl-result-title {
+            color: #18bfff;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .anl-result-status {
+            font-size: 0.68rem;
+            font-weight: bold;
+            color: #20d66b;
+            white-space: nowrap;
+        }
+
+        .anl-result-body {
+            padding: 16px;
+            color: #c8d5e5;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        /* =========================
            ESTADOS
-           ============================== */
+           ========================= */
 
         .loading {
             color: #20d66b;
             font-weight: bold;
-            text-align: center;
             padding: 20px;
-            animation: pulse 1.5s infinite;
+            text-align: center;
         }
 
         .empty {
@@ -258,34 +270,37 @@
             padding: 10px;
         }
 
-        .erro {
-            color: #ff4d4d;
-            padding: 10px;
+        .status-completed {
+            color: #20d66b !important;
         }
 
-        .sucesso {
-            color: #20d66b;
+        .status-partial {
+            color: #ffc857 !important;
         }
 
-        @keyframes pulse {
-            0% {
-                opacity: 0.5;
-            }
-
-            50% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.5;
-            }
+        .status-no-data {
+            color: #8fa3bd !important;
         }
 
-        /* ==============================
-           RESPONSIVIDADE
-           ============================== */
+        .status-error {
+            color: #ff6b6b !important;
+        }
 
-        @media (max-width: 800px) {
+        /* =========================
+           RESPONSIVO
+           ========================= */
+
+        @media (max-width: 760px) {
+
+            .app {
+                width: 94%;
+                margin-top: 20px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
             .search-grid {
                 grid-template-columns: 1fr;
             }
@@ -294,13 +309,12 @@
                 width: 100%;
             }
 
-            .header {
-                padding: 20px;
+            .matriz-grid {
+                grid-template-columns: 1fr;
             }
 
-            .app {
-                width: 94%;
-                margin-top: 20px;
+            .diagnostico-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
     </style>
@@ -310,32 +324,32 @@
 
 <div class="app">
 
-    <!-- ==========================================
-         CABEÇALHO / ENTRADA DA PESQUISA
-         ========================================== -->
+    <!-- =========================
+         CABEÇALHO / ENTRADA
+         ========================= -->
 
-    <div class="header">
+    <header class="header">
 
         <h1>MATRIZ DE ANÁLISE BÍBLICA</h1>
 
-        <p>
+        <div class="subtitle">
             Menu de Pesquisa Bíblica — Palavra &amp; Série
-        </p>
+        </div>
 
         <div class="search-grid">
 
             <input
                 id="tema-input"
                 type="text"
-                placeholder="Tema — ex.: Graça"
                 autocomplete="off"
+                placeholder="Tema — ex.: graça, verbo, fé"
             >
 
             <input
                 id="passagem-input"
                 type="text"
-                placeholder="Passagem — ex.: João 3:16"
                 autocomplete="off"
+                placeholder="Passagem — ex.: João 1:1"
             >
 
             <button
@@ -347,14 +361,14 @@
 
         </div>
 
-    </div>
+    </header>
 
 
-    <!-- ==========================================
-         DIAGNÓSTICO
-         ========================================== -->
+    <!-- =========================
+         ANL-00
+         ========================= -->
 
-    <div class="secao">
+    <section class="secao">
 
         <div class="titulo-secao">
             ANL-00 — DIAGNÓSTICO E ROTEAMENTO
@@ -371,14 +385,14 @@
 
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- ==========================================
-         MATRIZ DE FONTES
-         ========================================== -->
+    <!-- =========================
+         MATRIZ DOS 12 ANLs
+         ========================= -->
 
-    <div class="secao">
+    <section class="secao">
 
         <div class="titulo-secao">
             MATRIZ DE FONTES ACADÊMICAS
@@ -390,71 +404,66 @@
         >
 
             <div class="empty">
-                Defina um tema ou passagem para iniciar a investigação.
+                Defina um tema ou passagem para iniciar a pesquisa.
             </div>
 
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- ==========================================
-         FLUXO FIXO DOS 12 ANLs
-         ========================================== -->
+    <!-- =========================
+         FLUXO
+         ========================= -->
 
-    <div class="secao">
+    <section class="secao">
 
         <div class="titulo-secao">
             FLUXO FIXO — 12 MÓDULOS ANL
         </div>
 
         <div
-            id="anl-area"
-            class="anl-list"
+            id="fluxo-area"
+            class="empty"
         >
-
-            <div class="empty">
-                Os 12 módulos serão executados em sequência.
-            </div>
-
+            Cada ANL possui execução independente.
+            A ausência de dados em um módulo não interrompe os demais.
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- ==========================================
-         RESULTADO FINAL
-         ========================================== -->
+    <!-- =========================
+         DOSSIÊ
+         ========================= -->
 
-    <div
+    <section
         id="resultado-area"
         class="research-box"
         style="display: none;"
     >
 
-        <h2>Resultado da Investigação</h2>
+        <h2>Dossiê de Pesquisa</h2>
 
-        <div id="resultado-conteudo"></div>
+        <div id="dossie-conteudo"></div>
 
-    </div>
+    </section>
 
 </div>
 
 
-<!-- ==============================================
-     ÚNICO JAVASCRIPT DO INDEX
+<!--
+    TODA A LÓGICA DA APLICAÇÃO FICA NOS MÓDULOS JS.
 
-     Toda a lógica fica em:
-     ./js/ui.js
+    Não colocar:
+    - chave de API
+    - fetch de IA
+    - funções de pesquisa
+    - onclick inline
+    - lógica dos ANLs
 
-     O index.html NÃO possui:
-     - API Key
-     - fetch para IA
-     - lógica dos ANLs
-     - router
-     - engine
-     - funções inline
-     ============================================== -->
+    neste HTML.
+-->
 
 <script
     type="module"
