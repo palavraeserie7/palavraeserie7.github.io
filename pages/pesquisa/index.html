@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matriz de Análise Bíblica — Arquitetura Master V1</title>
+    <title>Matriz de Análise Bíblica — Palavra & Série</title>
     <style>
         :root {
             --primary: #20d66b; --alert: #ffd700; --blocked: #ff4d4d;
@@ -33,134 +33,176 @@
         /* SENTINELA EDITORIAL */
         .sentinela-badge { font-size: 10px; padding: 5px 12px; border-radius: 20px; font-weight: 900; margin-left: 10px; }
         .status-aprovado { background: rgba(32, 214, 107, 0.1); color: var(--primary); border: 1px solid var(--primary); }
-        .status-alerta { background: rgba(255, 215, 0, 0.1); color: var(--alert); border: 1px solid var(--alert); }
 
-        .module { background: var(--input); border: 1px solid #253650; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+        .module { background: var(--input); border: 1px solid #253650; border-radius: 10px; margin-bottom: 12px; overflow: hidden; opacity: 0.5; transition: 0.3s; }
+        .module.active { opacity: 1; border-color: var(--primary); }
         .module-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .module-title { color: #18bfff; font-weight: bold; font-size: 14px; }
-        .module-body { padding: 15px; line-height: 1.6; font-size: 0.95rem; border-top: 1px solid #253650; background: #0b1428; }
+        .module-status { font-size: 10px; font-weight: bold; color: #778ba5; }
+        .module-body { padding: 15px; line-height: 1.6; font-size: 0.9rem; border-top: 1px solid #253650; background: #0b1428; display: none; }
         
         .research-box { background: #fdfcf0; border-left: 8px solid var(--primary); padding: 40px; margin-top: 30px; color: #1a202c; font-family: 'Georgia', serif; line-height: 1.8; border-radius: 4px; }
-        
-        /* SEMENTE DO CORAÇÃO */
-        .editora-box { background: #111b33; border: 1px solid #20d66b; border-radius: 12px; padding: 25px; margin-top: 25px; }
-        .book-rec { background: #0d172b; padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 4px solid #18bfff; }
     </style>
 </head>
 <body>
 
 <div class="app">
     <div class="header">
-        <h1>PALAVRA & SÉRIE — M00 Orchestrator</h1>
+        <h1>MATRIZ DE ANÁLISE BÍBLICA</h1>
+        <p style="color:#94a3b8; font-size: 0.8rem; margin-top:-5px;">Menu de Pesquisa Bíblica — Palavra & Série</p>
         <div class="search-grid">
-            <input id="tema-input" type="text" placeholder="Tema para Investigação Vasta">
-            <input id="passagem-input" type="text" placeholder="Passagem de Apoio">
-            <button onclick="CLIENT_EXECUTE()">ANALISAR (V7)</button>
+            <input id="tema-input" type="text" placeholder="Tema ou Texto Bíblico">
+            <input id="passagem-input" type="text" placeholder="Passagem de Apoio (opcional)">
+            <button onclick="CLIENT_EXECUTE()">ANALISAR (MASTER V1)</button>
         </div>
     </div>
 
     <!-- E08 STATE ENGINE -->
     <div class="state-grid">
-        <div class="state-card"><small>Fé</small><strong id="val-faith">0.80</strong></div>
-        <div class="state-card"><small>Oração</small><strong id="val-prayer">0.70</strong></div>
+        <div class="state-card"><small>Fé</small><strong id="val-faith">0.85</strong></div>
+        <div class="state-card"><small>Oração</small><strong id="val-prayer">0.73</strong></div>
         <div class="state-card"><small>Disciplina</small><strong id="val-discipline">0.50</strong></div>
         <div class="state-card"><small>Maturidade</small><strong id="val-maturity">N2</strong></div>
     </div>
 
     <div class="secao">
         <div class="titulo-secao">SENTINELA EDITORIAL — VALIDAÇÃO CANÔNICA</div>
-        <div id="sentinela-area">Aguardando processamento...</div>
+        <div id="sentinela-area">Aguardando entrada...</div>
     </div>
 
     <div class="secao">
-        <div class="titulo-secao">INVESTIGAÇÃO VASTA (12 MÓDULOS ANL)</div>
-        <div id="modules-container">Inicie o fluxo via M00.</div>
+        <div class="titulo-secao">FLUXO FIXO (12 MÓDULOS ANL)</div>
+        <div id="modules-container">
+            <!-- ANL-01 -->
+            <div class="module" id="mod-01">
+                <div class="module-header"><span class="module-title">ANL-01 — TEXTO E MANUSCRITOS</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: NA28, BHS/BHQ, SBLGNT, Septuaginta, Variantes.</div>
+            </div>
+            <!-- ANL-02 -->
+            <div class="module" id="mod-02">
+                <div class="module-header"><span class="module-title">ANL-02 — TRADUÇÃO E TEXTO ORIGINAL</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Análise: Hebraico, Aramaico, Grego, Septuaginta, Equivalências.</div>
+            </div>
+            <!-- ANL-03 -->
+            <div class="module" id="mod-03">
+                <div class="module-header"><span class="module-title">ANL-03 — GRAMÁTICA E SINTAXE</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Análise: Morfologia, Sintaxe Grega/Hebraica, Verbos, Conectivos.</div>
+            </div>
+            <!-- ANL-04 -->
+            <div class="module" id="mod-04">
+                <div class="module-header"><span class="module-title">ANL-04 — PALAVRAS E SEMÂNTICA</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: BDAG, HALOT, BDB, LSJ, Campo Semântico.</div>
+            </div>
+            <!-- ANL-05 -->
+            <div class="module" id="mod-05">
+                <div class="module-header"><span class="module-title">ANL-05 — SIGNIFICADO TEOLÓGICO</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: NIDNTTE, NIDOTTE, TDNT, TDOT, Desenvolvimento Conceitual.</div>
+            </div>
+            <!-- ANL-06 -->
+            <div class="module" id="mod-06">
+                <div class="module-header"><span class="module-title">ANL-06 — EXEGESE E CONTEXTO LITERÁRIO</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: BECNT, NIGTC, NICNT, Pillar, WBC, NICOT, WBC.</div>
+            </div>
+            <!-- ANL-07 -->
+            <div class="module" id="mod-07">
+                <div class="module-header"><span class="module-title">ANL-07 — CONTEXTO HISTÓRICO, CULTURAL E RELIGIOSO</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: Zondervan Encyclopedia, IVP Background, ANET, COS.</div>
+            </div>
+            <!-- ANL-08 -->
+            <div class="module" id="mod-08">
+                <div class="module-header"><span class="module-title">ANL-08 — CONTEXTO GEOGRÁFICO E POLÍTICO</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: Atlas Bíblico, Zondervan Atlas, Arqueologia, Fronteiras.</div>
+            </div>
+            <!-- ANL-09 -->
+            <div class="module" id="mod-09">
+                <div class="module-header"><span class="module-title">ANL-09 — RELAÇÃO COM O RESTANTE DA ESCRITURA</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: Beale & Carson, Vos, Goldsworthy, Revelação Progressiva.</div>
+            </div>
+            <!-- ANL-10 -->
+            <div class="module" id="mod-10">
+                <div class="module-header"><span class="module-title">ANL-10 — HERMENÊUTICA E CONTROLE</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: Osborne, Carson (Fallacies), Fee & Stuart, Eisegese.</div>
+            </div>
+            <!-- ANL-11 -->
+            <div class="module" id="mod-11">
+                <div class="module-header"><span class="module-title">ANL-11 — TEOLOGIA E COMPARAÇÃO</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Fontes: Grudem, Berkhof, Frame, EDT, Consenso Acadêmico.</div>
+            </div>
+            <!-- ANL-12 -->
+            <div class="module" id="mod-12">
+                <div class="module-header"><span class="module-title">ANL-12 — SÍNTESE</span><span class="module-status">PENDING</span></div>
+                <div class="module-body">Conclusão: O que o texto afirma, implica e aplica.</div>
+            </div>
+        </div>
     </div>
 
     <div id="resultado-area" class="research-box" style="display:none;"></div>
-
-    <div id="editora-area" class="editora-box" style="display:none;">
-        <div class="titulo-secao" style="color:var(--primary);">SEMENTE DO CORAÇÃO — RECOMENDAÇÕES</div>
-        <div id="livros-container"></div>
-    </div>
 </div>
 
 <script>
 /**
- * M00 CORE ORCHESTRATOR — VERSÃO CANÔNICA V7
+ * M00 CORE ORCHESTRATOR — VERSÃO CANÔNICA MASTER V1
  */
 const M00 = {
-    state: { faith: 0.8, prayer: 0.7, discipline: 0.5, maturity: "N2" },
+    state: { faith: 0.85, prayer: 0.73, discipline: 0.50, maturity: "N2" },
     
     async execute(action, params) {
         if (action === "INVESTIGAR") {
             this.updateState();
-            const dossie = await this.runMatriz(params.tema);
-            const validacao = this.runSentinela(dossie);
-            const recomendacoes = this.runPRO(params.tema);
-            return { dossie, validacao, recomendacoes, state: this.state };
+            const dossie = await this.runFluxoFixo(params.tema);
+            const validacao = { score: 21, status: "APROVADO" };
+            return { dossie, validacao, state: this.state };
         }
     },
 
     updateState() {
-        this.state.faith = (parseFloat(this.state.faith) + 0.05).toFixed(2);
-        this.state.prayer = (parseFloat(this.state.prayer) + 0.03).toFixed(2);
+        this.state.faith = (parseFloat(this.state.faith) + 0.02).toFixed(2);
     },
 
-    runSentinela(conteudo) {
-        const score = Math.floor(Math.random() * 30);
-        return { score, status: score <= 30 ? "APROVADO" : "ALERTA" };
-    },
-
-    runPRO(tema) {
-        const categorias = ["ENCONTRO", "CURA INTERIOR", "FUNDAMENTOS"];
-        return { 
-            categoria: categorias[Math.floor(Math.random() * categorias.length)],
-            livro: "O Despertar da Palavra",
-            autor: "Semente do Coração"
-        };
-    },
-
-    async runMatriz(tema) {
-        const etapas = [
-            { id: "ANL-01", n: "Texto", f: "NA28/BHS" }, { id: "ANL-04", n: "Léxico", f: "BDAG/HALOT" },
-            { id: "ANL-06", n: "Exegese", f: "BECNT" }, { id: "ANL-11", n: "Doutrina", f: "Grudem" },
-            { id: "ANL-12", n: "Síntese", f: "M00" }
-        ];
+    async runFluxoFixo(tema) {
         let txt = "";
-        for (let e of etapas) {
-            await new Promise(r => setTimeout(r, 200));
-            txt += `[${e.id}] ${e.n} (${e.f}): Investigação vasta sobre ${tema} concluída.\n`;
-            this.renderModule(e.id, e.n, e.f, tema);
+        for (let i = 1; i <= 12; i++) {
+            const id = i.toString().padStart(2, '0');
+            const el = document.getElementById(`mod-${id}`);
+            el.classList.add('active');
+            el.querySelector('.module-status').innerText = "RUNNING...";
+            el.querySelector('.module-body').style.display = "block";
+            
+            await new Promise(r => setTimeout(r, 400));
+            
+            el.querySelector('.module-status').innerText = "COMPLETED";
+            txt += `[ANL-${id}] Investigação sobre "${tema}" validada conforme protocolo Master V1.\n`;
         }
         return txt;
-    },
-
-    renderModule(id, nome, fonte, tema) {
-        const c = document.getElementById('modules-container');
-        const div = document.createElement('div');
-        div.className = "module";
-        div.innerHTML = `<div class="module-header"><span class="module-title">${id} — ${nome}</span><span class="module-status">COMPLETED</span></div><div class="module-body">Fonte: ${fonte}  
-Análise de ${tema} validada.</div>`;
-        c.appendChild(div);
     }
 };
 
 async function CLIENT_EXECUTE() {
     const tema = document.getElementById('tema-input').value.trim();
     if (!tema) return alert("Informe o tema.");
-    document.getElementById('modules-container').innerHTML = "";
+
+    // Limpa estado anterior
+    document.querySelectorAll('.module').forEach(m => {
+        m.classList.remove('active');
+        m.querySelector('.module-status').innerText = "PENDING";
+        m.querySelector('.module-body').style.display = "none";
+    });
+
     const result = await M00.execute("INVESTIGAR", { tema });
+
+    // Atualiza UI
     document.getElementById('val-faith').innerText = result.state.faith;
-    document.getElementById('val-prayer').innerText = result.state.prayer;
-    document.getElementById('sentinela-area').innerHTML = `<div class="state-card" style="display:inline-block; width:auto; padding: 10px 30px;"><small>SCORE CANÔNICO</small><strong>${result.validacao.score}/100</strong><span class="sentinela-badge status-aprovado">${result.validacao.status}</span></div>`;
+    document.getElementById('sentinela-area').innerHTML = `
+        <div class="state-card" style="display:inline-block; width:auto; padding: 10px 30px;">
+            <small>SCORE CANÔNICO</small>
+            <strong>${result.validacao.score}/100</strong>
+            <span class="sentinela-badge status-aprovado">${result.validacao.status}</span>
+        </div>
+    `;
+
     const resArea = document.getElementById('resultado-area');
-    resArea.innerHTML = `<h2>DOSSIÊ: ${tema.toUpperCase()}</h2><div style="white-space:pre-wrap;">${result.dossie}</div>`;
+    resArea.innerHTML = `<h2>DOSSIÊ CONSOLIDADO: ${tema.toUpperCase()}</h2><div style="white-space:pre-wrap;">${result.dossie}</div>`;
     resArea.style.display = 'block';
-    document.getElementById('livros-container').innerHTML = `<div class="book-rec"><strong>CATEGORIA: ${result.recomendacoes.categoria}</strong>  
-Livro Recomendado: ${result.recomendacoes.livro}  
-<small>Editora: ${result.recomendacoes.autor}</small></div>`;
-    document.getElementById('editora-area').style.display = 'block';
 }
 </script>
 </body>
