@@ -1,76 +1,50 @@
-import { runANL01 } from '../../../etapas/anl-01.js';
-import { runANL02 } from '../../../etapas/anl-02.js';
-import { runANL03 } from '../../../etapas/anl-03.js';
-import { runANL04 } from '../../../etapas/anl-04.js';
-import { runANL05 } from '../../../etapas/anl-05.js';
-import { runANL06 } from '../../../etapas/anl-06.js';
-import { runANL07 } from '../../../etapas/anl-07.js';
-import { runANL08 } from '../../../etapas/anl-08.js';
-import { runANL09 } from '../../../etapas/anl-09.js';
-import { runANL10 } from '../../../etapas/anl-10.js';
-import { runANL11 } from '../../../etapas/anl-11.js';
-import { runANL12 } from '../../../etapas/anl-12.js';
-
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('analisar-btn');
-    if (btn) btn.addEventListener('click', iniciarMatriz);
-});
+import { Router } from './router.js';
+import * as Modulos from './loader.js'; // Ver abaixo como criar este loader
 
 async function iniciarMatriz() {
     const tema = document.getElementById('tema-input').value.trim();
     const passagem = document.getElementById('passagem-input').value.trim();
-    if (!tema && !passagem) return alert("Informe um tema ou passagem.");
+    if (!tema && !passagem) return alert("Informe um tema.");
 
-    const alvo = tema + (passagem ? " (" + passagem + ")" : "");
-    const diag = document.getElementById('diagnostico-area');
-    const container = document.getElementById('modules-container');
-    const resArea = document.getElementById('resultado-area');
+    const diagArea = document.getElementById('diagnostico-area');
+    const modulesArea = document.getElementById('modules-container');
+    const resultArea = document.getElementById('resultado-area');
 
-    diag.innerHTML = '<div class="loading">Roteando fontes acadêmicas...</div>';
-    container.innerHTML = "";
-    resArea.style.display = 'none';
+    // ANL-00 Roteamento
+    const rota = Router.classificar(tema, passagem);
+    diagArea.innerHTML = `<div class="diag-item"><small>TESTAMENTO</small><strong>${rota.testamento}</strong></div>`;
 
-    const modulos = [
-        { id: "ANL-01", fn: runANL01 }, { id: "ANL-02", fn: runANL02 },
-        { id: "ANL-03", fn: runANL03 }, { id: "ANL-04", fn: runANL04 },
-        { id: "ANL-05", fn: runANL05 }, { id: "ANL-06", fn: runANL06 },
-        { id: "ANL-07", fn: runANL07 }, { id: "ANL-08", fn: runANL08 },
-        { id: "ANL-09", fn: runANL09 }, { id: "ANL-10", fn: runANL10 },
-        { id: "ANL-11", fn: runANL11 }, { id: "ANL-12", fn: runANL12 }
+    let contextoAcumulado = "";
+    modulesArea.innerHTML = "";
+
+    const lista = [
+        {id: "ANL-01", fn: Modulos.run01}, {id: "ANL-02", fn: Modulos.run02},
+        {id: "ANL-03", fn: Modulos.run03}, {id: "ANL-04", fn: Modulos.run04},
+        {id: "ANL-05", fn: Modulos.run05}, {id: "ANL-06", fn: Modulos.run06},
+        {id: "ANL-07", fn: Modulos.run07}, {id: "ANL-08", fn: Modulos.run08},
+        {id: "ANL-09", fn: Modulos.run09}, {id: "ANL-10", fn: Modulos.run10},
+        {id: "ANL-11", fn: Modulos.run11}, {id: "ANL-12", fn: Modulos.run12}
     ];
 
-    let dossie = "";
-
-    for (const m of modulos) {
+    for (const m of lista) {
         const div = document.createElement('div');
         div.className = "module open";
-        div.innerHTML = `
-            <div class="module-header">
-                <span class="module-title">${m.id} — Processando...</span>
-                <span class="module-status">RUNNING</span>
-            </div>
-            <div class="module-body">Consultando fontes acadêmicas...</div>
-        `;
-        container.appendChild(div);
+        div.innerHTML = `<div class="module-header"><span class="module-title">${m.id}</span><span class="module-status">RUNNING</span></div>`;
+        modulesArea.appendChild(div);
 
         try {
-            const res = await m.fn(alvo);
-            div.querySelector('.module-title').innerText = `${m.id} — Concluído`;
-            div.querySelector('.module-status').innerText = "COMPLETED";
-            div.querySelector('.module-body').innerHTML = `<div style="white-space:pre-wrap;">${res.resultado}</div>`;
-            dossie += `\n\n### ${m.id}\n${res.resultado}`;
+            const res = await m.fn(tema + " " + passagem, contextoAcumulado);
+            div.querySelector('.module-status').innerText = res.review_required ? "REVIEW_REQUIRED" : "COMPLETED";
+            div.querySelector('.module-status').style.color = res.review_required ? "orange" : "#20d66b";
+            
+            contextoAcumulado += `\n[${m.id}]: ${res.resultado}\n`;
+            div.innerHTML += `<div class="module-body">${res.resultado}</div>`;
         } catch (e) {
             div.querySelector('.module-status').innerText = "ERROR";
-            div.querySelector('.module-body').innerText = "Erro: " + e.message;
+            break;
         }
     }
-
-    resArea.innerHTML = `<h2>Base de Evidências Validada</h2><div style="white-space:pre-wrap;">${dossie}</div>`;
-    resArea.style.display = 'block';
-    
-    diag.innerHTML = `
-        <div class="diag-item"><small>TESTAMENTO</small><strong>${tema.length > 5 ? 'ANTIGO' : 'NOVO'}</strong></div>
-        <div class="diag-item"><small>STATUS</small><strong style="color:#20d66b;">APROVADO</strong></div>
-        <div class="diag-item"><small>SENTINELA</small><strong>0/30</strong></div>
-    `;
+    resultArea.innerHTML = `<h2>Dossiê Final</h2><div class="research-box">${contextoAcumulado}</div>`;
+    resultArea.style.display = "block";
 }
+document.getElementById('analisar-btn').onclick = iniciarMatriz;
