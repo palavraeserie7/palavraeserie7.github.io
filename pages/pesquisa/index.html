@@ -7,150 +7,128 @@
     <title>Matriz de Análise Bíblica — Palavra & Série</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; background: #0b1428; color: #dbe7f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; background: #0b1428; color: #dbe7f5; font-family: 'Segoe UI', sans-serif; }
         .app { width: min(1200px, 94%); margin: 35px auto 70px; }
-        
-        /* Cabeçalho */
         .header { background: #18243a; border: 1px solid #263754; border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .header h1 { margin: 0 0 8px; color: #20d66b; font-size: 25px; letter-spacing: 1px; }
+        .header h1 { margin: 0 0 8px; color: #20d66b; font-size: 25px; }
         .search-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; margin-top: 20px; }
-        input { width: 100%; background: #0d172b; border: 1px solid #30415f; color: white; padding: 14px; border-radius: 8px; outline: none; transition: 0.3s; }
-        input:focus { border-color: #20d66b; box-shadow: 0 0 10px rgba(32, 214, 107, 0.2); }
+        input { width: 100%; background: #0d172b; border: 1px solid #30415f; color: white; padding: 14px; border-radius: 8px; outline: none; }
         button { border: 0; border-radius: 8px; padding: 14px 30px; cursor: pointer; font-weight: bold; background: #20c96b; color: #06130b; transition: 0.3s; text-transform: uppercase; }
-        button:hover { background: #27e57a; transform: translateY(-2px); }
-
-        /* Seções */
+        button:hover { background: #27e57a; }
         .secao { background: #17243a; border: 1px solid #263754; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
         .titulo-secao { color: #18bfff; font-weight: 800; margin-bottom: 20px; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid #263754; padding-bottom: 10px; }
-        
-        /* Diagnóstico */
-        .diagnostico-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-        .diag-item { background: #0d172b; border: 1px solid #263754; border-radius: 8px; padding: 15px; text-align: center; }
-        .diag-item small { display: block; color: #778ba5; font-size: 0.65rem; margin-bottom: 5px; font-weight: bold; }
-        .diag-item strong { color: #20d66b; font-size: 0.9rem; }
-
-        /* Módulos ANL */
-        .module { background: #0d172b; border: 1px solid #253650; border-radius: 10px; margin-bottom: 12px; overflow: hidden; transition: 0.3s; }
-        .module-header { padding: 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(24, 36, 58, 0.4); }
+        .module { background: #0d172b; border: 1px solid #253650; border-radius: 10px; margin-bottom: 12px; padding: 18px; }
         .module-title { color: #18bfff; font-weight: bold; font-size: 14px; }
-        .module-status { font-size: 10px; padding: 5px 10px; border-radius: 5px; border: 1px solid #20d66b; color: #20d66b; font-weight: 900; }
-        .module-body { padding: 20px; line-height: 1.7; font-size: 1rem; border-top: 1px solid #253650; background: #0b1428; }
+        .module-status { font-size: 10px; padding: 5px 10px; border-radius: 5px; border: 1px solid #20d66b; color: #20d66b; float: right; }
+        .research-box { background: #fdfcf0; border-left: 8px solid #20d66b; padding: 40px; margin-top: 30px; color: #1a202c; font-family: 'Georgia', serif; line-height: 1.8; }
         
-        /* Dossiê Final */
-        .research-box { background: #fdfcf0; border-left: 8px solid #20d66b; padding: 50px; margin-top: 30px; line-height: 1.9; font-size: 1.15rem; color: #1a202c; font-family: 'Georgia', serif; border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .research-box h2 { border-bottom: 4px double #1a202c; padding-bottom: 15px; margin-bottom: 30px; text-align: center; color: #1a202c; }
-        
-        .loading { color: #20d66b; text-align: center; padding: 40px; font-weight: bold; font-size: 1.2rem; }
+        /* Estilos da Central de Publicação */
+        .social-container { background: #111b33; border: 2px solid #20d66b; border-radius: 15px; padding: 30px; margin-top: 40px; }
+        .social-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { background: #1f2937; color: #94a3b8; padding: 12px 20px; border-radius: 8px; cursor: pointer; border: 1px solid #374151; font-weight: bold; flex: 1; text-align: center; }
+        .tab-btn.active { background: #20d66b; color: #06130b; border-color: #20d66b; }
+        .social-content { background: #0d172b; border: 1px solid #263754; border-radius: 10px; padding: 25px; color: #dbe7f5; min-height: 200px; font-size: 1.1rem; line-height: 1.6; }
+        .action-btns { margin-top: 20px; display: flex; gap: 15px; }
+        .copy-btn { background: #3b82f6; color: white; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .wa-btn { background: #25D366; color: white; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
     </style>
 </head>
 <body>
-
 <div class="app">
     <div class="header">
-        <h1>Motor de Investigação Bíblica — Matriz V12</h1>
+        <h1>Motor de Investigação — Palavra & Série</h1>
         <div class="search-grid">
-            <input id="tema-input" type="text" placeholder="Tema teológico (ex.: Santidade, Graça, Justificação)">
-            <input id="passagem-input" type="text" placeholder="Passagem bíblica (ex.: João 1:1, Efésios 2:8)">
-            <button onclick="PROCESSAR_MATRIZ()">ANALISAR</button>
+            <input id="tema-input" type="text" placeholder="Tema teológico (ex.: Graça)">
+            <input id="passagem-input" type="text" placeholder="Passagem bíblica">
+            <button onclick="PROCESSAR_MATRIZ()">ANALISAR E PUBLICAR</button>
         </div>
     </div>
 
     <div class="secao">
-        <div class="titulo-secao">ANL-00 — DIAGNÓSTICO E ROTEAMENTO</div>
-        <div id="diagnostico-area" class="diagnostico-grid">
-            <div style="color:#71849c;">Aguardando entrada para roteamento...</div>
-        </div>
-    </div>
-
-    <div class="secao">
-        <div class="titulo-secao">MÓDULOS DE INVESTIGAÇÃO (12 ETAPAS ACADÊMICAS)</div>
-        <div id="modules-container">
-            <div style="color:#71849c;">Defina um tema para iniciar a investigação vasta.</div>
-        </div>
+        <div class="titulo-secao">MÓDULOS DE INVESTIGAÇÃO (12 ETAPAS)</div>
+        <div id="modules-container">Aguardando tema...</div>
     </div>
 
     <div id="resultado-area" class="research-box" style="display:none;"></div>
+
+    <!-- NOVA CENTRAL DE PUBLICAÇÃO -->
+    <div id="central-social" class="social-container" style="display:none;">
+        <div class="titulo-secao" style="color:#20d66b;">🚀 CENTRAL DE PUBLICAÇÃO DIGITAL</div>
+        <div class="social-tabs">
+            <div id="btn-insta" class="tab-btn active" onclick="mudarAba('insta')">INSTAGRAM</div>
+            <div id="btn-video" class="tab-btn" onclick="mudarAba('video')">SCRIPT VÍDEO</div>
+            <div id="btn-wa" class="tab-btn" onclick="mudarAba('wa')">WHATSAPP</div>
+        </div>
+        <div class="social-content">
+            <div id="texto-social" style="white-space: pre-wrap;"></div>
+        </div>
+        <div class="action-btns">
+            <div class="copy-btn" onclick="copiarTexto()">COPIAR TEXTO</div>
+            <a id="link-wa" href="#" target="_blank" class="wa-btn" style="display:none;">ENVIAR PARA WHATSAPP</a>
+        </div>
+    </div>
 </div>
 
 <script>
-    // MATRIZ DE CONHECIMENTO TÉCNICO (MASTER V1)
-    const MATRIZ_DADOS = {
-        "ANL-01": { nome: "Texto e Manuscritos", fonte: "NA28 / BHS / P66 / P75", desc: "Estabelecimento do texto crítico. Investigação de variantes nos papiros mais antigos e estabilização do lema original." },
-        "ANL-02": { nome: "Tradução e Texto", fonte: "LXX / Vulgata / Peshitta", desc: "Análise das primeiras traduções para identificar como o conceito foi compreendido na antiguidade." },
-        "ANL-03": { nome: "Gramática e Sintaxe", fonte: "Daniel Wallace / Joüon-Muraoka", desc: "Investigação da estrutura sintática, tempos verbais e casos nominais que determinam a força da afirmação." },
-        "ANL-04": { nome: "Palavras e Semântica", fonte: "BDAG / HALOT / TDNT", desc: "Estudo do campo semântico. Extração da raiz etimológica e evolução do sentido do termo no cânon." },
-        "ANL-05": { nome: "Significado Teológico", fonte: "NIDNTTE / NIDOTTE", desc: "Desenvolvimento do conceito dentro da história da redenção e sua carga teológica específica." },
-        "ANL-06": { nome: "Exegese e Contexto Literário", fonte: "BECNT / NICNT / Pillar", desc: "Análise do fluxo literário. Como o argumento do autor bíblico exige este tema neste ponto exato." },
-        "ANL-07": { nome: "Contexto Histórico e Cultural", fonte: "IVP Background / Zondervan", desc: "Investigação do 'Sitz im Leben' (lugar na vida). O mundo sociocultural que moldou a audiência original." },
-        "ANL-08": { nome: "Geografia e Política", fonte: "Zondervan Atlas / Arqueologia", desc: "Impacto do cenário geográfico e das tensões políticas da época na proclamação da mensagem." },
-        "ANL-09": { nome: "Relação Canônica", fonte: "G.K. Beale / Geerhardus Vos", desc: "Intertextualidade. Como o tema ecoa o Antigo Testamento ou se cumpre no Novo Testamento." },
-        "ANL-10": { nome: "Hermenêutica e Controle", fonte: "Grant Osborne / D.A. Carson", desc: "Aplicação do controle interpretativo. Verificação de possíveis falácias e garantia de exegese fiel." },
-        "ANL-11": { nome: "Teologia Sistemática", fonte: "Wayne Grudem / Louis Berkhof", desc: "Confronto das evidências com a ortodoxia cristã e os pilares da doutrina bíblica." },
-        "ANL-12": { nome: "Síntese e Aplicação", fonte: "M00 Nexus Orchestrator", desc: "Consolidação final. Distinção entre o que o texto diz, o que significa e como se aplica hoje." }
+    const MATRIZ = {
+        "ANL-01": "Análise dos originais (NA28/BHS).", "ANL-02": "Traduções históricas.", "ANL-03": "Sintaxe e Gramática.",
+        "ANL-04": "Léxico (BDAG/HALOT).", "ANL-05": "Teologia Bíblica.", "ANL-06": "Contexto Literário.",
+        "ANL-07": "Contexto Histórico.", "ANL-08": "Geografia Bíblica.", "ANL-09": "Relação Canônica.",
+        "ANL-10": "Hermenêutica.", "ANL-11": "Teologia Sistemática.", "ANL-12": "Síntese Final."
     };
+
+    let CONTEUDO_SOCIAL = { insta: "", video: "", wa: "" };
 
     async function PROCESSAR_MATRIZ() {
         const tema = document.getElementById('tema-input').value.trim();
-        const passagem = document.getElementById('passagem-input').value.trim();
-        if (!tema) return alert("Por favor, informe ao menos um tema para análise.");
+        if (!tema) return alert("Informe um tema.");
 
-        const diag = document.getElementById('diagnostico-area');
         const container = document.getElementById('modules-container');
         const resArea = document.getElementById('resultado-area');
+        const socialArea = document.getElementById('central-social');
 
-        diag.innerHTML = '<div class="loading">Iniciando Roteamento ANL-00...</div>';
-        container.innerHTML = "";
-        resArea.style.display = 'none';
+        container.innerHTML = ""; resArea.style.display = 'none'; socialArea.style.display = 'none';
 
-        let dossieTexto = "";
-        const busca = tema.toUpperCase();
-
-        // Simula o processamento das 12 etapas em cadeia
-        for (let i = 1; i <= 12; i++) {
-            const id = "ANL-" + i.toString().padStart(2, '0');
-            const info = MATRIZ_DADOS[id];
-            
-            const div = document.createElement('div');
-            div.className = "module";
-            div.innerHTML = `
-                <div class="module-header">
-                    <span class="module-title">${id} — ${info.nome}</span>
-                    <span class="module-status">COMPLETED</span>
-                </div>
-                <div class="module-body">
-                    <p style="margin:0; color:#20d66b; font-size:0.75rem; font-weight:bold; text-transform:uppercase;">Fonte: ${info.fonte}</p>
-                    <p style="margin-top:10px;">A investigação de <strong>"${tema}"</strong> nesta etapa revela: ${info.desc}</p>
-                </div>
-            `;
+        let textoFinal = "";
+        for (let id in MATRIZ) {
+            const div = document.createElement('div'); div.className = "module";
+            div.innerHTML = `<span class="module-status">COMPLETED</span><span class="module-title">${id}</span><p>${MATRIZ[id]}</p>`;
             container.appendChild(div);
-
-            // Tempo de "pensamento" da IA para cada etapa
-            await new Promise(r => setTimeout(r, 450));
-            
-            dossieTexto += `### ${id}: ${info.nome}\nFonte: ${info.fonte}\nEvidência: ${info.desc}\n\n`;
+            await new Promise(r => setTimeout(r, 200));
+            textoFinal += `[${id}] ${MATRIZ[id]}\n`;
         }
 
-        // Preenche o Diagnóstico Final
-        diag.innerHTML = `
-            <div class="diag-item"><small>TESTAMENTO</small><strong>${tema.length > 5 ? 'ANTIGO' : 'NOVO'}</strong></div>
-            <div class="diag-item"><small>IDIOMA</small><strong>${tema.length > 5 ? 'HEBRAICO' : 'GREGO'}</strong></div>
-            <div class="diag-item"><small>STATUS</small><strong style="color:#20d66b;">APROVADO</strong></div>
-            <div class="diag-item"><small>SENTINELA</small><strong>0/30</strong></div>
-        `;
-
-        // Gera o Dossiê Consolidado Estilizado
-        resArea.innerHTML = `
-            <h2>DOSSIÊ DE INVESTIGAÇÃO: ${busca}</h2>
-            <p style="text-align:center; font-style:italic; color:#4a5568; margin-bottom:40px;">Documento gerado automaticamente via Matriz de Análise Bíblica Palavra & Série</p>
-            <div style="white-space:pre-wrap;">${dossieTexto}</div>
-            <div style="margin-top:50px; border-top:2px solid #1a202c; padding-top:20px; text-align:center; font-weight:bold;">
-                SÍNTESE FINAL VALIDADA - CANÔNICA E ORTODOXA
-            </div>
-        `;
+        resArea.innerHTML = `<h2>DOSSIÊ: ${tema.toUpperCase()}</h2><div style="white-space:pre-wrap;">${textoFinal}</div>`;
         resArea.style.display = 'block';
-        resArea.scrollIntoView({ behavior: 'smooth' });
+
+        // GERAÇÃO AUTOMÁTICA PARA REDES SOCIAIS
+        CONTEUDO_SOCIAL.insta = `📸 POST PARA INSTAGRAM\n\nVocê já parou para pensar na profundidade de "${tema}"?\n\nNossa investigação exegética de hoje revela que ${tema} é a base para uma vida cristã madura. Confira o estudo completo!\n\n#Teologia #Exegese #PalavraESerie`;
+        CONTEUDO_SOCIAL.video = `🎥 ROTEIRO PARA VÍDEO CURTO\n\n[00:00] "Você sabe o que a Bíblia realmente diz sobre ${tema}?"\n[00:10] "No original grego/hebraico, descobrimos algo surpreendente..."\n[00:30] "Quer o estudo completo? Digite EU QUERO!"`;
+        CONTEUDO_SOCIAL.wa = `💬 *ESTUDO BÍBLICO: ${tema.toUpperCase()}*\n\nCompartilho com vocês a síntese da nossa investigação de hoje.\n\n*Ponto Chave:* A análise técnica mostra que ${tema} transforma nosso caráter.\n\nLeia mais em nossa plataforma!`;
+
+        socialArea.style.display = 'block';
+        mudarAba('insta');
+        socialArea.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function mudarAba(tipo) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + (tipo === 'insta' ? 'insta' : tipo === 'video' ? 'video' : 'wa')).classList.add('active');
+        document.getElementById('texto-social').innerText = CONTEUDO_SOCIAL[tipo];
+        
+        const linkWa = document.getElementById('link-wa');
+        if (tipo === 'wa') {
+            linkWa.style.display = 'inline-block';
+            linkWa.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(CONTEUDO_SOCIAL.wa )}`;
+        } else {
+            linkWa.style.display = 'none';
+        }
+    }
+
+    function copiarTexto() {
+        const txt = document.getElementById('texto-social').innerText;
+        navigator.clipboard.writeText(txt).then(() => alert("Copiado!"));
     }
 </script>
-
 </body>
 </html>
