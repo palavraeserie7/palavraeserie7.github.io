@@ -1,7 +1,5 @@
-export const ANL_03 = {
-    etapa: 3,
-    nome: "Gramática e Sintaxe",
-    fontes: ["Wallace", "Joüon", "Sintaxe Grega/Hebraica"],
-    funcao: "Análise da estrutura gramatical e sintática.",
-    prompt: (tema) => `Etapa 3: Analise a sintaxe e a estrutura gramatical das passagens chaves sobre '${tema}' usando gramáticas acadêmicas.`
-};
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function runANL03(alvo) {
+    return await executarANL("ANL-03", "Gramática e Sintaxe", ["Wallace", "Joüon", "Sintaxe Grega/Hebraica"], 
+        `Analise a morfologia, sintaxe, verbos e relações sintáticas para: '${alvo}'.`);
+}
