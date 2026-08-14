@@ -1,7 +1,5 @@
-export const ANL_04 = {
-    etapa: 4,
-    nome: "Palavras-Chave (Léxico)",
-    fontes: ["BDAG", "HALOT", "LSJ", "BDB"],
-    funcao: "Semântica e raízes etimológicas nos originais.",
-    prompt: (tema) => `Etapa 4: Realize uma análise léxica detalhada das palavras-chave de '${tema}' usando BDAG ou HALOT.`
-};
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function runANL04(alvo) {
+    return await executarANL("ANL-04", "Palavras e Semântica", ["BDAG", "HALOT", "BDB", "LSJ"], 
+        `Analise o campo semântico e o sentido contextual das palavras-chave para: '${alvo}'.`);
+}
