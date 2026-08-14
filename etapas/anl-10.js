@@ -1,38 +1,39 @@
 /*
- * ANL-09 — RELAÇÃO COM O RESTANTE DA ESCRITURA
+ * ANL-10 — HERMENÊUTICA E CONTROLE
  */
 
-export async function runANL09(alvo, contexto = {}) {
+export async function runANL10(alvo, contexto = {}) {
     return {
-        id: "ANL-09",
-        titulo: "RELAÇÃO COM O RESTANTE DA ESCRITURA",
+        id: "ANL-10",
+        titulo: "HERMENÊUTICA E CONTROLE",
         status: "PENDING_SOURCE",
 
         entrada: {
             alvo: alvo || "",
-            etapaAnterior: contexto.anl08 || null
+            etapaAnterior: contexto.anl09 || null
         },
 
         fontes: [
-            "Beale",
-            "Beale & Carson",
-            "Vos",
-            "Goldsworthy",
-            "Schreiner"
+            "Grant Osborne",
+            "D. A. Carson",
+            "Carson & Moo",
+            "Dillard & Longman",
+            "Fee & Stuart"
         ],
 
         evidencias: [],
         achados: [],
 
         pendencias: [
-            "Criar mecanismo de referências cruzadas.",
-            "Identificar citações.",
-            "Identificar alusões.",
-            "Identificar ecos.",
-            "Separar paralelismo textual de inferência."
+            "Detectar eisegese.",
+            "Detectar falácias lexicais.",
+            "Detectar descontextualização.",
+            "Detectar anacronismo.",
+            "Detectar alegorização indevida.",
+            "Separar descrição de prescrição."
         ],
 
         observacao:
-            "Nenhuma relação intertextual será afirmada sem evidência."
+            "Esta etapa funciona como camada de controle e não como geradora de conclusões."
     };
 }
