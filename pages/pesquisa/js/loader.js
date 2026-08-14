@@ -1,0 +1,12 @@
+export { run01 } from '../../../etapas/anl-01.js';
+export { run02 } from '../../../etapas/anl-02.js';
+export { run03 } from '../../../etapas/anl-03.js';
+export { run04 } from '../../../etapas/anl-04.js';
+export { run05 } from '../../../etapas/anl-05.js';
+export { run06 } from '../../../etapas/anl-06.js';
+export { run07 } from '../../../etapas/anl-07.js';
+export { run08 } from '../../../etapas/anl-08.js';
+export { run09 } from '../../../etapas/anl-09.js';
+export { run10 } from '../../../etapas/anl-10.js';
+export { run11 } from '../../../etapas/anl-11.js';
+export { run12 } from '../../../etapas/anl-12.js';
