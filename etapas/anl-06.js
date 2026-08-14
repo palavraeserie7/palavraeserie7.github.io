@@ -1,7 +1,5 @@
-export const ANL_06 = {
-    etapa: 6,
-    nome: "Contexto Literário",
-    fontes: ["BECNT", "NIGTC", "NICNT", "WBC", "NICOT", "AOTC"],
-    funcao: "Análise do gênero, fluxo narrativo e comentários exegéticos.",
-    prompt: (tema) => `Etapa 6: Analise o contexto literário e comentários exegéticos de '${tema}' usando fontes como BECNT ou NICNT.`
-};
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function runANL06(alvo) {
+    return await executarANL("ANL-06", "Exegese e Contexto Literário", ["BECNT", "NICNT", "NICOT", "Pillar", "WBC"], 
+        `Determine a intenção comunicativa, gênero e contexto literário imediato para: '${alvo}'.`);
+}
