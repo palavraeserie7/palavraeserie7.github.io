@@ -1,7 +1,5 @@
-export const ANL_08 = {
-    etapa: 8,
-    nome: "Relação Canônica",
-    fontes: ["Beale", "Beale & Carson", "Vos", "Goldsworthy"],
-    funcao: "Intertextualidade e relação entre Antigo e Novo Testamento.",
-    prompt: (tema) => `Etapa 8: Analise a intertextualidade e a relação canônica de '${tema}' usando Beale & Carson.`
-};
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function runANL08(alvo) {
+    return await executarANL("ANL-08", "Contexto Geográfico e Político", ["Zondervan Atlas", "Arqueologia Bíblica"], 
+        `Analise a localização geográfica, impérios e relações de poder para: '${alvo}'.`);
+}
