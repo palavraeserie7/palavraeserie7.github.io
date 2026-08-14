@@ -1,21 +1,7 @@
-export const anl09 = {
-    id: "ANL-09",
-    titulo: "RELAÇÃO COM O RESTANTE DA ESCRITURA",
-    itens: [
-        "Relações AT–NT",
-        "Citações",
-        "Alusões",
-        "Ecos",
-        "Paralelos",
-        "Uso do AT no NT",
-        "LXX e NT",
-        "Relações canônicas",
-        "Desenvolvimento da revelação",
-        "História da redenção",
-        "Beale",
-        "Beale & Carson",
-        "Vos",
-        "Goldsworthy",
-        "Schreiner"
-    ]
+export const ANL_09 = {
+    etapa: 9,
+    nome: "Hermenêutica e Controle",
+    fontes: ["Osborne", "Carson — Exegetical Fallacies", "Fee & Stuart"],
+    funcao: "Método interpretativo e prevenção de erros exegéticos.",
+    prompt: (tema) => `Etapa 9: Aplique princípios hermenêuticos e controle de falácias exegéticas para '${tema}' usando Osborne.`
 };
