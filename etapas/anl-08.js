@@ -1,1 +1,4 @@
-import { executarANL } from '../pages/pesquisa/js/engine.js'; export async function run08(alvo, contexto) { return await executarANL("ANL-08", "Contexto Geográfico e Político", ["Zondervan Atlas"], "Analise a geografia e política para: " + alvo, contexto); }
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function run01(alvo, contexto) {
+    return await executarANL("ANL-01", "Texto", ["NA28", "BHS"], "Analise o texto para: " + alvo, contexto);
+}
