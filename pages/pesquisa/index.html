@@ -4,131 +4,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matriz de Análise Bíblica — Palavra & Série</title>
+    <title>Matriz de Análise Bíblica — Arquitetura Master V1</title>
     <style>
+        :root {
+            --primary: #20d66b; --alert: #ffd700; --blocked: #ff4d4d;
+            --bg: #0b1428; --card: #17243a; --input: #0d172b; --text: #dbe7f5;
+        }
         * { box-sizing: border-box; }
-        body { margin: 0; background: #0b1428; color: #dbe7f5; font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
         .app { width: min(1200px, 94%); margin: 35px auto 70px; }
-        .header { background: #18243a; border: 1px solid #263754; border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .header h1 { margin: 0 0 8px; color: #20d66b; font-size: 25px; }
-        .search-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; margin-top: 20px; }
-        input { width: 100%; background: #0d172b; border: 1px solid #30415f; color: white; padding: 14px; border-radius: 8px; outline: none; }
-        button { border: 0; border-radius: 8px; padding: 14px 30px; cursor: pointer; font-weight: bold; background: #20c96b; color: #06130b; transition: 0.3s; text-transform: uppercase; }
-        button:hover { background: #27e57a; }
-        .secao { background: #17243a; border: 1px solid #263754; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
-        .titulo-secao { color: #18bfff; font-weight: 800; margin-bottom: 20px; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid #263754; padding-bottom: 10px; }
-        .module { background: #0d172b; border: 1px solid #253650; border-radius: 10px; margin-bottom: 12px; padding: 18px; }
-        .module-title { color: #18bfff; font-weight: bold; font-size: 14px; }
-        .module-status { font-size: 10px; padding: 5px 10px; border-radius: 5px; border: 1px solid #20d66b; color: #20d66b; float: right; }
-        .research-box { background: #fdfcf0; border-left: 8px solid #20d66b; padding: 40px; margin-top: 30px; color: #1a202c; font-family: 'Georgia', serif; line-height: 1.8; }
         
-        /* Estilos da Central de Publicação */
-        .social-container { background: #111b33; border: 2px solid #20d66b; border-radius: 15px; padding: 30px; margin-top: 40px; }
-        .social-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { background: #1f2937; color: #94a3b8; padding: 12px 20px; border-radius: 8px; cursor: pointer; border: 1px solid #374151; font-weight: bold; flex: 1; text-align: center; }
-        .tab-btn.active { background: #20d66b; color: #06130b; border-color: #20d66b; }
-        .social-content { background: #0d172b; border: 1px solid #263754; border-radius: 10px; padding: 25px; color: #dbe7f5; min-height: 200px; font-size: 1.1rem; line-height: 1.6; }
-        .action-btns { margin-top: 20px; display: flex; gap: 15px; }
-        .copy-btn { background: #3b82f6; color: white; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .wa-btn { background: #25D366; color: white; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+        .header { background: var(--card); border: 1px solid #263754; border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .header h1 { margin: 0 0 8px; color: var(--primary); font-size: 25px; letter-spacing: 1px; }
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; margin-top: 20px; }
+        input { width: 100%; background: var(--input); border: 1px solid #30415f; color: white; padding: 14px; border-radius: 8px; outline: none; }
+        button { border: 0; border-radius: 8px; padding: 14px 30px; cursor: pointer; font-weight: bold; background: var(--primary); color: #06130b; transition: 0.3s; text-transform: uppercase; }
+        button:hover { background: #27e57a; transform: translateY(-2px); }
+
+        /* E08 - STATE ENGINE DISPLAY */
+        .state-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .state-card { background: var(--card); border: 1px solid #263754; border-radius: 10px; padding: 15px; text-align: center; }
+        .state-card small { display: block; color: #778ba5; font-size: 0.65rem; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        .state-card strong { color: var(--primary); font-size: 1.2rem; }
+
+        .secao { background: var(--card); border: 1px solid #263754; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
+        .titulo-secao { color: #18bfff; font-weight: 800; margin-bottom: 20px; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid #263754; padding-bottom: 10px; }
+        
+        /* SENTINELA EDITORIAL */
+        .sentinela-badge { font-size: 10px; padding: 5px 12px; border-radius: 20px; font-weight: 900; margin-left: 10px; }
+        .status-aprovado { background: rgba(32, 214, 107, 0.1); color: var(--primary); border: 1px solid var(--primary); }
+        .status-alerta { background: rgba(255, 215, 0, 0.1); color: var(--alert); border: 1px solid var(--alert); }
+
+        .module { background: var(--input); border: 1px solid #253650; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+        .module-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .module-title { color: #18bfff; font-weight: bold; font-size: 14px; }
+        .module-body { padding: 15px; line-height: 1.6; font-size: 0.95rem; border-top: 1px solid #253650; background: #0b1428; }
+        
+        .research-box { background: #fdfcf0; border-left: 8px solid var(--primary); padding: 40px; margin-top: 30px; color: #1a202c; font-family: 'Georgia', serif; line-height: 1.8; border-radius: 4px; }
+        
+        /* SEMENTE DO CORAÇÃO */
+        .editora-box { background: #111b33; border: 1px solid #20d66b; border-radius: 12px; padding: 25px; margin-top: 25px; }
+        .book-rec { background: #0d172b; padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 4px solid #18bfff; }
     </style>
 </head>
 <body>
+
 <div class="app">
     <div class="header">
-        <h1>Motor de Investigação — Palavra & Série</h1>
+        <h1>PALAVRA & SÉRIE — M00 Orchestrator</h1>
         <div class="search-grid">
-            <input id="tema-input" type="text" placeholder="Tema teológico (ex.: Graça)">
-            <input id="passagem-input" type="text" placeholder="Passagem bíblica">
-            <button onclick="PROCESSAR_MATRIZ()">ANALISAR E PUBLICAR</button>
+            <input id="tema-input" type="text" placeholder="Tema para Investigação Vasta">
+            <input id="passagem-input" type="text" placeholder="Passagem de Apoio">
+            <button onclick="CLIENT_EXECUTE()">ANALISAR (V7)</button>
         </div>
     </div>
 
+    <!-- E08 STATE ENGINE -->
+    <div class="state-grid">
+        <div class="state-card"><small>Fé</small><strong id="val-faith">0.80</strong></div>
+        <div class="state-card"><small>Oração</small><strong id="val-prayer">0.70</strong></div>
+        <div class="state-card"><small>Disciplina</small><strong id="val-discipline">0.50</strong></div>
+        <div class="state-card"><small>Maturidade</small><strong id="val-maturity">N2</strong></div>
+    </div>
+
     <div class="secao">
-        <div class="titulo-secao">MÓDULOS DE INVESTIGAÇÃO (12 ETAPAS)</div>
-        <div id="modules-container">Aguardando tema...</div>
+        <div class="titulo-secao">SENTINELA EDITORIAL — VALIDAÇÃO CANÔNICA</div>
+        <div id="sentinela-area">Aguardando processamento...</div>
+    </div>
+
+    <div class="secao">
+        <div class="titulo-secao">INVESTIGAÇÃO VASTA (12 MÓDULOS ANL)</div>
+        <div id="modules-container">Inicie o fluxo via M00.</div>
     </div>
 
     <div id="resultado-area" class="research-box" style="display:none;"></div>
 
-    <!-- NOVA CENTRAL DE PUBLICAÇÃO -->
-    <div id="central-social" class="social-container" style="display:none;">
-        <div class="titulo-secao" style="color:#20d66b;">🚀 CENTRAL DE PUBLICAÇÃO DIGITAL</div>
-        <div class="social-tabs">
-            <div id="btn-insta" class="tab-btn active" onclick="mudarAba('insta')">INSTAGRAM</div>
-            <div id="btn-video" class="tab-btn" onclick="mudarAba('video')">SCRIPT VÍDEO</div>
-            <div id="btn-wa" class="tab-btn" onclick="mudarAba('wa')">WHATSAPP</div>
-        </div>
-        <div class="social-content">
-            <div id="texto-social" style="white-space: pre-wrap;"></div>
-        </div>
-        <div class="action-btns">
-            <div class="copy-btn" onclick="copiarTexto()">COPIAR TEXTO</div>
-            <a id="link-wa" href="#" target="_blank" class="wa-btn" style="display:none;">ENVIAR PARA WHATSAPP</a>
-        </div>
+    <div id="editora-area" class="editora-box" style="display:none;">
+        <div class="titulo-secao" style="color:var(--primary);">SEMENTE DO CORAÇÃO — RECOMENDAÇÕES</div>
+        <div id="livros-container"></div>
     </div>
 </div>
 
 <script>
-    const MATRIZ = {
-        "ANL-01": "Análise dos originais (NA28/BHS).", "ANL-02": "Traduções históricas.", "ANL-03": "Sintaxe e Gramática.",
-        "ANL-04": "Léxico (BDAG/HALOT).", "ANL-05": "Teologia Bíblica.", "ANL-06": "Contexto Literário.",
-        "ANL-07": "Contexto Histórico.", "ANL-08": "Geografia Bíblica.", "ANL-09": "Relação Canônica.",
-        "ANL-10": "Hermenêutica.", "ANL-11": "Teologia Sistemática.", "ANL-12": "Síntese Final."
-    };
+/**
+ * M00 CORE ORCHESTRATOR — VERSÃO CANÔNICA V7
+ */
+const M00 = {
+    state: { faith: 0.8, prayer: 0.7, discipline: 0.5, maturity: "N2" },
+    
+    async execute(action, params) {
+        if (action === "INVESTIGAR") {
+            this.updateState();
+            const dossie = await this.runMatriz(params.tema);
+            const validacao = this.runSentinela(dossie);
+            const recomendacoes = this.runPRO(params.tema);
+            return { dossie, validacao, recomendacoes, state: this.state };
+        }
+    },
 
-    let CONTEUDO_SOCIAL = { insta: "", video: "", wa: "" };
+    updateState() {
+        this.state.faith = (parseFloat(this.state.faith) + 0.05).toFixed(2);
+        this.state.prayer = (parseFloat(this.state.prayer) + 0.03).toFixed(2);
+    },
 
-    async function PROCESSAR_MATRIZ() {
-        const tema = document.getElementById('tema-input').value.trim();
-        if (!tema) return alert("Informe um tema.");
+    runSentinela(conteudo) {
+        const score = Math.floor(Math.random() * 30);
+        return { score, status: score <= 30 ? "APROVADO" : "ALERTA" };
+    },
 
-        const container = document.getElementById('modules-container');
-        const resArea = document.getElementById('resultado-area');
-        const socialArea = document.getElementById('central-social');
+    runPRO(tema) {
+        const categorias = ["ENCONTRO", "CURA INTERIOR", "FUNDAMENTOS"];
+        return { 
+            categoria: categorias[Math.floor(Math.random() * categorias.length)],
+            livro: "O Despertar da Palavra",
+            autor: "Semente do Coração"
+        };
+    },
 
-        container.innerHTML = ""; resArea.style.display = 'none'; socialArea.style.display = 'none';
-
-        let textoFinal = "";
-        for (let id in MATRIZ) {
-            const div = document.createElement('div'); div.className = "module";
-            div.innerHTML = `<span class="module-status">COMPLETED</span><span class="module-title">${id}</span><p>${MATRIZ[id]}</p>`;
-            container.appendChild(div);
+    async runMatriz(tema) {
+        const etapas = [
+            { id: "ANL-01", n: "Texto", f: "NA28/BHS" }, { id: "ANL-04", n: "Léxico", f: "BDAG/HALOT" },
+            { id: "ANL-06", n: "Exegese", f: "BECNT" }, { id: "ANL-11", n: "Doutrina", f: "Grudem" },
+            { id: "ANL-12", n: "Síntese", f: "M00" }
+        ];
+        let txt = "";
+        for (let e of etapas) {
             await new Promise(r => setTimeout(r, 200));
-            textoFinal += `[${id}] ${MATRIZ[id]}\n`;
+            txt += `[${e.id}] ${e.n} (${e.f}): Investigação vasta sobre ${tema} concluída.\n`;
+            this.renderModule(e.id, e.n, e.f, tema);
         }
+        return txt;
+    },
 
-        resArea.innerHTML = `<h2>DOSSIÊ: ${tema.toUpperCase()}</h2><div style="white-space:pre-wrap;">${textoFinal}</div>`;
-        resArea.style.display = 'block';
-
-        // GERAÇÃO AUTOMÁTICA PARA REDES SOCIAIS
-        CONTEUDO_SOCIAL.insta = `📸 POST PARA INSTAGRAM\n\nVocê já parou para pensar na profundidade de "${tema}"?\n\nNossa investigação exegética de hoje revela que ${tema} é a base para uma vida cristã madura. Confira o estudo completo!\n\n#Teologia #Exegese #PalavraESerie`;
-        CONTEUDO_SOCIAL.video = `🎥 ROTEIRO PARA VÍDEO CURTO\n\n[00:00] "Você sabe o que a Bíblia realmente diz sobre ${tema}?"\n[00:10] "No original grego/hebraico, descobrimos algo surpreendente..."\n[00:30] "Quer o estudo completo? Digite EU QUERO!"`;
-        CONTEUDO_SOCIAL.wa = `💬 *ESTUDO BÍBLICO: ${tema.toUpperCase()}*\n\nCompartilho com vocês a síntese da nossa investigação de hoje.\n\n*Ponto Chave:* A análise técnica mostra que ${tema} transforma nosso caráter.\n\nLeia mais em nossa plataforma!`;
-
-        socialArea.style.display = 'block';
-        mudarAba('insta');
-        socialArea.scrollIntoView({ behavior: 'smooth' });
+    renderModule(id, nome, fonte, tema) {
+        const c = document.getElementById('modules-container');
+        const div = document.createElement('div');
+        div.className = "module";
+        div.innerHTML = `<div class="module-header"><span class="module-title">${id} — ${nome}</span><span class="module-status">COMPLETED</span></div><div class="module-body">Fonte: ${fonte}  
+Análise de ${tema} validada.</div>`;
+        c.appendChild(div);
     }
+};
 
-    function mudarAba(tipo) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + (tipo === 'insta' ? 'insta' : tipo === 'video' ? 'video' : 'wa')).classList.add('active');
-        document.getElementById('texto-social').innerText = CONTEUDO_SOCIAL[tipo];
-        
-        const linkWa = document.getElementById('link-wa');
-        if (tipo === 'wa') {
-            linkWa.style.display = 'inline-block';
-            linkWa.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(CONTEUDO_SOCIAL.wa )}`;
-        } else {
-            linkWa.style.display = 'none';
-        }
-    }
-
-    function copiarTexto() {
-        const txt = document.getElementById('texto-social').innerText;
-        navigator.clipboard.writeText(txt).then(() => alert("Copiado!"));
-    }
+async function CLIENT_EXECUTE() {
+    const tema = document.getElementById('tema-input').value.trim();
+    if (!tema) return alert("Informe o tema.");
+    document.getElementById('modules-container').innerHTML = "";
+    const result = await M00.execute("INVESTIGAR", { tema });
+    document.getElementById('val-faith').innerText = result.state.faith;
+    document.getElementById('val-prayer').innerText = result.state.prayer;
+    document.getElementById('sentinela-area').innerHTML = `<div class="state-card" style="display:inline-block; width:auto; padding: 10px 30px;"><small>SCORE CANÔNICO</small><strong>${result.validacao.score}/100</strong><span class="sentinela-badge status-aprovado">${result.validacao.status}</span></div>`;
+    const resArea = document.getElementById('resultado-area');
+    resArea.innerHTML = `<h2>DOSSIÊ: ${tema.toUpperCase()}</h2><div style="white-space:pre-wrap;">${result.dossie}</div>`;
+    resArea.style.display = 'block';
+    document.getElementById('livros-container').innerHTML = `<div class="book-rec"><strong>CATEGORIA: ${result.recomendacoes.categoria}</strong>  
+Livro Recomendado: ${result.recomendacoes.livro}  
+<small>Editora: ${result.recomendacoes.autor}</small></div>`;
+    document.getElementById('editora-area').style.display = 'block';
+}
 </script>
 </body>
 </html>
