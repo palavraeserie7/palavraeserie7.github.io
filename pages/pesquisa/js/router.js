@@ -1,12 +1,11 @@
 /**
- * ROUTER.JS - Decide quais etapas acionar baseado na pergunta
+ * ROUTER.JS - Roteamento
  */
-const Router = {
+export const Router = {
     analisarPergunta(tema) {
-        const isAT = /provérbios|salmos|gênesis|isaías|êxodo|levítico|deuteronômio/.test(tema.toLowerCase());
+        const isAT = /provérbios|salmos|gênesis|isaías|êxodo|levítico/.test(tema.toLowerCase());
         return {
-            testamento: isAT ? "AT" : "NT",
-            etapasAtivas: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] // Executa a matriz completa
+            testamento: isAT ? "Antigo Testamento (BHS/HALOT)" : "Novo Testamento (NA28/BDAG)"
         };
     }
 };
