@@ -1,20 +1,7 @@
-export const anl11 = {
-    id: "ANL-11",
-    titulo: "TEOLOGIA E COMPARAÇÃO",
-    itens: [
-        "Teologia sistemática",
-        "Coerência doutrinária",
-        "Comparação de interpretações",
-        "Concordâncias entre fontes",
-        "Divergências entre fontes",
-        "Argumentos das diferentes interpretações",
-        "Consenso acadêmico",
-        "Posições minoritárias",
-        "Evidências favoráveis e contrárias",
-        "Grudem",
-        "Berkhof",
-        "Frame",
-        "Evangelical Dictionary of Theology",
-        "Comentários bíblicos em comparação"
-    ]
+export const ANL_11 = {
+    etapa: 11,
+    nome: "Comparação e Consenso",
+    fontes: ["Cruzamento de conclusões", "Divergências e Pontos Controversos"],
+    funcao: "Identificação de consenso acadêmico e debates.",
+    prompt: (tema) => `Etapa 11: Compare as conclusões das etapas anteriores sobre '${tema}', identificando consensos e divergências.`
 };
