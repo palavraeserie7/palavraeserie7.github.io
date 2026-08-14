@@ -1,38 +1,12 @@
-(function () {
-
-    const Router = {
-
-        context: {
-            tema: "",
-            passagem: "",
-            diagnostico: null
-        },
-
-        analyze(tema, passagem) {
-
-            this.context.tema = tema;
-            this.context.passagem = passagem;
-
-            this.context.diagnostico =
-                BiblicalResearchEngine.diagnose(
-                    tema,
-                    passagem
-                );
-
-            return this.context.diagnostico;
-        },
-
-        investigate(stage, submodule) {
-
-            return BiblicalResearchEngine.investigate(
-                stage,
-                submodule,
-                this.context
-            );
-        }
-
-    };
-
-    window.BiblicalResearchRouter = Router;
-
-})();
+/**
+ * ROUTER.JS - Decide quais etapas acionar baseado na pergunta
+ */
+const Router = {
+    analisarPergunta(tema) {
+        const isAT = /provérbios|salmos|gênesis|isaías|êxodo|levítico|deuteronômio/.test(tema.toLowerCase());
+        return {
+            testamento: isAT ? "AT" : "NT",
+            etapasAtivas: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] // Executa a matriz completa
+        };
+    }
+};
