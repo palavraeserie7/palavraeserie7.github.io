@@ -1,1 +1,5 @@
-import { executarANL } from '../pages/pesquisa/js/engine.js'; export async function run06(alvo, contexto) { return await executarANL("ANL-06", "Exegese e Contexto Literário", ["BECNT", "NICNT", "NICOT"], "Determine a intenção do autor e o contexto literário de: " + alvo, contexto); }
+
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function run01(alvo, contexto) {
+    return await executarANL("ANL-01", "Texto", ["NA28", "BHS"], "Analise o texto para: " + alvo, contexto);
+}
