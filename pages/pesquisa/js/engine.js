@@ -1,52 +1,32 @@
 /*
  * ============================================================
  * MATRIZ DE ANÁLISE BÍBLICA
- * ENGINE — MOTOR INDEPENDENTE DOS 12 ANLs
+ * ENGINE — MOTOR DE PESQUISA
  * ============================================================
  *
- * PRINCÍPIO ARQUITETURAL:
+ * REGRA FUNDAMENTAL
  *
- * 1. Cada ANL recebe diretamente o ALVO ORIGINAL.
- * 2. Um ANL NÃO depende do resultado de outro ANL.
- * 3. Falha de um ANL NÃO interrompe os demais.
- * 4. Resultado parcial é preservado.
- * 5. Ausência de fonte não é transformada em "COMPLETED".
- * 6. Nenhuma evidência é inventada.
- * 7. O motor registra exatamente o que foi obtido.
- * 8. ANL-12 pode trabalhar com os resultados disponíveis,
- *    mas não depende da conclusão dos outros.
+ * Cada ANL é INDEPENDENTE.
  *
- * Estados permitidos:
+ * A ausência de dados em um ANL:
+ *     NÃO interrompe os demais.
  *
- * COMPLETED
- * PARTIAL
- * NO_DATA
- * ERROR
+ * Estados possíveis:
  *
+ *     COMPLETED
+ *     PARTIAL
+ *     NO_DATA
+ *     ERROR
+ *
+ * ERROR só deve ser usado quando ocorrer uma falha real
+ * de execução do próprio módulo.
+ *
+ * Nenhum módulo deve depender da existência de resultado
+ * dos módulos anteriores para funcionar.
  * ============================================================
  */
 
-
-/* ============================================================
-   CONFIGURAÇÃO
-   ============================================================ */
-
-const STATUS = Object.freeze({
-    COMPLETED: "COMPLETED",
-    PARTIAL: "PARTIAL",
-    NO_DATA: "NO_DATA",
-    ERROR: "ERROR"
-});
-
-
-const ENGINE_VERSION = "2.0.0-independent-anls";
-
-
-/* ============================================================
-   DESCRIÇÃO DOS 12 ANLs
-   ============================================================ */
-
-const ANL_DEFINITIONS = Object.freeze([
+const ANL_DEFINITIONS = [
 
     {
         id: "ANL-01",
@@ -58,7 +38,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "SBLGNT",
             "Septuaginta",
             "Testemunhos textuais"
-        ]
+        ],
+        objetivo:
+            "Investigar o texto bíblico e os testemunhos textuais relacionados ao alvo."
     },
 
     {
@@ -70,7 +52,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "Grego",
             "Septuaginta",
             "Traduções bíblicas"
-        ]
+        ],
+        objetivo:
+            "Comparar o texto original e traduções verificáveis."
     },
 
     {
@@ -82,7 +66,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "Gramáticas aramaicas",
             "Gramáticas gregas",
             "Dados sintáticos"
-        ]
+        ],
+        objetivo:
+            "Investigar morfologia, sintaxe e estrutura gramatical."
     },
 
     {
@@ -96,7 +82,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "Strong",
             "Lemas",
             "Campos semânticos"
-        ]
+        ],
+        objetivo:
+            "Investigar o significado lexical e o sentido contextual."
     },
 
     {
@@ -108,7 +96,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "TDNT",
             "TDOT",
             "Teologia bíblica"
-        ]
+        ],
+        objetivo:
+            "Investigar implicações e categorias de teologia bíblica relacionadas ao texto."
     },
 
     {
@@ -123,7 +113,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "NICOT",
             "AOTC",
             "Baker OT"
-        ]
+        ],
+        objetivo:
+            "Investigar contexto imediato, estrutura literária e argumento do autor."
     },
 
     {
@@ -136,7 +128,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "ANET",
             "Context of Scripture",
             "Manners and Customs"
-        ]
+        ],
+        objetivo:
+            "Investigar o contexto histórico, cultural e religioso."
     },
 
     {
@@ -148,7 +142,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "Arqueologia",
             "Fontes históricas",
             "Dados geográficos"
-        ]
+        ],
+        objetivo:
+            "Investigar localização, geografia, arqueologia e contexto político."
     },
 
     {
@@ -160,7 +156,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "Vos",
             "Goldsworthy",
             "Schreiner"
-        ]
+        ],
+        objetivo:
+            "Investigar citações, alusões, ecos e relações intertextuais."
     },
 
     {
@@ -172,7 +170,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "Carson & Moo",
             "Dillard & Longman",
             "Fee & Stuart"
-        ]
+        ],
+        objetivo:
+            "Controlar interpretações e detectar problemas hermenêuticos."
     },
 
     {
@@ -184,7 +184,9 @@ const ANL_DEFINITIONS = Object.freeze([
             "Frame",
             "Evangelical Dictionary of Theology",
             "Comentários bíblicos"
-        ]
+        ],
+        objetivo:
+            "Comparar interpretações teológicas e registrar concordâncias e divergências."
     },
 
     {
@@ -192,21 +194,19 @@ const ANL_DEFINITIONS = Object.freeze([
         titulo: "SÍNTESE",
         fontes: [
             "Base de evidências validada"
-        ]
+        ],
+        objetivo:
+            "Produzir uma síntese baseada somente nas evidências realmente disponíveis."
     }
 
-]);
+];
 
 
 /* ============================================================
-   UTILITÁRIOS
-   ============================================================ */
+ * UTILIDADES
+ * ============================================================ */
 
-
-/**
- * Converte qualquer valor para texto seguro.
- */
-function normalizarTexto(valor) {
+function textoSeguro(valor) {
 
     if (valor === null || valor === undefined) {
         return "";
@@ -216,413 +216,161 @@ function normalizarTexto(valor) {
 }
 
 
-/**
- * Garante que um valor seja um array.
- */
-function arraySeguro(valor) {
+function criarAlvo(tema, passagem, contexto = "") {
 
-    return Array.isArray(valor)
-        ? valor
-        : [];
-}
-
-
-/**
- * Converte erro para uma estrutura serializável.
- */
-function normalizarErro(erro) {
-
-    if (!erro) {
-        return null;
-    }
-
-    if (erro instanceof Error) {
-
-        return {
-            nome: erro.name || "Error",
-            mensagem: erro.message || "Erro desconhecido."
-        };
-
-    }
+    const alvoTema = textoSeguro(tema);
+    const alvoPassagem = textoSeguro(passagem);
+    const alvoContexto = textoSeguro(contexto);
 
     return {
-        nome: "Error",
-        mensagem: String(erro)
+        tema: alvoTema,
+        passagem: alvoPassagem,
+        alvo: alvoPassagem || alvoTema,
+        contexto: alvoContexto
     };
 }
 
 
 /* ============================================================
-   CRIAÇÃO DO ALVO ORIGINAL
-   ============================================================ */
+ * CLASSIFICAÇÃO
+ * ============================================================ */
 
+function classificarResultado(resultado) {
 
-/**
- * Cria o alvo que será entregue diretamente a cada ANL.
- *
- * IMPORTANTE:
- * nenhum resultado de ANL anterior entra aqui.
- */
-export function criarAlvo(tema = "", passagem = "", contexto = "") {
+    if (!resultado) {
+        return "NO_DATA";
+    }
 
-    const alvoTema = normalizarTexto(tema);
-    const alvoPassagem = normalizarTexto(passagem);
-    const alvoContexto = normalizarTexto(contexto);
+    if (resultado.erro === true) {
+        return "ERROR";
+    }
 
-    return Object.freeze({
-
-        tema: alvoTema,
-
-        passagem: alvoPassagem,
-
-        alvo:
-            alvoPassagem ||
-            alvoTema,
-
-        contexto: alvoContexto
-
-    });
-}
-
-
-/* ============================================================
-   NORMALIZAÇÃO DE RESULTADO
-   ============================================================ */
-
-
-/**
- * Normaliza qualquer resultado produzido por um ANL.
- *
- * Se o módulo devolver algo incompleto, o engine transforma
- * para o contrato padrão.
- */
-export function normalizarResultadoANL(
-    id,
-    resultado,
-    duracaoMs = 0
-) {
-
-    const definicao =
-        ANL_DEFINITIONS.find(
-            modulo => modulo.id === id
-        );
-
-
-    const titulo =
-        resultado?.titulo ||
-        definicao?.titulo ||
-        id;
-
-
-    let status =
-        resultado?.status;
-
-
-    const evidencias =
-        arraySeguro(
-            resultado?.evidencias
-        );
-
-
-    const achados =
-        arraySeguro(
-            resultado?.achados
-        );
-
-
-    const pendencias =
-        arraySeguro(
-            resultado?.pendencias
-        );
-
-
-    /*
-     * Se o módulo não declarou status,
-     * o engine determina um estado conservador.
-     */
-
-    if (!status) {
+    if (Array.isArray(resultado.evidencias) &&
+        resultado.evidencias.length > 0) {
 
         if (
-            evidencias.length > 0 ||
-            achados.length > 0
+            Array.isArray(resultado.pendencias) &&
+            resultado.pendencias.length > 0
         ) {
-
-            status = STATUS.COMPLETED;
-
-        } else {
-
-            status = STATUS.NO_DATA;
-
+            return "PARTIAL";
         }
 
+        return "COMPLETED";
     }
-
-
-    status =
-        String(status).toUpperCase();
-
-
-    /*
-     * Nunca aceitar estado inexistente.
-     */
 
     if (
-        !Object.values(STATUS)
-            .includes(status)
+        Array.isArray(resultado.achados) &&
+        resultado.achados.length > 0
     ) {
-
-        status = STATUS.ERROR;
-
+        return "PARTIAL";
     }
 
-
-    /*
-     * Se declarou COMPLETED mas não possui
-     * nenhuma evidência nem achado, não vamos
-     * permitir uma conclusão falsa.
-     */
-
-    if (
-        status === STATUS.COMPLETED &&
-        evidencias.length === 0 &&
-        achados.length === 0
-    ) {
-
-        status = STATUS.NO_DATA;
-
-    }
-
-
-    return {
-
-        id,
-
-        titulo,
-
-        status,
-
-        entrada:
-            resultado?.entrada || null,
-
-        fontes:
-            arraySeguro(
-                resultado?.fontes
-            ),
-
-        evidencias,
-
-        achados,
-
-        pendencias,
-
-        observacao:
-            resultado?.observacao ||
-            "",
-
-        limitacoes:
-            arraySeguro(
-                resultado?.limitacoes
-            ),
-
-        erro:
-            resultado?.erro || null,
-
-        duracaoMs,
-
-        engineVersion:
-            ENGINE_VERSION
-
-    };
+    return "NO_DATA";
 }
 
 
 /* ============================================================
-   RESULTADO PADRÃO — SEM MOTOR/FONTE
-   ============================================================ */
+ * RESULTADO VAZIO
+ * ============================================================ */
 
-
-/**
- * Resultado utilizado quando o arquivo do ANL existe,
- * mas ainda não possui uma implementação real.
- */
-export function criarResultadoSemDados(
-    id,
-    alvo
-) {
-
-    const definicao =
-        ANL_DEFINITIONS.find(
-            modulo => modulo.id === id
-        );
-
+function criarResultadoVazio(definicao, alvo) {
 
     return {
 
-        id,
+        id: definicao.id,
 
-        titulo:
-            definicao?.titulo ||
-            id,
+        titulo: definicao.titulo,
 
-        status:
-            STATUS.NO_DATA,
+        status: "NO_DATA",
 
         entrada: {
-            alvo
+            alvo: alvo
         },
 
-        fontes:
-            definicao?.fontes || [],
+        fontes: definicao.fontes,
 
         evidencias: [],
 
         achados: [],
 
         pendencias: [
-            "Nenhuma fonte real foi conectada a este módulo.",
-            "Nenhum resultado externo foi declarado como consultado."
+            "Nenhuma fonte de dados conectada para esta etapa."
         ],
 
+        limitacoes: [
+            "Este módulo não possui dados externos disponíveis nesta execução."
+        ],
+
+        objetivo: definicao.objetivo,
+
         observacao:
-            "O módulo recebeu o alvo original, mas não possui dados verificáveis disponíveis nesta execução.",
-
-        limitacoes: [],
-
-        erro: null
-
+            "O módulo foi executado de forma independente, mas nenhuma evidência verificável foi disponibilizada."
     };
 }
 
 
 /* ============================================================
-   EXECUÇÃO DE UM ÚNICO ANL
-   ============================================================ */
+ * EXECUÇÃO DE UM ANL
+ * ============================================================ */
 
-
-/**
- * Executa apenas UM ANL.
- *
- * Esta função é completamente independente dos demais.
- */
-export async function executarANL(
-    anl,
-    alvo
-) {
-
-    const inicio =
-        performance.now();
-
-
-    const id =
-        anl?.id ||
-        "ANL-DESCONHECIDO";
-
+async function executarANL(definicao, alvo, contextoPesquisa = {}) {
 
     try {
 
         /*
-         * O ANL precisa possuir uma função executável.
+         * IMPORTANTE:
+         *
+         * O ANL recebe DIRETAMENTE o alvo original.
+         *
+         * Não recebe o resultado do ANL anterior.
+         * Não depende de etapaAnterior.
+         * Não depende de ANL-01.
+         * Não depende de ANL-02.
          */
 
-        if (
-            !anl ||
-            typeof anl.executar !== "function"
-        ) {
-
-            const resultado =
-                criarResultadoSemDados(
-                    id,
-                    alvo
-                );
-
-
-            return {
-
-                ...resultado,
-
-                duracaoMs:
-                    Math.round(
-                        performance.now() -
-                        inicio
-                    ),
-
-                engineVersion:
-                    ENGINE_VERSION
-
-            };
-
-        }
+        const entrada = {
+            alvo: alvo,
+            contextoPesquisa: contextoPesquisa
+        };
 
 
         /*
-         * REGRA FUNDAMENTAL:
+         * Neste momento ainda não existe um conector externo
+         * real para as fontes acadêmicas.
          *
-         * somente o alvo original é enviado.
+         * Portanto, o comportamento correto é NO_DATA.
          *
-         * Nenhum resultado anterior é enviado.
+         * NÃO é ERROR.
          */
 
-        const resultado =
-            await anl.executar(
-                alvo
-            );
-
-
-        return normalizarResultadoANL(
-
-            id,
-
-            {
-                ...resultado,
-
-                entrada:
-                    resultado?.entrada || {
-                        alvo
-                    }
-            },
-
-            Math.round(
-                performance.now() -
-                inicio
-            )
-
+        const resultado = criarResultadoVazio(
+            definicao,
+            alvo
         );
 
-    }
+        resultado.entrada = entrada;
 
-    catch (erro) {
+        return resultado;
+
+    } catch (erro) {
 
         /*
-         * ERRO LOCAL.
-         *
-         * O erro fica registrado neste ANL.
-         * Ele NÃO é lançado novamente.
-         *
-         * Isso impede que um ANL derrube os outros.
+         * Somente uma falha REAL de execução chega aqui.
          */
 
         return {
 
-            id,
+            id: definicao.id,
 
-            titulo:
-                ANL_DEFINITIONS
-                    .find(
-                        modulo =>
-                            modulo.id === id
-                    )
-                    ?.titulo ||
-                id,
+            titulo: definicao.titulo,
 
-            status:
-                STATUS.ERROR,
+            status: "ERROR",
 
             entrada: {
-                alvo
+                alvo: alvo
             },
 
-            fontes: [],
+            fontes: definicao.fontes,
 
             evidencias: [],
 
@@ -630,615 +378,389 @@ export async function executarANL(
 
             pendencias: [],
 
-            observacao:
-                "O módulo encontrou um erro durante sua execução.",
-
             limitacoes: [],
 
-            erro:
-                normalizarErro(
-                    erro
-                ),
+            erro: true,
 
-            duracaoMs:
-                Math.round(
-                    performance.now() -
-                    inicio
-                ),
+            mensagemErro:
+                erro instanceof Error
+                    ? erro.message
+                    : String(erro),
 
-            engineVersion:
-                ENGINE_VERSION
-
+            observacao:
+                "Ocorreu uma falha real durante a execução deste módulo."
         };
-
     }
-
 }
 
 
 /* ============================================================
-   EXECUÇÃO INDEPENDENTE DOS 12 ANLs
-   ============================================================ */
-
-
-/**
- * Executa todos os ANLs.
+ * EXECUÇÃO DOS 12 ANLs
  *
- * IMPORTANTE:
- *
- * Cada ANL recebe o mesmo alvo original.
- *
- * Não existe:
- *
- * ANL-01 → ANL-02 → ANL-03
- *
- * Existe:
- *
- *                 ┌→ ANL-01
- *                 ├→ ANL-02
- *                 ├→ ANL-03
- * ALVO ORIGINAL ──┼→ ...
- *                 ├→ ANL-11
- *                 └→ ANL-12
- */
-export async function executarTodosANLs(
-    alvo,
-    modulos
-) {
+ * CADA ANL É INDEPENDENTE.
+ * ============================================================ */
 
-    const lista =
-        Array.isArray(modulos)
-            ? modulos
-            : [];
+async function executarInvestigacao(tema, passagem, contexto = "") {
 
-
-    const resultados = [];
-
-
-    /*
-     * Execução sequencial por enquanto.
-     *
-     * Isso permite acompanhar o progresso na interface.
-     *
-     * Mas a independência é preservada:
-     * um erro nunca interrompe o próximo.
-     */
-
-    for (
-        const anl
-        of lista
-    ) {
-
-        const resultado =
-            await executarANL(
-                anl,
-                alvo
-            );
-
-
-        resultados.push(
-            resultado
-        );
-
-    }
-
-
-    return resultados;
-
-}
-
-
-/* ============================================================
-   EXECUÇÃO PARALELA OPCIONAL
-   ============================================================ */
-
-
-/**
- * Versão paralela.
- *
- * Cada ANL continua independente.
- *
- * Útil futuramente quando as fontes externas
- * estiverem conectadas e o desempenho for importante.
- */
-export async function executarTodosANLsParalelo(
-    alvo,
-    modulos
-) {
-
-    const lista =
-        Array.isArray(modulos)
-            ? modulos
-            : [];
-
-
-    const promessas =
-        lista.map(
-            anl =>
-                executarANL(
-                    anl,
-                    alvo
-                )
-        );
-
-
-    /*
-     * Promise.all aqui é seguro porque
-     * executarANL captura seu próprio erro.
-     */
-
-    return Promise.all(
-        promessas
+    const alvo = criarAlvo(
+        tema,
+        passagem,
+        contexto
     );
 
-}
 
+    /*
+     * Nenhum ANL deve ser executado se não houver alvo.
+     *
+     * Porém, isso também NÃO deve gerar ERROR.
+     */
 
-/* ============================================================
-   CONTAGEM DOS ESTADOS
-   ============================================================ */
+    if (!alvo.tema && !alvo.passagem) {
 
+        return {
 
-/**
- * Conta os estados dos ANLs.
- */
-export function contarEstados(
-    resultados
-) {
+            tema: "",
+            passagem: "",
 
-    const lista =
-        arraySeguro(
-            resultados
-        );
+            alvo: alvo,
 
+            status: "NO_DATA",
 
-    return {
+            resultados: ANL_DEFINITIONS.map(definicao => {
 
-        COMPLETED:
-            lista.filter(
-                resultado =>
-                    resultado.status ===
-                    STATUS.COMPLETED
-            ).length,
+                return criarResultadoVazio(
+                    definicao,
+                    alvo
+                );
 
-        PARTIAL:
-            lista.filter(
-                resultado =>
-                    resultado.status ===
-                    STATUS.PARTIAL
-            ).length,
+            }),
 
-        NO_DATA:
-            lista.filter(
-                resultado =>
-                    resultado.status ===
-                    STATUS.NO_DATA
-            ).length,
+            resumo: {
+                completed: 0,
+                partial: 0,
+                noData: ANL_DEFINITIONS.length,
+                error: 0
+            },
 
-        ERROR:
-            lista.filter(
-                resultado =>
-                    resultado.status ===
-                    STATUS.ERROR
-            ).length
+            estadoFinal: "NO_DATA",
 
-    };
-
-}
-
-
-/* ============================================================
-   ESTADO GLOBAL DA INVESTIGAÇÃO
-   ============================================================ */
-
-
-/**
- * Determina o estado geral da pesquisa.
- *
- * IMPORTANTE:
- *
- * ERROR em um ANL não transforma tudo em ERROR.
- */
-export function calcularEstadoGeral(
-    resultados
-) {
-
-    const estados =
-        contarEstados(
-            resultados
-        );
-
-
-    const total =
-        estados.COMPLETED +
-        estados.PARTIAL +
-        estados.NO_DATA +
-        estados.ERROR;
-
-
-    if (total === 0) {
-
-        return STATUS.NO_DATA;
-
+            observacao:
+                "Nenhum tema ou passagem foi informado."
+        };
     }
 
 
     /*
-     * Se pelo menos um resultado útil existe,
-     * a investigação continua disponível.
+     * --------------------------------------------------------
+     * EXECUÇÃO INDEPENDENTE
+     * --------------------------------------------------------
+     *
+     * Promise.allSettled garante que uma falha isolada
+     * não interrompa os demais módulos.
      */
 
-    if (
-        estados.COMPLETED > 0 ||
-        estados.PARTIAL > 0
-    ) {
+    const execucoes = ANL_DEFINITIONS.map(
+        definicao =>
+            executarANL(
+                definicao,
+                alvo,
+                {
+                    tema: alvo.tema,
+                    passagem: alvo.passagem,
+                    contexto: alvo.contexto
+                }
+            )
+    );
 
-        if (
-            estados.PARTIAL > 0 ||
-            estados.ERROR > 0 ||
-            estados.NO_DATA > 0
-        ) {
 
-            return STATUS.PARTIAL;
+    const resultadosBrutos =
+        await Promise.allSettled(execucoes);
 
+
+    const resultados =
+        resultadosBrutos.map(
+            (resultado, indice) => {
+
+                const definicao =
+                    ANL_DEFINITIONS[indice];
+
+                /*
+                 * Uma Promise rejeitada é convertida
+                 * em ERROR SOMENTE para aquele ANL.
+                 */
+
+                if (resultado.status === "rejected") {
+
+                    return {
+
+                        id: definicao.id,
+
+                        titulo: definicao.titulo,
+
+                        status: "ERROR",
+
+                        entrada: {
+                            alvo: alvo
+                        },
+
+                        fontes: definicao.fontes,
+
+                        evidencias: [],
+
+                        achados: [],
+
+                        pendencias: [],
+
+                        limitacoes: [],
+
+                        erro: true,
+
+                        mensagemErro:
+                            resultado.reason
+                                ? String(resultado.reason)
+                                : "Falha desconhecida.",
+
+                        observacao:
+                            "Este ANL apresentou erro, mas os demais módulos continuam independentes."
+                    };
+                }
+
+
+                const valor = resultado.value;
+
+                /*
+                 * Segurança adicional:
+                 * qualquer resultado inválido vira NO_DATA,
+                 * não ERROR.
+                 */
+
+                if (!valor) {
+
+                    return criarResultadoVazio(
+                        definicao,
+                        alvo
+                    );
+                }
+
+                /*
+                 * O status é determinado pelo próprio conteúdo.
+                 */
+
+                valor.status =
+                    classificarResultado(valor);
+
+                return valor;
+            }
+        );
+
+
+    /*
+     * --------------------------------------------------------
+     * CONTAGEM DOS ESTADOS
+     * --------------------------------------------------------
+     */
+
+    let completed = 0;
+    let partial = 0;
+    let noData = 0;
+    let error = 0;
+
+
+    resultados.forEach(resultado => {
+
+        switch (resultado.status) {
+
+            case "COMPLETED":
+                completed++;
+                break;
+
+            case "PARTIAL":
+                partial++;
+                break;
+
+            case "ERROR":
+                error++;
+                break;
+
+            case "NO_DATA":
+            default:
+                noData++;
+                break;
         }
 
-        return STATUS.COMPLETED;
-
-    }
+    });
 
 
     /*
-     * Se todos falharam tecnicamente.
+     * --------------------------------------------------------
+     * ESTADO FINAL
+     * --------------------------------------------------------
+     *
+     * A existência de um NO_DATA não transforma a pesquisa
+     * inteira em ERROR.
+     *
+     * O estado geral é determinado pelo conjunto.
      */
 
-    if (
-        estados.ERROR === total
-    ) {
+    let estadoFinal = "NO_DATA";
 
-        return STATUS.ERROR;
 
+    if (completed > 0 || partial > 0) {
+
+        if (error > 0 || noData > 0) {
+            estadoFinal = "PARTIAL";
+        } else {
+            estadoFinal = "COMPLETED";
+        }
+
+    } else if (error === resultados.length) {
+
+        estadoFinal = "ERROR";
+
+    } else {
+
+        estadoFinal = "NO_DATA";
     }
-
-
-    /*
-     * Nenhum dado disponível, mas também
-     * não houve erro técnico.
-     */
-
-    return STATUS.NO_DATA;
-
-}
-
-
-/* ============================================================
-   CONSTRUÇÃO DO DOSSIÊ
-   ============================================================ */
-
-
-/**
- * Monta o objeto final da investigação.
- *
- * Não cria conclusões bíblicas.
- * Apenas consolida os resultados efetivamente obtidos.
- */
-export function construirDossie(
-    alvo,
-    resultados
-) {
-
-    const estados =
-        contarEstados(
-            resultados
-        );
-
-
-    const estadoGeral =
-        calcularEstadoGeral(
-            resultados
-        );
 
 
     return {
 
-        engineVersion:
-            ENGINE_VERSION,
+        tema: alvo.tema,
 
-        alvo,
+        passagem: alvo.passagem,
 
-        estado:
-            estadoGeral,
+        alvo: alvo,
+
+        status: estadoFinal,
+
+        resultados: resultados,
 
         resumo: {
 
-            total:
-                resultados.length,
+            completed: completed,
 
-            completed:
-                estados.COMPLETED,
+            partial: partial,
 
-            partial:
-                estados.PARTIAL,
+            noData: noData,
 
-            noData:
-                estados.NO_DATA,
-
-            error:
-                estados.ERROR
-
+            error: error
         },
 
-        resultados:
-            resultados.slice(),
+        estadoFinal: estadoFinal,
 
-        evidenciaTotal:
-            resultados.reduce(
-                (
-                    total,
-                    resultado
-                ) =>
-                    total +
-                    arraySeguro(
-                        resultado.evidencias
-                    ).length,
-                0
-            ),
-
-        achadosTotal:
-            resultados.reduce(
-                (
-                    total,
-                    resultado
-                ) =>
-                    total +
-                    arraySeguro(
-                        resultado.achados
-                    ).length,
-                0
-            ),
-
-        erros:
-            resultados.filter(
-                resultado =>
-                    resultado.status ===
-                    STATUS.ERROR
-            ),
-
-        limitacoes:
-            resultados.flatMap(
-                resultado =>
-                    arraySeguro(
-                        resultado.limitacoes
-                    )
-            )
-
+        observacao:
+            "Os 12 ANLs foram executados independentemente. A ausência de dados em um módulo não interrompe os demais."
     };
-
 }
 
 
 /* ============================================================
-   SÍNTESE INDEPENDENTE
-   ============================================================ */
+ * FUNÇÕES AUXILIARES PARA A INTERFACE
+ * ============================================================ */
+
+function obterDefinicoesANL() {
+
+    return ANL_DEFINITIONS.map(
+        definicao => ({
+            ...definicao
+        })
+    );
+}
 
 
-/**
- * Prepara os dados que o ANL-12 poderá utilizar.
- *
- * ATENÇÃO:
- *
- * Isso NÃO transforma ANL-12 em dependente dos demais.
- *
- * O ANL-12 recebe o alvo original normalmente.
- *
- * Estes resultados são apenas uma base opcional
- * para síntese quando existirem.
- */
-export function prepararBaseParaSintese(
-    resultados
-) {
+function obterANL(id) {
+
+    return ANL_DEFINITIONS.find(
+        definicao => definicao.id === id
+    ) || null;
+}
+
+
+function obterResumo(resultados) {
 
     const lista =
-        arraySeguro(
-            resultados
-        );
-
+        Array.isArray(resultados)
+            ? resultados
+            : [];
 
     return {
 
-        resultadosDisponiveis:
-            lista.map(
-                resultado => ({
+        completed:
+            lista.filter(
+                item => item.status === "COMPLETED"
+            ).length,
 
-                    id:
-                        resultado.id,
+        partial:
+            lista.filter(
+                item => item.status === "PARTIAL"
+            ).length,
 
-                    status:
-                        resultado.status,
+        noData:
+            lista.filter(
+                item => item.status === "NO_DATA"
+            ).length,
 
-                    evidencias:
-                        arraySeguro(
-                            resultado.evidencias
-                        ),
+        error:
+            lista.filter(
+                item => item.status === "ERROR"
+            ).length
+    };
+}
 
-                    achados:
-                        arraySeguro(
-                            resultado.achados
-                        ),
 
-                    limitacoes:
-                        arraySeguro(
-                            resultado.limitacoes
-                        )
+/* ============================================================
+ * API PÚBLICA
+ * ============================================================ */
 
-                })
-            ),
+export {
 
-        evidenciasDisponiveis:
-            lista.flatMap(
-                resultado =>
-                    arraySeguro(
-                        resultado.evidencias
-                    )
-            ),
+    ANL_DEFINITIONS,
 
-        achadosDisponiveis:
-            lista.flatMap(
-                resultado =>
-                    arraySeguro(
-                        resultado.achados
-                    )
+    criarAlvo,
 
-            )
+    classificarResultado,
+
+    executarANL,
+
+    executarInvestigacao,
+
+    obterDefinicoesANL,
+
+    obterANL,
+
+    obterResumo
+
+};
+
+
+/* ============================================================
+ * COMPATIBILIDADE COM CÓDIGO ANTIGO
+ * ============================================================
+ *
+ * Caso alguma parte antiga do site procure estas funções
+ * diretamente no window, elas continuam disponíveis.
+ * ============================================================ */
+
+if (typeof window !== "undefined") {
+
+    window.MATRIZ_ENGINE = {
+
+        ANL_DEFINITIONS,
+
+        criarAlvo,
+
+        classificarResultado,
+
+        executarANL,
+
+        executarInvestigacao,
+
+        obterDefinicoesANL,
+
+        obterANL,
+
+        obterResumo
 
     };
 
 }
-
-
-/* ============================================================
-   EXECUÇÃO COMPLETA
-   ============================================================ */
-
-
-/**
- * Função principal do engine.
- *
- * Uso:
- *
- * const dossie = await executarPesquisa({
- *
- *     tema: "verbo",
- *     passagem: "João 1:1"
- *
- * });
- */
-export async function executarPesquisa(
-    {
-        tema = "",
-        passagem = "",
-        contexto = ""
-    } = {},
-    modulos = []
-) {
-
-    const alvo =
-        criarAlvo(
-            tema,
-            passagem,
-            contexto
-        );
-
-
-    /*
-     * Validação mínima.
-     */
-
-    if (
-        !alvo.tema &&
-        !alvo.passagem
-    ) {
-
-        return construirDossie(
-
-            alvo,
-
-            [
-
-                {
-
-                    id: "ENGINE",
-
-                    titulo:
-                        "MOTOR DE PESQUISA",
-
-                    status:
-                        STATUS.NO_DATA,
-
-                    entrada:
-                        { alvo },
-
-                    fontes: [],
-
-                    evidencias: [],
-
-                    achados: [],
-
-                    pendencias: [
-                        "Informe um tema ou uma passagem."
-                    ],
-
-                    observacao:
-                        "Nenhum alvo foi fornecido.",
-
-                    limitacoes: [],
-
-                    erro: null
-
-                }
-
-            ]
-
-        );
-
-    }
-
-
-    /*
-     * Executa os ANLs.
-     */
-
-    const resultados =
-        await executarTodosANLs(
-            alvo,
-            modulos
-        );
-
-
-    /*
-     * O ANL-12 poderá utilizar esta base
-     * em uma implementação futura.
-     *
-     * Não alteramos o resultado dele aqui.
-     */
-
-    return construirDossie(
-        alvo,
-        resultados
-    );
-
-}
-
-
-/* ============================================================
-   API DE COMPATIBILIDADE
-   ============================================================ */
-
-
-/**
- * Alias para código existente.
- */
-export const executarFluxo =
-    executarPesquisa;
-
-
-/**
- * Alias para código existente.
- */
-export const executarInvestigacao =
-    executarPesquisa;
-
-
-/* ============================================================
-   EXPORTAÇÕES
-   ============================================================ */
-
-export {
-
-    STATUS,
-
-    ENGINE_VERSION,
-
-    ANL_DEFINITIONS
-
-};
