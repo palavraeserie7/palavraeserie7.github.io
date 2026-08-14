@@ -1,1 +1,4 @@
-import { executarANL } from '../pages/pesquisa/js/engine.js'; export async function run09(alvo, contexto) { return await executarANL("ANL-09", "Relação Canônica", ["Beale", "Vos"], "Analise a intertextualidade de: " + alvo, contexto); }
+import { executarANL } from '../pages/pesquisa/js/engine.js';
+export async function run01(alvo, contexto) {
+    return await executarANL("ANL-01", "Texto", ["NA28", "BHS"], "Analise o texto para: " + alvo, contexto);
+}
