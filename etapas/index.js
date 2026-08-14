@@ -1,27 +1,17 @@
-import { anl01 } from "./anl-01.js";
-import { anl02 } from "./anl-02.js";
-import { anl03 } from "./anl-03.js";
-import { anl04 } from "./anl-04.js";
-import { anl05 } from "./anl-05.js";
-import { anl06 } from "./anl-06.js";
-import { anl07 } from "./anl-07.js";
-import { anl08 } from "./anl-08.js";
-import { anl09 } from "./anl-09.js";
-import { anl10 } from "./anl-10.js";
-import { anl11 } from "./anl-11.js";
-import { anl12 } from "./anl-12.js";
+import { ANL_01 } from './anl-01.js';
+import { ANL_02 } from './anl-02.js';
+import { ANL_03 } from './anl-03.js';
+import { ANL_04 } from './anl-04.js';
+import { ANL_05 } from './anl-05.js';
+import { ANL_06 } from './anl-06.js';
+import { ANL_07 } from './anl-07.js';
+import { ANL_08 } from './anl-08.js';
+import { ANL_09 } from './anl-09.js';
+import { ANL_10 } from './anl-10.js';
+import { ANL_11 } from './anl-11.js';
+import { ANL_12 } from './anl-12.js';
 
-export const etapas = [
-    anl01,
-    anl02,
-    anl03,
-    anl04,
-    anl05,
-    anl06,
-    anl07,
-    anl08,
-    anl09,
-    anl10,
-    anl11,
-    anl12
+export const MATRIZ_ETAPAS = [
+    ANL_01, ANL_02, ANL_03, ANL_04, ANL_05, ANL_06, 
+    ANL_07, ANL_08, ANL_09, ANL_10, ANL_11, ANL_12
 ];
