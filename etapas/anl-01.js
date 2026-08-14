@@ -1,6 +1,2 @@
 
-import { executarANL } from '../pages/pesquisa/js/engine.js';
-export async function runANL01(alvo) {
-    return await executarANL("ANL-01", "Texto e Manuscritos", ["NA28", "BHS", "BHQ", "Septuaginta", "Metzger"], 
-        `Estabeleça o texto crítico e testemunhos textuais para: '${alvo}'.`);
-}
+import { executarANL } from '../pages/pesquisa/js/engine.js'; export async function run01(alvo, contexto) { return await executarANL("ANL-01", "Texto e Manuscritos", ["NA28", "BHS", "Septuaginta"], "Estabeleça o texto crítico para: " + alvo, contexto); }
