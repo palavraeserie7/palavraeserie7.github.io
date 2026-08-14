@@ -1,16 +1,7 @@
-export const anl12 = {
-    id: "ANL-12",
-    titulo: "SÍNTESE",
-    itens: [
-        "Integração das evidências",
-        "Conclusão exegética",
-        "O que o texto afirma",
-        "O que o texto implica",
-        "O que é interpretação",
-        "O que é inferência",
-        "O que é aplicação",
-        "Questões ainda debatidas",
-        "Grau de segurança da conclusão",
-        "Síntese final para geração de conteúdo"
-    ]
+export const ANL_12 = {
+    etapa: 12,
+    nome: "Síntese Final e Aplicação",
+    fontes: ["Conclusão baseada em evidências", "Aplicação Prática"],
+    funcao: "Conclusão exegética final e distinção entre texto e aplicação.",
+    prompt: (tema) => `Etapa 12: Apresente a síntese final e a aplicação prática de '${tema}' baseada em todas as evidências coletadas.`
 };
