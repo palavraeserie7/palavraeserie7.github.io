@@ -3,275 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Motor de Investigação Bíblica — Nexus</title>
-
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background: #0b1428;
-            color: #dbe7f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .app {
-            width: min(1200px, 94%);
-            margin: 35px auto 70px;
-        }
-
-        .header {
-            background: #18243a;
-            border: 1px solid #263754;
-            border-radius: 12px;
-            padding: 28px;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            margin: 0 0 8px;
-            color: #20d66b;
-            font-size: 25px;
-        }
-
-        .search-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 10px;
-        }
-
-        input {
-            width: 100%;
-            background: #0d172b;
-            border: 1px solid #30415f;
-            color: white;
-            padding: 13px;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        input:focus {
-            border-color: #20d66b;
-        }
-
-        button {
-            border: 0;
-            border-radius: 6px;
-            padding: 13px 24px;
-            cursor: pointer;
-            font-weight: bold;
-            background: #20c96b;
-            color: #06130b;
-        }
-
-        button:hover {
-            background: #27e57a;
-        }
-
-        .secao {
-            background: #17243a;
-            border: 1px solid #263754;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .titulo-secao {
-            color: #18bfff;
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-        }
-
-        .diagnostico-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-        }
-
-        .diag-item {
-            background: #0d172b;
-            border: 1px solid #263754;
-            border-radius: 6px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .diag-item small {
-            display: block;
-            color: #778ba5;
-            font-size: 0.7rem;
-            margin-bottom: 4px;
-        }
-
-        .diag-item strong {
-            color: #dce8f7;
-            font-size: 0.85rem;
-        }
-
-        .research-box {
-            background: #0a1426;
-            border-left: 4px solid #20d66b;
-            padding: 25px;
-            margin-top: 15px;
-            line-height: 1.8;
-            font-size: 1.1rem;
-        }
-
-        .research-box h2 {
-            color: #20d66b;
-            margin-top: 0;
-            border-bottom: 1px solid #263754;
-            padding-bottom: 10px;
-        }
-
-        .matriz-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .matriz-item {
-            background: #0d172b;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 3px solid #18bfff;
-            font-size: 0.8rem;
-        }
-
-        .loading {
-            color: #20d66b;
-            font-weight: bold;
-            text-align: center;
-            padding: 20px;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 0.5;
-            }
-
-            50% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.5;
-            }
-        }
-
-        @media (max-width: 800px) {
-            .search-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .app {
-                width: 94%;
-                margin-top: 20px;
-            }
-        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0b1428; color: #dbe7f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .app { width: min(1200px, 94%); margin: 35px auto 70px; }
+        .header { background: #18243a; border: 1px solid #263754; border-radius: 12px; padding: 28px; margin-bottom: 20px; }
+        .header h1 { margin: 0 0 8px; color: #20d66b; font-size: 25px; }
+        .search-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; }
+        input { width: 100%; background: #0d172b; border: 1px solid #30415f; color: white; padding: 13px; border-radius: 6px; outline: none; }
+        input:focus { border-color: #20d66b; }
+        button { border: 0; border-radius: 6px; padding: 13px 24px; cursor: pointer; font-weight: bold; background: #20c96b; color: #06130b; }
+        button:hover { background: #27e57a; }
+        .secao { background: #17243a; border: 1px solid #263754; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .titulo-secao { color: #18bfff; font-weight: bold; margin-bottom: 15px; font-size: 0.9rem; }
+        .diagnostico-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .diag-item { background: #0d172b; border: 1px solid #263754; border-radius: 6px; padding: 12px; text-align: center; }
+        .diag-item small { display: block; color: #778ba5; font-size: 0.7rem; margin-bottom: 4px; }
+        .diag-item strong { color: #dce8f7; font-size: 0.85rem; }
+        .research-box { background: #0a1426; border-left: 4px solid #20d66b; padding: 25px; margin-top: 15px; line-height: 1.8; font-size: 1.1rem; }
+        .research-box h2 { color: #20d66b; margin-top: 0; border-bottom: 1px solid #263754; padding-bottom: 10px; }
+        .module { background: #0d172b; border: 1px solid #253650; border-radius: 7px; margin-bottom: 9px; overflow: hidden; }
+        .module-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .module-title { color: #18bfff; font-weight: bold; font-size: 14px; }
+        .module-status { font-size: 10px; padding: 4px 8px; border-radius: 4px; border: 1px solid #20d66b; color: #20d66b; }
+        .module-body { display: none; border-top: 1px solid #253650; padding: 18px; }
+        .module.open .module-body { display: block; }
+        .loading { color: #20d66b; font-weight: bold; text-align: center; padding: 20px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
-
 <body>
-
 <div class="app">
-
     <div class="header">
         <h1>Pesquisa Bíblica — Motor de Investigação</h1>
-
         <div class="search-grid">
-
-            <input
-                id="tema-input"
-                type="text"
-                placeholder="Tema — ex.: Graça"
-            >
-
-            <input
-                id="passagem-input"
-                type="text"
-                placeholder="Passagem — ex.: João 3:16"
-            >
-
-            <button id="analisar-btn" type="button">
-                ANALISAR
-            </button>
-
+            <input id="tema-input" type="text" placeholder="Tema — ex.: Santidade">
+            <input id="passagem-input" type="text" placeholder="Passagem — ex.: 1 Pedro 1:15">
+            <button id="analisar-btn">ANALISAR</button>
         </div>
     </div>
 
-
     <div class="secao">
-
-        <div class="titulo-secao">
-            ANL-00 — DIAGNÓSTICO E ROTEAMENTO
-        </div>
-
+        <div class="titulo-secao">ANL-00 — DIAGNÓSTICO E ROTEAMENTO</div>
         <div id="diagnostico-area" class="diagnostico-grid">
-
-            <div style="color:#71849c; padding:10px;">
-                Aguardando entrada...
-            </div>
-
+            <div style="color:#71849c; padding:10px;">Aguardando entrada...</div>
         </div>
-
     </div>
-
 
     <div class="secao">
-
-        <div class="titulo-secao">
-            MATRIZ DE 12 ETAPAS
+        <div class="titulo-secao">MÓDULOS DE INVESTIGAÇÃO (12 ETAPAS)</div>
+        <div id="modules-container">
+            <div style="color:#71849c; padding:10px;">Defina um tema para iniciar a investigação.</div>
         </div>
-
-        <div id="matriz-area" class="matriz-grid">
-
-            <div style="color:#71849c; padding:10px;">
-                Defina um tema ou passagem para iniciar a investigação.
-            </div>
-
-        </div>
-
     </div>
 
-
-    <div
-        id="resultado-area"
-        class="research-box"
-        style="display:none;"
-    ></div>
-
+    <div id="resultado-area" class="research-box" style="display:none;"></div>
 </div>
 
-
-<!--
-    ARQUITETURA MODULAR DA PESQUISA
-
-    index.html
-        ↓
-    ui.js
-        ↓
-    router.js
-        ↓
-    stages.js
-        ↓
-    ANL-00
-        ↓
-    ANL-01 ... ANL-12
-        ↓
-    engine.js
-
-    A lógica da pesquisa NÃO fica mais dentro deste HTML.
--->
-
-
+<!-- Carrega o controlador principal -->
 <script type="module" src="./js/ui.js"></script>
-
 </body>
 </html>
