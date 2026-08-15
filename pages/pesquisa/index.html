@@ -42,6 +42,18 @@
         .pro-main-paper h2 { margin: 0 0 12px; color: #4a443b; font-size: 28px; }
         .pro-main-paper h4 { margin: 0 0 14px; color: #806f53; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; }
         .pro-main-paper p { margin: 0; line-height: 1.65; font-size: 13px; white-space: pre-wrap; }
+        .pro-chat { margin-top: 42px; padding-top: 24px; border-top: 1px solid #d8cdb8; }
+        .pro-chat h3 { margin: 0 0 8px; color: #806f53; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+        .pro-chat-intro { margin-bottom: 14px !important; color: #6a6256; font-size: 12px !important; }
+        .pro-chat-messages { min-height: 90px; max-height: 260px; overflow-y: auto; margin-bottom: 12px; }
+        .pro-chat-message { margin: 8px 0; padding: 10px 12px; border-radius: 7px; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
+        .pro-chat-message.system { background: rgba(128,111,83,0.10); color: #6a6256; }
+        .pro-chat-message.user { margin-left: 12%; background: #e3d8c4; color: #4a443b; }
+        .pro-chat-form { display: flex; gap: 10px; align-items: stretch; }
+        .pro-chat-form textarea { flex: 1; min-height: 58px; resize: vertical; padding: 11px; border: 1px solid #cdbfaa; border-radius: 6px; background: #faf6ed; color: #4a443b; font: inherit; font-size: 12px; outline: none; }
+        .pro-chat-form textarea:focus { border-color: #a88f66; box-shadow: 0 0 0 2px rgba(168,143,102,0.16); }
+        .pro-chat-form button { align-self: stretch; padding: 0 18px; border: 0; border-radius: 6px; background: #806f53; color: #fffaf0; font-weight: 800; cursor: pointer; }
+        .pro-chat-form button:hover { background: #6c5b42; }
         .pro-menu-heading { padding: 16px 14px 12px; border-bottom: 1px solid #2e6580; background: rgba(24,191,255,0.09); }
         .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1px; line-height: 1.35; }
         .pro-menu-heading strong { display: inline-block; margin-top: 8px; padding: 4px 8px; border: 1px solid var(--a); border-radius: 4px; color: #d8f5ff; font-size: 9px; line-height: 1.2; letter-spacing: 1px; }
@@ -464,6 +476,38 @@
         return html;
     }
 
+    function renderProChat(module) {
+        return `<div class="pro-chat">
+            <h3>MESA DE INVESTIGAÇÃO</h3>
+            <p class="pro-chat-intro">O estudo permanece disponível acima. Utilize esta mesa para aprofundar questões relacionadas ao módulo selecionado.</p>
+            <div class="pro-chat-messages" id="pro-chat-messages">
+                <div class="pro-chat-message system">Aguardando a sua questão de investigação.</div>
+            </div>
+            <form class="pro-chat-form" onsubmit="sendProQuestion(event, '${module}')">
+                <textarea id="pro-question" placeholder="Escreva a sua questão de investigação..."></textarea>
+                <button type="submit">ENVIAR</button>
+            </form>
+        </div>`;
+    }
+
+    function sendProQuestion(event, module) {
+        event.preventDefault();
+        const input = document.getElementById('pro-question');
+        const messages = document.getElementById('pro-chat-messages');
+        const question = input.value.trim();
+        if (!question || !messages) return;
+        const userMessage = document.createElement('div');
+        userMessage.className = 'pro-chat-message user';
+        userMessage.textContent = question;
+        messages.appendChild(userMessage);
+        const systemMessage = document.createElement('div');
+        systemMessage.className = 'pro-chat-message system';
+        systemMessage.textContent = 'A consulta foi registrada no contexto de ' + module + '. A ligação com o motor de IA será ativada na próxima etapa.';
+        messages.appendChild(systemMessage);
+        input.value = '';
+        messages.scrollTop = messages.scrollHeight;
+    }
+
     function openProCard(card, module) {
         document.getElementById('mn').innerHTML = `
             <div class="content">
@@ -472,6 +516,7 @@
                     <h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4>
                     <h2>${card}</h2>
                     <p>A resposta da consulta para este item será apresentada nesta folha de leitura.</p>
+                    ${renderProChat(module)}
                 </div>
             </div>`;
     }
@@ -489,6 +534,7 @@
                     <h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4>
                     <h2>${module}</h2>
                     <p>A resposta da consulta para este módulo será apresentada nesta folha de leitura. Selecione um subitem na lateral para continuar.</p>
+                    ${renderProChat(module)}
                 </div>
             </div>`;
     }
