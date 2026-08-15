@@ -368,10 +368,7 @@
             const item = document.createElement('li');
             item.className = 'pro-item';
             item.innerText = module;
-            item.onclick = () => {
-                showProfessionalModule(module, item);
-                if (module === '01 — TEXTO BÍBLICO') toggleTextBiblicoSubmenu(item);
-            };
+            item.onclick = () => showProfessionalModule(module, item);
             proList.appendChild(item);
         });
     }
@@ -474,6 +471,7 @@
     function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
         document.body.dataset.activeMenu = 'pro';
         document.querySelector('.sidebar').classList.add('pro-active');
+        document.querySelectorAll('.pro-sublist').forEach(submenu => submenu.remove());
         document.querySelectorAll('.module-item, .pro-item, .internal-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
         document.getElementById('mn').innerHTML = `
