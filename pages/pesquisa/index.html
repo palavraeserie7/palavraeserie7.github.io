@@ -786,10 +786,14 @@
                 })
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Erro no serviço de pesquisa.');
-            systemMessage.textContent = data.text || 'A consulta não devolveu texto.';
+            if (!response.ok) throw new Error(data.error || 'Não foi possível concluir o estudo.');
+            systemMessage.textContent = data.text || 'O estudo não devolveu conteúdo.';
         } catch (error) {
-            systemMessage.textContent = 'Não foi possível concluir a consulta: ' + error.message;
+            const technical = String(error?.message || '');
+            const temporary = /quota|sobrecarregado|alta procura|temporar|rate limit|unavailable|high demand/i.test(technical);
+            systemMessage.textContent = temporary
+                ? 'O estudo está temporariamente indisponível. Tente novamente dentro de alguns instantes.'
+                : 'Não foi possível concluir o estudo neste momento.';
         } finally {
             if (button) button.disabled = false;
             messages.scrollTop = messages.scrollHeight;
@@ -803,7 +807,7 @@
                 <div class="pro-main-paper">
                     <h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4>
                     <h2>${card}</h2>
-                    <p>A resposta da consulta para este item será apresentada nesta folha de leitura.</p>
+                    <p>O conteúdo deste módulo será organizado nesta folha de estudo.</p>
                     ${renderProChat(module)}
                 </div>
             </div>`;
