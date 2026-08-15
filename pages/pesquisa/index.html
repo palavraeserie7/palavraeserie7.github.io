@@ -91,13 +91,17 @@
         .shelf-section { margin-bottom: 10px; }
         .shelf-section h3 { margin: 0 0 12px; color: #806f53; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
         .shelf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); gap: 10px; }
-        .shelf-book { display: flex; flex-direction: column; min-height: 150px; padding: 16px; border: 1px solid #d8cdb8; border-radius: 8px; background: #fffdf7; box-shadow: 0 4px 12px rgba(55,45,30,.07); }
+        .shelf-book { display: flex; flex-direction: column; min-height: 260px; padding: 16px; border: 1px solid #d8cdb8; border-radius: 8px; background: #fffdf7; box-shadow: 0 4px 12px rgba(55,45,30,.07); }
+        .shelf-cover { display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; margin-bottom: 14px; padding: 14px; border: 1px solid #b9a887; border-radius: 4px; background: linear-gradient(145deg, #806f53, #4a443b); color: #fffaf0; box-shadow: 0 5px 10px rgba(55,45,30,.18); }
+        .shelf-cover small { font-size: 9px; letter-spacing: 1.5px; opacity: .78; }
+        .shelf-cover strong { font-family: Georgia, serif; font-size: 20px; line-height: 1.05; letter-spacing: 1px; }
+        .shelf-cover em { font-size: 10px; font-style: normal; opacity: .8; }
         .shelf-book.pro { background: #eee6d7; }
         .shelf-book h4 { margin: 0 0 8px; color: #4a443b; font-size: 15px; line-height: 1.3; }
         .shelf-book p { flex: 1; margin: 0 0 12px; color: #776b59; font-size: 12px; line-height: 1.55; }
         .shelf-badge { display: inline-block; align-self: flex-start; margin-bottom: 10px; padding: 3px 7px; border-radius: 4px; background: #d5c7ae; color: #5f513d; font-size: 9px; font-weight: 900; letter-spacing: .8px; }
         .shelf-book.pro .shelf-badge { background: #806f53; color: #fffaf0; }
-        .shelf-book button { min-height: 34px; padding: 0 12px; border-radius: 5px; background: #806f53; color: #fffaf0; font-size: 10px; }
+        .shelf-book button, .shelf-book .shelf-link { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 12px; border: 0; border-radius: 5px; background: #806f53; color: #fffaf0; font-size: 10px; font-weight: 800; text-decoration: none; cursor: pointer; }
         .shelf-book button.locked { background: #c8bba5; color: #5f513d; }
         .shelf-note { margin-top: 16px; padding: 12px 14px; border-left: 3px solid #b99b61; background: rgba(255,255,255,.45); color: #776b59; font-size: 12px; line-height: 1.55; }
         @media (max-width: 700px) { .shelf-overlay { padding: 0; } .shelf-window { width: 100%; height: 100%; } .shelf-header { padding: 14px 16px; } .shelf-body { padding: 16px; } }
@@ -285,8 +289,11 @@
         ],
         own: [],
         external: [
-            { title: 'Matthew Henry — Commentary on the Whole Bible', description: 'Comentário cristão clássico. Disponível através da página oficial do CCEL.', url: 'https://www.ccel.org/ccel/henry/mhc' },
-            { title: 'Referências externas autorizadas', description: 'As referências podem ser adicionadas por link oficial quando a obra não puder ser hospedada na estante.' }
+            { title: 'Matthew Henry — Commentary on the Whole Bible', author: 'Matthew Henry', cover: 'COMENTÁRIO', description: 'Comentário cristão clássico. Disponível através da página oficial do CCEL.', url: 'https://www.ccel.org/ccel/henry/mhc' },
+            { title: 'The Pilgrim’s Progress', author: 'John Bunyan', cover: 'PEREGRINO', description: 'Alegoria cristã clássica. Disponível através da página oficial do CCEL.', url: 'https://www.ccel.org/ccel/bunyan/pilgrim' },
+            { title: 'Institutes of the Christian Religion', author: 'John Calvin', cover: 'INSTITUTAS', description: 'Obra clássica da Reforma. Disponível através da página oficial do CCEL.', url: 'https://www.ccel.org/ccel/calvin/institutes' },
+            { title: 'Confessions and Enchiridion', author: 'St. Augustine', cover: 'CONFISSÕES', description: 'Obra clássica de Agostinho. Disponível através da página oficial do CCEL.', url: 'https://www.ccel.org/ccel/augustine/confessions' },
+            { title: 'Referências externas autorizadas', author: 'Catálogo em expansão', cover: 'FONTES', description: 'As referências podem ser adicionadas por link oficial quando a obra não puder ser hospedada na estante.' }
         ]
     };
 
@@ -313,7 +320,7 @@
         const books = SHELF_BOOKS[section] || [];
         const locked = section === 'pro';
         const access = sections[section];
-        const renderBooks = books.map(book => `<article class="shelf-book ${locked ? 'pro' : ''}"><span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p><button class="${locked ? 'locked' : ''}" onclick="shelfBookAction(${JSON.stringify(book.title)}, ${locked}, ${JSON.stringify(section)}, ${JSON.stringify(book.url || '')})">${locked ? 'ACESSO PRO' : section === 'external' ? 'ABRIR REFERÊNCIA' : 'ABRIR MATERIAL'}</button></article>`).join('');
+        const renderBooks = books.map(book => { const cover = `<div class="shelf-cover"><small>PALAVRA & SÉRIE</small><strong>${escapeBibleText(book.cover || 'ESTUDO')}</strong><em>${escapeBibleText(book.author || 'Biblioteca de estudo')}</em></div>`; const action = section === 'external' && book.url ? `<a class="shelf-link" href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA</a>` : `<button class="${locked ? 'locked' : ''}" onclick="shelfBookAction(${JSON.stringify(book.title)}, ${locked}, ${JSON.stringify(section)}, ${JSON.stringify(book.url || '')})">${locked ? 'ACESSO PRO' : 'ABRIR MATERIAL'}</button>`; return `<article class="shelf-book ${locked ? 'pro' : ''}">${cover}<span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p>${action}</article>`; }).join('');
         const content = renderBooks || `<div class="shelf-empty">Ainda não há materiais nesta divisão. Os seus livros próprios poderão ser adicionados posteriormente ao catálogo e aparecerão aqui automaticamente.</div>`;
         body.innerHTML = `<nav class="shelf-tabs" aria-label="Divisões da estante"><button class="shelf-tab ${section === 'free' ? 'active' : ''}" onclick="selectShelfSection('free')">FREE</button><button class="shelf-tab ${section === 'pro' ? 'active' : ''}" onclick="selectShelfSection('pro')">PRO</button><button class="shelf-tab ${section === 'own' ? 'active' : ''}" onclick="selectShelfSection('own')">MEUS LIVROS</button><button class="shelf-tab ${section === 'external' ? 'active' : ''}" onclick="selectShelfSection('external')">REFERÊNCIAS EXTERNAS</button></nav><section class="shelf-section"><h3>${access}</h3><div class="shelf-grid">${content}</div><div class="shelf-note" id="shelf-note">${section === 'pro' ? 'O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.' : section === 'external' ? 'As referências externas serão abertas apenas através de fontes oficiais ou autorizadas.' : section === 'own' ? 'Os seus livros poderão ser organizados aqui por título, categoria, autor e nível de acesso.' : 'Materiais introdutórios disponíveis para demonstração.'}</div></section>`;
     }
