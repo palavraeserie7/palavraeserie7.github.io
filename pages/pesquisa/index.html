@@ -51,6 +51,8 @@
         .study-loading { display: none; margin-top: 12px; color: #806f53; font-weight: 700; }
         .study-answer { display: none; margin-top: 20px; padding: 20px; border-left: 4px solid #b99b61; background: rgba(255,255,255,0.42); color: #4a443b; line-height: 1.75; white-space: pre-wrap; }
         .topic-paper-back { margin-bottom: 20px; background: transparent; color: var(--p); border: 1px solid var(--p); }
+        .back-arrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 8px 18px; border: 1px solid var(--p); border-radius: 999px; background: transparent; color: var(--p); cursor: pointer; font-size: 14px; font-weight: 900; }
+        .back-arrow:hover { background: rgba(32,214,107,0.12); }
         .ai-chat-panel { display: flex; flex-direction: column; min-height: 100%; overflow: hidden; border: 1px solid #263754; border-radius: 12px; background: #111b30; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
         .ai-chat-header { padding: 22px 24px; border-bottom: 1px solid #263754; background: #17243a; }
         .ai-chat-header h3 { margin: 0; color: #20d66b; font-size: 16px; letter-spacing: 1px; }
@@ -112,6 +114,9 @@
         '12 — COMPARAÇÃO DE INTERPRETAÇÕES'
     ];
     
+    let lastDisciplineKey = '1 FUNDAÇÃO BÍBLICA';
+    let lastDisciplineElement = null;
+
     const DATA = {
         "00 AS DISCIPLINAS DA TEOLOGIA": { "INTRODUÇÃO": ["Visão Geral do Sistema", "O Método Canônico", "Arquitetura da Pesquisa"] },
         "1 FUNDAÇÃO BÍBLICA": {
@@ -339,11 +344,17 @@
         });
     }
 
+    function backToPreviousView() {
+        const element = lastDisciplineElement || document.querySelector('.module-item');
+        showSub(lastDisciplineKey, element);
+    }
+
     function showProfessionalModule(module, element) {
         document.querySelectorAll('.module-item, .pro-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
         document.getElementById('mn').innerHTML = `
             <div class="content">
+                <button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button>
                 <div class="category-title">MÓDULO PROFISSIONAL DE ANÁLISE</div>
                 <div class="search-area" style="min-height:420px;">
                     <h1 style="color:#fff;">${module}</h1>
@@ -354,6 +365,8 @@
     }
 
     function showSub(k, el) {
+        lastDisciplineKey = k;
+        lastDisciplineElement = el;
         document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
         const mn = document.getElementById('mn');
@@ -372,7 +385,7 @@
     function openSearch(tool, disc) {
         const mn = document.getElementById('mn');
         mn.innerHTML = `
-            <button class="topic-paper-back" onclick="showSub('${disc}', document.querySelector('.module-item.active'))">← VOLTAR</button>
+            <button class="back-arrow" onclick="showSub('${disc}', document.querySelector('.module-item.active'))" title="Voltar para a tela anterior">← VOLTAR</button>
             <div class="split-view">
                 <article class="topic-paper">
                     <div class="category-title">${disc}</div>
