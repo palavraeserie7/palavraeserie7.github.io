@@ -19,6 +19,12 @@
         .menu-heading { padding: 22px 15px 14px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
         .menu-heading strong { display: block; margin-top: 7px; color: #e5edf7; font-size: 11px; line-height: 1.35; letter-spacing: 0.4px; }
+        .pro-menu-heading { padding: 18px 15px 10px; border-top: 1px solid var(--b); background: rgba(24,191,255,0.04); }
+        .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1.5px; }
+        .pro-menu-heading strong { display: block; margin-top: 5px; color: #cbd8e8; font-size: 10px; line-height: 1.35; letter-spacing: 0.3px; }
+        .pro-list { flex: 0 1 330px; max-height: 330px; overflow-y: auto; list-style: none; padding: 6px 10px 14px; margin: 0; }
+        .pro-item { padding: 9px 10px; margin-bottom: 3px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; color: #9fb1c7; font-size: 10px; font-weight: 600; line-height: 1.25; transition: 0.2s; }
+        .pro-item:hover, .pro-item.active { background: rgba(24,191,255,0.1); border-color: var(--a); color: #fff; }
         .main { flex: 1; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
         .content { padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%; }
         .category-group { margin-bottom: 40px; }
@@ -76,12 +82,29 @@
         <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p></div>
         <div class="menu-heading"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
         <ul class="module-list" id="ml"></ul>
+        <div class="pro-menu-heading"><span>MENU PROFISSIONAL</span><strong>MÓDULOS DE ANÁLISE</strong></div>
+        <ul class="pro-list" id="pro-list"></ul>
     </div>
     <div class="main" id="mn"></div>
 
 <script>
     const K1="AQ.Ab8RN6JQi5", K2="LCGgGxeIBaNVAocD", K3="N1FQkZSb0n2kje4bNke08sDQ";
     const KEY = K1+K2+K3;
+
+    const PRO_MODULES = [
+        '01 — TEXTO BÍBLICO',
+        '02 — CRÍTICA TEXTUAL',
+        '03 — GRAMÁTICA E SINTAXE',
+        '04 — LÉXICO',
+        '05 — LÉXICO TEOLÓGICO',
+        '06 — EXEGESE',
+        '07 — CONTEXTO HISTÓRICO-CULTURAL',
+        '08 — HERMENÊUTICA E CONTROLE DE ERROS',
+        '09 — TEOLOGIA BÍBLICA',
+        '10 — USO DO AT NO NT',
+        '11 — TEOLOGIA SISTEMÁTICA',
+        '12 — COMPARAÇÃO DE INTERPRETAÇÕES'
+    ];
     
     const DATA = {
         "00 AS DISCIPLINAS DA TEOLOGIA": { "INTRODUÇÃO": ["Visão Geral do Sistema", "O Método Canônico", "Arquitetura da Pesquisa"] },
@@ -280,7 +303,30 @@
                 ml.appendChild(li);
             });
 
-        showSub('1 FUNDAÇÃO BÍBLICA', ml.children[1]);
+        showSub('1 FUNDAÇÃO BÍBLICA', ml.children[0]);
+
+        const proList = document.getElementById('pro-list');
+        PRO_MODULES.forEach((module, index) => {
+            const item = document.createElement('li');
+            item.className = 'pro-item';
+            item.innerText = module;
+            item.onclick = () => showProfessionalModule(module, item);
+            proList.appendChild(item);
+        });
+    }
+
+    function showProfessionalModule(module, element) {
+        document.querySelectorAll('.module-item, .pro-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('mn').innerHTML = `
+            <div class="content">
+                <div class="category-title">MÓDULO PROFISSIONAL DE ANÁLISE</div>
+                <div class="search-area" style="min-height:420px;">
+                    <h1 style="color:#fff;">${module}</h1>
+                    <div style="height:1px; background:var(--b); margin:25px 0;"></div>
+                    <p style="color:#91a4bd;">Estrutura do módulo preparada para receber os procedimentos de análise.</p>
+                </div>
+            </div>`;
     }
 
     function showSub(k, el) {
