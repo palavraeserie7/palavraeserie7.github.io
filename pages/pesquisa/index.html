@@ -16,6 +16,7 @@
         .module-item { padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; font-size: 12px; font-weight: 600; color: #91a4bd; display: flex; align-items: center; }
         .module-item:hover { background: rgba(32, 214, 107, 0.05); color: var(--t); }
         .module-item.active { background: rgba(32, 214, 107, 0.1); border-color: var(--p); color: #fff; }
+        .menu-reference { padding: 16px 15px 12px; color: #c1cfdf; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; cursor: default; border-bottom: 1px solid var(--b); margin-bottom: 10px; }
         .main { flex: 1; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
         .content { padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%; }
         .category-group { margin-bottom: 40px; }
@@ -264,14 +265,26 @@
 
     function init() {
         const ml = document.getElementById('ml');
-        Object.keys(DATA).forEach(k => {
-            const li = document.createElement('li');
-            li.className = 'module-item';
-            li.innerText = k;
-            li.onclick = () => showSub(k, li);
-            ml.appendChild(li);
-        });
-        showSub("1 FUNDAÇÃO BÍBLICA", ml.children[1]);
+
+        // 00 é apenas uma referência visual do menu.
+        // Não é uma área clicável e não gera submenu.
+        const reference = document.createElement('li');
+        reference.className = 'menu-reference';
+        reference.innerText = '00 AS DISCIPLINAS DA TEOLOGIA';
+        ml.appendChild(reference);
+
+        // Somente as áreas 1 a 29 são itens funcionais.
+        Object.keys(DATA)
+            .filter(k => k !== '00 AS DISCIPLINAS DA TEOLOGIA')
+            .forEach(k => {
+                const li = document.createElement('li');
+                li.className = 'module-item';
+                li.innerText = k;
+                li.onclick = () => showSub(k, li);
+                ml.appendChild(li);
+            });
+
+        showSub('1 FUNDAÇÃO BÍBLICA', ml.children[1]);
     }
 
     function showSub(k, el) {
