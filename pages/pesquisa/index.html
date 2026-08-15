@@ -52,7 +52,7 @@
         .ai-chat-input .question-row { display: flex; gap: 10px; }
         .ai-chat-input input { min-width: 0; background: #111b30; border-color: #344762; }
         .ai-chat-input input:focus { border-color: var(--p); }
-        .ai-chat-answer { display: none; margin-top: 16px; padding: 16px; border-left: 3px solid var(--p); border-radius: 6px; background: #17243a; color: #dbe7f5; line-height: 1.7; white-space: pre-wrap; }
+        .ai-chat-answer { display: none; margin-top: 16px; padding: 20px; border-left: 3px solid var(--p); border-radius: 6px; background: #17243a; color: #dbe7f5; line-height: 1.8; white-space: pre-wrap; font-size: 14px; }
         .ai-chat-loading { display: none; margin-top: 10px; color: var(--p); font-size: 12px; font-weight: bold; }
         @media (max-width: 900px) { .split-view { grid-template-columns: 1fr; height: auto; min-height: 0; } .topic-paper { min-height: 520px; } .ai-chat-panel { min-height: 520px; } }
         .search-box { display: flex; gap: 10px; margin-top: 15px; }
@@ -308,7 +308,7 @@
                         <p><strong>${tool}</strong><br>O estudo em análise permanece disponível no painel de leitura.<br>Utilize esta mesa para aprofundar questões relacionadas ao tema selecionado.</p>
                     </header>
                     <div class="ai-chat-messages">
-                        <div class="ai-chat-welcome"><strong>Consulta de pesquisa</strong><br><br>O estudo em análise permanece disponível no painel de leitura.<br>Utilize esta mesa para aprofundar questões relacionadas ao tema selecionado.</div>
+                        <div class="ai-chat-welcome"><strong>Consulta de pesquisa</strong><br><br>Aguardando a sua questão de investigação.</div>
                         <div id="rs" class="ai-chat-answer"></div>
                     </div>
                     <div class="ai-chat-input">
@@ -337,7 +337,7 @@
             const data = await r.json();
             if (!r.ok) throw new Error(data.error?.message || "Erro na API");
             
-            rs.innerHTML = `<h2>RELATÓRIO DE INVESTIGAÇÃO</h2><div style="white-space:pre-wrap">${data.candidates[0].content.parts[0].text}</div>`;
+            rs.textContent = data.candidates[0].content.parts[0].text.trim();
             rs.style.display = 'block';
             rs.scrollIntoView({ behavior: 'smooth' });
         } catch (e) { alert("ERRO TÉCNICO: " + e.message); }
