@@ -54,6 +54,30 @@
         .pro-chat-form textarea:focus { border-color: #a88f66; box-shadow: 0 0 0 2px rgba(168,143,102,0.16); }
         .pro-chat-form button { align-self: stretch; padding: 0 18px; border: 0; border-radius: 6px; background: #806f53; color: #fffaf0; font-weight: 800; cursor: pointer; }
         .pro-chat-form button:hover { background: #6c5b42; }
+        .bible-launch { width: calc(100% - 30px); margin: 12px 15px 10px; padding: 12px 14px; border: 1px solid #b99b61; border-radius: 8px; background: #f1eadb; color: #4a443b; text-align: left; font-size: 12px; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
+        .bible-launch:hover { background: #fff8e9; border-color: #e0c487; }
+        .bible-overlay { position: fixed; inset: 0; z-index: 50; display: none; align-items: stretch; justify-content: center; background: rgba(5,10,20,0.82); }
+        .bible-overlay.open { display: flex; }
+        .bible-window { width: min(1180px, 96vw); height: 94vh; margin: 3vh auto; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #d8cdb8; border-radius: 12px; background: #f1eadb; color: #4a443b; box-shadow: 0 16px 50px rgba(0,0,0,0.45); }
+        .bible-window-header { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 16px 20px; border-bottom: 1px solid #d8cdb8; background: #e8decc; }
+        .bible-window-header h2 { margin: 0; font-size: 18px; letter-spacing: 1px; }
+        .bible-window-header p { margin: 4px 0 0; color: #806f53; font-size: 11px; }
+        .bible-close { padding: 8px 13px; border: 1px solid #806f53; border-radius: 6px; background: transparent; color: #4a443b; font-weight: 900; cursor: pointer; }
+        .bible-toolbar { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 20px; border-bottom: 1px solid #d8cdb8; background: #faf6ed; }
+        .bible-toolbar label { display: flex; flex-direction: column; gap: 5px; color: #806f53; font-size: 10px; font-weight: 900; letter-spacing: 0.5px; }
+        .bible-toolbar select, .bible-toolbar input { min-width: 150px; padding: 9px 10px; border: 1px solid #cdbfaa; border-radius: 6px; background: #fffdf7; color: #4a443b; font: inherit; }
+        .bible-toolbar input { min-width: 240px; }
+        .bible-window-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 210px minmax(0, 1fr); }
+        .bible-book-list { overflow-y: auto; padding: 12px; border-right: 1px solid #d8cdb8; background: #e8decc; }
+        .bible-book-list button { display: block; width: 100%; margin-bottom: 4px; padding: 8px 9px; border: 0; border-radius: 5px; background: transparent; color: #5f513d; text-align: left; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .bible-book-list button:hover, .bible-book-list button.active { background: #d5c7ae; color: #3e3428; }
+        .bible-reading-paper { overflow-y: auto; padding: 34px 42px; background: #f1eadb; }
+        .bible-reading-paper h3 { margin: 0 0 8px; color: #806f53; font-size: 11px; letter-spacing: 1.3px; text-transform: uppercase; }
+        .bible-reading-paper h1 { margin: 0 0 22px; font-size: clamp(26px, 4vw, 42px); }
+        .bible-reading-placeholder { max-width: 760px; padding: 24px 0; border-top: 1px solid #d8cdb8; color: #806f53; line-height: 1.8; font-size: 15px; }
+        .bible-reading-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; padding-top: 20px; border-top: 1px solid #d8cdb8; }
+        .bible-reading-actions button { min-height: 42px; padding: 0 15px; border-radius: 6px; background: #806f53; color: #fffaf0; }
+        @media (max-width: 700px) { .bible-window-body { grid-template-columns: 1fr; } .bible-book-list { max-height: 150px; border-right: 0; border-bottom: 1px solid #d8cdb8; } .bible-reading-paper { padding: 24px; } }
         .pro-menu-heading { padding: 16px 14px 12px; border-bottom: 1px solid #2e6580; background: rgba(24,191,255,0.09); }
         .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1px; line-height: 1.35; }
         .pro-menu-heading strong { display: inline-block; margin-top: 8px; padding: 4px 8px; border: 1px solid var(--a); border-radius: 4px; color: #d8f5ff; font-size: 9px; line-height: 1.2; letter-spacing: 1px; }
@@ -120,7 +144,7 @@
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p></div>
+        <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button></div>
         <div class="sidebar-menus">
             <section class="discipline-mode" id="discipline-mode">
                 <div class="menu-heading"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
@@ -144,6 +168,25 @@
         </div>
     </div>
     <div class="main" id="mn"></div>
+
+    <div class="bible-overlay" id="bible-overlay" role="dialog" aria-modal="true" aria-labelledby="bible-title">
+        <div class="bible-window">
+            <div class="bible-window-header">
+                <div><h2 id="bible-title">BÍBLIA — LEITURA</h2><p>Uma janela exclusiva para leitura e comparação bíblica.</p></div>
+                <button class="bible-close" onclick="closeBibleReader()">← FECHAR</button>
+            </div>
+            <div class="bible-toolbar">
+                <label>VERSÃO<select id="bible-version"><option>Almeida Revista e Atualizada (ARA)</option><option>Nova Versão Internacional (NVI)</option></select></label>
+                <label>LIVRO<select id="bible-book-select" onchange="selectBibleBook(this.value)"></select></label>
+                <label>CAPÍTULO<select id="bible-chapter-select" onchange="renderBibleChapter()"></select></label>
+                <label>PESQUISAR<input id="bible-search" type="search" placeholder="Versículo ou palavra"></label>
+            </div>
+            <div class="bible-window-body">
+                <nav class="bible-book-list" id="bible-book-list" aria-label="Livros bíblicos"></nav>
+                <main class="bible-reading-paper" id="bible-reading-paper"></main>
+            </div>
+        </div>
+    </div>
 
 <script>
     // Cole aqui a URL pública do seu serviço intermediário protegido.
@@ -438,6 +481,69 @@
         });
         parentItem.parentNode.insertBefore(submenu, parentItem.nextSibling);
     }
+
+    const BIBLE_BOOKS = ['Gênesis', 'Êxodo', 'Levítico', 'Números', 'Deuteronômio', 'Josué', 'Juízes', 'Rute', '1 Samuel', '2 Samuel', '1 Reis', '2 Reis', '1 Crônicas', '2 Crônicas', 'Esdras', 'Neemias', 'Ester', 'Jó', 'Salmos', 'Provérbios', 'Eclesiastes', 'Cânticos', 'Isaías', 'Jeremias', 'Lamentações', 'Ezequiel', 'Daniel', 'Oséias', 'Joel', 'Amós', 'Obadias', 'Jonas', 'Miquéias', 'Naum', 'Habacuque', 'Sofonias', 'Ageu', 'Zacarias', 'Malaquias', 'Mateus', 'Marcos', 'Lucas', 'João', 'Atos', 'Romanos', '1 Coríntios', '2 Coríntios', 'Gálatas', 'Efésios', 'Filipenses', 'Colossenses', '1 Tessalonicenses', '2 Tessalonicenses', '1 Timóteo', '2 Timóteo', 'Tito', 'Filemom', 'Hebreus', 'Tiago', '1 Pedro', '2 Pedro', '1 João', '2 João', '3 João', 'Judas', 'Apocalipse'];
+    let selectedBibleBook = 'Gênesis';
+    let selectedBibleChapter = 1;
+
+    function openBibleReader() {
+        const overlay = document.getElementById('bible-overlay');
+        overlay.classList.add('open');
+        document.body.classList.add('bible-open');
+        renderBibleBookList();
+        populateBibleSelectors();
+        renderBibleChapter();
+    }
+
+    function closeBibleReader() {
+        document.getElementById('bible-overlay').classList.remove('open');
+        document.body.classList.remove('bible-open');
+    }
+
+    function renderBibleBookList() {
+        const list = document.getElementById('bible-book-list');
+        if (!list) return;
+        list.innerHTML = '';
+        BIBLE_BOOKS.forEach(book => {
+            const button = document.createElement('button');
+            button.textContent = book;
+            button.className = book === selectedBibleBook ? 'active' : '';
+            button.onclick = () => selectBibleBook(book);
+            list.appendChild(button);
+        });
+    }
+
+    function populateBibleSelectors() {
+        const bookSelect = document.getElementById('bible-book-select');
+        const chapterSelect = document.getElementById('bible-chapter-select');
+        if (!bookSelect || !chapterSelect) return;
+        bookSelect.innerHTML = BIBLE_BOOKS.map(book => `<option ${book === selectedBibleBook ? 'selected' : ''}>${book}</option>`).join('');
+        chapterSelect.innerHTML = Array.from({ length: 50 }, (_, index) => `<option value="${index + 1}" ${index + 1 === selectedBibleChapter ? 'selected' : ''}>${index + 1}</option>`).join('');
+    }
+
+    function selectBibleBook(book) {
+        selectedBibleBook = book;
+        selectedBibleChapter = 1;
+        renderBibleBookList();
+        populateBibleSelectors();
+        renderBibleChapter();
+    }
+
+    function renderBibleChapter() {
+        const paper = document.getElementById('bible-reading-paper');
+        const version = document.getElementById('bible-version')?.value || 'Almeida Revista e Atualizada (ARA)';
+        if (!paper) return;
+        paper.innerHTML = `<h3>${version}</h3><h1>${selectedBibleBook} ${selectedBibleChapter}</h1><div class="bible-reading-placeholder">O texto desta passagem será carregado nesta janela de leitura quando a fonte bíblica autorizada estiver ligada ao sistema. A leitura bíblica permanecerá separada da pesquisa PRO.</div><div class="bible-reading-actions"><button onclick="sendBiblePassageToResearch()">PESQUISAR ESTA PASSAGEM</button><button onclick="closeBibleReader()">VOLTAR À MATRIZ</button></div>`;
+    }
+
+    function sendBiblePassageToResearch() {
+        closeBibleReader();
+        showProfessionalModule('01.1 — Identificação da passagem', null, 'LEITURA BÍBLICA ENVIADA PARA PESQUISA');
+    }
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeBibleReader();
+    });
 
     function backToPreviousView() {
         const element = lastDisciplineElement || document.querySelector('.module-item');
