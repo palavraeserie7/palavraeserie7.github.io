@@ -470,22 +470,48 @@
         </div>`;
     }
 
-    function sendProQuestion(event, module) {
+    async function sendProQuestion(event, module) {
         event.preventDefault();
         const input = document.getElementById('pro-question');
         const messages = document.getElementById('pro-chat-messages');
-        const question = input.value.trim();
+        const form = event.currentTarget;
+        const button = form ? form.querySelector('button') : null;
+        const question = input ? input.value.trim() : '';
         if (!question || !messages) return;
+
         const userMessage = document.createElement('div');
         userMessage.className = 'pro-chat-message user';
         userMessage.textContent = question;
         messages.appendChild(userMessage);
+
         const systemMessage = document.createElement('div');
         systemMessage.className = 'pro-chat-message system';
-        systemMessage.textContent = 'A consulta foi registrada no contexto de ' + module + '. A ligação com o motor de IA será ativada na próxima etapa.';
+        systemMessage.textContent = 'A consultar a Mesa de Investigação...';
         messages.appendChild(systemMessage);
-        input.value = '';
+        if (input) input.value = '';
+        if (button) button.disabled = true;
         messages.scrollTop = messages.scrollHeight;
+
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question,
+                    topic: module,
+                    discipline: 'MATRIZ CANÔNICA DE PESQUISA PRO',
+                    module
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Erro no serviço de pesquisa.');
+            systemMessage.textContent = data.text || 'A consulta não devolveu texto.';
+        } catch (error) {
+            systemMessage.textContent = 'Não foi possível concluir a consulta: ' + error.message;
+        } finally {
+            if (button) button.disabled = false;
+            messages.scrollTop = messages.scrollHeight;
+        }
     }
 
     function openProCard(card, module) {
