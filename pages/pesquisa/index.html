@@ -149,34 +149,23 @@
     const K1="AQ.Ab8RN6JQi5", K2="LCGgGxeIBaNVAocD", K3="N1FQkZSb0n2kje4bNke08sDQ";
     const KEY = K1+K2+K3;
 
-    const PRO_MODULES = [
-        '01 — TEXTO BÍBLICO',
-        '02 — CRÍTICA TEXTUAL',
-        '03 — GRAMÁTICA E SINTAXE',
-        '04 — LÉXICO',
-        '05 — LÉXICO TEOLÓGICO',
-        '06 — EXEGESE',
-        '07 — CONTEXTO HISTÓRICO-CULTURAL',
-        '08 — HERMENÊUTICA E CONTROLE DE ERROS',
-        '09 — TEOLOGIA BÍBLICA',
-        '10 — USO DO AT NO NT',
-        '11 — TEOLOGIA SISTEMÁTICA',
-        '12 — COMPARAÇÃO DE INTERPRETAÇÕES'
-    ];
+    const PRO_MODULE_DATA = {
+        '01 — TEXTO BÍBLICO': { question: 'O que constitui o texto objeto da pesquisa?', rule: 'o texto bíblico é a fonte primária; nenhum comentário o substitui. Texto crítico eclético é o padrão — tradições históricas alternativas entram só como testemunho comparativo. A comparação de tradições em 01.9 é apenas um mapeamento preliminar — a avaliação e o julgamento das variantes pertencem exclusivamente ao ANL-02.', items: ['01.1 — Identificação da passagem', '01.2 — Testamento', '01.3 — Livro', '01.4 — Capítulo', '01.5 — Versículo', '01.6 — Texto hebraico', '01.7 — Texto grego', '01.8 — Texto da Septuaginta', '01.9 — Identificação preliminar de tradições textuais divergentes', '01.10 — Palavras e construções no original', '01.11 — Determinação do texto-base'] },
+        '02 — CRÍTICA TEXTUAL': { question: 'Existem variantes textuais relevantes para esta passagem?', rule: 'variante relevante deve ser sinalizada, nunca apresentada como fato indiscutível.', items: ['02.1 — Identificação da variante textual', '02.2 — Localização da variante', '02.3 — Testemunhos textuais', '02.4 — Manuscritos e versões envolvidos', '02.5 — Evidências externas', '02.6 — Evidências internas', '02.7 — Comparação das leituras', '02.8 — Aparato crítico', '02.9 — Avaliação da variante', '02.10 — Impacto na tradução', '02.11 — Impacto na interpretação', '02.12 — Determinação textual'] },
+        '03 — GRAMÁTICA E SINTAXE': { question: 'Como as palavras estão funcionando dentro da frase?', rule: 'a unidade mínima de interpretação é a palavra dentro da construção e do contexto — nunca isolada.', items: ['03.1 — Identificação da construção', '03.2 — Morfologia', '03.3 — Lema e forma lexical', '03.4 — Classe gramatical', '03.5 — Sujeito', '03.6 — Predicado', '03.7 — Objeto', '03.8 — Verbos', '03.9 — Tempo e aspecto', '03.10 — Voz', '03.11 — Modo', '03.12 — Construções gramaticais', '03.13 — Relações sintáticas', '03.14 — Conectivos', '03.15 — Relações entre cláusulas', '03.16 — Estrutura da frase (síntese)'] },
+        '04 — LÉXICO': { question: 'O que determinado termo pode significar neste contexto?', rule: 'o contexto determina o sentido — vários significados possíveis não implica presença simultânea de todos. Fluxo: forma encontrada → lema → usos → campo semântico → contexto → sentido provável.', items: ['04.1 — Identificação da palavra', '04.2 — Forma encontrada no texto', '04.3 — Lema', '04.4 — Transliteração', '04.5 — Classe gramatical', '04.6 — Definições lexicais', '04.7 — Usos da palavra', '04.8 — Campo semântico', '04.9 — Uso no contexto', '04.10 — Uso no Antigo Testamento', '04.11 — Uso no Novo Testamento', '04.12 — Comparação das evidências lexicais', '04.13 — Sentido provável no contexto'] },
+        '05 — LÉXICO TEOLÓGICO': { question: 'Como esse conceito funciona dentro da linguagem teológica da Escritura?', rule: 'o conceito teológico aprofunda, mas permanece subordinado ao uso efetivo da palavra no texto estudado.', items: ['05.1 — Identificação do conceito', '05.2 — Termo no texto', '05.3 — Base lexical do conceito', '05.4 — Uso no Antigo Testamento', '05.5 — Uso na Septuaginta', '05.6 — Uso no Judaísmo', '05.7 — Uso no Novo Testamento', '05.8 — Desenvolvimento do conceito', '05.9 — Relações teológicas', '05.10 — Comparação das evidências', '05.11 — Síntese do conceito teológico', '05.12 — Relação com o contexto da passagem'] },
+        '06 — EXEGESE': { question: 'O que o autor está comunicando nesta passagem?', rule: 'integra as conclusões dos ANLs 01–05; não os repete.', items: ['06.1 — Delimitação da passagem', '06.2 — Contexto imediato', '06.3 — Estrutura da passagem', '06.4 — Argumento da passagem', '06.5 — Contexto literário', '06.6 — Gênero literário', '06.7 — Relação entre versículos', '06.8 — Relações entre unidades de pensamento', '06.9 — Intenção comunicativa', '06.10 — Problemas interpretativos', '06.11 — Interpretações existentes', '06.12 — Argumentos das interpretações', '06.13 — Avaliação exegética', '06.14 — Síntese exegética'] },
+        '07 — CONTEXTO HISTÓRICO-CULTURAL': { question: 'O que o mundo original do texto acrescenta à interpretação?', rule: 'nenhum pano de fundo especulativo sem base em fonte primária ou evidência material.', items: ['07.1 — Identificação do contexto histórico', '07.2 — Período histórico', '07.3 — Localização geográfica', '07.4 — Contexto político', '07.5 — Contexto religioso', '07.6 — Contexto social', '07.7 — Costumes e práticas', '07.8 — Instituições e estruturas sociais', '07.9 — Cultura e valores', '07.10 — Mundo greco-romano', '07.11 — Antigo Oriente Próximo', '07.12 — Judaísmo e contexto religioso', '07.13 — Arqueologia e evidências materiais', '07.14 — Literatura e fontes extrabíblicas', '07.15 — Impacto do contexto na interpretação'] },
+        '08 — HERMENÊUTICA E CONTROLE DE ERROS': { question: 'Estou interpretando corretamente aquilo que foi encontrado?', rule: 'camada de controle de qualidade — atua transversalmente, podendo auditar qualquer ANL anterior, não só como etapa final. Veredito reconhece: forte suporte / suporte parcial / evidência insuficiente / interpretação questionável / interpretações concorrentes.', items: ['08.1 — Identificação dos pressupostos', '08.2 — Controle do contexto', '08.3 — Controle do sentido lexical', '08.4 — Controle gramatical e sintático', '08.5 — Controle do contexto histórico-cultural', '08.6 — Detecção de eisegese', '08.7 — Detecção de anacronismo', '08.8 — Detecção de falácia lexical', '08.9 — Detecção de descontextualização', '08.10 — Controle de alegorização indevida', '08.11 — Controle de generalização indevida', '08.12 — Controle da relação AT–NT', '08.13 — Descrição versus prescrição', '08.14 — Coerência da interpretação com as evidências', '08.15 — Veredito hermenêutico'] },
+        '09 — TEOLOGIA BÍBLICA': { question: 'Como essa passagem se encaixa na totalidade da revelação bíblica?', rule: 'opera no nível de trajetória temática através do cânon — distinto do ANL-10 (mecanismo textual específico de citação/alusão/eco).', items: ['09.1 — Localização do tema na passagem', '09.2 — Relação com o contexto canônico', '09.3 — História da redenção', '09.4 — Desenvolvimento da revelação', '09.5 — Temas bíblicos relacionados', '09.6 — Relação com o Antigo Testamento', '09.7 — Relação com o Novo Testamento', '09.8 — Promessa e cumprimento', '09.9 — Alianças e desenvolvimento pactual', '09.10 — Criação, queda e redenção', '09.11 — Reino de Deus', '09.12 — Relação com Cristo', '09.13 — Consumação', '09.14 — Trajetória do tema na Escritura', '09.15 — Síntese teológico-bíblica'] },
+        '10 — USO DO AT NO NT': { question: 'Como o Novo Testamento utiliza o Antigo Testamento nesta passagem?', rule: 'função própria, com metodologia específica de intertextualidade — não subcategoria de 06 ou 09.', items: ['10.1 — Identificação da referência ao AT', '10.2 — Citação explícita', '10.3 — Alusão', '10.4 — Eco textual ou temático', '10.5 — Identificação da passagem de origem', '10.6 — Comparação com o texto hebraico', '10.7 — Comparação com a Septuaginta', '10.8 — Comparação com o texto grego do NT', '10.9 — Contexto da passagem do AT', '10.10 — Forma como o NT utiliza o AT', '10.11 — Função teológica da referência', '10.12 — Relação com promessa e cumprimento', '10.13 — Relação cristológica', '10.14 — Impacto na interpretação do NT', '10.15 — Síntese do uso do AT no NT'] },
+        '11 — TEOLOGIA SISTEMÁTICA': { question: 'Qual é a relação da interpretação com a doutrina cristã?', rule: 'Fluxo obrigatório: Texto → Exegese → Teologia Bíblica → Questão doutrinária → Teologia Sistemática. Nunca: a doutrina determina sozinha o significado do texto.', items: ['11.1 — Identificação da questão doutrinária', '11.2 — Dados doutrinários encontrados no texto', '11.3 — Relação com a teologia bíblica', '11.4 — Relação com outras passagens bíblicas', '11.5 — Doutrinas relacionadas', '11.6 — Formulações teológicas existentes', '11.7 — Comparação das formulações', '11.8 — Pressupostos teológicos', '11.9 — Convergências', '11.10 — Divergências', '11.11 — Avaliação da coerência doutrinária', '11.12 — Limites da conclusão doutrinária', '11.13 — Síntese doutrinária'] },
+        '12 — COMPARAÇÃO DE INTERPRETAÇÕES': { question: 'Como as interpretações concorrentes se sustentam diante das evidências?', rule: 'não apagar o debate acadêmico. O número de interpretações não é fixo em duas — a matriz deve acomodar N posições concorrentes, quando existirem. Este módulo pode reconsultar os ANLs 01–09 (loop de verificação, não etapa puramente linear).', items: ['12.1 — Identificação das interpretações existentes (N)', '12.2 — Classificação das interpretações', '12.3 — Argumentos de cada interpretação (N)', '12.4 — Evidências textuais', '12.5 — Evidências gramaticais e lexicais', '12.6 — Evidências históricas e culturais', '12.7 — Evidências teológicas', '12.8 — Pressupostos de cada interpretação', '12.9 — Pontos de convergência', '12.10 — Pontos de divergência', '12.11 — Grau de consenso', '12.12 — Força das evidências', '12.13 — Limites da conclusão', '12.14 — Síntese comparativa'] }
+    };
 
-    const TEXT_BIBLICO_SUBMODULES = [
-        '01.1 — Identificação da passagem',
-        '01.2 — Testamento',
-        '01.3 — Livro',
-        '01.4 — Capítulo',
-        '01.5 — Versículo',
-        '01.6 — Texto hebraico',
-        '01.7 — Texto grego',
-        '01.8 — Texto da Septuaginta',
-        '01.9 — Comparação de tradições textuais',
-        '01.10 — Palavras e construções no original',
-        '01.11 — Determinação do texto-base'
-    ];
+    const PRO_MODULES = Object.keys(PRO_MODULE_DATA);
+    const TEXT_BIBLICO_SUBMODULES = PRO_MODULE_DATA['01 — TEXTO BÍBLICO'].items;
     
     let lastDisciplineKey = '1 FUNDAÇÃO BÍBLICA';
     let lastDisciplineElement = null;
@@ -380,17 +369,7 @@
 
         showSub('1 FUNDAÇÃO BÍBLICA', ml.children[0]);
 
-        const proList = document.getElementById('pro-list');
-        PRO_MODULES.forEach(module => {
-            const item = document.createElement('li');
-            item.className = 'pro-item';
-            item.innerText = module;
-            item.onclick = () => {
-                showProfessionalModule(module, item);
-                if (module === '01 — TEXTO BÍBLICO') toggleTextBiblicoSubmenu(item);
-            };
-            proList.appendChild(item);
-        });
+        renderAllInternalProMenus();
     }
 
     function toggleProMenu() {
@@ -524,19 +503,13 @@
     function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
         document.body.dataset.activeMenu = 'pro';
         document.querySelector('.sidebar').classList.add('pro-active');
-        document.querySelectorAll('.pro-sublist').forEach(submenu => submenu.remove());
-        document.querySelectorAll('.module-item, .pro-item, .internal-item').forEach(item => item.classList.remove('active'));
-        element.classList.add('active');
-        document.getElementById('mn').innerHTML = `
-            <div class="content">
-                <button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button>
-                <div class="pro-main-paper">
-                    <h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4>
-                    <h2>${module}</h2>
-                    <p>A resposta da consulta para este módulo será apresentada nesta folha de leitura. Selecione um subitem na lateral para continuar.</p>
-                    ${renderProChat(module)}
-                </div>
-            </div>`;
+        document.querySelectorAll('.pro-item, .pro-subitem').forEach(item => item.classList.remove('active'));
+        if (element) element.classList.add('active');
+        const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
+        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-main-paper">`;
+        html += `<h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4><h2>${module}</h2><p><strong>Pergunta central:</strong> ${data.question}</p><p class="pro-question"><strong>Regra metodológica:</strong> ${data.rule || 'A análise deve permanecer vinculada às evidências do texto e às fontes primárias.'}</p>`;
+        html += `${renderProChat(module)}</div></div>`;
+        document.getElementById('mn').innerHTML = html;
     }
 
     function renderAllInternalDisciplineMenus() {
@@ -569,31 +542,46 @@
     }
 
     function renderAllInternalProMenus() {
-        const heading = document.getElementById('pro-internal-heading');
-        const list = document.getElementById('pro-internal-list');
-        if (!heading || !list) return;
-        heading.innerText = 'LISTAS INTERNAS — MATRIZ CANÔNICA PRO';
+        const list = document.getElementById('pro-list');
+        if (!list) return;
         list.innerHTML = '';
         PRO_MODULES.forEach(module => {
-            const moduleTitle = document.createElement('li');
-            moduleTitle.className = 'internal-discipline-title';
-            moduleTitle.innerText = module;
-            list.appendChild(moduleTitle);
-            const items = module === '01 — TEXTO BÍBLICO' ? TEXT_BIBLICO_SUBMODULES : ['Submenu interno deste módulo será estruturado nesta área.'];
-            items.forEach(submodule => {
-                const item = document.createElement('li');
-                item.className = 'internal-item';
-                item.innerText = submodule;
-                if (module === '01 — TEXTO BÍBLICO') {
-                    item.onclick = () => {
-                        document.querySelectorAll('.internal-item').forEach(i => i.classList.remove('active'));
-                        item.classList.add('active');
-                        showProfessionalModule(submodule, item, 'SUBMÓDULO DE TEXTO BÍBLICO');
-                    };
-                }
-                list.appendChild(item);
+            const data = PRO_MODULE_DATA[module];
+            const li = document.createElement('li');
+            const button = document.createElement('div');
+            button.className = 'pro-item';
+            button.innerText = module;
+            button.onclick = () => toggleProModule(module, li, button);
+            li.appendChild(button);
+            const sublist = document.createElement('ul');
+            sublist.className = 'pro-sublist';
+            data.items.forEach(itemName => {
+                const subitem = document.createElement('li');
+                subitem.className = 'pro-subitem';
+                subitem.innerText = itemName;
+                subitem.onclick = (event) => {
+                    event.stopPropagation();
+                    document.querySelectorAll('.pro-subitem').forEach(item => item.classList.remove('active'));
+                    subitem.classList.add('active');
+                    openProCard(itemName, module);
+                };
+                sublist.appendChild(subitem);
             });
+            li.appendChild(sublist);
+            list.appendChild(li);
         });
+    }
+
+    function toggleProModule(module, li, button) {
+        document.body.dataset.activeMenu = 'pro';
+        document.querySelector('.sidebar').classList.add('pro-active');
+        document.querySelectorAll('.pro-item').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        document.querySelectorAll('.pro-sublist').forEach(list => {
+            if (list !== li.querySelector('.pro-sublist')) list.classList.remove('open');
+        });
+        li.querySelector('.pro-sublist').classList.toggle('open');
+        showProfessionalModule(module, button);
     }
 
     function showSub(k, el) {
