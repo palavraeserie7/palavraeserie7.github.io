@@ -737,14 +737,14 @@
 
     function renderProChat(module) {
         return `<div class="pro-chat">
-            <h3>MESA DE INVESTIGAÇÃO</h3>
+            <h3>MESA DE ANÁLISE</h3>
             <p class="pro-chat-intro">O estudo permanece disponível acima. Utilize esta mesa para aprofundar questões relacionadas ao módulo selecionado.</p>
             <div class="pro-chat-messages" id="pro-chat-messages">
-                <div class="pro-chat-message system">Aguardando a sua questão de investigação.</div>
+                <div class="pro-chat-message system">Registe uma questão para prosseguir a análise.</div>
             </div>
             <form class="pro-chat-form" onsubmit="sendProQuestion(event, '${module}')">
-                <textarea id="pro-question" placeholder="Escreva a sua questão de investigação..."></textarea>
-                <button type="submit">ENVIAR</button>
+                <textarea id="pro-question" placeholder="Escreva a questão que pretende examinar..."></textarea>
+                <button type="submit">EXAMINAR</button>
             </form>
         </div>`;
     }
@@ -765,7 +765,7 @@
 
         const systemMessage = document.createElement('div');
         systemMessage.className = 'pro-chat-message system';
-        systemMessage.textContent = 'A consultar a Mesa de Investigação...';
+        systemMessage.textContent = 'A preparar a análise...';
         messages.appendChild(systemMessage);
         if (input) input.value = '';
         if (button) button.disabled = true;
@@ -932,24 +932,24 @@
                     <div class="category-title">${disc}</div>
                     <h2>${tool}</h2>
                     <div class="paper-space">
-                        <div id="study-commentary" class="study-commentary loading">A IA está a preparar o comentário amplo deste tema.</div>
+                        <div id="study-commentary" class="study-commentary loading">O estudo está a ser elaborado.</div>
                     </div>
                 </article>
                 <aside class="ai-chat-panel">
                     <header class="ai-chat-header">
-                        <h3>MESA DE INVESTIGAÇÃO</h3>
-                        <p><strong>${tool}</strong><br>O estudo em análise permanece disponível no painel de leitura.<br>Utilize esta mesa para aprofundar questões relacionadas ao tema selecionado.</p>
+                        <h3>MESA DE ANÁLISE</h3>
+                        <p><strong>${tool}</strong><br>O estudo permanece disponível no painel de leitura.<br>Utilize esta mesa para examinar questões relacionadas com o tema selecionado.</p>
                     </header>
                     <div class="ai-chat-messages">
-                        <div class="ai-chat-welcome"><strong>Consulta de pesquisa</strong><br><br>Aguardando a sua questão de investigação.</div>
+                        <div class="ai-chat-welcome"><strong>APROFUNDAMENTO DO ESTUDO</strong><br><br>Registe uma questão para prosseguir a análise.</div>
                         <div id="rs" class="ai-chat-answer"></div>
                     </div>
                     <div class="ai-chat-input">
                         <div class="question-row">
-                            <input type="text" id="q" placeholder="Escreva a sua questão de investigação...">
-                            <button id="b" onclick="run('${tool}', '${disc}')">ENVIAR</button>
+                            <input type="text" id="q" placeholder="Escreva a questão que pretende examinar...">
+                            <button id="b" onclick="run('${tool}', '${disc}')">EXAMINAR</button>
                         </div>
-                        <div id="ld" class="ai-chat-loading">Análise contextual assistida por inteligência artificial...</div>
+                        <div id="ld" class="ai-chat-loading">Aprofundamento metodológico disponível.</div>
                     </div>
                 </aside>
             </div>`;
@@ -1008,10 +1008,10 @@
                 commentary.classList.remove('loading');
                 commentary.style.display = 'block';
                 commentary.textContent = temporary
-                    ? 'O serviço de IA está temporariamente sobrecarregado. O tema continua disponível nesta folha. Aguarde alguns instantes e utilize a Mesa de Investigação para tentar novamente.'
+                    ? 'O serviço está temporariamente indisponível. O tema continua disponível nesta folha. Aguarde alguns instantes e utilize a Mesa de Análise para tentar novamente.'
                     : `Não foi possível gerar o comentário neste momento. ${message}`;
             }
-            rs.textContent = temporary ? 'A IA está temporariamente sobrecarregada. Tente novamente dentro de alguns instantes.' : message;
+            rs.textContent = temporary ? 'O serviço está temporariamente indisponível. Tente novamente dentro de alguns instantes.' : message;
             rs.style.display = 'block';
         } finally {
             btn.disabled = false;
