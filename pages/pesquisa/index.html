@@ -26,6 +26,10 @@
         .pro-list { max-height: 330px; overflow-y: auto; list-style: none; padding: 12px 10px 14px; margin: 0; }
         .pro-item { padding: 11px 10px; margin-bottom: 6px; border-radius: 7px; cursor: pointer; border: 1px solid transparent; color: #b5c5d8; font-size: 10px; font-weight: 700; line-height: 1.3; transition: 0.2s; }
         .pro-item:hover, .pro-item.active { background: rgba(24,191,255,0.14); border-color: var(--a); color: #fff; box-shadow: 0 3px 10px rgba(24,191,255,0.1); }
+        .pro-sublist { display: none; list-style: none; padding: 2px 0 6px 14px; margin: 0; border-left: 2px solid #2e6580; }
+        .pro-sublist.open { display: block; }
+        .pro-subitem { padding: 8px 8px; margin-bottom: 3px; color: #9fb9cc; cursor: pointer; font-size: 9px; line-height: 1.3; border-radius: 5px; }
+        .pro-subitem:hover, .pro-subitem.active { background: rgba(24,191,255,0.1); color: #fff; }
         .main { flex: 1; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
         .content { padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%; }
         .category-group { margin-bottom: 40px; }
@@ -112,6 +116,20 @@
         '10 — USO DO AT NO NT',
         '11 — TEOLOGIA SISTEMÁTICA',
         '12 — COMPARAÇÃO DE INTERPRETAÇÕES'
+    ];
+
+    const TEXT_BIBLICO_SUBMODULES = [
+        '01.1 — Identificação da passagem',
+        '01.2 — Testamento',
+        '01.3 — Livro',
+        '01.4 — Capítulo',
+        '01.5 — Versículo',
+        '01.6 — Texto hebraico',
+        '01.7 — Texto grego',
+        '01.8 — Texto da Septuaginta',
+        '01.9 — Comparação de tradições textuais',
+        '01.10 — Palavras e construções no original',
+        '01.11 — Determinação do texto-base'
     ];
     
     let lastDisciplineKey = '1 FUNDAÇÃO BÍBLICA';
@@ -321,7 +339,10 @@
             const item = document.createElement('li');
             item.className = 'pro-item';
             item.innerText = module;
-            item.onclick = () => showProfessionalModule(module, item);
+            item.onclick = () => {
+                showProfessionalModule(module, item);
+                if (module === '01 — TEXTO BÍBLICO') toggleTextBiblicoSubmenu(item);
+            };
             proList.appendChild(item);
         });
     }
@@ -344,18 +365,42 @@
         });
     }
 
+    function toggleTextBiblicoSubmenu(parentItem) {
+        const existing = parentItem.nextElementSibling;
+        if (existing && existing.classList.contains('pro-sublist')) {
+            existing.classList.toggle('open');
+            return;
+        }
+
+        const submenu = document.createElement('ul');
+        submenu.className = 'pro-sublist open';
+        TEXT_BIBLICO_SUBMODULES.forEach(submodule => {
+            const item = document.createElement('li');
+            item.className = 'pro-subitem';
+            item.innerText = submodule;
+            item.onclick = (event) => {
+                event.stopPropagation();
+                document.querySelectorAll('.pro-subitem').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                showProfessionalModule(submodule, item, 'SUBMÓDULO DE TEXTO BÍBLICO');
+            };
+            submenu.appendChild(item);
+        });
+        parentItem.parentNode.insertBefore(submenu, parentItem.nextSibling);
+    }
+
     function backToPreviousView() {
         const element = lastDisciplineElement || document.querySelector('.module-item');
         showSub(lastDisciplineKey, element);
     }
 
-    function showProfessionalModule(module, element) {
+    function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
         document.querySelectorAll('.module-item, .pro-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
         document.getElementById('mn').innerHTML = `
             <div class="content">
                 <button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button>
-                <div class="category-title">MÓDULO PROFISSIONAL DE ANÁLISE</div>
+                <div class="category-title">${category}</div>
                 <div class="search-area" style="min-height:420px;">
                     <h1 style="color:#fff;">${module}</h1>
                     <div style="height:1px; background:var(--b); margin:25px 0;"></div>
