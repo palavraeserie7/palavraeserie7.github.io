@@ -19,12 +19,14 @@
         .menu-heading { padding: 22px 15px 14px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
         .menu-heading strong { display: block; margin-top: 7px; color: #e5edf7; font-size: 11px; line-height: 1.35; letter-spacing: 0.4px; }
-        .pro-menu-heading { padding: 18px 15px 10px; border-top: 1px solid var(--b); background: rgba(24,191,255,0.04); }
-        .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1.5px; }
-        .pro-menu-heading strong { display: block; margin-top: 5px; color: #cbd8e8; font-size: 10px; line-height: 1.35; letter-spacing: 0.3px; }
-        .pro-list { flex: 0 1 330px; max-height: 330px; overflow-y: auto; list-style: none; padding: 6px 10px 14px; margin: 0; }
+        .pro-toggle { width: 100%; margin-top: 14px; min-height: 42px; padding: 0 14px; border: 1px solid var(--a); border-radius: 7px; background: rgba(24,191,255,0.08); color: #d8f5ff; font-size: 11px; letter-spacing: 0.7px; }
+        .pro-toggle:hover { background: rgba(24,191,255,0.18); }
+        .pro-panel { display: none; margin-top: 12px; max-height: 260px; overflow-y: auto; border: 1px solid #38516f; border-radius: 8px; background: #0d172b; }
+        .pro-panel.open { display: block; }
+        .pro-list { list-style: none; padding: 7px; margin: 0; }
         .pro-item { padding: 9px 10px; margin-bottom: 3px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; color: #9fb1c7; font-size: 10px; font-weight: 600; line-height: 1.25; transition: 0.2s; }
         .pro-item:hover, .pro-item.active { background: rgba(24,191,255,0.1); border-color: var(--a); color: #fff; }
+        .pro-badge { display: inline-block; margin-left: 6px; padding: 2px 5px; border-radius: 3px; background: var(--a); color: #071426; font-size: 8px; font-weight: 900; }
         .main { flex: 1; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
         .content { padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%; }
         .category-group { margin-bottom: 40px; }
@@ -82,8 +84,6 @@
         <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p></div>
         <div class="menu-heading"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
         <ul class="module-list" id="ml"></ul>
-        <div class="pro-menu-heading"><span>MENU PROFISSIONAL</span><strong>MÓDULOS DE ANÁLISE</strong></div>
-        <ul class="pro-list" id="pro-list"></ul>
     </div>
     <div class="main" id="mn"></div>
 
@@ -305,8 +305,18 @@
 
         showSub('1 FUNDAÇÃO BÍBLICA', ml.children[0]);
 
-        const proList = document.getElementById('pro-list');
-        PRO_MODULES.forEach((module, index) => {
+    }
+
+    function toggleProMenu() {
+        const panel = document.getElementById('pro-panel');
+        if (panel) panel.classList.toggle('open');
+    }
+
+    function renderProMenu() {
+        const proList = document.getElementById('pro-inline-list');
+        if (!proList) return;
+        proList.innerHTML = '';
+        PRO_MODULES.forEach(module => {
             const item = document.createElement('li');
             item.className = 'pro-item';
             item.innerText = module;
@@ -361,6 +371,10 @@
                     <header class="ai-chat-header">
                         <h3>MESA DE INVESTIGAÇÃO</h3>
                         <p><strong>${tool}</strong><br>O estudo em análise permanece disponível no painel de leitura.<br>Utilize esta mesa para aprofundar questões relacionadas ao tema selecionado.</p>
+                        <button class="pro-toggle" onclick="toggleProMenu()">MENU — MATRIZ CANÔNICA DE PESQUISA <span class="pro-badge">PRO</span></button>
+                        <div id="pro-panel" class="pro-panel">
+                            <ul id="pro-inline-list" class="pro-list"></ul>
+                        </div>
                     </header>
                     <div class="ai-chat-messages">
                         <div class="ai-chat-welcome"><strong>Consulta de pesquisa</strong><br><br>Aguardando a sua questão de investigação.</div>
@@ -375,6 +389,7 @@
                     </div>
                 </aside>
             </div>`;
+        renderProMenu();
     }
 
     async function run(t, d) {
