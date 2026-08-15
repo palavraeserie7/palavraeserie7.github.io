@@ -643,25 +643,41 @@
         if (portuguesePanel) portuguesePanel.innerHTML = portuguese.status === 'fulfilled' ? renderParallelVerses(portuguese.value, 'Não foram encontrados versículos.') : `<p class="bible-error">${escapeBibleText(portuguese.reason?.message)}</p>`;
     }
 
+    function normalizeBibleReferenceText(value) {
+        return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[ºª]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
     function parseBibleReference(value) {
         const raw = String(value || '').trim().replace(/^.*?—\s*/, '');
         if (!raw) return null;
-        const parts = raw.split(':');
-        const chapter = parts.length === 2 ? Number(parts[0]) : selectedBibleChapter;
+        const normalizedRaw = normalizeBibleReferenceText(raw);
+        const orderedBooks = [...BIBLE_BOOKS].sort((a, b) => normalizeBibleReferenceText(b).length - normalizeBibleReferenceText(a).length);
+        const matchedBook = orderedBooks.find(book => normalizedRaw === normalizeBibleReferenceText(book) || normalizedRaw.startsWith(`${normalizeBibleReferenceText(book)} `));
+        const book = matchedBook || null;
+        const remainder = book ? raw.slice(book.length).trim() : raw;
+        const parts = remainder.split(':');
+        const chapter = parts.length === 2 ? Number(parts[0].trim()) : selectedBibleChapter;
         const verseText = parts.length === 2 ? parts[1] : parts[0];
         const match = verseText.trim().match(/^(\d+)(?:\s*[-–]\s*(\d+))?$/);
         if (!Number.isInteger(chapter) || chapter < 1 || !match) return null;
         const start = Number(match[1]);
         const end = Number(match[2] || match[1]);
-        return start > 0 && end >= start ? { chapter, start, end } : null;
+        return start > 0 && end >= start ? { book, chapter, start, end } : null;
     }
 
     async function queryBiblePanel(language) {
         const input = document.getElementById(`bible-${language}-query`);
         let panel = document.getElementById(`bible-${language}-panel`);
         const reference = parseBibleReference(input?.value);
-        if (!panel || !reference) { if (panel) panel.innerHTML = '<p class="bible-error">Use capítulo:versículos, por exemplo 1:1-5, ou apenas 1-5.</p>'; return; }
-        if (reference.chapter !== selectedBibleChapter) {
+        if (!panel || !reference) { if (panel) panel.innerHTML = '<p class="bible-error">Use livro capítulo:versículos, por exemplo João 15:1-5, ou apenas 1-5.</p>'; return; }
+        const bookChanged = Boolean(reference.book && reference.book !== selectedBibleBook);
+        if (bookChanged) {
+            selectedBibleBook = reference.book;
+            selectedBibleChapter = reference.chapter;
+            renderBibleBookList();
+            populateBibleChapters();
+        }
+        if (bookChanged || reference.chapter !== selectedBibleChapter) {
             const chapterSelect = document.getElementById('bible-chapter-select');
             if (chapterSelect) chapterSelect.value = String(reference.chapter);
             selectedBibleChapter = reference.chapter;
