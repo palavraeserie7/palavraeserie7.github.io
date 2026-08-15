@@ -30,7 +30,10 @@
         .menu-heading { padding: 22px 15px 14px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
         .menu-heading strong { display: block; margin-top: 7px; color: #e5edf7; font-size: 11px; line-height: 1.35; letter-spacing: 0.4px; }
-        .pro-menu-box { flex: 1 1 auto; min-height: 0; margin: 10px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
+        .pro-area { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+        .pro-menu-box { flex: 1 1 50%; min-height: 0; margin: 10px 10px 5px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
+        .pro-internal-pane { flex: 1 1 50%; min-height: 0; margin: 5px 10px 10px; overflow-y: auto; border: 1px solid #2e6580; border-radius: 10px; background: rgba(13,27,49,0.9); }
+        .pro-internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
         .pro-menu-heading { padding: 16px 14px 12px; border-bottom: 1px solid #2e6580; background: rgba(24,191,255,0.09); }
         .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1px; line-height: 1.35; }
         .pro-menu-heading strong { display: inline-block; margin-top: 8px; padding: 4px 8px; border: 1px solid var(--a); border-radius: 4px; color: #d8f5ff; font-size: 9px; line-height: 1.2; letter-spacing: 1px; }
@@ -112,12 +115,18 @@
                 </div>
             </section>
             <section class="pro-mode" id="pro-mode">
+                <div class="pro-area">
                 <div class="pro-menu-box" data-access="pro">
                     <div class="pro-menu-heading">
                         <span>MENU — MATRIZ CANÔNICA DE PESQUISA</span>
                         <strong>ACESSO EXCLUSIVO — ASSINANTES PRO</strong>
                     </div>
                     <ul class="pro-list" id="pro-list"></ul>
+                </div>
+                <div class="pro-internal-pane">
+                    <div class="internal-heading" id="pro-internal-heading">LISTA INTERNA DO MÓDULO PRO</div>
+                    <ul class="pro-internal-list" id="pro-internal-list"></ul>
+                </div>
                 </div>
             </section>
         </div>
@@ -365,8 +374,8 @@
             item.className = 'pro-item';
             item.innerText = module;
             item.onclick = () => {
+                renderInternalProMenu(module);
                 showProfessionalModule(module, item);
-                if (module === '01 — TEXTO BÍBLICO') toggleTextBiblicoSubmenu(item);
             };
             proList.appendChild(item);
         });
@@ -387,6 +396,30 @@
             item.innerText = module;
             item.onclick = () => showProfessionalModule(module, item);
             proList.appendChild(item);
+        });
+    }
+
+    function renderInternalProMenu(module) {
+        const heading = document.getElementById('pro-internal-heading');
+        const list = document.getElementById('pro-internal-list');
+        if (!heading || !list) return;
+        heading.innerText = `LISTA INTERNA — ${module}`;
+        list.innerHTML = '';
+        const items = module === '01 — TEXTO BÍBLICO'
+            ? TEXT_BIBLICO_SUBMODULES
+            : ['Submenu interno deste módulo será estruturado nesta área.'];
+        items.forEach(submodule => {
+            const item = document.createElement('li');
+            item.className = 'internal-item';
+            item.innerText = submodule;
+            if (module === '01 — TEXTO BÍBLICO') {
+                item.onclick = () => {
+                    document.querySelectorAll('.internal-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    showProfessionalModule(submodule, item, 'SUBMÓDULO DE TEXTO BÍBLICO');
+                };
+            }
+            list.appendChild(item);
         });
     }
 
