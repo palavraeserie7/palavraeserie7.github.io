@@ -146,8 +146,9 @@
     <div class="main" id="mn"></div>
 
 <script>
-    const K1="AQ.Ab8RN6JQi5", K2="LCGgGxeIBaNVAocD", K3="N1FQkZSb0n2kje4bNke08sDQ";
-    const KEY = K1+K2+K3;
+    // Cole aqui a URL pública do seu serviço intermediário protegido.
+    // Exemplo: https://matriz-canonica-ai.seu-subdominio.workers.dev
+    const AI_PROXY_URL = "https://yellow-lab-f4b2.palavraeserie.workers.dev";
 
     const PRO_MODULE_DATA = {
         '01 — TEXTO BÍBLICO': { question: 'O que constitui o texto objeto da pesquisa?', rule: 'o texto bíblico é a fonte primária; nenhum comentário o substitui. Texto crítico eclético é o padrão — tradições históricas alternativas entram só como testemunho comparativo. A comparação de tradições em 01.9 é apenas um mapeamento preliminar — a avaliação e o julgamento das variantes pertencem exclusivamente ao ANL-02.', items: ['01.1 — Identificação da passagem', '01.2 — Testamento', '01.3 — Livro', '01.4 — Capítulo', '01.5 — Versículo', '01.6 — Texto hebraico', '01.7 — Texto grego', '01.8 — Texto da Septuaginta', '01.9 — Identificação preliminar de tradições textuais divergentes', '01.10 — Palavras e construções no original', '01.11 — Determinação do texto-base'] },
@@ -638,25 +639,42 @@
     }
 
     async function run(t, d) {
-        const q = document.getElementById('q').value.trim(); if(!q) return;
-        const btn = document.getElementById('b'); const ld = document.getElementById('ld'); const rs = document.getElementById('rs');
-        btn.disabled = true; ld.style.display = 'block'; rs.style.display = 'none';
-        
-        const prompt = `Aja como um Doutor em Teologia. Investigue "${q}" na área de "${t}" (${d}). REGRAS: 1. Foco absoluto no original (Hebraico/Grego/LXX). 2. Sem comentários devocionais. 3. Densidade técnica acadêmica. 4. Se for bíblico, cite manuscritos e variantes.`;
-        
+        const q = document.getElementById('q').value.trim();
+        if (!q) return;
+        if (!AI_PROXY_URL || AI_PROXY_URL.includes('COLE_AQUI')) {
+            alert('Primeiro configure a URL do serviço protegido no código do site.');
+            return;
+        }
+
+        const btn = document.getElementById('b');
+        const ld = document.getElementById('ld');
+        const rs = document.getElementById('rs');
+        btn.disabled = true;
+        ld.style.display = 'block';
+        rs.style.display = 'none';
+
         try {
-            const r = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-3.7-flash:generateContent?key=" + KEY, {
-                method: "POST", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] } )
+            const r = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: q,
+                    topic: t,
+                    discipline: d,
+                    module: document.querySelector('.pro-item.active')?.innerText || ''
+                })
             });
             const data = await r.json();
-            if (!r.ok) throw new Error(data.error?.message || "Erro na API");
-            
-            rs.textContent = data.candidates[0].content.parts[0].text.trim();
+            if (!r.ok) throw new Error(data.error || 'Erro no serviço de pesquisa');
+            rs.textContent = data.text || 'A consulta não devolveu texto.';
             rs.style.display = 'block';
             rs.scrollIntoView({ behavior: 'smooth' });
-        } catch (e) { alert("ERRO TÉCNICO: " + e.message); }
-        finally { btn.disabled = false; ld.style.display = 'none'; }
+        } catch (e) {
+            alert('ERRO TÉCNICO: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            ld.style.display = 'none';
+        }
     }
     init();
 </script>
