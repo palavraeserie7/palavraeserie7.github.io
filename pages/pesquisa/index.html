@@ -8,9 +8,12 @@
         :root { --p: #20d66b; --bg: #0b1428; --s: #111b30; --c: #17243a; --i: #0d172b; --t: #dbe7f5; --b: #263754; --a: #18bfff; }
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--bg); color: var(--t); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 320px; background: var(--s); border-right: 1px solid var(--b); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
-        .discipline-area { flex: 1 1 auto; min-height: 420px; display: flex; flex-direction: column; }
-        .discipline-list-pane, .discipline-internal-pane { flex: 1 1 50%; min-height: 190px; overflow-y: auto; }
+        .sidebar { width: 320px; background: var(--s); border-right: 1px solid var(--b); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .sidebar-menus { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+        .discipline-mode, .pro-mode { flex: 1 1 50%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+        .discipline-mode { border-bottom: 1px solid var(--b); }
+        .discipline-area { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+        .discipline-list-pane, .discipline-internal-pane { flex: 1 1 50%; min-height: 0; overflow-y: auto; }
         .discipline-internal-pane { border-top: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .internal-heading { padding: 12px 15px 8px; color: var(--a); font-size: 10px; font-weight: 900; letter-spacing: 1px; border-bottom: 1px solid var(--b); }
         .internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
@@ -27,11 +30,11 @@
         .menu-heading { padding: 22px 15px 14px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
         .menu-heading strong { display: block; margin-top: 7px; color: #e5edf7; font-size: 11px; line-height: 1.35; letter-spacing: 0.4px; }
-        .pro-menu-box { flex: 0 1 auto; max-height: 430px; margin: 0 10px 14px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); }
+        .pro-menu-box { flex: 1 1 auto; min-height: 0; margin: 10px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
         .pro-menu-heading { padding: 16px 14px 12px; border-bottom: 1px solid #2e6580; background: rgba(24,191,255,0.09); }
         .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1px; line-height: 1.35; }
         .pro-menu-heading strong { display: inline-block; margin-top: 8px; padding: 4px 8px; border: 1px solid var(--a); border-radius: 4px; color: #d8f5ff; font-size: 9px; line-height: 1.2; letter-spacing: 1px; }
-        .pro-list { max-height: 330px; overflow-y: auto; list-style: none; padding: 12px 10px 14px; margin: 0; }
+        .pro-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; list-style: none; padding: 12px 10px 14px; margin: 0; }
         .pro-item { padding: 11px 10px; margin-bottom: 6px; border-radius: 7px; cursor: pointer; border: 1px solid transparent; color: #b5c5d8; font-size: 10px; font-weight: 700; line-height: 1.3; transition: 0.2s; }
         .pro-item:hover, .pro-item.active { background: rgba(24,191,255,0.14); border-color: var(--a); color: #fff; box-shadow: 0 3px 10px rgba(24,191,255,0.1); }
         .pro-sublist { display: none; list-style: none; padding: 2px 0 6px 14px; margin: 0; border-left: 2px solid #2e6580; }
@@ -95,22 +98,28 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p></div>
-        <div class="menu-heading"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
-        <div class="discipline-area">
-            <div class="discipline-list-pane">
-                <ul class="module-list" id="ml"></ul>
-            </div>
-            <div class="discipline-internal-pane">
-                <div class="internal-heading">LISTA INTERNA DA DISCIPLINA</div>
-                <ul class="internal-list" id="internal-list"></ul>
-            </div>
-        </div>
-        <div class="pro-menu-box" data-access="pro">
-            <div class="pro-menu-heading">
-                <span>MENU — MATRIZ CANÔNICA DE PESQUISA</span>
-                <strong>ACESSO EXCLUSIVO — ASSINANTES PRO</strong>
-            </div>
-            <ul class="pro-list" id="pro-list"></ul>
+        <div class="sidebar-menus">
+            <section class="discipline-mode" id="discipline-mode">
+                <div class="menu-heading"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
+                <div class="discipline-area">
+                    <div class="discipline-list-pane">
+                        <ul class="module-list" id="ml"></ul>
+                    </div>
+                    <div class="discipline-internal-pane">
+                        <div class="internal-heading">LISTA INTERNA DA DISCIPLINA</div>
+                        <ul class="internal-list" id="internal-list"></ul>
+                    </div>
+                </div>
+            </section>
+            <section class="pro-mode" id="pro-mode">
+                <div class="pro-menu-box" data-access="pro">
+                    <div class="pro-menu-heading">
+                        <span>MENU — MATRIZ CANÔNICA DE PESQUISA</span>
+                        <strong>ACESSO EXCLUSIVO — ASSINANTES PRO</strong>
+                    </div>
+                    <ul class="pro-list" id="pro-list"></ul>
+                </div>
+            </section>
         </div>
     </div>
     <div class="main" id="mn"></div>
@@ -411,7 +420,8 @@
     }
 
     function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
-        document.querySelectorAll('.module-item, .pro-item').forEach(item => item.classList.remove('active'));
+        document.body.dataset.activeMenu = 'pro';
+        document.querySelectorAll('.module-item, .pro-item, .internal-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
         document.getElementById('mn').innerHTML = `
             <div class="content">
@@ -446,6 +456,7 @@
     }
 
     function showSub(k, el) {
+        document.body.dataset.activeMenu = 'discipline';
         lastDisciplineKey = k;
         lastDisciplineElement = el;
         renderInternalDisciplineMenu(k);
