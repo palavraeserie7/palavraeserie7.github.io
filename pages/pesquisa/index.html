@@ -552,12 +552,16 @@
     }
 
     const SBLGNT_XML_URL = 'https://raw.githubusercontent.com/scott-fleischman/sblgnt-osis/master/SBLGNT.osis.xml';
+    const LXX_TSV_URL = 'https://raw.githubusercontent.com/LukeSmithxyz/grb/master/grb.tsv';
     const OSHB_JSON_URL = 'https://raw.githubusercontent.com/openscriptures/morphhb/master/index.js';
     let sblgntDocument = null;
+    let lxxRows = null;
     let oshbData = null;
     let currentParallelVerses = { greek: [], hebrew: [], portuguese: [] };
+    let bibleRenderToken = 0;
     const OSIS_BOOKS = { 'Mateus':'Matt', 'Marcos':'Mark', 'Lucas':'Luke', 'João':'John', 'Atos':'Acts', 'Romanos':'Rom', '1 Coríntios':'1Cor', '2 Coríntios':'2Cor', 'Gálatas':'Gal', 'Efésios':'Eph', 'Filipenses':'Phil', 'Colossenses':'Col', '1 Tessalonicenses':'1Thess', '2 Tessalonicenses':'2Thess', '1 Timóteo':'1Tim', '2 Timóteo':'2Tim', 'Tito':'Titus', 'Filemom':'Phlm', 'Hebreus':'Heb', 'Tiago':'Jas', '1 Pedro':'1Pet', '2 Pedro':'2Pet', '1 João':'1John', '2 João':'2John', '3 João':'3John', 'Judas':'Jude', 'Apocalipse':'Rev' };
     const OSHB_BOOKS = { 'Gênesis':'Genesis', 'Êxodo':'Exodus', 'Levítico':'Leviticus', 'Números':'Numbers', 'Deuteronômio':'Deuteronomy', 'Josué':'Joshua', 'Juízes':'Judges', 'Rute':'Ruth', '1 Samuel':'1Samuel', '2 Samuel':'2Samuel', '1 Reis':'1Kings', '2 Reis':'2Kings', '1 Crônicas':'1Chronicles', '2 Crônicas':'2Chronicles', 'Esdras':'Ezra', 'Neemias':'Nehemiah', 'Ester':'Esther', 'Jó':'Job', 'Salmos':'Psalms', 'Provérbios':'Proverbs', 'Eclesiastes':'Ecclesiastes', 'Cânticos':'SongofSongs', 'Isaías':'Isaiah', 'Jeremias':'Jeremiah', 'Lamentações':'Lamentations', 'Ezequiel':'Ezekiel', 'Daniel':'Daniel', 'Oséias':'Hosea', 'Joel':'Joel', 'Amós':'Amos', 'Obadias':'Obadiah', 'Jonas':'Jonah', 'Miquéias':'Micah', 'Naum':'Nahum', 'Habacuque':'Habakkuk', 'Sofonias':'Zephaniah', 'Ageu':'Haggai', 'Zacarias':'Zechariah', 'Malaquias':'Malachi' };
+    const LXX_BOOKS = { 'Gênesis':'Genesis', 'Êxodo':'Exodus', 'Levítico':'Leviticus', 'Números':'Numbers', 'Deuteronômio':'Deuteronomy', 'Josué':'Joshua', 'Juízes':'Judges', 'Rute':'Ruth', '1 Samuel':'1 Samuel', '2 Samuel':'2 Samuel', '1 Reis':'1 Kings', '2 Reis':'2 Kings', '1 Crônicas':'1 Chronicles', '2 Crônicas':'2 Chronicles', 'Esdras':'Ezra', 'Neemias':'Nehemiah', 'Ester':'Esther', 'Jó':'Job', 'Salmos':'Psalms', 'Provérbios':'Proverbs', 'Eclesiastes':'Ecclesiastes', 'Cânticos':'Song of Solomon', 'Isaías':'Isaiah', 'Jeremias':'Jeremiah', 'Lamentações':'Lamentations', 'Ezequiel':'Ezekiel', 'Daniel':'Daniel', 'Oséias':'Hosea', 'Joel':'Joel', 'Amós':'Amos', 'Obadias':'Obadiah', 'Jonas':'Jonah', 'Miquéias':'Micah', 'Naum':'Nahum', 'Habacuque':'Habakkuk', 'Sofonias':'Zephaniah', 'Ageu':'Haggai', 'Zacarias':'Zechariah', 'Malaquias':'Malachi' };
 
     async function loadSBLGNT() {
         if (sblgntDocument) return sblgntDocument;
@@ -565,6 +569,14 @@
         if (!response.ok) throw new Error('O corpus grego SBLGNT não respondeu.');
         sblgntDocument = new DOMParser().parseFromString(await response.text(), 'application/xml');
         return sblgntDocument;
+    }
+
+    async function loadLXX() {
+        if (lxxRows) return lxxRows;
+        const response = await fetch(LXX_TSV_URL);
+        if (!response.ok) throw new Error('A fonte grega LXX não respondeu.');
+        lxxRows = (await response.text()).trim().split(/\r?\n/).map(line => line.split('\t')).filter(row => row.length >= 6);
+        return lxxRows;
     }
 
     async function loadOSHB() {
@@ -578,10 +590,23 @@
     }
 
     async function getGreekVerses(book, chapter) {
-        if (!OSIS_BOOKS[book]) return [];
-        const doc = await loadSBLGNT();
-        const prefix = `${OSIS_BOOKS[book]}.${chapter}.`;
-        return Array.from(doc.querySelectorAll('[osisID]')).filter(node => node.getAttribute('osisID')?.startsWith(prefix)).map(node => ({ verse: node.getAttribute('osisID').split('.').pop(), text: node.textContent.trim() }));
+        if (OSIS_BOOKS[book]) {
+            const doc = await loadSBLGNT();
+            const prefix = `${OSIS_BOOKS[book]}.${chapter}.`;
+            return Array.from(doc.querySelectorAll('[osisID]')).filter(node => node.getAttribute('osisID')?.startsWith(prefix)).map(node => {
+                const id = node.getAttribute('osisID');
+                const end = doc.querySelector(`verse[eID="${id}"]`);
+                const range = doc.createRange();
+                range.setStartAfter(node);
+                if (end) range.setEndBefore(end); else range.setEndAfter(node);
+                return { verse: id.split('.').pop(), text: range.cloneContents().textContent.replace(/\s+/g, ' ').trim() };
+            });
+        }
+        if (LXX_BOOKS[book]) {
+            const rows = await loadLXX();
+            return rows.filter(row => row[0] === LXX_BOOKS[book] && Number(row[3]) === Number(chapter)).map(row => ({ verse: row[4], text: row[5].trim() }));
+        }
+        return [];
     }
 
     async function getHebrewVerses(book, chapter) {
@@ -601,12 +626,14 @@
         const chapterSelect = document.getElementById('bible-chapter-select');
         if (!paper) return;
         selectedBibleChapter = Number(chapterSelect?.value || selectedBibleChapter || 1);
-        paper.innerHTML = `<h3>LEITURA PARALELA</h3><h1>${selectedBibleBook} ${selectedBibleChapter}</h1><div class="bible-parallel-grid"><section class="bible-parallel-panel greek"><div class="bible-panel-heading">Grego<span class="bible-panel-source">SBLGNT — Society of Biblical Literature</span></div><div class="bible-panel-body" id="bible-greek-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-greek-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência grega" onkeydown="if(event.key==='Enter') queryBiblePanel('greek')"><button onclick="queryBiblePanel('greek')">ABRIR</button></div></section><section class="bible-parallel-panel hebrew"><div class="bible-panel-heading">Hebraico<span class="bible-panel-source">OSHB — Open Scriptures Hebrew Bible</span></div><div class="bible-panel-body" id="bible-hebrew-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-hebrew-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência hebraica" onkeydown="if(event.key==='Enter') queryBiblePanel('hebrew')"><button onclick="queryBiblePanel('hebrew')">ABRIR</button></div></section><section class="bible-parallel-panel portuguese"><div class="bible-panel-heading">Português<span class="bible-panel-source">João Ferreira de Almeida — fonte pública</span></div><div class="bible-panel-body" id="bible-portuguese-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-portuguese-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência portuguesa" onkeydown="if(event.key==='Enter') queryBiblePanel('portuguese')"><button onclick="queryBiblePanel('portuguese')">ABRIR</button></div></section></div><div class="bible-reading-actions"><button onclick="sendBiblePassageToResearch()">PESQUISAR ESTA PASSAGEM</button><button onclick="closeBibleReader()">VOLTAR À MATRIZ</button></div>`;
+        const renderToken = ++bibleRenderToken;
+        paper.innerHTML = `<h3>LEITURA PARALELA</h3><h1>${selectedBibleBook} ${selectedBibleChapter}</h1><div class="bible-parallel-grid"><section class="bible-parallel-panel greek"><div class="bible-panel-heading">Grego<span class="bible-panel-source">LXX — Antigo Testamento · SBLGNT — Novo Testamento</span></div><div class="bible-panel-body" id="bible-greek-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-greek-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência grega" onkeydown="if(event.key==='Enter') queryBiblePanel('greek')"><button onclick="queryBiblePanel('greek')">ABRIR</button></div></section><section class="bible-parallel-panel hebrew"><div class="bible-panel-heading">Hebraico<span class="bible-panel-source">OSHB — Open Scriptures Hebrew Bible</span></div><div class="bible-panel-body" id="bible-hebrew-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-hebrew-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência hebraica" onkeydown="if(event.key==='Enter') queryBiblePanel('hebrew')"><button onclick="queryBiblePanel('hebrew')">ABRIR</button></div></section><section class="bible-parallel-panel portuguese"><div class="bible-panel-heading">Português<span class="bible-panel-source">João Ferreira de Almeida — fonte pública</span></div><div class="bible-panel-body" id="bible-portuguese-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-portuguese-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência portuguesa" onkeydown="if(event.key==='Enter') queryBiblePanel('portuguese')"><button onclick="queryBiblePanel('portuguese')">ABRIR</button></div></section></div><div class="bible-reading-actions"><button onclick="sendBiblePassageToResearch()">PESQUISAR ESTA PASSAGEM</button><button onclick="closeBibleReader()">VOLTAR À MATRIZ</button></div>`;
         const bookId = BIBLE_BOOK_IDS[selectedBibleBook];
-        const portuguesePromise = fetch(`https://bible-api.com/data/almeida/${bookId}/${selectedBibleChapter}`).then(async response => { const data = await response.json(); if (!response.ok || !Array.isArray(data.verses)) throw new Error(data?.error || 'A fonte portuguesa não devolveu o capítulo.'); return data.verses; });
+        const portuguesePromise = fetch(`https://bible-api.com/data/almeida/${bookId}/${selectedBibleChapter}`, { headers: { 'Accept': 'application/json' } }).then(async response => { const data = await response.json(); if (!response.ok || !Array.isArray(data.verses)) throw new Error(data?.error || 'A fonte portuguesa não devolveu o capítulo.'); return data.verses; });
         const greekPromise = getGreekVerses(selectedBibleBook, selectedBibleChapter);
         const hebrewPromise = getHebrewVerses(selectedBibleBook, selectedBibleChapter);
         const [portuguese, greek, hebrew] = await Promise.allSettled([portuguesePromise, greekPromise, hebrewPromise]);
+        if (renderToken !== bibleRenderToken) return;
         currentParallelVerses = { portuguese: portuguese.status === 'fulfilled' ? portuguese.value : [], greek: greek.status === 'fulfilled' ? greek.value : [], hebrew: hebrew.status === 'fulfilled' ? hebrew.value : [] };
         const greekPanel = document.getElementById('bible-greek-panel');
         const hebrewPanel = document.getElementById('bible-hebrew-panel');
