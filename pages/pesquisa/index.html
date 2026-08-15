@@ -8,11 +8,19 @@
         :root { --p: #20d66b; --bg: #0b1428; --s: #111b30; --c: #17243a; --i: #0d172b; --t: #dbe7f5; --b: #263754; --a: #18bfff; }
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--bg); color: var(--t); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 320px; background: var(--s); border-right: 1px solid var(--b); display: flex; flex-direction: column; height: 100vh; }
+        .sidebar { width: 320px; background: var(--s); border-right: 1px solid var(--b); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
+        .discipline-area { flex: 1 1 auto; min-height: 420px; display: flex; flex-direction: column; }
+        .discipline-list-pane, .discipline-internal-pane { flex: 1 1 50%; min-height: 190px; overflow-y: auto; }
+        .discipline-internal-pane { border-top: 1px solid var(--b); background: rgba(0,0,0,0.12); }
+        .internal-heading { padding: 12px 15px 8px; color: var(--a); font-size: 10px; font-weight: 900; letter-spacing: 1px; border-bottom: 1px solid var(--b); }
+        .internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
+        .internal-category { padding: 8px 8px 5px; color: #7fcbed; font-size: 9px; font-weight: 900; letter-spacing: 0.6px; }
+        .internal-item { padding: 7px 9px; margin-bottom: 3px; border-radius: 5px; cursor: pointer; color: #a9bbcf; font-size: 10px; line-height: 1.25; }
+        .internal-item:hover { background: rgba(24,191,255,0.1); color: #fff; }
         .sidebar-header { padding: 25px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.2); }
         .sidebar-header h2 { font-size: 14px; color: var(--p); margin: 0; letter-spacing: 2px; }
         .sidebar-header p { font-size: 10px; color: #91a4bd; margin: 5px 0 0; font-weight: bold; }
-        .module-list { flex: 1; overflow-y: auto; list-style: none; padding: 10px; margin: 0; }
+        .module-list { list-style: none; padding: 10px; margin: 0; }
         .module-item { padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; font-size: 12px; font-weight: 600; color: #91a4bd; display: flex; align-items: center; }
         .module-item:hover { background: rgba(32, 214, 107, 0.05); color: var(--t); }
         .module-item.active { background: rgba(32, 214, 107, 0.1); border-color: var(--p); color: #fff; }
@@ -88,7 +96,15 @@
     <div class="sidebar">
         <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p></div>
         <div class="menu-heading"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
-        <ul class="module-list" id="ml"></ul>
+        <div class="discipline-area">
+            <div class="discipline-list-pane">
+                <ul class="module-list" id="ml"></ul>
+            </div>
+            <div class="discipline-internal-pane">
+                <div class="internal-heading">LISTA INTERNA DA DISCIPLINA</div>
+                <ul class="internal-list" id="internal-list"></ul>
+            </div>
+        </div>
         <div class="pro-menu-box" data-access="pro">
             <div class="pro-menu-heading">
                 <span>MENU — MATRIZ CANÔNICA DE PESQUISA</span>
@@ -409,9 +425,30 @@
             </div>`;
     }
 
+    function renderInternalDisciplineMenu(discipline) {
+        const internalList = document.getElementById('internal-list');
+        if (!internalList || !DATA[discipline]) return;
+        internalList.innerHTML = '';
+        Object.keys(DATA[discipline]).forEach(category => {
+            const categoryItem = document.createElement('li');
+            categoryItem.className = 'internal-category';
+            categoryItem.innerText = category;
+            internalList.appendChild(categoryItem);
+
+            DATA[discipline][category].forEach(tool => {
+                const item = document.createElement('li');
+                item.className = 'internal-item';
+                item.innerText = tool;
+                item.onclick = () => openSearch(tool, discipline);
+                internalList.appendChild(item);
+            });
+        });
+    }
+
     function showSub(k, el) {
         lastDisciplineKey = k;
         lastDisciplineElement = el;
+        renderInternalDisciplineMenu(k);
         document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
         const mn = document.getElementById('mn');
