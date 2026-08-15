@@ -11,6 +11,8 @@
         .sidebar { width: 320px; background: var(--s); border-right: 1px solid var(--b); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .sidebar-menus { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
         .discipline-mode, .pro-mode { flex: 1 1 50%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+        .sidebar.pro-active .discipline-mode { display: none; }
+        .sidebar.pro-active .pro-mode { flex: 1 1 100%; }
         .discipline-mode { border-bottom: 1px solid var(--b); }
         .discipline-area { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
         .discipline-list-pane { height: 100%; overflow-y: auto; }
@@ -471,6 +473,7 @@
 
     function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
         document.body.dataset.activeMenu = 'pro';
+        document.querySelector('.sidebar').classList.add('pro-active');
         document.querySelectorAll('.module-item, .pro-item, .internal-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
         document.getElementById('mn').innerHTML = `
@@ -539,6 +542,7 @@
 
     function showSub(k, el) {
         document.body.dataset.activeMenu = 'discipline';
+        document.querySelector('.sidebar').classList.remove('pro-active');
         lastDisciplineKey = k;
         lastDisciplineElement = el;
         document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
