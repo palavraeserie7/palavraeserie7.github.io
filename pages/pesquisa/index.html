@@ -175,12 +175,7 @@
                 <div><h2 id="bible-title">BÍBLIA — LEITURA</h2><p>Uma janela exclusiva para leitura e comparação bíblica.</p></div>
                 <button class="bible-close" onclick="closeBibleReader()">← FECHAR</button>
             </div>
-            <div class="bible-toolbar">
-                <label>VERSÃO<select id="bible-version"><option>Almeida Revista e Atualizada (ARA)</option><option>Nova Versão Internacional (NVI)</option></select></label>
-                <label>LIVRO<select id="bible-book-select" onchange="selectBibleBook(this.value)"></select></label>
-                <label>CAPÍTULO<select id="bible-chapter-select" onchange="renderBibleChapter()"></select></label>
-                <label>PESQUISAR<input id="bible-search" type="search" placeholder="Versículo ou palavra"></label>
-            </div>
+
             <div class="bible-window-body">
                 <nav class="bible-book-list" id="bible-book-list" aria-label="Livros bíblicos"></nav>
                 <main class="bible-reading-paper" id="bible-reading-paper"></main>
@@ -484,14 +479,12 @@
 
     const BIBLE_BOOKS = ['Gênesis', 'Êxodo', 'Levítico', 'Números', 'Deuteronômio', 'Josué', 'Juízes', 'Rute', '1 Samuel', '2 Samuel', '1 Reis', '2 Reis', '1 Crônicas', '2 Crônicas', 'Esdras', 'Neemias', 'Ester', 'Jó', 'Salmos', 'Provérbios', 'Eclesiastes', 'Cânticos', 'Isaías', 'Jeremias', 'Lamentações', 'Ezequiel', 'Daniel', 'Oséias', 'Joel', 'Amós', 'Obadias', 'Jonas', 'Miquéias', 'Naum', 'Habacuque', 'Sofonias', 'Ageu', 'Zacarias', 'Malaquias', 'Mateus', 'Marcos', 'Lucas', 'João', 'Atos', 'Romanos', '1 Coríntios', '2 Coríntios', 'Gálatas', 'Efésios', 'Filipenses', 'Colossenses', '1 Tessalonicenses', '2 Tessalonicenses', '1 Timóteo', '2 Timóteo', 'Tito', 'Filemom', 'Hebreus', 'Tiago', '1 Pedro', '2 Pedro', '1 João', '2 João', '3 João', 'Judas', 'Apocalipse'];
     let selectedBibleBook = 'Gênesis';
-    let selectedBibleChapter = 1;
 
     function openBibleReader() {
         const overlay = document.getElementById('bible-overlay');
         overlay.classList.add('open');
         document.body.classList.add('bible-open');
         renderBibleBookList();
-        populateBibleSelectors();
         renderBibleChapter();
     }
 
@@ -513,27 +506,16 @@
         });
     }
 
-    function populateBibleSelectors() {
-        const bookSelect = document.getElementById('bible-book-select');
-        const chapterSelect = document.getElementById('bible-chapter-select');
-        if (!bookSelect || !chapterSelect) return;
-        bookSelect.innerHTML = BIBLE_BOOKS.map(book => `<option ${book === selectedBibleBook ? 'selected' : ''}>${book}</option>`).join('');
-        chapterSelect.innerHTML = Array.from({ length: 50 }, (_, index) => `<option value="${index + 1}" ${index + 1 === selectedBibleChapter ? 'selected' : ''}>${index + 1}</option>`).join('');
-    }
-
     function selectBibleBook(book) {
         selectedBibleBook = book;
-        selectedBibleChapter = 1;
         renderBibleBookList();
-        populateBibleSelectors();
         renderBibleChapter();
     }
 
     function renderBibleChapter() {
         const paper = document.getElementById('bible-reading-paper');
-        const version = document.getElementById('bible-version')?.value || 'Almeida Revista e Atualizada (ARA)';
         if (!paper) return;
-        paper.innerHTML = `<h3>ÍNDICE DE LEITURA</h3><h1>${selectedBibleBook} ${selectedBibleChapter}</h1><div class="bible-reading-placeholder">Referência selecionada: <strong>${selectedBibleBook} ${selectedBibleChapter}</strong><br>Versão selecionada: <strong>${version}</strong><br><br>Nesta etapa, esta janela apresenta somente o índice. O texto bíblico será acrescentado posteriormente.</div><div class="bible-reading-actions"><button onclick="sendBiblePassageToResearch()">PESQUISAR ESTA REFERÊNCIA</button><button onclick="closeBibleReader()">VOLTAR À MATRIZ</button></div>`;
+        paper.innerHTML = `<h3>ÍNDICE BÍBLICO</h3><h1>${selectedBibleBook}</h1><div class="bible-reading-placeholder">Livro selecionado no índice: <strong>${selectedBibleBook}</strong><br><br>Capítulos, versículos e o texto bíblico serão acrescentados posteriormente.</div><div class="bible-reading-actions"><button onclick="sendBiblePassageToResearch()">PESQUISAR ESTE LIVRO</button><button onclick="closeBibleReader()">VOLTAR À MATRIZ</button></div>`;
     }
 
     function sendBiblePassageToResearch() {
