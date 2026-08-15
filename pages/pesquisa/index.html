@@ -84,6 +84,10 @@
         .shelf-header p { margin: 4px 0 0; color: #806f53; font-size: 11px; }
         .shelf-close { padding: 8px 13px; border: 1px solid #806f53; border-radius: 6px; background: transparent; color: #4a443b; font-weight: 900; cursor: pointer; }
         .shelf-body { flex: 1; min-height: 0; overflow-y: auto; padding: 22px; }
+        .shelf-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; padding-bottom: 12px; border-bottom: 1px solid #d8cdb8; }
+        .shelf-tab { padding: 9px 12px; border: 1px solid #cdbfaa; border-radius: 6px; background: #fffdf7; color: #6d5d45; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .shelf-tab:hover, .shelf-tab.active { background: #806f53; border-color: #806f53; color: #fffaf0; }
+        .shelf-empty { padding: 25px 18px; border: 1px dashed #cdbfaa; border-radius: 8px; background: rgba(255,255,255,.28); color: #806f53; font-size: 13px; line-height: 1.6; }
         .shelf-section { margin-bottom: 26px; }
         .shelf-section h3 { margin: 0 0 12px; color: #806f53; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
         .shelf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
@@ -265,6 +269,8 @@
     // Exemplo: https://matriz-canonica-ai.seu-subdominio.workers.dev
     const AI_PROXY_URL = "https://yellow-lab-f4b2.palavraeserie.workers.dev";
 
+    let activeShelfSection = 'free';
+
     const SHELF_BOOKS = {
         free: [
             { title: 'Guia de Leitura Bíblica', description: 'Orientações introdutórias para observar passagem, contexto, estrutura e aplicação responsável.' },
@@ -276,6 +282,10 @@
             { title: 'Caderno de Hebraico do Antigo Testamento', description: 'Material de apoio para texto hebraico, formas, léxico e leitura do OSHB.' },
             { title: 'Manual da Matriz Canónica', description: 'Guia dos 12 módulos, fontes prioritárias e regras de investigação da plataforma.' },
             { title: 'Dossiês de Fontes e Contextos', description: 'Colecção de materiais de apoio para crítica textual, história, contexto e interpretação.' }
+        ],
+        own: [],
+        external: [
+            { title: 'Referências externas autorizadas', description: 'As referências podem ser adicionadas por link oficial quando a obra não puder ser hospedada na estante.' }
         ]
     };
 
@@ -283,27 +293,37 @@
         const overlay = document.getElementById('shelf-overlay');
         if (!overlay) return;
         overlay.classList.add('open');
-        renderShelf();
+        renderShelf(activeShelfSection);
     }
 
     function closeShelf() {
         document.getElementById('shelf-overlay')?.classList.remove('open');
     }
 
-    function renderShelf() {
-        const body = document.getElementById('shelf-body');
-        if (!body) return;
-        const renderBooks = (books, access, locked) => books.map(book => `<article class="shelf-book ${locked ? 'pro' : ''}"><span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p><button class="${locked ? 'locked' : ''}" onclick="shelfBookAction(${JSON.stringify(book.title)}, ${locked})">${locked ? 'ACESSO PRO' : 'ABRIR MATERIAL'}</button></article>`).join('');
-        body.innerHTML = `<section class="shelf-section"><h3>Materiais disponíveis</h3><div class="shelf-grid">${renderBooks(SHELF_BOOKS.free, 'FREE', false)}</div></section><section class="shelf-section"><h3>Materiais reservados ao PRO</h3><div class="shelf-grid">${renderBooks(SHELF_BOOKS.pro, 'PRO', true)}</div><div class="shelf-note" id="shelf-note">O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.</div></section>`;
+    function selectShelfSection(section) {
+        activeShelfSection = section;
+        renderShelf(section);
     }
 
-    function shelfBookAction(title, locked) {
+    function renderShelf(section = activeShelfSection) {
+        const body = document.getElementById('shelf-body');
+        if (!body) return;
+        const sections = { free: 'FREE', pro: 'PRO', own: 'MEUS LIVROS', external: 'REFERÊNCIAS EXTERNAS' };
+        const books = SHELF_BOOKS[section] || [];
+        const locked = section === 'pro';
+        const access = sections[section];
+        const renderBooks = books.map(book => `<article class="shelf-book ${locked ? 'pro' : ''}"><span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p><button class="${locked ? 'locked' : ''}" onclick="shelfBookAction(${JSON.stringify(book.title)}, ${locked}, ${JSON.stringify(section)})">${locked ? 'ACESSO PRO' : section === 'external' ? 'ABRIR REFERÊNCIA' : 'ABRIR MATERIAL'}</button></article>`).join('');
+        const content = renderBooks || `<div class="shelf-empty">Ainda não há materiais nesta divisão. Os seus livros próprios poderão ser adicionados posteriormente ao catálogo e aparecerão aqui automaticamente.</div>`;
+        body.innerHTML = `<nav class="shelf-tabs" aria-label="Divisões da estante"><button class="shelf-tab ${section === 'free' ? 'active' : ''}" onclick="selectShelfSection('free')">FREE</button><button class="shelf-tab ${section === 'pro' ? 'active' : ''}" onclick="selectShelfSection('pro')">PRO</button><button class="shelf-tab ${section === 'own' ? 'active' : ''}" onclick="selectShelfSection('own')">MEUS LIVROS</button><button class="shelf-tab ${section === 'external' ? 'active' : ''}" onclick="selectShelfSection('external')">REFERÊNCIAS EXTERNAS</button></nav><section class="shelf-section"><h3>${access}</h3><div class="shelf-grid">${content}</div><div class="shelf-note" id="shelf-note">${section === 'pro' ? 'O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.' : section === 'external' ? 'As referências externas serão abertas apenas através de fontes oficiais ou autorizadas.' : section === 'own' ? 'Os seus livros poderão ser organizados aqui por título, categoria, autor e nível de acesso.' : 'Materiais introdutórios disponíveis para demonstração.'}</div></section>`;
+    }
+
+    function shelfBookAction(title, locked, section) {
         const note = document.getElementById('shelf-note');
         if (locked) {
             if (note) note.textContent = `“${title}” está reservado para a futura área PRO. Esta demonstração não realiza pagamentos nem recolhe dados.`;
             return;
         }
-        if (note) note.textContent = `“${title}” está disponível como material demonstrativo da estante Free.`;
+        if (note) note.textContent = section === 'external' ? `“${title}” deverá apontar para a fonte oficial ou autorizada.` : `“${title}” está disponível nesta divisão demonstrativa da estante.`;
     }
 
     const PRO_MODULE_DATA = {
