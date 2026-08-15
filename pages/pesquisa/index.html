@@ -285,6 +285,7 @@
         ],
         own: [],
         external: [
+            { title: 'Matthew Henry — Commentary on the Whole Bible', description: 'Comentário cristão clássico. Disponível através da página oficial do CCEL.', url: 'https://www.ccel.org/ccel/henry/mhc' },
             { title: 'Referências externas autorizadas', description: 'As referências podem ser adicionadas por link oficial quando a obra não puder ser hospedada na estante.' }
         ]
     };
@@ -312,15 +313,20 @@
         const books = SHELF_BOOKS[section] || [];
         const locked = section === 'pro';
         const access = sections[section];
-        const renderBooks = books.map(book => `<article class="shelf-book ${locked ? 'pro' : ''}"><span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p><button class="${locked ? 'locked' : ''}" onclick="shelfBookAction(${JSON.stringify(book.title)}, ${locked}, ${JSON.stringify(section)})">${locked ? 'ACESSO PRO' : section === 'external' ? 'ABRIR REFERÊNCIA' : 'ABRIR MATERIAL'}</button></article>`).join('');
+        const renderBooks = books.map(book => `<article class="shelf-book ${locked ? 'pro' : ''}"><span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p><button class="${locked ? 'locked' : ''}" onclick="shelfBookAction(${JSON.stringify(book.title)}, ${locked}, ${JSON.stringify(section)}, ${JSON.stringify(book.url || '')})">${locked ? 'ACESSO PRO' : section === 'external' ? 'ABRIR REFERÊNCIA' : 'ABRIR MATERIAL'}</button></article>`).join('');
         const content = renderBooks || `<div class="shelf-empty">Ainda não há materiais nesta divisão. Os seus livros próprios poderão ser adicionados posteriormente ao catálogo e aparecerão aqui automaticamente.</div>`;
         body.innerHTML = `<nav class="shelf-tabs" aria-label="Divisões da estante"><button class="shelf-tab ${section === 'free' ? 'active' : ''}" onclick="selectShelfSection('free')">FREE</button><button class="shelf-tab ${section === 'pro' ? 'active' : ''}" onclick="selectShelfSection('pro')">PRO</button><button class="shelf-tab ${section === 'own' ? 'active' : ''}" onclick="selectShelfSection('own')">MEUS LIVROS</button><button class="shelf-tab ${section === 'external' ? 'active' : ''}" onclick="selectShelfSection('external')">REFERÊNCIAS EXTERNAS</button></nav><section class="shelf-section"><h3>${access}</h3><div class="shelf-grid">${content}</div><div class="shelf-note" id="shelf-note">${section === 'pro' ? 'O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.' : section === 'external' ? 'As referências externas serão abertas apenas através de fontes oficiais ou autorizadas.' : section === 'own' ? 'Os seus livros poderão ser organizados aqui por título, categoria, autor e nível de acesso.' : 'Materiais introdutórios disponíveis para demonstração.'}</div></section>`;
     }
 
-    function shelfBookAction(title, locked, section) {
+    function shelfBookAction(title, locked, section, url = '') {
         const note = document.getElementById('shelf-note');
         if (locked) {
             if (note) note.textContent = `“${title}” está reservado para a futura área PRO. Esta demonstração não realiza pagamentos nem recolhe dados.`;
+            return;
+        }
+        if (section === 'external' && url) {
+            window.open(url, '_blank', 'noopener,noreferrer');
+            if (note) note.textContent = `A referência “${title}” foi aberta na fonte oficial.`;
             return;
         }
         if (note) note.textContent = section === 'external' ? `“${title}” deverá apontar para a fonte oficial ou autorizada.` : `“${title}” está disponível nesta divisão demonstrativa da estante.`;
