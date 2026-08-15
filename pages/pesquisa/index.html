@@ -445,6 +445,30 @@
         showSub(lastDisciplineKey, element);
     }
 
+    function renderProModuleCards(module) {
+        const cards = module === '01 — TEXTO BÍBLICO'
+            ? TEXT_BIBLICO_SUBMODULES
+            : [`Procedimentos de análise — ${module}`, 'Fontes e critérios do módulo', 'Área de estudo e investigação'];
+        let html = `<div class="category-group"><div class="category-title">MATRIZ CANÔNICA DE PESQUISA PRO</div><div class="tools-grid">`;
+        cards.forEach(card => {
+            html += `<div class="tool-card" onclick="openProCard('${card}', '${module}')"><h4>${card}</h4></div>`;
+        });
+        html += '</div></div>';
+        return html;
+    }
+
+    function openProCard(card, module) {
+        document.getElementById('mn').innerHTML = `
+            <div class="content">
+                <button class="back-arrow" onclick="showProfessionalModule('${module}', document.querySelector('.pro-item.active'))" title="Voltar para o módulo PRO">← VOLTAR</button>
+                <div class="category-title">MATRIZ CANÔNICA DE PESQUISA PRO</div>
+                <h1>${card}</h1>
+                <div class="search-area" style="min-height:420px;">
+                    <p style="color:#91a4bd;">Estrutura do item PRO preparada para receber o procedimento de análise.</p>
+                </div>
+            </div>`;
+    }
+
     function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
         document.body.dataset.activeMenu = 'pro';
         document.querySelectorAll('.module-item, .pro-item, .internal-item').forEach(item => item.classList.remove('active'));
@@ -452,12 +476,7 @@
         document.getElementById('mn').innerHTML = `
             <div class="content">
                 <button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button>
-                <div class="category-title">${category}</div>
-                <div class="search-area" style="min-height:420px;">
-                    <h1 style="color:#fff;">${module}</h1>
-                    <div style="height:1px; background:var(--b); margin:25px 0;"></div>
-                    <p style="color:#91a4bd;">Estrutura do módulo preparada para receber os procedimentos de análise.</p>
-                </div>
+                ${renderProModuleCards(module)}
             </div>`;
     }
 
