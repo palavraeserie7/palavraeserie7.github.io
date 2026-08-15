@@ -106,6 +106,16 @@
         .shelf-book button, .shelf-book .shelf-link { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 12px; border: 0; border-radius: 5px; background: #806f53; color: #fffaf0; font-size: 10px; font-weight: 800; text-decoration: none; cursor: pointer; }
         .shelf-book button.locked { background: #c8bba5; color: #5f513d; }
         .shelf-note { margin-top: 16px; padding: 12px 14px; border-left: 3px solid #b99b61; background: rgba(255,255,255,.45); color: #776b59; font-size: 12px; line-height: 1.55; }
+        .book-presentation-overlay { display: none; position: fixed; inset: 0; z-index: 220; align-items: center; justify-content: center; padding: 24px; background: rgba(35,28,18,.68); }
+        .book-presentation-overlay.open { display: flex; }
+        .book-presentation-window { display: grid; grid-template-columns: minmax(180px, 280px) minmax(0, 1fr); gap: 26px; width: min(820px, 94vw); max-height: 90vh; overflow-y: auto; padding: 24px; border: 1px solid #d8cdb8; border-radius: 12px; background: #f1eadb; color: #4a443b; box-shadow: 0 16px 50px rgba(0,0,0,.35); }
+        .book-presentation-cover { min-height: 360px; border-radius: 6px; background: #806f53 center top / cover no-repeat; box-shadow: 0 8px 18px rgba(55,45,30,.22); }
+        .book-presentation-content h2 { margin: 0 0 7px; font-family: Georgia, serif; font-size: 28px; line-height: 1.15; }
+        .book-presentation-content h3 { margin: 0 0 20px; color: #806f53; font-size: 13px; font-weight: 700; }
+        .book-presentation-content p { line-height: 1.7; font-size: 14px; }
+        .book-presentation-status { margin: 20px 0; padding: 12px 14px; border-left: 3px solid #b99b61; background: rgba(255,255,255,.48); color: #6d5d45; font-size: 12px; line-height: 1.55; }
+        .book-presentation-close { margin-top: 10px; padding: 10px 15px; border: 1px solid #806f53; border-radius: 6px; background: transparent; color: #4a443b; font-weight: 900; cursor: pointer; }
+        @media (max-width: 650px) { .book-presentation-window { grid-template-columns: 1fr; } .book-presentation-cover { min-height: 300px; } }
         @media (max-width: 700px) { .shelf-overlay { padding: 0; } .shelf-window { width: 100%; height: 100%; } .shelf-header { padding: 14px 16px; } .shelf-body { padding: 16px; } }
         .bible-overlay { position: fixed; inset: 0; z-index: 50; display: none; align-items: stretch; justify-content: center; background: rgba(5,10,20,0.82); }
         .bible-overlay.open { display: flex; }
@@ -270,6 +280,10 @@
         </div>
     </div>
 
+    <div class="book-presentation-overlay" id="book-presentation-overlay" role="dialog" aria-modal="true" aria-labelledby="book-presentation-title">
+        <div class="book-presentation-window" id="book-presentation-window"></div>
+    </div>
+
 <script>
     // Cole aqui a URL pública do seu serviço intermediário protegido.
     // Exemplo: https://matriz-canonica-ai.seu-subdominio.workers.dev
@@ -290,8 +304,8 @@
             { title: 'Dossiês de Fontes e Contextos', author: 'Palavra & Série', cover: 'FONTES E CONTEXTOS', description: 'Colecção de materiais de apoio para crítica textual, história, contexto e interpretação.' }
         ],
         own: [
-            { title: 'Além da Régua', author: 'A. F. Santos', cover: 'ALÉM DA RÉGUA', coverImage: './assets/livros/alem-da-regua.png', description: 'Livro do autor. Capa divulgada na estante; o conteúdo completo permanece fechado nesta etapa.' },
-            { title: 'Você Não é um Acidente', author: 'A. F. Santos', cover: 'VOCÊ NÃO É UM ACIDENTE', coverImage: './assets/livros/voce-nao-e-um-acidente.png', description: 'Devocional de 30 dias para redescobrir o seu valor em Deus. Capa divulgada na estante; conteúdo fechado nesta etapa.' }
+            { title: 'Além da Régua', author: 'A. F. Santos', cover: 'ALÉM DA RÉGUA', coverImage: '../../assets/livros/alem-da-regua.png', description: 'Livro do autor. Capa divulgada na estante; o conteúdo completo permanece fechado nesta etapa.' },
+            { title: 'Você Não é um Acidente', author: 'A. F. Santos', cover: 'VOCÊ NÃO É UM ACIDENTE', coverImage: '../../assets/livros/voce-nao-e-um-acidente.png', description: 'Devocional de 30 dias para redescobrir o seu valor em Deus. Capa divulgada na estante; conteúdo fechado nesta etapa.' }
         ],
         external: [
             { title: 'Matthew Henry — Commentary on the Whole Bible', author: 'Matthew Henry', cover: 'COMENTÁRIO', description: 'Comentário cristão clássico. Disponível através da página oficial do CCEL.', url: 'https://www.ccel.org/ccel/henry/mhc' },
@@ -325,7 +339,7 @@
         const books = SHELF_BOOKS[section] || [];
         const locked = section === 'pro';
         const access = sections[section];
-        const renderBooks = books.map(book => { const cover = `<div class="shelf-cover ${book.coverImage ? 'has-image' : ''}" ${book.coverImage ? `style="background-image: linear-gradient(rgba(35,28,18,.08), rgba(35,28,18,.08)), url('${book.coverImage}')"` : ''}><small>PALAVRA & SÉRIE</small>${book.coverImage ? '' : `<strong>${escapeBibleText(book.cover || 'ESTUDO')}</strong><em>${escapeBibleText(book.author || 'Biblioteca de estudo')}</em>`}</div>`; const action = section === 'external' && book.url ? `<a class="shelf-link" href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA</a>` : `<button class="${locked ? 'locked' : ''}" onclick="shelfBookAction(${JSON.stringify(book.title)}, ${locked}, ${JSON.stringify(section)}, ${JSON.stringify(book.url || '')})">${locked ? 'ACESSO PRO' : section === 'own' ? 'VER APRESENTAÇÃO' : 'ABRIR MATERIAL'}</button>`; return `<article class="shelf-book ${locked ? 'pro' : ''}">${cover}<span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p>${action}</article>`; }).join('');
+        const renderBooks = books.map(book => { const cover = `<div class="shelf-cover ${book.coverImage ? 'has-image' : ''}" ${book.coverImage ? `style="background-image: linear-gradient(rgba(35,28,18,.08), rgba(35,28,18,.08)), url('${book.coverImage}')"` : ''}><small>PALAVRA & SÉRIE</small>${book.coverImage ? '' : `<strong>${escapeBibleText(book.cover || 'ESTUDO')}</strong><em>${escapeBibleText(book.author || 'Biblioteca de estudo')}</em>`}</div>`; const action = section === 'external' && book.url ? `<a class="shelf-link" href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA</a>` : `<button class="${locked ? 'locked' : ''}" onclick="${section === 'own' ? `openBookPresentation(${JSON.stringify(book.title)}, ${JSON.stringify(section)})` : `shelfBookAction(${JSON.stringify(book.title)}, ${locked}, ${JSON.stringify(section)}, ${JSON.stringify(book.url || '')})`}">${locked ? 'ACESSO PRO' : section === 'own' ? 'VER APRESENTAÇÃO' : 'ABRIR MATERIAL'}</button>`; return `<article class="shelf-book ${locked ? 'pro' : ''}">${cover}<span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p>${action}</article>`; }).join('');
         const content = renderBooks || `<div class="shelf-empty">Ainda não há materiais nesta divisão. Os seus livros próprios poderão ser adicionados posteriormente ao catálogo e aparecerão aqui automaticamente.</div>`;
         body.innerHTML = `<nav class="shelf-tabs" aria-label="Divisões da estante"><button class="shelf-tab ${section === 'free' ? 'active' : ''}" onclick="selectShelfSection('free')">FREE</button><button class="shelf-tab ${section === 'pro' ? 'active' : ''}" onclick="selectShelfSection('pro')">PRO</button><button class="shelf-tab ${section === 'own' ? 'active' : ''}" onclick="selectShelfSection('own')">MEUS LIVROS</button><button class="shelf-tab ${section === 'external' ? 'active' : ''}" onclick="selectShelfSection('external')">REFERÊNCIAS EXTERNAS</button></nav><section class="shelf-section"><h3>${access}</h3><div class="shelf-grid">${content}</div><div class="shelf-note" id="shelf-note">${section === 'pro' ? 'O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.' : section === 'external' ? 'As referências externas serão abertas apenas através de fontes oficiais ou autorizadas.' : section === 'own' ? 'Os seus livros poderão ser organizados aqui por título, categoria, autor e nível de acesso.' : 'Materiais introdutórios disponíveis para demonstração.'}</div></section>`;
     }
@@ -341,6 +355,20 @@
             return;
         }
         if (note) note.textContent = section === 'external' ? `“${title}” deverá apontar para a fonte oficial ou autorizada.` : `“${title}” está disponível nesta divisão demonstrativa da estante.`;
+    }
+
+    function openBookPresentation(title, section = 'own') {
+        const book = (SHELF_BOOKS[section] || []).find(item => item.title === title);
+        const overlay = document.getElementById('book-presentation-overlay');
+        const windowBox = document.getElementById('book-presentation-window');
+        if (!book || !overlay || !windowBox) return;
+        const coverStyle = book.coverImage ? `background-image: url('${book.coverImage}')` : '';
+        windowBox.innerHTML = `<div class="book-presentation-cover" style="${coverStyle}"></div><div class="book-presentation-content"><h2 id="book-presentation-title">${escapeBibleText(book.title)}</h2><h3>${escapeBibleText(book.author || 'Palavra & Série')}</h3><p>${escapeBibleText(book.description || '')}</p><div class="book-presentation-status">Esta é uma apresentação de divulgação do livro. O conteúdo completo permanece fechado nesta etapa.</div><button class="book-presentation-close" onclick="closeBookPresentation()">← VOLTAR PARA A ESTANTE</button></div>`;
+        overlay.classList.add('open');
+    }
+
+    function closeBookPresentation() {
+        document.getElementById('book-presentation-overlay')?.classList.remove('open');
     }
 
     const PRO_MODULE_DATA = {
