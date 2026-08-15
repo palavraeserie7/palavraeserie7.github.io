@@ -33,6 +33,24 @@
         .menu-heading { padding: 22px 15px 14px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
         .menu-heading strong { display: block; margin-top: 7px; color: #e5edf7; font-size: 11px; line-height: 1.35; letter-spacing: 0.4px; }
+        .menu-heading { cursor: pointer; }
+        .menu-heading:hover strong { color: #fff; }
+        .ontology-paper { min-height: calc(100vh - 80px); padding: 40px 48px; background: #f1eadb; color: #4a443b; overflow-y: auto; }
+        .ontology-paper h1 { margin: 0 0 26px; color: #4a443b; font-size: 30px; letter-spacing: 0.5px; }
+        .ontology-tree { max-width: 1100px; }
+        .ontology-node { margin: 0 0 10px; }
+        .ontology-node > summary { padding: 13px 16px; border: 1px solid #d8cdb8; border-radius: 7px; background: #fffdf7; color: #4a443b; font-size: 14px; font-weight: 800; cursor: pointer; list-style-position: inside; }
+        .ontology-node > summary:hover { background: #faf1df; border-color: #b99b61; }
+        .ontology-node[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: #eee2cd; }
+        .ontology-children { margin: 0 0 12px 22px; padding: 10px 0 0 18px; border-left: 2px solid #cdbfaa; }
+        .ontology-category { margin: 0 0 8px; }
+        .ontology-category > summary { padding: 10px 13px; border: 1px solid #d8cdb8; border-radius: 6px; background: #f8f1e4; color: #6d5d45; font-size: 12px; font-weight: 900; letter-spacing: 0.4px; cursor: pointer; list-style-position: inside; }
+        .ontology-category[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+        .ontology-items { margin: 0; padding: 8px 0 4px 28px; border-left: 1px solid #d8cdb8; list-style: none; }
+        .ontology-items li { position: relative; margin: 0; padding: 7px 10px; color: #5f513d; font-size: 12px; line-height: 1.4; }
+        .ontology-items li::before { content: '└─'; position: absolute; left: -22px; color: #9b8b70; }
+        .ontology-item-link { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+        .ontology-item-link:hover { color: #806f53; text-decoration: underline; }
         .pro-area { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
         .pro-menu-box { flex: 1 1 auto; min-height: 0; margin: 10px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
         .pro-internal-pane { display: none; }
@@ -165,7 +183,7 @@
         <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button></div>
         <div class="sidebar-menus">
             <section class="discipline-mode" id="discipline-mode">
-                <div class="menu-heading"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
+                <div class="menu-heading" onclick="showOntologyRoot()" title="Abrir árvore ontológica"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
                 <div class="discipline-area">
                     <div class="discipline-list-pane">
                         <ul class="module-list" id="ml"></ul>
@@ -870,24 +888,37 @@
         showProfessionalModule(module, button);
     }
 
+    function ontologyBranch(discipline, open = false) {
+        const subs = DATA[discipline] || {};
+        let html = `<details class="ontology-node"${open ? ' open' : ''}><summary>${discipline}</summary><div class="ontology-children">`;
+        Object.keys(subs).forEach(category => {
+            html += `<details class="ontology-category"><summary>${category}</summary><ul class="ontology-items">`;
+            subs[category].forEach(item => {
+                html += `<li><button class="ontology-item-link" onclick='openSearch(${JSON.stringify(item)}, ${JSON.stringify(discipline)})'>${item}</button></li>`;
+            });
+            html += `</ul></details>`;
+        });
+        return html + '</div></details>';
+    }
+
+    function showOntologyRoot() {
+        document.body.dataset.activeMenu = 'discipline';
+        document.querySelector('.sidebar').classList.remove('pro-active');
+        document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
+        const mn = document.getElementById('mn');
+        const disciplines = Object.keys(DATA).filter(key => key !== '00 AS DISCIPLINAS DA TEOLOGIA');
+        mn.innerHTML = `<main class="ontology-paper"><h1>AS DISCIPLINAS DA TEOLOGIA</h1><div class="ontology-tree">${disciplines.map(discipline => ontologyBranch(discipline)).join('')}</div></main>`;
+    }
+
     function showSub(k, el) {
         document.body.dataset.activeMenu = 'discipline';
         document.querySelector('.sidebar').classList.remove('pro-active');
         lastDisciplineKey = k;
         lastDisciplineElement = el;
         document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
+        if (el) el.classList.add('active');
         const mn = document.getElementById('mn');
-        const subs = DATA[k];
-        let html = `<div class="content"><h1>${k}</h1>`;
-        Object.keys(subs).forEach(cat => {
-            html += `<div class="category-group"><div class="category-title">${cat}</div><div class="tools-grid">`;
-            subs[cat].forEach(tool => {
-                html += `<div class="tool-card" onclick="openSearch('${tool}', '${k}')"><h4>${tool}</h4></div>`;
-            });
-            html += `</div></div>`;
-        });
-        mn.innerHTML = html + `</div>`;
+        mn.innerHTML = `<main class="ontology-paper"><button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para a árvore principal">← VOLTAR</button><h1>${k}</h1><div class="ontology-tree">${ontologyBranch(k, true)}</div></main>`;
     }
 
     function openSearch(tool, disc) {
