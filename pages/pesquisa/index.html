@@ -25,7 +25,8 @@
         .tool-card:hover { border-color: var(--p); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .tool-card h4 { margin: 0; font-size: 13px; color: #fff; line-height: 1.4; }
         .search-area { background: var(--c); border: 1px solid var(--b); padding: 30px; border-radius: 16px; margin-bottom: 30px; }
-        .topic-paper { background: #f1eadb; color: #4a443b; border: 1px solid #d8cdb8; padding: 42px; border-radius: 8px; min-height: calc(100vh - 150px); width: 100%; box-shadow: 0 6px 18px rgba(55,45,30,0.12); }
+        .split-view { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr); gap: 20px; height: calc(100vh - 145px); min-height: 560px; }
+        .topic-paper { background: #f1eadb; color: #4a443b; border: 1px solid #d8cdb8; padding: 42px; border-radius: 8px; min-height: 100%; width: 100%; overflow-y: auto; box-shadow: 0 6px 18px rgba(55,45,30,0.12); }
         .topic-paper .category-title { color: #806f53; border-bottom-color: #d8cdb8; }
         .topic-paper h2 { margin: 0; color: #4a443b; font-size: clamp(26px, 3vw, 42px); line-height: 1.2; }
         .topic-paper .paper-space { min-height: 180px; }
@@ -40,6 +41,20 @@
         .study-loading { display: none; margin-top: 12px; color: #806f53; font-weight: 700; }
         .study-answer { display: none; margin-top: 20px; padding: 20px; border-left: 4px solid #b99b61; background: rgba(255,255,255,0.42); color: #4a443b; line-height: 1.75; white-space: pre-wrap; }
         .topic-paper-back { margin-bottom: 20px; background: transparent; color: var(--p); border: 1px solid var(--p); }
+        .ai-chat-panel { display: flex; flex-direction: column; min-height: 100%; overflow: hidden; border: 1px solid #263754; border-radius: 12px; background: #111b30; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .ai-chat-header { padding: 22px 24px; border-bottom: 1px solid #263754; background: #17243a; }
+        .ai-chat-header h3 { margin: 0; color: #20d66b; font-size: 16px; letter-spacing: 1px; }
+        .ai-chat-header p { margin: 8px 0 0; color: #91a4bd; font-size: 12px; line-height: 1.5; }
+        .ai-chat-messages { flex: 1; overflow-y: auto; padding: 22px; }
+        .ai-chat-welcome { padding: 18px; border: 1px solid #344762; border-radius: 10px; background: #17243a; color: #b9c7d8; line-height: 1.6; font-size: 14px; }
+        .ai-chat-welcome strong { color: #fff; }
+        .ai-chat-input { padding: 16px; border-top: 1px solid #263754; background: #0d172b; }
+        .ai-chat-input .question-row { display: flex; gap: 10px; }
+        .ai-chat-input input { min-width: 0; background: #111b30; border-color: #344762; }
+        .ai-chat-input input:focus { border-color: var(--p); }
+        .ai-chat-answer { display: none; margin-top: 16px; padding: 16px; border-left: 3px solid var(--p); border-radius: 6px; background: #17243a; color: #dbe7f5; line-height: 1.7; white-space: pre-wrap; }
+        .ai-chat-loading { display: none; margin-top: 10px; color: var(--p); font-size: 12px; font-weight: bold; }
+        @media (max-width: 900px) { .split-view { grid-template-columns: 1fr; height: auto; min-height: 0; } .topic-paper { min-height: 520px; } .ai-chat-panel { min-height: 520px; } }
         .search-box { display: flex; gap: 10px; margin-top: 15px; }
         input { flex: 1; background: var(--i); border: 1px solid var(--b); color: #fff; padding: 15px; border-radius: 8px; outline: none; }
         input:focus { border-color: var(--p); }
@@ -278,25 +293,32 @@
     function openSearch(tool, disc) {
         const mn = document.getElementById('mn');
         mn.innerHTML = `
-            <div class="content">
-                <button class="topic-paper-back" onclick="showSub('${disc}', document.querySelector('.module-item.active'))">← VOLTAR</button>
-                <div class="topic-paper">
+            <button class="topic-paper-back" onclick="showSub('${disc}', document.querySelector('.module-item.active'))">← VOLTAR</button>
+            <div class="split-view">
+                <article class="topic-paper">
                     <div class="category-title">${disc}</div>
                     <h2>${tool}</h2>
                     <div class="paper-space">
                         <div class="study-placeholder">O conteúdo deste estudo será inserido aqui.</div>
                     </div>
-                    <div class="study-question">
-                        <h3>PERGUNTE À IA SOBRE ESTE ESTUDO</h3>
-                        <p>A sua pergunta ficará vinculada ao tema: <strong>${tool}</strong>.</p>
-                        <div class="question-row">
-                            <input type="text" id="q" placeholder="Digite uma pergunta sobre este estudo...">
-                            <button id="b" onclick="run('${tool}', '${disc}')">PERGUNTAR</button>
-                        </div>
-                        <div id="ld" class="study-loading">ANALISANDO A PERGUNTA...</div>
-                        <div id="rs" class="study-answer"></div>
+                </article>
+                <aside class="ai-chat-panel">
+                    <header class="ai-chat-header">
+                        <h3>CHAT DA IA</h3>
+                        <p>Contexto ativo: <strong>${tool}</strong><br>Faça perguntas relacionadas a este estudo.</p>
+                    </header>
+                    <div class="ai-chat-messages">
+                        <div class="ai-chat-welcome"><strong>Assistente de estudo</strong><br><br>O conteúdo deste estudo aparecerá no painel esquerdo. Quando quiser, faça uma pergunta sobre o tema aqui ao lado.</div>
+                        <div id="rs" class="ai-chat-answer"></div>
                     </div>
-                </div>
+                    <div class="ai-chat-input">
+                        <div class="question-row">
+                            <input type="text" id="q" placeholder="Pergunte sobre este estudo...">
+                            <button id="b" onclick="run('${tool}', '${disc}')">ENVIAR</button>
+                        </div>
+                        <div id="ld" class="ai-chat-loading">A IA está a analisar...</div>
+                    </div>
+                </aside>
             </div>`;
     }
 
