@@ -17,6 +17,7 @@
         .discipline-internal-pane { border-top: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .internal-heading { padding: 12px 15px 8px; color: var(--a); font-size: 10px; font-weight: 900; letter-spacing: 1px; border-bottom: 1px solid var(--b); }
         .internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
+        .internal-discipline-title { padding: 10px 8px 6px; margin-top: 6px; color: var(--p); font-size: 9px; font-weight: 900; line-height: 1.25; border-bottom: 1px solid rgba(38,55,84,0.7); }
         .internal-category { padding: 8px 8px 5px; color: #7fcbed; font-size: 9px; font-weight: 900; letter-spacing: 0.6px; }
         .internal-item { padding: 7px 9px; margin-bottom: 3px; border-radius: 5px; cursor: pointer; color: #a9bbcf; font-size: 10px; line-height: 1.25; }
         .internal-item:hover { background: rgba(24,191,255,0.1); color: #fff; }
@@ -366,6 +367,8 @@
                 ml.appendChild(li);
             });
 
+        renderAllInternalDisciplineMenus();
+        renderAllInternalProMenus();
         showSub('1 FUNDAÇÃO BÍBLICA', ml.children[0]);
 
         const proList = document.getElementById('pro-list');
@@ -373,10 +376,7 @@
             const item = document.createElement('li');
             item.className = 'pro-item';
             item.innerText = module;
-            item.onclick = () => {
-                renderInternalProMenu(module);
-                showProfessionalModule(module, item);
-            };
+            item.onclick = () => showProfessionalModule(module, item);
             proList.appendChild(item);
         });
     }
@@ -468,22 +468,59 @@
             </div>`;
     }
 
-    function renderInternalDisciplineMenu(discipline) {
+    function renderAllInternalDisciplineMenus() {
         const internalList = document.getElementById('internal-list');
-        if (!internalList || !DATA[discipline]) return;
+        if (!internalList) return;
         internalList.innerHTML = '';
-        Object.keys(DATA[discipline]).forEach(category => {
-            const categoryItem = document.createElement('li');
-            categoryItem.className = 'internal-category';
-            categoryItem.innerText = category;
-            internalList.appendChild(categoryItem);
+        Object.keys(DATA).filter(discipline => discipline !== '00 AS DISCIPLINAS DA TEOLOGIA').forEach(discipline => {
+            const disciplineTitle = document.createElement('li');
+            disciplineTitle.className = 'internal-discipline-title';
+            disciplineTitle.innerText = discipline;
+            disciplineTitle.onclick = () => {
+                const disciplineElement = Array.from(document.querySelectorAll('.module-item')).find(item => item.innerText === discipline);
+                showSub(discipline, disciplineElement || document.querySelector('.module-item'));
+            };
+            internalList.appendChild(disciplineTitle);
+            Object.keys(DATA[discipline]).forEach(category => {
+                const categoryItem = document.createElement('li');
+                categoryItem.className = 'internal-category';
+                categoryItem.innerText = category;
+                internalList.appendChild(categoryItem);
+                DATA[discipline][category].forEach(tool => {
+                    const item = document.createElement('li');
+                    item.className = 'internal-item';
+                    item.innerText = tool;
+                    item.onclick = () => openSearch(tool, discipline);
+                    internalList.appendChild(item);
+                });
+            });
+        });
+    }
 
-            DATA[discipline][category].forEach(tool => {
+    function renderAllInternalProMenus() {
+        const heading = document.getElementById('pro-internal-heading');
+        const list = document.getElementById('pro-internal-list');
+        if (!heading || !list) return;
+        heading.innerText = 'LISTAS INTERNAS — MATRIZ CANÔNICA PRO';
+        list.innerHTML = '';
+        PRO_MODULES.forEach(module => {
+            const moduleTitle = document.createElement('li');
+            moduleTitle.className = 'internal-discipline-title';
+            moduleTitle.innerText = module;
+            list.appendChild(moduleTitle);
+            const items = module === '01 — TEXTO BÍBLICO' ? TEXT_BIBLICO_SUBMODULES : ['Submenu interno deste módulo será estruturado nesta área.'];
+            items.forEach(submodule => {
                 const item = document.createElement('li');
                 item.className = 'internal-item';
-                item.innerText = tool;
-                item.onclick = () => openSearch(tool, discipline);
-                internalList.appendChild(item);
+                item.innerText = submodule;
+                if (module === '01 — TEXTO BÍBLICO') {
+                    item.onclick = () => {
+                        document.querySelectorAll('.internal-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        showProfessionalModule(submodule, item, 'SUBMÓDULO DE TEXTO BÍBLICO');
+                    };
+                }
+                list.appendChild(item);
             });
         });
     }
@@ -492,7 +529,6 @@
         document.body.dataset.activeMenu = 'discipline';
         lastDisciplineKey = k;
         lastDisciplineElement = el;
-        renderInternalDisciplineMenu(k);
         document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
         const mn = document.getElementById('mn');
