@@ -37,11 +37,11 @@
         .pro-menu-box { flex: 1 1 auto; min-height: 0; margin: 10px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
         .pro-internal-pane { display: none; }
         .pro-internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
-        .pro-response-paper { display: none; margin: 8px 10px 10px; padding: 16px; min-height: 150px; overflow-y: auto; border: 1px solid #d8cdb8; border-radius: 8px; background: #f1eadb; color: #4a443b; box-shadow: 0 5px 14px rgba(0,0,0,0.16); }
-        .sidebar.pro-active .pro-response-paper { display: block; }
-        .pro-response-paper h4 { margin: 0 0 8px; color: #806f53; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
-        .pro-response-paper h5 { margin: 0 0 10px; color: #4a443b; font-size: 13px; }
-        .pro-response-paper p { margin: 0; line-height: 1.55; font-size: 11px; white-space: pre-wrap; }
+        .pro-response-paper { display: none; }
+        .pro-main-paper { margin-top: 18px; min-height: calc(100vh - 150px); padding: 34px; overflow-y: auto; border: 1px solid #d8cdb8; border-radius: 8px; background: #f1eadb; color: #4a443b; box-shadow: 0 6px 18px rgba(55,45,30,0.12); }
+        .pro-main-paper h2 { margin: 0 0 12px; color: #4a443b; font-size: 28px; }
+        .pro-main-paper h4 { margin: 0 0 14px; color: #806f53; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; }
+        .pro-main-paper p { margin: 0; line-height: 1.65; font-size: 13px; white-space: pre-wrap; }
         .pro-menu-heading { padding: 16px 14px 12px; border-bottom: 1px solid #2e6580; background: rgba(24,191,255,0.09); }
         .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1px; line-height: 1.35; }
         .pro-menu-heading strong { display: inline-block; margin-top: 8px; padding: 4px 8px; border: 1px solid var(--a); border-radius: 4px; color: #d8f5ff; font-size: 9px; line-height: 1.2; letter-spacing: 1px; }
@@ -126,11 +126,6 @@
                         <strong>ACESSO EXCLUSIVO — ASSINANTES PRO</strong>
                     </div>
                     <ul class="pro-list" id="pro-list"></ul>
-                </div>
-                <div class="pro-response-paper" id="pro-response-paper">
-                    <h4>RESPOSTA DA CONSULTA</h4>
-                    <h5 id="pro-response-title">Matriz Canônica de Pesquisa PRO</h5>
-                    <p id="pro-response-text">A resposta da consulta aparecerá aqui quando um módulo ou cartão PRO for selecionado.</p>
                 </div>
                 </div>
             </section>
@@ -470,23 +465,19 @@
     }
 
     function openProCard(card, module) {
-        document.getElementById('pro-response-title').innerText = card;
-        document.getElementById('pro-response-text').innerText = 'A resposta da consulta para este item será apresentada nesta folha lateral.';
         document.getElementById('mn').innerHTML = `
             <div class="content">
                 <button class="back-arrow" onclick="showProfessionalModule('${module}', document.querySelector('.pro-item.active'))" title="Voltar para o módulo PRO">← VOLTAR</button>
-                <div class="category-title">MATRIZ CANÔNICA DE PESQUISA PRO</div>
-                <h1>${card}</h1>
-                <div class="search-area" style="min-height:420px;">
-                    <p style="color:#91a4bd;">Estrutura do item PRO preparada para receber o procedimento de análise.</p>
+                <div class="pro-main-paper">
+                    <h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4>
+                    <h2>${card}</h2>
+                    <p>A resposta da consulta para este item será apresentada nesta folha de leitura.</p>
                 </div>
             </div>`;
     }
 
     function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
         document.body.dataset.activeMenu = 'pro';
-        document.getElementById('pro-response-title').innerText = module;
-        document.getElementById('pro-response-text').innerText = 'A resposta da consulta para este módulo será apresentada nesta folha lateral.';
         document.querySelector('.sidebar').classList.add('pro-active');
         document.querySelectorAll('.pro-sublist').forEach(submenu => submenu.remove());
         document.querySelectorAll('.module-item, .pro-item, .internal-item').forEach(item => item.classList.remove('active'));
@@ -494,7 +485,11 @@
         document.getElementById('mn').innerHTML = `
             <div class="content">
                 <button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button>
-                ${renderProModuleCards(module)}
+                <div class="pro-main-paper">
+                    <h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4>
+                    <h2>${module}</h2>
+                    <p>A resposta da consulta para este módulo será apresentada nesta folha de leitura. Selecione um subitem na lateral para continuar.</p>
+                </div>
             </div>`;
     }
 
