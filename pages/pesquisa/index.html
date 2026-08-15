@@ -1,1009 +1,227 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palavra & Série — Matriz Canônica</title>
-    <style>
-        :root { --p: #20d66b; --bg: #0b1428; --s: #111b30; --c: #17243a; --i: #0d172b; --t: #dbe7f5; --b: #263754; --a: #18bfff; }
-        * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg); color: var(--t); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 320px; background: var(--s); border-right: 1px solid var(--b); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .sidebar-menus { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-        .discipline-mode, .pro-mode { flex: 1 1 50%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-        .sidebar.pro-active .discipline-mode { display: none; }
-        .sidebar.pro-active .pro-mode { flex: 1 1 100%; }
-        .discipline-mode { border-bottom: 1px solid var(--b); }
-        .discipline-area { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
-        .discipline-list-pane { height: 100%; overflow-y: auto; }
-        .discipline-internal-pane { display: none; }
-        .internal-heading { padding: 12px 15px 8px; color: var(--a); font-size: 10px; font-weight: 900; letter-spacing: 1px; border-bottom: 1px solid var(--b); }
-        .internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
-        .internal-discipline-title { padding: 10px 8px 6px; margin-top: 6px; color: var(--p); font-size: 9px; font-weight: 900; line-height: 1.25; border-bottom: 1px solid rgba(38,55,84,0.7); }
-        .internal-category { padding: 8px 8px 5px; color: #7fcbed; font-size: 9px; font-weight: 900; letter-spacing: 0.6px; }
-        .internal-item { padding: 7px 9px; margin-bottom: 3px; border-radius: 5px; cursor: pointer; color: #a9bbcf; font-size: 10px; line-height: 1.25; }
-        .internal-item:hover { background: rgba(24,191,255,0.1); color: #fff; }
-        .sidebar-header { padding: 25px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.2); }
-        .sidebar-header h2 { font-size: 14px; color: var(--p); margin: 0; letter-spacing: 2px; }
-        .sidebar-header p { font-size: 10px; color: #91a4bd; margin: 5px 0 0; font-weight: bold; }
-        .module-list { list-style: none; padding: 10px; margin: 0; }
-        .module-item { padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; font-size: 12px; font-weight: 600; color: #91a4bd; display: flex; align-items: center; }
-        .module-item:hover { background: rgba(32, 214, 107, 0.05); color: var(--t); }
-        .module-item.active { background: rgba(32, 214, 107, 0.1); border-color: var(--p); color: #fff; }
-        .menu-heading { padding: 22px 15px 14px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.12); }
-        .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
-        .menu-heading strong { display: block; margin-top: 7px; color: #e5edf7; font-size: 11px; line-height: 1.35; letter-spacing: 0.4px; }
-        .menu-heading { cursor: pointer; }
-        .menu-heading:hover strong { color: #fff; }
-        .ontology-paper { min-height: calc(100vh - 80px); padding: 40px 48px; background: #f1eadb; color: #4a443b; overflow-y: auto; }
-        .ontology-paper h1 { margin: 0 0 26px; color: #4a443b; font-size: 30px; letter-spacing: 0.5px; }
-        .ontology-tree { max-width: 1100px; }
-        .ontology-node { margin: 0 0 10px; }
-        .ontology-node > summary { padding: 13px 16px; border: 1px solid #d8cdb8; border-radius: 7px; background: #fffdf7; color: #4a443b; font-size: 14px; font-weight: 800; cursor: pointer; list-style-position: inside; }
-        .ontology-node > summary:hover { background: #faf1df; border-color: #b99b61; }
-        .ontology-node[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: #eee2cd; }
-        .ontology-children { margin: 0 0 12px 22px; padding: 10px 0 0 18px; border-left: 2px solid #cdbfaa; }
-        .ontology-category { margin: 0 0 8px; }
-        .ontology-category > summary { padding: 10px 13px; border: 1px solid #d8cdb8; border-radius: 6px; background: #f8f1e4; color: #6d5d45; font-size: 12px; font-weight: 900; letter-spacing: 0.4px; cursor: pointer; list-style-position: inside; }
-        .ontology-category[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-        .ontology-items { margin: 0; padding: 8px 0 4px 28px; border-left: 1px solid #d8cdb8; list-style: none; }
-        .ontology-items li { position: relative; margin: 0; padding: 7px 10px; color: #5f513d; font-size: 12px; line-height: 1.4; }
-        .ontology-items li::before { content: '└─'; position: absolute; left: -22px; color: #9b8b70; }
-        .ontology-item-link { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
-        .ontology-item-link:hover { color: #806f53; text-decoration: underline; }
-        .pro-area { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-        .pro-menu-box { flex: 1 1 auto; min-height: 0; margin: 10px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
-        .pro-internal-pane { display: none; }
-        .pro-internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
-        .pro-response-paper { display: none; }
-        .pro-main-paper { margin-top: 18px; min-height: calc(100vh - 150px); padding: 34px; overflow-y: auto; border: 1px solid #d8cdb8; border-radius: 8px; background: #f1eadb; color: #4a443b; box-shadow: 0 6px 18px rgba(55,45,30,0.12); }
-        .pro-main-paper h2 { margin: 0 0 12px; color: #4a443b; font-size: 28px; }
-        .pro-main-paper h4 { margin: 0 0 14px; color: #806f53; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; }
-        .pro-main-paper p { margin: 0; line-height: 1.65; font-size: 13px; white-space: pre-wrap; }
-        .pro-chat { margin-top: 42px; padding-top: 24px; border-top: 1px solid #d8cdb8; }
-        .pro-chat h3 { margin: 0 0 8px; color: #806f53; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
-        .pro-chat-intro { margin-bottom: 14px !important; color: #6a6256; font-size: 12px !important; }
-        .pro-chat-messages { min-height: 90px; max-height: 260px; overflow-y: auto; margin-bottom: 12px; }
-        .pro-chat-message { margin: 8px 0; padding: 10px 12px; border-radius: 7px; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
-        .pro-chat-message.system { background: rgba(128,111,83,0.10); color: #6a6256; }
-        .pro-chat-message.user { margin-left: 12%; background: #e3d8c4; color: #4a443b; }
-        .pro-chat-form { display: flex; gap: 10px; align-items: stretch; }
-        .pro-chat-form textarea { flex: 1; min-height: 58px; resize: vertical; padding: 11px; border: 1px solid #cdbfaa; border-radius: 6px; background: #faf6ed; color: #4a443b; font: inherit; font-size: 12px; outline: none; }
-        .pro-chat-form textarea:focus { border-color: #a88f66; box-shadow: 0 0 0 2px rgba(168,143,102,0.16); }
-        .pro-chat-form button { align-self: stretch; padding: 0 18px; border: 0; border-radius: 6px; background: #806f53; color: #fffaf0; font-weight: 800; cursor: pointer; }
-        .pro-chat-form button:hover { background: #6c5b42; }
-        .bible-launch { width: calc(100% - 30px); margin: 12px 15px 10px; padding: 12px 14px; border: 1px solid #b99b61; border-radius: 8px; background: #f1eadb; color: #4a443b; text-align: left; font-size: 12px; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
-        .bible-launch:hover { background: #fff8e9; border-color: #e0c487; }
-        .bible-overlay { position: fixed; inset: 0; z-index: 50; display: none; align-items: stretch; justify-content: center; background: rgba(5,10,20,0.82); }
-        .bible-overlay.open { display: flex; }
-        .bible-window { width: min(1400px, 98vw); height: 97vh; margin: 1.5vh auto; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #d8cdb8; border-radius: 12px; background: #f1eadb; color: #4a443b; box-shadow: 0 16px 50px rgba(0,0,0,0.45); }
-        .bible-window-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid #d8cdb8; background: #e8decc; }
-        .bible-window-header h2 { margin: 0; font-size: 16px; letter-spacing: 1px; }
-        .bible-window-header p { margin: 2px 0 0; color: #806f53; font-size: 11px; }
-        .bible-close { padding: 8px 13px; border: 1px solid #806f53; border-radius: 6px; background: transparent; color: #4a443b; font-weight: 900; cursor: pointer; }
-        .bible-toolbar { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px; border-bottom: 1px solid #d8cdb8; background: #faf6ed; }
-        .bible-toolbar label { display: flex; flex-direction: column; gap: 3px; color: #806f53; font-size: 10px; font-weight: 900; letter-spacing: 0.5px; }
-        .bible-toolbar select, .bible-toolbar input { min-width: 145px; padding: 7px 9px; border: 1px solid #cdbfaa; border-radius: 6px; background: #fffdf7; color: #4a443b; font: inherit; }
-        .bible-toolbar input { min-width: 240px; }
-        .bible-window-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); }
-        .bible-book-list { overflow-y: auto; padding: 8px; border-right: 1px solid #d8cdb8; background: #e8decc; }
-        .bible-book-list button { display: block; width: 100%; margin-bottom: 2px; padding: 6px 7px; border: 0; border-radius: 5px; background: transparent; color: #5f513d; text-align: left; font-size: 11px; font-weight: 700; cursor: pointer; }
-        .bible-book-list button:hover, .bible-book-list button.active { background: #d5c7ae; color: #3e3428; }
-        .bible-reading-paper { overflow-y: auto; padding: 18px 20px 22px; background: #f1eadb; }
-        .bible-reading-paper h3 { margin: 0 0 8px; color: #806f53; font-size: 11px; letter-spacing: 1.3px; text-transform: uppercase; }
-        .bible-reading-paper h1 { margin: 0 0 14px; font-size: clamp(24px, 3vw, 36px); }
-        .bible-reading-placeholder { padding: 24px 0; border-top: 1px solid #d8cdb8; color: #806f53; line-height: 1.8; font-size: 15px; }
-        .bible-parallel-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
-        .bible-parallel-panel { min-width: 0; min-height: 0; height: calc(100vh - 205px); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #d8cdb8; border-radius: 8px; box-shadow: 0 4px 12px rgba(55,45,30,0.08); }
-        .bible-parallel-panel.greek { background: #eee6d7; }
-        .bible-parallel-panel.hebrew { background: #f4eddf; }
-        .bible-parallel-panel.portuguese { background: #faf5e9; }
-        .bible-panel-heading { padding: 9px 11px; border-bottom: 1px solid rgba(128,111,83,0.25); color: #6d5d45; font-size: 10px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
-        .bible-panel-source { display: block; margin-top: 4px; color: #9b8b70; font-size: 9px; font-weight: 600; letter-spacing: 0; text-transform: none; }
-        .bible-panel-body { flex: 1 1 auto; min-height: 0; max-height: none; overflow-y: auto; padding: 8px 11px; }
-        .bible-panel-query { display: flex; gap: 5px; padding: 7px; border-top: 1px solid rgba(128,111,83,0.22); background: rgba(255,255,255,0.22); }
-        .bible-panel-query input { min-width: 0; flex: 1; padding: 8px 9px; border: 1px solid #cdbfaa; border-radius: 5px; background: rgba(255,253,247,0.86); color: #4a443b; font: inherit; font-size: 11px; }
-        .bible-panel-query button { padding: 0 9px; border: 0; border-radius: 5px; background: #806f53; color: #fffaf0; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .bible-panel-query button:hover { background: #6c5b42; }
-        .bible-verse { margin: 0; padding: 9px 0; border-bottom: 1px solid rgba(216,205,184,0.55); color: #4a443b; line-height: 1.75; font-size: 14px; }
-        .bible-parallel-panel.greek .bible-verse, .bible-parallel-panel.hebrew .bible-verse { font-family: Georgia, 'Times New Roman', serif; font-size: 16px; }
-        .bible-parallel-panel.hebrew .bible-verse { direction: rtl; text-align: right; }
-        .bible-verse sup { display: inline-block; min-width: 24px; color: #806f53; font-size: 9px; font-weight: 900; direction: ltr; }
-        .bible-error { color: #8a3f2f; font-weight: 700; }
-        .bible-reading-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #d8cdb8; }
-        .bible-reading-actions button { min-height: 42px; padding: 0 15px; border-radius: 6px; background: #806f53; color: #fffaf0; }
-        @media (max-width: 900px) { .bible-parallel-grid { grid-template-columns: 1fr; } .bible-parallel-panel { min-height: 240px; } .bible-panel-body { max-height: 38vh; } }
-        @media (max-width: 700px) { .bible-window-body { grid-template-columns: 1fr; } .bible-book-list { max-height: 150px; border-right: 0; border-bottom: 1px solid #d8cdb8; } .bible-reading-paper { padding: 24px; } }
-        .pro-menu-heading { padding: 16px 14px 12px; border-bottom: 1px solid #2e6580; background: rgba(24,191,255,0.09); }
-        .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1px; line-height: 1.35; }
-        .pro-menu-heading strong { display: inline-block; margin-top: 8px; padding: 4px 8px; border: 1px solid var(--a); border-radius: 4px; color: #d8f5ff; font-size: 9px; line-height: 1.2; letter-spacing: 1px; }
-        .pro-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; list-style: none; padding: 12px 10px 14px; margin: 0; }
-        .pro-item { padding: 11px 10px; margin-bottom: 6px; border-radius: 7px; cursor: pointer; border: 1px solid transparent; color: #b5c5d8; font-size: 10px; font-weight: 700; line-height: 1.3; transition: 0.2s; }
-        .pro-item:hover, .pro-item.active { background: rgba(24,191,255,0.14); border-color: var(--a); color: #fff; box-shadow: 0 3px 10px rgba(24,191,255,0.1); }
-        .pro-sublist { display: none; list-style: none; padding: 2px 0 6px 14px; margin: 0; border-left: 2px solid #2e6580; }
-        .pro-sublist.open { display: block; }
-        .pro-subitem { padding: 8px 8px; margin-bottom: 3px; color: #9fb9cc; cursor: pointer; font-size: 9px; line-height: 1.3; border-radius: 5px; }
-        .pro-subitem:hover, .pro-subitem.active { background: rgba(24,191,255,0.1); color: #fff; }
-        .main { flex: 1; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
-        .content { padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%; }
-        .category-group { margin-bottom: 40px; }
-        .category-title { font-size: 11px; font-weight: 900; color: var(--a); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid var(--b); }
-        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-        .tool-card { background: var(--c); border: 1px solid var(--b); padding: 15px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-        .tool-card:hover { border-color: var(--p); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .tool-card h4 { margin: 0; font-size: 13px; color: #fff; line-height: 1.4; }
-        .search-area { background: var(--c); border: 1px solid var(--b); padding: 30px; border-radius: 16px; margin-bottom: 30px; }
-        .split-view { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr); gap: 20px; height: calc(100vh - 145px); min-height: 560px; }
-        .topic-paper { background: #f1eadb; color: #4a443b; border: 1px solid #d8cdb8; padding: 42px; border-radius: 8px; min-height: 100%; width: 100%; overflow-y: auto; box-shadow: 0 6px 18px rgba(55,45,30,0.12); }
-        .topic-paper .category-title { color: #806f53; border-bottom-color: #d8cdb8; }
-        .topic-paper h2 { margin: 0; color: #4a443b; font-size: clamp(26px, 3vw, 42px); line-height: 1.2; }
-        .topic-paper .paper-space { min-height: 180px; }
-        .study-placeholder { min-height: 120px; padding: 26px 0; color: #8b806e; font-size: 14px; font-style: italic; }
-        .study-question { margin-top: 30px; padding: 28px 0 10px; border-top: 2px solid #c7b99f; }
-        .study-question h3 { margin: 0 0 8px; color: #5f513d; font-size: 18px; letter-spacing: 1px; }
-        .study-question p { margin: 0 0 14px; color: #776b59; font-size: 13px; }
-        .study-question .question-row { display: flex; gap: 10px; }
-        .study-question input { background: #faf6ed; border: 1px solid #cfc0a7; color: #4a443b; }
-        .study-question input::placeholder { color: #9b907e; }
-        .study-question button { min-height: 48px; }
-        .study-loading { display: none; margin-top: 12px; color: #806f53; font-weight: 700; }
-        .study-answer { display: none; margin-top: 20px; padding: 20px; border-left: 4px solid #b99b61; background: rgba(255,255,255,0.42); color: #4a443b; line-height: 1.75; white-space: pre-wrap; }
-        .study-commentary { margin-top: 28px; padding: 24px 26px; border-top: 1px solid #d8cdb8; background: #fffdf7; color: #4a443b; line-height: 1.8; font-size: 15px; white-space: pre-wrap; }
-        .study-commentary.loading { color: #806f53; font-style: italic; }
-        .topic-paper-back { margin-bottom: 20px; background: transparent; color: var(--p); border: 1px solid var(--p); }
-        .back-arrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 8px 18px; border: 1px solid var(--p); border-radius: 999px; background: transparent; color: var(--p); cursor: pointer; font-size: 14px; font-weight: 900; }
-        .back-arrow:hover { background: rgba(32,214,107,0.12); }
-        .ai-chat-panel { display: flex; flex-direction: column; min-height: 100%; overflow: hidden; border: 1px solid #263754; border-radius: 12px; background: #111b30; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
-        .ai-chat-header { padding: 22px 24px; border-bottom: 1px solid #263754; background: #17243a; }
-        .ai-chat-header h3 { margin: 0; color: #20d66b; font-size: 16px; letter-spacing: 1px; }
-        .ai-chat-header p { margin: 8px 0 0; color: #91a4bd; font-size: 12px; line-height: 1.5; }
-        .ai-chat-messages { flex: 1; overflow-y: auto; padding: 22px; }
-        .ai-chat-welcome { padding: 18px; border: 1px solid #344762; border-radius: 10px; background: #17243a; color: #b9c7d8; line-height: 1.6; font-size: 14px; }
-        .ai-chat-welcome strong { color: #fff; }
-        .ai-chat-input { padding: 16px; border-top: 1px solid #263754; background: #0d172b; }
-        .ai-chat-input .question-row { display: flex; gap: 10px; }
-        .ai-chat-input input { min-width: 0; background: #111b30; border-color: #344762; }
-        .ai-chat-input input:focus { border-color: var(--p); }
-        .ai-chat-answer { display: none; margin-top: 16px; padding: 20px; border-left: 3px solid var(--p); border-radius: 6px; background: #17243a; color: #dbe7f5; line-height: 1.8; white-space: pre-wrap; font-size: 14px; }
-        .ai-chat-loading { display: none; margin-top: 10px; color: var(--p); font-size: 12px; font-weight: bold; }
-        @media (max-width: 900px) { .split-view { grid-template-columns: 1fr; height: auto; min-height: 0; } .topic-paper { min-height: 520px; } .ai-chat-panel { min-height: 520px; } }
-        .search-box { display: flex; gap: 10px; margin-top: 15px; }
-        input { flex: 1; background: var(--i); border: 1px solid var(--b); color: #fff; padding: 15px; border-radius: 8px; outline: none; }
-        input:focus { border-color: var(--p); }
-        button { background: var(--p); color: #000; border: none; padding: 0 25px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; }
-        button:hover { filter: brightness(1.1); transform: scale(1.02); }
-        button:disabled { background: #333; color: #666; cursor: not-allowed; }
-        .res { background: #fdfcf0; color: #1a202c; padding: 40px; border-radius: 12px; border-left: 10px solid var(--p); display: none; line-height: 1.8; font-size: 1.1rem; }
-        .res h2 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 15px; color: #000; font-size: 1.4rem; }
-        #ld { color: var(--p); font-weight: bold; margin-top: 15px; display: none; text-align: center; letter-spacing: 2px; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--b); border-radius: 10px; }
-    </style>
-</head>
-<body>
-    <div class="sidebar">
-        <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button></div>
-        <div class="sidebar-menus">
-            <section class="discipline-mode" id="discipline-mode">
-                <div class="menu-heading" onclick="showOntologyRoot()" title="Abrir árvore ontológica"><span>MENU</span><strong>AS DISCIPLINAS DA TEOLOGIA</strong></div>
-                <div class="discipline-area">
-                    <div class="discipline-list-pane">
-                        <ul class="module-list" id="ml"></ul>
-                    </div>
-                </div>
-            </section>
-            <section class="pro-mode" id="pro-mode">
-                <div class="pro-area">
-                <div class="pro-menu-box" data-access="pro">
-                    <div class="pro-menu-heading">
-                        <strong>ACESSO EXCLUSIVO — ASSINANTES PRO</strong>
-                        <span>MENU — MATRIZ CANÔNICA DE PESQUISA</span>
-                    </div>
-                    <ul class="pro-list" id="pro-list"></ul>
-                </div>
-                </div>
-            </section>
-        </div>
-    </div>
-    <div class="main" id="mn"></div>
+const DEFAULT_MODEL = 'gemini-3.7-flash';
 
-    <div class="bible-overlay" id="bible-overlay" role="dialog" aria-modal="true" aria-labelledby="bible-title">
-        <div class="bible-window">
-            <div class="bible-window-header">
-                <div><h2 id="bible-title">BÍBLIA — LEITURA</h2><p>Leitura bíblica por livro e capítulo.</p></div>
-                <button class="bible-close" onclick="closeBibleReader()">← FECHAR</button>
-            </div>
-            <div class="bible-toolbar">
-                <label>LIVRO<select id="bible-book-select" onchange="selectBibleBook(this.value)"></select></label>
-                <label>CAPÍTULO<select id="bible-chapter-select" onchange="renderBibleChapter()"></select></label>
-            </div>
-            <div class="bible-window-body">
-                <nav class="bible-book-list" id="bible-book-list" aria-label="Livros bíblicos"></nav>
-                <main class="bible-reading-paper" id="bible-reading-paper"></main>
-            </div>
-        </div>
-    </div>
+/* Catálogo interno. Estes IDs ficam no Worker e não são enviados ao HTML público. */
+const SOURCE_CATALOG = {
+  ANET: 'ANET — Ancient Near Eastern Texts, Pritchard',
+  AOTC: 'AOTC — Apollos Old Testament Commentary',
+  BAKER_OT: 'Baker Old Testament Commentary',
+  BDAG: 'BDAG — Bauer-Danker-Arndt-Gingrich',
+  BDB: 'BDB — Brown-Driver-Briggs',
+  BECNT: 'BECNT — Baker Exegetical Commentary on the New Testament',
+  BEALE_CARSON: 'Beale & Carson — Commentary on the New Testament Use of the Old Testament',
+  BERKHOF: 'Berkhof, Louis — Systematic Theology',
+  BHQ: 'BHQ — Biblia Hebraica Quinta',
+  BHS: 'BHS — Biblia Hebraica Stuttgartensia',
+  CARSON_FALLACIES: 'Carson, D. A. — Exegetical Fallacies',
+  CARSON_MOO: 'Carson & Moo — obra introdutória ao NT',
+  COS: 'COS — Context of Scripture, Hallo & Younger',
+  DILLARD_LONGMAN: 'Dillard & Longman — obra introdutória ao AT',
+  EDT: 'Evangelical Dictionary of Theology',
+  FEE_STUART: 'Fee & Stuart — How to Read the Bible for All Its Worth',
+  FRAME: 'Frame, John — Systematic Theology',
+  GOLDSWORTHY: 'Goldsworthy, Graeme',
+  GRUDEM: 'Grudem, Wayne — Systematic Theology',
+  HALOT: 'HALOT — Koehler-Baumgartner',
+  IVP_BACKGROUND: 'IVP Bible Background Commentary',
+  LSJ: 'LSJ — Liddell-Scott-Jones',
+  MANNERS_CUSTOMS: 'Manners and Customs of the Bible',
+  METZGER_VERSIONS: 'Metzger, Bruce — The Early Versions of the New Testament',
+  METZGER_TEXT: 'Metzger, Bruce — The Text of the New Testament',
+  NA28: 'NA28 — Novum Testamentum Graece',
+  NEW_BIBLE_DICT: 'New Bible Dictionary',
+  NICNT: 'NICNT — New International Commentary on the New Testament',
+  NICOT: 'NICOT — New International Commentary on the Old Testament',
+  NIDNTTE: 'NIDNTTE — Silva',
+  NIDOTTE: 'NIDOTTE — VanGemeren',
+  NIGTC: 'NIGTC — New International Greek Testament Commentary',
+  OSBORNE: 'Osborne, Grant — The Hermeneutical Spiral',
+  PILLAR: 'Pillar New Testament Commentary',
+  SCHREINER: 'Schreiner, Thomas',
+  SBLGNT: 'SBLGNT — SBL Greek New Testament',
+  LXX_SBL: 'Septuaginta SBL',
+  TDNT: 'TDNT — Kittel/Friedrich',
+  TDOT: 'TDOT — Botterweck/Ringgren',
+  TR_SCRIVENER: 'Textus Receptus / Scrivener',
+  VOS: 'Vos, Geerhardus — Biblical Theology',
+  WBC: 'WBC — Word Biblical Commentary',
+  ZONDERVAN_ATLAS: 'Zondervan Atlas of the Bible',
+  ZONDERVAN_ENCYCLOPEDIA: 'Zondervan Encyclopedia of the Bible',
+  BEALE_BIBLICAL_THEOLOGY: 'G. K. Beale — A New Testament Biblical Theology',
+  ARA: 'Almeida Revista e Atualizada',
+  NVI: 'Nova Versão Internacional'
+};
 
-<script>
-    // Cole aqui a URL pública do seu serviço intermediário protegido.
-    // Exemplo: https://matriz-canonica-ai.seu-subdominio.workers.dev
-    const AI_PROXY_URL = "https://yellow-lab-f4b2.palavraeserie.workers.dev";
+/* Roteamento oculto: a pergunta recebe apenas as fontes adequadas ao módulo. */
+const ROUTING = {
+  '01 — TEXTO BÍBLICO': ['NA28', 'SBLGNT', 'BHS', 'BHQ', 'LXX_SBL', 'TR_SCRIVENER', 'ARA', 'NVI'],
+  '02 — CRÍTICA TEXTUAL': ['NA28', 'BHQ', 'BHS', 'SBLGNT', 'LXX_SBL', 'TR_SCRIVENER', 'ARA', 'NVI', 'METZGER_TEXT', 'METZGER_VERSIONS'],
+  '03 — GRAMÁTICA E SINTAXE': ['BDAG', 'BDB', 'HALOT', 'LSJ', 'NIDNTTE', 'NIDOTTE', 'TDNT', 'TDOT'],
+  '04 — LÉXICO': ['BDAG', 'BDB', 'HALOT', 'LSJ', 'NIDNTTE', 'NIDOTTE'],
+  '05 — LÉXICO TEOLÓGICO': ['NIDNTTE', 'NIDOTTE', 'TDNT', 'TDOT', 'EDT'],
+  '06 — EXEGESE': ['NICNT', 'NICOT', 'NIGTC', 'BECNT', 'WBC', 'PILLAR', 'AOTC', 'BAKER_OT', 'CARSON_MOO', 'DILLARD_LONGMAN', 'ARA', 'NVI'],
+  '07 — CONTEXTO HISTÓRICO-CULTURAL': ['ANET', 'COS', 'IVP_BACKGROUND', 'MANNERS_CUSTOMS', 'ZONDERVAN_ATLAS', 'ZONDERVAN_ENCYCLOPEDIA', 'NEW_BIBLE_DICT'],
+  '08 — HERMENÊUTICA E CONTROLE DE ERROS': ['FEE_STUART', 'OSBORNE', 'CARSON_FALLACIES', 'METZGER_TEXT', 'ARA', 'NVI'],
+  '09 — TEOLOGIA BÍBLICA': ['VOS', 'GOLDSWORTHY', 'BEALE_BIBLICAL_THEOLOGY', 'BEALE_CARSON', 'SCHREINER'],
+  '10 — USO DO AT NO NT': ['BEALE_CARSON', 'BEALE_BIBLICAL_THEOLOGY', 'NA28', 'SBLGNT', 'LXX_SBL', 'BHS', 'BHQ', 'ARA', 'NVI'],
+  '11 — TEOLOGIA SISTEMÁTICA': ['BERKHOF', 'FRAME', 'GRUDEM', 'EDT', 'SCHREINER'],
+  '12 — COMPARAÇÃO DE INTERPRETAÇÕES': ['NICNT', 'NICOT', 'NIGTC', 'BECNT', 'WBC', 'PILLAR', 'AOTC', 'BAKER_OT', 'BERKHOF', 'FRAME', 'GRUDEM', 'VOS', 'BEALE_BIBLICAL_THEOLOGY', 'ARA', 'NVI']
+};
 
-    const PRO_MODULE_DATA = {
-        '01 — TEXTO BÍBLICO': { question: 'O que constitui o texto objeto da pesquisa?', rule: 'o texto bíblico é a fonte primária; nenhum comentário o substitui. Texto crítico eclético é o padrão — tradições históricas alternativas entram só como testemunho comparativo. A comparação de tradições em 01.9 é apenas um mapeamento preliminar — a avaliação e o julgamento das variantes pertencem exclusivamente ao ANL-02.', items: ['01.1 — Identificação da passagem', '01.2 — Testamento', '01.3 — Livro', '01.4 — Capítulo', '01.5 — Versículo', '01.6 — Texto hebraico', '01.7 — Texto grego', '01.8 — Texto da Septuaginta', '01.9 — Identificação preliminar de tradições textuais divergentes', '01.10 — Palavras e construções no original', '01.11 — Determinação do texto-base'] },
-        '02 — CRÍTICA TEXTUAL': { question: 'Existem variantes textuais relevantes para esta passagem?', rule: 'variante relevante deve ser sinalizada, nunca apresentada como fato indiscutível.', items: ['02.1 — Identificação da variante textual', '02.2 — Localização da variante', '02.3 — Testemunhos textuais', '02.4 — Manuscritos e versões envolvidos', '02.5 — Evidências externas', '02.6 — Evidências internas', '02.7 — Comparação das leituras', '02.8 — Aparato crítico', '02.9 — Avaliação da variante', '02.10 — Impacto na tradução', '02.11 — Impacto na interpretação', '02.12 — Determinação textual'] },
-        '03 — GRAMÁTICA E SINTAXE': { question: 'Como as palavras estão funcionando dentro da frase?', rule: 'a unidade mínima de interpretação é a palavra dentro da construção e do contexto — nunca isolada.', items: ['03.1 — Identificação da construção', '03.2 — Morfologia', '03.3 — Lema e forma lexical', '03.4 — Classe gramatical', '03.5 — Sujeito', '03.6 — Predicado', '03.7 — Objeto', '03.8 — Verbos', '03.9 — Tempo e aspecto', '03.10 — Voz', '03.11 — Modo', '03.12 — Construções gramaticais', '03.13 — Relações sintáticas', '03.14 — Conectivos', '03.15 — Relações entre cláusulas', '03.16 — Estrutura da frase (síntese)'] },
-        '04 — LÉXICO': { question: 'O que determinado termo pode significar neste contexto?', rule: 'o contexto determina o sentido — vários significados possíveis não implica presença simultânea de todos. Fluxo: forma encontrada → lema → usos → campo semântico → contexto → sentido provável.', items: ['04.1 — Identificação da palavra', '04.2 — Forma encontrada no texto', '04.3 — Lema', '04.4 — Transliteração', '04.5 — Classe gramatical', '04.6 — Definições lexicais', '04.7 — Usos da palavra', '04.8 — Campo semântico', '04.9 — Uso no contexto', '04.10 — Uso no Antigo Testamento', '04.11 — Uso no Novo Testamento', '04.12 — Comparação das evidências lexicais', '04.13 — Sentido provável no contexto'] },
-        '05 — LÉXICO TEOLÓGICO': { question: 'Como esse conceito funciona dentro da linguagem teológica da Escritura?', rule: 'o conceito teológico aprofunda, mas permanece subordinado ao uso efetivo da palavra no texto estudado.', items: ['05.1 — Identificação do conceito', '05.2 — Termo no texto', '05.3 — Base lexical do conceito', '05.4 — Uso no Antigo Testamento', '05.5 — Uso na Septuaginta', '05.6 — Uso no Judaísmo', '05.7 — Uso no Novo Testamento', '05.8 — Desenvolvimento do conceito', '05.9 — Relações teológicas', '05.10 — Comparação das evidências', '05.11 — Síntese do conceito teológico', '05.12 — Relação com o contexto da passagem'] },
-        '06 — EXEGESE': { question: 'O que o autor está comunicando nesta passagem?', rule: 'integra as conclusões dos ANLs 01–05; não os repete.', items: ['06.1 — Delimitação da passagem', '06.2 — Contexto imediato', '06.3 — Estrutura da passagem', '06.4 — Argumento da passagem', '06.5 — Contexto literário', '06.6 — Gênero literário', '06.7 — Relação entre versículos', '06.8 — Relações entre unidades de pensamento', '06.9 — Intenção comunicativa', '06.10 — Problemas interpretativos', '06.11 — Interpretações existentes', '06.12 — Argumentos das interpretações', '06.13 — Avaliação exegética', '06.14 — Síntese exegética'] },
-        '07 — CONTEXTO HISTÓRICO-CULTURAL': { question: 'O que o mundo original do texto acrescenta à interpretação?', rule: 'nenhum pano de fundo especulativo sem base em fonte primária ou evidência material.', items: ['07.1 — Identificação do contexto histórico', '07.2 — Período histórico', '07.3 — Localização geográfica', '07.4 — Contexto político', '07.5 — Contexto religioso', '07.6 — Contexto social', '07.7 — Costumes e práticas', '07.8 — Instituições e estruturas sociais', '07.9 — Cultura e valores', '07.10 — Mundo greco-romano', '07.11 — Antigo Oriente Próximo', '07.12 — Judaísmo e contexto religioso', '07.13 — Arqueologia e evidências materiais', '07.14 — Literatura e fontes extrabíblicas', '07.15 — Impacto do contexto na interpretação'] },
-        '08 — HERMENÊUTICA E CONTROLE DE ERROS': { question: 'Estou interpretando corretamente aquilo que foi encontrado?', rule: 'camada de controle de qualidade — atua transversalmente, podendo auditar qualquer ANL anterior, não só como etapa final. Veredito reconhece: forte suporte / suporte parcial / evidência insuficiente / interpretação questionável / interpretações concorrentes.', items: ['08.1 — Identificação dos pressupostos', '08.2 — Controle do contexto', '08.3 — Controle do sentido lexical', '08.4 — Controle gramatical e sintático', '08.5 — Controle do contexto histórico-cultural', '08.6 — Detecção de eisegese', '08.7 — Detecção de anacronismo', '08.8 — Detecção de falácia lexical', '08.9 — Detecção de descontextualização', '08.10 — Controle de alegorização indevida', '08.11 — Controle de generalização indevida', '08.12 — Controle da relação AT–NT', '08.13 — Descrição versus prescrição', '08.14 — Coerência da interpretação com as evidências', '08.15 — Veredito hermenêutico'] },
-        '09 — TEOLOGIA BÍBLICA': { question: 'Como essa passagem se encaixa na totalidade da revelação bíblica?', rule: 'opera no nível de trajetória temática através do cânon — distinto do ANL-10 (mecanismo textual específico de citação/alusão/eco).', items: ['09.1 — Localização do tema na passagem', '09.2 — Relação com o contexto canônico', '09.3 — História da redenção', '09.4 — Desenvolvimento da revelação', '09.5 — Temas bíblicos relacionados', '09.6 — Relação com o Antigo Testamento', '09.7 — Relação com o Novo Testamento', '09.8 — Promessa e cumprimento', '09.9 — Alianças e desenvolvimento pactual', '09.10 — Criação, queda e redenção', '09.11 — Reino de Deus', '09.12 — Relação com Cristo', '09.13 — Consumação', '09.14 — Trajetória do tema na Escritura', '09.15 — Síntese teológico-bíblica'] },
-        '10 — USO DO AT NO NT': { question: 'Como o Novo Testamento utiliza o Antigo Testamento nesta passagem?', rule: 'função própria, com metodologia específica de intertextualidade — não subcategoria de 06 ou 09.', items: ['10.1 — Identificação da referência ao AT', '10.2 — Citação explícita', '10.3 — Alusão', '10.4 — Eco textual ou temático', '10.5 — Identificação da passagem de origem', '10.6 — Comparação com o texto hebraico', '10.7 — Comparação com a Septuaginta', '10.8 — Comparação com o texto grego do NT', '10.9 — Contexto da passagem do AT', '10.10 — Forma como o NT utiliza o AT', '10.11 — Função teológica da referência', '10.12 — Relação com promessa e cumprimento', '10.13 — Relação cristológica', '10.14 — Impacto na interpretação do NT', '10.15 — Síntese do uso do AT no NT'] },
-        '11 — TEOLOGIA SISTEMÁTICA': { question: 'Qual é a relação da interpretação com a doutrina cristã?', rule: 'Fluxo obrigatório: Texto → Exegese → Teologia Bíblica → Questão doutrinária → Teologia Sistemática. Nunca: a doutrina determina sozinha o significado do texto.', items: ['11.1 — Identificação da questão doutrinária', '11.2 — Dados doutrinários encontrados no texto', '11.3 — Relação com a teologia bíblica', '11.4 — Relação com outras passagens bíblicas', '11.5 — Doutrinas relacionadas', '11.6 — Formulações teológicas existentes', '11.7 — Comparação das formulações', '11.8 — Pressupostos teológicos', '11.9 — Convergências', '11.10 — Divergências', '11.11 — Avaliação da coerência doutrinária', '11.12 — Limites da conclusão doutrinária', '11.13 — Síntese doutrinária'] },
-        '12 — COMPARAÇÃO DE INTERPRETAÇÕES': { question: 'Como as interpretações concorrentes se sustentam diante das evidências?', rule: 'não apagar o debate acadêmico. O número de interpretações não é fixo em duas — a matriz deve acomodar N posições concorrentes, quando existirem. Este módulo pode reconsultar os ANLs 01–09 (loop de verificação, não etapa puramente linear).', items: ['12.1 — Identificação das interpretações existentes (N)', '12.2 — Classificação das interpretações', '12.3 — Argumentos de cada interpretação (N)', '12.4 — Evidências textuais', '12.5 — Evidências gramaticais e lexicais', '12.6 — Evidências históricas e culturais', '12.7 — Evidências teológicas', '12.8 — Pressupostos de cada interpretação', '12.9 — Pontos de convergência', '12.10 — Pontos de divergência', '12.11 — Grau de consenso', '12.12 — Força das evidências', '12.13 — Limites da conclusão', '12.14 — Síntese comparativa'] }
+const SOURCE_LEVELS = {
+  primary: ['NA28', 'SBLGNT', 'BHS', 'BHQ', 'LXX_SBL', 'TR_SCRIVENER'],
+  linguistic: ['BDAG', 'BDB', 'HALOT', 'LSJ', 'NIDNTTE', 'NIDOTTE', 'TDNT', 'TDOT'],
+  method: ['METZGER_TEXT', 'METZGER_VERSIONS', 'CARSON_FALLACIES', 'FEE_STUART', 'OSBORNE'],
+  commentary: ['NICNT', 'NICOT', 'NIGTC', 'BECNT', 'WBC', 'PILLAR', 'AOTC', 'BAKER_OT'],
+  context: ['ANET', 'COS', 'IVP_BACKGROUND', 'MANNERS_CUSTOMS', 'ZONDERVAN_ATLAS', 'ZONDERVAN_ENCYCLOPEDIA'],
+  theology: ['BERKHOF', 'FRAME', 'GRUDEM', 'VOS', 'GOLDSWORTHY', 'BEALE_BIBLICAL_THEOLOGY', 'SCHREINER', 'EDT']
+};
+
+const MATRIX_GUIDANCE = {
+  '01 — TEXTO BÍBLICO': { question: 'O que constitui o texto objecto da pesquisa?', function: 'Estabelecer o texto-base, comparar tradições textuais preliminarmente e verificar palavras e construções no original.', rule: 'O texto bíblico é a fonte primária. O texto crítico ecléctico é o texto-base padrão; tradições históricas alternativas entram apenas como testemunho comparativo.', sources: ['NA28', 'SBLGNT', 'BHS', 'BHQ', 'LXX_SBL', 'TR_SCRIVENER'] },
+  '02 — CRÍTICA TEXTUAL': { question: 'Existem variantes textuais relevantes para esta passagem?', function: 'Avaliar variantes seguindo o fluxo texto → variantes → evidências → decisão textual → interpretação.', rule: 'Quando uma variante for relevante, sinalizar a questão; nunca apresentar uma leitura controversa como facto indiscutível.', sources: ['METZGER_TEXT', 'METZGER_VERSIONS', 'NA28', 'BHS', 'BHQ', 'SBLGNT', 'LXX_SBL'] },
+  '03 — GRAMÁTICA E SINTAXE': { question: 'Como as palavras estão a funcionar dentro da frase?', function: 'Determinar sujeito, predicado, objecto, verbos, tempo, aspecto, voz, modo, construções, conectivos e relações entre cláusulas.', rule: 'Não construir doutrina a partir de palavra isolada; a unidade mínima é o uso da palavra dentro da construção e do contexto.', sources: ['BDAG', 'BDB', 'HALOT', 'LSJ', 'NIDNTTE', 'NIDOTTE', 'TDNT', 'TDOT'] },
+  '04 — LÉXICO': { question: 'O que determinado termo pode significar neste contexto?', function: 'Investigar forma → lema → usos → campo semântico → contexto → sentido provável.', rule: 'O contexto determina o sentido. Vários significados possíveis não significam que o autor quis dizer todos.', sources: ['BDAG', 'LSJ', 'HALOT', 'BDB'] },
+  '05 — LÉXICO TEOLÓGICO': { question: 'Como este conceito funciona dentro da linguagem teológica da Escritura?', function: 'Cruzar uso lexical, AT, LXX, judaísmo, NT e desenvolvimento conceptual.', rule: 'O conceito teológico permanece subordinado ao uso efectivo da palavra no texto estudado; não importar automaticamente sentidos de outras ocorrências.', sources: ['TDNT', 'NIDNTTE', 'TDOT', 'NIDOTTE', 'EDT'] },
+  '06 — EXEGESE': { question: 'O que o autor está a comunicar nesta passagem?', function: 'Integrar argumento, estrutura, contexto imediato, género e intenção comunicativa, passando do possível sentido lexical ao que o autor está a dizer.', rule: 'Não repetir análises anteriores; integrar as suas conclusões.', sources: ['BECNT', 'NIGTC', 'NICNT', 'PILLAR', 'WBC', 'NICOT', 'AOTC', 'BAKER_OT', 'CARSON_MOO', 'DILLARD_LONGMAN'] },
+  '07 — CONTEXTO HISTÓRICO-CULTURAL': { question: 'O que o mundo original do texto acrescenta à interpretação?', function: 'Reconstruir costumes, geografia, política, religião, sociedade, instituições e cultura relevantes.', rule: 'Não introduzir pano de fundo histórico especulativo sem base em fonte primária ou evidência material/arqueológica.', sources: ['ZONDERVAN_ENCYCLOPEDIA', 'IVP_BACKGROUND', 'NEW_BIBLE_DICT', 'ANET', 'COS', 'ZONDERVAN_ATLAS', 'MANNERS_CUSTOMS'] },
+  '08 — HERMENÊUTICA E CONTROLE DE ERROS': { question: 'Estou a interpretar correctamente aquilo que foi encontrado?', function: 'Verificar anacronismo, eisegese, falácia lexical, descontextualização, alegorização, generalização, transferência indevida AT–NT e confusão entre descrição e prescrição.', rule: 'Actuar como camada transversal de controlo de qualidade, especialmente sobre respostas de IA.', sources: ['OSBORNE', 'CARSON_FALLACIES', 'CARSON_MOO', 'DILLARD_LONGMAN', 'FEE_STUART'] },
+  '09 — TEOLOGIA BÍBLICA': { question: 'Como esta passagem se encaixa na totalidade da revelação bíblica?', function: 'Localizar história da redenção, desenvolvimento da revelação, promessa e cumprimento, criação-queda-redenção, reino, Cristo e consumação.', rule: 'Operar no nível da trajectória temática através do cânon, distinguindo-o do módulo 10, que trata do mecanismo textual específico.', sources: ['BEALE_BIBLICAL_THEOLOGY', 'BEALE_CARSON', 'VOS', 'GOLDSWORTHY', 'SCHREINER'] },
+  '10 — USO DO AT NO NT': { question: 'Como o Novo Testamento utiliza o Antigo Testamento nesta passagem?', function: 'Detectar citações, alusões, ecos, paralelos, uso da LXX, releituras cristológicas e cumprimento de promessas.', rule: 'Tratar como metodologia própria de intertextualidade, não como subcategoria de exegese ou teologia bíblica.', sources: ['BEALE_CARSON', 'NA28', 'BHS', 'BHQ', 'LXX_SBL', 'BDAG', 'HALOT', 'NIDNTTE', 'NIDOTTE', 'TDNT', 'TDOT'] },
+  '11 — TEOLOGIA SISTEMÁTICA': { question: 'Qual é a relação da interpretação com a doutrina cristã?', function: 'Fazer validação doutrinária, não determinação primária do significado.', rule: 'Fluxo obrigatório: texto → exegese → teologia bíblica → questão doutrinária → teologia sistemática. Nunca: a doutrina diz Y, logo o texto significa Y.', sources: ['GRUDEM', 'BERKHOF', 'FRAME', 'EDT'] },
+  '12 — COMPARAÇÃO DE INTERPRETAÇÕES': { question: 'Como as interpretações concorrentes se sustentam diante das evidências?', function: 'Identificar interpretações, argumentos, pressupostos, grau de consenso e distinguir facto textual de interpretação.', rule: 'Não apagar o debate académico. Reconsultar qualquer módulo 01–11 e apresentar a conclusão proporcionalmente às evidências.', sources: ['NICNT', 'NICOT', 'NIGTC', 'BECNT', 'WBC', 'PILLAR', 'AOTC', 'BAKER_OT', 'BERKHOF', 'FRAME', 'GRUDEM', 'VOS', 'BEALE_BIBLICAL_THEOLOGY'] }
+};
+
+const SYSTEM_INSTRUCTION = `
+Aja como pesquisador académico de teologia bíblica, com linguagem clara, técnica e responsável.
+O texto integral das obras não está automaticamente disponível. Nunca finja ter consultado uma página, edição ou citação que não foi fornecida ao sistema.
+Use o catálogo interno apenas para orientar o tipo de fonte adequado. Diferencie texto primário, evidência linguística, argumento exegético, contexto histórico e síntese teológica.
+Priorize fontes primárias quando a pergunta for textual. Comentários e obras sistemáticas não substituem o texto bíblico.
+Quando houver interpretações concorrentes, identifique a divergência e não apresente uma posição como consenso sem evidência.
+Não invente variantes, manuscritos, páginas, citações, autores ou conclusões.
+Se a consulta pedir conteúdo integral de uma obra que não foi fornecida, declare essa limitação e responda apenas com o que pode ser sustentado.
+Não use linguagem devocional nem exponha o catálogo interno como se fosse uma bibliografia consultada diretamente. ARA e NVI são traduções comparativas; não as trate como textos originais nem invente citações literais delas. Se o texto integral de uma tradução não estiver disponível ao sistema, declare essa limitação.
+`;
+
+function sourceNames(ids) {
+  return ids.map(id => `${id} — ${SOURCE_CATALOG[id]}`).join('\n');
+}
+
+function getSourcesForModule(module) {
+  const ids = ROUTING[module] || ROUTING['01 — TEXTO BÍBLICO'];
+  return { ids, names: sourceNames(ids) };
+}
+
+function corsHeaders(request, env) {
+  const origin = request.headers.get('Origin') || '';
+  const allowed = env.ALLOWED_ORIGIN || '*';
+  const allowOrigin = allowed === '*' || allowed === origin ? origin || '*' : allowed;
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json; charset=utf-8',
+    'Vary': 'Origin'
+  };
+}
+
+function json(data, status, request, env) {
+  return new Response(JSON.stringify(data), { status, headers: corsHeaders(request, env) });
+}
+
+export default {
+  async fetch(request, env) {
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: corsHeaders(request, env) });
+    }
+
+    const url = new URL(request.url);
+    if (url.pathname !== '/api/pesquisa' || request.method !== 'POST') {
+      return json({ error: 'Endpoint não encontrado.' }, 404, request, env);
+    }
+
+    if (!env.GEMINI_API_KEY) {
+      return json({ error: 'A chave da Gemini ainda não foi configurada no serviço protegido.' }, 500, request, env);
+    }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return json({ error: 'O pedido não contém JSON válido.' }, 400, request, env);
+    }
+
+    const question = String(body.question || '').trim();
+    const topic = String(body.topic || '').trim();
+    const module = String(body.module || '').trim();
+    const discipline = String(body.discipline || '').trim();
+
+    if (!question) return json({ error: 'Escreva uma questão de investigação.' }, 400, request, env);
+    if (question.length > 6000) return json({ error: 'A questão excede o limite de 6.000 caracteres.' }, 413, request, env);
+
+    const selected = getSourcesForModule(module);
+    const guidance = MATRIX_GUIDANCE[module] || MATRIX_GUIDANCE['01 — TEXTO BÍBLICO'];
+    const routingText = `IDs internos autorizados: ${selected.ids.join(', ')}\nFontes roteadas para este módulo:\n${selected.names}`;
+    const matrixText = `Pergunta central: ${guidance.question}\nFunção metodológica: ${guidance.function}\nRegra metodológica: ${guidance.rule}\nFontes prioritárias do módulo: ${guidance.sources.join(', ')}`;
+
+    const prompt = `${SYSTEM_INSTRUCTION}
+
+Módulo PRO: ${module || 'não especificado'}
+Subitem ou tema: ${topic || 'não especificado'}
+Área teológica relacionada: ${discipline || 'não especificada'}
+
+${routingText}
+
+Matriz Canónica aplicada:
+${matrixText}
+
+Questão do investigador:
+${question}
+
+Estruture a resposta com:
+1) delimitação da questão;
+2) evidências relevantes;
+3) análise separando texto, evidência, inferência e interpretação;
+4) limites e leituras concorrentes;
+5) síntese final.
+
+Quando mencionar uma obra, use o ID interno entre colchetes, por exemplo [NA28] ou [NICNT]. Não invente página ou citação literal.`;
+
+    const model = env.GEMINI_MODEL || DEFAULT_MODEL;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(env.GEMINI_API_KEY)}`;
+
+    const requestBody = {
+      systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.25, maxOutputTokens: 5000 }
     };
 
-    const PRO_MODULES = Object.keys(PRO_MODULE_DATA);
-    const TEXT_BIBLICO_SUBMODULES = PRO_MODULE_DATA['01 — TEXTO BÍBLICO'].items;
-    
-    let lastDisciplineKey = '1 FUNDAÇÃO BÍBLICA';
-    let lastDisciplineElement = null;
-
-    const DATA = {
-        "00 AS DISCIPLINAS DA TEOLOGIA": { "INTRODUÇÃO": ["Visão Geral do Sistema", "O Método Canônico", "Arquitetura da Pesquisa"] },
-        "1 FUNDAÇÃO BÍBLICA": {
-            "REVELAÇÃO E ESCRITURA": ["Doutrina das Escrituras", "Revelação e Inspiração", "Canonicidade", "Transmissão Textual", "Crítica Textual", "Manuscritologia Bíblica", "Paleografia Bíblica"],
-            "LINGUAGEM BÍBLICA": ["Línguas Bíblicas", "Linguística Bíblica", "Filologia Bíblica", "Estudos Lexicais", "Sintaxe Bíblica", "Semântica Bíblica", "Análise do Discurso", "Retórica Bíblica"],
-            "INTERPRETAÇÃO BÍBLICA": ["Exegese", "Metodologia Exegética", "Hermenêutica", "História da Interpretação", "Teologia Bíblica", "Teologia Canônica", "Tipologia Bíblica", "Intertextualidade Bíblica", "Simbolismo Bíblico"],
-            "CONTEXTO E MUNDO BÍBLICO": ["Contexto Histórico-Cultural", "Arqueologia Bíblica", "Estudos do Antigo Oriente", "Judaísmo do Segundo Templo", "Mundo Greco-Romano", "Literatura Intertestamentária"],
-            "LITERATURA BÍBLICA": ["Gêneros Literários", "Estruturas Literárias Bíblicas", "Narrativa Bíblica", "Poética Bíblica"],
-            "METODOLOGIA ACADÊMICA": ["Metodologia de Estudo Bíblico", "Pesquisa Acadêmica", "Escrita Teológica", "Ferramentas Acadêmicas", "Metodologia Científica Bíblica"],
-            "FUNDAMENTOS FILOSÓFICOS": ["Filosofia da Linguagem Bíblica", "Epistemologia Teológica", "Pedagogia Bíblica"]
-        },
-        "2 ESTUDOS BÍBLICOS CANÔNICOS": {
-            "CORPUS DO ANTIGO TESTAMENTO": ["Pentateuco", "História Deuteronomista", "História do Cronista", "Literatura Sapiencial", "Literatura Poética", "Profetas Maiores", "Profetas Menores", "Literatura Apocalíptica"],
-            "CORPUS DO NOVO TESTAMENTO": ["Evangelhos Sinóticos", "Literatura Joanina", "Atos dos Apóstolos", "Corpus Paulino", "Hebreus", "Epístolas Gerais", "Apocalipse"],
-            "TEOLOGIA BÍBLICA CANÔNICA": ["Teologia do Antigo Testamento", "Teologia do Novo Testamento", "Estudos Intercanônicos", "Desenvolvimento da Revelação", "Unidade Canônica das Escrituras"],
-            "ESTRUTURAS REDENTIVO-HISTÓRICAS": ["Reino de Deus", "Aliança", "Templo", "Presença Divina", "Sacrifício", "Messias", "Povo de Deus", "Nova Criação", "Escatologia Bíblica"]
-        },
-        "3 TEOLOGIA BÍBLICA": {
-            "TEMAS REDENTIVO-HISTÓRICOS": ["História Redentiva", "Reino de Deus", "Alianças Bíblicas", "Promessa e Cumprimento", "Tipologia Bíblica", "Temas Centrais da Redenção", "Êxodo e Redenção", "Templo e Presença Divina", "Sacrifício e Expiação", "Messianismo Bíblico", "Povo da Aliança", "Lei e Graça", "Nova Aliança", "Sião e Jerusalém", "Descanso e Shalom", "Santidade Bíblica", "Glória de Deus", "Imagem de Deus", "Filiação e Adoção", "União com Cristo", "Vida, Morte e Ressurreição", "Juízo e Consumação", "Nova Criação"],
-            "DOUTRINAS E MOTIVOS BÍBLICOS": ["Cristologia Bíblica", "Pneumatologia Bíblica", "Eclesiologia Bíblica", "Escatologia Bíblica", "Adão e Nova Criação", "Sabedoria Bíblica", "Profecia Bíblica", "Estruturas Pactuales"],
-            "TEOLOGIA DOS CORPUS E AUTORES": ["Teologia dos Autores Bíblicos", "Teologia do Pentateuco", "Teologia Deuteronomista", "Teologia Profética", "Teologia Sapiencial", "Teologia dos Evangelhos", "Teologia Paulina", "Teologia Joanina", "Teologia Petrina", "Teologia Hebraica", "Teologia Apocalíptica"],
-            "ESTRUTURA E UNIDADE CANÔNICA": ["Revelação Progressiva", "Continuidade e Descontinuidade", "Unidade Canônica das Escrituras", "Intertextualidade Canônica", "Estrutura da Narrativa Bíblica", "Metanarrativa Bíblica", "Centralidade de Cristo", "Centralidade do Reino", "Missão de Deus", "Consumação Escatológica"]
-        },
-        "4 TEOLOGIA SISTEMÁTICA": {
-            "LOCI THEOLOGICI": ["Prolegômenos", "Bibliologia", "Teontologia", "Trindadologia", "Cristologia", "Pneumatologia", "Angelologia", "Antropologia Teológica", "Hamartiologia", "Soteriologia", "Eclesiologia", "Escatologia"],
-            "DOUTRINAS FUNDAMENTAIS": ["Doutrina da Revelação", "Doutrina das Escrituras", "Doutrina de Deus", "Doutrina da Criação", "Doutrina da Providência", "Doutrina do Pecado", "Doutrina da Graça", "Doutrina da Salvação", "Doutrina da Igreja", "Doutrina dos Sacramentos", "Doutrina das Últimas Coisas", "União com Cristo", "Ordo Salutis", "Doutrina da Adoração", "Doutrina da Santificação", "Doutrina da Perseverança", "Doutrina da Glorificação", "Doutrina do Juízo", "Doutrina do Céu e Inferno", "Doutrina da Ressurreição", "Doutrina da Missão"],
-            "SISTEMAS E TRADIÇÕES": ["História das Doutrinas", "Sistemas Teológicos", "Calvinismo", "Arminianismo", "Teologia Reformada", "Teologia Batista", "Confessionalismo", "Teologia Pactual", "Teologia Dispensacional", "Teologia Contemporânea"],
-            "TEOLOGIA APLICADA E FILOSÓFICA": ["Ética Cristã", "Teologia da Aliança", "Teologia do Reino", "Teologia Filosófica", "Teologia Moral", "Teologia Pública", "Teologia Política", "Cosmovisão Cristã", "Relação Fé e Razão", "Integração Doutrinária"]
-        },
-        "5 HISTÓRIA DA IGREJA": {
-            "ERA ANTIGA E PATRÍSTICA": ["Igreja Primitiva", "Era Apostólica", "Pais Apostólicos", "Patrística", "Concílios Ecumênicos", "Formação da Ortodoxia", "História das Heresias", "História do Cânon", "História do Martírio", "História das Perseguições"],
-            "MEDIEVAL E REFORMA": ["Monasticismo", "Igreja Medieval", "Escolasticismo", "Pré-Reforma", "Reforma Protestante", "Reforma Magisterial", "Reforma Radical", "Contrarreforma", "Protestantismo Histórico"],
-            "MOVIMENTOS E TRADIÇÕES": ["Puritanismo", "Pietismo", "Avivamentos", "História Batista", "História Reformada", "História Presbiteriana", "História Pentecostal", "História Evangélica", "Liberalismo Teológico", "Neo-ortodoxia", "Fundamentalismo", "Evangelicalismo", "Ecumenismo"],
-            "HISTÓRIA TEMÁTICA E GLOBAL": ["História das Missões", "História da Liturgia", "História da Espiritualidade Cristã", "História da Pregação", "História da Educação Cristã", "História do Discipulado", "História da Adoração", "História da Bíblia", "História da Tradução Bíblica", "História da Teologia", "História da Filosofia Cristã", "História da Apologética", "Cristianismo e Cultura", "Cristianismo e Política", "Cristianismo e Sociedade", "Denominações Cristãs", "Confissões e Credos", "Movimentos Contemporâneos", "História do Cristianismo Global", "Cristianismo Latino-Americano", "Cristianismo Africano", "Cristianismo Asiático", "História das Instituições Cristãs", "Biografias Históricas Cristãs"]
-        },
-        "6 VIDA CRISTÃ": {
-            "FUNDAMENTOS E COMUNHÃO": ["União com Cristo", "Identidade em Cristo", "Centralidade de Cristo", "Vida de Graça", "Vida Pactual", "Fé Cristã", "Esperança Cristã", "Amor Cristão", "Evangelho e Vida Cristã", "Comunhão com Deus", "Vida Devocional", "Oração", "Adoração", "Leitura Bíblica", "Meditação Bíblica", "Jejum", "Presença de Deus"],
-            "SANTIFICAÇÃO E GUERRA": ["Santificação", "Vida de Santidade", "Mortificação do Pecado", "Vivificação Espiritual", "Pureza Cristã", "Obediência Cristã", "Temor do Senhor", "Disciplina Espiritual", "Formação Espiritual", "Maturidade Espiritual", "Guerra Espiritual", "Tentação Cristã", "Armadura de Deus", "Batalha contra a Carne", "Resistência ao Diabo", "Discernimento Espiritual"],
-            "VIRTUDES E EMOÇÕES": ["Humildade Cristã", "Integridade Cristã", "Fidelidade Cristã", "Mansidão Cristã", "Paciência Cristã", "Bondade Cristã", "Misericórdia Cristã", "Generosidade Cristã", "Contentamento Cristão", "Gratidão Cristã", "Sofrimento Cristão", "Consolação Cristã", "Ansiedade e Fé", "Medo e Confiança", "Culpa e Graça", "Descanso Espiritual"],
-            "VIDA RELACIONAL E MISSÃO": ["Amor ao Próximo", "Perdão Cristão", "Reconciliação Cristã", "Unidade Cristã", "Comunhão da Igreja", "Serviço Cristão", "Hospitalidade Cristã", "Vida Familiar Cristã", "Casamento Cristão", "Discipulado", "Chamado Cristão", "Vocação Cristã", "Vida Missional", "Evangelismo", "Testemunho Cristão", "Mordomia Cristã"],
-            "MENTE E COTIDIANO": ["Mente Cristã", "Cosmovisão Cristã", "Pensamento Cristão", "Integração Fé e Vida", "Ética da Vida Cristã", "Cultura e Cristianismo", "Uso Cristão da Tecnologia", "Administração do Tempo", "Dinheiro e Vida Cristã", "Trabalho Cristão", "Descanso e Ritmo Espiritual", "Simplicidade Cristã", "Vida Cristã no Mundo Digital", "Saúde e Corpo Cristão", "Peregrinação Cristã", "Esperança Escatológica"]
-        },
-        "7 ACONSELHAMENTO PASTORAL": {
-            "FUNDAMENTOS E ANTROPOLOGIA": ["Fundamentos do Aconselhamento Pastoral", "Antropologia Bíblica e Condição Humana"],
-            "CUIDADO NA DOR E PECADO": ["Sofrimento Humano e Experiência da Dor", "Pecado, Culpa e Arrependimento"],
-            "VIDA INTERIOR E RELACIONAL": ["Vida Emocional e Desordem Interior", "Conflitos Relacionais e Restauração"],
-            "CRESCIMENTO E DIREÇÃO": ["Crises de Fé e Experiência Espiritual", "Discipulado e Transformação da Vida", "Direção Pastoral e Decisões da Vida"],
-            "RESTAURAÇÃO E COMUNIDADE": ["Cuidado Pastoral e Restauração da Alma", "Igreja e Comunidade no Cuidado Pastoral", "Esperança Cristã e Restauração Final"]
-        },
-        "8 APOLOGÉTICA": {
-            "FUNDAMENTOS E VERDADE": ["Fundamentos da Apologética Cristã", "Revelação, Verdade e Autoridade das Escrituras", "Confiabilidade Histórica das Escrituras"],
-            "DEUS E CRISTO": ["Existência de Deus e Teísmo Cristão", "Jesus Cristo e a Ressurreição", "Salvação e Exclusividade de Cristo"],
-            "CIÊNCIA, RAZÃO E MAL": ["Ciência, Fé e Razão", "Problema do Mal e Sofrimento", "Antropologia e Sentido da Existência Humana"],
-            "COSMOVISÃO E CULTURA": ["Religiões e Cosmovisões", "Ética Cristã e Cosmovisão", "Relativismo, Cultura e Pós-Modernidade", "Heresias e Distorções da Fé Cristã", "Evangelismo e Defesa da Fé no Mundo Contemporâneo"]
-        },
-        "9 MISSÕES / CULTURA / SOCIEDADE": {
-            "FUNDAMENTOS E ENVIO": ["Fundamentos Missionais do Evangelho", "Grande Comissão e Envio da Igreja", "Missio Dei e Reino de Deus"],
-            "EVANGELISMO E DISCIPULADO": ["Evangelismo e Proclamação do Evangelho", "Discipulado e Formação das Nações", "Igreja e Sua Missão no Mundo"],
-            "CULTURA E SOCIEDADE": ["Cultura e Cosmovisão Cristã", "Cristianismo e Sociedade", "Justiça, Misericórdia e Responsabilidade Social", "Trabalho, Economia e Vida Pública"],
-            "TRANSFORMAÇÃO E FUTURO": ["Educação e Transformação Cultural", "Mídia, Tecnologia e Comunicação", "Contextualização Missionária", "Conflito de Cosmovisões Modernas", "Esperança do Reino e Consumação Final"]
-        },
-        "10 ÉTICA CRISTÃ": {
-            "FUNDAMENTOS E COSMOVISÃO": ["Fundamentos da ÉTICA CRISTÃ", "Deus, Revelação e Moralidade", "Cosmovisão Cristã e Vida Moral"],
-            "CARÁTER E VIDA INTERIOR": ["Pecado, Santidade e Responsabilidade Moral", "Consciência e Responsabilidade Humana", "Virtudes Cristãs e Formação do Caráter", "Ética Pessoal e Vida Interior"],
-            "ÉTICA RELACIONAL E SOCIAL": ["Ética Relacional e Amor ao Próximo", "Ética Familiar e Vida Doméstica", "Ética do Trabalho e Vida Profissional", "Ética Social e Justiça", "Ética Política e Vida Pública"],
-            "ÉTICA DA VIDA E CONTEMPORÂNEA": ["Ética Sexual e Corpo Humano", "Ética da Palavra e Comunicação", "Ética do Sofrimento e Situações-Limite", "Ética Cristã e Mundo Contemporâneo", "Responsabilidade Eterna e Juízo de Deus"]
-        },
-        "11 LIDERANÇA E MINISTÉRIO": {
-            "FUNDAMENTOS E VOCAÇÃO": ["Fundamentos da Liderança Cristã", "Cristologia da Liderança", "Chamado e Vocação Ministerial", "Espiritualidade do Líder"],
-            "CARÁTER E SERVIÇO": ["Caráter do Líder Cristão", "Liderança Servidora", "Ética Ministerial", "Perseverança e Longevidade Ministerial"],
-            "FORMAÇÃO E GESTÃO": ["Discipulado e Formação de Líderes", "Gestão e Administração Ministerial", "Sucessão e Multiplicação de Líderes"],
-            "ATUAÇÃO MINISTERIAL": ["Pastoreio e Cuidado Espiritual", "Ensino e Ministério da Palavra", "Dons Espirituais e Ministério", "Relacionamentos e Unidade Ministerial", "Liderança em Crises", "Missão e Expansão Ministerial"]
-        },
-        "12 PREGAÇÃO E ENSINO": {
-            "FUNDAMENTOS E PREPARO": ["Fundamentos Bíblicos da Pregação e Ensino", "Cristo no Centro da Pregação", "Poder do Espírito Santo na Pregação", "Preparo e Vida do Preletor"],
-            "HERMENÊUTICA E HOMILÉTICA": ["Hermenêutica e Interpretação Bíblica", "Exposição das Escrituras", "Homilética e Construção do Sermão", "Autoridade e Fidelidade à Escritura"],
-            "ENSINO E DISCIPULADO": ["Ensino Bíblico e Formação de Discípulos", "Contexto e Aplicação da Palavra", "Comunicação e Linguagem Ministerial", "Ensino no Discipulado"],
-            "ESTILOS E IMPACTO": ["Pregação Evangelística", "Pregação Pastoral e Cuidado da Alma", "Pregação Profética e Edificação", "Ética na Pregação e Ensino", "Impacto e Fruto da Palavra"]
-        },
-        "13 ADORAÇÃO E LITURGIA": {
-            "FUNDAMENTOS E CENTRO": ["Fundamentos Bíblicos da Adoração", "Deus como Centro da Adoração", "Adoração em Espírito e em Verdade", "Presença de Deus na Adoração"],
-            "BÍBLIA E HISTÓRIA": ["Adoração no Antigo e Novo Testamento", "Palavra e Adoração", "Adoração Escatológica"],
-            "LITURGIA E CULTO": ["Liturgia e Ordem do Culto", "Santidade e Reverência na Adoração", "Adoração Corporativa da Igreja", "Ordem, Decência e Edificação no Culto"],
-            "EXPRESSÃO E MINISTÉRIO": ["Música e Expressão na Adoração", "Oração e Adoração", "Liderança de Louvor e Serviço", "Unção e Direção do Espírito", "Adoração e Vida Cristã", "Cultura e Expressão da Adoração"]
-        },
-        "14 EDUCAÇÃO CRISTÃ": {
-            "FUNDAMENTOS E COSMOVISÃO": ["Fundamentos Bíblicos da Educação Cristã", "Deus como Fundamento do Conhecimento", "Cosmovisão Cristã e Formação Educacional", "Mente Cristã e Formação do Pensamento"],
-            "ENSINO E CARÁTER": ["Ensino da Palavra de Deus", "Discipulado e Formação Integral", "Desenvolvimento do Caráter Cristão", "Educação e Disciplina Espiritual"],
-            "CICLOS DA VIDA": ["Educação Infantil e Base Espiritual", "Educação de Jovens e Adolescentes", "Educação de Adultos e Maturidade", "Educação Familiar Cristã"],
-            "INSTITUIÇÃO E SOCIEDADE": ["Educação na Igreja", "Educação e Cultura", "Educação e Sociedade", "Tecnologia e Educação Cristã", "Educação e Missão da Igreja"]
-        },
-        "15 DISCIPULADO": {
-            "FUNDAMENTOS E IDENTIDADE": ["Fundamentos Bíblicos do Discipulado", "Seguir a Cristo", "Identidade em Cristo", "Renúncia e Custo do Discipulado"],
-            "FORMAÇÃO E COMUNHÃO": ["Formação do Caráter Cristão", "Obediência à Palavra de Deus", "Vida no Espírito Santo", "Oração e Comunhão com Deus", "Comunhão e Vida na Igreja"],
-            "PRÁTICA E CRESCIMENTO": ["Ensino e Aprendizado Contínuo", "Prática da Fé no Cotidiano", "Correção, Disciplina e Maturidade", "Perseverança na Fé"],
-            "MISSÃO E MULTIPLICAÇÃO": ["Evangelismo e Testemunho Pessoal", "Discipulado e Multiplicação", "Vida Missional do Discípulo", "Esperança e Vida Eterna"]
-        },
-        "16 FAMÍLIA CRISTÃ": {
-            "FUNDAMENTOS E ALIANÇA": ["Fundamentos Bíblicos da Família", "Deus como Autor da Família", "Casamento Cristão", "Amor, Unidade e Aliança Familiar", "Herança Espiritual Familiar"],
-            "PAPÉIS E FORMAÇÃO": ["Papéis e Responsabilidades Familiares", "Pais e Educação dos Filhos", "Filhos e Vida Familiar", "Criação de Filhos na Fé Cristã"],
-            "VIDA PRÁTICA E CUIDADO": ["Vida Espiritual no Lar", "Conflitos e Reconciliação Familiar", "Sexualidade e Pureza no Casamento", "Finanças e Mordomia Familiar"],
-            "INSTITUIÇÃO E PROPÓSITO": ["Família e Igreja", "Família e Sociedade", "Família em Crises e Sofrimento", "Família e Propósito Eterno"]
-        },
-        "17 FORMAÇÃO ESPIRITUAL": {
-            "FUNDAMENTOS E IDENTIDADE": ["Fundamentos da Formação Espiritual", "Vida em Cristo e Novo Nascimento", "Comunhão com Deus"],
-            "DISCIPLINAS E PRÁTICAS": ["Oração e Vida Devocional", "Leitura e Meditação Bíblica", "Disciplina Espiritual", "Obediência e Prática da Palavra"],
-            "TRANSFORMAÇÃO E CARÁTER": ["Santificação e Transformação Interior", "Caráter Cristão", "Renovação da Mente", "Luta contra o Pecado"],
-            "CRESCIMENTO E FRUTO": ["Perseverança Espiritual", "Crescimento e Maturidade Espiritual", "Comunhão com a Igreja", "Serviço e Fruto Espiritual", "Esperança e Vida Eterna"]
-        },
-        "18 EVANGELISMO": {
-            "FUNDAMENTOS E MENSAGEM": ["Fundamentos Bíblicos do Evangelismo", "Evangelho de Jesus Cristo", "Chamado e Missão de Evangelizar", "Evangelismo e Eternidade"],
-            "ESPIRITUALIDADE E COMUNICAÇÃO": ["Poder do Espírito Santo no Evangelismo", "Oração e Evangelismo", "Comunicação do Evangelho", "Evangelismo e Cosmovisão Cristã"],
-            "MÉTODOS E PRÁTICA": ["Evangelismo Pessoal", "Evangelismo Comunitário", "Evangelismo e Discipulado", "Evangelismo e Relações Humanas"],
-            "CONTEXTO E EXPANSÃO": ["Contexto Cultural e Evangelismo", "Evangelismo e Ação Social", "Evangelismo em Contextos Difíceis", "Evangelismo e Apostolado", "Evangelismo e Fruto da Conversão"]
-        },
-        "19 FILOSOFIA CRISTÃ": {
-            "FUNDAMENTOS E METAFÍSICA": ["Fundamentos da Filosofia Cristã", "Cosmovisão Cristã", "Ontologia Cristã", "Teologia Natural", "Teologia Revelada"],
-            "CONHECIMENTO E RAZÃO": ["Epistemologia Cristã", "Lógica e Razão no Pensamento Cristão", "Fé e Razão", "Verdade e Relativismo"],
-            "ANTROPOLOGIA E ÉTICA": ["Antropologia Filosófica Cristã", "Ética Filosófica Cristã", "Liberdade, Determinismo e Vontade Humana", "Identidade e Sentido da Vida"],
-            "DESAFIOS E DIÁLOGOS": ["Problema do Mal", "Existência de Deus", "Cristianismo e Filosofias Seculares", "Filosofia Cristã e Vida Prática"]
-        },
-        "20 COSMOVISÃO CRISTÃ": {
-            "FUNDAMENTOS E REALIDADE": ["Fundamentos da Cosmovisão Cristã", "Deus e a Realidade", "Criação e Ordem do Mundo", "Escritura e Verdade"],
-            "CONDIÇÃO E REDENÇÃO": ["Queda e Condição Humana", "Redenção em Cristo", "Reino de Deus", "Homem e Identidade Humana"],
-            "HISTÓRIA E SABER": ["História e Providência Divina", "Ciência e Conhecimento", "Sofrimento e Mal no Mundo", "Esperança e Futuro da Criação"],
-            "CULTURA E SOCIEDADE": ["Moralidade e Ética da Vida", "Cultura e Formação Social", "Trabalho e Vida no Mundo", "Igreja e Presença no Mundo", "Missão e Transformação do Mundo"]
-        },
-        "21 TEOLOGIA PÚBLICA": {
-            "FUNDAMENTOS E ESPAÇO PÚBLICO": ["Fundamentos da Teologia Pública", "Deus e Vida Pública", "Igreja e Espaço Público", "Fé Cristã e Sociedade"],
-            "POLÍTICA, ESTADO E PODER": ["Política e Poder", "Estado e Governo", "Liberdade Religiosa e Consciência"],
-            "JUSTIÇA, ÉTICA E DIREITOS": ["Ética Pública e Vida Moral Coletiva", "Justiça e Direitos Humanos", "Justiça Social e Compasso Cristão", "Esperança Cristã e Futuro da Sociedade"],
-            "CULTURA, ECONOMIA E MÍDIA": ["Economia e Vida Pública", "Educação e Formação Cultural", "Cultura e Transformação Social", "Religião e Pluralismo", "Mídia e Comunicação Pública", "Tecnologia e Vida Pública"]
-        },
-        "22 ESTUDOS JUDAICOS E CONTEXTUAIS": {
-            "FUNDAMENTOS E CONTEXTO HISTÓRICO": ["Fundamentos dos Estudos Judaicos", "Contexto do Antigo Testamento", "Contexto do Novo Testamento", "Geografia Bíblica e Contexto Histórico"],
-            "JUDAÍSMO E TRADIÇÃO": ["Judaísmo do Segundo Templo", "Torá e Tradição Judaica", "Sinagoga e Vida Religiosa Judaica", "Interpretação Judaica das Escrituras"],
-            "CULTURA E MENTALIDADE": ["Cultura Hebraica e Mentalidade Bíblica", "Línguas Bíblicas e Contexto Linguístico", "Costumes e Práticas Sociais Judaicas", "Festas e Calendário Bíblico"],
-            "IDENTIDADE E TRANSIÇÃO": ["Profetismo e Expectativa Messiânica", "Lei e Pureza e Sistema Religioso", "Jesus no Contexto Judaico", "Igreja Primitiva e Raízes Judaicas", "Contextualização Bíblica para Hoje"]
-        },
-        "23 ESTUDOS DENOMINACIONAIS": {
-            "FUNDAMENTOS E HISTÓRIA": ["Fundamentos dos Estudos Denominacionais", "Unidade e Diversidade da Igreja", "História das Denominações Cristãs"],
-            "TRADIÇÕES CLÁSSICAS": ["Catolicismo e Tradição Romana", "Ortodoxia Cristã", "Protestantismo Histórico", "Anglicanismo"],
-            "MOVIMENTOS E ÊNFASES": ["Evangelicalismo", "Pentecostalismo", "Movimento Carismático", "Movimentos Restauracionistas"],
-            "TEOLOGIA E DIÁLOGO": ["Batistas e Tradições Congregacionais", "Presbiterianos e Tradição Reformada", "Metodistas e Tradição Wesleyana", "Diferenças Doutrinárias entre Denominações", "Ecumenismo e Diálogo Interdenominacional", "Denominações e Contexto Contemporâneo"]
-        },
-        "24 TEOLOGIA HISTÓRICA": {
-            "FUNDAMENTOS E ERA ANTIGA": ["Fundamentos da Teologia Histórica", "Igreja Primitiva", "Patrística", "Concílios Ecumênicos"],
-            "ORTODOXIA E CONFLITOS": ["Formação da Ortodoxia Cristã", "Heresias e Controvérsias Doutrinárias", "História da Doutrina Cristã"],
-            "MEDIEVAL E REFORMA": ["Idade Média e Teologia Escolástica", "Reforma Protestante", "Reforma Radical", "Contrarreforma"],
-            "MODERNIDADE E CONTINUIDADE": ["Teologia Reformada", "Pietismo e Revivamentos", "Iluminismo e Desafios Modernos", "Teologia Moderna", "Teologia Contemporânea", "Continuidade da Fé Cristã na História"]
-        },
-        "25 ESPIRITUALIDADE HISTÓRICA": {
-            "FUNDAMENTOS E ERA ANTIGA": ["Fundamentos da Espiritualidade Histórica", "Espiritualidade da Igreja Primitiva", "Espiritualidade Patrística", "Espiritualidade no Deserto e Ascetismo"],
-            "TRADIÇÕES CLÁSSICAS": ["Espiritualidade Monástica", "Espiritualidade Medieval", "Mística Cristã", "Espiritualidade Litúrgica"],
-            "REFORMA E RENOVAÇÃO": ["Espiritualidade Reformada", "Espiritualidade Pietista", "Espiritualidade Metodista", "Espiritualidade Reformada Contemporânea"],
-            "MOVIMENTOS E PRÁTICAS": ["Espiritualidade Pentecostal", "Espiritualidade Carismática", "Espiritualidade Missional", "Disciplinas Espirituais Históricas", "Continuidade da Vida Espiritual Cristã"]
-        },
-        "26 TEOLOGIA APLICADA": {
-            "FUNDAMENTOS E VIDA CRISTÃ": ["Fundamentos da Teologia Aplicada", "Bíblia e Vida Prática", "Teologia e Vida Cristã", "Teologia e Espiritualidade", "Teologia e Vida Cotidiana"],
-            "MINISTÉRIO E LIDERANÇA": ["Teologia e Ministério", "Teologia e Liderança", "Teologia e Pastoreio", "Teologia e Educação", "Teologia e Discipulado"],
-            "IGREJA E FAMÍLIA": ["Teologia e Igreja", "Teologia e Família"],
-            "ÉTICA, CULTURA E SOCIEDADE": ["Teologia e Sociedade", "Teologia e Cultura", "Teologia e Ética", "Teologia e Missão", "Teologia e Transformação Social"]
-        },
-        "27 MINISTÉRIO INFANTIL E JUVENIL": {
-            "FUNDAMENTOS E INFÂNCIA": ["Fundamentos do Ministério Infantil e Juvenil", "Crianças e o Reino de Deus", "Discipulado Infantil", "Ensino Bíblico para Crianças"],
-            "JUVENTUDE E DISCIPULADO": ["Juventude e Fé Cristã", "Discipulado Juvenil", "Ensino Bíblico para Jovens", "Transição para a Vida Adulta Cristã"],
-            "FORMAÇÃO E LIDERANÇA": ["Formação de Caráter na Infância e Juventude", "Liderança Infantil e Juvenil", "Evangelismo Infantil e Juvenil", "Vida Espiritual de Crianças e Jovens"],
-            "CUIDADO E CONTEXTO": ["Igreja e Integração de Crianças e Jovens", "Proteção e Cuidado no Ministério", "Família e Ministério Infantil e Juvenil", "Cultura e Desafios da Juventude", "Tecnologia e Ministério com Jovens"]
-        },
-        "28 MISSIOLOGIA": {
-            "FUNDAMENTOS E ESTRATÉGIA": ["Fundamentos da Missiologia", "Missio Dei", "Grande Comissão", "Estratégias Missionárias", "Escatologia Missionária"],
-            "CONTEXTO E CULTURA": ["Evangelho e Contexto Mundial", "Evangelização Global", "Missões Urbanas e Rurais", "Contextualização Missionária", "Cultura e Missão"],
-            "DISCIPULADO E POVOS": ["Povos Não Alcançados", "Plantação de Igrejas", "Discipulado nas Nações"],
-            "VIDA E TESTEMUNHO": ["Missões e Espírito Santo", "Sofrimento e Perseguição Missionária", "Missões e Justiça Social", "Igreja Local e Missão Global"]
-        },
-        "29 LINGUAGENS E COMUNICAÇÃO CRISTÃ": {
-            "FUNDAMENTOS E TEOLOGIA": ["Fundamentos da Comunicação Cristã", "Deus e a Comunicação", "Escritura como Linguagem Divina", "Linguagem e Verdade"],
-            "INTERPRETAÇÃO E RETÓRICA": ["Interpretação e Compreensão", "Retórica Cristã", "Homilética e Discurso Público", "Linguagem Bíblica e Figuras de Discurso"],
-            "MÉTODOS E MÍDIAS": ["Narrativa Bíblica e Storytelling Cristão", "Comunicação Oral Cristã", "Comunicação Escrita Cristã", "Comunicação Digital Cristã"],
-            "ÉTICA E IMPACTO": ["Linguagem Cultural e Contexto", "Comunicação e Discipulado", "Ética na Comunicação Cristã", "Comunicação e Impacto Espiritual"]
-        }
-    };
-
-    function init() {
-        const ml = document.getElementById('ml');
-
-        // Somente as áreas 1 a 29 são itens funcionais.
-        Object.keys(DATA)
-            .filter(k => k !== '00 AS DISCIPLINAS DA TEOLOGIA')
-            .forEach(k => {
-                const li = document.createElement('li');
-                li.className = 'module-item';
-                li.innerText = k;
-                li.onclick = () => showSub(k, li);
-                ml.appendChild(li);
-            });
-
-        showSub('1 FUNDAÇÃO BÍBLICA', ml.children[0]);
-
-        renderAllInternalProMenus();
-    }
-
-    function toggleProMenu() {
-        const panel = document.getElementById('pro-panel');
-        if (panel) panel.classList.toggle('open');
-    }
-
-    function renderProMenu() {
-        const proList = document.getElementById('pro-inline-list');
-        if (!proList) return;
-        proList.innerHTML = '';
-        PRO_MODULES.forEach(module => {
-            const item = document.createElement('li');
-            item.className = 'pro-item';
-            item.innerText = module;
-            item.onclick = () => showProfessionalModule(module, item);
-            proList.appendChild(item);
+    try {
+      let upstream;
+      let data;
+      const maxAttempts = 2;
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        upstream = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
         });
+        data = await upstream.json();
+        const temporary = [429, 500, 502, 503, 504].includes(upstream.status);
+        if (upstream.ok || !temporary || attempt === maxAttempts) break;
+        await new Promise(resolve => setTimeout(resolve, 900 * attempt));
+      }
+
+      if (!upstream.ok) {
+        const message = data?.error?.message || 'A Gemini recusou temporariamente a consulta.';
+        const highDemand = /high demand|overloaded|temporar|quota|rate limit|unavailable/i.test(message);
+        return json({ error: highDemand ? 'O serviço de IA está temporariamente sobrecarregado. Tente novamente dentro de alguns instantes.' : message, temporary: highDemand, retryAfterSeconds: highDemand ? 20 : undefined }, highDemand ? 503 : upstream.status, request, env);
+      }
+
+      const text = data?.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim();
+      if (!text) return json({ error: 'A Gemini não devolveu uma resposta textual.' }, 502, request, env);
+      return json({ text }, 200, request, env);
+    } catch {
+      return json({ error: 'Não foi possível comunicar com o serviço de IA neste momento.', temporary: true, retryAfterSeconds: 20 }, 502, request, env);
     }
-
-    function renderInternalProMenu(module) {
-        const heading = document.getElementById('pro-internal-heading');
-        const list = document.getElementById('pro-internal-list');
-        if (!heading || !list) return;
-        heading.innerText = `LISTA INTERNA — ${module}`;
-        list.innerHTML = '';
-        const items = module === '01 — TEXTO BÍBLICO'
-            ? TEXT_BIBLICO_SUBMODULES
-            : ['Submenu interno deste módulo será estruturado nesta área.'];
-        items.forEach(submodule => {
-            const item = document.createElement('li');
-            item.className = 'internal-item';
-            item.innerText = submodule;
-            if (module === '01 — TEXTO BÍBLICO') {
-                item.onclick = () => {
-                    document.querySelectorAll('.internal-item').forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    showProfessionalModule(submodule, item, 'SUBMÓDULO DE TEXTO BÍBLICO');
-                };
-            }
-            list.appendChild(item);
-        });
-    }
-
-    function toggleTextBiblicoSubmenu(parentItem) {
-        const existing = parentItem.nextElementSibling;
-        if (existing && existing.classList.contains('pro-sublist')) {
-            existing.classList.toggle('open');
-            return;
-        }
-
-        const submenu = document.createElement('ul');
-        submenu.className = 'pro-sublist open';
-        TEXT_BIBLICO_SUBMODULES.forEach(submodule => {
-            const item = document.createElement('li');
-            item.className = 'pro-subitem';
-            item.innerText = submodule;
-            item.onclick = (event) => {
-                event.stopPropagation();
-                document.querySelectorAll('.pro-subitem').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                showProfessionalModule(submodule, item, 'SUBMÓDULO DE TEXTO BÍBLICO');
-            };
-            submenu.appendChild(item);
-        });
-        parentItem.parentNode.insertBefore(submenu, parentItem.nextSibling);
-    }
-
-    const BIBLE_BOOKS = ['Gênesis', 'Êxodo', 'Levítico', 'Números', 'Deuteronômio', 'Josué', 'Juízes', 'Rute', '1 Samuel', '2 Samuel', '1 Reis', '2 Reis', '1 Crônicas', '2 Crônicas', 'Esdras', 'Neemias', 'Ester', 'Jó', 'Salmos', 'Provérbios', 'Eclesiastes', 'Cânticos', 'Isaías', 'Jeremias', 'Lamentações', 'Ezequiel', 'Daniel', 'Oséias', 'Joel', 'Amós', 'Obadias', 'Jonas', 'Miquéias', 'Naum', 'Habacuque', 'Sofonias', 'Ageu', 'Zacarias', 'Malaquias', 'Mateus', 'Marcos', 'Lucas', 'João', 'Atos', 'Romanos', '1 Coríntios', '2 Coríntios', 'Gálatas', 'Efésios', 'Filipenses', 'Colossenses', '1 Tessalonicenses', '2 Tessalonicenses', '1 Timóteo', '2 Timóteo', 'Tito', 'Filemom', 'Hebreus', 'Tiago', '1 Pedro', '2 Pedro', '1 João', '2 João', '3 João', 'Judas', 'Apocalipse'];
-    const BIBLE_BOOK_IDS = { 'Gênesis':'GEN','Êxodo':'EXO','Levítico':'LEV','Números':'NUM','Deuteronômio':'DEU','Josué':'JOS','Juízes':'JDG','Rute':'RUT','1 Samuel':'1SA','2 Samuel':'2SA','1 Reis':'1KI','2 Reis':'2KI','1 Crônicas':'1CH','2 Crônicas':'2CH','Esdras':'EZR','Neemias':'NEH','Ester':'EST','Jó':'JOB','Salmos':'PSA','Provérbios':'PRO','Eclesiastes':'ECC','Cânticos':'SNG','Isaías':'ISA','Jeremias':'JER','Lamentações':'LAM','Ezequiel':'EZK','Daniel':'DAN','Oséias':'HOS','Joel':'JOL','Amós':'AMO','Obadias':'OBA','Jonas':'JON','Miquéias':'MIC','Naum':'NAM','Habacuque':'HAB','Sofonias':'ZEP','Ageu':'HAG','Zacarias':'ZEC','Malaquias':'MAL','Mateus':'MAT','Marcos':'MRK','Lucas':'LUK','João':'JHN','Atos':'ACT','Romanos':'ROM','1 Coríntios':'1CO','2 Coríntios':'2CO','Gálatas':'GAL','Efésios':'EPH','Filipenses':'PHP','Colossenses':'COL','1 Tessalonicenses':'1TH','2 Tessalonicenses':'2TH','1 Timóteo':'1TI','2 Timóteo':'2TI','Tito':'TIT','Filemom':'PHM','Hebreus':'HEB','Tiago':'JAS','1 Pedro':'1PE','2 Pedro':'2PE','1 João':'1JN','2 João':'2JN','3 João':'3JN','Judas':'JUD','Apocalipse':'REV' };
-    const BIBLE_CHAPTER_COUNTS = { 'Gênesis':50,'Êxodo':40,'Levítico':27,'Números':36,'Deuteronômio':34,'Josué':24,'Juízes':21,'Rute':4,'1 Samuel':31,'2 Samuel':24,'1 Reis':22,'2 Reis':25,'1 Crônicas':29,'2 Crônicas':36,'Esdras':10,'Neemias':13,'Ester':10,'Jó':42,'Salmos':150,'Provérbios':31,'Eclesiastes':12,'Cânticos':8,'Isaías':66,'Jeremias':52,'Lamentações':5,'Ezequiel':48,'Daniel':12,'Oséias':14,'Joel':3,'Amós':9,'Obadias':1,'Jonas':4,'Miquéias':7,'Naum':3,'Habacuque':3,'Sofonias':3,'Ageu':2,'Zacarias':14,'Malaquias':4,'Mateus':28,'Marcos':16,'Lucas':24,'João':21,'Atos':28,'Romanos':16,'1 Coríntios':16,'2 Coríntios':13,'Gálatas':6,'Efésios':6,'Filipenses':4,'Colossenses':4,'1 Tessalonicenses':5,'2 Tessalonicenses':3,'1 Timóteo':6,'2 Timóteo':4,'Tito':3,'Filemom':1,'Hebreus':13,'Tiago':5,'1 Pedro':5,'2 Pedro':3,'1 João':5,'2 João':1,'3 João':1,'Judas':1,'Apocalipse':22 };
-    let selectedBibleBook = 'Gênesis';
-    let selectedBibleChapter = 1;
-
-    function openBibleReader() {
-        const overlay = document.getElementById('bible-overlay');
-        overlay.classList.add('open');
-        document.body.classList.add('bible-open');
-        renderBibleBookList();
-        populateBibleChapters();
-        renderBibleChapter();
-    }
-
-    function closeBibleReader() {
-        document.getElementById('bible-overlay').classList.remove('open');
-        document.body.classList.remove('bible-open');
-    }
-
-    function renderBibleBookList() {
-        const list = document.getElementById('bible-book-list');
-        if (!list) return;
-        list.innerHTML = '';
-        BIBLE_BOOKS.forEach(book => {
-            const button = document.createElement('button');
-            button.textContent = book;
-            button.className = book === selectedBibleBook ? 'active' : '';
-            button.onclick = () => selectBibleBook(book);
-            list.appendChild(button);
-        });
-    }
-
-    function populateBibleChapters() {
-        const chapterSelect = document.getElementById('bible-chapter-select');
-        if (!chapterSelect) return;
-        const count = BIBLE_CHAPTER_COUNTS[selectedBibleBook] || 1;
-        if (selectedBibleChapter > count) selectedBibleChapter = 1;
-        chapterSelect.innerHTML = Array.from({ length: count }, (_, index) => `<option value="${index + 1}" ${index + 1 === selectedBibleChapter ? 'selected' : ''}>${index + 1}</option>`).join('');
-    }
-
-    function selectBibleBook(book) {
-        selectedBibleBook = book;
-        selectedBibleChapter = 1;
-        renderBibleBookList();
-        populateBibleChapters();
-        renderBibleChapter();
-    }
-
-    function escapeBibleText(value) {
-        return String(value || '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
-    }
-
-    const SBLGNT_XML_URL = 'https://raw.githubusercontent.com/scott-fleischman/sblgnt-osis/master/SBLGNT.osis.xml';
-    const LXX_TSV_URL = 'https://raw.githubusercontent.com/LukeSmithxyz/grb/master/grb.tsv';
-    const OSHB_JSON_URL = 'https://raw.githubusercontent.com/openscriptures/morphhb/master/index.js';
-    let sblgntDocument = null;
-    let lxxRows = null;
-    let oshbData = null;
-    let currentParallelVerses = { greek: [], hebrew: [], portuguese: [] };
-    let bibleRenderToken = 0;
-    const OSIS_BOOKS = { 'Mateus':'Matt', 'Marcos':'Mark', 'Lucas':'Luke', 'João':'John', 'Atos':'Acts', 'Romanos':'Rom', '1 Coríntios':'1Cor', '2 Coríntios':'2Cor', 'Gálatas':'Gal', 'Efésios':'Eph', 'Filipenses':'Phil', 'Colossenses':'Col', '1 Tessalonicenses':'1Thess', '2 Tessalonicenses':'2Thess', '1 Timóteo':'1Tim', '2 Timóteo':'2Tim', 'Tito':'Titus', 'Filemom':'Phlm', 'Hebreus':'Heb', 'Tiago':'Jas', '1 Pedro':'1Pet', '2 Pedro':'2Pet', '1 João':'1John', '2 João':'2John', '3 João':'3John', 'Judas':'Jude', 'Apocalipse':'Rev' };
-    const OSHB_BOOKS = { 'Gênesis':'Genesis', 'Êxodo':'Exodus', 'Levítico':'Leviticus', 'Números':'Numbers', 'Deuteronômio':'Deuteronomy', 'Josué':'Joshua', 'Juízes':'Judges', 'Rute':'Ruth', '1 Samuel':'I Samuel', '2 Samuel':'II Samuel', '1 Reis':'I Kings', '2 Reis':'II Kings', '1 Crônicas':'I Chronicles', '2 Crônicas':'II Chronicles', 'Esdras':'Ezra', 'Neemias':'Nehemiah', 'Ester':'Esther', 'Jó':'Job', 'Salmos':'Psalms', 'Provérbios':'Proverbs', 'Eclesiastes':'Ecclesiastes', 'Cânticos':'Song of Solomon', 'Isaías':'Isaiah', 'Jeremias':'Jeremiah', 'Lamentações':'Lamentations', 'Ezequiel':'Ezekiel', 'Daniel':'Daniel', 'Oséias':'Hosea', 'Joel':'Joel', 'Amós':'Amos', 'Obadias':'Obadiah', 'Jonas':'Jonah', 'Miquéias':'Micah', 'Naum':'Nahum', 'Habacuque':'Habakkuk', 'Sofonias':'Zephaniah', 'Ageu':'Haggai', 'Zacarias':'Zechariah', 'Malaquias':'Malachi' };
-    const LXX_BOOKS = { 'Gênesis':'Genesis', 'Êxodo':'Exodus', 'Levítico':'Leviticus', 'Números':'Numbers', 'Deuteronômio':'Deuteronomy', 'Josué':'Joshua', 'Juízes':'Judges', 'Rute':'Ruth', '1 Samuel':'1 Samuel', '2 Samuel':'2 Samuel', '1 Reis':'1 Kings', '2 Reis':'2 Kings', '1 Crônicas':'1 Chronicles', '2 Crônicas':'2 Chronicles', 'Esdras':'Ezra', 'Neemias':'Nehemiah', 'Ester':'Esther', 'Jó':'Job', 'Salmos':'Psalms', 'Provérbios':'Proverbs', 'Eclesiastes':'Ecclesiastes', 'Cânticos':'Song of Solomon', 'Isaías':'Isaiah', 'Jeremias':'Jeremiah', 'Lamentações':'Lamentations', 'Ezequiel':'Ezekiel', 'Daniel':'Daniel', 'Oséias':'Hosea', 'Joel':'Joel', 'Amós':'Amos', 'Obadias':'Obadiah', 'Jonas':'Jonah', 'Miquéias':'Micah', 'Naum':'Nahum', 'Habacuque':'Habakkuk', 'Sofonias':'Zephaniah', 'Ageu':'Haggai', 'Zacarias':'Zechariah', 'Malaquias':'Malachi' };
-
-    async function loadSBLGNT() {
-        if (sblgntDocument) return sblgntDocument;
-        const response = await fetch(SBLGNT_XML_URL);
-        if (!response.ok) throw new Error('O corpus grego SBLGNT não respondeu.');
-        sblgntDocument = new DOMParser().parseFromString(await response.text(), 'application/xml');
-        return sblgntDocument;
-    }
-
-    async function loadLXX() {
-        if (lxxRows) return lxxRows;
-        const response = await fetch(LXX_TSV_URL);
-        if (!response.ok) throw new Error('A fonte grega LXX não respondeu.');
-        lxxRows = (await response.text()).trim().split(/\r?\n/).map(line => line.split('\t')).filter(row => row.length >= 6);
-        return lxxRows;
-    }
-
-    async function loadOSHB() {
-        if (oshbData) return oshbData;
-        const response = await fetch(OSHB_JSON_URL);
-        if (!response.ok) throw new Error('O corpus hebraico OSHB não respondeu.');
-        const raw = await response.text();
-        const jsonText = raw.replace(/^\s*var\s+morphhb\s*=\s*/, '').replace(/;\s*module\.exports\s*=\s*morphhb\s*;\s*$/, '');
-        oshbData = JSON.parse(jsonText);
-        return oshbData;
-    }
-
-    async function getGreekVerses(book, chapter) {
-        if (OSIS_BOOKS[book]) {
-            const doc = await loadSBLGNT();
-            const prefix = `${OSIS_BOOKS[book]}.${chapter}.`;
-            return Array.from(doc.querySelectorAll('[osisID]')).filter(node => node.getAttribute('osisID')?.startsWith(prefix)).map(node => {
-                const id = node.getAttribute('osisID');
-                const end = doc.querySelector(`verse[eID="${id}"]`);
-                const range = doc.createRange();
-                range.setStartAfter(node);
-                if (end) range.setEndBefore(end); else range.setEndAfter(node);
-                return { verse: id.split('.').pop(), text: range.cloneContents().textContent.replace(/\s+/g, ' ').trim() };
-            });
-        }
-        if (LXX_BOOKS[book]) {
-            const rows = await loadLXX();
-            return rows.filter(row => row[0] === LXX_BOOKS[book] && Number(row[3]) === Number(chapter)).map(row => ({ verse: row[4], text: row[5].trim() }));
-        }
-        return [];
-    }
-
-    async function getHebrewVerses(book, chapter) {
-        if (!OSHB_BOOKS[book]) return [];
-        const data = await loadOSHB();
-        const chapterData = data[OSHB_BOOKS[book]]?.[chapter - 1] || [];
-        return chapterData.map((verse, index) => ({ verse: index + 1, text: verse.map(token => token[0]).join(' ') }));
-    }
-
-    function renderParallelVerses(verses, emptyMessage) {
-        if (!verses.length) return `<p class="bible-reading-placeholder">${emptyMessage}</p>`;
-        return verses.map(verse => `<p class="bible-verse"><sup>${escapeBibleText(verse.verse)}</sup>${escapeBibleText(verse.text).trim()}</p>`).join('');
-    }
-
-    async function renderBibleChapter() {
-        const paper = document.getElementById('bible-reading-paper');
-        const chapterSelect = document.getElementById('bible-chapter-select');
-        if (!paper) return;
-        selectedBibleChapter = Number(chapterSelect?.value || selectedBibleChapter || 1);
-        const renderToken = ++bibleRenderToken;
-        paper.innerHTML = `<h3>LEITURA PARALELA</h3><h1>${selectedBibleBook} ${selectedBibleChapter}</h1><div class="bible-parallel-grid"><section class="bible-parallel-panel greek"><div class="bible-panel-heading">Grego<span class="bible-panel-source">LXX — Antigo Testamento · SBLGNT — Novo Testamento</span></div><div class="bible-panel-body" id="bible-greek-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-greek-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência grega" onkeydown="if(event.key==='Enter') queryBiblePanel('greek')"><button onclick="queryBiblePanel('greek')">ABRIR</button></div></section><section class="bible-parallel-panel hebrew"><div class="bible-panel-heading">Hebraico<span class="bible-panel-source">OSHB — Open Scriptures Hebrew Bible</span></div><div class="bible-panel-body" id="bible-hebrew-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-hebrew-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência hebraica" onkeydown="if(event.key==='Enter') queryBiblePanel('hebrew')"><button onclick="queryBiblePanel('hebrew')">ABRIR</button></div></section><section class="bible-parallel-panel portuguese"><div class="bible-panel-heading">Português<span class="bible-panel-source">João Ferreira de Almeida — fonte pública</span></div><div class="bible-panel-body" id="bible-portuguese-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-portuguese-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência portuguesa" onkeydown="if(event.key==='Enter') queryBiblePanel('portuguese')"><button onclick="queryBiblePanel('portuguese')">ABRIR</button></div></section></div><div class="bible-reading-actions"><button onclick="sendBiblePassageToResearch()">PESQUISAR ESTA PASSAGEM</button><button onclick="closeBibleReader()">VOLTAR À MATRIZ</button></div>`;
-        const bookId = BIBLE_BOOK_IDS[selectedBibleBook];
-        const portuguesePromise = fetch(`https://bible-api.com/data/almeida/${bookId}/${selectedBibleChapter}`, { headers: { 'Accept': 'application/json' } }).then(async response => { const data = await response.json(); if (!response.ok || !Array.isArray(data.verses)) throw new Error(data?.error || 'A fonte portuguesa não devolveu o capítulo.'); return data.verses; });
-        const greekPromise = getGreekVerses(selectedBibleBook, selectedBibleChapter);
-        const hebrewPromise = getHebrewVerses(selectedBibleBook, selectedBibleChapter);
-        const [portuguese, greek, hebrew] = await Promise.allSettled([portuguesePromise, greekPromise, hebrewPromise]);
-        if (renderToken !== bibleRenderToken) return;
-        currentParallelVerses = { portuguese: portuguese.status === 'fulfilled' ? portuguese.value : [], greek: greek.status === 'fulfilled' ? greek.value : [], hebrew: hebrew.status === 'fulfilled' ? hebrew.value : [] };
-        const greekPanel = document.getElementById('bible-greek-panel');
-        const hebrewPanel = document.getElementById('bible-hebrew-panel');
-        const portuguesePanel = document.getElementById('bible-portuguese-panel');
-        if (greekPanel) greekPanel.innerHTML = greek.status === 'fulfilled' ? renderParallelVerses(greek.value, 'Este livro pertence ao corpus hebraico.') : `<p class="bible-error">${escapeBibleText(greek.reason?.message)}</p>`;
-        if (hebrewPanel) hebrewPanel.innerHTML = hebrew.status === 'fulfilled' ? renderParallelVerses(hebrew.value, 'Este livro pertence ao Novo Testamento.') : `<p class="bible-error">${escapeBibleText(hebrew.reason?.message)}</p>`;
-        if (portuguesePanel) portuguesePanel.innerHTML = portuguese.status === 'fulfilled' ? renderParallelVerses(portuguese.value, 'Não foram encontrados versículos.') : `<p class="bible-error">${escapeBibleText(portuguese.reason?.message)}</p>`;
-    }
-
-    function normalizeBibleReferenceText(value) {
-        return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[ºª]/g, '').replace(/\s+/g, ' ').trim();
-    }
-
-    function parseBibleReference(value) {
-        const raw = String(value || '').trim().replace(/^.*?—\s*/, '');
-        if (!raw) return null;
-        const normalizedRaw = normalizeBibleReferenceText(raw);
-        const orderedBooks = [...BIBLE_BOOKS].sort((a, b) => normalizeBibleReferenceText(b).length - normalizeBibleReferenceText(a).length);
-        const matchedBook = orderedBooks.find(book => normalizedRaw === normalizeBibleReferenceText(book) || normalizedRaw.startsWith(`${normalizeBibleReferenceText(book)} `));
-        const book = matchedBook || null;
-        const remainder = book ? raw.slice(book.length).trim() : raw;
-        const parts = remainder.split(':');
-        const chapter = parts.length === 2 ? Number(parts[0].trim()) : selectedBibleChapter;
-        const verseText = parts.length === 2 ? parts[1] : parts[0];
-        const match = verseText.trim().match(/^(\d+)(?:\s*[-–]\s*(\d+))?$/);
-        if (!Number.isInteger(chapter) || chapter < 1 || !match) return null;
-        const start = Number(match[1]);
-        const end = Number(match[2] || match[1]);
-        return start > 0 && end >= start ? { book, chapter, start, end } : null;
-    }
-
-    async function queryBiblePanel(language) {
-        const input = document.getElementById(`bible-${language}-query`);
-        let panel = document.getElementById(`bible-${language}-panel`);
-        const reference = parseBibleReference(input?.value);
-        if (!panel || !reference) { if (panel) panel.innerHTML = '<p class="bible-error">Use livro capítulo:versículos, por exemplo João 15:1-5, ou apenas 1-5.</p>'; return; }
-        const bookChanged = Boolean(reference.book && reference.book !== selectedBibleBook);
-        if (bookChanged) {
-            selectedBibleBook = reference.book;
-            selectedBibleChapter = reference.chapter;
-            renderBibleBookList();
-            populateBibleChapters();
-        }
-        if (bookChanged || reference.chapter !== selectedBibleChapter) {
-            const chapterSelect = document.getElementById('bible-chapter-select');
-            if (chapterSelect) chapterSelect.value = String(reference.chapter);
-            selectedBibleChapter = reference.chapter;
-            await renderBibleChapter();
-            panel = document.getElementById(`bible-${language}-panel`);
-        }
-        const verses = currentParallelVerses[language] || [];
-        const selected = verses.filter(verse => Number(verse.verse) >= reference.start && Number(verse.verse) <= reference.end);
-        panel.innerHTML = selected.length ? renderParallelVerses(selected, '') : '<p class="bible-error">Essa referência não está disponível nesta fonte ou neste capítulo.</p>';
-    }
-
-    function sendBiblePassageToResearch() {
-        closeBibleReader();
-        showProfessionalModule('01.1 — Identificação da passagem', null, 'LEITURA BÍBLICA ENVIADA PARA PESQUISA');
-    }
-
-    document.addEventListener('keydown', event => {
-        if (event.key === 'Escape') closeBibleReader();
-    });
-
-    function backToPreviousView() {
-        const element = lastDisciplineElement || document.querySelector('.module-item');
-        showSub(lastDisciplineKey, element);
-    }
-
-    function renderProModuleCards(module) {
-        const cards = module === '01 — TEXTO BÍBLICO'
-            ? TEXT_BIBLICO_SUBMODULES
-            : [`Procedimentos de análise — ${module}`, 'Fontes e critérios do módulo', 'Área de estudo e investigação'];
-        let html = `<div class="category-group"><div class="category-title">MATRIZ CANÔNICA DE PESQUISA PRO</div><div class="tools-grid">`;
-        cards.forEach(card => {
-            html += `<div class="tool-card" onclick="openProCard('${card}', '${module}')"><h4>${card}</h4></div>`;
-        });
-        html += '</div></div>';
-        return html;
-    }
-
-    function renderProChat(module) {
-        return `<div class="pro-chat">
-            <h3>MESA DE INVESTIGAÇÃO</h3>
-            <p class="pro-chat-intro">O estudo permanece disponível acima. Utilize esta mesa para aprofundar questões relacionadas ao módulo selecionado.</p>
-            <div class="pro-chat-messages" id="pro-chat-messages">
-                <div class="pro-chat-message system">Aguardando a sua questão de investigação.</div>
-            </div>
-            <form class="pro-chat-form" onsubmit="sendProQuestion(event, '${module}')">
-                <textarea id="pro-question" placeholder="Escreva a sua questão de investigação..."></textarea>
-                <button type="submit">ENVIAR</button>
-            </form>
-        </div>`;
-    }
-
-    async function sendProQuestion(event, module) {
-        event.preventDefault();
-        const input = document.getElementById('pro-question');
-        const messages = document.getElementById('pro-chat-messages');
-        const form = event.currentTarget;
-        const button = form ? form.querySelector('button') : null;
-        const question = input ? input.value.trim() : '';
-        if (!question || !messages) return;
-
-        const userMessage = document.createElement('div');
-        userMessage.className = 'pro-chat-message user';
-        userMessage.textContent = question;
-        messages.appendChild(userMessage);
-
-        const systemMessage = document.createElement('div');
-        systemMessage.className = 'pro-chat-message system';
-        systemMessage.textContent = 'A consultar a Mesa de Investigação...';
-        messages.appendChild(systemMessage);
-        if (input) input.value = '';
-        if (button) button.disabled = true;
-        messages.scrollTop = messages.scrollHeight;
-
-        try {
-            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    question,
-                    topic: module,
-                    discipline: 'MATRIZ CANÔNICA DE PESQUISA PRO',
-                    module
-                })
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Erro no serviço de pesquisa.');
-            systemMessage.textContent = data.text || 'A consulta não devolveu texto.';
-        } catch (error) {
-            systemMessage.textContent = 'Não foi possível concluir a consulta: ' + error.message;
-        } finally {
-            if (button) button.disabled = false;
-            messages.scrollTop = messages.scrollHeight;
-        }
-    }
-
-    function openProCard(card, module) {
-        document.getElementById('mn').innerHTML = `
-            <div class="content">
-                <button class="back-arrow" onclick="showProfessionalModule('${module}', document.querySelector('.pro-item.active'))" title="Voltar para o módulo PRO">← VOLTAR</button>
-                <div class="pro-main-paper">
-                    <h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4>
-                    <h2>${card}</h2>
-                    <p>A resposta da consulta para este item será apresentada nesta folha de leitura.</p>
-                    ${renderProChat(module)}
-                </div>
-            </div>`;
-    }
-
-    function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
-        document.body.dataset.activeMenu = 'pro';
-        document.querySelector('.sidebar').classList.add('pro-active');
-        document.querySelectorAll('.pro-item, .pro-subitem').forEach(item => item.classList.remove('active'));
-        if (element) element.classList.add('active');
-        const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
-        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-main-paper">`;
-        html += `<h4>MATRIZ CANÔNICA DE PESQUISA PRO</h4><h2>${module}</h2><p><strong>Pergunta central:</strong> ${data.question}</p><p class="pro-question"><strong>Regra metodológica:</strong> ${data.rule || 'A análise deve permanecer vinculada às evidências do texto e às fontes primárias.'}</p>`;
-        html += `${renderProChat(module)}</div></div>`;
-        document.getElementById('mn').innerHTML = html;
-    }
-
-    function renderAllInternalDisciplineMenus() {
-        const internalList = document.getElementById('internal-list');
-        if (!internalList) return;
-        internalList.innerHTML = '';
-        Object.keys(DATA).filter(discipline => discipline !== '00 AS DISCIPLINAS DA TEOLOGIA').forEach(discipline => {
-            const disciplineTitle = document.createElement('li');
-            disciplineTitle.className = 'internal-discipline-title';
-            disciplineTitle.innerText = discipline;
-            disciplineTitle.onclick = () => {
-                const disciplineElement = Array.from(document.querySelectorAll('.module-item')).find(item => item.innerText === discipline);
-                showSub(discipline, disciplineElement || document.querySelector('.module-item'));
-            };
-            internalList.appendChild(disciplineTitle);
-            Object.keys(DATA[discipline]).forEach(category => {
-                const categoryItem = document.createElement('li');
-                categoryItem.className = 'internal-category';
-                categoryItem.innerText = category;
-                internalList.appendChild(categoryItem);
-                DATA[discipline][category].forEach(tool => {
-                    const item = document.createElement('li');
-                    item.className = 'internal-item';
-                    item.innerText = tool;
-                    item.onclick = () => openSearch(tool, discipline);
-                    internalList.appendChild(item);
-                });
-            });
-        });
-    }
-
-    function renderAllInternalProMenus() {
-        const list = document.getElementById('pro-list');
-        if (!list) return;
-        list.innerHTML = '';
-        PRO_MODULES.forEach(module => {
-            const data = PRO_MODULE_DATA[module];
-            const li = document.createElement('li');
-            const button = document.createElement('div');
-            button.className = 'pro-item';
-            button.innerText = module;
-            button.onclick = () => toggleProModule(module, li, button);
-            li.appendChild(button);
-            const sublist = document.createElement('ul');
-            sublist.className = 'pro-sublist';
-            data.items.forEach(itemName => {
-                const subitem = document.createElement('li');
-                subitem.className = 'pro-subitem';
-                subitem.innerText = itemName;
-                subitem.onclick = (event) => {
-                    event.stopPropagation();
-                    document.querySelectorAll('.pro-subitem').forEach(item => item.classList.remove('active'));
-                    subitem.classList.add('active');
-                    openProCard(itemName, module);
-                };
-                sublist.appendChild(subitem);
-            });
-            li.appendChild(sublist);
-            list.appendChild(li);
-        });
-    }
-
-    function toggleProModule(module, li, button) {
-        document.body.dataset.activeMenu = 'pro';
-        document.querySelector('.sidebar').classList.add('pro-active');
-        document.querySelectorAll('.pro-item').forEach(item => item.classList.remove('active'));
-        button.classList.add('active');
-        document.querySelectorAll('.pro-sublist').forEach(list => {
-            if (list !== li.querySelector('.pro-sublist')) list.classList.remove('open');
-        });
-        li.querySelector('.pro-sublist').classList.toggle('open');
-        showProfessionalModule(module, button);
-    }
-
-    function ontologyBranch(discipline, open = false) {
-        const subs = DATA[discipline] || {};
-        let html = `<details class="ontology-node"${open ? ' open' : ''}><summary>${discipline}</summary><div class="ontology-children">`;
-        Object.keys(subs).forEach(category => {
-            html += `<details class="ontology-category"><summary>${category}</summary><ul class="ontology-items">`;
-            subs[category].forEach(item => {
-                html += `<li><button class="ontology-item-link" onclick='openSearch(${JSON.stringify(item)}, ${JSON.stringify(discipline)})'>${item}</button></li>`;
-            });
-            html += `</ul></details>`;
-        });
-        return html + '</div></details>';
-    }
-
-    function showOntologyRoot() {
-        document.body.dataset.activeMenu = 'discipline';
-        document.querySelector('.sidebar').classList.remove('pro-active');
-        document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
-        const mn = document.getElementById('mn');
-        const disciplines = Object.keys(DATA).filter(key => key !== '00 AS DISCIPLINAS DA TEOLOGIA');
-        mn.innerHTML = `<main class="ontology-paper"><h1>AS DISCIPLINAS DA TEOLOGIA</h1><div class="ontology-tree">${disciplines.map(discipline => ontologyBranch(discipline)).join('')}</div></main>`;
-    }
-
-    function showSub(k, el) {
-        document.body.dataset.activeMenu = 'discipline';
-        document.querySelector('.sidebar').classList.remove('pro-active');
-        lastDisciplineKey = k;
-        lastDisciplineElement = el;
-        document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
-        if (el) el.classList.add('active');
-        const mn = document.getElementById('mn');
-        mn.innerHTML = `<main class="ontology-paper"><button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para a árvore principal">← VOLTAR</button><h1>${k}</h1><div class="ontology-tree">${ontologyBranch(k, true)}</div></main>`;
-    }
-
-    function openSearch(tool, disc) {
-        const mn = document.getElementById('mn');
-        mn.innerHTML = `
-            <button class="back-arrow" onclick="showSub('${disc}', document.querySelector('.module-item.active'))" title="Voltar para a tela anterior">← VOLTAR</button>
-            <div class="split-view">
-                <article class="topic-paper">
-                    <div class="category-title">${disc}</div>
-                    <h2>${tool}</h2>
-                    <div class="paper-space">
-                        <div id="study-commentary" class="study-commentary loading">A IA está a preparar o comentário amplo deste tema.</div>
-                    </div>
-                </article>
-                <aside class="ai-chat-panel">
-                    <header class="ai-chat-header">
-                        <h3>MESA DE INVESTIGAÇÃO</h3>
-                        <p><strong>${tool}</strong><br>O estudo em análise permanece disponível no painel de leitura.<br>Utilize esta mesa para aprofundar questões relacionadas ao tema selecionado.</p>
-                    </header>
-                    <div class="ai-chat-messages">
-                        <div class="ai-chat-welcome"><strong>Consulta de pesquisa</strong><br><br>Aguardando a sua questão de investigação.</div>
-                        <div id="rs" class="ai-chat-answer"></div>
-                    </div>
-                    <div class="ai-chat-input">
-                        <div class="question-row">
-                            <input type="text" id="q" placeholder="Escreva a sua questão de investigação...">
-                            <button id="b" onclick="run('${tool}', '${disc}')">ENVIAR</button>
-                        </div>
-                        <div id="ld" class="ai-chat-loading">Análise contextual assistida por inteligência artificial...</div>
-                    </div>
-                </aside>
-            </div>`;
-        renderProMenu();
-        setTimeout(() => run(tool, disc, `Apresente um comentário amplo, explicativo e académico sobre ${tool}. Organize a resposta pela natureza do tema, pelas suas relações com as Escrituras, pelo desenvolvimento histórico e teológico, pelas principais questões interpretativas e pelos limites da evidência. Não use linguagem devocional nem invente fontes, citações ou consenso.`), 0);
-    }
-
-    async function run(t, d, questionOverride = '') {
-        const input = document.getElementById('q');
-        const q = String(questionOverride || input?.value || '').trim();
-        if (!q) return;
-        if (!AI_PROXY_URL || AI_PROXY_URL.includes('COLE_AQUI')) {
-            alert('Primeiro configure a URL do serviço protegido no código do site.');
-            return;
-        }
-
-        const btn = document.getElementById('b');
-        const ld = document.getElementById('ld');
-        const rs = document.getElementById('rs');
-        btn.disabled = true;
-        ld.style.display = 'block';
-        rs.style.display = 'none';
-
-        try {
-            const r = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    question: q,
-                    topic: t,
-                    discipline: d,
-                    module: document.querySelector('.pro-item.active')?.innerText || '06 — EXEGESE'
-                })
-            });
-            const data = await r.json();
-            if (!r.ok) throw new Error(data.error || 'Erro no serviço de pesquisa');
-            const answer = data.text || 'A consulta não devolveu texto.';
-            rs.textContent = answer;
-            rs.style.display = 'block';
-            const commentary = document.getElementById('study-commentary');
-            if (commentary) {
-                commentary.classList.remove('loading');
-                commentary.textContent = answer;
-                commentary.style.display = 'block';
-            }
-            rs.scrollIntoView({ behavior: 'smooth' });
-        } catch (e) {
-            alert('ERRO TÉCNICO: ' + e.message);
-        } finally {
-            btn.disabled = false;
-            ld.style.display = 'none';
-        }
-    }
-    init();
-</script>
-</body>
-</html>
+  }
+};
