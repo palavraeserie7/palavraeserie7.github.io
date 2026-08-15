@@ -29,6 +29,15 @@
         .topic-paper .category-title { color: #806f53; border-bottom-color: #d8cdb8; }
         .topic-paper h2 { margin: 0; color: #4a443b; font-size: clamp(26px, 3vw, 42px); line-height: 1.2; }
         .topic-paper .paper-space { min-height: calc(100vh - 290px); }
+        .study-question { margin-top: 30px; padding-top: 28px; border-top: 1px solid #d8cdb8; }
+        .study-question h3 { margin: 0 0 8px; color: #5f513d; font-size: 18px; }
+        .study-question p { margin: 0 0 14px; color: #776b59; font-size: 13px; }
+        .study-question .question-row { display: flex; gap: 10px; }
+        .study-question input { background: #faf6ed; border: 1px solid #cfc0a7; color: #4a443b; }
+        .study-question input::placeholder { color: #9b907e; }
+        .study-question button { min-height: 48px; }
+        .study-loading { display: none; margin-top: 12px; color: #806f53; font-weight: 700; }
+        .study-answer { display: none; margin-top: 20px; padding: 20px; border-left: 4px solid #b99b61; background: rgba(255,255,255,0.42); color: #4a443b; line-height: 1.75; white-space: pre-wrap; }
         .topic-paper-back { margin-bottom: 20px; background: transparent; color: var(--p); border: 1px solid var(--p); }
         .search-box { display: flex; gap: 10px; margin-top: 15px; }
         input { flex: 1; background: var(--i); border: 1px solid var(--b); color: #fff; padding: 15px; border-radius: 8px; outline: none; }
@@ -274,6 +283,16 @@
                     <div class="category-title">${disc}</div>
                     <h2>${tool}</h2>
                     <div class="paper-space"></div>
+                    <div class="study-question">
+                        <h3>PERGUNTE À IA SOBRE ESTE ESTUDO</h3>
+                        <p>A sua pergunta ficará vinculada ao tema: <strong>${tool}</strong>.</p>
+                        <div class="question-row">
+                            <input type="text" id="q" placeholder="Digite uma pergunta sobre este estudo...">
+                            <button id="b" onclick="run('${tool}', '${disc}')">PERGUNTAR</button>
+                        </div>
+                        <div id="ld" class="study-loading">ANALISANDO A PERGUNTA...</div>
+                        <div id="rs" class="study-answer"></div>
+                    </div>
                 </div>
             </div>`;
     }
