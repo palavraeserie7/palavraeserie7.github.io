@@ -12,9 +12,9 @@
         .sidebar-menus { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
         .discipline-mode, .pro-mode { flex: 1 1 50%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
         .discipline-mode { border-bottom: 1px solid var(--b); }
-        .discipline-area { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-        .discipline-list-pane, .discipline-internal-pane { flex: 1 1 50%; min-height: 0; overflow-y: auto; }
-        .discipline-internal-pane { border-top: 1px solid var(--b); background: rgba(0,0,0,0.12); }
+        .discipline-area { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+        .discipline-list-pane { height: 100%; overflow-y: auto; }
+        .discipline-internal-pane { display: none; }
         .internal-heading { padding: 12px 15px 8px; color: var(--a); font-size: 10px; font-weight: 900; letter-spacing: 1px; border-bottom: 1px solid var(--b); }
         .internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
         .internal-discipline-title { padding: 10px 8px 6px; margin-top: 6px; color: var(--p); font-size: 9px; font-weight: 900; line-height: 1.25; border-bottom: 1px solid rgba(38,55,84,0.7); }
@@ -32,8 +32,8 @@
         .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
         .menu-heading strong { display: block; margin-top: 7px; color: #e5edf7; font-size: 11px; line-height: 1.35; letter-spacing: 0.4px; }
         .pro-area { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-        .pro-menu-box { flex: 1 1 50%; min-height: 0; margin: 10px 10px 5px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
-        .pro-internal-pane { flex: 1 1 50%; min-height: 0; margin: 5px 10px 10px; overflow-y: auto; border: 1px solid #2e6580; border-radius: 10px; background: rgba(13,27,49,0.9); }
+        .pro-menu-box { flex: 1 1 auto; min-height: 0; margin: 10px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
+        .pro-internal-pane { display: none; }
         .pro-internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
         .pro-menu-heading { padding: 16px 14px 12px; border-bottom: 1px solid #2e6580; background: rgba(24,191,255,0.09); }
         .pro-menu-heading span { display: block; color: var(--a); font-size: 11px; font-weight: 900; letter-spacing: 1px; line-height: 1.35; }
@@ -109,10 +109,6 @@
                     <div class="discipline-list-pane">
                         <ul class="module-list" id="ml"></ul>
                     </div>
-                    <div class="discipline-internal-pane">
-                        <div class="internal-heading">LISTA INTERNA DA DISCIPLINA</div>
-                        <ul class="internal-list" id="internal-list"></ul>
-                    </div>
                 </div>
             </section>
             <section class="pro-mode" id="pro-mode">
@@ -123,10 +119,6 @@
                         <strong>ACESSO EXCLUSIVO — ASSINANTES PRO</strong>
                     </div>
                     <ul class="pro-list" id="pro-list"></ul>
-                </div>
-                <div class="pro-internal-pane">
-                    <div class="internal-heading" id="pro-internal-heading">LISTA INTERNA DO MÓDULO PRO</div>
-                    <ul class="pro-internal-list" id="pro-internal-list"></ul>
                 </div>
                 </div>
             </section>
@@ -367,8 +359,6 @@
                 ml.appendChild(li);
             });
 
-        renderAllInternalDisciplineMenus();
-        renderAllInternalProMenus();
         showSub('1 FUNDAÇÃO BÍBLICA', ml.children[0]);
 
         const proList = document.getElementById('pro-list');
@@ -376,7 +366,10 @@
             const item = document.createElement('li');
             item.className = 'pro-item';
             item.innerText = module;
-            item.onclick = () => showProfessionalModule(module, item);
+            item.onclick = () => {
+                showProfessionalModule(module, item);
+                if (module === '01 — TEXTO BÍBLICO') toggleTextBiblicoSubmenu(item);
+            };
             proList.appendChild(item);
         });
     }
@@ -532,14 +525,16 @@
         document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
         const mn = document.getElementById('mn');
-        mn.innerHTML = `
-            <div class="content">
-                <div class="category-title">AS DISCIPLINAS DA TEOLOGIA</div>
-                <h1>${k}</h1>
-                <div class="search-area" style="min-height:420px;">
-                    <p style="color:#91a4bd;">Selecione um item no submenu da barra lateral para abrir o estudo.</p>
-                </div>
-            </div>`;
+        const subs = DATA[k];
+        let html = `<div class="content"><h1>${k}</h1>`;
+        Object.keys(subs).forEach(cat => {
+            html += `<div class="category-group"><div class="category-title">${cat}</div><div class="tools-grid">`;
+            subs[cat].forEach(tool => {
+                html += `<div class="tool-card" onclick="openSearch('${tool}', '${k}')"><h4>${tool}</h4></div>`;
+            });
+            html += `</div></div>`;
+        });
+        mn.innerHTML = html + `</div>`;
     }
 
     function openSearch(tool, disc) {
