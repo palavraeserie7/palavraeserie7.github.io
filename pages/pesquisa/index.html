@@ -567,7 +567,7 @@
         const response = await fetch(OSHB_JSON_URL);
         if (!response.ok) throw new Error('O corpus hebraico OSHB não respondeu.');
         const raw = await response.text();
-        const jsonText = raw.replace(/^\s*var\s+morphhb\s*=\s*/, '').replace(/;\s*$/, '');
+        const jsonText = raw.replace(/^\s*var\s+morphhb\s*=\s*/, '').replace(/;\s*module\.exports\s*=\s*morphhb\s*;\s*$/, '');
         oshbData = JSON.parse(jsonText);
         return oshbData;
     }
