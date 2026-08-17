@@ -56,9 +56,10 @@
         .pro-internal-pane { display: none; }
         .pro-internal-list { list-style: none; padding: 8px 10px 14px; margin: 0; }
         .pro-response-paper { display: none; }
+        .pro-analysis-only { display:flex; justify-content:flex-end; min-height:calc(100vh - 150px); }
         .pro-split-view { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(320px,.8fr); gap:20px; min-height:calc(100vh - 150px); }
         .pro-main-paper { margin-top: 18px; min-height:calc(100vh - 150px); padding:34px; overflow-y:auto; border:1px solid #d8cdb8; border-radius:8px; background:#f1eadb; color:#4a443b; box-shadow:0 6px 18px rgba(55,45,30,0.12); }
-        .pro-analysis-panel { display:flex; flex-direction:column; min-height:calc(100vh - 150px); margin-top:18px; border:1px solid #263754; border-radius:12px; background:#111b30; box-shadow:0 6px 18px rgba(0,0,0,.2); overflow:hidden; }
+        .pro-analysis-panel { display:flex; flex-direction:column; width:min(100%,620px); min-height:calc(100vh - 150px); margin-top:18px; border:1px solid #263754; border-radius:12px; background:#111b30; box-shadow:0 6px 18px rgba(0,0,0,.2); overflow:hidden; }
         .pro-analysis-panel .pro-chat { display:flex; flex-direction:column; flex:1; height:100%; margin:0; padding:24px; border:0; background:#111b30; color:#dbe7f5; }
         .pro-analysis-panel .pro-chat h3 { color:#20d66b; }
         .pro-analysis-panel .pro-chat-intro { color:#91a4bd; }
@@ -233,7 +234,7 @@
         .ai-chat-input input:focus { border-color: var(--p); }
         .ai-chat-answer { display: none; margin-top: 16px; padding: 20px; border-left: 3px solid var(--p); border-radius: 6px; background: #17243a; color: #dbe7f5; line-height: 1.8; white-space: pre-wrap; font-size: 14px; }
         .ai-chat-loading { display: none; margin-top: 10px; color: var(--p); font-size: 12px; font-weight: bold; }
-        @media (max-width: 900px) { .split-view,.pro-split-view { grid-template-columns:1fr; height:auto; min-height:0; } .topic-paper,.pro-main-paper { min-height:520px; } .ai-chat-panel,.pro-analysis-panel { min-height:520px; } }
+        @media (max-width: 900px) { .split-view,.pro-split-view { grid-template-columns:1fr; height:auto; min-height:0; } .topic-paper,.pro-main-paper { min-height:520px; } .ai-chat-panel,.pro-analysis-panel { min-height:520px; } .pro-analysis-only { min-height:520px; } }
         .search-box { display: flex; gap: 10px; margin-top: 15px; }
         input { flex: 1; background: var(--i); border: 1px solid var(--b); color: #fff; padding: 15px; border-radius: 8px; outline: none; }
         input:focus { border-color: var(--p); }
@@ -779,7 +780,7 @@
     function renderProChat(module) {
         return `<div class="pro-chat">
             <h3>MESA DE ANÁLISE</h3>
-            <p class="pro-chat-intro">O estudo permanece disponível acima. Utilize esta mesa para aprofundar questões relacionadas ao módulo selecionado.</p>
+            <p class="pro-chat-intro">Módulo seleccionado: <strong>${escapeBibleText(module)}</strong>. Toda a pesquisa PRO é realizada nesta mesa.</p>
             <div class="pro-chat-messages" id="pro-chat-messages">
                 <div class="pro-chat-message system">Registe uma questão para prosseguir a análise.</div>
             </div>
@@ -844,14 +845,7 @@
         document.getElementById('mn').innerHTML = `
             <div class="content">
                 <button class="back-arrow" onclick="showProfessionalModule('${module}', document.querySelector('.pro-item.active'))" title="Voltar para o módulo PRO">← VOLTAR</button>
-                <div class="pro-split-view">
-                    <div class="pro-main-paper">
-                        <h4>MATRIZ TÉCNICA DE PESQUISA PRO</h4>
-                        <h2>${card}</h2>
-                        <p>O conteúdo e as evidências do módulo serão apresentados nesta folha.</p>
-                    </div>
-                    <aside class="pro-analysis-panel">${renderProChat(module)}</aside>
-                </div>
+                <div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module)}</aside></div>
             </div>`;
     }
 
@@ -861,8 +855,7 @@
         document.querySelectorAll('.pro-item, .pro-subitem').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
         const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
-        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-split-view"><div class="pro-main-paper">`;
-        html += `<h4>MATRIZ TÉCNICA DE PESQUISA PRO</h4><h2>${module}</h2><p><strong>Pergunta central:</strong> ${data.question}</p><p class="pro-question"><strong>Regra metodológica:</strong> ${data.rule || 'A análise deve permanecer vinculada às evidências do texto e às fontes primárias.'}</p></div><aside class="pro-analysis-panel">${renderProChat(module)}</aside></div></div>`;
+        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module)}</aside></div></div>`;
         document.getElementById('mn').innerHTML = html;
     }
 
