@@ -277,7 +277,7 @@
                 <div class="pro-area">
                 <div class="pro-menu-box" data-access="pro">
                     <div class="pro-menu-heading">
-                        <strong>MENU 2 — ACESSO PRO</strong>
+                        <strong>MENU 2</strong>
                         <span>MATRIZ TÉCNICA DE PESQUISA PRO</span>
                     </div>
                     <ul class="pro-list" id="pro-list"></ul>
@@ -777,21 +777,21 @@
         return html;
     }
 
-    function renderProChat(module) {
+    function renderProChat(module, topic = module) {
         return `<div class="pro-chat">
             <h3>MESA DE ANÁLISE</h3>
-            <p class="pro-chat-intro">Módulo seleccionado: <strong>${escapeBibleText(module)}</strong>. Toda a pesquisa PRO é realizada nesta mesa.</p>
+            <p class="pro-chat-intro">Módulo: <strong>${escapeBibleText(module)}</strong><br>Tema seleccionado: <strong>${escapeBibleText(topic)}</strong>. Toda a pesquisa PRO é realizada nesta mesa.</p>
             <div class="pro-chat-messages" id="pro-chat-messages">
                 <div class="pro-chat-message system">Registe uma questão para prosseguir a análise.</div>
             </div>
-            <form class="pro-chat-form" onsubmit="sendProQuestion(event, '${module}')">
+            <form class="pro-chat-form" onsubmit="sendProQuestion(event, '${module}', '${topic}')">
                 <textarea id="pro-question" placeholder="Escreva a questão que pretende examinar..."></textarea>
                 <button type="submit">EXAMINAR</button>
             </form>
         </div>`;
     }
 
-    async function sendProQuestion(event, module) {
+    async function sendProQuestion(event, module, topic = module) {
         event.preventDefault();
         const input = document.getElementById('pro-question');
         const messages = document.getElementById('pro-chat-messages');
@@ -819,8 +819,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     question,
-                    topic: module,
-                    discipline: 'MATRIZ CANÔNICA DE PESQUISA PRO',
+                    topic: topic,
+                    discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO',
                     module
                 })
             });
@@ -845,7 +845,7 @@
         document.getElementById('mn').innerHTML = `
             <div class="content">
                 <button class="back-arrow" onclick="showProfessionalModule('${module}', document.querySelector('.pro-item.active'))" title="Voltar para o módulo PRO">← VOLTAR</button>
-                <div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module)}</aside></div>
+                <div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, card)}</aside></div>
             </div>`;
     }
 
@@ -855,7 +855,7 @@
         document.querySelectorAll('.pro-item, .pro-subitem').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
         const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
-        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module)}</aside></div></div>`;
+        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, module)}</aside></div></div>`;
         document.getElementById('mn').innerHTML = html;
     }
 
