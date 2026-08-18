@@ -79,10 +79,14 @@
         .pro-chat-message { margin: 8px 0; padding: 10px 12px; border-radius: 7px; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
         .pro-chat-message.system { background: rgba(128,111,83,0.10); color: #6a6256; }
         .pro-chat-message.user { margin-left: 12%; background: #e3d8c4; color: #4a443b; }
-        .pro-chat-form { display: flex; gap: 10px; align-items: stretch; }
+        .pro-reference-fields { display: grid; grid-template-columns: minmax(0, 1.35fr) 90px 100px 100px; gap: 7px; margin-bottom: 8px; }
+        .pro-reference-fields label { display: flex; flex-direction: column; gap: 4px; color: #8fa7bf; font-size: 8px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; }
+        .pro-reference-fields select, .pro-reference-fields input { min-width: 0; padding: 9px 8px; border: 1px solid #304766; border-radius: 5px; background: #101d34; color: #e4edf7; font: inherit; font-size: 10px; }
+        .pro-reference-note { margin: 0 0 9px; color: #8196ad; font-size: 9px; line-height: 1.4; }
+        .pro-chat-form { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
         .pro-chat-form textarea { flex: 1; min-height: 58px; resize: vertical; padding: 11px; border: 1px solid #cdbfaa; border-radius: 6px; background: #faf6ed; color: #4a443b; font: inherit; font-size: 12px; outline: none; }
         .pro-chat-form textarea:focus { border-color: #a88f66; box-shadow: 0 0 0 2px rgba(168,143,102,0.16); }
-        .pro-chat-form button { align-self: stretch; padding: 0 18px; border: 0; border-radius: 6px; background: #806f53; color: #fffaf0; font-weight: 800; cursor: pointer; }
+        .pro-chat-form button { align-self: flex-end; min-height: 40px; padding: 0 18px; border: 0; border-radius: 6px; background: #806f53; color: #fffaf0; font-weight: 800; cursor: pointer; }
         .pro-chat-form button:hover { background: #6c5b42; }
         .bible-launch { width: calc(100% - 30px); margin: 12px 15px 10px; padding: 12px 14px; border: 1px solid #b99b61; border-radius: 8px; background: #f1eadb; color: #4a443b; text-align: left; font-size: 12px; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
         .bible-launch:hover { background: #fff8e9; border-color: #e0c487; }
@@ -789,38 +793,119 @@
     }
 
     function renderProChat(module, topic = module) {
+        const bookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}">${escapeBibleText(book)}</option>`)].join('');
         return `<div class="pro-chat">
             <h3>MESA DE ANÁLISE</h3>
             <p class="pro-chat-intro">Módulo: <strong>${escapeBibleText(module)}</strong><br>Tema seleccionado: <strong>${escapeBibleText(topic)}</strong>. Toda a pesquisa PRO é realizada nesta mesa.</p>
             <div class="pro-chat-messages" id="pro-chat-messages">
-                <div class="pro-chat-message system">Registe uma questão para prosseguir a análise.</div>
+                <div class="pro-chat-message system">Informe primeiro a passagem que será estudada.</div>
             </div>
             <form class="pro-chat-form" onsubmit="sendProQuestion(event, '${module}', '${topic}')">
-                <textarea id="pro-question" placeholder="Escreva a questão que pretende examinar..."></textarea>
-                <button type="submit">EXAMINAR</button>
+                <div class="pro-reference-fields">
+                    <label>Livro<select id="pro-book" onchange="populateProChapterOptions(this.value)" required>${bookOptions}</select></label>
+                    <label>Capítulo<select id="pro-chapter" onchange="populateProVerseOptions(this.value)" disabled required><option value="">Seleccione</option></select></label>
+                    <label>Versículo inicial<select id="pro-verse-start" disabled required><option value="">Seleccione</option></select></label>
+                    <label>Versículo final<select id="pro-verse-end" disabled required><option value="">Seleccione</option></select></label>
+                </div>
+                <label class="pro-whole-chapter"><input id="pro-whole-chapter" type="checkbox" onchange="toggleProWholeChapter(this.checked)"> Estudar o capítulo inteiro</label>
+                <p class="pro-reference-note">Escolha um versículo inicial e final ou marque capítulo inteiro.</p>
+                <button type="submit">EXAMINAR ESTUDO</button>
             </form>
         </div>`;
     }
 
+    function populateProChapterOptions(book) {
+        const chapterSelect = document.getElementById('pro-chapter');
+        const startSelect = document.getElementById('pro-verse-start');
+        const endSelect = document.getElementById('pro-verse-end');
+        if (!chapterSelect || !startSelect || !endSelect) return;
+        const count = BIBLE_CHAPTER_COUNTS[book] || 0;
+        chapterSelect.disabled = !count;
+        chapterSelect.innerHTML = `<option value="">Seleccione</option>` + Array.from({ length: count }, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join('');
+        startSelect.disabled = true;
+        endSelect.disabled = true;
+        startSelect.innerHTML = '<option value="">Seleccione primeiro o capítulo</option>';
+        endSelect.innerHTML = '<option value="">Seleccione primeiro o capítulo</option>';
+    }
+
+    async function populateProVerseOptions(chapter) {
+        const book = document.getElementById('pro-book')?.value || '';
+        const startSelect = document.getElementById('pro-verse-start');
+        const endSelect = document.getElementById('pro-verse-end');
+        if (!startSelect || !endSelect) return;
+        if (!book || !chapter) {
+            startSelect.disabled = true;
+            endSelect.disabled = true;
+            startSelect.innerHTML = '<option value="">Seleccione primeiro o capítulo</option>';
+            endSelect.innerHTML = '<option value="">Seleccione primeiro o capítulo</option>';
+            return;
+        }
+        const bookId = BIBLE_BOOK_IDS[book];
+        startSelect.disabled = true;
+        endSelect.disabled = true;
+        startSelect.innerHTML = '<option value="">A carregar versículos...</option>';
+        endSelect.innerHTML = '<option value="">A carregar versículos...</option>';
+        try {
+            const response = await fetch(`https://bible-api.com/data/almeida/${bookId}/${chapter}`, { headers: { 'Accept': 'application/json' } });
+            const data = await response.json();
+            const verses = Array.isArray(data.verses) ? data.verses : [];
+            if (!verses.length) throw new Error('Versículos indisponíveis');
+            const options = '<option value="">Seleccione</option>' + verses.map(verse => `<option value="${escapeBibleText(String(verse.verse))}">${escapeBibleText(String(verse.verse))}</option>`).join('');
+            startSelect.innerHTML = options;
+            endSelect.innerHTML = options;
+            startSelect.disabled = false;
+            endSelect.disabled = false;
+        } catch (error) {
+            startSelect.innerHTML = '<option value="">Não foi possível carregar</option>';
+            endSelect.innerHTML = '<option value="">Não foi possível carregar</option>';
+            startSelect.disabled = true;
+            endSelect.disabled = true;
+        }
+    }
+
+    function toggleProWholeChapter(checked) {
+        const startSelect = document.getElementById('pro-verse-start');
+        const endSelect = document.getElementById('pro-verse-end');
+        if (startSelect) startSelect.disabled = checked || startSelect.options.length <= 1;
+        if (endSelect) endSelect.disabled = checked || endSelect.options.length <= 1;
+    }
+
     async function sendProQuestion(event, module, topic = module) {
         event.preventDefault();
-        const input = document.getElementById('pro-question');
+        const bookInput = document.getElementById('pro-book');
+        const chapterInput = document.getElementById('pro-chapter');
+        const startInput = document.getElementById('pro-verse-start');
+        const endInput = document.getElementById('pro-verse-end');
+        const wholeChapterInput = document.getElementById('pro-whole-chapter');
         const messages = document.getElementById('pro-chat-messages');
         const form = event.currentTarget;
         const button = form ? form.querySelector('button') : null;
-        const question = input ? input.value.trim() : '';
-        if (!question || !messages) return;
-
+        const book = bookInput ? bookInput.value.trim() : '';
+        const chapter = chapterInput ? chapterInput.value.trim() : '';
+        const startVerse = startInput ? startInput.value.trim() : '';
+        const endVerse = endInput ? endInput.value.trim() : '';
+        const wholeChapter = Boolean(wholeChapterInput?.checked);
+        if (!messages) return;
+        const validChapter = /^\d+$/.test(chapter) && Number(chapter) > 0;
+        const validRange = /^\d+$/.test(startVerse) && /^\d+$/.test(endVerse) && Number(startVerse) > 0 && Number(endVerse) >= Number(startVerse);
+        if (!book || !validChapter || (!wholeChapter && !validRange)) {
+            const validationMessage = document.createElement('div');
+            validationMessage.className = 'pro-chat-message system';
+            validationMessage.textContent = 'Informe livro, capítulo e um intervalo de versículos válido ou seleccione capítulo inteiro.';
+            messages.appendChild(validationMessage);
+            messages.scrollTop = messages.scrollHeight;
+            return;
+        }
+        const reference = wholeChapter ? `${book} ${chapter}` : `${book} ${chapter}:${startVerse}${startVerse === endVerse ? '' : `-${endVerse}`}`;
         const userMessage = document.createElement('div');
         userMessage.className = 'pro-chat-message user';
-        userMessage.textContent = question;
+        userMessage.textContent = `Estudo académico: ${reference} — ${topic}`;
         messages.appendChild(userMessage);
 
         const systemMessage = document.createElement('div');
         systemMessage.className = 'pro-chat-message system';
         systemMessage.textContent = 'A preparar a análise...';
         messages.appendChild(systemMessage);
-        if (input) input.value = '';
         if (button) button.disabled = true;
         messages.scrollTop = messages.scrollHeight;
 
@@ -829,8 +914,8 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    question,
-                    topic: topic,
+                    question: `Executar a análise académica da subetapa "${topic}" para a passagem ${reference}. Produzir resultado estruturado, evidências, explicação didáctica, ensino e indicação da próxima etapa. Não solicitar outra pergunta ao utilizador.`,
+                    topic: `${topic} — ${reference}`,
                     discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO',
                     module
                 })
