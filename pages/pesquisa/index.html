@@ -491,7 +491,69 @@
                         <li><button class="external-submenu-item" type="button">ESQUELETOS</button></li>
                     </ul>
                 </li>
-                <li><button class="external-menu-item" type="button" data-external-item="estante">ESTANTE</button></li>
+                <li>
+                    <button class="external-menu-item" type="button" data-external-item="estante" aria-expanded="false" aria-controls="external-bookshelf-submenu" onclick="toggleBookshelfMenu(this)">ESTANTE</button>
+                    <ul class="external-submenu" id="external-bookshelf-submenu">
+                        <li>
+                            <button class="external-submenu-category" type="button">ESTUDOS</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">ANTIGO TESTAMENTO</button></li>
+                                <li><button class="external-submenu-item" type="button">NOVO TESTAMENTO</button></li>
+                                <li><button class="external-submenu-item" type="button">TEMÁTICOS</button></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="external-submenu-category" type="button">REFLEXÕES</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">DIÁRIAS</button></li>
+                                <li><button class="external-submenu-item" type="button">SEMANAIS</button></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="external-submenu-category" type="button">LIVROS</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">TEOLOGIA SISTEMÁTICA</button></li>
+                                <li><button class="external-submenu-item" type="button">EXEGESE E HERMENÊUTICA</button></li>
+                                <li><button class="external-submenu-item" type="button">HISTÓRIA DA IGREJA</button></li>
+                                <li><button class="external-submenu-item" type="button">APOLOGÉTICA</button></li>
+                                <li><button class="external-submenu-item" type="button">FAMÍLIA E VIDA CRISTÃ</button></li>
+                                <li><button class="external-submenu-item" type="button">LIDERANÇA E MINISTÉRIO</button></li>
+                                <li><button class="external-submenu-item" type="button">DEVOCIONAIS</button></li>
+                                <li><button class="external-submenu-item" type="button">ROMANCES CRISTÃOS</button></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="external-submenu-category" type="button">SÉRIES ESPECIAIS</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">ADVENTO</button></li>
+                                <li><button class="external-submenu-item" type="button">PÁSCOA</button></li>
+                                <li><button class="external-submenu-item" type="button">JEJUM E CONSAGRAÇÃO</button></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="external-submenu-category" type="button">ÁUDIO</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">DEVOCIONAIS</button></li>
+                                <li><button class="external-submenu-item" type="button">PODCASTS</button></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="external-submenu-category" type="button" aria-expanded="false" aria-controls="external-my-bookshelf-submenu" onclick="toggleMyBookshelfMenu(this)">MINHA ESTANTE</button>
+                            <ul class="external-submenu" id="external-my-bookshelf-submenu">
+                                <li>
+                                    <button class="external-submenu-category" type="button">MEUS LIVROS</button>
+                                    <ul class="external-submenu-children">
+                                        <li><button class="external-submenu-item" type="button">FREE</button></li>
+                                        <li><button class="external-submenu-item" type="button">PRO</button></li>
+                                    </ul>
+                                </li>
+                                <li><button class="external-submenu-item" type="button">FAVORITOS</button></li>
+                                <li><button class="external-submenu-item" type="button">EM PROGRESSO</button></li>
+                                <li><button class="external-submenu-item" type="button">REFERÊNCIAS EXTERNAS</button></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </nav>
         <div class="sidebar-menus">
@@ -750,6 +812,18 @@
 
     function toggleNewSermonMenu(button) {
         const submenu = document.getElementById('external-new-sermon-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function toggleBookshelfMenu(button) {
+        const submenu = document.getElementById('external-bookshelf-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function toggleMyBookshelfMenu(button) {
+        const submenu = document.getElementById('external-my-bookshelf-submenu');
         const isOpen = submenu.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
     }
