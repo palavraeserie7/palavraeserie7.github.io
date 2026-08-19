@@ -382,7 +382,7 @@
                 <li>
                     <button class="external-menu-item" type="button" data-external-item="oraculo" aria-expanded="false" aria-controls="external-oracle-submenu" onclick="toggleOracleMenu(this)">ORÁCULO</button>
                     <ul class="external-submenu" id="external-oracle-submenu">
-                        <li><button class="external-submenu-item" type="button">CHAT DE CONSULTA HISTÓRICO-TEOLÓGICA</button></li>
+                        <li><button class="external-submenu-item" type="button" onclick="openOracleChat()">NOVA CONSULTA</button></li>
                     </ul>
                 </li>
                 <li>
@@ -803,6 +803,75 @@
         const submenu = document.getElementById('external-bridge-submenu');
         const isOpen = submenu.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function openOracleChat() {
+        document.body.dataset.activeMenu = 'oracle';
+        const main = document.getElementById('mn');
+        if (!main) return;
+        main.innerHTML = `<div class="content">
+            <button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para a árvore principal">← VOLTAR</button>
+            <section class="ai-chat-panel oracle-chat-panel" aria-label="Chat do Oráculo">
+                <header class="ai-chat-header">
+                    <h3>CHAT DO ORÁCULO</h3>
+                    <p>Faça uma pergunta sobre qualquer área do conhecimento. O Oráculo organiza a investigação nos bastidores e apresenta o resultado de forma clara.</p>
+                </header>
+                <div class="ai-chat-messages" id="oracle-chat-messages">
+                    <div class="ai-chat-welcome"><strong>ORÁCULO</strong><br>Você não precisa escolher uma disciplina ou método antes de começar. Escreva a sua pergunta para iniciar uma investigação interdisciplinar.</div>
+                </div>
+                <div class="ai-chat-input">
+                    <form class="question-row" onsubmit="sendOracleQuestion(event)">
+                        <input id="oracle-question" type="text" placeholder="Escreva a sua pergunta..." aria-label="Pergunta para o Oráculo" autocomplete="off" required>
+                        <button type="submit">INVESTIGAR</button>
+                    </form>
+                    <div class="ai-chat-loading" id="oracle-chat-loading">A organizar a investigação...</div>
+                </div>
+            </section>
+        </div>`;
+        document.getElementById('oracle-question')?.focus();
+    }
+
+    async function sendOracleQuestion(event) {
+        event.preventDefault();
+        const input = document.getElementById('oracle-question');
+        const messages = document.getElementById('oracle-chat-messages');
+        const loading = document.getElementById('oracle-chat-loading');
+        const button = event.currentTarget?.querySelector('button');
+        const question = input?.value.trim();
+        if (!question || !messages) return;
+        const userMessage = document.createElement('div');
+        userMessage.className = 'ai-chat-message user';
+        userMessage.textContent = question;
+        messages.appendChild(userMessage);
+        const answer = document.createElement('div');
+        answer.className = 'ai-chat-answer';
+        answer.style.display = 'block';
+        answer.textContent = 'A investigar a pergunta...';
+        messages.appendChild(answer);
+        if (input) input.value = '';
+        if (button) button.disabled = true;
+        if (loading) loading.style.display = 'block';
+        messages.scrollTop = messages.scrollHeight;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: `Atue como Oráculo interdisciplinar. Investigue a pergunta abaixo sem exigir que o utilizador escolha uma área. Determine nos bastidores os recursos necessários. Responda em português claro e organize a resposta nas secções INVESTIGAÇÃO, EVIDÊNCIAS, CONCLUSÃO FACTUAL e, quando pertinente, PERSPECTIVA BÍBLICA. Na INVESTIGAÇÃO, diferencie factos, fontes, contexto, autoria, data, local, possíveis distorções e grau de confirmação. Na PERSPECTIVA BÍBLICA, analise à luz das Escrituras sem misturar essa análise com os factos. Não exponha códigos de módulos, IDs ou nomes técnicos internos. Pergunta do utilizador: ${question}`,
+                    topic: 'NOVA CONSULTA — ORÁCULO',
+                    discipline: 'CONSULTA INTERDISCIPLINAR'
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Não foi possível concluir a investigação.');
+            answer.textContent = neutralizeServiceText(data.text || 'A investigação não devolveu uma resposta.');
+        } catch (error) {
+            answer.textContent = String(error?.message || '') === 'Failed to fetch' ? 'Não foi possível ligar ao serviço de investigação neste momento.' : 'Não foi possível concluir a investigação neste momento.';
+        } finally {
+            if (button) button.disabled = false;
+            if (loading) loading.style.display = 'none';
+            messages.scrollTop = messages.scrollHeight;
+        }
     }
 
     function toggleOracleMenu(button) {
