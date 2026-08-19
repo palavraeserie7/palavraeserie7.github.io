@@ -117,7 +117,12 @@
         .shelf-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 24px 30px 30px; }
         .shelf-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; padding-bottom: 12px; border-bottom: 1px solid #d8cdb8; }
         .shelf-tab { padding: 9px 12px; border: 1px solid #cdbfaa; border-radius: 6px; background: #fffdf7; color: #6d5d45; font-size: 10px; font-weight: 900; cursor: pointer; }
-        .shelf-tab:hover, .shelf-tab.active { background: #806f53; border-color: #806f53; color: #fffaf0; }
+                .shelf-tab:hover, .shelf-tab.active { background: #806f53; border-color: #806f53; color: #fffaf0; }
+        .shelf-filters { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; padding: 14px; border: 1px solid #d8cdb8; border-radius: 8px; background: #ebe0cd; }
+        .shelf-filters label { display: flex; flex-direction: column; gap: 5px; color: #806f53; font-size: 9px; font-weight: 900; letter-spacing: .7px; text-transform: uppercase; }
+        .shelf-filters select { padding: 8px; border: 1px solid #cdbfaa; border-radius: 5px; background: #fffdf7; color: #4a443b; font: inherit; font-size: 11px; }
+        @media (max-width: 900px) { .shelf-filters { grid-template-columns: repeat(2, minmax(140px, 1fr)); } }
+
         .shelf-empty { padding: 25px 18px; border: 1px dashed #cdbfaa; border-radius: 8px; background: rgba(255,255,255,.28); color: #806f53; font-size: 13px; line-height: 1.6; }
         .shelf-section { margin-bottom: 10px; }
         .shelf-section h3 { margin: 0 0 12px; color: #806f53; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
@@ -531,6 +536,16 @@
                             </ul>
                         </li>
                         <li>
+                            <button class="external-submenu-category" type="button">MÚSICA</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">PARTITURAS</button></li>
+                                <li><button class="external-submenu-item" type="button">CIFRAS</button></li>
+                                <li><button class="external-submenu-item" type="button">LETRAS</button></li>
+                                <li><button class="external-submenu-item" type="button">GOSPEL</button></li>
+                                <li><button class="external-submenu-item" type="button">ESTUDO MUSICAL</button></li>
+                            </ul>
+                        </li>
+                        <li>
                             <button class="external-submenu-category" type="button">SÉRIES ESPECIAIS</button>
                             <ul class="external-submenu-children">
                                 <li><button class="external-submenu-item" type="button">ADVENTO</button></li>
@@ -546,18 +561,9 @@
                             </ul>
                         </li>
                         <li>
-                            <button class="external-submenu-category" type="button" aria-expanded="false" aria-controls="external-my-bookshelf-submenu" onclick="toggleMyBookshelfMenu(this)">MINHA ESTANTE</button>
-                            <ul class="external-submenu" id="external-my-bookshelf-submenu">
-                                <li>
-                                    <button class="external-submenu-category" type="button">MEUS LIVROS</button>
-                                    <ul class="external-submenu-children">
-                                        <li><button class="external-submenu-item" type="button">FREE</button></li>
-                                        <li><button class="external-submenu-item" type="button">PRO</button></li>
-                                    </ul>
-                                </li>
-                                <li><button class="external-submenu-item" type="button">FAVORITOS</button></li>
-                                <li><button class="external-submenu-item" type="button">EM PROGRESSO</button></li>
-                                <li><button class="external-submenu-item" type="button">REFERÊNCIAS EXTERNAS</button></li>
+                            <button class="external-submenu-category" type="button" onclick="openShelf()">MINHA ESTANTE</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button" onclick="openShelf()">FILTROS DO CATÁLOGO</button></li>
                             </ul>
                         </li>
                     </ul>
@@ -656,7 +662,35 @@
         ]
     };
 
+        const activeShelfFilters = { contentType: '', audience: '', depth: '', format: '' };
+    const SHELF_FILTER_OPTIONS = {
+        contentType: ['DEVOCIONAL', 'SERMÃO', 'ESTUDO BÍBLICO', 'COMENTÁRIO EXEGÉTICO', 'LIVRO TEOLÓGICO', 'LIVRO PASTORAL', 'LIVRO ACADÉMICO', 'ENCICLOPÉDIA', 'INFANTIL', 'JUVENIL', 'ROMANCE'],
+        audience: ['CRIANÇAS', 'ADOLESCENTES', 'JOVENS', 'ADULTOS', 'PASTORES', 'LÍDERES', 'ACADÉMICOS'],
+        depth: ['BÁSICO', 'INTERMEDIÁRIO', 'AVANÇADO', 'ESPECIALIZADO'],
+        format: ['LIVRO', 'AUDIOBOOK', 'CURSO', 'COLEÇÃO', 'ESTUDO GUIADO', 'MATERIAL DIDÁTICO']
+    };
+
+    function getShelfFacet(book, facet, section) {
+        if (book[facet]) return book[facet];
+        if (facet === 'contentType') return section === 'pro' ? 'LIVRO ACADÉMICO' : section === 'external' ? 'LIVRO TEOLÓGICO' : section === 'own' ? 'LIVRO PASTORAL' : 'ESTUDO BÍBLICO';
+        if (facet === 'audience') return section === 'pro' ? 'ACADÉMICOS' : section === 'own' ? 'ADULTOS' : 'PÚBLICO GERAL';
+        if (facet === 'depth') return section === 'pro' ? 'AVANÇADO' : section === 'external' ? 'ESPECIALIZADO' : section === 'own' ? 'INTERMEDIÁRIO' : 'BÁSICO';
+        if (facet === 'format') return 'LIVRO';
+        return '';
+    }
+
+    function setShelfFilter(facet, value) {
+        activeShelfFilters[facet] = value;
+        renderShelf(activeShelfSection);
+    }
+
+    function renderShelfFilters() {
+        const labels = { contentType: 'TIPO DE CONTEÚDO', audience: 'PÚBLICO', depth: 'PROFUNDIDADE', format: 'FORMATO' };
+        return `<section class="shelf-filters" aria-label="Filtros do catálogo">${Object.entries(labels).map(([facet, label]) => `<label>${label}<select onchange="setShelfFilter('${facet}', this.value)"><option value="">TODOS</option>${SHELF_FILTER_OPTIONS[facet].map(option => `<option value="${option}" ${activeShelfFilters[facet] === option ? 'selected' : ''}>${option}</option>`).join('')}</select></label>`).join('')}</section>`;
+    }
+
     function openShelf() {
+
         const overlay = document.getElementById('shelf-overlay');
         if (!overlay) return;
         overlay.classList.add('open');
@@ -679,9 +713,9 @@
         const books = SHELF_BOOKS[section] || [];
         const locked = section === 'pro';
         const access = sections[section];
-        const renderBooks = books.map((book, bookIndex) => { const cover = `<div class="shelf-cover ${book.coverImage ? 'has-image' : ''}" ${book.coverImage ? `style="background-image: linear-gradient(rgba(35,28,18,.08), rgba(35,28,18,.08)), url('${book.coverImage}')"` : ''}><small>PALAVRA & SÉRIE</small>${book.coverImage ? '' : `<strong>${escapeBibleText(book.cover || 'ESTUDO')}</strong><em>${escapeBibleText(book.author || 'Biblioteca de estudo')}</em>`}</div>`; const action = section === 'external' && book.url ? `<a class="shelf-link" href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA</a>` : `<button class="${locked ? 'locked' : ''}" onclick="${section === 'own' ? `openBookPresentationByIndex(${bookIndex}, '${section}')` : `shelfBookAction(${JSON.stringify(book.title)}, ${locked}, '${section}', ${JSON.stringify(book.url || '')})`}">${locked ? 'ACESSO PRO' : section === 'own' ? 'VER APRESENTAÇÃO' : 'ABRIR MATERIAL'}</button>`; return `<article class="shelf-book ${locked ? 'pro' : ''}">${cover}<span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p>${action}</article>`; }).join('');
+        const renderBooks = books.filter(book => Object.entries(activeShelfFilters).every(([facet, value]) => !value || getShelfFacet(book, facet, section) === value)).map((book, bookIndex) => { const cover = `<div class="shelf-cover ${book.coverImage ? 'has-image' : ''}" ${book.coverImage ? `style="background-image: linear-gradient(rgba(35,28,18,.08), rgba(35,28,18,.08)), url('${book.coverImage}')"` : ''}><small>PALAVRA & SÉRIE</small>${book.coverImage ? '' : `<strong>${escapeBibleText(book.cover || 'ESTUDO')}</strong><em>${escapeBibleText(book.author || 'Biblioteca de estudo')}</em>`}</div>`; const action = section === 'external' && book.url ? `<a class="shelf-link" href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA</a>` : `<button class="${locked ? 'locked' : ''}" onclick="${section === 'own' ? `openBookPresentationByIndex(${bookIndex}, '${section}')` : `shelfBookAction(${JSON.stringify(book.title)}, ${locked}, '${section}', ${JSON.stringify(book.url || '')})`}">${locked ? 'ACESSO PRO' : section === 'own' ? 'VER APRESENTAÇÃO' : 'ABRIR MATERIAL'}</button>`; return `<article class="shelf-book ${locked ? 'pro' : ''}">${cover}<span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p>${action}</article>`; }).join('');
         const content = renderBooks || `<div class="shelf-empty">Ainda não há materiais nesta divisão. Os seus livros próprios poderão ser adicionados posteriormente ao catálogo e aparecerão aqui automaticamente.</div>`;
-        body.innerHTML = `<nav class="shelf-tabs" aria-label="Divisões da estante"><button class="shelf-tab ${section === 'free' ? 'active' : ''}" onclick="selectShelfSection('free')">FREE</button><button class="shelf-tab ${section === 'pro' ? 'active' : ''}" onclick="selectShelfSection('pro')">PRO</button><button class="shelf-tab ${section === 'own' ? 'active' : ''}" onclick="selectShelfSection('own')">MEUS LIVROS</button><button class="shelf-tab ${section === 'external' ? 'active' : ''}" onclick="selectShelfSection('external')">REFERÊNCIAS EXTERNAS</button></nav><section class="shelf-section"><h3>${access}</h3><div class="shelf-grid">${content}</div><div class="shelf-note" id="shelf-note">${section === 'pro' ? 'O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.' : section === 'external' ? 'As referências externas serão abertas apenas através de fontes oficiais ou autorizadas.' : section === 'own' ? 'Os seus livros poderão ser organizados aqui por título, categoria, autor e nível de acesso.' : 'Materiais introdutórios disponíveis para demonstração.'}</div></section>`;
+        body.innerHTML = `${renderShelfFilters()}<nav class="shelf-tabs" aria-label="Divisões da estante"><button class="shelf-tab ${section === 'free' ? 'active' : ''}" onclick="selectShelfSection('free')">FREE</button><button class="shelf-tab ${section === 'pro' ? 'active' : ''}" onclick="selectShelfSection('pro')">PRO</button><button class="shelf-tab ${section === 'own' ? 'active' : ''}" onclick="selectShelfSection('own')">MEUS LIVROS</button><button class="shelf-tab ${section === 'external' ? 'active' : ''}" onclick="selectShelfSection('external')">REFERÊNCIAS EXTERNAS</button></nav><section class="shelf-section"><h3>${access}</h3><div class="shelf-grid">${content}</div><div class="shelf-note" id="shelf-note">${section === 'pro' ? 'O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.' : section === 'external' ? 'As referências externas serão abertas apenas através de fontes oficiais ou autorizadas.' : section === 'own' ? 'Os seus livros poderão ser organizados aqui por título, categoria, autor e nível de acesso.' : 'Materiais introdutórios disponíveis para demonstração.'}</div></section>`;
     }
 
     function shelfBookAction(title, locked, section, url = '') {
