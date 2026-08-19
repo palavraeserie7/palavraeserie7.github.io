@@ -38,6 +38,8 @@
         .external-submenu { display: none; list-style: none; margin: 0 0 4px 10px; padding: 2px 0 2px 8px; border-left: 1px solid #2e6580; }
         .external-submenu.open { display: block; }
         .external-submenu-item { display: block; width: 100%; padding: 6px 7px; border: 0; background: transparent; color: #8fa7bf; text-align: left; font: inherit; font-size: 9px; font-weight: 700; letter-spacing: .2px; cursor: default; }
+        .external-submenu-category { display: block; width: 100%; padding: 6px 7px; border: 0; background: transparent; color: #b5c5d8; text-align: left; font: inherit; font-size: 9px; font-weight: 800; letter-spacing: .2px; cursor: default; }
+        .external-submenu-children { list-style: none; margin: 0 0 2px 10px; padding: 0 0 0 8px; border-left: 1px solid #2e6580; }
 
         .menu-heading { padding: 22px 15px 14px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
@@ -326,8 +328,49 @@
                         <li><button class="external-submenu-item" type="button">N5</button></li>
                     </ul>
                 </li>
-                <li><button class="external-menu-item" type="button" data-external-item="biblio">BIBLIO</button></li>
-                <li><button class="external-menu-item" type="button" data-external-item="ponte">PONTE</button></li>
+                <li>
+                    <button class="external-menu-item" type="button" data-external-item="biblio" aria-expanded="false" aria-controls="external-biblio-submenu" onclick="toggleBiblioMenu(this)">BIBLIO</button>
+                    <ul class="external-submenu" id="external-biblio-submenu">
+                        <li>
+                            <button class="external-submenu-category" type="button">ÁREAS ACADÊMICAS DA TEOLOGIA</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">Estudos Bíblicos</button></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <button class="external-menu-item" type="button" data-external-item="ponte" aria-expanded="false" aria-controls="external-bridge-submenu" onclick="togglePonteMenu(this)">PONTE</button>
+                    <ul class="external-submenu" id="external-bridge-submenu">
+                        <li>
+                            <button class="external-submenu-category" type="button">BÍBLIA DE LEITURA</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">0–2</button></li>
+                                <li><button class="external-submenu-item" type="button">3–5</button></li>
+                                <li><button class="external-submenu-item" type="button">6–8</button></li>
+                                <li><button class="external-submenu-item" type="button">8–10</button></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="external-submenu-category" type="button">DEVOCIONAL</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">0–2</button></li>
+                                <li><button class="external-submenu-item" type="button">3–5</button></li>
+                                <li><button class="external-submenu-item" type="button">6–8</button></li>
+                                <li><button class="external-submenu-item" type="button">8–10</button></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="external-submenu-category" type="button">HISTÓRIA</button>
+                            <ul class="external-submenu-children">
+                                <li><button class="external-submenu-item" type="button">0–2</button></li>
+                                <li><button class="external-submenu-item" type="button">3–5</button></li>
+                                <li><button class="external-submenu-item" type="button">6–8</button></li>
+                                <li><button class="external-submenu-item" type="button">8–10</button></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
                 <li><button class="external-menu-item" type="button" data-external-item="oraculo">ORÁCULO</button></li>
                 <li><button class="external-menu-item" type="button" data-external-item="sermoes">SERMÕES</button></li>
                 <li><button class="external-menu-item" type="button" data-external-item="estante">ESTANTE</button></li>
@@ -559,6 +602,18 @@
 
     function toggleLevelsMenu(button) {
         const submenu = document.getElementById('external-levels-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function toggleBiblioMenu(button) {
+        const submenu = document.getElementById('external-biblio-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function togglePonteMenu(button) {
+        const submenu = document.getElementById('external-bridge-submenu');
         const isOpen = submenu.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
     }
