@@ -371,7 +371,12 @@
                         </li>
                     </ul>
                 </li>
-                <li><button class="external-menu-item" type="button" data-external-item="oraculo">ORÁCULO</button></li>
+                <li>
+                    <button class="external-menu-item" type="button" data-external-item="oraculo" aria-expanded="false" aria-controls="external-oracle-submenu" onclick="toggleOracleMenu(this)">ORÁCULO</button>
+                    <ul class="external-submenu" id="external-oracle-submenu">
+                        <li><button class="external-submenu-item" type="button">CHAT DE CONSULTA HISTÓRICO-TEOLÓGICA</button></li>
+                    </ul>
+                </li>
                 <li><button class="external-menu-item" type="button" data-external-item="sermoes">SERMÕES</button></li>
                 <li><button class="external-menu-item" type="button" data-external-item="estante">ESTANTE</button></li>
             </ul>
@@ -614,6 +619,12 @@
 
     function togglePonteMenu(button) {
         const submenu = document.getElementById('external-bridge-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function toggleOracleMenu(button) {
+        const submenu = document.getElementById('external-oracle-submenu');
         const isOpen = submenu.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
     }
