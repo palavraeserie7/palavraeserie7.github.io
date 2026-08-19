@@ -316,7 +316,16 @@
                         <li><button class="external-submenu-item" type="button">C5 — ENTREGA</button></li>
                     </ul>
                 </li>
-                <li><button class="external-menu-item" type="button" data-external-item="niveis">NÍVEIS</button></li>
+                <li>
+                    <button class="external-menu-item" type="button" data-external-item="niveis" aria-expanded="false" aria-controls="external-levels-submenu" onclick="toggleLevelsMenu(this)">NÍVEIS</button>
+                    <ul class="external-submenu" id="external-levels-submenu">
+                        <li><button class="external-submenu-item" type="button">N1</button></li>
+                        <li><button class="external-submenu-item" type="button">N2</button></li>
+                        <li><button class="external-submenu-item" type="button">N3</button></li>
+                        <li><button class="external-submenu-item" type="button">N4</button></li>
+                        <li><button class="external-submenu-item" type="button">N5</button></li>
+                    </ul>
+                </li>
                 <li><button class="external-menu-item" type="button" data-external-item="biblio">BIBLIO</button></li>
                 <li><button class="external-menu-item" type="button" data-external-item="ponte">PONTE</button></li>
                 <li><button class="external-menu-item" type="button" data-external-item="oraculo">ORÁCULO</button></li>
@@ -544,6 +553,12 @@
 
     function toggleMasterMenu(button) {
         const submenu = document.getElementById('external-master-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function toggleLevelsMenu(button) {
+        const submenu = document.getElementById('external-levels-submenu');
         const isOpen = submenu.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
     }
