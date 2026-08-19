@@ -296,16 +296,27 @@
                 <li>
                     <button class="external-menu-item" type="button" data-external-item="sistema" aria-expanded="false" aria-controls="external-system-submenu" onclick="toggleSystemMenu(this)">SISTEMA</button>
                     <ul class="external-submenu" id="external-system-submenu">
-                        <li><button class="external-submenu-item" type="button">M00 — ORQUESTRADOR</button></li>
-                        <li><button class="external-submenu-item" type="button">M02 — MOTOR DE ESCRITA</button></li>
-                        <li><button class="external-submenu-item" type="button">M03 — EXEGESE</button></li>
-                        <li><button class="external-submenu-item" type="button">M04 — PONTE</button></li>
-                        <li><button class="external-submenu-item" type="button">M06 — GUARDIÃO</button></li>
-                        <li><button class="external-submenu-item" type="button">M09 — SERMÕES</button></li>
-                        <li><button class="external-submenu-item" type="button">M11 — MOTOR MUSICAL</button></li>
-                        <li><button class="external-submenu-item" type="button">SOCIAL ENGINE</button></li>
-                        <li><button class="external-submenu-item" type="button">SENTINELA</button></li>
-                        <li><button class="external-submenu-item" type="button">PROMPTS</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M00">COORDENAÇÃO DO SISTEMA</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M02">ESCRITA</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M03">ESTUDO BÍBLICO</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M04">CONTEÚDO INFANTIL</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M06">REVISÃO TEOLÓGICA</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M09">SERMÕES</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M11">MÚSICA</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="SOCIAL ENGINE">CONTEÚDO SOCIAL</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="SENTINELA">VALIDAÇÃO E SEGURANÇA</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="PROMPTS">PROMPTS</button></li>
+                        <li>
+                            <button class="external-submenu-category" type="button" aria-expanded="false" aria-controls="external-system-help-submenu" onclick="toggleSystemHelpMenu(this)">AJUDA DO SISTEMA</button>
+                            <ul class="external-submenu" id="external-system-help-submenu">
+                                <li><button class="external-submenu-item" type="button">O que cada função faz</button></li>
+                                <li><button class="external-submenu-item" type="button">Quando utilizar cada função</button></li>
+                                <li><button class="external-submenu-item" type="button">Como as funções trabalham juntas</button></li>
+                                <li><button class="external-submenu-item" type="button">Explicação simples dos módulos técnicos</button></li>
+                                <li><button class="external-submenu-item" type="button">Códigos técnicos M00, M02, M03, M04, M06, M09 e M11</button></li>
+                                <li><button class="external-submenu-item" type="button">O M00 coordena o acionamento dos módulos</button></li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 <li>
@@ -770,6 +781,12 @@
 
     function toggleSystemMenu(button) {
         const submenu = document.getElementById('external-system-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function toggleSystemHelpMenu(button) {
+        const submenu = document.getElementById('external-system-help-submenu');
         const isOpen = submenu.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
     }
