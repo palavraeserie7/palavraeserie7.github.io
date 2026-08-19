@@ -35,6 +35,9 @@
         .external-menu-list { list-style: none; margin: 0; padding: 3px 6px 7px; border: 1px solid #2e6580; border-top: 0; border-radius: 0 0 7px 7px; }
         .external-menu-item { display: block; width: 100%; padding: 8px 7px; border: 0; border-radius: 4px; background: transparent; color: #b5c5d8; text-align: left; font: inherit; font-size: 10px; font-weight: 800; letter-spacing: .35px; cursor: pointer; }
         .external-menu-item:hover, .external-menu-item:focus-visible { background: rgba(24,191,255,0.14); color: #fff; outline: none; }
+        .external-submenu { display: none; list-style: none; margin: 0 0 4px 10px; padding: 2px 0 2px 8px; border-left: 1px solid #2e6580; }
+        .external-submenu.open { display: block; }
+        .external-submenu-item { display: block; width: 100%; padding: 6px 7px; border: 0; background: transparent; color: #8fa7bf; text-align: left; font: inherit; font-size: 9px; font-weight: 700; letter-spacing: .2px; cursor: default; }
 
         .menu-heading { padding: 22px 15px 14px; border-bottom: 1px solid var(--b); background: rgba(0,0,0,0.12); }
         .menu-heading span { display: block; color: var(--p); font-size: 13px; font-weight: 900; letter-spacing: 2px; }
@@ -288,8 +291,31 @@
         <nav class="external-menu" aria-label="Menu principal externo">
             <div class="external-menu-heading">MENU PRINCIPAL</div>
             <ul class="external-menu-list">
-                <li><button class="external-menu-item" type="button" data-external-item="sistema">SISTEMA</button></li>
-                <li><button class="external-menu-item" type="button" data-external-item="mestre">MESTRE</button></li>
+                <li>
+                    <button class="external-menu-item" type="button" data-external-item="sistema" aria-expanded="false" aria-controls="external-system-submenu" onclick="toggleSystemMenu(this)">SISTEMA</button>
+                    <ul class="external-submenu" id="external-system-submenu">
+                        <li><button class="external-submenu-item" type="button">M00 — ORQUESTRADOR</button></li>
+                        <li><button class="external-submenu-item" type="button">M02 — MOTOR DE ESCRITA</button></li>
+                        <li><button class="external-submenu-item" type="button">M03 — EXEGESE</button></li>
+                        <li><button class="external-submenu-item" type="button">M04 — PONTE</button></li>
+                        <li><button class="external-submenu-item" type="button">M06 — GUARDIÃO</button></li>
+                        <li><button class="external-submenu-item" type="button">M09 — SERMÕES</button></li>
+                        <li><button class="external-submenu-item" type="button">M11 — MOTOR MUSICAL</button></li>
+                        <li><button class="external-submenu-item" type="button">SOCIAL ENGINE</button></li>
+                        <li><button class="external-submenu-item" type="button">SENTINELA</button></li>
+                        <li><button class="external-submenu-item" type="button">PROMPTS</button></li>
+                    </ul>
+                </li>
+                <li>
+                    <button class="external-menu-item" type="button" data-external-item="mestre" aria-expanded="false" aria-controls="external-master-submenu" onclick="toggleMasterMenu(this)">MESTRE</button>
+                    <ul class="external-submenu" id="external-master-submenu">
+                        <li><button class="external-submenu-item" type="button">C1 — NAMING ENGINE</button></li>
+                        <li><button class="external-submenu-item" type="button">C2 — DIAGNÓSTICO</button></li>
+                        <li><button class="external-submenu-item" type="button">C3 — SUBSTITUIÇÃO</button></li>
+                        <li><button class="external-submenu-item" type="button">C4 — AUTORIDADE</button></li>
+                        <li><button class="external-submenu-item" type="button">C5 — ENTREGA</button></li>
+                    </ul>
+                </li>
                 <li><button class="external-menu-item" type="button" data-external-item="niveis">NÍVEIS</button></li>
                 <li><button class="external-menu-item" type="button" data-external-item="biblio">BIBLIO</button></li>
                 <li><button class="external-menu-item" type="button" data-external-item="ponte">PONTE</button></li>
@@ -510,7 +536,21 @@
 
     };
 
-    function init() {
+    function toggleSystemMenu(button) {
+        const submenu = document.getElementById('external-system-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function toggleMasterMenu(button) {
+        const submenu = document.getElementById('external-master-submenu');
+        const isOpen = submenu.classList.toggle('open');
+        button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+        function init()
+ {
+
         const ml = document.getElementById('ml');
 
         // Somente as áreas 1 a 29 são itens funcionais.
