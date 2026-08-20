@@ -138,6 +138,14 @@
                 .shelf-launch:hover { background: #fff8e9; border-color: #e0c487; }
         .biblio-launch { display: block; width: calc(100% - 30px); margin: 0 15px 12px; padding: 10px 12px; border: 1px solid #b99b61; border-radius: 7px; background: #f1eadb; color: #4a443b; text-align: left; font-size: 11px; font-weight: 900; letter-spacing: .5px; cursor: pointer; }
         .biblio-launch:hover { background: #fff8e9; border-color: #e0c487; }
+        .sermons-launch { display: block; width: calc(100% - 30px); margin: 0 15px 12px; padding: 10px 12px; border: 1px solid #b99b61; border-radius: 7px; background: #f1eadb; color: #4a443b; text-align: left; font-size: 11px; font-weight: 900; letter-spacing: .5px; cursor: pointer; }
+        .sermons-launch:hover { background: #fff8e9; border-color: #e0c487; }
+        .sermons-screen-paper { min-height: 100%; padding: 32px 40px 50px; background: #f1eadb; color: #4a443b; }
+        .sermons-screen-paper h1 { margin: 0 0 24px; font-size: 24px; letter-spacing: 1px; }
+        .sermons-screen-tree.external-submenu { display: block; margin: 0; padding: 0; border: 0; }
+        .sermons-screen-tree .external-submenu-category { width: 100%; margin: 0 0 8px; padding: 12px 14px; border: 1px solid #d8cdb8; border-radius: 5px; background: #ebe0cd; color: #4a443b; text-align: left; font-weight: 900; }
+        .sermons-screen-tree .external-submenu-children { margin: 0 0 14px 12px; padding: 0 0 0 12px; border-left: 1px solid #cdbfaa; }
+        .sermons-screen-tree .external-submenu-item { width: 100%; margin-bottom: 5px; padding: 10px 12px; border: 1px solid #d8cdb8; border-radius: 5px; background: #fffdf7; color: #4a443b; text-align: left; }
 
         .shelf-overlay { display: none; position: fixed; inset: 0; z-index: 100; align-items: stretch; justify-content: stretch; padding: 0; background: #f1eadb; }
         .shelf-overlay.open { display: flex; }
@@ -335,7 +343,7 @@
 </head>
 <body>
     <div class="sidebar">
-                <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="oracle-launch" onclick="openOracleChat()" aria-label="Abrir o Oráculo">◈ ORÁCULO — CONSULTA</button><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button><button class="shelf-launch" onclick="openShelf()">▤ MINHA ESTANTE — FREE / PRO</button><button class="biblio-launch" onclick="showOntologyRoot()" aria-label="Abrir Biblio">▤ BIBLIO</button><button class="owner-login-launch" onclick="openOwnerLogin()" aria-label="Entrar">ENTRAR</button></div>
+                <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="oracle-launch" onclick="openOracleChat()" aria-label="Abrir o Oráculo">◈ ORÁCULO — CONSULTA</button><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button><button class="shelf-launch" onclick="openShelf()">▤ MINHA ESTANTE — FREE / PRO</button><button class="biblio-launch" onclick="showOntologyRoot()" aria-label="Abrir Biblio">▤ BIBLIO</button><button class="sermons-launch" onclick="openSermonsScreen()" aria-label="Abrir Sermões">▤ SERMÕES</button><button class="owner-login-launch" onclick="openOwnerLogin()" aria-label="Entrar">ENTRAR</button></div>
         <nav class="external-menu" aria-label="Menu principal externo">
             <div class="external-menu-heading">MENU PRINCIPAL</div>
             <ul class="external-menu-list">
@@ -371,7 +379,7 @@
                         </li>
                     </ul>
                 </li>
-                <li>
+                <li style="display:none">
                     <button class="external-menu-item" type="button" data-external-item="sermoes" aria-expanded="false" aria-controls="external-sermons-submenu" onclick="toggleSermonsMenu(this)">SERMÕES</button>
                     <ul class="external-submenu" id="external-sermons-submenu">
                         <li>
@@ -842,6 +850,18 @@
         const submenu = document.getElementById('external-oracle-submenu');
         const isOpen = submenu.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function openSermonsScreen() {
+        const submenu = document.getElementById('external-sermons-submenu');
+        const main = document.getElementById('mn');
+        if (!submenu || !main) return;
+        document.body.dataset.activeMenu = 'sermons';
+        document.querySelector('.sidebar')?.classList.remove('pro-active');
+        main.innerHTML = `<div class="content"><button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para a árvore principal">← VOLTAR</button><main class="sermons-screen-paper"><h1>CONSTRUTOR DE SERMÕES</h1><div class="sermons-screen-tree" id="sermons-screen-tree"></div></main></div>`;
+        const tree = document.getElementById('sermons-screen-tree');
+        tree.appendChild(submenu);
+        submenu.classList.add('open');
     }
 
     function toggleSermonsMenu(button) {
