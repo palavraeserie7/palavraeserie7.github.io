@@ -47,7 +47,25 @@
         .menu-heading { cursor: pointer; }
         .menu-heading:hover strong { color: #fff; }
         .ontology-paper { min-height: calc(100vh - 80px); padding: 40px 48px; background: #f1eadb; color: #4a443b; overflow-y: auto; }
-        .ontology-paper h1 { margin: 0 0 26px; color: #4a443b; font-size: 30px; letter-spacing: 0.5px; }
+                .ontology-paper h1 { margin: 0 0 26px; color: #4a443b; font-size: 30px; letter-spacing: 0.5px; }
+        .progressive-paper { min-height: calc(100vh - 80px); padding: 34px 42px; background: #f1eadb; color: #4a443b; overflow-y: auto; }
+        .progressive-intro { max-width: 900px; margin-bottom: 22px; line-height: 1.65; }
+        .progressive-form { display: grid; gap: 12px; max-width: 900px; padding: 18px; border: 1px solid #d8cdb8; border-radius: 8px; background: #fffdf7; }
+        .progressive-form label { display: grid; gap: 5px; color: #806f53; font-size: 10px; font-weight: 900; letter-spacing: .8px; text-transform: uppercase; }
+        .progressive-form input, .progressive-form textarea, .progressive-form select { padding: 10px; border: 1px solid #cdbfaa; border-radius: 5px; background: #fffaf0; color: #4a443b; font: inherit; }
+        .progressive-form textarea { min-height: 70px; resize: vertical; }
+        .progressive-form button, .progressive-step-actions button { width: fit-content; min-height: 38px; padding: 0 16px; border: 0; border-radius: 6px; background: #806f53; color: #fffaf0; font-weight: 900; cursor: pointer; }
+        .progressive-progress { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0; max-width: 1100px; }
+        .progressive-progress button { padding: 8px 10px; border: 1px solid #cdbfaa; border-radius: 5px; background: #fffdf7; color: #806f53; font-weight: 900; cursor: pointer; }
+        .progressive-progress button.active, .progressive-progress button.completed { background: #806f53; color: #fffaf0; }
+        .progressive-step { max-width: 1100px; padding: 22px; border: 1px solid #d8cdb8; border-radius: 8px; background: #fffdf7; }
+        .progressive-step h2 { margin: 0 0 8px; color: #806f53; }
+        .progressive-step h3 { margin: 18px 0 6px; color: #806f53; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+        .progressive-step p { line-height: 1.65; white-space: pre-wrap; }
+        .progressive-result { margin-top: 12px; padding: 13px; border-left: 3px solid #806f53; background: #f1eadb; white-space: pre-wrap; line-height: 1.6; }
+        .progressive-step-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+        .progressive-step-actions button.secondary { background: #e3d8c4; color: #4a443b; }
+
         .ontology-tree { max-width: 1100px; }
         .ontology-node { margin: 0 0 10px; }
         .ontology-node > summary { padding: 13px 16px; border: 1px solid #d8cdb8; border-radius: 7px; background: #fffdf7; color: #4a443b; font-size: 14px; font-weight: 800; cursor: pointer; list-style-position: inside; }
@@ -302,9 +320,6 @@
                     <button class="external-menu-item" type="button" data-external-item="sistema" aria-expanded="false" aria-controls="external-system-submenu" onclick="toggleSystemMenu(this)">SISTEMA</button>
                     <ul class="external-submenu" id="external-system-submenu">
                         <li><button class="external-submenu-item" type="button" data-technical-module="M00">COORDENAÇÃO DO SISTEMA</button></li>
-                        <li><button class="external-submenu-item" type="button" data-technical-module="M02">ESCRITA</button></li>
-                        <li><button class="external-submenu-item" type="button" data-technical-module="M03">ESTUDO BÍBLICO</button></li>
-                        <li><button class="external-submenu-item" type="button" data-technical-module="M04">CONTEÚDO INFANTIL</button></li>
                         <li><button class="external-submenu-item" type="button" data-technical-module="M06">REVISÃO TEOLÓGICA</button></li>
                         <li><button class="external-submenu-item" type="button" data-technical-module="M11">MÚSICA</button></li>
                         <li><button class="external-submenu-item" type="button" data-technical-module="SOCIAL ENGINE">CONTEÚDO SOCIAL</button></li>
@@ -347,8 +362,11 @@
                     <button class="external-menu-item" type="button" data-external-item="biblio" aria-expanded="false" aria-controls="external-biblio-submenu" onclick="toggleBiblioMenu(this)">BIBLIO</button>
                     <ul class="external-submenu" id="external-biblio-submenu">
                         <li>
-                            <button class="external-submenu-category" type="button" onclick="showOntologyRoot()">MENU 1 — ÁREAS ACADÉMICAS DA TEOLOGIA</button>
+                            <button class="external-submenu-category" type="button" onclick="showOntologyRoot()">ÁREAS ACADÉMICAS DA TEOLOGIA</button>
                             <ul class="external-submenu-children module-list" id="ml" aria-label="Áreas académicas da teologia"></ul>
+                        </li>
+                        <li>
+                            <button class="external-submenu-category" type="button" onclick="openProgressiveInvestigation()">INVESTIGAR UMA PASSAGEM</button>
                         </li>
                     </ul>
                 </li>
@@ -567,6 +585,9 @@
                             </ul>
                         </li>
                     </ul>
+                </li>
+                <li>
+                    <button class="external-menu-item" type="button" data-external-item="escrita" data-technical-module="M02">ESCRITA</button>
                 </li>
             </ul>
         </nav>
@@ -1551,7 +1572,70 @@
         return html + '</div></details>';
     }
 
+        const PROGRESSIVE_STEPS = [
+        { number: '01', title: 'TEXTO BÍBLICO', question: 'Qual é exatamente o texto que vamos estudar?', objective: 'Estabelecer o texto-base da investigação.', investigation: 'Identificar a passagem, a tradução e as tradições textuais relevantes.', module: '01 — TEXTO BÍBLICO' },
+        { number: '02', title: 'CRÍTICA TEXTUAL', question: 'Existem diferenças importantes entre os manuscritos?', objective: 'Identificar variantes textuais relevantes e explicar o seu impacto interpretativo.', investigation: 'Comparar evidências textuais sem apresentar uma variante controversa como facto indiscutível.', module: '02 — CRÍTICA TEXTUAL' },
+        { number: '03', title: 'GRAMÁTICA E SINTAXE', question: 'Como as palavras e frases estão funcionando no texto?', objective: 'Observar a estrutura da frase e as relações entre as suas partes.', investigation: 'Analisar verbos, sujeitos, objetos, conectivos, cláusulas, tempo, aspecto, voz e modo.', module: '03 — GRAMÁTICA E SINTAXE' },
+        { number: '04', title: 'LÉXICO', question: 'O que as palavras podem significar neste contexto?', objective: 'Investigar o sentido contextual das palavras.', investigation: 'Observar lema, usos possíveis e campo semântico sem assumir todos os significados ao mesmo tempo.', module: '04 — LÉXICO' },
+        { number: '05', title: 'LÉXICO TEOLÓGICO', question: 'Como esse conceito funciona dentro da linguagem teológica da Bíblia?', objective: 'Investigar o desenvolvimento e uso teológico do conceito.', investigation: 'Relacionar o conceito ao contexto bíblico sem importar automaticamente sentidos de outras passagens.', module: '05 — LÉXICO TEOLÓGICO' },
+        { number: '06', title: 'EXEGESE', question: 'O que o autor está comunicando nesta passagem?', objective: 'Integrar as descobertas anteriores numa leitura coerente.', investigation: 'Sintetizar texto, gramática, léxico, contexto, género literário e intenção comunicativa.', module: '06 — EXEGESE' },
+        { number: '07', title: 'CONTEXTO HISTÓRICO-CULTURAL', question: 'O que precisamos conhecer sobre o mundo original dessa passagem?', objective: 'Compreender o contexto histórico e cultural relevante.', investigation: 'Investigar sociedade, política, religião, geografia, costumes e instituições com base em evidências.', module: '07 — CONTEXTO HISTÓRICO-CULTURAL' },
+        { number: '08', title: 'HERMENÊUTICA E CONTROLE DE ERROS', question: 'Estamos interpretando corretamente aquilo que encontramos?', objective: 'Verificar a qualidade e os limites da interpretação.', investigation: 'Testar anacronismo, eisegese, falácia lexical, descontextualização, alegorização indevida e generalizações.', module: '08 — HERMENÊUTICA E CONTROLE DE ERROS' },
+        { number: '09', title: 'TEOLOGIA BÍBLICA', question: 'Como esta passagem se encaixa na história e na mensagem da Bíblia?', objective: 'Relacionar a passagem à progressão da revelação bíblica.', investigation: 'Observar história da redenção, promessa e cumprimento, reino, Cristo e consumação.', module: '09 — TEOLOGIA BÍBLICA' },
+        { number: '10', title: 'USO DO AT NO NT', question: 'Como o Novo Testamento utiliza o Antigo Testamento nesta passagem?', objective: 'Investigar relações entre o Antigo e o Novo Testamento quando aplicável.', investigation: 'Verificar citações, alusões, ecos, paralelos, Septuaginta, releituras e cumprimento de promessas.', module: '10 — USO DO AT NO NT' },
+        { number: '11', title: 'TEOLOGIA SISTEMÁTICA', question: 'Que relação esta interpretação possui com a doutrina cristã?', objective: 'Relacionar a interpretação obtida com questões doutrinárias.', investigation: 'Seguir a ordem texto → exegese → teologia bíblica → questão doutrinária → teologia sistemática.', module: '11 — TEOLOGIA SISTEMÁTICA' },
+        { number: '12', title: 'COMPARAÇÃO DE INTERPRETAÇÕES', question: 'Quais são as principais interpretações e como elas se sustentam diante das evidências?', objective: 'Apresentar interpretações concorrentes de forma proporcional às evidências.', investigation: 'Comparar argumentos, pressupostos, pontos fortes, pontos fracos e grau de sustentação.', module: '12 — COMPARAÇÃO DE INTERPRETAÇÕES' }
+    ];
+    let progressiveInvestigation = { passage: '', translation: '', objective: '', mode: 'guided', current: 0, results: {} };
+
+    function openProgressiveInvestigation() {
+        document.body.dataset.activeMenu = 'discipline';
+        document.querySelector('.sidebar').classList.remove('pro-active');
+        document.getElementById('mn').innerHTML = `<main class="progressive-paper"><button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para as áreas académicas">← VOLTAR</button><h1>INVESTIGAR UMA PASSAGEM</h1><p class="progressive-intro">Aprenda a estudar uma passagem bíblica passo a passo. O sistema organiza a investigação, preserva os resultados e executa a análise técnica nos bastidores.</p><form class="progressive-form" onsubmit="startProgressiveInvestigation(event)"><label>PASSAGEM BÍBLICA<input id="progressive-passage" required placeholder="Ex.: João 15:1-5"></label><label>TRADUÇÃO<input id="progressive-translation" placeholder="Ex.: Almeida, NVI ou outra tradução"></label><label>PERGUNTA OU OBJETIVO<textarea id="progressive-objective" placeholder="O que deseja compreender nesta passagem?"></textarea></label><label>MODO DE USO<select id="progressive-mode"><option value="guided">MODO GUIADO — linguagem acessível</option><option value="advanced">MODO AVANÇADO — acesso técnico</option></select></label><button type="submit">COMEÇAR INVESTIGAÇÃO</button></form></main>`;
+    }
+
+    function startProgressiveInvestigation(event) {
+        event.preventDefault();
+        progressiveInvestigation = { passage: document.getElementById('progressive-passage')?.value.trim() || '', translation: document.getElementById('progressive-translation')?.value.trim() || '', objective: document.getElementById('progressive-objective')?.value.trim() || '', mode: document.getElementById('progressive-mode')?.value || 'guided', current: 0, results: {} };
+        renderProgressiveWorkspace();
+    }
+
+    function renderProgressiveWorkspace() {
+        const step = PROGRESSIVE_STEPS[progressiveInvestigation.current];
+        const completed = Object.keys(progressiveInvestigation.results).map(Number);
+        const result = progressiveInvestigation.results[progressiveInvestigation.current] || '';
+        const progress = PROGRESSIVE_STEPS.map((item, index) => `<button class="${index === progressiveInvestigation.current ? 'active ' : ''}${completed.includes(index) ? 'completed' : ''}" onclick="setProgressiveStep(${index})">${item.number}</button>`).join('');
+        const technical = progressiveInvestigation.mode === 'advanced' ? `<p><strong>Módulo técnico associado:</strong> ${step.module}</p>` : '';
+        document.getElementById('mn').innerHTML = `<main class="progressive-paper"><button class="back-arrow" onclick="openProgressiveInvestigation()" title="Voltar à configuração da investigação">← VOLTAR</button><h1>INVESTIGAR UMA PASSAGEM</h1><p class="progressive-intro"><strong>Passagem:</strong> ${escapeBibleText(progressiveInvestigation.passage)}${progressiveInvestigation.translation ? ` · <strong>Tradução:</strong> ${escapeBibleText(progressiveInvestigation.translation)}` : ''}${progressiveInvestigation.objective ? `<br><strong>Objetivo:</strong> ${escapeBibleText(progressiveInvestigation.objective)}` : ''}</p><div class="progressive-progress" aria-label="Progressão da investigação">${progress}</div><section class="progressive-step"><h2>${step.number} — ${step.title}</h2>${technical}<h3>Pergunta orientadora</h3><p>${step.question}</p><h3>Objetivo desta etapa</h3><p>${step.objective}</p><h3>O que será investigado</h3><p>${step.investigation}</p>${result ? `<h3>Resultado produzido</h3><div class="progressive-result">${escapeBibleText(result)}</div>` : '<p class="progressive-result">Ainda não há resultado nesta etapa. Inicie a investigação para produzir uma resposta organizada.</p>'}<div class="progressive-step-actions"><button onclick="requestProgressiveStepAnalysis()">${result ? 'ATUALIZAR INVESTIGAÇÃO' : 'INVESTIGAR ESTA ETAPA'}</button>${progressiveInvestigation.current > 0 ? '<button class="secondary" onclick="setProgressiveStep(progressiveInvestigation.current - 1)">← ETAPA ANTERIOR</button>' : ''}${progressiveInvestigation.current < PROGRESSIVE_STEPS.length - 1 ? '<button class="secondary" onclick="setProgressiveStep(progressiveInvestigation.current + 1)">PRÓXIMA ETAPA →</button>' : ''}<button class="secondary" onclick="openProgressiveAdvancedStep(${progressiveInvestigation.current})">APROFUNDAR TECNICAMENTE</button></div></section></main>`;
+    }
+
+    function setProgressiveStep(index) {
+        progressiveInvestigation.current = Math.max(0, Math.min(PROGRESSIVE_STEPS.length - 1, Number(index)));
+        renderProgressiveWorkspace();
+    }
+
+    async function requestProgressiveStepAnalysis() {
+        const step = PROGRESSIVE_STEPS[progressiveInvestigation.current];
+        progressiveInvestigation.results[progressiveInvestigation.current] = 'A investigar a etapa com os recursos disponíveis...';
+        renderProgressiveWorkspace();
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: `BIBLIO — ${step.title}. Passagem: ${progressiveInvestigation.passage}. Tradução: ${progressiveInvestigation.translation || 'não indicada'}. Objetivo: ${progressiveInvestigation.objective || 'investigar a passagem com rigor'}. Pergunta da etapa: ${step.question}. Produza uma resposta acessível, indique limites das evidências e não invente fontes.`, topic: `INVESTIGAR UMA PASSAGEM — ${step.title}`, discipline: 'BIBLIO — INVESTIGAÇÃO PROGRESSIVA' }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A pesquisa não pôde ser concluída.');
+            progressiveInvestigation.results[progressiveInvestigation.current] = data.answer || data.response || data.result || 'A etapa foi processada, mas não houve texto de resposta disponível.';
+        } catch (error) {
+            progressiveInvestigation.results[progressiveInvestigation.current] = `Não foi possível concluir esta etapa agora. ${error.message || 'Tente novamente mais tarde.'}`;
+        }
+        renderProgressiveWorkspace();
+    }
+
+    function openProgressiveAdvancedStep(index) {
+        const step = PROGRESSIVE_STEPS[index];
+        showProfessionalModule(step.module, null, `APROFUNDAMENTO TÉCNICO — ${step.title}`);
+    }
+
     function showOntologyRoot() {
+
         document.body.dataset.activeMenu = 'discipline';
         document.querySelector('.sidebar').classList.remove('pro-active');
         document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
