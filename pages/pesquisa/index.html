@@ -128,7 +128,11 @@
         .pro-chat-form textarea { flex: 1; min-height: 58px; resize: vertical; padding: 11px; border: 1px solid #cdbfaa; border-radius: 6px; background: #faf6ed; color: #4a443b; font: inherit; font-size: 12px; outline: none; }
         .pro-chat-form textarea:focus { border-color: #a88f66; box-shadow: 0 0 0 2px rgba(168,143,102,0.16); }
         .pro-chat-form button { align-self: flex-end; min-height: 40px; padding: 0 18px; border: 0; border-radius: 6px; background: #806f53; color: #fffaf0; font-weight: 800; cursor: pointer; }
-        .pro-chat-form button:hover { background: #6c5b42; }
+                .pro-chat-form button:hover { background: #6c5b42; }
+        .pro-conversation-form { margin-top: 16px; padding-top: 14px; border-top: 1px solid #d8cdb8; }
+        .pro-conversation-form label { color: #806f53; font-size: 11px; font-weight: 900; letter-spacing: .6px; }
+        .pro-conversation-form textarea { min-height: 78px; }
+
                         .oracle-launch { display: block; width: calc(100% - 30px); margin: 10px 15px 12px; padding: 11px 14px; border: 1px solid #8f7cff; border-radius: 8px; background: linear-gradient(135deg, #34256f, #5b3bb5); color: #f4f0ff; text-align: left; font-size: 12px; font-weight: 900; letter-spacing: 1px; cursor: pointer; box-shadow: 0 5px 14px rgba(91,59,181,.28); }
                 .oracle-launch:hover { background: linear-gradient(135deg, #45318b, #704bd1); border-color: #b8adff; color: #fff; }
                 .bible-launch { width: calc(100% - 30px); margin: 12px 15px 10px; padding: 12px 14px; border: 1px solid #b99b61; border-radius: 8px; background: #f1eadb; color: #4a443b; text-align: left; font-size: 12px; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
@@ -435,6 +439,12 @@
       .external-menu { display: none; }
       .main { width: 100%; min-height: 0; }
       @media (max-width: 900px) { .sidebar-header { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sidebar-header h2 { grid-row: 1; grid-column: 1; } .sidebar-header .owner-login-launch { grid-row: 1; grid-column: 2; } .sidebar-header .oracle-launch, .sidebar-header .pro-matrix-launch, .sidebar-header .shelf-launch, .sidebar-header .bible-launch, .sidebar-header .biblio-launch, .sidebar-header .sermons-launch, .sidebar-header .bridge-launch { grid-row: auto; grid-column: auto; width: 100%; } }
+    </style>
+    <style>
+      /* Fundo visual da tela inicial de abertura */
+      .main { background-color: #0b1426; background-image: url('./background-opening-bible.png'); background-size: cover; background-position: center center; background-repeat: no-repeat; }
+      body[data-active-menu]:not([data-active-menu=""]) .main { background-image: none; }
+      @media (max-width: 700px) { .main { background-position: center center; } }
     </style>
 </head>
 
@@ -1376,7 +1386,61 @@
                 <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.'}</div>
             </div>
             ${studyContext ? '' : creationForm}
+            ${renderProConversationForm(module, topic)}
         </div>`;
+    }
+
+    function renderProConversationForm(module, topic) {
+        const moduleArg = JSON.stringify(module);
+        const topicArg = JSON.stringify(topic);
+        return `<form class="pro-chat-form pro-conversation-form" onsubmit="sendProChatMessage(event, ${moduleArg}, ${topicArg})">
+            <label for="pro-chat-input">CONVERSA DE ANÁLISE</label>
+            <textarea id="pro-chat-input" placeholder="Escreva uma pergunta ou observação sobre esta subetapa..." aria-label="Mensagem para a Mesa de Análise PRO"></textarea>
+            <button type="submit">ENVIAR MENSAGEM</button>
+        </form>`;
+    }
+
+    async function sendProChatMessage(event, module, topic) {
+        event.preventDefault();
+        const input = event.currentTarget.querySelector('#pro-chat-input');
+        const messages = document.getElementById('pro-chat-messages');
+        const button = event.currentTarget.querySelector('button');
+        const question = input?.value.trim() || '';
+        if (!messages || !question) return;
+        if (!studyContext) {
+            const notice = document.createElement('div');
+            notice.className = 'pro-chat-message system';
+            notice.textContent = 'Crie primeiro o estudo bíblico acima para iniciar a conversa de análise.';
+            messages.appendChild(notice);
+            messages.scrollTop = messages.scrollHeight;
+            return;
+        }
+        const userMessage = document.createElement('div');
+        userMessage.className = 'pro-chat-message user';
+        userMessage.textContent = question;
+        messages.appendChild(userMessage);
+        input.value = '';
+        if (button) button.disabled = true;
+        const answer = document.createElement('div');
+        answer.className = 'pro-chat-message system';
+        answer.textContent = 'A analisar a sua pergunta...';
+        messages.appendChild(answer);
+        messages.scrollTop = messages.scrollHeight;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Não foi possível responder à mensagem.');
+            answer.textContent = neutralizeServiceText(data.text || 'A análise não devolveu conteúdo.');
+        } catch (error) {
+            answer.textContent = 'Não foi possível concluir a resposta neste momento. Tente novamente.';
+        } finally {
+            if (button) button.disabled = false;
+            messages.scrollTop = messages.scrollHeight;
+        }
     }
 
     function populateProChapterOptions(book) {
