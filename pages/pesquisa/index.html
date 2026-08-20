@@ -375,15 +375,76 @@
 
       .owner-login-overlay{display:none;position:fixed;inset:0;z-index:260;align-items:center;justify-content:center;background:rgba(5,10,20,.78);padding:20px}.owner-login-overlay.open{display:flex}.owner-login-box{width:min(430px,92vw);padding:28px;border:1px solid #35506d;border-radius:12px;background:#111b30;color:#dbe7f5;box-shadow:0 18px 60px rgba(0,0,0,.4)}.owner-login-box h2{margin:14px 0 12px;color:#20d66b;font-size:17px;letter-spacing:1px}.owner-login-box p{line-height:1.6;color:#b8c9dc}.owner-login-box small{display:block;margin-top:14px;color:#91a4bd;line-height:1.45}.owner-login-close{border:1px solid #536780;border-radius:6px;background:transparent;color:#dbe7f5;padding:8px 12px;cursor:pointer}.owner-login-demo{margin-top:16px;border:0;border-radius:7px;background:#20d66b;color:#07151f;padding:11px 14px;font-weight:900;cursor:pointer}
     </style>
+    <style>
+      /* Cabeçalho horizontal conforme a nova organização visual */
+      .sidebar-header { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "brand enter" "tools tools" "content content"; align-items: center; column-gap: 14px; row-gap: 10px; padding: 20px 18px 14px; }
+      .sidebar-header h2 { grid-area: brand; margin: 0; white-space: nowrap; }
+      .sidebar-header p { display: none; }
+      .sidebar-header .owner-login-launch { grid-area: enter; justify-self: start; margin: 0; }
+      .sidebar-header .oracle-launch { grid-area: tools; }
+      .sidebar-header .pro-matrix-launch { grid-area: tools; }
+      .sidebar-header .shelf-launch { grid-area: tools; }
+      .sidebar-header .bible-launch { grid-area: content; }
+      .sidebar-header .biblio-launch { grid-area: content; }
+      .sidebar-header .sermons-launch { grid-area: content; }
+      .sidebar-header .bridge-launch { grid-area: content; }
+      .sidebar-header > button { display: inline-flex; width: auto; min-height: 32px; margin: 0; padding: 8px 10px; align-items: center; justify-content: center; white-space: nowrap; }
+      .sidebar-header .oracle-launch, .sidebar-header .pro-matrix-launch, .sidebar-header .shelf-launch, .sidebar-header .bible-launch, .sidebar-header .biblio-launch, .sidebar-header .sermons-launch, .sidebar-header .bridge-launch { display: inline-flex; }
+      .sidebar-header { grid-template-columns: minmax(130px, auto) auto; }
+      .sidebar-header .oracle-launch { margin-right: 4px; }
+      .sidebar-header .pro-matrix-launch { margin-right: 4px; }
+      .sidebar-header .shelf-launch { margin-right: 4px; }
+      .sidebar-header .bible-launch { margin-right: 4px; }
+      .sidebar-header .biblio-launch { margin-right: 4px; }
+      .sidebar-header .sermons-launch { margin-right: 4px; }
+      .sidebar-header .tools-row, .sidebar-header .content-row { display: flex; flex-wrap: wrap; gap: 6px; }
+      .sidebar-header .oracle-launch { grid-column: 1; }
+      .sidebar-header .pro-matrix-launch { grid-column: 2; }
+      .sidebar-header .shelf-launch { grid-column: 3; }
+      .sidebar-header .bible-launch { grid-row: 3; grid-column: 1; }
+      .sidebar-header .biblio-launch { grid-row: 3; grid-column: 2; }
+      .sidebar-header .sermons-launch { grid-row: 3; grid-column: 3; }
+      .sidebar-header .bridge-launch { grid-row: 3; grid-column: 4; }
+      .sidebar-header .oracle-launch, .sidebar-header .pro-matrix-launch, .sidebar-header .shelf-launch { grid-row: 2; }
+      .sidebar-header .owner-login-launch { grid-row: 1; grid-column: 2; }
+      .sidebar-header .external-bridge-holder { margin-top: 0; }
+      .sidebar-header .bridge-launch { background: #0d1b31; color: #d8f5ff; border: 1px solid #2e6580; border-radius: 7px; font-weight: 900; cursor: pointer; }
+      .sidebar-header .bridge-launch:hover { background: #163451; border-color: #18bfff; }
+      .external-bridge-holder > .external-submenu { margin-top: 8px; }
+      .sidebar-header > #external-bridge-submenu { grid-column: 1 / -1; grid-row: 4; width: max-content; max-width: min(760px, 100%); margin: 0; padding: 8px 10px; border: 1px solid #2e6580; border-radius: 7px; background: #0d1b31; }
+      .sidebar-header > #external-bridge-submenu.open { display: block; }
+      @media (max-width: 1100px) { .sidebar-header { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sidebar-header h2 { grid-column: 1; } .sidebar-header .owner-login-launch { grid-column: 2; } .sidebar-header .oracle-launch, .sidebar-header .pro-matrix-launch, .sidebar-header .shelf-launch { grid-row: auto; grid-column: auto; } .sidebar-header .bible-launch, .sidebar-header .biblio-launch, .sidebar-header .sermons-launch, .sidebar-header .bridge-launch { grid-row: auto; grid-column: auto; } }
+    </style>
+    <style>
+      /* Cabeçalho horizontal em toda a largura da página */
+      body { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; flex: 0 0 auto; overflow: visible; border-right: 0; border-bottom: 1px solid var(--b); }
+      .sidebar-header { display: grid; grid-template-columns: max-content max-content max-content minmax(0, 1fr); grid-template-rows: auto auto auto; grid-template-areas: none; align-items: center; gap: 8px 10px; width: 100%; box-sizing: border-box; padding: 18px 28px 14px; }
+      .sidebar-header h2 { grid-area: auto; grid-row: 1; grid-column: 1; margin: 0; }
+      .sidebar-header p { display: none; }
+      .sidebar-header .owner-login-launch { grid-area: auto; grid-row: 1; grid-column: 2; justify-self: start; margin: 0; }
+      .sidebar-header .oracle-launch { grid-area: auto; grid-row: 2; grid-column: 1; }
+      .sidebar-header .pro-matrix-launch { grid-area: auto; grid-row: 2; grid-column: 2; }
+      .sidebar-header .shelf-launch { grid-area: auto; grid-row: 2; grid-column: 3; }
+      .sidebar-header .bible-launch { grid-area: auto; grid-row: 3; grid-column: 1; }
+      .sidebar-header .biblio-launch { grid-area: auto; grid-row: 3; grid-column: 2; }
+      .sidebar-header .sermons-launch { grid-area: auto; grid-row: 3; grid-column: 3; }
+      .sidebar-header .bridge-launch { grid-area: auto; grid-row: 3; grid-column: 4; justify-self: start; }
+      .sidebar-header > button { width: max-content; max-width: 100%; min-height: 32px; margin: 0; padding: 8px 12px; white-space: nowrap; }
+      .sidebar-header .pro-matrix-launch { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
+      .external-menu { display: none; }
+      .main { width: 100%; min-height: 0; }
+      @media (max-width: 900px) { .sidebar-header { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sidebar-header h2 { grid-row: 1; grid-column: 1; } .sidebar-header .owner-login-launch { grid-row: 1; grid-column: 2; } .sidebar-header .oracle-launch, .sidebar-header .pro-matrix-launch, .sidebar-header .shelf-launch, .sidebar-header .bible-launch, .sidebar-header .biblio-launch, .sidebar-header .sermons-launch, .sidebar-header .bridge-launch { grid-row: auto; grid-column: auto; width: 100%; } }
+    </style>
 </head>
+
 <body>
     <div class="sidebar">
-                <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="oracle-launch" onclick="openOracleChat()" aria-label="Abrir o Oráculo">◈ ORÁCULO — CONSULTA</button><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button><button class="shelf-launch" onclick="openShelf()">▤ MINHA ESTANTE — FREE / PRO</button><button class="biblio-launch" onclick="showOntologyRoot()" aria-label="Abrir Biblio">▤ BIBLIO</button><button class="sermons-launch" onclick="openSermonsScreen()" aria-label="Abrir Sermões">▤ SERMÕES</button><button class="pro-matrix-launch" onclick="openProMatrix()" aria-label="Abrir a Matriz Técnica de Pesquisa PRO">▤ MENU 2 — MATRIZ TÉCNICA DE PESQUISA PRO</button><button class="owner-login-launch" onclick="openOwnerLogin()" aria-label="Entrar">ENTRAR</button></div>
+                <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="oracle-launch" onclick="openOracleChat()" aria-label="Abrir o Oráculo">◈ ORÁCULO — CONSULTA</button><button class="pro-matrix-launch" onclick="openProMatrix()" aria-label="Abrir a Matriz Técnica de Pesquisa PRO">▤ MENU 2 — MATRIZ TÉCNICA DE PESQUISA PRO</button><button class="shelf-launch" onclick="openShelf()">▤ MINHA ESTANTE — FREE / PRO</button><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button><button class="biblio-launch" onclick="showOntologyRoot()" aria-label="Abrir Estudo Teológico">▤ ESTUDO TEOLÓGICO</button><button class="sermons-launch" onclick="openSermonsScreen()" aria-label="Abrir Sermões">▤ SERMÕES</button><button class="bridge-launch" type="button" aria-expanded="false" aria-controls="external-bridge-submenu" onclick="togglePonteMenu(this)">PONTE</button><button class="owner-login-launch" onclick="openOwnerLogin()" aria-label="Entrar">ENTRAR</button></div>
         <nav class="external-menu" aria-label="Menu principal externo">
             <div class="external-menu-heading">MENU PRINCIPAL</div>
             <ul class="external-menu-list">
-                <li>
-                    <button class="external-menu-item" type="button" data-external-item="ponte" aria-expanded="false" aria-controls="external-bridge-submenu" onclick="togglePonteMenu(this)">PONTE</button>
+                <li class="external-bridge-holder">
                     <ul class="external-submenu" id="external-bridge-submenu">
                         <li>
                             <button class="external-submenu-category" type="button">BÍBLIA DE LEITURA</button>
@@ -1893,10 +1954,9 @@
         let historyIndex = -1;
         let restoring = false;
         function snapshot() {
-            const mn = document.getElementById('mn');
             const proList = document.getElementById('pro-list');
             const proAnalysis = document.getElementById('pro-matrix-analysis');
-            return { mn: mn ? mn.innerHTML : '', activeMenu: document.body.dataset.activeMenu || '', sidebarPro: document.querySelector('.sidebar')?.classList.contains('pro-active') || false, proOpen: document.getElementById('pro-matrix-overlay')?.classList.contains('open') || false, proList: proList ? proList.innerHTML : '', proAnalysis: proAnalysis ? proAnalysis.innerHTML : '', overlays: overlaySelectors.map(selector => ({ selector, className: document.querySelector(selector)?.className || '' })) };
+            return { activeMenu: document.body.dataset.activeMenu || '', disciplineKey: typeof lastDisciplineKey !== 'undefined' ? (lastDisciplineKey || '') : '', sidebarPro: document.querySelector('.sidebar')?.classList.contains('pro-active') || false, proOpen: document.getElementById('pro-matrix-overlay')?.classList.contains('open') || false, proList: proList ? proList.innerHTML : '', proAnalysis: proAnalysis ? proAnalysis.innerHTML : '', overlays: overlaySelectors.map(selector => ({ selector, className: document.querySelector(selector)?.className || '' })) };
         }
         function updateButtons() { back.disabled = historyIndex <= 0; forward.disabled = historyIndex < 0 || historyIndex >= historyStack.length - 1; }
         function record() { if (restoring) return; const state = snapshot(); const previous = historyStack[historyIndex]; if (previous && JSON.stringify(previous) === JSON.stringify(state)) return; historyStack = historyStack.slice(0, historyIndex + 1); historyStack.push(state); historyIndex = historyStack.length - 1; updateButtons(); }
@@ -1910,10 +1970,15 @@
             if (!state) return;
             restoring = true;
             closeScreens();
-            const mn = document.getElementById('mn');
-            if (mn) mn.innerHTML = state.mn;
             document.body.dataset.activeMenu = state.activeMenu || '';
             document.querySelector('.sidebar')?.classList.toggle('pro-active', Boolean(state.sidebarPro));
+            if (state.activeMenu === 'discipline') {
+                if (state.disciplineKey) showSub(state.disciplineKey, null); else showOntologyRoot();
+            } else if (state.activeMenu === 'sermons') {
+                openSermonsScreen();
+            } else if (state.activeMenu === 'oracle') {
+                openOracleChat();
+            }
             if (state.proOpen) {
                 openProMatrix();
                 const proList = document.getElementById('pro-list');
@@ -1931,6 +1996,9 @@
         document.addEventListener('click', event => { if (restoring || event.target.closest('.nav-history-controls')) return; if (!event.target.closest('button,[role="button"],summary,.pro-item,.pro-subitem,select')) return; window.setTimeout(record, 0); }, true);
         record();
     }
+    const bridgeSubmenuForHeader = document.getElementById('external-bridge-submenu');
+    const headerForBridgeSubmenu = document.querySelector('.sidebar-header');
+    if (bridgeSubmenuForHeader && headerForBridgeSubmenu) headerForBridgeSubmenu.appendChild(bridgeSubmenuForHeader);
     init();
     setupNavigationHistory();
 
