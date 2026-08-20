@@ -306,7 +306,9 @@
     </style>
 
     <style>
-      .owner-login-launch{display:block;margin:0 15px 12px;padding:7px 10px;border:1px solid #536780;border-radius:6px;background:transparent;color:#91a4bd;font-size:9px;font-weight:800;letter-spacing:1px;cursor:pointer}.owner-login-launch:hover{color:#fff;border-color:#1ed760}
+            .owner-login-launch{display:block;margin:0 15px 12px;padding:7px 10px;border:1px solid #536780;border-radius:6px;background:transparent;color:#91a4bd;font-size:9px;font-weight:800;letter-spacing:1px;cursor:pointer}.owner-login-launch:hover{color:#fff;border-color:#1ed760}
+      .owner-access-list{display:grid;gap:9px;margin-top:16px}.owner-access-list .owner-login-demo{width:100%;margin-top:0;text-align:left}
+
       .owner-login-overlay{display:none;position:fixed;inset:0;z-index:260;align-items:center;justify-content:center;background:rgba(5,10,20,.78);padding:20px}.owner-login-overlay.open{display:flex}.owner-login-box{width:min(430px,92vw);padding:28px;border:1px solid #35506d;border-radius:12px;background:#111b30;color:#dbe7f5;box-shadow:0 18px 60px rgba(0,0,0,.4)}.owner-login-box h2{margin:14px 0 12px;color:#20d66b;font-size:17px;letter-spacing:1px}.owner-login-box p{line-height:1.6;color:#b8c9dc}.owner-login-box small{display:block;margin-top:14px;color:#91a4bd;line-height:1.45}.owner-login-close{border:1px solid #536780;border-radius:6px;background:transparent;color:#dbe7f5;padding:8px 12px;cursor:pointer}.owner-login-demo{margin-top:16px;border:0;border-radius:7px;background:#20d66b;color:#07151f;padding:11px 14px;font-weight:900;cursor:pointer}
     </style>
 </head>
@@ -319,7 +321,6 @@
                 <li>
                     <button class="external-menu-item" type="button" data-external-item="sistema" aria-expanded="false" aria-controls="external-system-submenu" onclick="toggleSystemMenu(this)">SISTEMA</button>
                     <ul class="external-submenu" id="external-system-submenu">
-                        <li><button class="external-submenu-item" type="button" data-technical-module="M00">COORDENAÇÃO DO SISTEMA</button></li>
                         <li><button class="external-submenu-item" type="button" data-technical-module="M06">REVISÃO TEOLÓGICA</button></li>
                         <li><button class="external-submenu-item" type="button" data-technical-module="M11">MÚSICA</button></li>
                         <li><button class="external-submenu-item" type="button" data-technical-module="SOCIAL ENGINE">CONTEÚDO SOCIAL</button></li>
@@ -586,9 +587,6 @@
                         </li>
                     </ul>
                 </li>
-                <li>
-                    <button class="external-menu-item" type="button" data-external-item="escrita" data-technical-module="M02">ESCRITA</button>
-                </li>
             </ul>
         </nav>
         <div class="sidebar-menus">
@@ -612,10 +610,13 @@
     <div class="owner-login-overlay" id="owner-login-overlay" role="dialog" aria-modal="true" aria-labelledby="owner-login-title">
         <div class="owner-login-box">
             <button class="owner-login-close" onclick="closeOwnerLogin()">← FECHAR</button>
-            <h2 id="owner-login-title">ENTRADA DO PROPRIETÁRIO</h2>
-            <p>A Mesa Privada de Pesquisa só será carregada depois de uma autenticação real. Nesta versão de trabalho, os dados privados não são expostos.</p>
-            <button class="owner-login-demo" onclick="activateOwnerDemo()">ACTIVAR PRÉ-VISUALIZAÇÃO PRIVADA</button>
-            <small>Pré-visualização local. Antes da publicação, esta entrada deve ser ligada ao Supabase Auth.</small>
+            <h2 id="owner-login-title">ENTRAR</h2>
+            <p>Aceda às ferramentas internas de produção e operação da plataforma.</p>
+            <div class="owner-access-list" aria-label="Ferramentas internas">
+                <button class="owner-login-demo" type="button" data-internal-access="coordenação-do-sistema" onclick="activateOwnerDemo()">COORDENAÇÃO DO SISTEMA</button>
+                <button class="owner-login-demo" type="button" data-internal-access="escrita">ESCRITA</button>
+            </div>
+            <small>Os acessos utilizam as funcionalidades internas existentes. A expansão das áreas será definida posteriormente.</small>
         </div>
     </div>
 
