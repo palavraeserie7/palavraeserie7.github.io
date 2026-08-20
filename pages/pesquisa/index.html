@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -140,6 +140,37 @@
         .biblio-launch:hover { background: #fff8e9; border-color: #e0c487; }
         .sermons-launch { display: block; width: calc(100% - 30px); margin: 0 15px 12px; padding: 10px 12px; border: 1px solid #b99b61; border-radius: 7px; background: #f1eadb; color: #4a443b; text-align: left; font-size: 11px; font-weight: 900; letter-spacing: .5px; cursor: pointer; }
         .sermons-launch:hover { background: #fff8e9; border-color: #e0c487; }
+        .pro-matrix-launch { display: block; width: calc(100% - 30px); margin: 0 15px 12px; padding: 10px 12px; border: 1px solid #2e6580; border-radius: 7px; background: #0d1b31; color: #d8f5ff; text-align: left; font-size: 11px; font-weight: 900; letter-spacing: .5px; cursor: pointer; }
+        .pro-matrix-launch:hover { background: #163451; border-color: #18bfff; }
+        .pro-matrix-overlay { display: none; position: fixed; inset: 0; z-index: 130; background: #f1eadb; color: #4a443b; }
+        .pro-matrix-overlay.open { display: flex; flex-direction: column; }
+        .pro-matrix-window { display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; background: #f1eadb; }
+        .pro-matrix-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 30px; border-bottom: 1px solid #d8cdb8; background: #ebe0cd; }
+        .pro-matrix-header h2 { margin: 0; font-size: 19px; letter-spacing: 1px; }
+        .pro-matrix-header p { margin: 4px 0 0; color: #806f53; font-size: 11px; }
+        .pro-matrix-close { padding: 8px 13px; border: 1px solid #806f53; border-radius: 6px; background: transparent; color: #4a443b; font-weight: 900; cursor: pointer; }
+        .pro-matrix-body { flex: 1 1 auto; min-height: 0; overflow: hidden; padding: 24px 30px 30px; }
+        .pro-matrix-layout { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(420px, 1.35fr); gap: 20px; width: 100%; height: 100%; min-height: 0; }
+        .pro-matrix-list-pane { min-width: 0; min-height: 0; overflow-y: auto; padding: 0 14px 14px; border: 1px solid #d8cdb8; border-radius: 8px; background: rgba(235,224,205,.55); }
+        .pro-matrix-analysis-pane { min-width: 0; min-height: 0; overflow: auto; }
+        .pro-matrix-analysis-pane .content { min-height: 100%; }
+        .pro-matrix-analysis-pane .pro-analysis-only { min-height: 100%; }
+        .pro-matrix-analysis-pane .pro-analysis-panel { min-height: calc(100vh - 190px); margin-top: 0; }
+        .pro-matrix-placeholder { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 190px); padding: 30px; border: 1px dashed #cdbfaa; border-radius: 8px; background: rgba(255,253,247,.68); color: #806f53; text-align: center; line-height: 1.6; }
+        .pro-placeholder-content { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 380px; }
+        .pro-placeholder-icon { width: 66px; height: 66px; opacity: .42; color: #b99b61; }
+        .pro-placeholder-icon svg { display: block; width: 100%; height: 100%; }
+        .pro-matrix-body .pro-menu-box { min-height: 100%; margin: 0; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+        .pro-matrix-body .pro-menu-heading { padding: 0 0 16px; border-bottom: 1px solid #d8cdb8; background: transparent; }
+        .pro-matrix-body .pro-menu-heading strong { border-color: #806f53; color: #4a443b; }
+        .pro-matrix-body .pro-menu-heading span { color: #806f53; }
+        .pro-matrix-body .pro-list { overflow: visible; padding: 16px 0; }
+        @media (max-width: 1000px) { .pro-matrix-layout { grid-template-columns: 1fr; height: auto; overflow-y: auto; } .pro-matrix-list-pane, .pro-matrix-analysis-pane { min-height: 520px; } }
+        .pro-matrix-body .pro-item { padding: 12px 14px; border: 1px solid #d8cdb8; background: #ebe0cd; color: #4a443b; }
+        .pro-matrix-body .pro-item:hover, .pro-matrix-body .pro-item.active { border-color: #b99b61; background: #e4d7c0; color: #30291f; box-shadow: none; }
+        .pro-matrix-body .pro-sublist { border-left-color: #cdbfaa; }
+        .pro-matrix-body .pro-subitem { color: #6d5d45; background: #fffdf7; }
+        .pro-matrix-body .pro-subitem:hover, .pro-matrix-body .pro-subitem.active { background: #f5eddf; color: #4a443b; }
         .sermons-screen-paper { min-height: 100%; padding: 32px 40px 50px; background: #f1eadb; color: #4a443b; }
         .sermons-screen-paper h1 { margin: 0 0 24px; font-size: 24px; letter-spacing: 1px; }
         .sermons-screen-tree.external-submenu { display: block; margin: 0; padding: 0; border: 0; }
@@ -343,7 +374,7 @@
 </head>
 <body>
     <div class="sidebar">
-                <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="oracle-launch" onclick="openOracleChat()" aria-label="Abrir o Oráculo">◈ ORÁCULO — CONSULTA</button><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button><button class="shelf-launch" onclick="openShelf()">▤ MINHA ESTANTE — FREE / PRO</button><button class="biblio-launch" onclick="showOntologyRoot()" aria-label="Abrir Biblio">▤ BIBLIO</button><button class="sermons-launch" onclick="openSermonsScreen()" aria-label="Abrir Sermões">▤ SERMÕES</button><button class="owner-login-launch" onclick="openOwnerLogin()" aria-label="Entrar">ENTRAR</button></div>
+                <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><button class="oracle-launch" onclick="openOracleChat()" aria-label="Abrir o Oráculo">◈ ORÁCULO — CONSULTA</button><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button><button class="shelf-launch" onclick="openShelf()">▤ MINHA ESTANTE — FREE / PRO</button><button class="biblio-launch" onclick="showOntologyRoot()" aria-label="Abrir Biblio">▤ BIBLIO</button><button class="sermons-launch" onclick="openSermonsScreen()" aria-label="Abrir Sermões">▤ SERMÕES</button><button class="pro-matrix-launch" onclick="openProMatrix()" aria-label="Abrir a Matriz Técnica de Pesquisa PRO">▤ MENU 2 — MATRIZ TÉCNICA DE PESQUISA PRO</button><button class="owner-login-launch" onclick="openOwnerLogin()" aria-label="Entrar">ENTRAR</button></div>
         <nav class="external-menu" aria-label="Menu principal externo">
             <div class="external-menu-heading">MENU PRINCIPAL</div>
             <ul class="external-menu-list">
@@ -498,7 +529,8 @@
         <div class="sidebar-menus">
 
             
-            <section class="pro-mode" id="pro-mode">
+                        <section class="pro-mode" id="pro-mode" style="display:none">
+
                 <div class="pro-area">
                 <div class="pro-menu-box" data-access="pro">
                     <div class="pro-menu-heading">
@@ -560,6 +592,16 @@
                 <button class="shelf-close" onclick="closeShelf()">← FECHAR</button>
             </div>
             <div class="shelf-body" id="shelf-body"></div>
+        </div>
+    </div>
+
+    <div class="pro-matrix-overlay" id="pro-matrix-overlay" role="dialog" aria-modal="true" aria-labelledby="pro-matrix-title">
+        <div class="pro-matrix-window">
+            <div class="pro-matrix-header">
+                <div><h2 id="pro-matrix-title">MATRIZ TÉCNICA DE PESQUISA PRO</h2><p>Módulos e procedimentos de investigação da Matriz Canónica.</p></div>
+                <button class="pro-matrix-close" onclick="closeProMatrix()">← FECHAR</button>
+            </div>
+            <div class="pro-matrix-body" id="pro-matrix-body"></div>
         </div>
     </div>
 
@@ -637,6 +679,24 @@
     function renderShelfFilters() {
         const labels = { contentType: 'TIPO DE CONTEÚDO', audience: 'PÚBLICO', depth: 'PROFUNDIDADE', format: 'FORMATO' };
         return `<section class="shelf-filters" aria-label="Filtros do catálogo">${Object.entries(labels).map(([facet, label]) => `<label>${label}<select onchange="setShelfFilter('${facet}', this.value)"><option value="">TODOS</option>${SHELF_FILTER_OPTIONS[facet].map(option => `<option value="${option}" ${activeShelfFilters[facet] === option ? 'selected' : ''}>${option}</option>`).join('')}</select></label>`).join('')}</section>`;
+    }
+
+    function openProMatrix() {
+        const overlay = document.getElementById('pro-matrix-overlay');
+        const body = document.getElementById('pro-matrix-body');
+        const box = document.querySelector('#pro-mode .pro-menu-box');
+        if (!overlay || !body || !box) return;
+        body.innerHTML = '<div class="pro-matrix-layout"><section class="pro-matrix-list-pane" id="pro-matrix-list-pane"></section><section class="pro-matrix-analysis-pane" id="pro-matrix-analysis"><div class="pro-matrix-placeholder"><div class="pro-placeholder-content"><span class="pro-placeholder-icon" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.5C18 13.46 20.46 11 23.5 11H54V57H23.5C20.46 57 18 54.54 18 51.5V16.5Z" stroke="currentColor" stroke-width="2.2"/><path d="M18 16.5C18 19.54 20.46 22 23.5 22H54" stroke="currentColor" stroke-width="2.2"/><path d="M27 31H47M27 38H47M27 45H40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M54 11V57" stroke="currentColor" stroke-width="2.2"/><path d="M14 15.5C14 12.46 16.46 10 19.5 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>Seleccione uma subetapa interna da Matriz para abrir a MESA DE ANÁLISE PRO nesta área.</span></div></div></section></div>';
+        document.getElementById('pro-matrix-list-pane')?.appendChild(box);
+        overlay.classList.add('open');
+    }
+
+    function closeProMatrix() {
+        const overlay = document.getElementById('pro-matrix-overlay');
+        const box = document.querySelector('#pro-matrix-body .pro-menu-box');
+        const host = document.querySelector('#pro-mode .pro-area');
+        if (box && host) host.appendChild(box);
+        overlay?.classList.remove('open');
     }
 
     function openShelf() {
@@ -918,19 +978,23 @@
 
         const ml = document.getElementById('ml');
 
-        // Somente as áreas 1 a 29 são itens funcionais.
-        Object.keys(DATA)
-            .filter(k => k !== '00 AS DISCIPLINAS DA TEOLOGIA')
-            .forEach(k => {
-                const li = document.createElement('li');
-                li.className = 'module-item';
-                li.innerText = k;
-                li.dataset.biblioDiscipline = k;
-                li.onclick = () => toggleBiblioDiscipline(k, li);
-                ml.appendChild(li);
-            });
+                // A BIBLIO é agora aberta na tela académica; se a árvore lateral existir, ela continua a ser preenchida.
+        if (ml) {
+            Object.keys(DATA)
+                .filter(k => k !== '00 AS DISCIPLINAS DA TEOLOGIA')
+                .forEach(k => {
+                    const li = document.createElement('li');
+                    li.className = 'module-item';
+                    li.innerText = k;
+                    li.dataset.biblioDiscipline = k;
+                    li.onclick = () => toggleBiblioDiscipline(k, li);
+                    ml.appendChild(li);
+                });
+        }
 
+        // A Matriz Técnica PRO é independente da BIBLIO e deve ser sempre renderizada.
         renderAllInternalProMenus();
+
     }
 
     function toggleProMenu() {
@@ -1381,8 +1445,10 @@
 
     function openProCard(card, module) {
         setProProgressState(card, 'in_progress');
-        document.getElementById('mn').innerHTML = `
+                const analysisTarget = document.getElementById('pro-matrix-analysis') || document.getElementById('mn');
+        analysisTarget.innerHTML = `
             <div class="content">
+
                 <button class="back-arrow" onclick="showProfessionalModule('${module}', document.querySelector('.pro-item.active'))" title="Voltar para o módulo PRO">← VOLTAR</button>
                 <div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, card)}</aside></div>
             </div>`;
@@ -1394,8 +1460,10 @@
         document.querySelectorAll('.pro-item, .pro-subitem').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
         const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
-        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, module)}</aside></div></div>`;
-        document.getElementById('mn').innerHTML = html;
+                let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, module)}</aside></div></div>`;
+        const analysisTarget = document.getElementById('pro-matrix-analysis') || document.getElementById('mn');
+        analysisTarget.innerHTML = html;
+
     }
 
     function renderAllInternalDisciplineMenus() {
@@ -1500,13 +1568,18 @@
         });
     }
 
+    function resetProMatrixAnalysis() {
+        const target = document.getElementById('pro-matrix-analysis');
+        if (target) target.innerHTML = '<div class="pro-matrix-placeholder"><div class="pro-placeholder-content"><span class="pro-placeholder-icon" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.5C18 13.46 20.46 11 23.5 11H54V57H23.5C20.46 57 18 54.54 18 51.5V16.5Z" stroke="currentColor" stroke-width="2.2"/><path d="M18 16.5C18 19.54 20.46 22 23.5 22H54" stroke="currentColor" stroke-width="2.2"/><path d="M27 31H47M27 38H47M27 45H40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M54 11V57" stroke="currentColor" stroke-width="2.2"/><path d="M14 15.5C14 12.46 16.46 10 19.5 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>Seleccione uma subetapa interna da Matriz para abrir a MESA DE ANÁLISE PRO nesta área.</span></div></div>';
+    }
+
     function toggleProModule(module, li, button) {
         document.body.dataset.activeMenu = 'pro';
         document.querySelector('.sidebar').classList.add('pro-active');
         document.querySelectorAll('.pro-item').forEach(item => item.classList.remove('active'));
         button.classList.add('active');
         li.querySelector('.pro-sublist').classList.toggle('open');
-        showProfessionalModule(module, button);
+        resetProMatrixAnalysis();
     }
 
     function ontologyBranch(discipline, open = false) {
