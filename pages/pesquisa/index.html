@@ -307,7 +307,7 @@
 
     <style>
             .owner-login-launch{display:block;margin:0 15px 12px;padding:7px 10px;border:1px solid #536780;border-radius:6px;background:transparent;color:#91a4bd;font-size:9px;font-weight:800;letter-spacing:1px;cursor:pointer}.owner-login-launch:hover{color:#fff;border-color:#1ed760}
-      .owner-access-list{display:grid;gap:9px;margin-top:16px}.owner-access-list .owner-login-demo{width:100%;margin-top:0;text-align:left}
+      .owner-access-list{display:grid;gap:9px;margin-top:16px}.owner-access-list .owner-login-demo{width:100%;margin-top:0;text-align:left}.owner-access-branch{display:block}.owner-coordination-submenu{position:static;margin:8px 0 0;padding-left:12px;border-left:1px solid #35506d;background:rgba(5,10,20,.25)}
 
       .owner-login-overlay{display:none;position:fixed;inset:0;z-index:260;align-items:center;justify-content:center;background:rgba(5,10,20,.78);padding:20px}.owner-login-overlay.open{display:flex}.owner-login-box{width:min(430px,92vw);padding:28px;border:1px solid #35506d;border-radius:12px;background:#111b30;color:#dbe7f5;box-shadow:0 18px 60px rgba(0,0,0,.4)}.owner-login-box h2{margin:14px 0 12px;color:#20d66b;font-size:17px;letter-spacing:1px}.owner-login-box p{line-height:1.6;color:#b8c9dc}.owner-login-box small{display:block;margin-top:14px;color:#91a4bd;line-height:1.45}.owner-login-close{border:1px solid #536780;border-radius:6px;background:transparent;color:#dbe7f5;padding:8px 12px;cursor:pointer}.owner-login-demo{margin-top:16px;border:0;border-radius:7px;background:#20d66b;color:#07151f;padding:11px 14px;font-weight:900;cursor:pointer}
     </style>
@@ -318,27 +318,6 @@
         <nav class="external-menu" aria-label="Menu principal externo">
             <div class="external-menu-heading">MENU PRINCIPAL</div>
             <ul class="external-menu-list">
-                <li>
-                    <button class="external-menu-item" type="button" data-external-item="sistema" aria-expanded="false" aria-controls="external-system-submenu" onclick="toggleSystemMenu(this)">SISTEMA</button>
-                    <ul class="external-submenu" id="external-system-submenu">
-                        <li><button class="external-submenu-item" type="button" data-technical-module="M06">REVISÃO TEOLÓGICA</button></li>
-                        <li><button class="external-submenu-item" type="button" data-technical-module="M11">MÚSICA</button></li>
-                        <li><button class="external-submenu-item" type="button" data-technical-module="SOCIAL ENGINE">CONTEÚDO SOCIAL</button></li>
-                        <li><button class="external-submenu-item" type="button" data-technical-module="SENTINELA">VALIDAÇÃO E SEGURANÇA</button></li>
-                        <li><button class="external-submenu-item" type="button" data-technical-module="PROMPTS">PROMPTS</button></li>
-                        <li>
-                            <button class="external-submenu-category" type="button" aria-expanded="false" aria-controls="external-system-help-submenu" onclick="toggleSystemHelpMenu(this)">AJUDA DO SISTEMA</button>
-                            <ul class="external-submenu" id="external-system-help-submenu">
-                                <li><button class="external-submenu-item" type="button">O que cada função faz</button></li>
-                                <li><button class="external-submenu-item" type="button">Quando utilizar cada função</button></li>
-                                <li><button class="external-submenu-item" type="button">Como as funções trabalham juntas</button></li>
-                                <li><button class="external-submenu-item" type="button">Explicação simples dos módulos técnicos</button></li>
-                                <li><button class="external-submenu-item" type="button">Códigos técnicos M00, M02, M03, M04, M06, M09 e M11</button></li>
-                                <li><button class="external-submenu-item" type="button">O M00 coordena o acionamento dos módulos</button></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
                 <li>
                     <button class="external-menu-item" type="button" data-external-item="mestre" aria-expanded="false" aria-controls="external-master-submenu" onclick="toggleMasterMenu(this)">MESTRE</button>
                     <ul class="external-submenu" id="external-master-submenu">
@@ -613,7 +592,17 @@
             <h2 id="owner-login-title">ENTRAR</h2>
             <p>Aceda às ferramentas internas de produção e operação da plataforma.</p>
             <div class="owner-access-list" aria-label="Ferramentas internas">
-                <button class="owner-login-demo" type="button" data-internal-access="coordenação-do-sistema" onclick="activateOwnerDemo()">COORDENAÇÃO DO SISTEMA</button>
+                <div class="owner-access-branch">
+                    <button class="owner-login-demo" type="button" data-internal-access="coordenação-do-sistema" aria-expanded="false" aria-controls="owner-coordination-submenu" onclick="toggleOwnerCoordination(this)">COORDENAÇÃO DO SISTEMA</button>
+                    <ul class="external-submenu owner-coordination-submenu" id="owner-coordination-submenu">
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M06">REVISÃO TEOLÓGICA</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="M11">MÚSICA</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="SOCIAL ENGINE">CONTEÚDO SOCIAL</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="SENTINELA">VALIDAÇÃO E SEGURANÇA</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="PROMPTS">PROMPTS</button></li>
+                        <li><button class="external-submenu-item" type="button" data-technical-module="AJUDA DO SISTEMA">AJUDA DO SISTEMA</button></li>
+                    </ul>
+                </div>
                 <button class="owner-login-demo" type="button" data-internal-access="escrita">ESCRITA</button>
             </div>
             <small>Os acessos utilizam as funcionalidades internas existentes. A expansão das áreas será definida posteriormente.</small>
@@ -825,8 +814,8 @@
 
     };
 
-    function toggleSystemMenu(button) {
-        const submenu = document.getElementById('external-system-submenu');
+    function toggleOwnerCoordination(button) {
+        const submenu = document.getElementById('owner-coordination-submenu');
         const isOpen = submenu.classList.toggle('open');
         button.setAttribute('aria-expanded', String(isOpen));
     }
