@@ -144,6 +144,11 @@
         .pro-matrix-launch:hover { background: #163451; border-color: #18bfff; }
         .pro-matrix-overlay { display: none; position: fixed; inset: 0; z-index: 130; background: #f1eadb; color: #4a443b; }
         .pro-matrix-overlay.open { display: flex; flex-direction: column; }
+        .nav-history-controls { position: fixed; top: 12px; right: 16px; z-index: 1000; display: flex; gap: 6px; padding: 5px; border: 1px solid rgba(184,156,97,.45); border-radius: 8px; background: rgba(18,27,48,.88); box-shadow: 0 6px 18px rgba(0,0,0,.22); }
+        .nav-history-controls button { min-width: 38px; height: 30px; padding: 0 9px; border: 1px solid #536780; border-radius: 5px; background: #15243b; color: #e8d7ad; font-size: 16px; font-weight: 800; line-height: 1; cursor: pointer; }
+        .nav-history-controls button:hover:not(:disabled) { border-color: #d5b878; background: #263a57; }
+        .nav-history-controls button:disabled { opacity: .35; cursor: not-allowed; }
+        .nav-history-controls button span { margin-left: 3px; font-size: 9px; letter-spacing: .3px; vertical-align: 2px; }
         .pro-matrix-window { display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; background: #f1eadb; }
         .pro-matrix-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 30px; border-bottom: 1px solid #d8cdb8; background: #ebe0cd; }
         .pro-matrix-header h2 { margin: 0; font-size: 19px; letter-spacing: 1px; }
@@ -158,8 +163,7 @@
         .pro-matrix-analysis-pane .pro-analysis-panel { min-height: calc(100vh - 190px); margin-top: 0; }
         .pro-matrix-placeholder { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 190px); padding: 30px; border: 1px dashed #cdbfaa; border-radius: 8px; background: rgba(255,253,247,.68); color: #806f53; text-align: center; line-height: 1.6; }
         .pro-placeholder-content { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 380px; }
-        .pro-placeholder-icon { width: 66px; height: 66px; opacity: .42; color: #b99b61; }
-        .pro-placeholder-icon svg { display: block; width: 100%; height: 100%; }
+        .pro-placeholder-icon { display: block; width: 300px; height: 300px; object-fit: contain; opacity: .92; }
         .pro-matrix-body .pro-menu-box { min-height: 100%; margin: 0; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
         .pro-matrix-body .pro-menu-heading { padding: 0 0 16px; border-bottom: 1px solid #d8cdb8; background: transparent; }
         .pro-matrix-body .pro-menu-heading strong { border-color: #806f53; color: #4a443b; }
@@ -686,7 +690,7 @@
         const body = document.getElementById('pro-matrix-body');
         const box = document.querySelector('#pro-mode .pro-menu-box');
         if (!overlay || !body || !box) return;
-        body.innerHTML = '<div class="pro-matrix-layout"><section class="pro-matrix-list-pane" id="pro-matrix-list-pane"></section><section class="pro-matrix-analysis-pane" id="pro-matrix-analysis"><div class="pro-matrix-placeholder"><div class="pro-placeholder-content"><span class="pro-placeholder-icon" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.5C18 13.46 20.46 11 23.5 11H54V57H23.5C20.46 57 18 54.54 18 51.5V16.5Z" stroke="currentColor" stroke-width="2.2"/><path d="M18 16.5C18 19.54 20.46 22 23.5 22H54" stroke="currentColor" stroke-width="2.2"/><path d="M27 31H47M27 38H47M27 45H40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M54 11V57" stroke="currentColor" stroke-width="2.2"/><path d="M14 15.5C14 12.46 16.46 10 19.5 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>Seleccione uma subetapa interna da Matriz para abrir a MESA DE ANÁLISE PRO nesta área.</span></div></div></section></div>';
+        body.innerHTML = '<div class="pro-matrix-layout"><section class="pro-matrix-list-pane" id="pro-matrix-list-pane"></section><section class="pro-matrix-analysis-pane" id="pro-matrix-analysis"><div class="pro-matrix-placeholder"><div class="pro-placeholder-content"><img class="pro-placeholder-icon" src="pro_placeholder_manuscript.png" alt="Manuscrito antigo" loading="lazy"><span>Seleccione uma subetapa interna da Matriz para abrir a MESA DE ANÁLISE PRO nesta área.</span></div></div></section></div>';
         document.getElementById('pro-matrix-list-pane')?.appendChild(box);
         overlay.classList.add('open');
     }
@@ -1570,7 +1574,7 @@
 
     function resetProMatrixAnalysis() {
         const target = document.getElementById('pro-matrix-analysis');
-        if (target) target.innerHTML = '<div class="pro-matrix-placeholder"><div class="pro-placeholder-content"><span class="pro-placeholder-icon" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.5C18 13.46 20.46 11 23.5 11H54V57H23.5C20.46 57 18 54.54 18 51.5V16.5Z" stroke="currentColor" stroke-width="2.2"/><path d="M18 16.5C18 19.54 20.46 22 23.5 22H54" stroke="currentColor" stroke-width="2.2"/><path d="M27 31H47M27 38H47M27 45H40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M54 11V57" stroke="currentColor" stroke-width="2.2"/><path d="M14 15.5C14 12.46 16.46 10 19.5 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>Seleccione uma subetapa interna da Matriz para abrir a MESA DE ANÁLISE PRO nesta área.</span></div></div>';
+        if (target) target.innerHTML = '<div class="pro-matrix-placeholder"><div class="pro-placeholder-content"><img class="pro-placeholder-icon" src="pro_placeholder_manuscript.png" alt="Manuscrito antigo" loading="lazy"><span>Seleccione uma subetapa interna da Matriz para abrir a MESA DE ANÁLISE PRO nesta área.</span></div></div>';
     }
 
     function toggleProModule(module, li, button) {
@@ -1876,7 +1880,60 @@
             ld.style.display = 'none';
         }
     }
+        function setupNavigationHistory() {
+        const controls = document.createElement('nav');
+        controls.className = 'nav-history-controls';
+        controls.setAttribute('aria-label', 'Navegação entre menus e submenus');
+        controls.innerHTML = '<button type="button" id="nav-history-back" title="Voltar um passo" aria-label="Voltar um passo">←<span>VOLTAR</span></button><button type="button" id="nav-history-forward" title="Avançar um passo" aria-label="Avançar um passo">→<span>AVANÇAR</span></button>';
+        document.body.appendChild(controls);
+        const back = document.getElementById('nav-history-back');
+        const forward = document.getElementById('nav-history-forward');
+        const overlaySelectors = ['#pro-matrix-overlay', '#shelf-overlay', '#bible-overlay', '#owner-login-overlay', '#oracle-overlay'];
+        let historyStack = [];
+        let historyIndex = -1;
+        let restoring = false;
+        function snapshot() {
+            const mn = document.getElementById('mn');
+            const proList = document.getElementById('pro-list');
+            const proAnalysis = document.getElementById('pro-matrix-analysis');
+            return { mn: mn ? mn.innerHTML : '', activeMenu: document.body.dataset.activeMenu || '', sidebarPro: document.querySelector('.sidebar')?.classList.contains('pro-active') || false, proOpen: document.getElementById('pro-matrix-overlay')?.classList.contains('open') || false, proList: proList ? proList.innerHTML : '', proAnalysis: proAnalysis ? proAnalysis.innerHTML : '', overlays: overlaySelectors.map(selector => ({ selector, className: document.querySelector(selector)?.className || '' })) };
+        }
+        function updateButtons() { back.disabled = historyIndex <= 0; forward.disabled = historyIndex < 0 || historyIndex >= historyStack.length - 1; }
+        function record() { if (restoring) return; const state = snapshot(); const previous = historyStack[historyIndex]; if (previous && JSON.stringify(previous) === JSON.stringify(state)) return; historyStack = historyStack.slice(0, historyIndex + 1); historyStack.push(state); historyIndex = historyStack.length - 1; updateButtons(); }
+        function closeScreens() {
+            try { if (document.getElementById('pro-matrix-overlay')?.classList.contains('open')) closeProMatrix(); } catch (e) {}
+            try { if (document.getElementById('shelf-overlay')?.classList.contains('open')) closeShelf(); } catch (e) {}
+            try { if (document.getElementById('bible-overlay')?.classList.contains('open')) closeBibleReader(); } catch (e) {}
+            try { if (document.getElementById('owner-login-overlay')?.classList.contains('open')) closeOwnerLogin(); } catch (e) {}
+        }
+        function restore(state) {
+            if (!state) return;
+            restoring = true;
+            closeScreens();
+            const mn = document.getElementById('mn');
+            if (mn) mn.innerHTML = state.mn;
+            document.body.dataset.activeMenu = state.activeMenu || '';
+            document.querySelector('.sidebar')?.classList.toggle('pro-active', Boolean(state.sidebarPro));
+            if (state.proOpen) {
+                openProMatrix();
+                const proList = document.getElementById('pro-list');
+                const proAnalysis = document.getElementById('pro-matrix-analysis');
+                if (proList && state.proList) proList.innerHTML = state.proList;
+                if (proAnalysis && state.proAnalysis) proAnalysis.innerHTML = state.proAnalysis;
+            }
+            overlaySelectors.forEach(({selector, className}) => { if (selector !== '#pro-matrix-overlay' && selector !== '#shelf-overlay') { const node = document.querySelector(selector); if (node && className) node.className = className; } });
+            if (state.overlays.some(item => item.selector === '#shelf-overlay' && item.className.includes('open'))) { try { openShelf(); } catch (e) {} }
+            restoring = false;
+            updateButtons();
+        }
+        back.addEventListener('click', () => { if (historyIndex > 0) { historyIndex -= 1; restore(historyStack[historyIndex]); } });
+        forward.addEventListener('click', () => { if (historyIndex < historyStack.length - 1) { historyIndex += 1; restore(historyStack[historyIndex]); } });
+        document.addEventListener('click', event => { if (restoring || event.target.closest('.nav-history-controls')) return; if (!event.target.closest('button,[role="button"],summary,.pro-item,.pro-subitem,select')) return; window.setTimeout(record, 0); }, true);
+        record();
+    }
     init();
+    setupNavigationHistory();
+
 </script>
 </body>
 </html>
