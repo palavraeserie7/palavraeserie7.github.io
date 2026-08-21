@@ -1270,7 +1270,39 @@
         '05.12': 'Retorne a {PASSAGEM_ATUAL} e explique como o panorama teológico pode ampliar, esclarecer ou qualificar a compreensão da passagem. Não faça nova exegese, análise de intenção autoral, análise literária ou aplicação pastoral; não altere a leitura textual, gramatical ou lexical estabelecida.'
     };
     function saveM04State() { try { localStorage.setItem('palavraSerieM04State', JSON.stringify(m04State)); } catch (error) {} }
+    let m06State = (() => { try { return JSON.parse(localStorage.getItem('palavraSerieM06State') || '{"results":{}}'); } catch (error) { return { results: {} }; } })();
+    if (!m06State || typeof m06State !== 'object') m06State = { results: {} };
+    if (!m06State.results || typeof m06State.results !== 'object') m06State.results = {};
+    const M06_RULES = {
+        '06.1': 'Para {PASSAGEM_ATUAL}, delimite a unidade com critérios literários e marcadores textuais. Se as evidências não permitirem fronteira precisa, declare a incerteza, a fluidez e as leituras alternativas. Use a leitura de trabalho do Módulo 02 e não reabra variantes.',
+        '06.2': 'Analise o contexto imediato de {PASSAGEM_ATUAL}, explicando como o bloco anterior e o posterior influenciam o fluxo da unidade. Não substitua a análise histórica-cultural completa do Módulo 07.',
+        '06.3': 'Divida esquematicamente as secções literárias internas de {PASSAGEM_ATUAL} em unidades de pensamento. Use os dados sintácticos do Módulo 03 como base estática, sem repetir a análise gramatical.',
+        '06.4': 'Reconstrua estritamente a progressão do discurso, linha de pensamento, fluxo narrativo ou estrutura do poema dentro de {PASSAGEM_ATUAL}. Concentre-se na mecânica interna do texto e não declare directamente o que o autor quis dizer ou a sua intenção externa.',
+        '06.5': 'Posicione {PASSAGEM_ATUAL} no desenvolvimento global do livro, usando evidências internas, estrutura literária e fontes académicas identificáveis. Se houver debate sobre o propósito do livro, apresente as alternativas e não trate uma finalidade global como facto absoluto.',
+        '06.6': 'Identifique o género e subgéneros literários de {PASSAGEM_ATUAL}. Apresente características da linguagem como orientações hermenêuticas flexíveis, sem impor regras rígidas ou classificações artificiais.',
+        '06.7': 'Examine como os versículos de {PASSAGEM_ATUAL} se conectam no plano do discurso, mostrando avanços, tensões e dependências de sentido sem repetir a morfologia ou a sintaxe do Módulo 03.',
+        '06.8': 'Analise como as unidades de pensamento de 06.3 dialogam, mostrando transições, equilíbrio e desenvolvimento das ideias. Não acrescente estrutura ausente no texto.',
+        '06.9': 'Reconstrua a provável intenção comunicativa relativa a {PASSAGEM_ATUAL} apenas com evidências textuais e o contexto histórico estritamente necessário. Não especule sobre estados mentais. Não execute a investigação histórico-cultural completa do Módulo 07.',
+        '06.10': 'Mapeie ambiguidades, tensões e obscuridades literárias ou históricas de {PASSAGEM_ATUAL} que gerem debates exegéticos documentados. Se não houver debates maiores, declare exactamente: “Não foram identificados debates interpretativos maiores documentados para esta passagem.” Não fabrique controvérsias.',
+        '06.11': 'Apresente apenas interpretações documentadas em fontes históricas ou académicas identificáveis para os problemas de 06.10. Não crie correntes hipotéticas nem atribua uma posição sem fonte.',
+        '06.12': 'Exponha as evidências textuais, linguísticas, literárias e históricas que cada interpretação documentada utiliza. Diferencie argumento da fonte, reconstrução e avaliação própria.',
+        '06.13': 'Avalie criticamente as interpretações de 06.12 em relação à leitura textual do Módulo 02 e aos dados dos Módulos 03–05. Apresente coerência, fragilidades, contra-argumentos, limites e grau de segurança. Preserve a pluralidade quando não houver base suficiente para decidir.',
+        '06.14': 'Com base nas etapas anteriores, apresente uma síntese exegética de {PASSAGEM_ATUAL} com sentido mais provável, evidências, alternativas, limites e grau de segurança. Não force certeza sobre a mente do autor nem emita julgamento dogmático de legitimidade teológica. Contexto literário e exegese pertencem ao Módulo 06; contexto histórico-cultural detalhado, política, geografia, sociedade, costumes, arqueologia e fontes extrabíblicas pertencem ao Módulo 07.'
+    };
     function saveM05State() { try { localStorage.setItem('palavraSerieM05State', JSON.stringify(m05State)); } catch (error) {} }
+    function saveM06State() { try { localStorage.setItem('palavraSerieM06State', JSON.stringify(m06State)); } catch (error) {} }
+    function isM06(module, topic = '') { return module === '06 — EXEGESE' || String(topic).startsWith('06.'); }
+    function m06Code(topic) { const match = String(topic).match(/^(06\.\d+)/); return match ? match[1] : ''; }
+    function m06PreviousContext(topic) { return Object.entries(m06State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
+    function getModuleResults(module, topic) {
+        if (isM01(module, topic)) return m01State.results;
+        if (isM02(module, topic)) return m02State.results;
+        if (isM03(module, topic)) return m03State.results;
+        if (isM04(module, topic)) return m04State.results;
+        if (isM05(module, topic)) return m05State.results;
+        if (isM06(module, topic)) return m06State.results;
+        return undefined;
+    }
     function isM05(module, topic = '') { return module === '05 — LÉXICO TEOLÓGICO' || String(topic).startsWith('05.'); }
     function m05Code(topic) { const match = String(topic).match(/^(05\.\d+)/); return match ? match[1] : ''; }
     function m05PreviousContext(topic) { return Object.entries(m05State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
@@ -1519,6 +1551,7 @@
         const m03Mode = isM03(module, topic);
         const m04Mode = isM04(module, topic);
         const m05Mode = isM05(module, topic);
+        const m06Mode = isM06(module, topic);
         const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
         const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); ${(m01Mode ? `submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg})` : `submitResearchPassage(event, ${m01ModuleArg}, ${m01TopicArg})`)}; return false;">
@@ -1543,6 +1576,10 @@
                 <p class="pro-reference-note">A análise utilizará os dados dos Módulos 02–04 e o desenvolvimento teológico acumulado, distinguindo evidência, reconstrução histórica e interpretação.</p>
                 <button type="submit">EXECUTAR SUBETAPA</button>
             </form>`;
+        const m06RunForm = `<form id="m06-run-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); runM06Substep(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
+                <p class="pro-reference-note">A exegese utilizará a leitura do Módulo 02, os dados dos Módulos 03–05 e o contexto literário da passagem. O contexto histórico-cultural detalhado pertence ao Módulo 07.</p>
+                <button type="submit">EXECUTAR SUBETAPA</button>
+            </form>`;
         const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProQuestion(event, '${module}', '${topic}'); return false;">
 
                 <div class="pro-reference-fields">
@@ -1557,14 +1594,14 @@
             </form>`;
         return `<div class="pro-analysis-split">
             <section class="pro-free-panel">
-                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
+                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
-                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.'))))}</div>
+                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : (m06Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Exegese.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')))))}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
+                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : (m06Mode && studyContext ? m06RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
-                </form>`))))}
+                </form>`))))) }
             </section>
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
@@ -1574,11 +1611,12 @@
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode) ? '' : (studyContext ? '' : creationForm)}
+                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode) ? '' : (studyContext ? '' : creationForm)}
                 ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m03Mode && m03State.results[topic] ? `<div class="pro-chat-message system m03-result" id="m03-result">${escapeBibleText(m03State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m04Mode && m04State.results[topic] ? `<div class="pro-chat-message system m04-result" id="m04-result">${escapeBibleText(m04State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m05Mode && m05State.results[topic] ? `<div class="pro-chat-message system m05-result" id="m05-result">${escapeBibleText(m05State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
+                ${m06Mode && m06State.results[topic] ? `<div class="pro-chat-message system m06-result" id="m06-result">${escapeBibleText(m06State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${renderProConversationForm(module, topic)}
             </section>
         </div>`;
@@ -1635,6 +1673,38 @@
         saveM01State();
         showProfessionalModule('01 — TEXTO BÍBLICO', null, topic);
     }
+    async function runM06Substep(event, module, topic) {
+        event.preventDefault();
+        if (!studyContext || !M06_RULES[m06Code(topic)]) return;
+        const form = event.currentTarget;
+        const button = form?.querySelector('button');
+        const messages = document.getElementById('pro-chat-messages');
+        const rule = M06_RULES[m06Code(topic)].replaceAll('{PASSAGEM_ATUAL}', studyContext.referenciaFormatada);
+        const previousM02 = Object.entries(m02State.results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n');
+        const previousM03 = Object.entries(m03State.results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n');
+        const previousM04 = Object.entries(m04State.results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n');
+        const previousM05 = Object.entries(m05State.results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n');
+        const previousM06 = m06PreviousContext(topic);
+        const loading = document.createElement('div');
+        loading.className = 'pro-chat-message system';
+        loading.textContent = `A executar ${topic} sobre ${studyContext.referenciaFormatada}...`;
+        messages?.appendChild(loading);
+        if (button) button.disabled = true;
+        const question = `Passagem actual: ${studyContext.referenciaFormatada}\\nSubetapa: ${topic}\\nRegra interna: ${rule}\\nLeitura e dados do Módulo 02:\\n${previousM02 || 'Nenhum resultado disponível.'}\\nDados gramaticais do Módulo 03:\\n${previousM03 || 'Nenhum resultado disponível.'}\\nDados lexicais do Módulo 04:\\n${previousM04 || 'Nenhum resultado disponível.'}\\nDados teológicos do Módulo 05:\\n${previousM05 || 'Nenhum resultado disponível.'}\\nResultados anteriores do Módulo 06:\\n${previousM06 || 'Nenhum resultado anterior disponível.'}\\nExecute somente esta subetapa. Diferencie DADO TEXTUAL, FONTE, INFERÊNCIA, INTERPRETAÇÃO e CONCLUSÃO. Use linguagem de plausibilidade e grau de segurança. Não invente debates, correntes, fontes ou citações. Se não houver debates interpretativos maiores documentados, declare exactamente: “Não foram identificados debates interpretativos maiores documentados para esta passagem.” Preserve interpretações concorrentes quando não houver base suficiente para decidir. Não reabra os Módulos 02–05 e não execute a investigação histórico-cultural completa do Módulo 07.`;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, topic, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — MÓDULO 06', module: '06 — EXEGESE', studyContext, m02State, m03State, m04State, m05State, previousResults: m06State.results, accessLevel: 'pro' }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A consulta não pôde ser concluída.');
+            m06State.results[topic] = data.text || data.answer || data.response || data.result || 'A consulta foi processada, mas não devolveu texto.';
+        } catch (error) {
+            m06State.results[topic] = `Não foi possível concluir ${topic} agora. ${error.message || 'Tente novamente mais tarde.'}`;
+        }
+        m06State.passage = studyContext.passage;
+        m06State.activeTopic = topic;
+        saveM06State();
+        showProfessionalModule('06 — EXEGESE', null, topic);
+    }
+
     async function runM05Substep(event, module, topic) {
         event.preventDefault();
         if (!studyContext || !M05_RULES[m05Code(topic)]) return;
@@ -1823,7 +1893,7 @@
             const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, m01State: isM01(module, topic) ? m01State : undefined, m02State: isM02(module, topic) || isM03(module, topic) ? m02State : undefined, m03State: isM03(module, topic) || isM04(module, topic) ? m03State : undefined, m04State: isM04(module, topic) || isM05(module, topic) ? m04State : undefined, m05State: isM05(module, topic) ? m05State : undefined, previousResults: isM01(module, topic) ? m01State.results : (isM02(module, topic) ? m02State.results : (isM03(module, topic) ? m03State.results : (isM04(module, topic) ? m04State.results : (isM05(module, topic) ? m05State.results : undefined)))), discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
+                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, m01State: isM01(module, topic) ? m01State : undefined, m02State: isM02(module, topic) || isM03(module, topic) ? m02State : undefined, m03State: isM03(module, topic) || isM04(module, topic) ? m03State : undefined, m04State: isM04(module, topic) || isM05(module, topic) ? m04State : undefined, m05State: isM05(module, topic) || isM06(module, topic) ? m05State : undefined, m06State: isM06(module, topic) ? m06State : undefined, previousResults: getModuleResults(module, topic), discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Não foi possível responder à mensagem.');
