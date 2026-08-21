@@ -221,10 +221,12 @@
         .pro-matrix-body .pro-menu-heading span { color: #806f53; }
         .pro-matrix-body .pro-list { overflow: visible; padding: 16px 0; }
         @media (max-width: 1000px) { .pro-matrix-layout { grid-template-columns: 1fr; height: auto; overflow-y: auto; } .pro-matrix-list-pane, .pro-matrix-analysis-pane { min-height: 520px; } }
-        .pro-matrix-body .pro-item { padding: 12px 14px; border: 1px solid #d8cdb8; background: #ebe0cd; color: #4a443b; }
+                .pro-matrix-body .pro-item { display:flex; align-items:center; width:100%; min-height:46px; box-sizing:border-box; padding:12px 14px; border:1px solid #d8cdb8; border-radius:6px; background:#ebe0cd; color:#4a443b; text-align:left; line-height:1.25; }
+
         .pro-matrix-body .pro-item:hover, .pro-matrix-body .pro-item.active { border-color: #b99b61; background: #e4d7c0; color: #30291f; box-shadow: none; }
         .pro-matrix-body .pro-sublist { border-left-color: #cdbfaa; }
-        .pro-matrix-body .pro-subitem { color: #6d5d45; background: #fffdf7; }
+                .pro-matrix-body .pro-subitem { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:40px; box-sizing:border-box; color:#6d5d45; background:#fffdf7; }
+
         .pro-matrix-body .pro-subitem:hover, .pro-matrix-body .pro-subitem.active { background: #f5eddf; color: #4a443b; }
         .sermons-screen-paper { min-height: 100%; padding: 32px 40px 50px; background: #f1eadb; color: #4a443b; }
         .sermons-screen-paper h1 { margin: 0 0 24px; font-size: 24px; letter-spacing: 1px; }
@@ -2000,7 +2002,7 @@
                 <p class="pro-chat-intro">Módulo: <strong>${escapeBibleText(module)}</strong><br>Subetapa seleccionada: <strong>${escapeBibleText(topic)}</strong>.</p>
                 ${renderStudyContextPanel(module, topic)}
                 <div class="pro-chat-messages" id="pro-chat-messages">
-                    <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
+                    <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Seleccione Livro, Capítulo e Versículo para iniciar a análise.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
                                 ${studyContext ? '' : creationForm}
@@ -2718,11 +2720,17 @@
                         <h2>${escapeBibleText(card)}</h2>
                         <p>Escreva aqui o conteúdo da sua pesquisa. A folha é independente do Chat e fica associada a esta etapa.</p>
                         <textarea id="pro-work-note" placeholder="Registe aqui dados, fontes, observações e conclusões..." oninput="saveProWorkNote(${JSON.stringify(module)}, ${JSON.stringify(card)}, this)">${escapeBibleText(savedNote)}</textarea>
-                        <button type="button" onclick="saveProWorkNote(${JSON.stringify(module)}, ${JSON.stringify(card)}, document.getElementById('pro-work-note')); this.textContent='GUARDADO'; setTimeout(() => this.textContent='GUARDAR', 1200);">GUARDAR</button>
+                        <button type="button" id="pro-work-note-save">GUARDAR</button>
                     </section>
                     <aside class="pro-analysis-panel">${renderProChat(module, card)}</aside>
                 </div>
             </div>`;
+        const saveButton = analysisTarget.querySelector('#pro-work-note-save');
+        if (saveButton) saveButton.addEventListener('click', () => {
+            saveProWorkNote(module, card, analysisTarget.querySelector('#pro-work-note'));
+            saveButton.textContent = 'GUARDADO';
+            setTimeout(() => { saveButton.textContent = 'GUARDAR'; }, 1200);
+        });
         if (module === '01 — TEXTO BÍBLICO' && studyContext) runM01Substep(card);
     }
 
