@@ -1499,7 +1499,7 @@
         const m04Mode = isM04(module, topic);
         const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
-        const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
+        const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); ${(m01Mode ? `submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg})` : `submitResearchPassage(event, ${m01ModuleArg}, ${m01TopicArg})`)}; return false;">
                 <label for="m01-passage-input">PASSAGEM BÍBLICA</label>
                 <input id="m01-passage-input" type="text" placeholder="Ex.: Gênesis 1:1-2" value="${escapeBibleText(studyContext?.referenciaFormatada || '')}" required>
                 <p class="pro-reference-note">Informe a passagem uma única vez. Ela será mantida como ESTUDO ATUAL nas próximas subetapas.</p>
@@ -1531,11 +1531,11 @@
             </form>`;
         return `<div class="pro-analysis-split">
             <section class="pro-free-panel">
-                <div class="pro-free-kicker">${m01Mode ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
+                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
-                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A subetapa utilizará o ESTUDO ACTUAL e o histórico relevante da Crítica Textual.' : (m03Mode ? 'A análise utilizará a leitura de trabalho estabelecida pelos módulos anteriores.' : (m04Mode ? 'A análise utilizará o texto de trabalho e os dados linguísticos disponíveis.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')))}</div>
+                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')))}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${m01Mode ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
+                ${(m01Mode || m02Mode || m03Mode || m04Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
                 </form>`)))}
@@ -1548,7 +1548,7 @@
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                ${m01Mode || (m02Mode && studyContext) || (m03Mode && studyContext) || (m04Mode && studyContext) ? '' : (studyContext ? '' : creationForm)}
+                ${(m01Mode || m02Mode || m03Mode || m04Mode) ? '' : (studyContext ? '' : creationForm)}
                 ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m03Mode && m03State.results[topic] ? `<div class="pro-chat-message system m03-result" id="m03-result">${escapeBibleText(m03State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m04Mode && m04State.results[topic] ? `<div class="pro-chat-message system m04-result" id="m04-result">${escapeBibleText(m04State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
@@ -1569,6 +1569,21 @@
         showProfessionalModule(module, null, topic);
         await runM01Substep(topic);
     }
+    async function submitResearchPassage(event, module, topic) {
+        event.preventDefault();
+        const input = event.currentTarget.querySelector('#m01-passage-input');
+        const passage = input?.value.trim() || '';
+        if (!passage) return;
+        studyContext = { referenciaFormatada: passage, passage, escopo: 'passagem informada no chat', source: module };
+        try { localStorage.setItem('palavraSerieStudyContext', JSON.stringify(studyContext)); } catch (error) {}
+        m01State = { passage, results: {}, activeTopic: '' };
+        saveM01State();
+        showProfessionalModule(module, null, topic);
+        if (isM02(module, topic)) await runM02Substep({ preventDefault() {}, currentTarget: document.querySelector('#m02-run-form') }, module, topic);
+        else if (isM03(module, topic)) await runM03Substep({ preventDefault() {}, currentTarget: document.querySelector('#m03-run-form') }, module, topic);
+        else if (isM04(module, topic)) await runM04Substep({ preventDefault() {}, currentTarget: document.querySelector('#m04-run-form') }, module, topic);
+    }
+
     async function runM01Substep(topic) {
         const code = m01Code(topic);
         const rule = M01_RULES[code];
