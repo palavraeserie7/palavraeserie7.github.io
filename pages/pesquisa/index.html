@@ -476,6 +476,36 @@
       body[data-active-menu]:not([data-active-menu=""]) .main { background-image: none; }
       @media (max-width: 700px) { .main { background-position: center center; } }
     </style>
+<style>
+        .writing-workspace { display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:20px; min-height:calc(100vh - 145px); padding:34px; background:#0b1428; }
+        .writing-research-panel { min-width:0; padding:26px; border:1px solid #263754; border-radius:12px; background:#111b30; box-shadow:0 8px 24px rgba(0,0,0,.22); }
+        .writing-research-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid #263754; }
+        .writing-research-header h1 { margin:0; color:#20d66b; font-size:24px; letter-spacing:1px; }
+        .writing-research-header p { margin:7px 0 0; color:#91a4bd; font-size:12px; line-height:1.5; }
+        .writing-area-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+        .writing-area-card { display:flex; flex-direction:column; align-items:flex-start; min-height:108px; padding:16px; border:1px solid #35506d; border-radius:8px; background:#0d1b31; color:#dbe7f5; text-align:left; cursor:pointer; transition:.2s; }
+        .writing-area-card:hover,.writing-area-card:focus-visible { border-color:#20d66b; background:#14263e; transform:translateY(-2px); outline:none; }
+        .writing-area-card strong { color:#20d66b; font-size:11px; letter-spacing:.7px; line-height:1.35; }
+        .writing-area-card span { margin-top:8px; color:#9fb2c8; font-size:11px; line-height:1.45; }
+        .writing-chat-panel { display:flex; flex-direction:column; min-width:0; min-height:520px; border:1px solid #263754; border-radius:12px; background:#111b30; box-shadow:0 8px 24px rgba(0,0,0,.22); overflow:hidden; }
+        .writing-chat-header { padding:20px; border-bottom:1px solid #263754; background:#17243a; }
+        .writing-chat-header h2 { margin:0; color:#20d66b; font-size:15px; letter-spacing:1px; }
+        .writing-chat-header p { margin:7px 0 0; color:#91a4bd; font-size:11px; line-height:1.45; }
+        .writing-chat-messages { flex:1; min-height:220px; overflow-y:auto; padding:18px; }
+        .writing-chat-message { margin:0 0 10px; padding:10px 12px; border-radius:7px; color:#dbe7f5; font-size:11px; line-height:1.5; white-space:pre-wrap; }
+        .writing-chat-message.system { background:#17243a; }
+        .writing-chat-message.user { margin-left:12%; background:#263754; }
+        .writing-chat-form { display:flex; flex-direction:column; gap:8px; padding:14px; border-top:1px solid #263754; }
+        .writing-chat-form textarea { min-height:80px; resize:vertical; padding:10px; border:1px solid #344762; border-radius:6px; background:#0d172b; color:#dbe7f5; font:inherit; font-size:11px; }
+        .writing-chat-form textarea:focus { outline:none; border-color:#20d66b; box-shadow:0 0 0 2px rgba(32,214,107,.14); }
+        .writing-chat-form button { align-self:flex-end; min-height:36px; padding:0 16px; border:0; border-radius:6px; background:#20d66b; color:#07151f; font-weight:900; cursor:pointer; }
+        .writing-chat-form button:hover { background:#19b85a; }
+        .writing-demo-note { margin-top:18px; padding:10px 12px; border-left:3px solid #806f53; background:rgba(128,111,83,.12); color:#a9bbcf; font-size:10px; line-height:1.5; }
+        @media (max-width:900px) { .writing-workspace { grid-template-columns:1fr; padding:20px; } .writing-chat-panel { min-height:420px; } }
+        @media (max-width:560px) { .writing-area-grid { grid-template-columns:1fr; } .writing-research-header { flex-direction:column; } }
+        body.writing-session .sidebar-header > * { display:none !important; }
+        body.writing-session .sidebar-header > .pro-matrix-launch { display:block !important; grid-row:1 !important; grid-column:1 / -1 !important; width:100% !important; max-width:none !important; margin:0 !important; }
+    </style>
 </head>
 
 <body>
@@ -675,7 +705,7 @@
                         <li><button class="external-submenu-item" type="button" data-technical-module="AJUDA DO SISTEMA">AJUDA DO SISTEMA</button></li>
                     </ul>
                 </div>
-                <button class="owner-login-demo" type="button" data-internal-access="escrita">ESCRITA</button>
+                <button class="owner-login-demo" type="button" data-internal-access="escrita" onclick="openWritingWorkspace()">ESCRITA</button>
             </div>
             <small id="owner-login-note">Esta tela é apenas uma representação visual. Nenhuma credencial é validada, enviada ou armazenada nesta versão.</small>
         </div>
@@ -736,6 +766,7 @@
 
     let activeShelfSection = 'free';
     let ownerSession = false;
+    let writingReturnTarget = false;
 
     const SHELF_BOOKS = {
         free: [
@@ -935,6 +966,55 @@
 
     };
 
+    function openWritingWorkspace() {
+        closeOwnerLogin();
+        document.body.dataset.activeMenu = 'writing';
+        document.body.classList.add('writing-session');
+        document.querySelector('.sidebar')?.classList.remove('pro-active');
+        const main = document.getElementById('mn');
+        if (!main) return;
+        main.innerHTML = `<div class="writing-workspace writing-chat-only"><section class="writing-research-panel"><button class="back-arrow" onclick="returnToWritingAccess()" title="Voltar para a área interna">← VOLTAR</button><header class="writing-research-header"><div><h1>ESCRITA</h1><p>Espaço interno de apoio à produção de conteúdos.</p></div></header></section><aside class="writing-chat-panel" aria-label="Chat de escrita"><header class="writing-chat-header"><h2>CHAT DE ESCRITA</h2><p>Organize ideias, perguntas e próximos passos desta produção.</p></header><div class="writing-chat-messages" id="writing-chat-messages"><div class="writing-chat-message system">Estou pronto para ajudar a organizar a sua escrita. Escreva uma orientação para começar.</div></div><form class="writing-chat-form" onsubmit="return submitWritingChat(event)"><textarea id="writing-chat-input" placeholder="Escreva aqui a sua orientação..." aria-label="Mensagem do chat de escrita"></textarea><button type="submit">ENVIAR</button></form></aside></div>`;
+    }
+
+    function returnToWritingAccess() {
+        const overlay = document.getElementById('owner-login-overlay');
+        const accessList = overlay?.querySelector('.owner-access-list');
+        const form = document.getElementById('owner-login-form');
+        const submenu = document.getElementById('owner-coordination-submenu');
+        const coordinationButton = overlay?.querySelector('[aria-controls="owner-coordination-submenu"]');
+        const note = document.getElementById('owner-login-note');
+        if (!overlay || !accessList) return;
+        document.body.dataset.activeMenu = 'owner-access';
+        document.body.classList.add('writing-session');
+        ownerSession = true;
+        overlay.classList.add('open');
+        if (form) form.hidden = true;
+        accessList.hidden = false;
+        document.getElementById('owner-login-close')?.setAttribute('hidden', 'hidden');
+        document.getElementById('owner-login-back')?.classList.add('visible');
+        submenu?.classList.remove('open');
+        coordinationButton?.setAttribute('aria-expanded', 'false');
+        if (note) note.textContent = 'Área interna de demonstração. Os recursos públicos serão abertos pelas funções existentes do site.';
+    }
+
+    function submitWritingChat(event) {
+        event?.preventDefault();
+        const input = document.getElementById('writing-chat-input');
+        const messages = document.getElementById('writing-chat-messages');
+        const text = input?.value.trim();
+        if (!text || !messages) return false;
+        const userMessage = document.createElement('div');
+        userMessage.className = 'writing-chat-message user';
+        userMessage.textContent = text;
+        const systemMessage = document.createElement('div');
+        systemMessage.className = 'writing-chat-message system';
+        systemMessage.textContent = 'Orientação registada nesta demonstração visual. A ligação deste chat à IA será feita numa etapa separada.';
+        messages.append(userMessage, systemMessage);
+        input.value = '';
+        messages.scrollTop = messages.scrollHeight;
+        return false;
+    }
+
     function toggleOwnerCoordination(button) {
         const submenu = document.getElementById('owner-coordination-submenu');
         const isOpen = submenu.classList.toggle('open');
@@ -953,6 +1033,24 @@
         button.setAttribute('aria-expanded', String(isOpen));
     }
 
+    function openWritingTool(tool) {
+        writingReturnTarget = true;
+        if (tool === 'oracle') openOracleChat();
+        else if (tool === 'pro') openProMatrix();
+        else if (tool === 'bible') openBibleReader();
+        else if (tool === 'theology') showOntologyRoot();
+        else if (tool === 'sermons') openSermonsScreen();
+    }
+
+    function returnFromOracle() {
+        if (writingReturnTarget) {
+            writingReturnTarget = false;
+            openWritingWorkspace();
+            return;
+        }
+        showOntologyRoot();
+    }
+
     function togglePonteMenu(button) {
         const submenu = document.getElementById('external-bridge-submenu');
         const isOpen = submenu.classList.toggle('open');
@@ -964,7 +1062,7 @@
         const main = document.getElementById('mn');
         if (!main) return;
         main.innerHTML = `<div class="content">
-            <button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para a árvore principal">← VOLTAR</button>
+                        <button class="back-arrow" onclick="returnFromOracle()" title="Voltar para a tela anterior">← VOLTAR</button>
             <section class="ai-chat-panel oracle-chat-panel" aria-label="Chat do Oráculo">
                 <header class="ai-chat-header">
                     <h3>CHAT DO ORÁCULO</h3>
@@ -2788,6 +2886,10 @@
 
     function closeOwnerLogin() {
         document.getElementById('owner-login-overlay')?.classList.remove('open');
+        if (document.body.dataset.activeMenu === 'owner-access') {
+            document.body.classList.remove('writing-session');
+            document.body.dataset.activeMenu = '';
+        }
     }
 
     function returnToOwnerLogin() {
