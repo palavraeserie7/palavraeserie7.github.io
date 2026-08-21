@@ -1193,7 +1193,28 @@
         '01.10': 'Identifique preliminarmente as palavras, formas e construções do texto original que merecem atenção para a continuidade da investigação. Pode indicar termos relevantes, formas importantes, construções significativas, características que uma tradução portuguesa pode ocultar e diferenças linguísticas relevantes entre tradições textuais. Não execute a investigação lexical completa do Módulo 04 nem a análise gramatical completa do Módulo 03. Responda à pergunta: “Quais palavras e construções do texto original precisam ser observadas?” Não transforme hipótese em facto e não apresente conclusão de texto-base nesta etapa.',
         '01.11': 'Estabeleça um texto-base operacional e provisório para a continuidade da pesquisa, utilizando os dados textuais relevantes já levantados no Módulo 01. Não apresente esta etapa como a determinação textual definitiva e não substitua o 02.12 — Determinação textual do Módulo 02. Separe claramente: DADOS DISPONÍVEIS, AVALIAÇÃO PROVISÓRIA, GRAU DE SEGURANÇA e INCERTEZAS. A etapa actual pode confirmar, qualificar ou corrigir resultados anteriores. Se as evidências não permitirem uma determinação segura, declare a incerteza. Não procure novidade artificial; se não houver observação nova ou relevante, informe isso.'
     };
+    let m02State = (() => { try { return JSON.parse(localStorage.getItem('palavraSerieM02State') || '{"results":{}}'); } catch (error) { return { results: {} }; } })();
+    if (!m02State || typeof m02State !== 'object') m02State = { results: {} };
+    if (!m02State.results || typeof m02State.results !== 'object') m02State.results = {};
+    const M02_RULES = {
+        '02.1': 'Com base no texto-base operacional de 01.11 e nos dados do Módulo 01, identifique apenas variantes textuais efectivamente documentadas para a passagem actual. Diferencie variante textual de diferença de tradução, ortografia ou estilo. Isole as palavras ou expressões concorrentes. Se não houver variante textual relevante documentada, declare exactamente: “Não foram identificadas variantes textuais relevantes documentadas para esta passagem.” Nesse caso, marque as etapas dependentes como não aplicáveis, sem inventar dados.',
+        '02.2': 'Com base nas variantes documentadas em 02.1, localize cada divergência com precisão: versículo, palavra ou expressão, posição na frase, função no contexto imediato, leitura do texto-base e leituras concorrentes. Se 02.1 não identificou variante relevante, declare esta etapa não aplicável.',
+        '02.3': 'Para cada variante identificada, apresente as principais testemunhas textuais documentadas que sustentam cada leitura concorrente. Diferencie manuscritos hebraicos, gregos, versões antigas e outras testemunhas. Não apresente uma lista como exaustiva se os dados disponíveis não permitirem garantir exaustividade. Se não houver variante documentada, declare não aplicável.',
+        '02.4': 'Aprofunde 02.3 identificando, apenas quando documentados, manuscritos, códices, fragmentos, versões e siglas técnicas associados a cada leitura. Não atribua uma leitura a um manuscrito sem evidência documental suficiente. Se não houver variante documentada, declare não aplicável.',
+        '02.5': 'Avalie as evidências externas para cada variante documentada, considerando antiguidade, distribuição geográfica, independência, relações genealógicas quando conhecidas e características das tradições. Não trate a testemunha mais antiga como automaticamente superior; compare pontos fortes e limitações de cada lado.',
+        '02.6': 'Avalie as evidências internas para cada variante documentada. Considere, quando pertinentes, lectio difficilior, lectio brevior, harmonização, simplificação, expansão, correcção gramatical, assimilação e erros de cópia. Não aplique critérios como regras automáticas; explique por que favorecem ou desfavorecem cada leitura.',
+        '02.7': 'Coloque lado a lado todas as leituras concorrentes documentadas. Compare exactamente as palavras e expressões divergentes e explique o efeito sobre estrutura, sentido, gramática e fluxo. Diferencie alterações de significado de diferenças linguísticas ou estilísticas.',
+        '02.8': 'Com base exclusivamente nas evidências documentadas nas etapas anteriores, componha um aparato crítico simplificado. Apresente a leitura adoptada, as principais testemunhas e as leituras concorrentes com respectivas testemunhas. Se os dados não permitirem aparato completo, declare a limitação em vez de preencher lacunas por inferência.',
+        '02.9': 'Pondere conjuntamente as evidências externas e internas. Avalie qual leitura possui o conjunto de evidências mais favorável à reconstrução provável da forma textual mais antiga alcançável. Apresente argumentos favoráveis, contrários, limitações e grau de segurança alto, moderado ou baixo. Não apresente reconstrução provável como certeza absoluta.',
+        '02.10': 'Demonstre como cada leitura documentada afectaria a tradução para português. Apresente as traduções correspondentes e destaque exactamente as palavras ou construções responsáveis pela diferença. Não introduza diferenças interpretativas que não decorram da variante textual.',
+        '02.11': 'Analise o impacto exegético, histórico e teológico das variantes documentadas. Explique se a diferença altera o sentido, uma afirmação histórica, uma referência profética, uma construção teológica ou apenas uma nuance linguística. Diferencie o que é alterado do que permanece igual e não atribua consequências doutrinárias sem demonstração textual.',
+        '02.12': 'Com base no histórico do Módulo 02, apresente a determinação textual final. Separe factos documentados, evidências externas, evidências internas, argumentos contrários e conclusão crítica. Indique grau de segurança alto, moderado ou baixo. Se não houver evidência suficiente, não force uma leitura: apresente alternativas, grau baixo e a razão da incerteza. A leitura determinada será texto de trabalho para etapas posteriores.'
+    };
     function saveM01State() { try { localStorage.setItem('palavraSerieM01State', JSON.stringify(m01State)); } catch (error) {} }
+    function saveM02State() { try { localStorage.setItem('palavraSerieM02State', JSON.stringify(m02State)); } catch (error) {} }
+    function isM02(module, topic = '') { return module === '02 — CRÍTICA TEXTUAL' || String(topic).startsWith('02.'); }
+    function m02Code(topic) { const match = String(topic).match(/^(02\.\d+)/); return match ? match[1] : ''; }
+    function m02PreviousContext(topic) { return Object.entries(m02State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
     function isM01(module, topic = '') { return module === '01 — TEXTO BÍBLICO' || String(topic).startsWith('01.'); }
     function m01Code(topic) { const match = String(topic).match(/^(01\.\d+)/); return match ? match[1] : ''; }
     function m01PreviousContext(topic) { return Object.entries(m01State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
@@ -1426,6 +1447,7 @@
     function renderProChat(module, topic = module) {
         const bookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}">${escapeBibleText(book)}</option>`)].join('');
                 const m01Mode = isM01(module, topic);
+        const m02Mode = isM02(module, topic);
         const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
         const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
@@ -1433,6 +1455,10 @@
                 <input id="m01-passage-input" type="text" placeholder="Ex.: Gênesis 1:1-2" value="${escapeBibleText(studyContext?.referenciaFormatada || '')}" required>
                 <p class="pro-reference-note">Informe a passagem uma única vez. Ela será mantida como ESTUDO ATUAL nas próximas subetapas.</p>
                 <button type="submit">EXAMINAR</button>
+            </form>`;
+        const m02RunForm = `<form id="m02-run-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); runM02Substep(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
+                <p class="pro-reference-note">A subetapa utilizará o ESTUDO ACTUAL e os resultados anteriores do Módulo 02. Resultados anteriores são dados provisórios e podem ser corrigidos.</p>
+                <button type="submit">EXECUTAR SUBETAPA</button>
             </form>`;
         const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProQuestion(event, '${module}', '${topic}'); return false;">
 
@@ -1450,12 +1476,12 @@
             <section class="pro-free-panel">
                 <div class="pro-free-kicker">${m01Mode ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
-                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.'}</div>
+                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A subetapa utilizará o ESTUDO ACTUAL e o histórico relevante da Crítica Textual.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${m01Mode ? m01PassageForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
+                ${m01Mode ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
-                </form>`}
+                </form>`)}
             </section>
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
@@ -1465,7 +1491,8 @@
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                ${m01Mode ? '' : (studyContext ? '' : creationForm)}
+                ${m01Mode || (m02Mode && studyContext) ? '' : (studyContext ? '' : creationForm)}
+                ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${renderProConversationForm(module, topic)}
             </section>
         </div>`;
@@ -1507,6 +1534,35 @@
         saveM01State();
         showProfessionalModule('01 — TEXTO BÍBLICO', null, topic);
     }
+    async function runM02Substep(event, module, topic) {
+        event.preventDefault();
+        if (!studyContext || !M02_RULES[m02Code(topic)]) return;
+        const form = event.currentTarget;
+        const button = form?.querySelector('button');
+        const messages = document.getElementById('pro-chat-messages');
+        const rule = M02_RULES[m02Code(topic)];
+        const previousM01 = Object.entries(m01State.results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n');
+        const previousM02 = m02PreviousContext(topic);
+        const loading = document.createElement('div');
+        loading.className = 'pro-chat-message system';
+        loading.textContent = `A executar ${topic} sobre ${studyContext.referenciaFormatada}...`;
+        messages?.appendChild(loading);
+        if (button) button.disabled = true;
+        const question = `Passagem actual: ${studyContext.referenciaFormatada}\\nSubetapa: ${topic}\\nRegra interna: ${rule}\\nDados relevantes do Módulo 01:\\n${previousM01 || 'Nenhum resultado disponível.'}\\nResultados anteriores do Módulo 02:\\n${previousM02 || 'Nenhum resultado anterior disponível.'}\\nExecute somente esta subetapa. Trate resultados anteriores como dados provisórios. Distinga DADO, OBSERVAÇÃO, HIPÓTESE, INTERPRETAÇÃO e CONCLUSÃO. Não invente variantes, manuscritos, testemunhas ou evidências. Declare incertezas e marque como não aplicável quando não houver variante documentada.`;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, topic, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — MÓDULO 02', module: '02 — CRÍTICA TEXTUAL', studyContext, m01State, previousResults: m02State.results, accessLevel: 'pro' }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A consulta não pôde ser concluída.');
+            m02State.results[topic] = data.text || data.answer || data.response || data.result || 'A consulta foi processada, mas não devolveu texto.';
+        } catch (error) {
+            m02State.results[topic] = `Não foi possível concluir ${topic} agora. ${error.message || 'Tente novamente mais tarde.'}`;
+        }
+        m02State.passage = studyContext.passage;
+        m02State.activeTopic = topic;
+        saveM02State();
+        showProfessionalModule('02 — CRÍTICA TEXTUAL', null, topic);
+    }
+
     async function sendProFreeQuestion(event, module, topic) {
         event.preventDefault();
         const input = event.currentTarget.querySelector('#pro-free-input');
@@ -1575,7 +1631,7 @@
             const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, m01State: isM01(module, topic) ? m01State : undefined, previousResults: isM01(module, topic) ? m01State.results : undefined, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
+                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, m01State: isM01(module, topic) ? m01State : undefined, m02State: isM02(module, topic) ? m02State : undefined, previousResults: isM01(module, topic) ? m01State.results : (isM02(module, topic) ? m02State.results : undefined), discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Não foi possível responder à mensagem.');
