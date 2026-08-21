@@ -1211,7 +1211,32 @@
         '02.12': 'Com base no histórico do Módulo 02, apresente a determinação textual final. Separe factos documentados, evidências externas, evidências internas, argumentos contrários e conclusão crítica. Indique grau de segurança alto, moderado ou baixo. Se não houver evidência suficiente, não force uma leitura: apresente alternativas, grau baixo e a razão da incerteza. A leitura determinada será texto de trabalho para etapas posteriores.'
     };
     function saveM01State() { try { localStorage.setItem('palavraSerieM01State', JSON.stringify(m01State)); } catch (error) {} }
+    let m03State = (() => { try { return JSON.parse(localStorage.getItem('palavraSerieM03State') || '{"results":{}}'); } catch (error) { return { results: {} }; } })();
+    if (!m03State || typeof m03State !== 'object') m03State = { results: {} };
+    if (!m03State.results || typeof m03State.results !== 'object') m03State.results = {};
+    const M03_RULES = {
+        '03.1': 'Analise exclusivamente a organização estrutural da frase e das orações do texto de trabalho de {PASSAGEM_ATUAL}. Identifique a construção sintáctica predominante e a disposição das unidades sintácticas. Distinga estrutura da frase de análise literária ampla. Não analise género, argumento literário, intenção comunicativa, crítica textual, variantes ou exegese.',
+        '03.2': 'Forneça a análise morfológica das formas efectivamente presentes no texto de trabalho de {PASSAGEM_ATUAL}. Para cada forma relevante, apresente classe morfológica e características pertinentes: no hebraico, género, número, estado, pessoa e forma verbal; no grego, género, número, caso, pessoa, tempo, aspecto, modo e voz, quando aplicáveis. Não substitua a análise por categorias da língua portuguesa e não invente formas.',
+        '03.3': 'Para cada palavra relevante de {PASSAGEM_ATUAL}, apresente a forma flexionada efectivamente presente e o lema correspondente. Informe raiz consonantal hebraica ou formação lexical grega apenas quando puder ser determinada com segurança. Mostre a relação forma–lema sem desenvolver investigação lexical completa, campo semântico ou usos no Módulo 04.',
+        '03.4': 'Classifique as formas efectivamente presentes em {PASSAGEM_ATUAL} segundo a sua categoria e função gramatical no contexto: substantivo, verbo, adjectivo, pronome, preposição, artigo, partícula, conjunção, advérbio ou outra categoria aplicável. Não repita apenas a flexão morfológica de 03.2 e não atribua categorias ausentes.',
+        '03.5': 'Identifique o sujeito gramatical de cada oração em {PASSAGEM_ATUAL}, explícito, implícito ou recuperável pela forma verbal. Indique núcleo, modificadores e concordância. Se não houver sujeito expresso ou houver ambiguidade linguística real, declare-a.',
+        '03.6': 'Isole e analise o predicado de cada oração de {PASSAGEM_ATUAL}. Identifique o núcleo verbal ou nominal e os elementos que o completam ou modificam. Utilize categorias compatíveis com hebraico ou grego e não imponha a gramática portuguesa.',
+        '03.7': 'Identifique os complementos exigidos ou relacionados aos verbos de {PASSAGEM_ATUAL}. Distinga objecto directo, indirecto, complemento verbal ou outra função pertinente segundo a língua. No hebraico, trate אֵת (ʾet) como marcador de objecto definido quando aplicável, não como caso acusativo grego. Não classifique circunstanciais automaticamente como objectos.',
+        '03.8': 'Faça apenas o inventário das formas verbais efectivamente presentes em {PASSAGEM_ATUAL}, indicando lema, forma morfológica, transitividade quando determinável e função sintáctica. Não substitua forma presente por forma hipotética e não desenvolva estudo lexical completo.',
+        '03.9': 'Analise tempo, aspecto e valor contextual das formas verbais efectivamente presentes em {PASSAGEM_ATUAL}. No hebraico, considere qatal, yiqtol, formas com ו e outras formas pertinentes sem equivalências rígidas de passado, presente ou futuro. No grego, considere tempo e aspecto conforme a forma. Não aplique equivalências mecânicas.',
+        '03.10': 'Analise a relação entre sujeito e acção verbal em {PASSAGEM_ATUAL}. No hebraico, identifique binyan ou padrão verbal e explique a sua função sem equivalência automática com voz grega. No grego, identifique voz activa, média ou passiva quando aplicável.',
+        '03.11': 'Analise modo e modalidade das formas efectivamente presentes em {PASSAGEM_ATUAL}. No grego, identifique indicativo, subjuntivo, imperativo, optativo ou outras formas quando ocorrerem. No hebraico, use categorias modais próprias sem forçar correspondência grega. Distinga formas finitas, infinitivos e particípios.',
+        '03.12': 'Examine construções gramaticais especiais efectivamente presentes em {PASSAGEM_ATUAL}. No hebraico, considere infinitivo absoluto, cadeia construta, coordenação e subordinação quando ocorrerem. No grego, considere genitivo absoluto, acusativo e infinitivo, particípios circunstanciais e outras estruturas pertinentes. Se nenhuma construção especial relevante ocorrer, declare a ausência.',
+        '03.13': 'Mapeie as relações sintácticas internas de {PASSAGEM_ATUAL}: dependência, regência nominal e verbal, concordância, complementação e modificação. Apresente como palavras e grupos se relacionam dentro das orações, sem introduzir elementos ausentes.',
+        '03.14': 'Identifique os conectivos efectivamente presentes em {PASSAGEM_ATUAL}, incluindo conjunções, preposições, partículas e outros elementos relacionais. Explique apenas funções demonstráveis no contexto, como coordenação, subordinação, causa, consequência, condição, contraste, finalidade ou sequência.',
+        '03.15': 'Examine a relação sintáctica e lógica entre as orações de {PASSAGEM_ATUAL}. Identifique coordenação, subordinação e relações demonstráveis de condição, causa, consequência, finalidade, explicação, complemento, contraste ou sequência. Não confunda relação sintáctica com interpretação teológica ou exegética.',
+        '03.16': 'Com base exclusivamente nas análises anteriores do Módulo 03 para {PASSAGEM_ATUAL}, apresente uma síntese esquemática da estrutura das orações, elementos sintácticos, relações entre cláusulas e fenómenos morfológicos relevantes. Não introduza nova crítica textual, variante, determinação textual, análise lexical profunda ou exegese.'
+    };
     function saveM02State() { try { localStorage.setItem('palavraSerieM02State', JSON.stringify(m02State)); } catch (error) {} }
+    function saveM03State() { try { localStorage.setItem('palavraSerieM03State', JSON.stringify(m03State)); } catch (error) {} }
+    function isM03(module, topic = '') { return module === '03 — GRAMÁTICA E SINTAXE' || String(topic).startsWith('03.'); }
+    function m03Code(topic) { const match = String(topic).match(/^(03\.\d+)/); return match ? match[1] : ''; }
+    function m03PreviousContext(topic) { return Object.entries(m03State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
     function isM02(module, topic = '') { return module === '02 — CRÍTICA TEXTUAL' || String(topic).startsWith('02.'); }
     function m02Code(topic) { const match = String(topic).match(/^(02\.\d+)/); return match ? match[1] : ''; }
     function m02PreviousContext(topic) { return Object.entries(m02State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
@@ -1448,6 +1473,7 @@
         const bookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}">${escapeBibleText(book)}</option>`)].join('');
                 const m01Mode = isM01(module, topic);
         const m02Mode = isM02(module, topic);
+        const m03Mode = isM03(module, topic);
         const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
         const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
@@ -1458,6 +1484,10 @@
             </form>`;
         const m02RunForm = `<form id="m02-run-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); runM02Substep(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
                 <p class="pro-reference-note">A subetapa utilizará o ESTUDO ACTUAL e os resultados anteriores do Módulo 02. Resultados anteriores são dados provisórios e podem ser corrigidos.</p>
+                <button type="submit">EXECUTAR SUBETAPA</button>
+            </form>`;
+        const m03RunForm = `<form id="m03-run-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); runM03Substep(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
+                <p class="pro-reference-note">A análise utilizará a leitura de trabalho estabelecida pelos módulos anteriores e os resultados acumulados do Módulo 03.</p>
                 <button type="submit">EXECUTAR SUBETAPA</button>
             </form>`;
         const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProQuestion(event, '${module}', '${topic}'); return false;">
@@ -1476,12 +1506,12 @@
             <section class="pro-free-panel">
                 <div class="pro-free-kicker">${m01Mode ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
-                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A subetapa utilizará o ESTUDO ACTUAL e o histórico relevante da Crítica Textual.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')}</div>
+                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A subetapa utilizará o ESTUDO ACTUAL e o histórico relevante da Crítica Textual.' : (m03Mode ? 'A análise utilizará a leitura de trabalho estabelecida pelos módulos anteriores.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.'))}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${m01Mode ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
+                ${m01Mode ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
-                </form>`)}
+                </form>`))}
             </section>
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
@@ -1491,8 +1521,9 @@
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                ${m01Mode || (m02Mode && studyContext) ? '' : (studyContext ? '' : creationForm)}
+                ${m01Mode || (m02Mode && studyContext) || (m03Mode && studyContext) ? '' : (studyContext ? '' : creationForm)}
                 ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
+                ${m03Mode && m03State.results[topic] ? `<div class="pro-chat-message system m03-result" id="m03-result">${escapeBibleText(m03State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${renderProConversationForm(module, topic)}
             </section>
         </div>`;
@@ -1534,6 +1565,36 @@
         saveM01State();
         showProfessionalModule('01 — TEXTO BÍBLICO', null, topic);
     }
+    async function runM03Substep(event, module, topic) {
+        event.preventDefault();
+        if (!studyContext || !M03_RULES[m03Code(topic)]) return;
+        const form = event.currentTarget;
+        const button = form?.querySelector('button');
+        const messages = document.getElementById('pro-chat-messages');
+        const rule = M03_RULES[m03Code(topic)].replaceAll('{PASSAGEM_ATUAL}', studyContext.referenciaFormatada);
+        const previousM01 = Object.entries(m01State.results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n');
+        const previousM02 = Object.entries(m02State.results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n');
+        const previousM03 = m03PreviousContext(topic);
+        const loading = document.createElement('div');
+        loading.className = 'pro-chat-message system';
+        loading.textContent = `A executar ${topic} sobre ${studyContext.referenciaFormatada}...`;
+        messages?.appendChild(loading);
+        if (button) button.disabled = true;
+        const question = `Passagem actual: ${studyContext.referenciaFormatada}\\nSubetapa: ${topic}\\nRegra interna: ${rule}\\nLeitura e dados do Módulo 01:\\n${previousM01 || 'Nenhum resultado disponível.'}\\nDados do Módulo 02, incluindo a determinação textual quando disponível:\\n${previousM02 || 'Nenhum resultado disponível.'}\\nResultados anteriores do Módulo 03:\\n${previousM03 || 'Nenhum resultado anterior disponível.'}\\nExecute somente esta subetapa. Analise a leitura de trabalho na língua em que está documentada. Não reabra variantes, testemunhos ou determinação textual. Não invente formas, categorias ou relações. Se uma categoria não ocorrer, declare a ausência; se houver ambiguidade real, apresente as possibilidades sustentáveis e a limitação.`;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, topic, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — MÓDULO 03', module: '03 — GRAMÁTICA E SINTAXE', studyContext, m01State, m02State, previousResults: m03State.results, accessLevel: 'pro' }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A consulta não pôde ser concluída.');
+            m03State.results[topic] = data.text || data.answer || data.response || data.result || 'A consulta foi processada, mas não devolveu texto.';
+        } catch (error) {
+            m03State.results[topic] = `Não foi possível concluir ${topic} agora. ${error.message || 'Tente novamente mais tarde.'}`;
+        }
+        m03State.passage = studyContext.passage;
+        m03State.activeTopic = topic;
+        saveM03State();
+        showProfessionalModule('03 — GRAMÁTICA E SINTAXE', null, topic);
+    }
+
     async function runM02Substep(event, module, topic) {
         event.preventDefault();
         if (!studyContext || !M02_RULES[m02Code(topic)]) return;
@@ -1631,7 +1692,7 @@
             const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, m01State: isM01(module, topic) ? m01State : undefined, m02State: isM02(module, topic) ? m02State : undefined, previousResults: isM01(module, topic) ? m01State.results : (isM02(module, topic) ? m02State.results : undefined), discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
+                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, m01State: isM01(module, topic) ? m01State : undefined, m02State: isM02(module, topic) || isM03(module, topic) ? m02State : undefined, m03State: isM03(module, topic) ? m03State : undefined, previousResults: isM01(module, topic) ? m01State.results : (isM02(module, topic) ? m02State.results : (isM03(module, topic) ? m03State.results : undefined)), discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Não foi possível responder à mensagem.');
