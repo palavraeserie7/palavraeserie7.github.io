@@ -1354,6 +1354,32 @@
         '09.15': 'Elabore síntese teológico-bíblica histórica e indutiva da contribuição específica de {PASSAGEM_ATUAL}. Separe evidência directa, trajectória canónica e debate interpretativo. Não transforme a conclusão em Teologia Sistemática, dogma confessional ou decisão denominacional.'
     };
     function saveM09State() { try { localStorage.setItem('palavraSerieM09State', JSON.stringify(m09State)); } catch (error) {} }
+    let m10State = (() => { try { return JSON.parse(localStorage.getItem('palavraSerieM10State') || '{"results":{},"notApplicable":{}}'); } catch (error) { return { results: {}, notApplicable: {} }; } })();
+    if (!m10State || typeof m10State !== 'object') m10State = { results: {}, notApplicable: {} };
+    if (!m10State.results || typeof m10State.results !== 'object') m10State.results = {};
+    if (!m10State.notApplicable || typeof m10State.notApplicable !== 'object') m10State.notApplicable = {};
+    const M10_RULES = {
+        '10.1': 'Identifique formalmente se há material do AT em {PASSAGEM_ATUAL}. Classifique como citação, alusão, eco textual ou eco temático apenas quando houver evidência suficiente e múltiplos indicadores relevantes. Se não houver relação documentável, registre a declaração de ausência e marque as etapas dependentes como não aplicáveis, sem repetir desnecessariamente a mesma mensagem.',
+        '10.2': 'Se houver citação directa, identifique a fonte, fórmulas introdutórias e correspondência verbal. Se o bloco foi marcado não aplicável por ausência de relação, registe apenas “não aplicável” no estado, sem repetir a declaração de ausência.',
+        '10.3': 'Se não houver citação explícita, avalie possível alusão por fraseado, imagem, estrutura, vocabulário raro, contexto e padrões do autor, usando classificação graduada. Não force intenção.',
+        '10.4': 'Avalie ecos textuais ou temáticos sem considerar vocabulário comum ou tema genérico suficientes por si só. Classifique como demonstrável, provável, possível, controverso ou não demonstrável.',
+        '10.5': 'Forneça coordenadas da fonte do AT quando determináveis. Se houver alternativas documentadas, apresente-as com grau de confiança e não escolha artificialmente uma origem única.',
+        '10.6': 'Compare a forma hebraica relevante, especialmente o Texto Massorético quando pertinente, com a forma reflectida no NT. Registe convergências, divergências e testemunhas antigas sem presumir uso necessário do MT actual.',
+        '10.7': 'Compare a fonte com a Septuaginta e verifique correspondência, divergência, combinação ou outra relação documentável. Não presuma dependência da LXX por correspondência parcial.',
+        '10.8': 'Compare, quando houver base, hebraico, LXX e grego do NT. Se não houver elementos suficientes para comparação textual directa entre essas formas, declare especificamente essa limitação e preserve as hipóteses.',
+        '10.9': 'Reconstrua brevemente o sentido histórico-literário da fonte do AT antes de analisar o seu uso no NT. Não permita que a utilização posterior substitua retroactivamente o sentido original.',
+        '10.10': 'Classifique a forma de utilização como citação, alusão, eco, aplicação analógica, releitura profética, tipologia ou outra categoria apenas quando documentada. Não aplique automaticamente pesher, midrash ou categorias técnicas semelhantes.',
+        '10.11': 'Explique a função teológica local da referência dentro do argumento específico do NT. Não reconstrua a trajectória teológica completa, que pertence ao Módulo 09.',
+        '10.12': 'Analise localmente promessa e cumprimento, tipologia, desenvolvimento escatológico ou aplicação contextual quando documentados. Não classifique toda utilização do AT como cumprimento nem expanda para a história da redenção do Módulo 09.',
+        '10.13': 'Avalie a relação cristológica local com critérios textuais e contextuais. Evite alegorias e conexões modernas sem fundamento e não substitua a síntese do Módulo 09.',
+        '10.14': 'Demonstre como a fonte do AT modifica, esclarece, enriquece ou restringe a interpretação do NT, sem transformar o resultado numa nova exegese geral.',
+        '10.15': 'Apresente relatório estritamente técnico sobre a relação intertextual, evidência, forma de uso, método e função local. Separe factos, hipóteses e debate; não decida a interpretação teológica geral nem antecipe os Módulos 08, 09, 11 ou 12.'
+    };
+    const M10_EVIDENCE_LEVELS = ['demonstrável', 'provável', 'possível', 'controverso', 'não demonstrável'];
+    function saveM10State() { try { localStorage.setItem('palavraSerieM10State', JSON.stringify(m10State)); } catch (error) {} }
+    function isM10(module, topic = '') { return module === '10 — USO DO AT NO NT' || String(topic).startsWith('10.'); }
+    function m10Code(topic) { const match = String(topic).match(/^(10\.\d+)/); return match ? match[1] : ''; }
+    function m10PreviousContext(topic) { return Object.entries(m10State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
     function isM09(module, topic = '') { return module === '09 — TEOLOGIA BÍBLICA' || String(topic).startsWith('09.'); }
     function m09Code(topic) { const match = String(topic).match(/^(09\.\d+)/); return match ? match[1] : ''; }
     function m09PreviousContext(topic) { return Object.entries(m09State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
@@ -1628,6 +1654,7 @@
         const m07Mode = isM07(module, topic);
         const m08Mode = isM08(module, topic);
         const m09Mode = isM09(module, topic);
+        const m10Mode = isM10(module, topic);
         const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
         const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); ${(m01Mode ? `submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg})` : `submitResearchPassage(event, ${m01ModuleArg}, ${m01TopicArg})`)}; return false;">
@@ -1668,6 +1695,10 @@
                 <p class="pro-reference-note">A Teologia Bíblica utilizará os resultados dos Módulos 01–08, distinguindo sentido original, trajectória canónica, inferência e debate. O uso técnico do AT no NT pertence ao Módulo 10.</p>
                 <button type="submit">EXECUTAR SUBETAPA</button>
             </form>`;
+        const m10RunForm = `<form id="m10-run-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); runM10Substep(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
+                <p class="pro-reference-note">O Módulo 10 auditará tecnicamente o uso do AT no NT. Relações não demonstráveis ficam não aplicáveis, sem repetição artificial da mesma mensagem.</p>
+                <button type="submit">EXECUTAR SUBETAPA</button>
+            </form>`;
         const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProQuestion(event, '${module}', '${topic}'); return false;">
 
                 <div class="pro-reference-fields">
@@ -1682,14 +1713,14 @@
             </form>`;
         return `<div class="pro-analysis-split">
             <section class="pro-free-panel">
-                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
+                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
-                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : (m06Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Exegese.' : (m07Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Contexto Histórico-Cultural.' : (m08Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Controle Hermenêutico.' : (m09Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Bíblica.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.'))))))))}</div>
+                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : (m06Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Exegese.' : (m07Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Contexto Histórico-Cultural.' : (m08Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Controle Hermenêutico.' : (m09Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Bíblica.' : (m10Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Uso do AT no NT.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')))))))))}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : (m06Mode && studyContext ? m06RunForm : (m07Mode && studyContext ? m07RunForm : (m08Mode && studyContext ? m08RunForm : (m09Mode && studyContext ? m09RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
+                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : (m06Mode && studyContext ? m06RunForm : (m07Mode && studyContext ? m07RunForm : (m08Mode && studyContext ? m08RunForm : (m09Mode && studyContext ? m09RunForm : (m10Mode && studyContext ? m10RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
-                </form>`)))))))) }
+                </form>`))))))))) }
             </section>
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
@@ -1699,7 +1730,7 @@
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode) ? '' : (studyContext ? '' : creationForm)}
+                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode) ? '' : (studyContext ? '' : creationForm)}
                 ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m03Mode && m03State.results[topic] ? `<div class="pro-chat-message system m03-result" id="m03-result">${escapeBibleText(m03State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m04Mode && m04State.results[topic] ? `<div class="pro-chat-message system m04-result" id="m04-result">${escapeBibleText(m04State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
@@ -1708,6 +1739,7 @@
                 ${m07Mode && m07State.results[topic] ? `<div class="pro-chat-message system m07-result" id="m07-result">${escapeBibleText(m07State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m08Mode && m08State.results[topic] ? `<div class="pro-chat-message system m08-result" id="m08-result">${escapeBibleText(m08State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m09Mode && m09State.results[topic] ? `<div class="pro-chat-message system m09-result" id="m09-result">${escapeBibleText(m09State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
+                ${m10Mode && m10State.results[topic] ? `<div class="pro-chat-message system m10-result" id="m10-result">${escapeBibleText(m10State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${renderProConversationForm(module, topic)}
             </section>
         </div>`;
@@ -1764,6 +1796,52 @@
         saveM01State();
         showProfessionalModule('01 — TEXTO BÍBLICO', null, topic);
     }
+    async function runM10Substep(event, module, topic) {
+        event.preventDefault();
+        const code = m10Code(topic);
+        if (!studyContext || !M10_RULES[code]) return;
+        const dependentCodes = ['10.2','10.3','10.4','10.5','10.6','10.7','10.8','10.9','10.10','10.11','10.12','10.13','10.14','10.15'];
+        if (m10State.notApplicable[code]) {
+            m10State.results[topic] = 'Não aplicável para esta passagem; a declaração de ausência foi registada em 10.1.';
+            m10State.activeTopic = topic;
+            saveM10State();
+            showProfessionalModule('10 — USO DO AT NO NT', null, topic);
+            return;
+        }
+        const form = event.currentTarget;
+        const button = form?.querySelector('button');
+        const messages = document.getElementById('pro-chat-messages');
+        const rule = M10_RULES[code].replaceAll('{PASSAGEM_ATUAL}', studyContext.referenciaFormatada);
+        const previous = [
+            ['Módulo 01', m01State.results], ['Módulo 02', m02State.results], ['Módulo 03', m03State.results],
+            ['Módulo 04', m04State.results], ['Módulo 05', m05State.results], ['Módulo 06', m06State.results],
+            ['Módulo 07', m07State.results], ['Módulo 08', m08State.results], ['Módulo 09', m09State.results]
+        ].map(([name, results]) => `${name}:\\n${Object.entries(results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n') || 'Nenhum resultado disponível.'}`).join('\\n\\n');
+        const previousM10 = m10PreviousContext(topic);
+        const loading = document.createElement('div');
+        loading.className = 'pro-chat-message system';
+        loading.textContent = `A executar ${topic} sobre ${studyContext.referenciaFormatada}...`;
+        messages?.appendChild(loading);
+        if (button) button.disabled = true;
+        const question = `Passagem actual: ${studyContext.referenciaFormatada}\\nSubetapa: ${topic}\\nRegra interna: ${rule}\\nResultados auditáveis dos Módulos 01–09:\\n${previous}\\nResultados anteriores do Módulo 10:\\n${previousM10 || 'Nenhum resultado anterior disponível.'}\\nClassifique qualquer relação somente com estas categorias: ${M10_EVIDENCE_LEVELS.join(', ')}. Não eleve hipótese a facto. Se 10.1 identificar ausência de relação com o AT/NT, registe a ausência e marque as etapas dependentes como não aplicáveis, sem repetir o mesmo texto em todas elas. Para alusão sem elementos suficientes, use: “A natureza da referência não fornece elementos textuais suficientes para uma comparação textual directa entre as formas hebraica, grega da Septuaginta e grega do Novo Testamento.” Não invente fontes, citações, paralelos, variantes ou intenções. Execute somente esta subetapa e preserve os módulos anteriores.`;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, topic, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — MÓDULO 10', module: '10 — USO DO AT NO NT', studyContext, m01State, m02State, m03State, m04State, m05State, m06State, m07State, m08State, m09State, previousResults: m10State.results, evidenceLevels: M10_EVIDENCE_LEVELS, accessLevel: 'pro' }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A consulta não pôde ser concluída.');
+            const result = data.text || data.answer || data.response || data.result || 'A consulta foi processada, mas não devolveu texto.';
+            m10State.results[topic] = result;
+            if (code === '10.1' && /não (foram identificad|possui)|sem (cita|refer)|ausência de relação|não faz uso/i.test(result)) {
+                dependentCodes.forEach(item => { m10State.notApplicable[item] = true; });
+            }
+        } catch (error) {
+            m10State.results[topic] = `Não foi possível concluir ${topic} agora. ${error.message || 'Tente novamente mais tarde.'}`;
+        }
+        m10State.passage = studyContext.passage;
+        m10State.activeTopic = topic;
+        saveM10State();
+        showProfessionalModule('10 — USO DO AT NO NT', null, topic);
+    }
+
     async function runM09Substep(event, module, topic) {
         event.preventDefault();
         if (!studyContext || !M09_RULES[m09Code(topic)]) return;
