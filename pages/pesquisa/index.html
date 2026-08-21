@@ -1175,6 +1175,21 @@
     let selectedBibleBook = 'Gênesis';
     let selectedBibleChapter = 1;
     let studyContext = (() => { try { return JSON.parse(localStorage.getItem('palavraSerieStudyContext') || 'null'); } catch (error) { return null; } })();
+    let m01State = (() => { try { return JSON.parse(localStorage.getItem('palavraSerieM01State') || '{"results":{}}'); } catch (error) { return { results: {} }; } })();
+    if (!m01State || typeof m01State !== 'object') m01State = { results: {} };
+    if (!m01State.results || typeof m01State.results !== 'object') m01State.results = {};
+    const M01_RULES = {
+        '01.6': 'Trabalhe exclusivamente com o dado textual hebraico da passagem do Antigo Testamento actualmente definida. Identifique a referência, apresente o texto hebraico correspondente e preserve a forma textual e a vocalização quando disponíveis. Apresente uma tradução literal para português e destaque apenas elementos textuais relevantes para etapas posteriores. Não execute crítica textual completa, análise gramatical do Módulo 03, análise lexical do Módulo 04 ou exegese. Organize a resposta distinguindo DADO e OBSERVAÇÃO. Não invente texto, vocalização, fonte ou evidência; declare limitações quando necessário.',
+        '01.7': 'Trabalhe com o texto grego relevante para a passagem actualmente definida, explicando explicitamente qual tradição está a ser consultada. Para uma passagem do Antigo Testamento, se o texto grego for a Septuaginta, declare isso claramente e não crie uma segunda tradição grega artificial. Apresente o texto grego disponível, a tradução e a relação textual necessária para compreender o dado grego antes da análise específica da LXX. Não trate automaticamente “texto grego” como uma tradição distinta da Septuaginta, não invente diferenças e não avance para crítica textual completa. Distinga DADO, OBSERVAÇÃO e limitações.',
+        '01.8': 'Analise especificamente a Septuaginta (LXX) para a passagem actualmente definida, quando aplicável. Apresente a redação da LXX e a tradução; compare-a de forma controlada com o texto hebraico; e identifique, apenas quando houver evidência, diferenças de tradução, omissões, acréscimos, mudanças de ordem, escolhas tradutórias ou diferenças linguísticas relevantes. Não presuma causas como erro de escriba, erro de leitura, alteração teológica, intenção deliberada, harmonização ou interpretação. Essas explicações só podem aparecer como HIPÓTESES claramente assinaladas e acompanhadas da evidência disponível. Não execute crítica textual completa nem decisão textual definitiva. Se não houver diferença relevante documentada, declare isso explicitamente.',
+        '01.9': 'Faça uma triagem textual preliminar dos dados anteriores relevantes do Módulo 01. Identifique se existem divergências relevantes, indique onde ocorrem, descreva a natureza da diferença e registe quais evidências devem ser investigadas posteriormente. Não substitua o Módulo 02 — Crítica Textual: não execute avaliação completa de evidências externas ou internas, comparação definitiva, avaliação final de variantes ou decisão textual definitiva. Trate resultados anteriores como dados de pesquisa provisórios, não como verdades infalíveis. Se não houver divergência relevante, escreva: “Não foi identificada divergência textual relevante nesta etapa preliminar.” Não crie uma variante para justificar a etapa.',
+        '01.10': 'Identifique preliminarmente as palavras, formas e construções do texto original que merecem atenção para a continuidade da investigação. Pode indicar termos relevantes, formas importantes, construções significativas, características que uma tradução portuguesa pode ocultar e diferenças linguísticas relevantes entre tradições textuais. Não execute a investigação lexical completa do Módulo 04 nem a análise gramatical completa do Módulo 03. Responda à pergunta: “Quais palavras e construções do texto original precisam ser observadas?” Não transforme hipótese em facto e não apresente conclusão de texto-base nesta etapa.',
+        '01.11': 'Estabeleça um texto-base operacional e provisório para a continuidade da pesquisa, utilizando os dados textuais relevantes já levantados no Módulo 01. Não apresente esta etapa como a determinação textual definitiva e não substitua o 02.12 — Determinação textual do Módulo 02. Separe claramente: DADOS DISPONÍVEIS, AVALIAÇÃO PROVISÓRIA, GRAU DE SEGURANÇA e INCERTEZAS. A etapa actual pode confirmar, qualificar ou corrigir resultados anteriores. Se as evidências não permitirem uma determinação segura, declare a incerteza. Não procure novidade artificial; se não houver observação nova ou relevante, informe isso.'
+    };
+    function saveM01State() { try { localStorage.setItem('palavraSerieM01State', JSON.stringify(m01State)); } catch (error) {} }
+    function isM01(module, topic = '') { return module === '01 — TEXTO BÍBLICO' || String(topic).startsWith('01.'); }
+    function m01Code(topic) { const match = String(topic).match(/^(01\.\d+)/); return match ? match[1] : ''; }
+    function m01PreviousContext(topic) { return Object.entries(m01State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
 
     function openBibleReader() {
         const overlay = document.getElementById('bible-overlay');
@@ -1375,6 +1390,11 @@
     });
 
     function backToPreviousView() {
+        const proLayout = document.querySelector('#pro-matrix-overlay .pro-matrix-layout');
+        if (proLayout?.classList.contains('detail-open')) {
+            returnToProMatrixList();
+            return;
+        }
         const element = lastDisciplineElement || document.querySelector('.module-item');
         showSub(lastDisciplineKey, element);
     }
@@ -1398,7 +1418,17 @@
 
     function renderProChat(module, topic = module) {
         const bookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}">${escapeBibleText(book)}</option>`)].join('');
+                const m01Mode = isM01(module, topic);
+        const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
+        const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
+        const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" onsubmit="submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg})">
+                <label for="m01-passage-input">PASSAGEM BÍBLICA</label>
+                <input id="m01-passage-input" type="text" placeholder="Ex.: Gênesis 1:1-2" value="${escapeBibleText(studyContext?.referenciaFormatada || '')}" required>
+                <p class="pro-reference-note">Informe a passagem uma única vez. Ela será mantida como ESTUDO ATUAL nas próximas subetapas.</p>
+                <button type="submit">EXAMINAR</button>
+            </form>`;
         const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" onsubmit="sendProQuestion(event, '${module}', '${topic}')">
+
                 <div class="pro-reference-fields">
                     <label>Livro<select id="pro-book" onchange="populateProChapterOptions(this.value)" required>${bookOptions}</select></label>
                     <label>Capítulo<select id="pro-chapter" onchange="populateProVerseOptions(this.value)" disabled required><option value="">Seleccione</option></select></label>
@@ -1411,28 +1441,65 @@
             </form>`;
         return `<div class="pro-analysis-split">
             <section class="pro-free-panel">
-                <div class="pro-free-kicker">CONSULTA FREE</div>
+                <div class="pro-free-kicker">${m01Mode ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
-                <div class="pro-free-paper">A folha branca está pronta para uma consulta FREE sobre esta subetapa.</div>
+                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.'}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                <form class="pro-free-form" onsubmit="sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)})">
+                ${m01Mode ? m01PassageForm : `<form class="pro-free-form" onsubmit="sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)})">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
-                </form>
+                </form>`}
             </section>
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
                 <p class="pro-chat-intro">Módulo: <strong>${escapeBibleText(module)}</strong><br>Subetapa seleccionada: <strong>${escapeBibleText(topic)}</strong>.</p>
                 ${renderStudyContextPanel(module, topic)}
                 <div class="pro-chat-messages" id="pro-chat-messages">
-                    <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.'}</div>
+                    <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
+                    ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                ${studyContext ? '' : creationForm}
+                ${m01Mode ? '' : (studyContext ? '' : creationForm)}
                 ${renderProConversationForm(module, topic)}
             </section>
         </div>`;
     }
 
+    async function submitM01Passage(event, module, topic) {
+        event.preventDefault();
+        const input = event.currentTarget.querySelector('#m01-passage-input');
+        const passage = input?.value.trim() || '';
+        if (!passage) return;
+        studyContext = { referenciaFormatada: passage, passage, escopo: 'passagem informada no chat', source: 'Módulo 01 — Texto Bíblico' };
+        m01State = { passage, results: {}, activeTopic: topic };
+        saveM01State();
+        try { localStorage.setItem('palavraSerieStudyContext', JSON.stringify(studyContext)); } catch (error) {}
+        showProfessionalModule(module, null, topic);
+        await runM01Substep(topic);
+    }
+    async function runM01Substep(topic) {
+        const code = m01Code(topic);
+        const rule = M01_RULES[code];
+        if (!studyContext || !rule || !topic) return;
+        const resultBox = document.getElementById('m01-result');
+        const messages = document.getElementById('pro-chat-messages');
+        const loading = document.createElement('div');
+        loading.className = 'pro-chat-message system';
+        loading.textContent = `A executar ${topic} sobre ${studyContext.referenciaFormatada}...`;
+        (messages || resultBox)?.appendChild(loading);
+        const previous = m01PreviousContext(topic);
+        const question = `Passagem atual: ${studyContext.referenciaFormatada}\nSubetapa: ${topic}\nRegra interna: ${rule}\nResultados anteriores do Módulo 01, que devem ser considerados quando existirem:\n${previous || 'Nenhum resultado anterior disponível.'}\nExecute somente esta subetapa. Não avance para outras etapas. Não invente dados, variantes ou fontes. Quando uma informação não puder ser determinada com segurança, declare a limitação.`;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, topic, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — MÓDULO 01', module: '01 — TEXTO BÍBLICO', studyContext, previousResults: m01State.results, accessLevel: 'pro' }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A consulta não pôde ser concluída.');
+            m01State.results[topic] = data.text || data.answer || data.response || data.result || 'A consulta foi processada, mas não devolveu texto.';
+        } catch (error) {
+            m01State.results[topic] = `Não foi possível concluir ${topic} agora. ${error.message || 'Tente novamente mais tarde.'}`;
+        }
+        m01State.activeTopic = topic;
+        saveM01State();
+        showProfessionalModule('01 — TEXTO BÍBLICO', null, topic);
+    }
     async function sendProFreeQuestion(event, module, topic) {
         event.preventDefault();
         const input = event.currentTarget.querySelector('#pro-free-input');
@@ -1462,8 +1529,8 @@
     }
 
     function renderProConversationForm(module, topic) {
-        const moduleArg = JSON.stringify(module);
-        const topicArg = JSON.stringify(topic);
+        const moduleArg = JSON.stringify(module).replace(/"/g, '&quot;');
+        const topicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
         return `<form class="pro-chat-form pro-conversation-form" onsubmit="sendProChatMessage(event, ${moduleArg}, ${topicArg})">
             <label for="pro-chat-input">CONVERSA DE ANÁLISE</label>
             <textarea id="pro-chat-input" placeholder="Escreva uma pergunta ou observação sobre esta subetapa..." aria-label="Mensagem para a Mesa de Análise PRO"></textarea>
@@ -1501,7 +1568,7 @@
             const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
+                body: JSON.stringify({ question, topic: `${topic} — conversa da Mesa PRO`, studyContext, m01State: isM01(module, topic) ? m01State : undefined, previousResults: isM01(module, topic) ? m01State.results : undefined, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO', module })
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Não foi possível responder à mensagem.');
@@ -1647,12 +1714,14 @@
         setProProgressState(card, 'in_progress');
         document.querySelector('#pro-matrix-overlay .pro-matrix-layout')?.classList.add('detail-open');
                 const analysisTarget = document.getElementById('pro-matrix-analysis') || document.getElementById('mn');
-        analysisTarget.innerHTML = `
+                analysisTarget.innerHTML = `
             <div class="content">
 
                 <button class="back-arrow" onclick="returnToProMatrixList()" title="Voltar para a lista da Matriz PRO">← VOLTAR</button>
                 <div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, card)}</aside></div>
             </div>`;
+        if (module === '01 — TEXTO BÍBLICO' && studyContext) runM01Substep(card);
+
     }
 
     function returnToProMatrixList() {
@@ -1667,8 +1736,10 @@
         document.querySelector('.sidebar').classList.add('pro-active');
         document.querySelectorAll('.pro-item, .pro-subitem').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
-        const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
-                let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, module)}</aside></div></div>`;
+                const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
+        const topic = module === '01 — TEXTO BÍBLICO' && isM01(module, category) ? category : module;
+        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, topic)}</aside></div></div>`;
+
         const analysisTarget = document.getElementById('pro-matrix-analysis') || document.getElementById('mn');
         analysisTarget.innerHTML = html;
 
