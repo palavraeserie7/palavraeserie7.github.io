@@ -106,6 +106,9 @@
         .pro-analysis-panel .pro-chat-form textarea { background:#111b30; border-color:#344762; color:#dbe7f5; }
         .pro-analysis-panel .pro-chat-form button { background:#20d66b; color:#07151f; }
                 .pro-analysis-panel .pro-chat-form button:hover { background:#19b85a; }
+        .pro-result-actions { display:flex; justify-content:flex-end; margin-top:10px; padding-top:10px; border-top:1px solid #263754; }
+        .pro-delete-result { min-height:34px; padding:0 13px; border:1px solid #d96b6b; border-radius:6px; background:#263754; color:#ffb2b2; font-weight:800; cursor:pointer; }
+        .pro-delete-result:hover { background:#4a2732; color:#fff; }
         .pro-prompt-sheet { min-height:calc(100vh - 190px); padding:24px 28px; border:1px solid #d8cdb8; border-radius:8px; background:#fffdf7; color:#4a443b; overflow-y:auto; }
         .pro-prompt-sheet h2 { margin:0 0 8px; color:#806f53; font-size:20px; }
         .pro-prompt-sheet-intro { margin:0 0 18px; color:#806f53; line-height:1.5; }
@@ -1908,7 +1911,44 @@
         return `<div class="pro-study-context"><strong>ESTUDO ACTUAL</strong><span>${escapeBibleText(studyContext.referenciaFormatada)}</span><small>Módulo: ${escapeBibleText(module)}<br>Subetapa: ${escapeBibleText(topic)}</small></div>`;
     }
 
+        function getProStateBundle(module) {
+        const bundles = {
+            '01 — TEXTO BÍBLICO': [m01State, saveM01State],
+            '02 — CRÍTICA TEXTUAL': [m02State, saveM02State],
+            '03 — GRAMÁTICA E SINTAXE': [m03State, saveM03State],
+            '04 — LÉXICO': [m04State, saveM04State],
+            '05 — LÉXICO TEOLÓGICO': [m05State, saveM05State],
+            '06 — EXEGESE': [m06State, saveM06State],
+            '07 — CONTEXTO HISTÓRICO-CULTURAL': [m07State, saveM07State],
+            '08 — HERMENÊUTICA E CONTROLE DE ERROS': [m08State, saveM08State],
+            '09 — TEOLOGIA BÍBLICA': [m09State, saveM09State],
+            '10 — USO DO AT NO NT': [m10State, saveM10State],
+            '11 — TEOLOGIA SISTEMÁTICA': [m11State, saveM11State],
+            '12 — COMPARAÇÃO DE INTERPRETAÇÕES': [m12State, saveM12State]
+        };
+        return bundles[module] || null;
+    }
+
+    function getProStoredResult(module, topic) {
+        const bundle = getProStateBundle(module);
+        return bundle && bundle[0]?.results && Object.prototype.hasOwnProperty.call(bundle[0].results, topic)
+            ? bundle[0].results[topic]
+            : '';
+    }
+
+    function deleteProResult(module, topic) {
+        const bundle = getProStateBundle(module);
+        if (!bundle || !bundle[0]?.results || !Object.prototype.hasOwnProperty.call(bundle[0].results, topic)) return;
+        if (!window.confirm(`Apagar somente o resultado da etapa ${topic}? A folha de trabalho, a referência bíblica e os outros resultados serão preservados.`)) return;
+        delete bundle[0].results[topic];
+        if (bundle[0].activeTopic === topic) bundle[0].activeTopic = '';
+        bundle[1]();
+        setProProgressState(topic, 'not_started');
+        showProfessionalModule(module, null, topic);
+    }
+
     function renderProChat(module, topic = module) {
+
         const bookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}">${escapeBibleText(book)}</option>`)].join('');
                 const m01Mode = isM01(module, topic);
         const m02Mode = isM02(module, topic);
@@ -1986,7 +2026,10 @@
                 <p class="pro-reference-note">Crie o estudo uma única vez. Todos os módulos utilizarão esta passagem.</p>
                 <button type="submit">CRIAR ESTUDO</button>
             </form>`;
+                const storedResult = getProStoredResult(module, topic);
+        const deleteResultButton = storedResult ? `<div class="pro-result-actions"><button type="button" class="pro-delete-result" onclick="deleteProResult(decodeURIComponent('${encodeURIComponent(module)}'), decodeURIComponent('${encodeURIComponent(topic)}'))">APAGAR RESULTADO</button></div>` : '';
         return `<div class="pro-analysis-split">
+
             <section class="pro-free-panel">
                 <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode || m11Mode || m12Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
@@ -2018,10 +2061,11 @@
                 ${m09Mode && m09State.results[topic] ? `<div class="pro-chat-message system m09-result" id="m09-result">${escapeBibleText(m09State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m10Mode && m10State.results[topic] ? `<div class="pro-chat-message system m10-result" id="m10-result">${escapeBibleText(m10State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m11Mode && m11State.results[topic] ? `<div class="pro-chat-message system m11-result" id="m11-result">${escapeBibleText(m11State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
-                ${m12Mode && m12State.results[topic] ? `<div class="pro-chat-message system m12-result" id="m12-result">${escapeBibleText(m12State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
-                
+                                ${m12Mode && m12State.results[topic] ? `<div class="pro-chat-message system m12-result" id="m12-result">${escapeBibleText(m12State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
+                ${deleteResultButton}
 
             </section>
+
         </div>`;
     }
 
