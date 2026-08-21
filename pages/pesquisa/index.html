@@ -716,7 +716,14 @@
 <script>
     // Cole aqui a URL pública do seu serviço intermediário protegido.
     // Exemplo: https://matriz-canonica-ai.seu-subdominio.workers.dev
-    const AI_PROXY_URL = "https://yellow-lab-f4b2.palavraeserie.workers.dev";
+        const AI_PROXY_URL = "https://yellow-lab-f4b2.palavraeserie.workers.dev";
+
+    // Evita que uma query string vazia fique visível após uma submissão acidental.
+    if (window.location.href.endsWith('?')) {
+        window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+    }
+
+
 
     let activeShelfSection = 'free';
     let ownerSession = false;
@@ -958,7 +965,7 @@
                     <div class="ai-chat-welcome"><strong>ORÁCULO</strong><br>Você não precisa escolher uma disciplina ou método antes de começar. Escreva a sua pergunta para iniciar uma investigação interdisciplinar.</div>
                 </div>
                 <div class="ai-chat-input">
-                    <form class="question-row" onsubmit="sendOracleQuestion(event)">
+                    <form class="question-row" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendOracleQuestion(event); return false;">
                         <input id="oracle-question" type="text" placeholder="Escreva a sua pergunta..." aria-label="Pergunta para o Oráculo" autocomplete="off" required>
                         <button type="submit">INVESTIGAR</button>
                     </form>
@@ -1421,13 +1428,13 @@
                 const m01Mode = isM01(module, topic);
         const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
-        const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" onsubmit="submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg})">
+        const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
                 <label for="m01-passage-input">PASSAGEM BÍBLICA</label>
                 <input id="m01-passage-input" type="text" placeholder="Ex.: Gênesis 1:1-2" value="${escapeBibleText(studyContext?.referenciaFormatada || '')}" required>
                 <p class="pro-reference-note">Informe a passagem uma única vez. Ela será mantida como ESTUDO ATUAL nas próximas subetapas.</p>
                 <button type="submit">EXAMINAR</button>
             </form>`;
-        const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" onsubmit="sendProQuestion(event, '${module}', '${topic}')">
+        const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProQuestion(event, '${module}', '${topic}'); return false;">
 
                 <div class="pro-reference-fields">
                     <label>Livro<select id="pro-book" onchange="populateProChapterOptions(this.value)" required>${bookOptions}</select></label>
@@ -1445,7 +1452,7 @@
                 <h3>${escapeBibleText(topic)}</h3>
                 <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.'}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${m01Mode ? m01PassageForm : `<form class="pro-free-form" onsubmit="sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)})">
+                ${m01Mode ? m01PassageForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
                 </form>`}
@@ -1531,7 +1538,7 @@
     function renderProConversationForm(module, topic) {
         const moduleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const topicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
-        return `<form class="pro-chat-form pro-conversation-form" onsubmit="sendProChatMessage(event, ${moduleArg}, ${topicArg})">
+        return `<form class="pro-chat-form pro-conversation-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProChatMessage(event, ${moduleArg}, ${topicArg}); return false;">
             <label for="pro-chat-input">CONVERSA DE ANÁLISE</label>
             <textarea id="pro-chat-input" placeholder="Escreva uma pergunta ou observação sobre esta subetapa..." aria-label="Mensagem para a Mesa de Análise PRO"></textarea>
             <button type="submit">ENVIAR MENSAGEM</button>
@@ -1893,7 +1900,7 @@
     function openProgressiveInvestigation() {
         document.body.dataset.activeMenu = 'discipline';
         document.querySelector('.sidebar').classList.remove('pro-active');
-        document.getElementById('mn').innerHTML = `<main class="progressive-paper"><button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para as áreas académicas">← VOLTAR</button><h1>INVESTIGAR UMA PASSAGEM</h1><p class="progressive-intro">Aprenda a estudar uma passagem bíblica passo a passo. O sistema organiza a investigação, preserva os resultados e executa a análise técnica nos bastidores.</p><form class="progressive-form" onsubmit="startProgressiveInvestigation(event)"><label>PASSAGEM BÍBLICA<input id="progressive-passage" required placeholder="Ex.: João 15:1-5"></label><label>TRADUÇÃO<input id="progressive-translation" placeholder="Ex.: Almeida, NVI ou outra tradução"></label><label>PERGUNTA OU OBJETIVO<textarea id="progressive-objective" placeholder="O que deseja compreender nesta passagem?"></textarea></label><label>MODO DE USO<select id="progressive-mode"><option value="guided">MODO GUIADO — linguagem acessível</option><option value="advanced">MODO AVANÇADO — acesso técnico</option></select></label><button type="submit">COMEÇAR INVESTIGAÇÃO</button></form></main>`;
+        document.getElementById('mn').innerHTML = `<main class="progressive-paper"><button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para as áreas académicas">← VOLTAR</button><h1>INVESTIGAR UMA PASSAGEM</h1><p class="progressive-intro">Aprenda a estudar uma passagem bíblica passo a passo. O sistema organiza a investigação, preserva os resultados e executa a análise técnica nos bastidores.</p><form class="progressive-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); startProgressiveInvestigation(event); return false;"><label>PASSAGEM BÍBLICA<input id="progressive-passage" required placeholder="Ex.: João 15:1-5"></label><label>TRADUÇÃO<input id="progressive-translation" placeholder="Ex.: Almeida, NVI ou outra tradução"></label><label>PERGUNTA OU OBJETIVO<textarea id="progressive-objective" placeholder="O que deseja compreender nesta passagem?"></textarea></label><label>MODO DE USO<select id="progressive-mode"><option value="guided">MODO GUIADO — linguagem acessível</option><option value="advanced">MODO AVANÇADO — acesso técnico</option></select></label><button type="submit">COMEÇAR INVESTIGAÇÃO</button></form></main>`;
     }
 
     function startProgressiveInvestigation(event) {
