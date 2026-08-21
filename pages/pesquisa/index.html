@@ -1333,6 +1333,30 @@
         '08.15': 'Classifique o grau de sustentação metodológica das interpretações, com margens de segurança, incertezas e limites. O veredito não é juízo dogmático e não substitui Teologia Bíblica, Teologia Sistemática, Comparação formal de interpretações ou decisões do utilizador.'
     };
     function saveM08State() { try { localStorage.setItem('palavraSerieM08State', JSON.stringify(m08State)); } catch (error) {} }
+    let m09State = (() => { try { return JSON.parse(localStorage.getItem('palavraSerieM09State') || '{"results":{}}'); } catch (error) { return { results: {} }; } })();
+    if (!m09State || typeof m09State !== 'object') m09State = { results: {} };
+    if (!m09State.results || typeof m09State.results !== 'object') m09State.results = {};
+    const M09_RULES = {
+        '09.1': 'Identifique o tema ou motivo teológico que emerge organicamente de {PASSAGEM_ATUAL}, ancorado nas palavras, estrutura e sentido do Módulo 06. Não imponha tema externo.',
+        '09.2': 'Posicione {PASSAGEM_ATUAL} no seu bloco canónico e explique como o tema dialoga com a ênfase daquela secção das Escrituras, sem reduzir a análise a associação genérica.',
+        '09.3': 'Situe a passagem na narrativa histórico-redentiva, relacionando acontecimentos anteriores e posteriores sem alterar retroactivamente o sentido histórico original.',
+        '09.4': 'Analise o desenvolvimento da revelação e o grau de clareza do tema nesse ponto da história bíblica. Compare com revelações anteriores e posteriores sem projectar informação posterior sobre o significado original.',
+        '09.5': 'Mapeie temas bíblicos relacionados apenas quando houver conexão orgânica e documentável com o tema principal. Não estabeleça conexões por mera semelhança temática.',
+        '09.6': 'Para passagem do NT, analise herança, citação, eco ou pressuposição de estruturas do AT; para passagem do AT, identifique conexões internas e desenvolvimentos dentro do próprio AT. Não execute a análise técnica de citações do Módulo 10.',
+        '09.7': 'Para passagem do AT, acompanhe o desenvolvimento canónico posterior no NT respeitando o sentido nativo; para passagem do NT, articule o tema com o testemunho apostólico. O uso textual detalhado de citações e alusões pertence ao Módulo 10.',
+        '09.8': 'Avalie promessa e cumprimento apenas quando houver expectativa, promessa, antecipação ou concretização sustentada por evidência textual ou canónica. Se não houver vínculo orgânico, declare a ausência formal definida na regra.',
+        '09.9': 'Identifique alianças ou estruturas pactuais com relação textual, histórica ou teológica documentável. Não obrigue a passagem a caber numa aliança sem evidência suficiente.',
+        '09.10': 'Avalie a posição da passagem no drama Criação, Queda e Redenção apenas quando houver conexão orgânica. Não force a classificação para preencher a subetapa.',
+        '09.11': 'Avalie Reino de Deus como soberania, governo ou senhorio divino apenas quando houver fundamento textual ou canónico suficiente. Declare ausência quando não for pertinente.',
+        '09.12': 'Demonstre relação com Cristo apenas quando sustentada pelo desenvolvimento canónico. No AT, respeite distância histórica e sentido original; não crie tipologia, alegoria ou correspondência artificial. A análise técnica de releituras pertence ao Módulo 10.',
+        '09.13': 'Rastreie dimensão escatológica apenas quando houver fundamento canónico suficiente. Não atribua consumação, juízo, ressurreição ou renovação por mera associação temática.',
+        '09.14': 'Apresente a trajectória documentável do tema na Escritura, distinguindo ocorrências, antecedentes, desenvolvimentos, manifestações posteriores e destino final. Registe lacunas e modelos concorrentes.',
+        '09.15': 'Elabore síntese teológico-bíblica histórica e indutiva da contribuição específica de {PASSAGEM_ATUAL}. Separe evidência directa, trajectória canónica e debate interpretativo. Não transforme a conclusão em Teologia Sistemática, dogma confessional ou decisão denominacional.'
+    };
+    function saveM09State() { try { localStorage.setItem('palavraSerieM09State', JSON.stringify(m09State)); } catch (error) {} }
+    function isM09(module, topic = '') { return module === '09 — TEOLOGIA BÍBLICA' || String(topic).startsWith('09.'); }
+    function m09Code(topic) { const match = String(topic).match(/^(09\.\d+)/); return match ? match[1] : ''; }
+    function m09PreviousContext(topic) { return Object.entries(m09State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
     function isM08(module, topic = '') { return module === '08 — HERMENÊUTICA E CONTROLE DE ERROS' || String(topic).startsWith('08.'); }
     function m08Code(topic) { const match = String(topic).match(/^(08\.\d+)/); return match ? match[1] : ''; }
     function m08PreviousContext(topic) { return Object.entries(m08State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
@@ -1603,6 +1627,7 @@
         const m06Mode = isM06(module, topic);
         const m07Mode = isM07(module, topic);
         const m08Mode = isM08(module, topic);
+        const m09Mode = isM09(module, topic);
         const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
         const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); ${(m01Mode ? `submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg})` : `submitResearchPassage(event, ${m01ModuleArg}, ${m01TopicArg})`)}; return false;">
@@ -1639,6 +1664,10 @@
                 <p class="pro-reference-note">O controlo hermenêutico auditará os resultados dos Módulos 01–07 sem os alterar. O veredito classifica sustentação metodológica e preserva a pluralidade.</p>
                 <button type="submit">EXECUTAR SUBETAPA</button>
             </form>`;
+        const m09RunForm = `<form id="m09-run-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); runM09Substep(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
+                <p class="pro-reference-note">A Teologia Bíblica utilizará os resultados dos Módulos 01–08, distinguindo sentido original, trajectória canónica, inferência e debate. O uso técnico do AT no NT pertence ao Módulo 10.</p>
+                <button type="submit">EXECUTAR SUBETAPA</button>
+            </form>`;
         const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProQuestion(event, '${module}', '${topic}'); return false;">
 
                 <div class="pro-reference-fields">
@@ -1653,14 +1682,14 @@
             </form>`;
         return `<div class="pro-analysis-split">
             <section class="pro-free-panel">
-                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
+                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
-                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : (m06Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Exegese.' : (m07Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Contexto Histórico-Cultural.' : (m08Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Controle Hermenêutico.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')))))))}</div>
+                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : (m06Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Exegese.' : (m07Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Contexto Histórico-Cultural.' : (m08Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Controle Hermenêutico.' : (m09Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Bíblica.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.'))))))))}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : (m06Mode && studyContext ? m06RunForm : (m07Mode && studyContext ? m07RunForm : (m08Mode && studyContext ? m08RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
+                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : (m06Mode && studyContext ? m06RunForm : (m07Mode && studyContext ? m07RunForm : (m08Mode && studyContext ? m08RunForm : (m09Mode && studyContext ? m09RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
-                </form>`))))))) }
+                </form>`)))))))) }
             </section>
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
@@ -1670,7 +1699,7 @@
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode) ? '' : (studyContext ? '' : creationForm)}
+                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode) ? '' : (studyContext ? '' : creationForm)}
                 ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m03Mode && m03State.results[topic] ? `<div class="pro-chat-message system m03-result" id="m03-result">${escapeBibleText(m03State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m04Mode && m04State.results[topic] ? `<div class="pro-chat-message system m04-result" id="m04-result">${escapeBibleText(m04State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
@@ -1678,6 +1707,7 @@
                 ${m06Mode && m06State.results[topic] ? `<div class="pro-chat-message system m06-result" id="m06-result">${escapeBibleText(m06State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m07Mode && m07State.results[topic] ? `<div class="pro-chat-message system m07-result" id="m07-result">${escapeBibleText(m07State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m08Mode && m08State.results[topic] ? `<div class="pro-chat-message system m08-result" id="m08-result">${escapeBibleText(m08State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
+                ${m09Mode && m09State.results[topic] ? `<div class="pro-chat-message system m09-result" id="m09-result">${escapeBibleText(m09State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${renderProConversationForm(module, topic)}
             </section>
         </div>`;
@@ -1734,6 +1764,39 @@
         saveM01State();
         showProfessionalModule('01 — TEXTO BÍBLICO', null, topic);
     }
+    async function runM09Substep(event, module, topic) {
+        event.preventDefault();
+        if (!studyContext || !M09_RULES[m09Code(topic)]) return;
+        const form = event.currentTarget;
+        const button = form?.querySelector('button');
+        const messages = document.getElementById('pro-chat-messages');
+        const rule = M09_RULES[m09Code(topic)].replaceAll('{PASSAGEM_ATUAL}', studyContext.referenciaFormatada);
+        const previous = [
+            ['Módulo 01', m01State.results], ['Módulo 02', m02State.results], ['Módulo 03', m03State.results],
+            ['Módulo 04', m04State.results], ['Módulo 05', m05State.results], ['Módulo 06', m06State.results],
+            ['Módulo 07', m07State.results], ['Módulo 08', m08State.results]
+        ].map(([name, results]) => `${name}:\\n${Object.entries(results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n') || 'Nenhum resultado disponível.'}`).join('\\n\\n');
+        const previousM09 = m09PreviousContext(topic);
+        const loading = document.createElement('div');
+        loading.className = 'pro-chat-message system';
+        loading.textContent = `A executar ${topic} sobre ${studyContext.referenciaFormatada}...`;
+        messages?.appendChild(loading);
+        if (button) button.disabled = true;
+        const question = `Passagem actual: ${studyContext.referenciaFormatada}\\nSubetapa: ${topic}\\nRegra interna: ${rule}\\nResultados auditáveis dos Módulos 01–08:\\n${previous}\\nResultados anteriores do Módulo 09:\\n${previousM09 || 'Nenhum resultado anterior disponível.'}\\nExecute somente esta subetapa de Teologia Bíblica. Diferencie conexão explícita, alusão ou eco plausível, desenvolvimento temático canónico e interpretação teológica debatida. Preserve o sentido histórico original e não o substitua por desenvolvimentos posteriores. Se não houver vínculo orgânico em promessa, aliança, Reino, Cristo ou consumação, use a declaração formal de ausência definida na regra. Não fabrique conexões, fontes ou trajectórias. Não execute a análise técnica de citações e alusões do Módulo 10. Não transforme o resultado em Teologia Sistemática, dogma confessional ou decisão denominacional.`;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, topic, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — MÓDULO 09', module: '09 — TEOLOGIA BÍBLICA', studyContext, m01State, m02State, m03State, m04State, m05State, m06State, m07State, m08State, previousResults: m09State.results, accessLevel: 'pro' }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A consulta não pôde ser concluída.');
+            m09State.results[topic] = data.text || data.answer || data.response || data.result || 'A consulta foi processada, mas não devolveu texto.';
+        } catch (error) {
+            m09State.results[topic] = `Não foi possível concluir ${topic} agora. ${error.message || 'Tente novamente mais tarde.'}`;
+        }
+        m09State.passage = studyContext.passage;
+        m09State.activeTopic = topic;
+        saveM09State();
+        showProfessionalModule('09 — TEOLOGIA BÍBLICA', null, topic);
+    }
+
     async function runM08Substep(event, module, topic) {
         event.preventDefault();
         if (!studyContext || !M08_RULES[m08Code(topic)]) return;
