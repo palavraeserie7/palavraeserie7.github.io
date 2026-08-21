@@ -1398,6 +1398,32 @@
     };
     const M11_RELEVANCE = ['Directa', 'Indirecta', 'Sem Relevância'];
     function saveM11State() { try { localStorage.setItem('palavraSerieM11State', JSON.stringify(m11State)); } catch (error) {} }
+    let m12State = (() => { try { return JSON.parse(localStorage.getItem('palavraSerieM12State') || '{"results":{},"notApplicable":{},"flow":"","interpretations":[]}'); } catch (error) { return { results: {}, notApplicable: {}, flow: '', interpretations: [] }; } })();
+    if (!m12State || typeof m12State !== 'object') m12State = { results: {}, notApplicable: {}, flow: '', interpretations: [] };
+    if (!m12State.results || typeof m12State.results !== 'object') m12State.results = {};
+    if (!m12State.notApplicable || typeof m12State.notApplicable !== 'object') m12State.notApplicable = {};
+    if (!Array.isArray(m12State.interpretations)) m12State.interpretations = [];
+    const M12_RULES = {
+        '12.1': 'Mapeie apenas interpretações e linhas de recepção historicamente documentadas, cada uma ligada a período, autor, escola ou comentário identificável. Este é o nó decisório. Determine Fluxo A (duas ou mais leituras documentadas), Fluxo B (uma leitura consensual sem debates) ou Fluxo C (ausência de recepção específica; verificar unidade maior). Não invente correntes.',
+        '12.2': 'Classifique as leituras documentadas em eixos hermenêuticos claros, sem misturar escolas ou criar categorias não sustentadas pelas fontes.',
+        '12.3': 'Descreva separadamente a argumentação de cada interpretação, sem misturar argumentos de escolas concorrentes.',
+        '12.4': 'Identifique os dados textuais do Módulo 02 invocados por cada interpretação, distinguindo variante, delimitação e pontuação quando documentados.',
+        '12.5': 'Mapeie o uso da sintaxe dos Módulos 03 e dos dados lexicais dos Módulos 04–05, distinguindo filologia contextualizada de estresse linguístico.',
+        '12.6': 'Confronte os dados histórico-culturais do Módulo 07 utilizados por cada escola, exigindo fontes documentadas e evitando anacronismo.',
+        '12.7': 'Identifique conexões teológicas com o Módulo 09, analogias da fé e dados dos módulos posteriores apenas quando documentados, sem transformar harmonia confessional em prova textual.',
+        '12.8': 'Exponha pressupostos filosóficos, dogmáticos, eclesiais ou ideológicos apenas quando vinculados a fontes e autores documentados.',
+        '12.9': 'Rastreie convergências e denominadores comuns, sem transformar acordo histórico em prova de verdade absoluta.',
+        '12.10': 'Mapeie zonas de tensão ou incompatibilidade interpretativa dentro das evidências disponíveis, sem tratar divergências como metafisicamente irreconciliáveis.',
+        '12.11': 'Classifique a aceitação histórica de cada leitura como consensual histórica/académica, posição de escola majoritária, minoritária/alternativa plausível, controversa/debate aberto ou minoritária/amplamente contestada. Toda classificação deve ter base documental.',
+        '12.12': 'Avalie o grau de sustentação textual, histórica, contextual e metodológica de cada leitura, cruzando os dados relevantes e consolidados dos Módulos 02–11, sem prometer probabilidade objectiva nem inventar dados.',
+        '12.13': 'Delimite onde terminam os dados de cada escola e começam suposição, aplicação homilética ou salto lógico extratextual.',
+        '12.14': 'Apresente relatório transversal técnico da história da recepção. Estabilidade, desenvolvimento e sustentação são descrições documentadas da recepção histórica, não decisões sobre verdade absoluta. Preserve a pluralidade quando necessário.'
+    };
+    const M12_FLOWS = ['A — Pluralidade Interpretativa Documentada', 'B — Leitura Linear Consensual Sem Debates', 'C — Ausência de Recepção Específica'];
+    function saveM12State() { try { localStorage.setItem('palavraSerieM12State', JSON.stringify(m12State)); } catch (error) {} }
+    function isM12(module, topic = '') { return module === '12 — COMPARAÇÃO DE INTERPRETAÇÕES' || String(topic).startsWith('12.'); }
+    function m12Code(topic) { const match = String(topic).match(/^(12\.\d+)/); return match ? match[1] : ''; }
+    function m12PreviousContext(topic) { return Object.entries(m12State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
     function isM11(module, topic = '') { return module === '11 — TEOLOGIA SISTEMÁTICA' || String(topic).startsWith('11.'); }
     function m11Code(topic) { const match = String(topic).match(/^(11\.\d+)/); return match ? match[1] : ''; }
     function m11PreviousContext(topic) { return Object.entries(m11State.results).filter(([key, value]) => key !== topic && value && !String(value).startsWith('A investigar')).map(([key, value]) => `${key}: ${value}`).join('\\n\\n'); }
@@ -1680,6 +1706,7 @@
         const m09Mode = isM09(module, topic);
         const m10Mode = isM10(module, topic);
         const m11Mode = isM11(module, topic);
+        const m12Mode = isM12(module, topic);
         const m01ModuleArg = JSON.stringify(module).replace(/"/g, '&quot;');
         const m01TopicArg = JSON.stringify(topic).replace(/"/g, '&quot;');
         const m01PassageForm = `<form id="m01-passage-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); ${(m01Mode ? `submitM01Passage(event, ${m01ModuleArg}, ${m01TopicArg})` : `submitResearchPassage(event, ${m01ModuleArg}, ${m01TopicArg})`)}; return false;">
@@ -1728,6 +1755,10 @@
                 <p class="pro-reference-note">A Teologia Sistemática partirá dos Módulos 01–10. A comparação formal geral das interpretações pertence ao Módulo 12; esta análise não declara uma tradição vencedora.</p>
                 <button type="submit">EXECUTAR SUBETAPA</button>
             </form>`;
+        const m12RunForm = `<form id="m12-run-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); runM12Substep(event, ${m01ModuleArg}, ${m01TopicArg}); return false;">
+                <p class="pro-reference-note">A Comparação de Interpretações utiliza os Módulos 01–11 sem alterar os estados anteriores. A recepção deve ser documentada; ausências e leituras consensuais não geram debates artificiais.</p>
+                <button type="submit">EXECUTAR SUBETAPA</button>
+            </form>`;
         const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProQuestion(event, '${module}', '${topic}'); return false;">
 
                 <div class="pro-reference-fields">
@@ -1742,14 +1773,14 @@
             </form>`;
         return `<div class="pro-analysis-split">
             <section class="pro-free-panel">
-                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode || m11Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
+                <div class="pro-free-kicker">${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode || m11Mode || m12Mode) ? 'PASSAGEM BÍBLICA' : 'CONSULTA FREE'}</div>
                 <h3>${escapeBibleText(topic)}</h3>
-                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : (m06Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Exegese.' : (m07Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Contexto Histórico-Cultural.' : (m08Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Controle Hermenêutico.' : (m09Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Bíblica.' : (m10Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Uso do AT no NT.' : (m11Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Sistemática.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.'))))))))))}</div>
+                <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : (m06Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Exegese.' : (m07Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Contexto Histórico-Cultural.' : (m08Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Controle Hermenêutico.' : (m09Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Bíblica.' : (m10Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Uso do AT no NT.' : (m11Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Sistemática.' : (m12Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Comparação de Interpretações.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')))))))))))}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode || m11Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : (m06Mode && studyContext ? m06RunForm : (m07Mode && studyContext ? m07RunForm : (m08Mode && studyContext ? m08RunForm : (m09Mode && studyContext ? m09RunForm : (m10Mode && studyContext ? m10RunForm : (m11Mode && studyContext ? m11RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
+                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode || m11Mode || m12Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : (m06Mode && studyContext ? m06RunForm : (m07Mode && studyContext ? m07RunForm : (m08Mode && studyContext ? m08RunForm : (m09Mode && studyContext ? m09RunForm : (m10Mode && studyContext ? m10RunForm : (m11Mode && studyContext ? m11RunForm : (m12Mode && studyContext ? m12RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
-                </form>`)))))))))) }
+                </form>`))))))))))) }
             </section>
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
@@ -1759,7 +1790,7 @@
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Informe uma passagem no painel FREE para iniciar o Módulo 01.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode || m11Mode) ? '' : (studyContext ? '' : creationForm)}
+                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode || m11Mode || m12Mode) ? '' : (studyContext ? '' : creationForm)}
                 ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m03Mode && m03State.results[topic] ? `<div class="pro-chat-message system m03-result" id="m03-result">${escapeBibleText(m03State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m04Mode && m04State.results[topic] ? `<div class="pro-chat-message system m04-result" id="m04-result">${escapeBibleText(m04State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
@@ -1770,6 +1801,7 @@
                 ${m09Mode && m09State.results[topic] ? `<div class="pro-chat-message system m09-result" id="m09-result">${escapeBibleText(m09State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m10Mode && m10State.results[topic] ? `<div class="pro-chat-message system m10-result" id="m10-result">${escapeBibleText(m10State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m11Mode && m11State.results[topic] ? `<div class="pro-chat-message system m11-result" id="m11-result">${escapeBibleText(m11State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
+                ${m12Mode && m12State.results[topic] ? `<div class="pro-chat-message system m12-result" id="m12-result">${escapeBibleText(m12State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${renderProConversationForm(module, topic)}
             </section>
         </div>`;
@@ -1826,6 +1858,64 @@
         saveM01State();
         showProfessionalModule('01 — TEXTO BÍBLICO', null, topic);
     }
+    async function runM12Substep(event, module, topic) {
+        event.preventDefault();
+        const code = m12Code(topic);
+        if (!studyContext || !M12_RULES[code]) return;
+        const comparisonCodes = ['12.9','12.10','12.12'];
+        if (code !== '12.1' && !m12State.flow) {
+            m12State.results[topic] = 'Execute primeiro 12.1 — Identificação das interpretações existentes para activar o Fluxo A, B ou C.';
+            m12State.activeTopic = topic;
+            saveM12State();
+            showProfessionalModule('12 — COMPARAÇÃO DE INTERPRETAÇÕES', null, topic);
+            return;
+        }
+        if (m12State.notApplicable[code]) {
+            m12State.results[topic] = m12State.flow === 'B' ? 'Não se aplica (Leitura Consensual); não foram identificados debates comparáveis documentados.' : 'Não aplicável para esta passagem; não foram identificados registos específicos suficientes para esta subetapa.';
+            m12State.activeTopic = topic;
+            saveM12State();
+            showProfessionalModule('12 — COMPARAÇÃO DE INTERPRETAÇÕES', null, topic);
+            return;
+        }
+        const form = event.currentTarget;
+        const button = form?.querySelector('button');
+        const messages = document.getElementById('pro-chat-messages');
+        const rule = M12_RULES[code].replaceAll('{PASSAGEM_ATUAL}', studyContext.referenciaFormatada);
+        const previous = [
+            ['Módulo 01', m01State.results], ['Módulo 02', m02State.results], ['Módulo 03', m03State.results],
+            ['Módulo 04', m04State.results], ['Módulo 05', m05State.results], ['Módulo 06', m06State.results],
+            ['Módulo 07', m07State.results], ['Módulo 08', m08State.results], ['Módulo 09', m09State.results],
+            ['Módulo 10', m10State.results], ['Módulo 11', m11State.results]
+        ].map(([name, results]) => `${name}:\\n${Object.entries(results || {}).map(([key, value]) => `${key}: ${value}`).join('\\n\\n') || 'Nenhum resultado disponível.'}`).join('\\n\\n');
+        const previousM12 = m12PreviousContext(topic);
+        const loading = document.createElement('div');
+        loading.className = 'pro-chat-message system';
+        loading.textContent = `A executar ${topic} sobre ${studyContext.referenciaFormatada}...`;
+        messages?.appendChild(loading);
+        if (button) button.disabled = true;
+        const question = `Passagem actual: ${studyContext.referenciaFormatada}\\nSubetapa: ${topic}\\nRegra interna: ${rule}\\nFluxo actual: ${m12State.flow || 'a determinar em 12.1'}\\nResultados auditáveis dos Módulos 01–11:\\n${previous}\\nResultados anteriores do Módulo 12:\\n${previousM12 || 'Nenhum resultado anterior disponível.'}\\nDependências e limites: use os Módulos 01–11 como dados de entrada sem os modificar. O Módulo 11 organiza formulações doutrinárias; o Módulo 12 compara transversalmente interpretações e recepções documentadas, sem substituir a Teologia Sistemática. Use somente fontes identificáveis. Não invente correntes, autores, períodos, comentários, pressupostos ou debates. Nas classificações, diferencie consenso histórico, posição de escola majoritária, leitura minoritária plausível, debate aberto e leitura minoritária/amplamente contestada, sempre com base documental. Execute apenas esta subetapa.`;
+        try {
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, topic, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — MÓDULO 12', module: '12 — COMPARAÇÃO DE INTERPRETAÇÕES', studyContext, m01State, m02State, m03State, m04State, m05State, m06State, m07State, m08State, m09State, m10State, m11State, previousResults: m12State.results, flows: M12_FLOWS, accessLevel: 'pro' }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A consulta não pôde ser concluída.');
+            const result = data.text || data.answer || data.response || data.result || 'A consulta foi processada, mas não devolveu texto.';
+            m12State.results[topic] = result;
+            if (code === '12.1') {
+                if (/duas ou mais|pluralidade interpretativa|múltiplas leituras/i.test(result)) m12State.flow = 'A';
+                else if (/uma linha|leitura consensual|sem debates|sem controvérsia/i.test(result)) m12State.flow = 'B';
+                else if (/não foram identificados|sem registros|sem registos|ausência de recepção/i.test(result)) m12State.flow = /(nem estudos|sem estudos|não existem estudos|não foram identificados estudos)/i.test(result) ? 'C' : (/(existem|foram identificados|há estudos|estudos documentados).*(unidade literária maior|escopo mais amplo|contexto macro)/i.test(result) ? 'C-MACRO' : 'C');
+                if (m12State.flow === 'B') comparisonCodes.forEach(item => { m12State.notApplicable[item] = true; });
+                if (m12State.flow === 'C') for (let i = 2; i <= 14; i += 1) m12State.notApplicable[`12.${i}`] = true;
+            }
+        } catch (error) {
+            m12State.results[topic] = `Não foi possível concluir ${topic} agora. ${error.message || 'Tente novamente mais tarde.'}`;
+        }
+        m12State.passage = studyContext.passage;
+        m12State.activeTopic = topic;
+        saveM12State();
+        showProfessionalModule('12 — COMPARAÇÃO DE INTERPRETAÇÕES', null, topic);
+    }
+
     async function runM11Substep(event, module, topic) {
         event.preventDefault();
         const code = m11Code(topic);
