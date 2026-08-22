@@ -803,10 +803,30 @@
         <div class="book-presentation-window" id="book-presentation-window"></div>
     </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
     // Cole aqui a URL pública do seu serviço intermediário protegido.
     // Exemplo: https://matriz-canonica-ai.seu-subdominio.workers.dev
         const AI_PROXY_URL = "https://yellow-lab-f4b2.palavraeserie.workers.dev";
+
+    // Configuração pública do Supabase; segredos do servidor não entram no HTML.
+    const SUPABASE_URL = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
+    const supabaseClient = (window.supabase && !SUPABASE_URL.includes('COLE_AQUI'))
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null;
+
+    async function getWritingAccessToken() {
+        if (!supabaseClient) {
+            throw new Error('A autenticação Supabase ainda não foi configurada.');
+        }
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error || !data?.session?.access_token) {
+            throw new Error('Sessão expirada. Entre novamente para utilizar a Sala de Escrita.');
+        }
+        return data.session.access_token;
+    }
 
     // Evita que uma query string vazia fique visível após uma submissão acidental.
     if (window.location.href.endsWith('?')) {
@@ -1162,7 +1182,8 @@
         messages.appendChild(loading);
         input.value = '';
         try {
-            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ question:`Referência: ${reference}\nEtapa da Matriz: ${step}\nPergunta de acompanhamento: ${text}`, topic: step, module: moduleSelect?.value || '', discipline:'CHAT DE ESCRITA — ACOMPANHAMENTO PRO', accessLevel:'pro' }) });
+            const accessToken = await getWritingAccessToken();
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method:'POST', headers:{'Content-Type':'application/json', 'Authorization':`Bearer ${accessToken}`}, body:JSON.stringify({ question:`Referência: ${reference}\nEtapa da Matriz: ${step}\nPergunta de acompanhamento: ${text}`, topic: step, module: moduleSelect?.value || '', discipline:'CHAT DE ESCRITA — ACOMPANHAMENTO PRIVADO', accessLevel:'private' }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data?.error || 'A pergunta de acompanhamento não pôde ser concluída.');
             loading.textContent = neutralizeServiceText(data.text || data.answer || data.response || data.result || 'A consulta não devolveu texto.');
@@ -1202,7 +1223,8 @@
         if (button) { button.disabled = true; button.textContent = 'A EXECUTAR...'; }
         try {
             if (!AI_PROXY_URL || AI_PROXY_URL.includes('COLE_AQUI')) throw new Error('Configure a URL do serviço protegido da IA antes de executar a busca.');
-            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ question, topic: item, discipline: 'CHAT DE ESCRITA — MATRIZ TÉCNICA DE PESQUISA PRO', module, studyContext: { referenciaFormatada: reference, passage: reference, source: 'Chat de Escrita' }, accessLevel: 'pro' }) });
+            const accessToken = await getWritingAccessToken();
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` }, signal: controller.signal, body: JSON.stringify({ question, topic: item, discipline: 'CHAT DE ESCRITA — MATRIZ TÉCNICA DE PESQUISA PRIVADA', module, studyContext: { referenciaFormatada: reference, passage: reference, source: 'Chat de Escrita' }, accessLevel: 'private' }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data?.error || 'A busca da etapa não pôde ser concluída.');
             clearTimeout(timeoutId);
@@ -1248,7 +1270,7 @@
         if (note) note.textContent = 'Área interna de demonstração. Os recursos públicos serão abertos pelas funções existentes do site.';
     }
 
-    function submitWritingChat(event) {
+    async function submitWritingChat(event) {
         event?.preventDefault();
         const input = document.getElementById('writing-chat-input');
         const messages = document.getElementById('writing-chat-messages');
@@ -1256,22 +1278,46 @@
         if (!text || !messages) return false;
         const moduleValue = document.getElementById('writing-matrix-module')?.value || '';
         const stepValue = document.getElementById('writing-matrix-step')?.value || '';
-        const matrixActive = Boolean(moduleValue && stepValue);
-        if (matrixActive) {
+        if (moduleValue && stepValue) {
             input.value = '';
             return false;
         }
+        const reference = document.getElementById('writing-bible-reference')?.textContent.replace(/^REFERÊNCIA:\s*/i, '') || 'referência não seleccionada';
         const userMessage = document.createElement('div');
         userMessage.className = 'writing-chat-message user';
         userMessage.textContent = text;
         const systemMessage = document.createElement('div');
         systemMessage.className = 'writing-chat-message system';
-        systemMessage.textContent = matrixActive
-            ? `Orientação associada à etapa ${stepValue} nesta demonstração visual. A ligação desta etapa à IA será feita numa etapa separada.`
-            : 'Pergunta livre registada nesta demonstração visual. A ligação deste chat à IA será feita numa etapa separada.';
+        systemMessage.textContent = 'A processar a pergunta privada...';
         messages.append(userMessage, systemMessage);
         input.value = '';
-        messages.scrollTop = messages.scrollHeight;
+        try {
+            const accessToken = await getWritingAccessToken();
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({
+                    question: text,
+                    topic: 'CONSULTA LIVRE — SALA DE ESCRITA',
+                    module: moduleValue,
+                    discipline: 'SALA DE ESCRITA PRIVADA',
+                    studyContext: { referenciaFormatada: reference, passage: reference, source: 'Sala de Escrita' },
+                    accessLevel: 'private'
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data?.error || 'A consulta privada não pôde ser concluída.');
+            systemMessage.textContent = neutralizeServiceText(data.text || data.answer || data.response || data.result || 'A consulta não devolveu texto.');
+        } catch (error) {
+            systemMessage.textContent = `Não foi possível responder agora: ${error?.message || 'tente novamente mais tarde.'}`;
+        } finally {
+            input.value = '';
+            input.focus();
+            messages.scrollTop = messages.scrollHeight;
+        }
         return false;
     }
 
@@ -3292,7 +3338,7 @@
         if (note) note.textContent = 'Esta tela é apenas uma representação visual. Nenhuma credencial é validada, enviada ou armazenada nesta versão.';
     }
 
-    function activateOwnerDemo(event) {
+    async function activateOwnerDemo(event) {
         event?.preventDefault();
         const form = document.getElementById('owner-login-form');
         const identity = document.getElementById('owner-login-identity');
@@ -3304,13 +3350,28 @@
             error?.classList.add('visible');
             return false;
         }
-        error?.classList.remove('visible');
-        ownerSession = true;
-        if (form) form.hidden = true;
-        if (accessList) accessList.hidden = false;
-        document.getElementById('owner-login-close')?.setAttribute('hidden', 'hidden');
-        document.getElementById('owner-login-back')?.classList.add('visible');
-        if (note) note.textContent = 'Demonstração visual activa. A autenticação real deverá ser integrada no backend antes da publicação.';
+        try {
+            if (!supabaseClient) throw new Error('A autenticação Supabase ainda não foi configurada.');
+            const { data, error: authError } = await supabaseClient.auth.signInWithPassword({
+                email: identity.value.trim(),
+                password: password.value
+            });
+            if (authError || !data?.session?.access_token) {
+                throw new Error(authError?.message || 'Não foi possível autenticar.');
+            }
+            error?.classList.remove('visible');
+            ownerSession = true;
+            if (form) form.hidden = true;
+            if (accessList) accessList.hidden = false;
+            document.getElementById('owner-login-close')?.setAttribute('hidden', 'hidden');
+            document.getElementById('owner-login-back')?.classList.add('visible');
+            if (note) note.textContent = 'Sessão autenticada. Acesso privado activo.';
+        } catch (authError) {
+            if (error) {
+                error.textContent = authError?.message || 'Não foi possível autenticar.';
+                error.classList.add('visible');
+            }
+        }
         return false;
     }
 
