@@ -2034,13 +2034,8 @@
     });
 
     function backToPreviousView() {
-        const proLayout = document.querySelector('#pro-matrix-overlay .pro-matrix-layout');
-        if (proLayout?.classList.contains('detail-open')) {
-            returnToProMatrixList();
-            return;
-        }
-        const element = lastDisciplineElement || document.querySelector('.module-item');
-        showSub(lastDisciplineKey, element);
+        closeProMatrix();
+        showOntologyRoot();
     }
 
     function renderProModuleCards(module) {
@@ -2163,17 +2158,22 @@
                 <p class="pro-reference-note">A Comparação de Interpretações utiliza os Módulos 01–11 sem alterar os estados anteriores. A recepção deve ser documentada; ausências e leituras consensuais não geram debates artificiais.</p>
                 <button type="submit">EXECUTAR SUBETAPA</button>
             </form>`;
-        const creationForm = `<form id="pro-study-creation-form" class="pro-chat-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProQuestion(event, '${module}', '${topic}'); return false;">
-
+        const currentBook = studyContext?.livro || '';
+        const currentChapter = Number(studyContext?.capitulo || 0);
+        const currentStart = Number(studyContext?.versiculoInicial || 0);
+        const currentEnd = Number(studyContext?.versiculoFinal || 0);
+        const selectedBookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}"${book === currentBook ? ' selected' : ''}>${escapeBibleText(book)}</option>`)].join('');
+        const chapterOptions = currentBook ? '<option value="">Seleccione</option>' + Array.from({ length: BIBLE_CHAPTER_COUNTS[currentBook] || 0 }, (_, index) => `<option value="${index + 1}"${index + 1 === currentChapter ? ' selected' : ''}>${index + 1}</option>`).join('') : '<option value="">Seleccione</option>';
+        const verseOptions = '<option value="">Seleccione</option>' + Array.from({ length: 200 }, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join('');
+        const headerForm = `<form id="pro-study-creation-form" class="pro-chat-form pro-reference-header" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); executeProHeaderSearch(event, '${module}', '${topic}'); return false;">
                 <div class="pro-reference-fields">
-                    <label>Livro<select id="pro-book" onchange="populateProChapterOptions(this.value)" required>${bookOptions}</select></label>
-                    <label>Capítulo<select id="pro-chapter" onchange="populateProVerseOptions(this.value)" disabled required><option value="">Seleccione</option></select></label>
-                    <label>Versículo inicial<select id="pro-verse-start" disabled required><option value="">Seleccione</option></select></label>
-                    <label>Versículo final<select id="pro-verse-end" disabled required><option value="">Seleccione</option></select></label>
+                    <label>Livro<select id="pro-book" onchange="populateProChapterOptions(this.value)" required>${selectedBookOptions}</select></label>
+                    <label>Capítulo<select id="pro-chapter" onchange="populateProVerseOptions(this.value)" ${currentBook ? '' : 'disabled'} required>${chapterOptions}</select></label>
+                    <label>Versículo inicial<select id="pro-verse-start" ${currentBook && currentChapter ? '' : 'disabled'} required>${verseOptions}</select></label>
+                    <label>Versículo final<select id="pro-verse-end" ${currentBook && currentChapter ? '' : 'disabled'} required>${verseOptions}</select></label>
                 </div>
-                <label class="pro-whole-chapter"><input id="pro-whole-chapter" type="checkbox" onchange="toggleProWholeChapter(this.checked)"> Estudar o capítulo inteiro</label>
-                <p class="pro-reference-note">Crie o estudo uma única vez. Todos os módulos utilizarão esta passagem.</p>
-                <button type="submit">CRIAR ESTUDO</button>
+                <label class="pro-whole-chapter"><input id="pro-whole-chapter" type="checkbox" onchange="toggleProWholeChapter(this.checked)"${studyContext?.escopo === 'capítulo inteiro' ? ' checked' : ''}> Estudar o capítulo inteiro</label>
+                <button type="submit">ACCIONAR BUSCA DA ETAPA</button>
             </form>`;
                 const storedResult = getProStoredResult(module, topic);
         const deleteResultButton = storedResult ? `<div class="pro-result-actions"><button type="button" class="pro-delete-result" onclick="deleteProResult(decodeURIComponent('${encodeURIComponent(module)}'), decodeURIComponent('${encodeURIComponent(topic)}'))">APAGAR RESULTADO</button></div>` : '';
@@ -2184,22 +2184,21 @@
                 <h3>${escapeBibleText(topic)}</h3>
                 <div class="pro-free-paper">${m01Mode ? 'Informe a passagem bíblica no chat. Depois de examinada, ela ficará disponível para todas as subetapas 01.6 a 01.11.' : (m02Mode ? 'A passagem examinada no Módulo 01 será utilizada como ESTUDO ACTUAL para a Crítica Textual.' : (m03Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Gramática e Sintaxe.' : (m04Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico.' : (m05Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Léxico Teológico.' : (m06Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Exegese.' : (m07Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Contexto Histórico-Cultural.' : (m08Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Controle Hermenêutico.' : (m09Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Bíblica.' : (m10Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para o Uso do AT no NT.' : (m11Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Teologia Sistemática.' : (m12Mode ? 'A passagem examinada anteriormente será utilizada como ESTUDO ACTUAL para a Comparação de Interpretações.' : 'A folha branca está pronta para uma consulta FREE sobre esta subetapa.')))))))))))}</div>
                 <div class="pro-free-answer" id="pro-free-answer"></div>
-                ${(m01Mode || m02Mode || m03Mode || m04Mode || m05Mode || m06Mode || m07Mode || m08Mode || m09Mode || m10Mode || m11Mode || m12Mode) && !studyContext ? m01PassageForm : (m02Mode && studyContext ? m02RunForm : (m03Mode && studyContext ? m03RunForm : (m04Mode && studyContext ? m04RunForm : (m05Mode && studyContext ? m05RunForm : (m06Mode && studyContext ? m06RunForm : (m07Mode && studyContext ? m07RunForm : (m08Mode && studyContext ? m08RunForm : (m09Mode && studyContext ? m09RunForm : (m10Mode && studyContext ? m10RunForm : (m11Mode && studyContext ? m11RunForm : (m12Mode && studyContext ? m12RunForm : `<form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
+                <form class="pro-free-form" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); sendProFreeQuestion(event, ${JSON.stringify(module)}, ${JSON.stringify(topic)}); return false;">
                     <input id="pro-free-input" type="text" placeholder="Escreva uma pergunta geral sobre o tema..." aria-label="Pergunta da consulta FREE">
                     <button type="submit">EXAMINAR</button>
-                </form>`))))))))))) }
+                </form>
             </section>
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
+                ${headerForm}
                 <p class="pro-chat-intro">Módulo: <strong>${escapeBibleText(module)}</strong><br>Subetapa seleccionada: <strong>${escapeBibleText(topic)}</strong>.</p>
                 ${renderStudyContextPanel(module, topic)}
                 <div class="pro-chat-messages" id="pro-chat-messages">
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Seleccione Livro, Capítulo e Versículo para iniciar a análise.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                                ${studyContext ? '' : creationForm}
-
-                ${m01Mode && studyContext ? m01RunForm : ''}
+                                
                 ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m03Mode && m03State.results[topic] ? `<div class="pro-chat-message system m03-result" id="m03-result">${escapeBibleText(m03State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m04Mode && m04State.results[topic] ? `<div class="pro-chat-message system m04-result" id="m04-result">${escapeBibleText(m04State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
@@ -2216,6 +2215,47 @@
             </section>
 
         </div>`;
+    }
+
+    async function executeProHeaderSearch(event, module, topic) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const book = document.getElementById('pro-book')?.value.trim() || '';
+        const chapter = document.getElementById('pro-chapter')?.value.trim() || '';
+        const startVerse = document.getElementById('pro-verse-start')?.value.trim() || '';
+        const endVerse = document.getElementById('pro-verse-end')?.value.trim() || '';
+        const wholeChapter = Boolean(document.getElementById('pro-whole-chapter')?.checked);
+        const messages = document.getElementById('pro-chat-messages');
+        const validChapter = /^\d+$/.test(chapter) && Number(chapter) > 0;
+        const validRange = /^\d+$/.test(startVerse) && /^\d+$/.test(endVerse) && Number(startVerse) > 0 && Number(endVerse) >= Number(startVerse);
+        if (!messages || !book || !validChapter || (!wholeChapter && !validRange)) {
+            if (messages) {
+                const notice = document.createElement('div');
+                notice.className = 'pro-chat-message system';
+                notice.textContent = 'Informe livro, capítulo e um intervalo de versículos válido ou seleccione capítulo inteiro.';
+                messages.appendChild(notice);
+            }
+            return;
+        }
+        const reference = wholeChapter ? `${book} ${chapter} — capítulo inteiro` : `${book} ${chapter}:${startVerse}${startVerse === endVerse ? '' : `-${endVerse}`}`;
+        studyContext = { livro: book, capitulo: Number(chapter), versiculoInicial: wholeChapter ? null : Number(startVerse), versiculoFinal: wholeChapter ? null : Number(endVerse), escopo: wholeChapter ? 'capítulo inteiro' : 'intervalo', referenciaFormatada: reference };
+        try { localStorage.setItem('palavraSerieStudyContext', JSON.stringify(studyContext)); } catch (error) {}
+        const button = form?.querySelector('button');
+        if (button) button.disabled = true;
+        const syntheticEvent = { preventDefault() {}, currentTarget: form };
+        if (isM01(module, topic)) await runM01Substep(topic);
+        else if (isM02(module, topic)) await runM02Substep(syntheticEvent, module, topic);
+        else if (isM03(module, topic)) await runM03Substep(syntheticEvent, module, topic);
+        else if (isM04(module, topic)) await runM04Substep(syntheticEvent, module, topic);
+        else if (isM05(module, topic)) await runM05Substep(syntheticEvent, module, topic);
+        else if (isM06(module, topic)) await runM06Substep(syntheticEvent, module, topic);
+        else if (isM07(module, topic)) await runM07Substep(syntheticEvent, module, topic);
+        else if (isM08(module, topic)) await runM08Substep(syntheticEvent, module, topic);
+        else if (isM09(module, topic)) await runM09Substep(syntheticEvent, module, topic);
+        else if (isM10(module, topic)) await runM10Substep(syntheticEvent, module, topic);
+        else if (isM11(module, topic)) await runM11Substep(syntheticEvent, module, topic);
+        else if (isM12(module, topic)) await runM12Substep(syntheticEvent, module, topic);
+        else if (button) button.disabled = false;
     }
 
     async function submitM01Passage(event, module, topic) {
@@ -2899,7 +2939,10 @@
         try { localStorage.setItem(getProWorkNoteKey(module, card), textarea.value); } catch (error) {}
     }
 
+    let activeProRoute = { module: '', topic: '' };
+
     function openProCard(card, module) {
+        activeProRoute = { module, topic: card };
         setProProgressState(card, 'in_progress');
         document.querySelector('#pro-matrix-overlay .pro-matrix-layout')?.classList.add('detail-open');
         const analysisTarget = document.getElementById('pro-matrix-analysis') || document.getElementById('mn');
@@ -2924,10 +2967,11 @@
             saveButton.textContent = 'GUARDADO';
             setTimeout(() => { saveButton.textContent = 'GUARDAR'; }, 1200);
         });
-        if (module === '01 — TEXTO BÍBLICO' && studyContext) runM01Substep(card);
     }
 
     function returnToProMatrixList() {
+        activeProRoute = { module: '', topic: '' };
+        closeProMatrix();
         const layout = document.querySelector('#pro-matrix-overlay .pro-matrix-layout');
         const analysis = document.getElementById('pro-matrix-analysis');
         layout?.classList.remove('detail-open');
@@ -2935,17 +2979,18 @@
     }
 
     function showProfessionalModule(module, element, category = 'MÓDULO PROFISSIONAL DE ANÁLISE') {
+        const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
+        const topic = module === '01 — TEXTO BÍBLICO' && isM01(module, category) ? category : category;
+        if (element) {
+            activeProRoute = { module, topic };
+        } else if (activeProRoute.module && (activeProRoute.module !== module || activeProRoute.topic !== topic)) {
+            return;
+        }
         document.body.dataset.activeMenu = 'pro';
-        document.querySelector('.sidebar').classList.add('pro-active');
+        document.querySelector('.sidebar')?.classList.add('pro-active');
         document.querySelectorAll('.pro-item, .pro-subitem').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
-                const data = PRO_MODULE_DATA[module] || { question: '', rule: '', items: [] };
-        const topic = module === '01 — TEXTO BÍBLICO' && isM01(module, category) ? category : module;
-        let html = `<div class="content"><button class="back-arrow" onclick="backToPreviousView()" title="Voltar para a tela anterior">← VOLTAR</button><div class="pro-analysis-only"><aside class="pro-analysis-panel">${renderProChat(module, topic)}</aside></div></div>`;
-
-        const analysisTarget = document.getElementById('pro-matrix-analysis') || document.getElementById('mn');
-        analysisTarget.innerHTML = html;
-
+        openProCard(topic, module);
     }
 
     function renderAllInternalDisciplineMenus() {
@@ -3433,7 +3478,8 @@
         function snapshot() {
             const proList = document.getElementById('pro-list');
             const proAnalysis = document.getElementById('pro-matrix-analysis');
-            return { activeMenu: document.body.dataset.activeMenu || '', disciplineKey: typeof lastDisciplineKey !== 'undefined' ? (lastDisciplineKey || '') : '', sidebarPro: document.querySelector('.sidebar')?.classList.contains('pro-active') || false, proOpen: document.getElementById('pro-matrix-overlay')?.classList.contains('open') || false, proList: proList ? proList.innerHTML : '', proAnalysis: proAnalysis ? proAnalysis.innerHTML : '', overlays: overlaySelectors.map(selector => ({ selector, className: document.querySelector(selector)?.className || '' })) };
+            const proLayout = document.querySelector('#pro-matrix-overlay .pro-matrix-layout');
+            return { activeMenu: document.body.dataset.activeMenu || '', disciplineKey: typeof lastDisciplineKey !== 'undefined' ? (lastDisciplineKey || '') : '', sidebarPro: document.querySelector('.sidebar')?.classList.contains('pro-active') || false, proOpen: document.getElementById('pro-matrix-overlay')?.classList.contains('open') || false, proDetailOpen: Boolean(proLayout?.classList.contains('detail-open')), proList: proList ? proList.innerHTML : '', proAnalysis: proAnalysis ? proAnalysis.innerHTML : '', overlays: overlaySelectors.map(selector => ({ selector, className: document.querySelector(selector)?.className || '' })) };
         }
         function updateButtons() { back.disabled = historyIndex <= 0; forward.disabled = historyIndex < 0 || historyIndex >= historyStack.length - 1; }
         function record() { if (restoring) return; const state = snapshot(); const previous = historyStack[historyIndex]; if (previous && JSON.stringify(previous) === JSON.stringify(state)) return; historyStack = historyStack.slice(0, historyIndex + 1); historyStack.push(state); historyIndex = historyStack.length - 1; updateButtons(); }
@@ -3474,7 +3520,14 @@
                         if (savedSublist?.classList.contains('open')) liveSublist?.classList.add('open');
                     });
                 }
-                if (proAnalysis && state.proAnalysis) proAnalysis.innerHTML = state.proAnalysis;
+                const liveLayout = document.querySelector('#pro-matrix-overlay .pro-matrix-layout');
+                if (state.proDetailOpen && proAnalysis && state.proAnalysis) {
+                    proAnalysis.innerHTML = state.proAnalysis;
+                    liveLayout?.classList.add('detail-open');
+                } else if (proAnalysis) {
+                    proAnalysis.innerHTML = '<div class="pro-matrix-placeholder"><div class="pro-placeholder-content"><img class="pro-placeholder-icon" src="pro_placeholder_manuscript.png" alt="Manuscrito antigo" loading="lazy"><span>Seleccione uma subetapa interna da Matriz para abrir a MESA DE ANÁLISE PRO nesta área.</span></div></div>';
+                    liveLayout?.classList.remove('detail-open');
+                }
                 updateProProgressVisuals();
             }
 
@@ -3483,7 +3536,18 @@
             restoring = false;
             updateButtons();
         }
-        back.addEventListener('click', () => { if (historyIndex > 0) { historyIndex -= 1; restore(historyStack[historyIndex]); } });
+        back.addEventListener('click', () => {
+            const proOverlay = document.getElementById('pro-matrix-overlay');
+            if (proOverlay?.classList.contains('open')) {
+                closeProMatrix();
+                showOntologyRoot();
+                historyStack = [snapshot()];
+                historyIndex = 0;
+                updateButtons();
+                return;
+            }
+            if (historyIndex > 0) { historyIndex -= 1; restore(historyStack[historyIndex]); }
+        });
         forward.addEventListener('click', () => { if (historyIndex < historyStack.length - 1) { historyIndex += 1; restore(historyStack[historyIndex]); } });
         document.addEventListener('click', event => { if (restoring || event.target.closest('.nav-history-controls')) return; if (!event.target.closest('button,[role="button"],summary,.pro-item,.pro-subitem,select')) return; window.setTimeout(record, 0); }, true);
         record();
