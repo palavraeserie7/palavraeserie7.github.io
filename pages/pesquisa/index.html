@@ -817,16 +817,32 @@
         ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
         : null;
 
-    async function getWritingAccessToken() {
-        if (!supabaseClient) {
-            throw new Error('A autenticação Supabase ainda não foi configurada.');
-        }
+  async function getWritingAccessToken() {
+    if (!supabaseClient) {
+        throw new Error('A autenticação Supabase ainda não foi configurada.');
+    }
+
+    const timeout = new Promise((_, reject) => {
+        setTimeout(() => {
+            reject(new Error(
+                'A autenticação demorou demasiado. Saia e entre novamente na Sala de Escrita.'
+            ));
+        }, 10000);
+    });
+
+    const sessionRequest = (async () => {
         const { data, error } = await supabaseClient.auth.getSession();
         if (error || !data?.session?.access_token) {
-            throw new Error('Sessão expirada. Entre novamente para utilizar a Sala de Escrita.');
+            throw new Error(
+                'Sessão expirada. Entre novamente para utilizar a Sala de Escrita.'
+            );
         }
         return data.session.access_token;
-    }
+    })();
+
+    return Promise.race([sessionRequest, timeout]);
+}
+
 
     // Evita que uma query string vazia fique visível após uma submissão acidental.
     if (window.location.href.endsWith('?')) {
