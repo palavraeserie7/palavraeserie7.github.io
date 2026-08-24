@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1288,8 +1287,10 @@
         if (button) { button.disabled = true; button.textContent = 'A EXECUTAR...'; }
         try {
             if (!AI_PROXY_URL || AI_PROXY_URL.includes('COLE_AQUI')) throw new Error('Configure a URL do serviço protegido da IA antes de executar a busca.');
-            const accessToken = await getWritingAccessToken();
-            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` }, signal: controller.signal, body: JSON.stringify({ question, topic: item, discipline: 'CHAT DE ESCRITA — MATRIZ TÉCNICA DE PESQUISA PRIVADA', module, studyContext: { referenciaFormatada: reference, passage: reference, source: 'Chat de Escrita' }, accessLevel: 'private' }) });
+            // A Sala de Escrita usa o mesmo motor de pesquisa PRO que já funciona na Matriz.
+            // A interface continua privada; a autorização específica do Worker privado será adicionada
+            // posteriormente sem duplicar o motor de pesquisa.
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ question, topic: item, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — SALA DE ESCRITA', module, studyContext: { referenciaFormatada: reference, passage: reference, source: 'Sala de Escrita' }, accessLevel: 'pro' }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data?.error || 'A busca da etapa não pôde ser concluída.');
             clearTimeout(timeoutId);
