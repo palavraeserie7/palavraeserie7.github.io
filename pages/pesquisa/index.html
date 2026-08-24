@@ -557,6 +557,18 @@
         body.writing-session .sidebar-header > * { display:none !important; }
         body.writing-session .sidebar-header > .pro-matrix-launch { display:block !important; grid-row:1 !important; grid-column:1 / -1 !important; width:100% !important; max-width:none !important; margin:0 !important; }
     </style>
+
+    <style id="norma001-styles">
+      .norma001-item{color:#d7aa43!important;font-weight:900}.norma001-item:hover{color:#fff!important;background:rgba(213,166,59,.12)!important}
+      .norma001-overlay{display:none;position:fixed;inset:0;z-index:280;background:rgba(3,8,18,.82);padding:22px;overflow:auto;align-items:flex-start;justify-content:center}
+      .norma001-overlay.open{display:flex}
+      .norma001-window{width:min(900px,96vw);max-height:92vh;overflow-y:auto;background:#0d182b;border:1px solid #405674;border-radius:12px;box-shadow:0 22px 80px rgba(0,0,0,.55);padding:24px;color:#dbe7f5}
+      .norma001-header{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.norma001-header h2{margin:0 0 6px;color:#20d66b;font-size:18px}.norma001-header p{margin:0;color:#9db0c7;font-size:11px;line-height:1.5}
+      .norma001-close{border:1px solid #536780;border-radius:6px;background:transparent;color:#dbe7f5;padding:8px 12px;cursor:pointer;font-weight:800}.norma001-close:hover{border-color:#20d66b}
+      .norma001-flow{margin:20px 0;padding:15px;border:1px solid #344965;border-radius:8px;background:#091426;text-align:center;font-size:12px;font-weight:900;line-height:1.8}.norma001-flow b{color:#20d66b}
+      .norma001-rule{border-top:1px solid #263754;padding:13px 0}.norma001-rule h3{margin:0 0 6px;font-size:12px;color:#dce8f6}.norma001-rule p,.norma001-rule li{font-size:11px;line-height:1.6;color:#adbad0}.norma001-rule ul{margin:6px 0 0 18px;padding:0}.norma001-warning{border-left:3px solid #d5a63b;background:rgba(213,166,59,.07);padding:10px 12px;color:#d8c38c;font-size:11px;line-height:1.5}
+      @media(max-width:600px){.norma001-overlay{padding:10px}.norma001-window{padding:16px}.norma001-header{flex-direction:column}.norma001-close{align-self:flex-end}.norma001-flow{text-align:left}}
+    </style>
 </head>
 
 <body>
@@ -754,12 +766,36 @@
                         <li><button class="external-submenu-item" type="button" data-technical-module="SENTINELA">VALIDAÇÃO E SEGURANÇA</button></li>
                         <li><button class="external-submenu-item" type="button" data-technical-module="PROMPTS">PROMPTS</button></li>
                         <li><button class="external-submenu-item" type="button" data-technical-module="AJUDA DO SISTEMA">AJUDA DO SISTEMA</button></li>
+                        <li><button class="external-submenu-item norma001-item" type="button" data-internal-access="norma-001" onclick="openNorma001()">📜 NORMA 001 — DESENVOLVIMENTO DO SITE</button></li>
                     </ul>
                 </div>
                 <button class="owner-login-demo" type="button" data-internal-access="escrita" onclick="openWritingWorkspace()">ESCRITA</button>
             </div>
             <small id="owner-login-note">Esta tela é apenas uma representação visual. Nenhuma credencial é validada, enviada ou armazenada nesta versão.</small>
         </div>
+    </div>
+
+
+    <div class="norma001-overlay" id="norma001-overlay" role="dialog" aria-modal="true" aria-labelledby="norma001-title">
+        <section class="norma001-window">
+            <div class="norma001-header">
+                <div><h2 id="norma001-title">📜 NORMA 001 — DESENVOLVIMENTO DO SITE</h2><p>Regras para construção, alteração e crescimento controlado do Palavra &amp; Série.</p></div>
+                <button class="norma001-close" type="button" onclick="closeNorma001()">← FECHAR</button>
+            </div>
+            <div class="norma001-flow">FUNÇÃO <b>→</b> OBJETIVO <b>→</b> IA <b>→</b> ESCOPO <b>→</b> ALTERAÇÃO <b>→</b> TESTE <b>→</b> APROVAÇÃO</div>
+            <div class="norma001-rule"><h3>1. FUNÇÃO</h3><p>Identificar exatamente qual função será criada, corrigida ou ampliada.</p></div>
+            <div class="norma001-rule"><h3>2. OBJETIVO</h3><p>Definir o que a função deverá fazer e qual problema deverá resolver.</p></div>
+            <div class="norma001-rule"><h3>3. IA</h3><p>Determinar qual IA é mais adequada para executar a tarefa. A IA não deve ampliar a tarefa por iniciativa própria.</p></div>
+            <div class="norma001-rule"><h3>4. ESCOPO</h3><p>Definir arquivos, módulos, componentes, permissões e partes que não podem ser alteradas.</p><div class="norma001-warning">Se for necessário sair do escopo: <strong>PARAR → INFORMAR → AGUARDAR AUTORIZAÇÃO.</strong></div></div>
+            <div class="norma001-rule"><h3>5. ALTERAÇÃO</h3><p>A IA executará somente as alterações necessárias para cumprir a tarefa autorizada.</p></div>
+            <div class="norma001-rule"><h3>6. TESTE</h3><ul><li>Testar a nova função.</li><li>Testar funções existentes.</li><li>Verificar efeitos colaterais e regressões.</li><li>“Funciona na tela” não é teste suficiente.</li></ul></div>
+            <div class="norma001-rule"><h3>7. APROVAÇÃO</h3><p>A alteração só é oficialmente concluída após revisão e aprovação do responsável pelo projeto.</p></div>
+            <div class="norma001-rule"><h3>REGRA DOS BOTÕES E MENUS</h3><p>A existência de um botão ou menu não significa que a função esteja implementada.</p><ul><li><strong>FUNCIONAL</strong> — já funciona.</li><li><strong>ESTRUTURAL</strong> — preparado para futura função.</li><li><strong>PLANEJADO</strong> — função ainda será definida.</li><li><strong>EM DESENVOLVIMENTO</strong> — implementação iniciada.</li><li><strong>PROTEGIDO</strong> — alteração exige autorização.</li></ul></div>
+            <div class="norma001-rule"><h3>REGRA DE CRESCIMENTO</h3><p>O site deve crescer de forma incremental, preservando as funções existentes e evitando alterações desnecessárias.</p></div>
+            <div class="norma001-rule"><h3>REGRA DE PROTEÇÃO</h3><p>Arquitetura principal, autenticação, banco de dados crítico, APIs críticas, contratos, catálogo de fontes, roteamento metodológico, matriz metodológica e instruções centrais da IA são áreas protegidas.</p></div>
+            <div class="norma001-rule"><h3>IA NÃO AUTORIZADA E ROLLBACK</h3><p>Se uma IA não autorizada alterar o projeto, as mudanças devem ser identificadas, testadas e comparadas com o estado anterior. Depois podem ser aprovadas, corrigidas ou revertidas.</p></div>
+            <div class="norma001-rule"><h3>REGRA DE DÚVIDA</h3><p><strong>PARAR.</strong> Não improvisar, não ampliar o escopo e solicitar orientação.</p></div>
+        </section>
     </div>
 
     <div class="bible-overlay" id="bible-overlay" role="dialog" aria-modal="true" aria-labelledby="bible-title">
@@ -3634,6 +3670,21 @@
     if (bridgeSubmenuForHeader && headerForBridgeSubmenu) headerForBridgeSubmenu.appendChild(bridgeSubmenuForHeader);
     init();
     setupNavigationHistory();
+
+
+    function openNorma001() {
+        const overlay = document.getElementById('norma001-overlay');
+        if (!overlay) return;
+        overlay.classList.add('open');
+        document.body.classList.add('norma001-open');
+    }
+
+    function closeNorma001() {
+        const overlay = document.getElementById('norma001-overlay');
+        if (!overlay) return;
+        overlay.classList.remove('open');
+        document.body.classList.remove('norma001-open');
+    }
 
 </script>
 </body>
