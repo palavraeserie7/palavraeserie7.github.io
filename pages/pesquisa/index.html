@@ -564,6 +564,7 @@
         .writing-demo-note { margin-top:18px; padding:10px 12px; border-left:3px solid #806f53; background:rgba(128,111,83,.12); color:#a9bbcf; font-size:10px; line-height:1.5; }
         @media (max-width:900px) { .writing-workspace { grid-template-columns:1fr; padding:20px; } .writing-chat-panel { min-height:420px; } }
         @media (max-width:560px) { .writing-area-grid { grid-template-columns:1fr; } .writing-research-header { flex-direction:column; } }
+        body:not(.writing-session) .sidebar-header > .pro-matrix-launch { display:none !important; }
         body.writing-session .sidebar-header > * { display:none !important; }
         body.writing-session .sidebar-header > .pro-matrix-launch { display:block !important; grid-row:1 !important; grid-column:1 / -1 !important; width:100% !important; max-width:none !important; margin:0 !important; }
     </style>
@@ -783,7 +784,7 @@
                         <li><button class="external-submenu-item norma001-item" type="button" data-internal-access="norma-001" onclick="openNorma001()">📜 NORMA 001 — DESENVOLVIMENTO DO SITE</button></li>
                     </ul>
                 </div>
-                <button class="owner-login-demo" type="button" data-internal-access="escrita" onclick="openWritingWorkspace()">ESCRITA</button>
+                <button class="owner-login-demo" type="button" data-internal-access="escrita" onclick="openWritingWorkspace()">SALA DO ESCRITOR</button>
             </div>
             <small id="owner-login-note">Esta tela é apenas uma representação visual. Nenhuma credencial é validada, enviada ou armazenada nesta versão.</small>
         </div>
@@ -1091,6 +1092,1077 @@
 
     const DATA = academicTreeToLegacyData(ACADEMIC_TREE);
 
+    const WRITING_ROOM_MODULE_DATA = [
+  {
+    "id": "01",
+    "title": "TEXTO BÍBLICO",
+    "label": "01 — TEXTO BÍBLICO",
+    "question": "O que constitui o texto objeto da pesquisa?",
+    "rule": "o texto bíblico é a fonte primária; nenhum comentário o substitui. Texto crítico eclético é o padrão — tradições históricas alternativas entram só como testemunho comparativo. A comparação de tradições em 01.9 é apenas um mapeamento preliminar — a avaliação e o julgamento das variantes pertencem exclusivamente ao ANL-02.",
+    "steps": [
+      {
+        "code": "01.6",
+        "label": "Texto hebraico",
+        "item": "01.6 — Texto hebraico",
+        "prompt": "Trabalhe exclusivamente com o dado textual hebraico da passagem do Antigo Testamento actualmente definida. Identifique a referência, apresente o texto hebraico correspondente e preserve a forma textual e a vocalização quando disponíveis. Apresente uma tradução literal para português e destaque apenas elementos textuais relevantes para etapas posteriores. Não execute crítica textual completa, análise gramatical do Módulo 03, análise lexical do Módulo 04 ou exegese. Organize a resposta distinguindo DADO e OBSERVAÇÃO. Não invente texto, vocalização, fonte ou evidência; declare limitações quando necessário."
+      },
+      {
+        "code": "01.7",
+        "label": "Texto grego",
+        "item": "01.7 — Texto grego",
+        "prompt": "Trabalhe com o texto grego relevante para a passagem actualmente definida, explicando explicitamente qual tradição está a ser consultada. Para uma passagem do Antigo Testamento, se o texto grego for a Septuaginta, declare isso claramente e não crie uma segunda tradição grega artificial. Apresente o texto grego disponível, a tradução e a relação textual necessária para compreender o dado grego antes da análise específica da LXX. Não trate automaticamente “texto grego” como uma tradição distinta da Septuaginta, não invente diferenças e não avance para crítica textual completa. Distinga DADO, OBSERVAÇÃO e limitações."
+      },
+      {
+        "code": "01.8",
+        "label": "Texto da Septuaginta",
+        "item": "01.8 — Texto da Septuaginta",
+        "prompt": "Analise especificamente a Septuaginta (LXX) para a passagem actualmente definida, quando aplicável. Apresente a redação da LXX e a tradução; compare-a de forma controlada com o texto hebraico; e identifique, apenas quando houver evidência, diferenças de tradução, omissões, acréscimos, mudanças de ordem, escolhas tradutórias ou diferenças linguísticas relevantes. Não presuma causas como erro de escriba, erro de leitura, alteração teológica, intenção deliberada, harmonização ou interpretação. Essas explicações só podem aparecer como HIPÓTESES claramente assinaladas e acompanhadas da evidência disponível. Não execute crítica textual completa nem decisão textual definitiva. Se não houver diferença relevante documentada, declare isso explicitamente."
+      },
+      {
+        "code": "01.9",
+        "label": "Identificação preliminar de tradições textuais divergentes",
+        "item": "01.9 — Identificação preliminar de tradições textuais divergentes",
+        "prompt": "Faça uma triagem textual preliminar dos dados anteriores relevantes do Módulo 01. Identifique se existem divergências relevantes, indique onde ocorrem, descreva a natureza da diferença e registe quais evidências devem ser investigadas posteriormente. Não substitua o Módulo 02 — Crítica Textual: não execute avaliação completa de evidências externas ou internas, comparação definitiva, avaliação final de variantes ou decisão textual definitiva. Trate resultados anteriores como dados de pesquisa provisórios, não como verdades infalíveis. Se não houver divergência relevante, escreva: “Não foi identificada divergência textual relevante nesta etapa preliminar.” Não crie uma variante para justificar a etapa."
+      },
+      {
+        "code": "01.10",
+        "label": "Palavras e construções no original",
+        "item": "01.10 — Palavras e construções no original",
+        "prompt": "Identifique preliminarmente as palavras, formas e construções do texto original que merecem atenção para a continuidade da investigação. Pode indicar termos relevantes, formas importantes, construções significativas, características que uma tradução portuguesa pode ocultar e diferenças linguísticas relevantes entre tradições textuais. Não execute a investigação lexical completa do Módulo 04 nem a análise gramatical completa do Módulo 03. Responda à pergunta: “Quais palavras e construções do texto original precisam ser observadas?” Não transforme hipótese em facto e não apresente conclusão de texto-base nesta etapa."
+      },
+      {
+        "code": "01.11",
+        "label": "Determinação do texto-base",
+        "item": "01.11 — Determinação do texto-base",
+        "prompt": "Estabeleça um texto-base operacional e provisório para a continuidade da pesquisa, utilizando os dados textuais relevantes já levantados no Módulo 01. Não apresente esta etapa como a determinação textual definitiva e não substitua o 02.12 — Determinação textual do Módulo 02. Separe claramente: DADOS DISPONÍVEIS, AVALIAÇÃO PROVISÓRIA, GRAU DE SEGURANÇA e INCERTEZAS. A etapa actual pode confirmar, qualificar ou corrigir resultados anteriores. Se as evidências não permitirem uma determinação segura, declare a incerteza. Não procure novidade artificial; se não houver observação nova ou relevante, informe isso."
+      }
+    ]
+  },
+  {
+    "id": "02",
+    "title": "CRÍTICA TEXTUAL",
+    "label": "02 — CRÍTICA TEXTUAL",
+    "question": "Existem variantes textuais relevantes para esta passagem?",
+    "rule": "variante relevante deve ser sinalizada, nunca apresentada como fato indiscutível.",
+    "steps": [
+      {
+        "code": "02.1",
+        "label": "Identificação da variante textual",
+        "item": "02.1 — Identificação da variante textual",
+        "prompt": "Com base no texto-base operacional de 01.11 e nos dados do Módulo 01, identifique apenas variantes textuais efectivamente documentadas para a passagem actual. Diferencie variante textual de diferença de tradução, ortografia ou estilo. Isole as palavras ou expressões concorrentes. Se não houver variante textual relevante documentada, declare exactamente: “Não foram identificadas variantes textuais relevantes documentadas para esta passagem.” Nesse caso, marque as etapas dependentes como não aplicáveis, sem inventar dados."
+      },
+      {
+        "code": "02.2",
+        "label": "Localização da variante",
+        "item": "02.2 — Localização da variante",
+        "prompt": "Com base nas variantes documentadas em 02.1, localize cada divergência com precisão: versículo, palavra ou expressão, posição na frase, função no contexto imediato, leitura do texto-base e leituras concorrentes. Se 02.1 não identificou variante relevante, declare esta etapa não aplicável."
+      },
+      {
+        "code": "02.3",
+        "label": "Testemunhos textuais",
+        "item": "02.3 — Testemunhos textuais",
+        "prompt": "Para cada variante identificada, apresente as principais testemunhas textuais documentadas que sustentam cada leitura concorrente. Diferencie manuscritos hebraicos, gregos, versões antigas e outras testemunhas. Não apresente uma lista como exaustiva se os dados disponíveis não permitirem garantir exaustividade. Se não houver variante documentada, declare não aplicável."
+      },
+      {
+        "code": "02.4",
+        "label": "Manuscritos e versões envolvidos",
+        "item": "02.4 — Manuscritos e versões envolvidos",
+        "prompt": "Aprofunde 02.3 identificando, apenas quando documentados, manuscritos, códices, fragmentos, versões e siglas técnicas associados a cada leitura. Não atribua uma leitura a um manuscrito sem evidência documental suficiente. Se não houver variante documentada, declare não aplicável."
+      },
+      {
+        "code": "02.5",
+        "label": "Evidências externas",
+        "item": "02.5 — Evidências externas",
+        "prompt": "Avalie as evidências externas para cada variante documentada, considerando antiguidade, distribuição geográfica, independência, relações genealógicas quando conhecidas e características das tradições. Não trate a testemunha mais antiga como automaticamente superior; compare pontos fortes e limitações de cada lado."
+      },
+      {
+        "code": "02.6",
+        "label": "Evidências internas",
+        "item": "02.6 — Evidências internas",
+        "prompt": "Avalie as evidências internas para cada variante documentada. Considere, quando pertinentes, lectio difficilior, lectio brevior, harmonização, simplificação, expansão, correcção gramatical, assimilação e erros de cópia. Não aplique critérios como regras automáticas; explique por que favorecem ou desfavorecem cada leitura."
+      },
+      {
+        "code": "02.7",
+        "label": "Comparação das leituras",
+        "item": "02.7 — Comparação das leituras",
+        "prompt": "Coloque lado a lado todas as leituras concorrentes documentadas. Compare exactamente as palavras e expressões divergentes e explique o efeito sobre estrutura, sentido, gramática e fluxo. Diferencie alterações de significado de diferenças linguísticas ou estilísticas."
+      },
+      {
+        "code": "02.8",
+        "label": "Aparato crítico",
+        "item": "02.8 — Aparato crítico",
+        "prompt": "Com base exclusivamente nas evidências documentadas nas etapas anteriores, componha um aparato crítico simplificado. Apresente a leitura adoptada, as principais testemunhas e as leituras concorrentes com respectivas testemunhas. Se os dados não permitirem aparato completo, declare a limitação em vez de preencher lacunas por inferência."
+      },
+      {
+        "code": "02.9",
+        "label": "Avaliação da variante",
+        "item": "02.9 — Avaliação da variante",
+        "prompt": "Pondere conjuntamente as evidências externas e internas. Avalie qual leitura possui o conjunto de evidências mais favorável à reconstrução provável da forma textual mais antiga alcançável. Apresente argumentos favoráveis, contrários, limitações e grau de segurança alto, moderado ou baixo. Não apresente reconstrução provável como certeza absoluta."
+      },
+      {
+        "code": "02.10",
+        "label": "Impacto na tradução",
+        "item": "02.10 — Impacto na tradução",
+        "prompt": "Demonstre como cada leitura documentada afectaria a tradução para português. Apresente as traduções correspondentes e destaque exactamente as palavras ou construções responsáveis pela diferença. Não introduza diferenças interpretativas que não decorram da variante textual."
+      },
+      {
+        "code": "02.11",
+        "label": "Impacto na interpretação",
+        "item": "02.11 — Impacto na interpretação",
+        "prompt": "Analise o impacto exegético, histórico e teológico das variantes documentadas. Explique se a diferença altera o sentido, uma afirmação histórica, uma referência profética, uma construção teológica ou apenas uma nuance linguística. Diferencie o que é alterado do que permanece igual e não atribua consequências doutrinárias sem demonstração textual."
+      },
+      {
+        "code": "02.12",
+        "label": "Determinação textual",
+        "item": "02.12 — Determinação textual",
+        "prompt": "Com base no histórico do Módulo 02, apresente a determinação textual final. Separe factos documentados, evidências externas, evidências internas, argumentos contrários e conclusão crítica. Indique grau de segurança alto, moderado ou baixo. Se não houver evidência suficiente, não force uma leitura: apresente alternativas, grau baixo e a razão da incerteza. A leitura determinada será texto de trabalho para etapas posteriores."
+      }
+    ]
+  },
+  {
+    "id": "03",
+    "title": "GRAMÁTICA E SINTAXE",
+    "label": "03 — GRAMÁTICA E SINTAXE",
+    "question": "Como as palavras estão funcionando dentro da frase?",
+    "rule": "a unidade mínima de interpretação é a palavra dentro da construção e do contexto — nunca isolada.",
+    "steps": [
+      {
+        "code": "03.1",
+        "label": "Identificação da construção",
+        "item": "03.1 — Identificação da construção",
+        "prompt": "Analise exclusivamente a organização estrutural da frase e das orações do texto de trabalho de {PASSAGEM_ATUAL}. Identifique a construção sintáctica predominante e a disposição das unidades sintácticas. Distinga estrutura da frase de análise literária ampla. Não analise género, argumento literário, intenção comunicativa, crítica textual, variantes ou exegese."
+      },
+      {
+        "code": "03.2",
+        "label": "Morfologia",
+        "item": "03.2 — Morfologia",
+        "prompt": "Forneça a análise morfológica das formas efectivamente presentes no texto de trabalho de {PASSAGEM_ATUAL}. Para cada forma relevante, apresente classe morfológica e características pertinentes: no hebraico, género, número, estado, pessoa e forma verbal; no grego, género, número, caso, pessoa, tempo, aspecto, modo e voz, quando aplicáveis. Não substitua a análise por categorias da língua portuguesa e não invente formas."
+      },
+      {
+        "code": "03.3",
+        "label": "Lema e forma lexical",
+        "item": "03.3 — Lema e forma lexical",
+        "prompt": "Para cada palavra relevante de {PASSAGEM_ATUAL}, apresente a forma flexionada efectivamente presente e o lema correspondente. Informe raiz consonantal hebraica ou formação lexical grega apenas quando puder ser determinada com segurança. Mostre a relação forma–lema sem desenvolver investigação lexical completa, campo semântico ou usos no Módulo 04."
+      },
+      {
+        "code": "03.4",
+        "label": "Classe gramatical",
+        "item": "03.4 — Classe gramatical",
+        "prompt": "Classifique as formas efectivamente presentes em {PASSAGEM_ATUAL} segundo a sua categoria e função gramatical no contexto: substantivo, verbo, adjectivo, pronome, preposição, artigo, partícula, conjunção, advérbio ou outra categoria aplicável. Não repita apenas a flexão morfológica de 03.2 e não atribua categorias ausentes."
+      },
+      {
+        "code": "03.5",
+        "label": "Sujeito",
+        "item": "03.5 — Sujeito",
+        "prompt": "Identifique o sujeito gramatical de cada oração em {PASSAGEM_ATUAL}, explícito, implícito ou recuperável pela forma verbal. Indique núcleo, modificadores e concordância. Se não houver sujeito expresso ou houver ambiguidade linguística real, declare-a."
+      },
+      {
+        "code": "03.6",
+        "label": "Predicado",
+        "item": "03.6 — Predicado",
+        "prompt": "Isole e analise o predicado de cada oração de {PASSAGEM_ATUAL}. Identifique o núcleo verbal ou nominal e os elementos que o completam ou modificam. Utilize categorias compatíveis com hebraico ou grego e não imponha a gramática portuguesa."
+      },
+      {
+        "code": "03.7",
+        "label": "Objeto",
+        "item": "03.7 — Objeto",
+        "prompt": "Identifique os complementos exigidos ou relacionados aos verbos de {PASSAGEM_ATUAL}. Distinga objecto directo, indirecto, complemento verbal ou outra função pertinente segundo a língua. No hebraico, trate אֵת (ʾet) como marcador de objecto definido quando aplicável, não como caso acusativo grego. Não classifique circunstanciais automaticamente como objectos."
+      },
+      {
+        "code": "03.8",
+        "label": "Verbos",
+        "item": "03.8 — Verbos",
+        "prompt": "Faça apenas o inventário das formas verbais efectivamente presentes em {PASSAGEM_ATUAL}, indicando lema, forma morfológica, transitividade quando determinável e função sintáctica. Não substitua forma presente por forma hipotética e não desenvolva estudo lexical completo."
+      },
+      {
+        "code": "03.9",
+        "label": "Tempo e aspecto",
+        "item": "03.9 — Tempo e aspecto",
+        "prompt": "Analise tempo, aspecto e valor contextual das formas verbais efectivamente presentes em {PASSAGEM_ATUAL}. No hebraico, considere qatal, yiqtol, formas com ו e outras formas pertinentes sem equivalências rígidas de passado, presente ou futuro. No grego, considere tempo e aspecto conforme a forma. Não aplique equivalências mecânicas."
+      },
+      {
+        "code": "03.10",
+        "label": "Voz",
+        "item": "03.10 — Voz",
+        "prompt": "Analise a relação entre sujeito e acção verbal em {PASSAGEM_ATUAL}. No hebraico, identifique binyan ou padrão verbal e explique a sua função sem equivalência automática com voz grega. No grego, identifique voz activa, média ou passiva quando aplicável."
+      },
+      {
+        "code": "03.11",
+        "label": "Modo",
+        "item": "03.11 — Modo",
+        "prompt": "Analise modo e modalidade das formas efectivamente presentes em {PASSAGEM_ATUAL}. No grego, identifique indicativo, subjuntivo, imperativo, optativo ou outras formas quando ocorrerem. No hebraico, use categorias modais próprias sem forçar correspondência grega. Distinga formas finitas, infinitivos e particípios."
+      },
+      {
+        "code": "03.12",
+        "label": "Construções gramaticais",
+        "item": "03.12 — Construções gramaticais",
+        "prompt": "Examine construções gramaticais especiais efectivamente presentes em {PASSAGEM_ATUAL}. No hebraico, considere infinitivo absoluto, cadeia construta, coordenação e subordinação quando ocorrerem. No grego, considere genitivo absoluto, acusativo e infinitivo, particípios circunstanciais e outras estruturas pertinentes. Se nenhuma construção especial relevante ocorrer, declare a ausência."
+      },
+      {
+        "code": "03.13",
+        "label": "Relações sintáticas",
+        "item": "03.13 — Relações sintáticas",
+        "prompt": "Mapeie as relações sintácticas internas de {PASSAGEM_ATUAL}: dependência, regência nominal e verbal, concordância, complementação e modificação. Apresente como palavras e grupos se relacionam dentro das orações, sem introduzir elementos ausentes."
+      },
+      {
+        "code": "03.14",
+        "label": "Conectivos",
+        "item": "03.14 — Conectivos",
+        "prompt": "Identifique os conectivos efectivamente presentes em {PASSAGEM_ATUAL}, incluindo conjunções, preposições, partículas e outros elementos relacionais. Explique apenas funções demonstráveis no contexto, como coordenação, subordinação, causa, consequência, condição, contraste, finalidade ou sequência."
+      },
+      {
+        "code": "03.15",
+        "label": "Relações entre cláusulas",
+        "item": "03.15 — Relações entre cláusulas",
+        "prompt": "Examine a relação sintáctica e lógica entre as orações de {PASSAGEM_ATUAL}. Identifique coordenação, subordinação e relações demonstráveis de condição, causa, consequência, finalidade, explicação, complemento, contraste ou sequência. Não confunda relação sintáctica com interpretação teológica ou exegética."
+      },
+      {
+        "code": "03.16",
+        "label": "Estrutura da frase (síntese)",
+        "item": "03.16 — Estrutura da frase (síntese)",
+        "prompt": "Com base exclusivamente nas análises anteriores do Módulo 03 para {PASSAGEM_ATUAL}, apresente uma síntese esquemática da estrutura das orações, elementos sintácticos, relações entre cláusulas e fenómenos morfológicos relevantes. Não introduza nova crítica textual, variante, determinação textual, análise lexical profunda ou exegese."
+      }
+    ]
+  },
+  {
+    "id": "04",
+    "title": "LÉXICO",
+    "label": "04 — LÉXICO",
+    "question": "O que determinado termo pode significar neste contexto?",
+    "rule": "o contexto determina o sentido — vários significados possíveis não implica presença simultânea de todos. Fluxo: forma encontrada → lema → usos → campo semântico → contexto → sentido provável.",
+    "steps": [
+      {
+        "code": "04.1",
+        "label": "Identificação da palavra",
+        "item": "04.1 — Identificação da palavra",
+        "prompt": "Para {PASSAGEM_ATUAL}, seleccione apenas vocábulos que mereçam estudo lexical por função na passagem, peso semântico demonstrável, ambiguidade lexical real ou relevância para a construção do sentido. Justifique cada selecção com evidência do contexto imediato. Não seleccione termos apenas por frequência ou importância teológica genérica. Apresente cada termo na grafia original."
+      },
+      {
+        "code": "04.2",
+        "label": "Forma encontrada no texto",
+        "item": "04.2 — Forma encontrada no texto",
+        "prompt": "Para cada palavra seleccionada em 04.1 de {PASSAGEM_ATUAL}, apresente a forma exacta efectivamente presente no texto de trabalho, preservando a grafia original e as características flexionais relevantes. Não substitua a forma por lema, variante ou reconstrução."
+      },
+      {
+        "code": "04.3",
+        "label": "Lema",
+        "item": "04.3 — Lema",
+        "prompt": "Para cada forma de {PASSAGEM_ATUAL}, apresente o lema segundo a convenção lexicográfica da língua original e mostre claramente a relação forma–lema. No hebraico, use a forma lexical convencional; no grego, a forma lexicográfica convencional. Não reabra a decisão textual."
+      },
+      {
+        "code": "04.4",
+        "label": "Transliteração",
+        "item": "04.4 — Transliteração",
+        "prompt": "Forneça transliteração técnica e consistente dos termos analisados em {PASSAGEM_ATUAL}. Identifique expressamente o sistema de transliteração utilizado e preserve distinções relevantes. Se o sistema não puder ser identificado ou a forma não puder ser transliterada com segurança, declare a limitação."
+      },
+      {
+        "code": "04.5",
+        "label": "Classe gramatical",
+        "item": "04.5 — Classe gramatical",
+        "prompt": "Confirme a classe gramatical das palavras estudadas em {PASSAGEM_ATUAL} com base na forma e função efectivamente presentes. Utilize os dados do Módulo 03 sem repetir integralmente a análise morfológica e sintáctica. Se houver ambiguidade, apresente as possibilidades sustentáveis."
+      },
+      {
+        "code": "04.6",
+        "label": "Definições lexicais",
+        "item": "04.6 — Definições lexicais",
+        "prompt": "Apresente as acepções lexicais documentadas dos lemas analisados em {PASSAGEM_ATUAL}. Só cite BDB, HALOT, BDAG ou outro léxico académico se o conteúdo tiver sido efectivamente consultado nesta execução. Se a fonte for apenas uma referência metodológica, declare que não foi consultada. Não invente citações, páginas, definições ou bibliografia."
+      },
+      {
+        "code": "04.7",
+        "label": "Usos da palavra",
+        "item": "04.7 — Usos da palavra",
+        "prompt": "Mapeie os usos documentados de cada palavra em {PASSAGEM_ATUAL}, distinguindo significado lexical potencial de significado realizado. Explique a influência do contexto, género ou construção apenas quando houver base disponível. Não invente ocorrências nem trate todas as acepções como simultaneamente presentes."
+      },
+      {
+        "code": "04.8",
+        "label": "Campo semântico",
+        "item": "04.8 — Campo semântico",
+        "prompt": "Identifique o campo semântico dos vocábulos analisados em {PASSAGEM_ATUAL} apenas quando houver evidência lexical suficiente. Apresente termos próximos, sinónimos, antónimos ou relações pertinentes e justifique-as. Não invente relações semânticas nem trate semelhança formal como equivalência."
+      },
+      {
+        "code": "04.9",
+        "label": "Uso no contexto",
+        "item": "04.9 — Uso no contexto",
+        "prompt": "Determine como cada palavra funciona no contexto imediato de {PASSAGEM_ATUAL}. Avalie a acepção mais compatível com a forma, a gramática e o contexto. Distinga significado possível de significado realizado e classifique uso literal, metafórico, figurado, poético, técnico ou hiperbólico somente quando demonstrável."
+      },
+      {
+        "code": "04.10",
+        "label": "Uso no Antigo Testamento",
+        "item": "04.10 — Uso no Antigo Testamento",
+        "prompt": "Analise usos no Antigo Testamento apenas quando a língua, o lema e o corpus forem aplicáveis. Informe frequência somente com dados estatísticos efectivamente disponíveis, identificando o corpus e a fonte. Se não houver corpus ou evidência suficiente, marque como não aplicável ou declare a limitação. Não invente estatísticas."
+      },
+      {
+        "code": "04.11",
+        "label": "Uso no Novo Testamento",
+        "item": "04.11 — Uso no Novo Testamento",
+        "prompt": "Analise a relação com o Novo Testamento apenas quando houver conexão textual ou lexical documentável. Para termo hebraico, diferencie correspondente na Septuaginta, equivalência semântica e relação temática; para termo grego, analise usos documentados no Novo Testamento. Se não houver conexão directa relevante, declare a ausência e não force paralelos."
+      },
+      {
+        "code": "04.12",
+        "label": "Comparação das evidências lexicais",
+        "item": "04.12 — Comparação das evidências lexicais",
+        "prompt": "Cruze os dados lexicais anteriores para cada palavra de {PASSAGEM_ATUAL}: definições, usos, campo semântico, dados de corpus e contexto imediato. Distinga evolução histórica comprovável de variação contextual e indique quais evidências sustentam cada comparação. Registe limitações das fontes."
+      },
+      {
+        "code": "04.13",
+        "label": "Sentido provável no contexto",
+        "item": "04.13 — Sentido provável no contexto",
+        "prompt": "Apresente a avaliação lexical final de cada palavra analisada em {PASSAGEM_ATUAL}. Indique o sentido mais provável no contexto, a tradução portuguesa preferível, alternativas plausíveis, dados documentados, inferência lexical, razões contra acepções alternativas e grau de segurança alto, moderado ou baixo. Não apresente a inferência como certeza absoluta e não introduza nova crítica textual ou análise gramatical."
+      }
+    ]
+  },
+  {
+    "id": "05",
+    "title": "LÉXICO TEOLÓGICO",
+    "label": "05 — LÉXICO TEOLÓGICO",
+    "question": "Como esse conceito funciona dentro da linguagem teológica da Escritura?",
+    "rule": "o conceito teológico aprofunda, mas permanece subordinado ao uso efetivo da palavra no texto estudado.",
+    "steps": [
+      {
+        "code": "05.1",
+        "label": "Identificação do conceito",
+        "item": "05.1 — Identificação do conceito",
+        "prompt": "Para {PASSAGEM_ATUAL}, identifique um ou mais conceitos, temas ou afirmações teologicamente relevantes quando houver fundamento textual suficiente. Considere também a possibilidade de nenhum conceito central demonstrável. Justifique cada selecção com elementos do próprio texto e não force um grande conceito doutrinário."
+      },
+      {
+        "code": "05.2",
+        "label": "Termo no texto",
+        "item": "05.2 — Termo no texto",
+        "prompt": "Para cada conceito identificado em 05.1 em {PASSAGEM_ATUAL}, identifique o termo ou conjunto de termos efectivamente presentes que funciona como veículo linguístico. Apresente grafia original, transliteração quando pertinente e tradução básica. Não substitua o termo presente por outro de maior importância teológica noutras passagens."
+      },
+      {
+        "code": "05.3",
+        "label": "Base lexical do conceito",
+        "item": "05.3 — Base lexical do conceito",
+        "prompt": "Com base nos resultados do Módulo 04, apresente a base lexical de cada conceito de {PASSAGEM_ATUAL}. Resuma apenas dados lexicais relevantes e diferencie significado lexical, significado contextual e interpretação teológica. Não repita integralmente o Módulo 04."
+      },
+      {
+        "code": "05.4",
+        "label": "Uso no Antigo Testamento",
+        "item": "05.4 — Uso no Antigo Testamento",
+        "prompt": "Rastreie o desenvolvimento documentado de cada conceito no Antigo Testamento, usando fontes e corpora identificáveis quando disponíveis. Mostre continuidades, ampliações, restrições, divergências e mudanças de ênfase. Não presuma evolução linear ou doutrina progressiva sem evidência textual."
+      },
+      {
+        "code": "05.5",
+        "label": "Uso na Septuaginta",
+        "item": "05.5 — Uso na Septuaginta",
+        "prompt": "Analise o uso do conceito na Septuaginta quando houver correspondência relevante documentada. Identifique termos gregos, compare nuances e distinga evidência textual de inferência histórica. Se não houver correspondência ou fonte suficiente, declare não aplicável ou a limitação. Não atribua uma escolha da LXX a todo o Judaísmo grego."
+      },
+      {
+        "code": "05.6",
+        "label": "Uso no Judaísmo",
+        "item": "05.6 — Uso no Judaísmo",
+        "prompt": "Examine o conceito no Judaísmo do Segundo Templo apenas com fontes documentadas e datação/contexto identificáveis. Diferencie Manuscritos do Mar Morto, literatura apocalíptica, apócrifa e pseudepígrafa. Trate literatura rabínica posterior separadamente e declare ausência de evidência quando aplicável."
+      },
+      {
+        "code": "05.7",
+        "label": "Uso no Novo Testamento",
+        "item": "05.7 — Uso no Novo Testamento",
+        "prompt": "Analise retomada, desenvolvimento, reinterpretação ou cumprimento no Novo Testamento apenas quando a relação textual for demonstrável. Diferencie citação directa, alusão, paralelo temático, desenvolvimento conceitual e interpretação posterior. Não presuma continuidade doutrinária ou cumprimento sem evidência."
+      },
+      {
+        "code": "05.8",
+        "label": "Desenvolvimento do conceito",
+        "item": "05.8 — Desenvolvimento do conceito",
+        "prompt": "Apresente o desenvolvimento histórico e conceitual documentado de forma não linear: organize formulações, lacunas, divergências, desenvolvimentos paralelos e mudanças de ênfase no AT, LXX, Segundo Templo e NT quando pertinentes. Não force uma trajectória única nem uma consolidação final."
+      },
+      {
+        "code": "05.9",
+        "label": "Relações teológicas",
+        "item": "05.9 — Relações teológicas",
+        "prompt": "Relacione o conceito com temas teológicos pertinentes, distinguindo relações directamente fundamentadas no texto, relações da Teologia Bíblica e sínteses posteriores da Teologia Sistemática. Não execute o Módulo 09 completo, não construa o sistema doutrinário do Módulo 11 e não transforme uma relação temática em conclusão doutrinária."
+      },
+      {
+        "code": "05.10",
+        "label": "Comparação das evidências",
+        "item": "05.10 — Comparação das evidências",
+        "prompt": "Compare os dados das etapas 05.4–05.7. Distinga continuidades, mudanças, expansões, restrições e rupturas documentadas de interpretações posteriores. Apresente divergências entre fontes e tradições sem forçar uma síntese artificial."
+      },
+      {
+        "code": "05.11",
+        "label": "Síntese do conceito teológico",
+        "item": "05.11 — Síntese do conceito teológico",
+        "prompt": "Com base exclusivamente nas evidências anteriores, construa uma síntese académica do conceito ou conceitos de {PASSAGEM_ATUAL}. Separe evidência textual, reconstrução histórica, interpretação teológica e conclusão doutrinária. Indique fontes, lacunas e grau de segurança; não apresente uma tradição específica como facto universal."
+      },
+      {
+        "code": "05.12",
+        "label": "Relação com o contexto da passagem",
+        "item": "05.12 — Relação com o contexto da passagem",
+        "prompt": "Retorne a {PASSAGEM_ATUAL} e explique como o panorama teológico pode ampliar, esclarecer ou qualificar a compreensão da passagem. Não faça nova exegese, análise de intenção autoral, análise literária ou aplicação pastoral; não altere a leitura textual, gramatical ou lexical estabelecida."
+      }
+    ]
+  },
+  {
+    "id": "06",
+    "title": "EXEGESE",
+    "label": "06 — EXEGESE",
+    "question": "O que o autor está comunicando nesta passagem?",
+    "rule": "integra as conclusões dos ANLs 01–05; não os repete.",
+    "steps": [
+      {
+        "code": "06.1",
+        "label": "Delimitação da passagem",
+        "item": "06.1 — Delimitação da passagem",
+        "prompt": "Para {PASSAGEM_ATUAL}, delimite a unidade com critérios literários e marcadores textuais. Se as evidências não permitirem fronteira precisa, declare a incerteza, a fluidez e as leituras alternativas. Use a leitura de trabalho do Módulo 02 e não reabra variantes."
+      },
+      {
+        "code": "06.2",
+        "label": "Contexto imediato",
+        "item": "06.2 — Contexto imediato",
+        "prompt": "Analise o contexto imediato de {PASSAGEM_ATUAL}, explicando como o bloco anterior e o posterior influenciam o fluxo da unidade. Não substitua a análise histórica-cultural completa do Módulo 07."
+      },
+      {
+        "code": "06.3",
+        "label": "Estrutura da passagem",
+        "item": "06.3 — Estrutura da passagem",
+        "prompt": "Divida esquematicamente as secções literárias internas de {PASSAGEM_ATUAL} em unidades de pensamento. Use os dados sintácticos do Módulo 03 como base estática, sem repetir a análise gramatical."
+      },
+      {
+        "code": "06.4",
+        "label": "Argumento da passagem",
+        "item": "06.4 — Argumento da passagem",
+        "prompt": "Reconstrua estritamente a progressão do discurso, linha de pensamento, fluxo narrativo ou estrutura do poema dentro de {PASSAGEM_ATUAL}. Concentre-se na mecânica interna do texto e não declare directamente o que o autor quis dizer ou a sua intenção externa."
+      },
+      {
+        "code": "06.5",
+        "label": "Contexto literário",
+        "item": "06.5 — Contexto literário",
+        "prompt": "Posicione {PASSAGEM_ATUAL} no desenvolvimento global do livro, usando evidências internas, estrutura literária e fontes académicas identificáveis. Se houver debate sobre o propósito do livro, apresente as alternativas e não trate uma finalidade global como facto absoluto."
+      },
+      {
+        "code": "06.6",
+        "label": "Gênero literário",
+        "item": "06.6 — Gênero literário",
+        "prompt": "Identifique o género e subgéneros literários de {PASSAGEM_ATUAL}. Apresente características da linguagem como orientações hermenêuticas flexíveis, sem impor regras rígidas ou classificações artificiais."
+      },
+      {
+        "code": "06.7",
+        "label": "Relação entre versículos",
+        "item": "06.7 — Relação entre versículos",
+        "prompt": "Examine como os versículos de {PASSAGEM_ATUAL} se conectam no plano do discurso, mostrando avanços, tensões e dependências de sentido sem repetir a morfologia ou a sintaxe do Módulo 03."
+      },
+      {
+        "code": "06.8",
+        "label": "Relações entre unidades de pensamento",
+        "item": "06.8 — Relações entre unidades de pensamento",
+        "prompt": "Analise como as unidades de pensamento de 06.3 dialogam, mostrando transições, equilíbrio e desenvolvimento das ideias. Não acrescente estrutura ausente no texto."
+      },
+      {
+        "code": "06.9",
+        "label": "Intenção comunicativa",
+        "item": "06.9 — Intenção comunicativa",
+        "prompt": "Reconstrua a provável intenção comunicativa relativa a {PASSAGEM_ATUAL} apenas com evidências textuais e o contexto histórico estritamente necessário. Não especule sobre estados mentais. Não execute a investigação histórico-cultural completa do Módulo 07."
+      },
+      {
+        "code": "06.10",
+        "label": "Problemas interpretativos",
+        "item": "06.10 — Problemas interpretativos",
+        "prompt": "Mapeie ambiguidades, tensões e obscuridades literárias ou históricas de {PASSAGEM_ATUAL} que gerem debates exegéticos documentados. Se não houver debates maiores, declare exactamente: “Não foram identificados debates interpretativos maiores documentados para esta passagem.” Não fabrique controvérsias."
+      },
+      {
+        "code": "06.11",
+        "label": "Interpretações existentes",
+        "item": "06.11 — Interpretações existentes",
+        "prompt": "Apresente apenas interpretações documentadas em fontes históricas ou académicas identificáveis para os problemas de 06.10. Não crie correntes hipotéticas nem atribua uma posição sem fonte."
+      },
+      {
+        "code": "06.12",
+        "label": "Argumentos das interpretações",
+        "item": "06.12 — Argumentos das interpretações",
+        "prompt": "Exponha as evidências textuais, linguísticas, literárias e históricas que cada interpretação documentada utiliza. Diferencie argumento da fonte, reconstrução e avaliação própria."
+      },
+      {
+        "code": "06.13",
+        "label": "Avaliação exegética",
+        "item": "06.13 — Avaliação exegética",
+        "prompt": "Avalie criticamente as interpretações de 06.12 em relação à leitura textual do Módulo 02 e aos dados dos Módulos 03–05. Apresente coerência, fragilidades, contra-argumentos, limites e grau de segurança. Preserve a pluralidade quando não houver base suficiente para decidir."
+      },
+      {
+        "code": "06.14",
+        "label": "Síntese exegética",
+        "item": "06.14 — Síntese exegética",
+        "prompt": "Com base nas etapas anteriores, apresente uma síntese exegética de {PASSAGEM_ATUAL} com sentido mais provável, evidências, alternativas, limites e grau de segurança. Não force certeza sobre a mente do autor nem emita julgamento dogmático de legitimidade teológica. Contexto literário e exegese pertencem ao Módulo 06; contexto histórico-cultural detalhado, política, geografia, sociedade, costumes, arqueologia e fontes extrabíblicas pertencem ao Módulo 07."
+      }
+    ]
+  },
+  {
+    "id": "07",
+    "title": "CONTEXTO HISTÓRICO-CULTURAL",
+    "label": "07 — CONTEXTO HISTÓRICO-CULTURAL",
+    "question": "O que o mundo original do texto acrescenta à interpretação?",
+    "rule": "nenhum pano de fundo especulativo sem base em fonte primária ou evidência material.",
+    "steps": [
+      {
+        "code": "07.1",
+        "label": "Identificação do contexto histórico",
+        "item": "07.1 — Identificação do contexto histórico",
+        "prompt": "Identifique o horizonte histórico geral e o cenário relevante de {PASSAGEM_ATUAL}. Use dados documentados e indique incerteza; não apresente o pano de fundo como facto quando houver debate."
+      },
+      {
+        "code": "07.2",
+        "label": "Período histórico",
+        "item": "07.2 — Período histórico",
+        "prompt": "Estime o período histórico ou a datação provável de {PASSAGEM_ATUAL} com intervalos e margens de incerteza. Não force uma data absoluta nem confunda data do cenário com data da redação."
+      },
+      {
+        "code": "07.3",
+        "label": "Localização geográfica",
+        "item": "07.3 — Localização geográfica",
+        "prompt": "Mapeie a geografia histórica pertinente: locais, cidades, fronteiras, rotas ou acidentes geográficos. Explique relevância situacional apenas quando documentada."
+      },
+      {
+        "code": "07.4",
+        "label": "Contexto político",
+        "item": "07.4 — Contexto político",
+        "prompt": "Descreva poder, governação, impérios, governantes, conflitos e tratados directamente pertinentes à região e ao povo da passagem. Diferencie facto documentado de reconstrução."
+      },
+      {
+        "code": "07.5",
+        "label": "Contexto religioso",
+        "item": "07.5 — Contexto religioso",
+        "prompt": "Examine o panorama religioso geral do período, incluindo culto de Israel e ambiente circundante quando pertinente. Não antecipe as correntes e divisões internas do Judaísmo, que pertencem a 07.12."
+      },
+      {
+        "code": "07.6",
+        "label": "Contexto social",
+        "item": "07.6 — Contexto social",
+        "prompt": "Analise classes, clãs, elites, camponeses, servidão, escravidão, família e dinâmicas socioeconómicas apenas na medida em que sejam relevantes e documentáveis para {PASSAGEM_ATUAL}."
+      },
+      {
+        "code": "07.7",
+        "label": "Costumes e práticas",
+        "item": "07.7 — Costumes e práticas",
+        "prompt": "Explique costumes quotidianos específicos retratados ou pressupostos na passagem, distinguindo evidência histórica de analogia conjectural."
+      },
+      {
+        "code": "07.8",
+        "label": "Instituições e estruturas sociais",
+        "item": "07.8 — Instituições e estruturas sociais",
+        "prompt": "Descreva instituições e estruturas sociais somente quando forem historicamente pertinentes. Verifique se uma instituição existia, com essa forma e denominação, no período analisado; não aplique categorias anacrónicas como “Sinédrio” automaticamente."
+      },
+      {
+        "code": "07.9",
+        "label": "Cultura e valores",
+        "item": "07.9 — Cultura e valores",
+        "prompt": "Isole mentalidades, cosmovisões, honra e vergonha, pureza e impureza e valores vigentes que sejam documentáveis no cenário específico. Não transforme reconstruções culturais em características universais."
+      },
+      {
+        "code": "07.10",
+        "label": "Mundo greco-romano",
+        "item": "07.10 — Mundo greco-romano",
+        "prompt": "Se cronologicamente e historicamente aplicável, analise influências greco-romanas directas ou indirectas. Se não houver contacto relevante, declare a ausência de pertinência específica e não force paralelos."
+      },
+      {
+        "code": "07.11",
+        "label": "Antigo Oriente Próximo",
+        "item": "07.11 — Antigo Oriente Próximo",
+        "prompt": "Analise paralelos e ambiente do Antigo Oriente Próximo apenas quando houver relação histórica, cultural ou literária relevante com {PASSAGEM_ATUAL}. Declare ausência de pertinência quando aplicável; não crie paralelos artificiais."
+      },
+      {
+        "code": "07.12",
+        "label": "Judaísmo e contexto religioso",
+        "item": "07.12 — Judaísmo e contexto religioso",
+        "prompt": "Quando cronologicamente pertinente, analise grupos, correntes e divisões internas do Judaísmo documentados para o período. Não projete instituições, seitas ou categorias posteriores sobre épocas anteriores. Esta etapa é distinta do panorama religioso geral de 07.5."
+      },
+      {
+        "code": "07.13",
+        "label": "Arqueologia e evidências materiais",
+        "item": "07.13 — Arqueologia e evidências materiais",
+        "prompt": "Apresente achados arqueológicos documentados que contextualizem, esclareçam ou problematizem a passagem. Não use arqueologia de modo puramente apologético ou antagónico e não invente achados. Se não houver dados, declare: “Não foram identificados achados arqueológicos relevantes documentados para esta passagem.”"
+      },
+      {
+        "code": "07.14",
+        "label": "Literatura e fontes extrabíblicas",
+        "item": "07.14 — Literatura e fontes extrabíblicas",
+        "prompt": "Liste fontes extrabíblicas documentadas — históricas, legais, epigráficas, Qumran, apócrifas ou pseudepígrafas — apenas quando forem pertinentes. Se não houver fontes relevantes, declare: “Não foram identificadas fontes extrabíblicas relevantes documentadas para esta passagem.” Não fabrique paralelos ou citações."
+      },
+      {
+        "code": "07.15",
+        "label": "Impacto do contexto na interpretação",
+        "item": "07.15 — Impacto do contexto na interpretação",
+        "prompt": "Consolide os achados históricos, culturais, geográficos, arqueológicos e extrabíblicos e explique como contextualizam, esclarecem, restringem ou problematizam a leitura. Não produza nova síntese exegética: a exegese pertence ao Módulo 06."
+      }
+    ]
+  },
+  {
+    "id": "08",
+    "title": "HERMENÊUTICA E CONTROLE DE ERROS",
+    "label": "08 — HERMENÊUTICA E CONTROLE DE ERROS",
+    "question": "Estou interpretando corretamente aquilo que foi encontrado?",
+    "rule": "camada de controle de qualidade — atua transversalmente, podendo auditar qualquer ANL anterior, não só como etapa final. Veredito reconhece: forte suporte / suporte parcial / evidência insuficiente / interpretação questionável / interpretações concorrentes.",
+    "steps": [
+      {
+        "code": "08.1",
+        "label": "Identificação dos pressupostos",
+        "item": "08.1 — Identificação dos pressupostos",
+        "prompt": "Identifique pressupostos teológicos, filosóficos ou metodológicos trazidos pelo intérprete, pela tradição, pelo método ou pelo ambiente moderno. Não presuma que todo pressuposto seja moderno, incorrecto ou ilegítimo. Diferencie pressuposto interpretativo de dado demonstrável no texto ou no contexto."
+      },
+      {
+        "code": "08.2",
+        "label": "Controle do contexto",
+        "item": "08.2 — Controle do contexto",
+        "prompt": "Confronte as interpretações com a síntese do Módulo 06, a delimitação e o contexto imediato. Verifique se respeitam o fluxo da unidade ou ultrapassam os limites contextuais sem justificação."
+      },
+      {
+        "code": "08.3",
+        "label": "Controle do sentido lexical",
+        "item": "08.3 — Controle do sentido lexical",
+        "prompt": "Confronte as interpretações com o Módulo 04. Verifique forma lexical, campo semântico e usos documentados pertinentes, sem criar sentidos artificiais ou repetir o estudo lexical."
+      },
+      {
+        "code": "08.4",
+        "label": "Controle gramatical e sintático",
+        "item": "08.4 — Controle gramatical e sintático",
+        "prompt": "Confronte as conclusões com o Módulo 03. Verifique morfologia, sintaxe, tempo, aspecto, modo e voz no idioma original, sem refazer a análise gramatical."
+      },
+      {
+        "code": "08.5",
+        "label": "Controle do contexto histórico-cultural",
+        "item": "08.5 — Controle do contexto histórico-cultural",
+        "prompt": "Confronte as interpretações com o Módulo 07. Verifique compatibilidade com o período, política, sociedade, religião, geografia e instituições, sem reconstruir o contexto histórico-cultural."
+      },
+      {
+        "code": "08.6",
+        "label": "Detecção de eisegese",
+        "item": "08.6 — Detecção de eisegese",
+        "prompt": "Identifique possível eisegese quando conceitos, doutrinas ou ideias forem introduzidos sem ancoragem textual, linguística, literária ou histórica suficiente. Divergência do Módulo 06, por si só, não prova eisegese."
+      },
+      {
+        "code": "08.7",
+        "label": "Detecção de anacronismo",
+        "item": "08.7 — Detecção de anacronismo",
+        "prompt": "Detecte projecções anacrónicas de conceitos, mentalidades, instituições, terminologia ou categorias posteriores sobre o ambiente original da passagem. Diferencie desenvolvimento posterior de erro automático."
+      },
+      {
+        "code": "08.8",
+        "label": "Detecção de falácia lexical",
+        "item": "08.8 — Detecção de falácia lexical",
+        "prompt": "Investigue falácias lexicais, incluindo anacronismo semântico, apelo indevido à raiz ou etimologia e transferência conceptual ilícita. Separe etimologia de significado demonstrado no contexto."
+      },
+      {
+        "code": "08.9",
+        "label": "Detecção de descontextualização",
+        "item": "08.9 — Detecção de descontextualização",
+        "prompt": "Verifique descontextualização por uso isolado de versículos ou expressões, ignorando progressão discursiva, estrutura, género e relações estabelecidas no Módulo 06."
+      },
+      {
+        "code": "08.10",
+        "label": "Controle de alegorização indevida",
+        "item": "08.10 — Controle de alegorização indevida",
+        "prompt": "Avalie alegorizações ou espiritualizações artificiais. Diferencie alegoria, símbolo ou metáfora legítimos do texto de uma alegorização interpretativa não sustentada."
+      },
+      {
+        "code": "08.11",
+        "label": "Controle de generalização indevida",
+        "item": "08.11 — Controle de generalização indevida",
+        "prompt": "Verifique se afirmações locais, narrativas, poéticas ou condicionadas foram transformadas em regras universais ou dogmáticas sem justificação suficiente."
+      },
+      {
+        "code": "08.12",
+        "label": "Controle da relação AT–NT",
+        "item": "08.12 — Controle da relação AT–NT",
+        "prompt": "Avalie a relação AT–NT preservando o sentido histórico original do AT antes de leituras posteriores, sem tratar toda releitura canónica como erro. No NT, verifique citações e alusões segundo evidências textuais e contexto literário."
+      },
+      {
+        "code": "08.13",
+        "label": "Descrição versus prescrição",
+        "item": "08.13 — Descrição versus prescrição",
+        "prompt": "Determine se a passagem é predominantemente descritiva ou prescritiva e verifique se uma descrição narrativa ou histórica foi indevidamente transformada em prescrição universal."
+      },
+      {
+        "code": "08.14",
+        "label": "Coerência da interpretação com as evidências",
+        "item": "08.14 — Coerência da interpretação com as evidências",
+        "prompt": "Cruze os resultados de 08.1–08.13 com os Módulos 01–07. Diferencie ausência de problema identificado de demonstração positiva de que uma interpretação esteja correcta."
+      },
+      {
+        "code": "08.15",
+        "label": "Veredito hermenêutico",
+        "item": "08.15 — Veredito hermenêutico",
+        "prompt": "Classifique o grau de sustentação metodológica das interpretações, com margens de segurança, incertezas e limites. O veredito não é juízo dogmático e não substitui Teologia Bíblica, Teologia Sistemática, Comparação formal de interpretações ou decisões do utilizador."
+      }
+    ]
+  },
+  {
+    "id": "09",
+    "title": "TEOLOGIA BÍBLICA",
+    "label": "09 — TEOLOGIA BÍBLICA",
+    "question": "Como essa passagem se encaixa na totalidade da revelação bíblica?",
+    "rule": "opera no nível de trajetória temática através do cânon — distinto do ANL-10 (mecanismo textual específico de citação/alusão/eco).",
+    "steps": [
+      {
+        "code": "09.1",
+        "label": "Localização do tema na passagem",
+        "item": "09.1 — Localização do tema na passagem",
+        "prompt": "Identifique o tema ou motivo teológico que emerge organicamente de {PASSAGEM_ATUAL}, ancorado nas palavras, estrutura e sentido do Módulo 06. Não imponha tema externo."
+      },
+      {
+        "code": "09.2",
+        "label": "Relação com o contexto canônico",
+        "item": "09.2 — Relação com o contexto canônico",
+        "prompt": "Posicione {PASSAGEM_ATUAL} no seu bloco canónico e explique como o tema dialoga com a ênfase daquela secção das Escrituras, sem reduzir a análise a associação genérica."
+      },
+      {
+        "code": "09.3",
+        "label": "História da redenção",
+        "item": "09.3 — História da redenção",
+        "prompt": "Situe a passagem na narrativa histórico-redentiva, relacionando acontecimentos anteriores e posteriores sem alterar retroactivamente o sentido histórico original."
+      },
+      {
+        "code": "09.4",
+        "label": "Desenvolvimento da revelação",
+        "item": "09.4 — Desenvolvimento da revelação",
+        "prompt": "Analise o desenvolvimento da revelação e o grau de clareza do tema nesse ponto da história bíblica. Compare com revelações anteriores e posteriores sem projectar informação posterior sobre o significado original."
+      },
+      {
+        "code": "09.5",
+        "label": "Temas bíblicos relacionados",
+        "item": "09.5 — Temas bíblicos relacionados",
+        "prompt": "Mapeie temas bíblicos relacionados apenas quando houver conexão orgânica e documentável com o tema principal. Não estabeleça conexões por mera semelhança temática."
+      },
+      {
+        "code": "09.6",
+        "label": "Relação com o Antigo Testamento",
+        "item": "09.6 — Relação com o Antigo Testamento",
+        "prompt": "Para passagem do NT, analise herança, citação, eco ou pressuposição de estruturas do AT; para passagem do AT, identifique conexões internas e desenvolvimentos dentro do próprio AT. Não execute a análise técnica de citações do Módulo 10."
+      },
+      {
+        "code": "09.7",
+        "label": "Relação com o Novo Testamento",
+        "item": "09.7 — Relação com o Novo Testamento",
+        "prompt": "Para passagem do AT, acompanhe o desenvolvimento canónico posterior no NT respeitando o sentido nativo; para passagem do NT, articule o tema com o testemunho apostólico. O uso textual detalhado de citações e alusões pertence ao Módulo 10."
+      },
+      {
+        "code": "09.8",
+        "label": "Promessa e cumprimento",
+        "item": "09.8 — Promessa e cumprimento",
+        "prompt": "Avalie promessa e cumprimento apenas quando houver expectativa, promessa, antecipação ou concretização sustentada por evidência textual ou canónica. Se não houver vínculo orgânico, declare a ausência formal definida na regra."
+      },
+      {
+        "code": "09.9",
+        "label": "Alianças e desenvolvimento pactual",
+        "item": "09.9 — Alianças e desenvolvimento pactual",
+        "prompt": "Identifique alianças ou estruturas pactuais com relação textual, histórica ou teológica documentável. Não obrigue a passagem a caber numa aliança sem evidência suficiente."
+      },
+      {
+        "code": "09.10",
+        "label": "Criação, queda e redenção",
+        "item": "09.10 — Criação, queda e redenção",
+        "prompt": "Avalie a posição da passagem no drama Criação, Queda e Redenção apenas quando houver conexão orgânica. Não force a classificação para preencher a subetapa."
+      },
+      {
+        "code": "09.11",
+        "label": "Reino de Deus",
+        "item": "09.11 — Reino de Deus",
+        "prompt": "Avalie Reino de Deus como soberania, governo ou senhorio divino apenas quando houver fundamento textual ou canónico suficiente. Declare ausência quando não for pertinente."
+      },
+      {
+        "code": "09.12",
+        "label": "Relação com Cristo",
+        "item": "09.12 — Relação com Cristo",
+        "prompt": "Demonstre relação com Cristo apenas quando sustentada pelo desenvolvimento canónico. No AT, respeite distância histórica e sentido original; não crie tipologia, alegoria ou correspondência artificial. A análise técnica de releituras pertence ao Módulo 10."
+      },
+      {
+        "code": "09.13",
+        "label": "Consumação",
+        "item": "09.13 — Consumação",
+        "prompt": "Rastreie dimensão escatológica apenas quando houver fundamento canónico suficiente. Não atribua consumação, juízo, ressurreição ou renovação por mera associação temática."
+      },
+      {
+        "code": "09.14",
+        "label": "Trajetória do tema na Escritura",
+        "item": "09.14 — Trajetória do tema na Escritura",
+        "prompt": "Apresente a trajectória documentável do tema na Escritura, distinguindo ocorrências, antecedentes, desenvolvimentos, manifestações posteriores e destino final. Registe lacunas e modelos concorrentes."
+      },
+      {
+        "code": "09.15",
+        "label": "Síntese teológico-bíblica",
+        "item": "09.15 — Síntese teológico-bíblica",
+        "prompt": "Elabore síntese teológico-bíblica histórica e indutiva da contribuição específica de {PASSAGEM_ATUAL}. Separe evidência directa, trajectória canónica e debate interpretativo. Não transforme a conclusão em Teologia Sistemática, dogma confessional ou decisão denominacional."
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "title": "USO DO AT NO NT",
+    "label": "10 — USO DO AT NO NT",
+    "question": "Como o Novo Testamento utiliza o Antigo Testamento nesta passagem?",
+    "rule": "função própria, com metodologia específica de intertextualidade — não subcategoria de 06 ou 09.",
+    "steps": [
+      {
+        "code": "10.1",
+        "label": "Identificação da referência ao AT",
+        "item": "10.1 — Identificação da referência ao AT",
+        "prompt": "Identifique formalmente se há material do AT em {PASSAGEM_ATUAL}. Classifique como citação, alusão, eco textual ou eco temático apenas quando houver evidência suficiente e múltiplos indicadores relevantes. Se não houver relação documentável, registre a declaração de ausência e marque as etapas dependentes como não aplicáveis, sem repetir desnecessariamente a mesma mensagem."
+      },
+      {
+        "code": "10.2",
+        "label": "Citação explícita",
+        "item": "10.2 — Citação explícita",
+        "prompt": "Se houver citação directa, identifique a fonte, fórmulas introdutórias e correspondência verbal. Se o bloco foi marcado não aplicável por ausência de relação, registe apenas “não aplicável” no estado, sem repetir a declaração de ausência."
+      },
+      {
+        "code": "10.3",
+        "label": "Alusão",
+        "item": "10.3 — Alusão",
+        "prompt": "Se não houver citação explícita, avalie possível alusão por fraseado, imagem, estrutura, vocabulário raro, contexto e padrões do autor, usando classificação graduada. Não force intenção."
+      },
+      {
+        "code": "10.4",
+        "label": "Eco textual ou temático",
+        "item": "10.4 — Eco textual ou temático",
+        "prompt": "Avalie ecos textuais ou temáticos sem considerar vocabulário comum ou tema genérico suficientes por si só. Classifique como demonstrável, provável, possível, controverso ou não demonstrável."
+      },
+      {
+        "code": "10.5",
+        "label": "Identificação da passagem de origem",
+        "item": "10.5 — Identificação da passagem de origem",
+        "prompt": "Forneça coordenadas da fonte do AT quando determináveis. Se houver alternativas documentadas, apresente-as com grau de confiança e não escolha artificialmente uma origem única."
+      },
+      {
+        "code": "10.6",
+        "label": "Comparação com o texto hebraico",
+        "item": "10.6 — Comparação com o texto hebraico",
+        "prompt": "Compare a forma hebraica relevante, especialmente o Texto Massorético quando pertinente, com a forma reflectida no NT. Registe convergências, divergências e testemunhas antigas sem presumir uso necessário do MT actual."
+      },
+      {
+        "code": "10.7",
+        "label": "Comparação com a Septuaginta",
+        "item": "10.7 — Comparação com a Septuaginta",
+        "prompt": "Compare a fonte com a Septuaginta e verifique correspondência, divergência, combinação ou outra relação documentável. Não presuma dependência da LXX por correspondência parcial."
+      },
+      {
+        "code": "10.8",
+        "label": "Comparação com o texto grego do NT",
+        "item": "10.8 — Comparação com o texto grego do NT",
+        "prompt": "Compare, quando houver base, hebraico, LXX e grego do NT. Se não houver elementos suficientes para comparação textual directa entre essas formas, declare especificamente essa limitação e preserve as hipóteses."
+      },
+      {
+        "code": "10.9",
+        "label": "Contexto da passagem do AT",
+        "item": "10.9 — Contexto da passagem do AT",
+        "prompt": "Reconstrua brevemente o sentido histórico-literário da fonte do AT antes de analisar o seu uso no NT. Não permita que a utilização posterior substitua retroactivamente o sentido original."
+      },
+      {
+        "code": "10.10",
+        "label": "Forma como o NT utiliza o AT",
+        "item": "10.10 — Forma como o NT utiliza o AT",
+        "prompt": "Classifique a forma de utilização como citação, alusão, eco, aplicação analógica, releitura profética, tipologia ou outra categoria apenas quando documentada. Não aplique automaticamente pesher, midrash ou categorias técnicas semelhantes."
+      },
+      {
+        "code": "10.11",
+        "label": "Função teológica da referência",
+        "item": "10.11 — Função teológica da referência",
+        "prompt": "Explique a função teológica local da referência dentro do argumento específico do NT. Não reconstrua a trajectória teológica completa, que pertence ao Módulo 09."
+      },
+      {
+        "code": "10.12",
+        "label": "Relação com promessa e cumprimento",
+        "item": "10.12 — Relação com promessa e cumprimento",
+        "prompt": "Analise localmente promessa e cumprimento, tipologia, desenvolvimento escatológico ou aplicação contextual quando documentados. Não classifique toda utilização do AT como cumprimento nem expanda para a história da redenção do Módulo 09."
+      },
+      {
+        "code": "10.13",
+        "label": "Relação cristológica",
+        "item": "10.13 — Relação cristológica",
+        "prompt": "Avalie a relação cristológica local com critérios textuais e contextuais. Evite alegorias e conexões modernas sem fundamento e não substitua a síntese do Módulo 09."
+      },
+      {
+        "code": "10.14",
+        "label": "Impacto na interpretação do NT",
+        "item": "10.14 — Impacto na interpretação do NT",
+        "prompt": "Demonstre como a fonte do AT modifica, esclarece, enriquece ou restringe a interpretação do NT, sem transformar o resultado numa nova exegese geral."
+      },
+      {
+        "code": "10.15",
+        "label": "Síntese do uso do AT no NT",
+        "item": "10.15 — Síntese do uso do AT no NT",
+        "prompt": "Apresente relatório estritamente técnico sobre a relação intertextual, evidência, forma de uso, método e função local. Separe factos, hipóteses e debate; não decida a interpretação teológica geral nem antecipe os Módulos 08, 09, 11 ou 12."
+      }
+    ]
+  },
+  {
+    "id": "11",
+    "title": "TEOLOGIA SISTEMÁTICA",
+    "label": "11 — TEOLOGIA SISTEMÁTICA",
+    "question": "Qual é a relação da interpretação com a doutrina cristã?",
+    "rule": "Fluxo obrigatório: Texto → Exegese → Teologia Bíblica → Questão doutrinária → Teologia Sistemática. Nunca: a doutrina determina sozinha o significado do texto.",
+    "steps": [
+      {
+        "code": "11.1",
+        "label": "Identificação da questão doutrinária",
+        "item": "11.1 — Identificação da questão doutrinária",
+        "prompt": "Declare o estado de relevância: Directa, Indirecta ou Sem Relevância. Directa significa que a passagem afecta directamente um locus doutrinário; Indirecta significa contribuição por correlação, trajectória canónica ou recepção documentada; Sem Relevância significa ausência documentável de questão doutrinária sistemática. Identifique os loci sem atribuir importância por associação genérica."
+      },
+      {
+        "code": "11.2",
+        "label": "Dados doutrinários encontrados no texto",
+        "item": "11.2 — Dados doutrinários encontrados no texto",
+        "prompt": "Isole afirmações e dados teológicos explícitos ou imediatamente implicados, baseando-se na exegese do Módulo 06. Não apresente formulação sistemática posterior como afirmação explícita da passagem."
+      },
+      {
+        "code": "11.3",
+        "label": "Relação com a teologia bíblica",
+        "item": "11.3 — Relação com a teologia bíblica",
+        "prompt": "Conecte o dado local ao desenvolvimento canónico do Módulo 09, distinguindo a linha histórico-redentiva da categorização sistemática posterior."
+      },
+      {
+        "code": "11.4",
+        "label": "Relação com outras passagens bíblicas",
+        "item": "11.4 — Relação com outras passagens bíblicas",
+        "prompt": "Quando pertinente, correlacione outras passagens respeitando contexto, género, sentido original e função canónica. Não use proof-texting. Se não houver textos relevantes, registe ausência específica."
+      },
+      {
+        "code": "11.5",
+        "label": "Doutrinas relacionadas",
+        "item": "11.5 — Doutrinas relacionadas",
+        "prompt": "Mapeie relações lógicas com doutrinas vizinhas, separando relações necessárias, implicações plausíveis e construções dependentes de pressupostos adicionais."
+      },
+      {
+        "code": "11.6",
+        "label": "Formulações teológicas existentes",
+        "item": "11.6 — Formulações teológicas existentes",
+        "prompt": "Quando pertinente, identifique formulações e modelos historicamente documentados. Cada atribuição a tradição, autor, confissão ou escola exige fonte identificável, data ou período e descrição precisa. Se não houver formulações documentadas, registe ausência específica."
+      },
+      {
+        "code": "11.7",
+        "label": "Comparação das formulações",
+        "item": "11.7 — Comparação das formulações",
+        "prompt": "Compare as formulações de 11.6 com a mesma ancoragem documental e cronológica, distinguindo dados do texto de premissas teológicas, filosóficas ou confessionais."
+      },
+      {
+        "code": "11.8",
+        "label": "Pressupostos teológicos",
+        "item": "11.8 — Pressupostos teológicos",
+        "prompt": "Quando pertinente, exponha pressupostos lógicos, filosóficos ou metafísicos de cada modelo. Só atribua pressupostos a tradições, autores ou escolas com documentação identificável; registe ausência quando não houver dados."
+      },
+      {
+        "code": "11.9",
+        "label": "Convergências",
+        "item": "11.9 — Convergências",
+        "prompt": "Identifique convergências, separando núcleo textual, consensos amplos, acordos condicionados e pontos disputados. Convergência histórica não prova que uma formulação seja directamente ensinada pela passagem."
+      },
+      {
+        "code": "11.10",
+        "label": "Divergências",
+        "item": "11.10 — Divergências",
+        "prompt": "Mapeie divergências, dados utilizados, pressupostos e zonas de tensão. Preserve posições concorrentes quando a controvérsia não puder ser resolvida de modo metodologicamente neutro."
+      },
+      {
+        "code": "11.11",
+        "label": "Avaliação da coerência doutrinária",
+        "item": "11.11 — Avaliação da coerência doutrinária",
+        "prompt": "Avalie comparativamente a compatibilidade das formulações com os Módulos 01–10, especialmente o Módulo 06. Não declare tradição correcta, falsa, vencedora ou superior e não produza nova decisão exegética."
+      },
+      {
+        "code": "11.12",
+        "label": "Limites da conclusão doutrinária",
+        "item": "11.12 — Limites da conclusão doutrinária",
+        "prompt": "Delimite o que pode ser afirmado a partir da passagem isolada. Sinalize saltos lógicos, correlações adicionais, pressupostos filosóficos e especulação extratextual não ancorada na exegese."
+      },
+      {
+        "code": "11.13",
+        "label": "Síntese doutrinária",
+        "item": "11.13 — Síntese doutrinária",
+        "prompt": "Apresente síntese técnica da arquitectura sistemática, distinguindo afirmação textual, exegese, correlação, formulação construída, tradição confessional e especulação. Classifique estabilidade, desenvolvimento e sustentação sem decidir uma tradição como definitivamente correcta."
+      }
+    ]
+  },
+  {
+    "id": "12",
+    "title": "COMPARAÇÃO DE INTERPRETAÇÕES",
+    "label": "12 — COMPARAÇÃO DE INTERPRETAÇÕES",
+    "question": "Como as interpretações concorrentes se sustentam diante das evidências?",
+    "rule": "não apagar o debate acadêmico. O número de interpretações não é fixo em duas — a matriz deve acomodar N posições concorrentes, quando existirem. Este módulo pode reconsultar os ANLs 01–09 (loop de verificação, não etapa puramente linear).",
+    "steps": [
+      {
+        "code": "12.1",
+        "label": "Identificação das interpretações existentes (N)",
+        "item": "12.1 — Identificação das interpretações existentes (N)",
+        "prompt": "Mapeie apenas interpretações e linhas de recepção historicamente documentadas, cada uma ligada a período, autor, escola ou comentário identificável. Este é o nó decisório. Determine Fluxo A (duas ou mais leituras documentadas), Fluxo B (uma leitura consensual sem debates) ou Fluxo C (ausência de recepção específica; verificar unidade maior). Não invente correntes."
+      },
+      {
+        "code": "12.2",
+        "label": "Classificação das interpretações",
+        "item": "12.2 — Classificação das interpretações",
+        "prompt": "Classifique as leituras documentadas em eixos hermenêuticos claros, sem misturar escolas ou criar categorias não sustentadas pelas fontes."
+      },
+      {
+        "code": "12.3",
+        "label": "Argumentos de cada interpretação (N)",
+        "item": "12.3 — Argumentos de cada interpretação (N)",
+        "prompt": "Descreva separadamente a argumentação de cada interpretação, sem misturar argumentos de escolas concorrentes."
+      },
+      {
+        "code": "12.4",
+        "label": "Evidências textuais",
+        "item": "12.4 — Evidências textuais",
+        "prompt": "Identifique os dados textuais do Módulo 02 invocados por cada interpretação, distinguindo variante, delimitação e pontuação quando documentados."
+      },
+      {
+        "code": "12.5",
+        "label": "Evidências gramaticais e lexicais",
+        "item": "12.5 — Evidências gramaticais e lexicais",
+        "prompt": "Mapeie o uso da sintaxe dos Módulos 03 e dos dados lexicais dos Módulos 04–05, distinguindo filologia contextualizada de estresse linguístico."
+      },
+      {
+        "code": "12.6",
+        "label": "Evidências históricas e culturais",
+        "item": "12.6 — Evidências históricas e culturais",
+        "prompt": "Confronte os dados histórico-culturais do Módulo 07 utilizados por cada escola, exigindo fontes documentadas e evitando anacronismo."
+      },
+      {
+        "code": "12.7",
+        "label": "Evidências teológicas",
+        "item": "12.7 — Evidências teológicas",
+        "prompt": "Identifique conexões teológicas com o Módulo 09, analogias da fé e dados dos módulos posteriores apenas quando documentados, sem transformar harmonia confessional em prova textual."
+      },
+      {
+        "code": "12.8",
+        "label": "Pressupostos de cada interpretação",
+        "item": "12.8 — Pressupostos de cada interpretação",
+        "prompt": "Exponha pressupostos filosóficos, dogmáticos, eclesiais ou ideológicos apenas quando vinculados a fontes e autores documentados."
+      },
+      {
+        "code": "12.9",
+        "label": "Pontos de convergência",
+        "item": "12.9 — Pontos de convergência",
+        "prompt": "Rastreie convergências e denominadores comuns, sem transformar acordo histórico em prova de verdade absoluta."
+      },
+      {
+        "code": "12.10",
+        "label": "Pontos de divergência",
+        "item": "12.10 — Pontos de divergência",
+        "prompt": "Mapeie zonas de tensão ou incompatibilidade interpretativa dentro das evidências disponíveis, sem tratar divergências como metafisicamente irreconciliáveis."
+      },
+      {
+        "code": "12.11",
+        "label": "Grau de consenso",
+        "item": "12.11 — Grau de consenso",
+        "prompt": "Classifique a aceitação histórica de cada leitura como consensual histórica/académica, posição de escola majoritária, minoritária/alternativa plausível, controversa/debate aberto ou minoritária/amplamente contestada. Toda classificação deve ter base documental."
+      },
+      {
+        "code": "12.12",
+        "label": "Força das evidências",
+        "item": "12.12 — Força das evidências",
+        "prompt": "Avalie o grau de sustentação textual, histórica, contextual e metodológica de cada leitura, cruzando os dados relevantes e consolidados dos Módulos 02–11, sem prometer probabilidade objectiva nem inventar dados."
+      },
+      {
+        "code": "12.13",
+        "label": "Limites da conclusão",
+        "item": "12.13 — Limites da conclusão",
+        "prompt": "Delimite onde terminam os dados de cada escola e começam suposição, aplicação homilética ou salto lógico extratextual."
+      },
+      {
+        "code": "12.14",
+        "label": "Síntese comparativa",
+        "item": "12.14 — Síntese comparativa",
+        "prompt": "Apresente relatório transversal técnico da história da recepção. Estabilidade, desenvolvimento e sustentação são descrições documentadas da recepção histórica, não decisões sobre verdade absoluta. Preserve a pluralidade quando necessário."
+      }
+    ]
+  }
+];
+
     function openWritingWorkspace() {
         closeOwnerLogin();
         document.body.dataset.activeMenu = 'writing';
@@ -1106,10 +2178,48 @@
         return { '01': M01_RULES, '02': M02_RULES, '03': M03_RULES, '04': M04_RULES, '05': M05_RULES, '06': M06_RULES, '07': M07_RULES, '08': M08_RULES, '09': M09_RULES, '10': M10_RULES, '11': M11_RULES, '12': M12_RULES };
     }
 
+    const WRITING_ROOM_MODULES = WRITING_ROOM_MODULE_DATA;
+    const WRITING_ROOM_PROGRESS_KEY = 'palavraSerieWritingRoomProgress';
+
+    function getWritingRoomModule(id) {
+        return WRITING_ROOM_MODULES.find(module => module.id === String(id || '')) || null;
+    }
+
+    function getWritingRoomStep(moduleId, stepCode) {
+        return getWritingRoomModule(moduleId)?.steps.find(step => step.code === String(stepCode || '')) || null;
+    }
+
+    function getWritingRoomPromptMap() {
+        return WRITING_ROOM_MODULES.reduce((map, module) => {
+            map[module.id] = module.steps.reduce((steps, step) => {
+                steps[step.code] = step.prompt;
+                return steps;
+            }, {});
+            return map;
+        }, {});
+    }
+
+    function getWritingRoomProgressState(stepCode) {
+        try {
+            const progress = JSON.parse(localStorage.getItem(WRITING_ROOM_PROGRESS_KEY) || '{}');
+            return progress[stepCode] || { state: 'pending', label: 'NÃO INICIADO' };
+        } catch (error) {
+            return { state: 'pending', label: 'NÃO INICIADO' };
+        }
+    }
+
+    function setWritingRoomProgressState(stepCode, state) {
+        try {
+            const progress = JSON.parse(localStorage.getItem(WRITING_ROOM_PROGRESS_KEY) || '{}');
+            progress[stepCode] = { state, label: state === 'completed' ? 'CONCLUÍDO' : 'NÃO INICIADO' };
+            localStorage.setItem(WRITING_ROOM_PROGRESS_KEY, JSON.stringify(progress));
+        } catch (error) {}
+    }
+
     function initWritingMatrixControls() {
         const moduleSelect = document.getElementById('writing-matrix-module');
         if (!moduleSelect) return;
-        moduleSelect.innerHTML = `<option value="">SELECCIONE UM MÓDULO</option>` + PRO_MODULES.map(module => { const id = module.slice(0, 2); return `<option value="${id}">${id}</option>`; }).join('');
+        moduleSelect.innerHTML = `<option value="">SELECCIONE UM MÓDULO</option>` + WRITING_ROOM_MODULES.map(module => `<option value="${module.id}">${module.id}</option>`).join('');
         const bookSelect = document.getElementById('writing-bible-book');
         if (bookSelect) { bookSelect.innerHTML = BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}">${escapeBibleText(book)}</option>`).join(''); bookSelect.value = selectedBibleBook; }
         updateWritingBibleChapters();
@@ -1155,9 +2265,9 @@
             return;
         }
         if (stageControls) stageControls.hidden = false;
-        const module = PRO_MODULES.find(item => item.startsWith(id + ' — '));
-        const items = PRO_MODULE_DATA[module]?.items || [];
-        stepSelect.innerHTML = `<option value="">SELECCIONE UMA ETAPA</option>` + items.map(item => { const step = item.split(' — ')[0]; return `<option value="${escapeBibleText(step)}">${escapeBibleText(step)}</option>`; }).join('');
+        const module = getWritingRoomModule(id);
+        const items = module?.steps || [];
+        stepSelect.innerHTML = `<option value="">SELECCIONE UMA ETAPA</option>` + items.map(step => `<option value="${escapeBibleText(step.code)}">${escapeBibleText(step.code)}</option>`).join('');
         stepSelect.value = '';
         updateWritingMatrixPrompt();
         updateWritingChatMode();
@@ -1196,7 +2306,7 @@
         const stepSelect = document.getElementById('writing-matrix-step');
         const promptBox = document.getElementById('writing-matrix-prompt');
         if (!moduleSelect || !stepSelect || !promptBox) return;
-        const ruleMap = getWritingRuleMap();
+        const ruleMap = getWritingRoomPromptMap();
         const step = stepSelect.value;
         const rawRule = step ? (ruleMap[moduleSelect.value]?.[step] || 'A regra desta etapa será aplicada pela Matriz quando a investigação for enviada.') : 'Nenhuma etapa da Matriz foi activada. Pode fazer uma pergunta livre no Chat de Escrita.';
         const book = document.getElementById('writing-bible-book')?.value || selectedBibleBook;
@@ -1204,7 +2314,7 @@
         const verse = document.getElementById('writing-bible-verse')?.value.trim();
         const reference = `${book} ${chapter}${verse ? ':' + verse : ''}`;
         const rule = rawRule.replaceAll('{PASSAGEM_ATUAL}', reference);
-        const status = typeof getProProgressState === 'function' ? getProProgressState(step) : null;
+        const status = getWritingRoomProgressState(step);
         const statusLabel = status?.label || 'NÃO INICIADO';
         promptBox.innerHTML = `<strong>${step ? `ETAPA ${escapeBibleText(step)} · ${escapeBibleText(statusLabel)}` : 'MODO PERGUNTA LIVRE'}</strong>${escapeBibleText(rule)}`;
         updateWritingChatMode();
@@ -1259,9 +2369,11 @@
         const button = document.getElementById('writing-matrix-run-button');
         const moduleId = moduleSelect?.value || '';
         const stepCode = stepSelect?.value || '';
-        const module = PRO_MODULES.find(item => item.startsWith(moduleId + ' — ')) || '';
-        const item = PRO_MODULE_DATA[module]?.items?.find(value => value.startsWith(stepCode + ' — ')) || stepCode;
-        const rawRule = getWritingRuleMap()[moduleId]?.[stepCode] || '';
+        const moduleRecord = getWritingRoomModule(moduleId);
+        const stepRecord = getWritingRoomStep(moduleId, stepCode);
+        const module = moduleRecord?.label || '';
+        const item = stepRecord?.item || stepCode;
+        const rawRule = stepRecord?.prompt || '';
         const book = document.getElementById('writing-bible-book')?.value || selectedBibleBook;
         const chapter = document.getElementById('writing-bible-chapter')?.value || selectedBibleChapter;
         const verse = document.getElementById('writing-bible-verse')?.value.trim() || '';
@@ -1292,7 +2404,7 @@
             document.getElementById('writing-result-copy')?.removeAttribute('disabled');
             const followup = document.getElementById('writing-followup-form');
             if (followup) followup.hidden = false;
-            if (typeof setProProgressState === 'function') setProProgressState(item, 'completed');
+            setWritingRoomProgressState(stepCode, 'completed');
         } catch (error) {
             clearTimeout(timeoutId);
             const failure = document.createElement('div');
