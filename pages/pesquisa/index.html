@@ -1,43 +1,4 @@
-    function ontologyBranch(discipline, open = false) {
-        const subs = DATA[discipline] || {};
-        const isEstudosBiblicos = discipline === ESTUDOS_BIBLICOS_MATRIZ.areaAcademica;
-        let html = `<details class="ontology-node" ${open ? 'open' : ''}><summary>${escapeBibleText(discipline)}</summary>`;
-
-        if (isEstudosBiblicos) {
-            const matriz = ESTUDOS_BIBLICOS_MATRIZ;
-            html += `<div class="estudos-matriz-meta">
-                <h2>Estrutura Académica — ${escapeBibleText(matriz.areaAcademica)}</h2>
-                <p>Três perfis de matriz organizam os tópicos por ênfase metodológica, preservando o esqueleto padrão de 17 pontos para a investigação.</p>
-                <div class="matriz-profile-grid">
-                    ${Object.entries(matriz.perfisMatriz).map(([key, profile]) => `
-                        <div class="matriz-profile-card">
-                            <strong>${key}</strong>
-                            <span>${escapeBibleText(profile.descricao)}</span>
-                            <small>${profile.itensPeso.map(escapeBibleText).join(' · ')}</small>
-                        </div>`).join('')}
-                </div>
-                <strong style="display:block;margin-bottom:8px;color:#806f53;font-size:10px;letter-spacing:1px;">ESQUELETO PADRÃO — 17 PONTOS</strong>
-                <div class="matriz-17-pontos">${matriz.esqueletoPadrao17Pontos.map(p => `<span>${escapeBibleText(p)}</span>`).join('')}</div>
-            </div>`;
-        }
-
-        html += `<div class="ontology-children">`;
-        Object.keys(subs).forEach(category => {
-            const section = isEstudosBiblicos ? matrizSectionByTitle(category) : null;
-            html += `<details class="ontology-category"><summary>${escapeBibleText(category)}${section ? ` <small style="color:#9b8b70;">· ${section.perfilMatriz}</small>` : ''}</summary><ul class="ontology-items">`;
-            subs[category].forEach(item => {
-                const topic = section?.topicos.find(t => t[1] === item);
-                const topicId = topic ? topic[0] : '';
-                html += `<li>${topicId ? `<span data-topic-id="${topicId}">` : ''}<button class="ontology-item-link" onclick='openSearch(${JSON.stringify(item)}, ${JSON.stringify(discipline)})'>${escapeBibleText(item)}</button>${topicId ? `</span>` : ''}</li>`;
-            });
-            html += `</ul></details>`;
-        });
-        return html + '</div></details>';
-    }
-
-    function matrizSectionByTitle(title) {
-        return ESTUDOS_BIBLICOS_MATRIZ.secoes.find(section => section.titulo === title) || null;
-    }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -127,17 +88,6 @@
         .ontology-items li::before { content: '└─'; position: absolute; left: -22px; color: #9b8b70; }
         .ontology-item-link { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
         .ontology-item-link:hover { color: #806f53; text-decoration: underline; }
-        .estudos-matriz-meta { margin: 0 0 26px; padding: 18px; border: 1px solid #d8cdb8; border-radius: 8px; background: #fffdf7; }
-        .estudos-matriz-meta h2 { margin: 0 0 8px; color: #4a443b; font-size: 19px; }
-        .estudos-matriz-meta > p { margin: 0 0 14px; color: #806f53; line-height: 1.55; font-size: 12px; }
-        .matriz-profile-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
-        .matriz-profile-card { padding: 12px; border: 1px solid #d8cdb8; border-radius: 7px; background: #f8f1e4; }
-        .matriz-profile-card strong { display:block; color:#806f53; font-size:11px; margin-bottom:6px; }
-        .matriz-profile-card span { display:block; color:#5f513d; font-size:11px; line-height:1.45; }
-        .matriz-profile-card small { display:block; margin-top:8px; color:#8b806e; font-size:9px; line-height:1.45; }
-        .matriz-17-pontos { display:flex; flex-wrap:wrap; gap:5px; }
-        .matriz-17-pontos span { padding:5px 7px; border:1px solid #cdbfaa; border-radius:5px; background:#f1eadb; color:#6d5d45; font-size:9px; font-weight:800; }
-        @media (max-width: 850px) { .matriz-profile-grid { grid-template-columns:1fr; } }
         .pro-area { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
         .pro-menu-box { flex: 1 1 auto; min-height: 0; margin: 10px; overflow: hidden; border: 1px solid #2e6580; border-radius: 10px; background: #0d1b31; box-shadow: 0 8px 18px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
         .pro-internal-pane { display: none; }
@@ -1002,7 +952,7 @@
 
     function renderShelfFilters() {
         const labels = { contentType: 'TIPO DE CONTEÚDO', audience: 'PÚBLICO', depth: 'PROFUNDIDADE', format: 'FORMATO' };
-        return `<section class="shelf-filters" aria-label="Filtros do catálogo">${Object.entries(labels).map(([facet, label]) => `<label>${label}<select onchange="setShelfFilter('facet',this.value)"><option value="">TODOS</option>${SHELF_FILTER_OPTIONS[facet].map(option => `<option value="${option}" ${activeShelfFilters[facet]===option?'selected':''}>${option}</option>`).join('')}</select></label>`).join('')}</section>`;
+        return `<section class="shelf-filters" aria-label="Filtros do catálogo">${Object.entries(labels).map(([facet, label]) => `<label>${label}<select onchange="setShelfFilter('facet',this.value)"><optionvalue="">TODOS</option>{SHELF_FILTER_OPTIONS[facet].map(option => `<option value="${option}" activeShelfFilters[facet]===option?'selected':''>{option}</option>`).join('')}</select></label>`).join('')}</section>`;
     }
 
     function openProMatrix() {
@@ -1111,8 +1061,8 @@
     const DATA = {
 'Estudos Bíblicos':{
 'Fundamentos e Fontes Bíblicas':['Introdução ao Antigo Testamento','Introdução ao Novo Testamento','Cânon e Formação das Escrituras','História do Texto Bíblico','Crítica Textual','Manuscritologia Bíblica','Arqueologia Bíblica','Contexto Histórico e Cultural'],
-'Línguas Bíblicas e Ferramentas':['Hebraico Bíblico','Aramaico Bíblico','Grego do Novo Testamento','Linguística Bíblica','Gramática e Sintaxe','Lexicografia Bíblica'],
-'Hermenêutica e Exegese':['Hermenêutica Bíblica','História da Interpretação','Métodos Exegéticos','Semântica e Pragmática','Análise do Discurso','Crítica Literária','Exegese do Pentateuco','Exegese dos Livros Históricos','Exegese da Literatura Poética e Sapiencial','Exegese dos Profetas','Exegese dos Evangelhos','Exegese das Epístolas Paulinas','Exegese das Epístolas Gerais','Exegese do Apocalipse']},
+'Línguas Bíblicas e Ferramentas':['Hebraico Bíblico','Aramaico Bíblico','Grego do Novo Testamento','Linguística Bíblica','Gramática e Sintaxe','Lexicografia Bíblica','Semântica e Pragmática','Análise do Discurso','Crítica Literária'],
+'Hermenêutica e Exegese':['Hermenêutica Bíblica','História da Interpretação','Métodos Exegéticos','Exegese do Pentateuco','Exegese dos Livros Históricos','Exegese da Literatura Poética e Sapiencial','Exegese dos Profetas','Exegese dos Evangelhos','Exegese das Epístolas Paulinas','Exegese das Epístolas Gerais','Exegese do Apocalipse']},
 'Teologia Bíblica':{
 'Teologia do Antigo Testamento':['Teologia do Pentateuco','Teologia dos Livros Históricos','Teologia da Literatura Poética e Sapiencial','Teologia dos Profetas','Temas do Antigo Testamento','História da Redenção no Antigo Testamento'],
 'Teologia do Novo Testamento':['Teologia dos Evangelhos Sinópticos','Teologia Joanina','Teologia dos Actos dos Apóstolos','Teologia Paulina','Teologia das Epístolas Gerais','Teologia da Carta aos Hebreus','Teologia Apocalíptica','Temas do Novo Testamento'],
@@ -1137,85 +1087,6 @@
 'Estudos Comparados e Contextuais':['Estudo Comparado das Religiões','Judaísmo','Islamismo','Religiões Orientais','Religiões Tradicionais','Diálogo Inter-religioso','Teologia Ecuménica','Teologias Contextuais','Teologia Intercultural','Teologia Pós-colonial','Teologia Feminista','Teologia Negra','Teologia da Criação e Ecoteologia'],
 'Ciências Humanas e Pesquisa':['Sociologia da Religião','Antropologia da Religião','Psicologia da Religião','História das Religiões','Fenomenologia da Religião','Metodologia Científica','Pesquisa Académica','Estudos Interdisciplinares']}
 
-    };
-
-    // ESTRUTURA ACADÉMICA — ESTUDOS BÍBLICOS
-    // Dados mantidos separados da interface para facilitar futuras ampliações.
-    const ESTUDOS_BIBLICOS_MATRIZ = {
-        areaAcademica: 'Estudos Bíblicos',
-        secoes: [
-            {
-                id: 'fundamentos-fontes-biblicas',
-                titulo: 'Fundamentos e Fontes Bíblicas',
-                perfilMatriz: 'A_TEXTUAL_HISTORICO',
-                topicos: [
-                    ['introducao-antigo-testamento','Introdução ao Antigo Testamento'],
-                    ['introducao-novo-testamento','Introdução ao Novo Testamento'],
-                    ['canon-formacao-escrituras','Cânon e Formação das Escrituras'],
-                    ['historia-texto-biblico','História do Texto Bíblico'],
-                    ['critica-textual','Crítica Textual'],
-                    ['manuscritologia-biblica','Manuscritologia Bíblica'],
-                    ['arqueologia-biblica','Arqueologia Bíblica'],
-                    ['contexto-historico-cultural','Contexto Histórico e Cultural']
-                ]
-            },
-            {
-                id: 'linguas-biblicas-ferramentas',
-                titulo: 'Línguas Bíblicas e Ferramentas',
-                perfilMatriz: 'B_LINGUISTICO',
-                topicos: [
-                    ['hebraico-biblico','Hebraico Bíblico'],
-                    ['aramaico-biblico','Aramaico Bíblico'],
-                    ['grego-novo-testamento','Grego do Novo Testamento'],
-                    ['linguistica-biblica','Linguística Bíblica'],
-                    ['gramatica-sintaxe','Gramática e Sintaxe'],
-                    ['lexicografia-biblica','Lexicografia Bíblica']
-                ]
-            },
-            {
-                id: 'hermeneutica-exegese',
-                titulo: 'Hermenêutica e Exegese',
-                perfilMatriz: 'C_EXEGETICO_CORPUS',
-                topicos: [
-                    ['hermeneutica-biblica','Hermenêutica Bíblica'],
-                    ['historia-interpretacao','História da Interpretação'],
-                    ['metodos-exegeticos','Métodos Exegéticos'],
-                    ['semantica-pragmatica','Semântica e Pragmática'],
-                    ['analise-discurso','Análise do Discurso'],
-                    ['critica-literaria','Crítica Literária'],
-                    ['exegese-pentateuco','Exegese do Pentateuco'],
-                    ['exegese-livros-historicos','Exegese dos Livros Históricos'],
-                    ['exegese-literatura-poetica-sapiencial','Exegese da Literatura Poética e Sapiencial'],
-                    ['exegese-profetas','Exegese dos Profetas'],
-                    ['exegese-evangelhos','Exegese dos Evangelhos'],
-                    ['exegese-epistolas-paulinas','Exegese das Epístolas Paulinas'],
-                    ['exegese-epistolas-gerais','Exegese das Epístolas Gerais'],
-                    ['exegese-apocalipse','Exegese do Apocalipse']
-                ]
-            }
-        ],
-        perfisMatriz: {
-            A_TEXTUAL_HISTORICO: {
-                descricao: 'Ênfase em transmissão textual, manuscritos, cânon e contexto histórico',
-                itensPeso: ['02 - O Corpus','06 - Transmissão e História do Texto','07 - Manuscritos e Testemunhos Textuais','08 - Cânon e Formação das Escrituras','09 - Contexto Histórico']
-            },
-            B_LINGUISTICO: {
-                descricao: 'Ênfase em gramática, léxico, línguas comparadas e corpus textual da língua',
-                itensPeso: ['02 - O Corpus Textual da Língua','03 - Organização e Estrutura Sistêmica','08 - Regras Gramaticais e Sintaxe','11 - Línguas Comparadas/Cognatas','13 - Estrutura Literária e Poética']
-            },
-            C_EXEGETICO_CORPUS: {
-                descricao: 'Ênfase em teologia central, gêneros literários, história da interpretação e debates acadêmicos',
-                itensPeso: ['12 - Gêneros e Formas Literárias','13 - Estrutura Literária Global','14 - Teologia e Temas Centrais','15 - História da Interpretação','16 - Questões e Debates Acadêmicos']
-            }
-        },
-        esqueletoPadrao17Pontos: [
-            '01 - Objeto e Escopo','02 - O Corpus','03 - Organização e Estrutura','04 - Formação e Composição',
-            '05 - Autoria, Datação e Origem','06 - Transmissão e História','07 - Manuscritos e Testemunhos Textuais',
-            '08 - Cânon / Regras / Critérios (varia por perfil)','09 - Contexto Histórico','10 - Contexto Cultural e Religioso',
-            '11 - Línguas e Tradições Textuais','12 - Gêneros e Formas Literárias',
-            '13 - Estrutura Literária e Organização dos Corpora','14 - Teologia e Temas Centrais',
-            '15 - História da Interpretação','16 - Questões e Debates Acadêmicos','17 - Síntese'
-        ]
     };
 
     function openWritingWorkspace() {
@@ -3818,4 +3689,5 @@
 </script>
 </body>
 </html>
+
 
