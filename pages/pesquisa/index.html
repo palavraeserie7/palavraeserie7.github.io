@@ -525,7 +525,17 @@
         .writing-matrix-controls select:focus { outline:none; border-color:#20d66b; }
         .writing-matrix-prompt { margin-top:10px; padding:10px; border-left:3px solid #20d66b; background:#0d172b; color:#cbd8e8; font-size:10px; line-height:1.5; white-space:pre-wrap; max-height:210px; overflow-y:auto; }
         .writing-matrix-prompt strong { display:block; margin-bottom:5px; color:#20d66b; font-size:10px; }
-        .writing-chat-messages { flex:1; min-height:220px; overflow-y:auto; padding:18px; }
+        .writing-result-panel { display:flex; flex-direction:column; min-width:0; min-height:520px; border:1px solid #263754; border-radius:12px; background:#111b30; box-shadow:0 8px 24px rgba(0,0,0,.22); overflow:hidden; }
+        .writing-result-header { padding:20px 22px; border-bottom:1px solid #263754; background:#17243a; }
+        .writing-result-header h2 { margin:0; color:#20d66b; font-size:15px; letter-spacing:1px; }
+        .writing-result-header p { margin:7px 0 0; color:#91a4bd; font-size:11px; line-height:1.45; }
+        .writing-result-body { flex:1; min-height:320px; overflow-y:auto; padding:22px; color:#dbe7f5; font-size:13px; line-height:1.7; white-space:pre-wrap; }
+        .writing-result-placeholder { color:#71849e; border:1px dashed #344762; border-radius:8px; padding:22px; background:#0d172b; }
+        .writing-result-actions { display:flex; justify-content:flex-end; gap:8px; padding:12px 18px; border-top:1px solid #263754; background:#0d172b; }
+        .writing-result-actions button { min-height:34px; padding:0 13px; border:1px solid #344762; border-radius:6px; background:#17243a; color:#dbe7f5; font-weight:900; cursor:pointer; }
+        .writing-result-actions button.primary { border:0; background:#20d66b; color:#07151f; }
+        .writing-result-actions button:disabled { opacity:.45; cursor:not-allowed; }
+        .writing-chat-messages { flex:1; min-height:180px; overflow-y:auto; padding:18px; }
         .writing-chat-message { margin:0 0 10px; padding:10px 12px; border-radius:7px; color:#dbe7f5; font-size:11px; line-height:1.5; white-space:pre-wrap; }
         .writing-chat-message.system { background:#17243a; }
         .writing-chat-message.user { margin-left:12%; background:#263754; }
@@ -952,7 +962,7 @@
 
     function renderShelfFilters() {
         const labels = { contentType: 'TIPO DE CONTEÚDO', audience: 'PÚBLICO', depth: 'PROFUNDIDADE', format: 'FORMATO' };
-        return `<section class="shelf-filters" aria-label="Filtros do catálogo">${Object.entries(labels).map(([facet, label]) => `<label>${label}<select onchange="setShelfFilter('facet',this.value)"><optionvalue="">TODOS</option>{SHELF_FILTER_OPTIONS[facet].map(option => `<option value="${option}" activeShelfFilters[facet]===option?'selected':''>{option}</option>`).join('')}</select></label>`).join('')}</section>`;
+        return `<section class="shelf-filters" aria-label="Filtros do catálogo">${Object.entries(labels).map(([facet, label]) => `<label>${label}<select onchange="setShelfFilter('${facet}', this.value)"><option value="">TODOS</option>${SHELF_FILTER_OPTIONS[facet].map(option => `<option value="${option}" ${activeShelfFilters[facet] === option ? 'selected' : ''}>${option}</option>`).join('')}</select></label>`).join('')}</section>`;
     }
 
     function openProMatrix() {
@@ -999,9 +1009,9 @@
         const books = SHELF_BOOKS[section] || [];
         const locked = section === 'pro';
         const access = sections[section];
-        const renderBooks = books.filter(book => Object.entries(activeShelfFilters).every(([facet, value]) => !value || getShelfFacet(book, facet, section) === value)).map((book, bookIndex) => { const cover = `<div class="shelf-cover ${book.coverImage ? 'has-image' : ''}" ${book.coverImage ? `style="background-image: linear-gradient(rgba(35,28,18,.08), rgba(35,28,18,.08)), url('${book.coverImage}')"` : ''}><small>PALAVRA & SÉRIE</small>${book.coverImage ? '' : `<strong>${escapeBibleText(book.cover || 'ESTUDO')}</strong><em>${escapeBibleText(book.author || 'Biblioteca de estudo')}</em>`}</div>`; const action = section === 'external' && book.url ? `<a class="shelf-link" href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA</a>` : `<button class="locked?'locked':''"onclick="{section === 'own' ? `openBookPresentationByIndex(bookIndex,'{section}')` : `shelfBookAction(${JSON.stringify(book.title)}, locked,'{section}', ${JSON.stringify(book.url || '')})`}">${locked ? 'ACESSO PRO' : section === 'own' ? 'VER APRESENTAÇÃO' : 'ABRIR MATERIAL'}</button>`; return `<article class="shelf-book locked?'pro':''">{cover}<span class="shelf-badge">access</span><h4>{escapeBibleText(book.title)}</h4><p>escapeBibleText(book.description)</p>{action}</article>`; }).join('');
+        const renderBooks = books.filter(book => Object.entries(activeShelfFilters).every(([facet, value]) => !value || getShelfFacet(book, facet, section) === value)).map((book, bookIndex) => { const cover = `<div class="shelf-cover ${book.coverImage ? 'has-image' : ''}" ${book.coverImage ? `style="background-image: linear-gradient(rgba(35,28,18,.08), rgba(35,28,18,.08)), url('${book.coverImage}')"` : ''}><small>PALAVRA & SÉRIE</small>${book.coverImage ? '' : `<strong>${escapeBibleText(book.cover || 'ESTUDO')}</strong><em>${escapeBibleText(book.author || 'Biblioteca de estudo')}</em>`}</div>`; const action = section === 'external' && book.url ? `<a class="shelf-link" href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA</a>` : `<button class="${locked ? 'locked' : ''}" onclick="${section === 'own' ? `openBookPresentationByIndex(${bookIndex}, '${section}')` : `shelfBookAction(${JSON.stringify(book.title)}, ${locked}, '${section}', ${JSON.stringify(book.url || '')})`}">${locked ? 'ACESSO PRO' : section === 'own' ? 'VER APRESENTAÇÃO' : 'ABRIR MATERIAL'}</button>`; return `<article class="shelf-book ${locked ? 'pro' : ''}">${cover}<span class="shelf-badge">${access}</span><h4>${escapeBibleText(book.title)}</h4><p>${escapeBibleText(book.description)}</p>${action}</article>`; }).join('');
         const content = renderBooks || `<div class="shelf-empty">Ainda não há materiais nesta divisão. Os seus livros próprios poderão ser adicionados posteriormente ao catálogo e aparecerão aqui automaticamente.</div>`;
-        body.innerHTML = `renderShelfCatalogMenu(){renderShelfFilters()}<nav class="shelf-tabs" aria-label="Divisões da estante"><button class="shelf-tab ${section === 'free' ? 'active' : ''}" onclick="selectShelfSection('free')">FREE</button><button class="shelf-tab ${section === 'pro' ? 'active' : ''}" onclick="selectShelfSection('pro')">PRO</button><button class="shelf-tab ${section === 'own' ? 'active' : ''}" onclick="selectShelfSection('own')">MEUS LIVROS</button><button class="shelf-tab section==='external'?'active':''"onclick="selectShelfSection('external')">REFERÊNCIASEXTERNAS</button></nav><sectionclass="shelf-section"><h3>{access}</h3><div class="shelf-grid">content</div><divclass="shelf-note"id="shelf-note">{section === 'pro' ? 'O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.' : section === 'external' ? 'As referências externas serão abertas apenas através de fontes oficiais ou autorizadas.' : section === 'own' ? 'Os seus livros poderão ser organizados aqui por título, categoria, autor e nível de acesso.' : 'Materiais introdutórios disponíveis para demonstração.'}</div></section>`;
+        body.innerHTML = `${renderShelfCatalogMenu()}${renderShelfFilters()}<nav class="shelf-tabs" aria-label="Divisões da estante"><button class="shelf-tab ${section === 'free' ? 'active' : ''}" onclick="selectShelfSection('free')">FREE</button><button class="shelf-tab ${section === 'pro' ? 'active' : ''}" onclick="selectShelfSection('pro')">PRO</button><button class="shelf-tab ${section === 'own' ? 'active' : ''}" onclick="selectShelfSection('own')">MEUS LIVROS</button><button class="shelf-tab ${section === 'external' ? 'active' : ''}" onclick="selectShelfSection('external')">REFERÊNCIAS EXTERNAS</button></nav><section class="shelf-section"><h3>${access}</h3><div class="shelf-grid">${content}</div><div class="shelf-note" id="shelf-note">${section === 'pro' ? 'O acesso PRO está em modo de demonstração. Nenhum pagamento ou dado bancário é solicitado nesta versão.' : section === 'external' ? 'As referências externas serão abertas apenas através de fontes oficiais ou autorizadas.' : section === 'own' ? 'Os seus livros poderão ser organizados aqui por título, categoria, autor e nível de acesso.' : 'Materiais introdutórios disponíveis para demonstração.'}</div></section>`;
     }
 
     function shelfBookAction(title, locked, section, url = '') {
@@ -1014,7 +1024,7 @@
             window.location.href = url;
             return;
         }
-        if (note) note.textContent = section === 'external' ? `“title”deveráapontarparaafonteoficialouautorizada.`:`“{title}” está disponível nesta divisão demonstrativa da estante.`;
+        if (note) note.textContent = section === 'external' ? `“${title}” deverá apontar para a fonte oficial ou autorizada.` : `“${title}” está disponível nesta divisão demonstrativa da estante.`;
     }
 
     function openBookPresentationByIndex(index, section = 'own') {
@@ -1029,7 +1039,7 @@
         const windowBox = document.getElementById('book-presentation-window');
         if (!book || !overlay || !windowBox) return;
         const coverStyle = book.coverImage ? `background-image: url('${book.coverImage}')` : '';
-        windowBox.innerHTML = `<div class="book-presentation-cover" style="coverStyle"></div><divclass="book-presentation-content"><h2id="book-presentation-title">{escapeBibleText(book.title)}</h2><h3>escapeBibleText(book.author||'Palavra&Série')</h3><p>{escapeBibleText(book.description || '')}</p><div class="book-presentation-status">Esta é uma apresentação de divulgação do livro. O conteúdo completo permanece fechado nesta etapa.</div><button class="book-presentation-close" onclick="closeBookPresentation()">← VOLTAR PARA A ESTANTE</button></div>`;
+        windowBox.innerHTML = `<div class="book-presentation-cover" style="${coverStyle}"></div><div class="book-presentation-content"><h2 id="book-presentation-title">${escapeBibleText(book.title)}</h2><h3>${escapeBibleText(book.author || 'Palavra & Série')}</h3><p>${escapeBibleText(book.description || '')}</p><div class="book-presentation-status">Esta é uma apresentação de divulgação do livro. O conteúdo completo permanece fechado nesta etapa.</div><button class="book-presentation-close" onclick="closeBookPresentation()">← VOLTAR PARA A ESTANTE</button></div>`;
         overlay.classList.add('open');
     }
 
@@ -1096,7 +1106,7 @@
         document.querySelector('.sidebar')?.classList.remove('pro-active');
         const main = document.getElementById('mn');
         if (!main) return;
-        main.innerHTML = `<div class="writing-workspace writing-chat-only"><section class="writing-research-panel"><button class="back-arrow" onclick="returnToWritingAccess()" title="Voltar para a área interna">← VOLTAR</button><header class="writing-research-header"><div><h1>ESCRITA</h1><p>Espaço interno de apoio à produção de conteúdos.</p></div></header></section><aside class="writing-chat-panel" aria-label="Chat de escrita"><header class="writing-chat-header"><h2>CHAT DE ESCRITA</h2><p>Organize ideias, perguntas e próximos passos desta produção.</p><div class="writing-matrix-controls"><div class="writing-bible-grid"><label for="writing-bible-book">LIVRO<select id="writing-bible-book" onchange="updateWritingBibleChapters()"></select></label><label for="writing-bible-chapter">CAPÍTULO<select id="writing-bible-chapter" onchange="updateWritingBibleReference()"></select></label><label for="writing-bible-verse">VERSÍCULO<input id="writing-bible-verse" type="text" inputmode="text" placeholder="ex.: 1 ou 1-5" oninput="updateWritingBibleReference()"></label></div><div class="writing-bible-reference" id="writing-bible-reference">REFERÊNCIA: seleccione livro, capítulo e versículo</div><label for="writing-matrix-module">MÓDULO DA MATRIZ</label><select id="writing-matrix-module" onchange="updateWritingMatrixSteps()"></select><div id="writing-matrix-stage-controls" hidden><label for="writing-matrix-step">ETAPA / PROMPT</label><select id="writing-matrix-step" onchange="updateWritingMatrixPrompt()"></select><div class="writing-matrix-prompt" id="writing-matrix-prompt"><strong>ETAPA DA MATRIZ</strong>Seleccione uma etapa para ver o prompt correspondente.</div><div id="writing-matrix-run" class="writing-matrix-run" hidden><button type="button" id="writing-matrix-run-button" onclick="runWritingMatrixPrompt()">EXECUTAR BUSCA DA ETAPA</button></div></div></div></div></header><div class="writing-chat-messages" id="writing-chat-messages"><div class="writing-chat-message system" id="writing-chat-status">MODO PERGUNTA LIVRE — BUSCA ACTIVA. Pode escrever uma pergunta livre.</div></div><form id="writing-chat-form" class="writing-chat-form" onsubmit="return submitWritingChat(event)"><div id="writing-chat-mode-note" class="writing-chat-mode-note" hidden></div><textarea id="writing-chat-input" placeholder="Escreva uma pergunta livre..." aria-label="Pergunta livre do chat de escrita"></textarea><button type="submit">ENVIAR</button></form><form id="writing-followup-form" class="writing-followup-form" hidden onsubmit="return submitWritingFollowup(event)"><label for="writing-followup-input">PERGUNTA DE ACOMPANHAMENTO</label><textarea id="writing-followup-input" placeholder="Pergunte algo sobre a resposta recebida..."></textarea><div class="writing-followup-actions"><button type="button" class="writing-followup-clear" onclick="clearWritingFollowup()">LIMPAR</button><button type="submit" class="writing-followup-send">ENVIAR</button></div></form>        </aside></div>`;
+        main.innerHTML = `<div class="writing-workspace"><section class="writing-result-panel" aria-label="Resultado da pesquisa"><div class="writing-result-header"><button class="back-arrow" onclick="returnToWritingAccess()" title="Voltar para a área interna">← VOLTAR</button><h2 style="margin-top:16px">RESULTADO DA PESQUISA</h2><p>A resposta da etapa executada aparecerá aqui. O resultado fica separado do chat e da conversa livre.</p></div><div class="writing-result-body" id="writing-result-body"><div class="writing-result-placeholder">Nenhum resultado ainda. Seleccione a referência, o módulo e a etapa no painel ao lado e clique em <strong>EXECUTAR BUSCA DA ETAPA</strong>.</div></div><div class="writing-result-actions"><button type="button" onclick="copyWritingResult()" id="writing-result-copy" disabled>COPIAR</button><button type="button" onclick="clearWritingResult()" id="writing-result-clear">LIMPAR</button></div></section><aside class="writing-chat-panel" aria-label="Chat de escrita"><header class="writing-chat-header"><h2>CONTROLE E CONVERSA</h2><p>Escolha a referência e execute a Matriz. A conversa livre fica separada do resultado.</p><div class="writing-matrix-controls"><div class="writing-bible-grid"><label for="writing-bible-book">LIVRO<select id="writing-bible-book" onchange="updateWritingBibleChapters()"></select></label><label for="writing-bible-chapter">CAPÍTULO<select id="writing-bible-chapter" onchange="updateWritingBibleReference()"></select></label><label for="writing-bible-verse">VERSÍCULO<input id="writing-bible-verse" type="text" inputmode="text" placeholder="ex.: 1 ou 1-5" oninput="updateWritingBibleReference()"></label></div><div class="writing-bible-reference" id="writing-bible-reference">REFERÊNCIA: seleccione livro, capítulo e versículo</div><label for="writing-matrix-module">MÓDULO DA MATRIZ</label><select id="writing-matrix-module" onchange="updateWritingMatrixSteps()"></select><div id="writing-matrix-stage-controls" hidden><label for="writing-matrix-step">ETAPA / PROMPT</label><select id="writing-matrix-step" onchange="updateWritingMatrixPrompt()"></select><div class="writing-matrix-prompt" id="writing-matrix-prompt"><strong>ETAPA DA MATRIZ</strong>Seleccione uma etapa para ver o prompt correspondente.</div><div id="writing-matrix-run" class="writing-matrix-run" hidden><button type="button" id="writing-matrix-run-button" onclick="runWritingMatrixPrompt()">EXECUTAR BUSCA DA ETAPA</button></div></div></div></div></header><div class="writing-chat-messages" id="writing-chat-messages"><div class="writing-chat-message system" id="writing-chat-status">MODO PERGUNTA LIVRE — a conversa ficará aqui, sem substituir o resultado da pesquisa.</div></div><form id="writing-chat-form" class="writing-chat-form" onsubmit="return submitWritingChat(event)"><div id="writing-chat-mode-note" class="writing-chat-mode-note" hidden></div><textarea id="writing-chat-input" placeholder="Escreva uma pergunta livre..." aria-label="Pergunta livre do chat de escrita"></textarea><button type="submit">ENVIAR</button></form><form id="writing-followup-form" class="writing-followup-form" hidden onsubmit="return submitWritingFollowup(event)"><label for="writing-followup-input">PERGUNTA SOBRE O RESULTADO</label><textarea id="writing-followup-input" placeholder="Pergunte algo sobre a resposta recebida..."></textarea><div class="writing-followup-actions"><button type="button" class="writing-followup-clear" onclick="clearWritingFollowup()">LIMPAR</button><button type="submit" class="writing-followup-send">ENVIAR</button></div></form></aside></div>`;
         initWritingMatrixControls();
     }
 
@@ -1107,9 +1117,9 @@
     function initWritingMatrixControls() {
         const moduleSelect = document.getElementById('writing-matrix-module');
         if (!moduleSelect) return;
-        moduleSelect.innerHTML = `<option value="">SELECCIONE UM MÓDULO</option>` + PRO_MODULES.map(module => { const id = module.slice(0, 2); return `<option value="id">{id}</option>`; }).join('');
+        moduleSelect.innerHTML = `<option value="">SELECCIONE UM MÓDULO</option>` + PRO_MODULES.map(module => { const id = module.slice(0, 2); return `<option value="${id}">${id}</option>`; }).join('');
         const bookSelect = document.getElementById('writing-bible-book');
-        if (bookSelect) { bookSelect.innerHTML = BIBLE_BOOKS.map(book => `<option value="escapeBibleText(book)">{escapeBibleText(book)}</option>`).join(''); bookSelect.value = selectedBibleBook; }
+        if (bookSelect) { bookSelect.innerHTML = BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}">${escapeBibleText(book)}</option>`).join(''); bookSelect.value = selectedBibleBook; }
         updateWritingBibleChapters();
         updateWritingMatrixSteps();
     }
@@ -1121,7 +1131,7 @@
         selectedBibleBook = bookSelect.value || selectedBibleBook;
         const count = BIBLE_CHAPTER_COUNTS[selectedBibleBook] || 1;
         if (selectedBibleChapter > count) selectedBibleChapter = 1;
-        chapterSelect.innerHTML = Array.from({ length: count }, (_, index) => `<option value="index+1">{index + 1}</option>`).join('');
+        chapterSelect.innerHTML = Array.from({ length: count }, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join('');
         chapterSelect.value = String(selectedBibleChapter);
         updateWritingBibleReference();
     }
@@ -1135,7 +1145,7 @@
         selectedBibleBook = bookSelect.value || selectedBibleBook;
         selectedBibleChapter = Number(chapterSelect.value || selectedBibleChapter || 1);
         const verse = verseInput.value.trim();
-        const ref = `${selectedBibleBook} selectedBibleChapter{verse ? ':' + verse : ''}`;
+        const ref = `${selectedBibleBook} ${selectedBibleChapter}${verse ? ':' + verse : ''}`;
         reference.textContent = `REFERÊNCIA: ${ref}`;
         updateWritingMatrixPrompt();
     }
@@ -1155,7 +1165,7 @@
         if (stageControls) stageControls.hidden = false;
         const module = PRO_MODULES.find(item => item.startsWith(id + ' — '));
         const items = PRO_MODULE_DATA[module]?.items || [];
-        stepSelect.innerHTML = `<option value="">SELECCIONE UMA ETAPA</option>` + items.map(item => { const step = item.split(' — ')[0]; return `<option value="escapeBibleText(step)">{escapeBibleText(step)}</option>`; }).join('');
+        stepSelect.innerHTML = `<option value="">SELECCIONE UMA ETAPA</option>` + items.map(item => { const step = item.split(' — ')[0]; return `<option value="${escapeBibleText(step)}">${escapeBibleText(step)}</option>`; }).join('');
         stepSelect.value = '';
         updateWritingMatrixPrompt();
         updateWritingChatMode();
@@ -1200,7 +1210,7 @@
         const book = document.getElementById('writing-bible-book')?.value || selectedBibleBook;
         const chapter = document.getElementById('writing-bible-chapter')?.value || selectedBibleChapter;
         const verse = document.getElementById('writing-bible-verse')?.value.trim();
-        const reference = `${book} chapter{verse ? ':' + verse : ''}`;
+        const reference = `${book} ${chapter}${verse ? ':' + verse : ''}`;
         const rule = rawRule.replaceAll('{PASSAGEM_ATUAL}', reference);
         const status = typeof getProProgressState === 'function' ? getProProgressState(step) : null;
         const statusLabel = status?.label || 'NÃO INICIADO';
@@ -1253,6 +1263,7 @@
         const moduleSelect = document.getElementById('writing-matrix-module');
         const stepSelect = document.getElementById('writing-matrix-step');
         const messages = document.getElementById('writing-chat-messages');
+        const resultBody = document.getElementById('writing-result-body');
         const button = document.getElementById('writing-matrix-run-button');
         const moduleId = moduleSelect?.value || '';
         const stepCode = stepSelect?.value || '';
@@ -1262,10 +1273,11 @@
         const book = document.getElementById('writing-bible-book')?.value || selectedBibleBook;
         const chapter = document.getElementById('writing-bible-chapter')?.value || selectedBibleChapter;
         const verse = document.getElementById('writing-bible-verse')?.value.trim() || '';
-        const reference = `${book} chapter{verse ? ':' + verse : ''}`;
-        if (!moduleId || !stepCode || !rawRule || !messages) return false;
+        const reference = `${book} ${chapter}${verse ? ':' + verse : ''}`;
+        if (!moduleId || !stepCode || !rawRule || !messages || !resultBody) return false;
         const question = `Passagem actual: ${reference}\nMódulo: ${module}\nSubetapa: ${item}\nPrompt da Matriz: ${rawRule.replaceAll('{PASSAGEM_ATUAL}', reference)}\n\nExecute exclusivamente esta etapa. Não avance para outras etapas. Não invente fontes, dados ou evidências. Declare limitações e incertezas quando necessário.`;
         messages.querySelectorAll('.writing-retry-message').forEach(node => node.remove());
+        resultBody.innerHTML = `<div class="writing-chat-message system">A executar o prompt ${escapeBibleText(stepCode)} sobre ${escapeBibleText(reference)}...</div>`;
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 45000);
         const loading = document.createElement('div');
@@ -1275,15 +1287,17 @@
         if (button) { button.disabled = true; button.textContent = 'A EXECUTAR...'; }
         try {
             if (!AI_PROXY_URL || AI_PROXY_URL.includes('COLE_AQUI')) throw new Error('Configure a URL do serviço protegido da IA antes de executar a busca.');
-            const accessToken = await getWritingAccessToken();
-            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` }, signal: controller.signal, body: JSON.stringify({ question, topic: item, discipline: 'CHAT DE ESCRITA — MATRIZ TÉCNICA DE PESQUISA PRIVADA', module, studyContext: { referenciaFormatada: reference, passage: reference, source: 'Chat de Escrita' }, accessLevel: 'private' }) });
+            // A Sala de Escrita usa o mesmo motor de pesquisa PRO que já funciona na Matriz.
+            // A interface continua privada; a autorização específica do Worker privado será adicionada
+            // posteriormente sem duplicar o motor de pesquisa.
+            const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ question, topic: item, discipline: 'MATRIZ TÉCNICA DE PESQUISA PRO — SALA DE ESCRITA', module, studyContext: { referenciaFormatada: reference, passage: reference, source: 'Sala de Escrita' }, accessLevel: 'pro' }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data?.error || 'A busca da etapa não pôde ser concluída.');
             clearTimeout(timeoutId);
-            const answer = document.createElement('div');
-            answer.className = 'writing-chat-message system';
-            answer.innerHTML = escapeBibleText(neutralizeServiceText(data.text || data.answer || data.response || data.result || 'A busca não devolveu texto.')).replace(/\n/g, '<br>');
-            messages.appendChild(answer);
+            const answerText = neutralizeServiceText(data.text || data.answer || data.response || data.result || 'A busca não devolveu texto.');
+            resultBody.innerHTML = escapeBibleText(answerText).replace(/\n/g, '<br>');
+            resultBody.dataset.resultText = answerText;
+            document.getElementById('writing-result-copy')?.removeAttribute('disabled');
             const followup = document.getElementById('writing-followup-form');
             if (followup) followup.hidden = false;
             if (typeof setProProgressState === 'function') setProProgressState(item, 'completed');
@@ -1294,10 +1308,34 @@
             const reason = error?.name === 'AbortError' ? 'A busca demorou mais de 45 segundos e foi interrompida.' : (error?.message || 'tente novamente mais tarde.');
             failure.innerHTML = `<span>Não foi possível executar ${escapeBibleText(item)}: ${escapeBibleText(reason)}</span><button type="button" onclick="runWritingMatrixPrompt(true)">TENTAR NOVAMENTE</button>`;
             messages.appendChild(failure);
+            resultBody.innerHTML = `<div class="writing-result-placeholder"><strong>EXECUÇÃO NÃO CONCLUÍDA</strong><br>${escapeBibleText(reason)}</div>`;
+            resultBody.dataset.resultText = ''; 
+            document.getElementById('writing-result-copy')?.setAttribute('disabled','disabled');
         } finally {
             if (button) { button.disabled = false; button.textContent = `EXECUTAR BUSCA DA ETAPA ${stepCode}`; }
             messages.scrollTop = messages.scrollHeight;
         }
+        return false;
+    }
+
+    function copyWritingResult() {
+        const body = document.getElementById('writing-result-body');
+        const text = body?.dataset.resultText || body?.innerText || '';
+        if (!text.trim()) return false;
+        navigator.clipboard?.writeText(text).then(() => {
+            const button = document.getElementById('writing-result-copy');
+            if (button) { const old = button.textContent; button.textContent = 'COPIADO'; setTimeout(() => button.textContent = old, 1200); }
+        }).catch(() => {});
+        return false;
+    }
+
+    function clearWritingResult() {
+        const body = document.getElementById('writing-result-body');
+        if (!body) return false;
+        body.dataset.resultText = '';
+        body.innerHTML = '<div class="writing-result-placeholder">Nenhum resultado ainda. Execute uma etapa da Matriz para preencher esta área.</div>';
+        document.getElementById('writing-result-copy')?.setAttribute('disabled','disabled');
+        document.getElementById('writing-followup-form')?.setAttribute('hidden','hidden');
         return false;
     }
 
@@ -1965,7 +2003,7 @@
         if (!chapterSelect) return;
         const count = BIBLE_CHAPTER_COUNTS[selectedBibleBook] || 1;
         if (selectedBibleChapter > count) selectedBibleChapter = 1;
-        chapterSelect.innerHTML = Array.from({ length: count }, (_, index) => `<option value="${index + 1}" index+1===selectedBibleChapter?'selected':''>{index + 1}</option>`).join('');
+        chapterSelect.innerHTML = Array.from({ length: count }, (_, index) => `<option value="${index + 1}" ${index + 1 === selectedBibleChapter ? 'selected' : ''}>${index + 1}</option>`).join('');
     }
 
     function selectBibleBook(book) {
@@ -2025,7 +2063,7 @@
     async function getGreekVerses(book, chapter) {
         if (OSIS_BOOKS[book]) {
             const doc = await loadSBLGNT();
-            const prefix = `OSISBOOKS[book].{chapter}.`;
+            const prefix = `${OSIS_BOOKS[book]}.${chapter}.`;
             return Array.from(doc.querySelectorAll('[osisID]')).filter(node => node.getAttribute('osisID')?.startsWith(prefix)).map(node => {
                 const id = node.getAttribute('osisID');
                 const end = doc.querySelector(`verse[eID="${id}"]`);
@@ -2051,7 +2089,7 @@
 
     function renderParallelVerses(verses, emptyMessage) {
         if (!verses.length) return `<p class="bible-reading-placeholder">${emptyMessage}</p>`;
-        return verses.map(verse => `<p class="bible-verse"><sup>escapeBibleText(verse.verse)</sup>{escapeBibleText(verse.text).trim()}</p>`).join('');
+        return verses.map(verse => `<p class="bible-verse"><sup>${escapeBibleText(verse.verse)}</sup>${escapeBibleText(verse.text).trim()}</p>`).join('');
     }
 
     async function renderBibleChapter() {
@@ -2062,7 +2100,7 @@
         const renderToken = ++bibleRenderToken;
         paper.innerHTML = `<h3>LEITURA PARALELA</h3><h1>${selectedBibleBook} ${selectedBibleChapter}</h1><div class="bible-parallel-grid"><section class="bible-parallel-panel greek"><div class="bible-panel-heading">Grego<span class="bible-panel-source">LXX — Antigo Testamento · SBLGNT — Novo Testamento</span></div><div class="bible-panel-body" id="bible-greek-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-greek-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência grega" onkeydown="if(event.key==='Enter') queryBiblePanel('greek')"><button onclick="queryBiblePanel('greek')">ABRIR</button></div></section><section class="bible-parallel-panel hebrew"><div class="bible-panel-heading">Hebraico<span class="bible-panel-source">OSHB — Open Scriptures Hebrew Bible</span></div><div class="bible-panel-body" id="bible-hebrew-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-hebrew-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência hebraica" onkeydown="if(event.key==='Enter') queryBiblePanel('hebrew')"><button onclick="queryBiblePanel('hebrew')">ABRIR</button></div></section><section class="bible-parallel-panel portuguese"><div class="bible-panel-heading">Português<span class="bible-panel-source">João Ferreira de Almeida — fonte pública</span></div><div class="bible-panel-body" id="bible-portuguese-panel"><div class="bible-reading-placeholder">A carregar...</div></div><div class="bible-panel-query"><input id="bible-portuguese-query" placeholder="Capítulo:versículos — 1:1-5" aria-label="Referência portuguesa" onkeydown="if(event.key==='Enter') queryBiblePanel('portuguese')"><button onclick="queryBiblePanel('portuguese')">ABRIR</button></div></section></div><div class="bible-reading-actions"><button onclick="sendBiblePassageToResearch()">PESQUISAR ESTA PASSAGEM</button><button onclick="closeBibleReader()">VOLTAR À MATRIZ</button></div>`;
         const bookId = BIBLE_BOOK_IDS[selectedBibleBook];
-        const portuguesePromise = fetch(`https://bible-api.com/data/almeida/bookId/{selectedBibleChapter}`, { headers: { 'Accept': 'application/json' } }).then(async response => { const data = await response.json(); if (!response.ok || !Array.isArray(data.verses)) throw new Error(data?.error || 'A fonte portuguesa não devolveu o capítulo.'); return data.verses; });
+        const portuguesePromise = fetch(`https://bible-api.com/data/almeida/${bookId}/${selectedBibleChapter}`, { headers: { 'Accept': 'application/json' } }).then(async response => { const data = await response.json(); if (!response.ok || !Array.isArray(data.verses)) throw new Error(data?.error || 'A fonte portuguesa não devolveu o capítulo.'); return data.verses; });
         const greekPromise = getGreekVerses(selectedBibleBook, selectedBibleChapter);
         const hebrewPromise = getHebrewVerses(selectedBibleBook, selectedBibleChapter);
         const [portuguese, greek, hebrew] = await Promise.allSettled([portuguesePromise, greekPromise, hebrewPromise]);
@@ -2142,7 +2180,7 @@
             : [`Procedimentos de análise — ${module}`, 'Fontes e critérios do módulo', 'Área de estudo e investigação'];
         let html = `<div class="category-group"><div class="category-title">MATRIZ CANÔNICA DE PESQUISA PRO</div><div class="tools-grid">`;
         cards.forEach(card => {
-            html += `<div class="tool-card" onclick="openProCard('card','{module}')"><h4>${card}</h4></div>`;
+            html += `<div class="tool-card" onclick="openProCard('${card}', '${module}')"><h4>${card}</h4></div>`;
         });
         html += '</div></div>';
         return html;
@@ -2191,7 +2229,7 @@
 
     function renderProChat(module, topic = module) {
 
-        const bookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="escapeBibleText(book)">{escapeBibleText(book)}</option>`)].join('');
+        const bookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}">${escapeBibleText(book)}</option>`)].join('');
                 const m01Mode = isM01(module, topic);
         const m02Mode = isM02(module, topic);
         const m03Mode = isM03(module, topic);
@@ -2260,21 +2298,21 @@
         const currentChapter = Number(studyContext?.capitulo || 0);
         const currentStart = Number(studyContext?.versiculoInicial || 0);
         const currentEnd = Number(studyContext?.versiculoFinal || 0);
-        const selectedBookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="escapeBibleText(book)"{book === currentBook ? ' selected' : ''}>${escapeBibleText(book)}</option>`)].join('');
-        const chapterOptions = currentBook ? '<option value="">Seleccione</option>' + Array.from({ length: BIBLE_CHAPTER_COUNTS[currentBook] || 0 }, (_, index) => `<option value="index+1"{index + 1 === currentChapter ? ' selected' : ''}>${index + 1}</option>`).join('') : '<option value="">Seleccione</option>';
-        const verseOptions = '<option value="">Seleccione</option>' + Array.from({ length: 200 }, (_, index) => `<option value="index+1">{index + 1}</option>`).join('');
-        const headerForm = `<form id="pro-study-creation-form" class="pro-chat-form pro-reference-header" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); executeProHeaderSearch(event, 'module','{topic}'); return false;">
+        const selectedBookOptions = ['<option value="">Seleccione o livro</option>', ...BIBLE_BOOKS.map(book => `<option value="${escapeBibleText(book)}"${book === currentBook ? ' selected' : ''}>${escapeBibleText(book)}</option>`)].join('');
+        const chapterOptions = currentBook ? '<option value="">Seleccione</option>' + Array.from({ length: BIBLE_CHAPTER_COUNTS[currentBook] || 0 }, (_, index) => `<option value="${index + 1}"${index + 1 === currentChapter ? ' selected' : ''}>${index + 1}</option>`).join('') : '<option value="">Seleccione</option>';
+        const verseOptions = '<option value="">Seleccione</option>' + Array.from({ length: 200 }, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join('');
+        const headerForm = `<form id="pro-study-creation-form" class="pro-chat-form pro-reference-header" method="post" action="javascript:void(0)" onsubmit="event.preventDefault(); executeProHeaderSearch(event, '${module}', '${topic}'); return false;">
                 <div class="pro-reference-fields">
                     <label>Livro<select id="pro-book" onchange="populateProChapterOptions(this.value)" required>${selectedBookOptions}</select></label>
-                    <label>Capítulo<select id="pro-chapter" onchange="populateProVerseOptions(this.value)" currentBook?'':'disabled'required>{chapterOptions}</select></label>
-                    <label>Versículo inicial<select id="pro-verse-start" currentBook&&currentChapter?'':'disabled'required>{verseOptions}</select></label>
-                    <label>Versículo final<select id="pro-verse-end" currentBook&&currentChapter?'':'disabled'required>{verseOptions}</select></label>
+                    <label>Capítulo<select id="pro-chapter" onchange="populateProVerseOptions(this.value)" ${currentBook ? '' : 'disabled'} required>${chapterOptions}</select></label>
+                    <label>Versículo inicial<select id="pro-verse-start" ${currentBook && currentChapter ? '' : 'disabled'} required>${verseOptions}</select></label>
+                    <label>Versículo final<select id="pro-verse-end" ${currentBook && currentChapter ? '' : 'disabled'} required>${verseOptions}</select></label>
                 </div>
                 <label class="pro-whole-chapter"><input id="pro-whole-chapter" type="checkbox" onchange="toggleProWholeChapter(this.checked)"${studyContext?.escopo === 'capítulo inteiro' ? ' checked' : ''}> Estudar o capítulo inteiro</label>
                 <button type="submit">ACCIONAR BUSCA DA ETAPA</button>
             </form>`;
                 const storedResult = getProStoredResult(module, topic);
-        const deleteResultButton = storedResult ? `<div class="pro-result-actions"><button type="button" class="pro-delete-result" onclick="deleteProResult(decodeURIComponent('encodeURIComponent(module)'),decodeURIComponent('{encodeURIComponent(topic)}'))">APAGAR RESULTADO</button></div>` : '';
+        const deleteResultButton = storedResult ? `<div class="pro-result-actions"><button type="button" class="pro-delete-result" onclick="deleteProResult(decodeURIComponent('${encodeURIComponent(module)}'), decodeURIComponent('${encodeURIComponent(topic)}'))">APAGAR RESULTADO</button></div>` : '';
         return `<div class="pro-analysis-split">
 
             <section class="pro-free-panel">
@@ -2290,7 +2328,7 @@
             <section class="pro-chat pro-pro-panel">
                 <h3>MESA DE ANÁLISE PRO</h3>
                 ${headerForm}
-                <p class="pro-chat-intro">Módulo: <strong>escapeBibleText(module)</strong><br>Subetapaseleccionada:<strong>{escapeBibleText(topic)}</strong>.</p>
+                <p class="pro-chat-intro">Módulo: <strong>${escapeBibleText(module)}</strong><br>Subetapa seleccionada: <strong>${escapeBibleText(topic)}</strong>.</p>
                 ${renderStudyContextPanel(module, topic)}
                 <div class="pro-chat-messages" id="pro-chat-messages">
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Seleccione Livro, Capítulo e Versículo para iniciar a análise.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
@@ -2335,7 +2373,7 @@
             }
             return;
         }
-        const reference = wholeChapter ? `${book} chapter—capítulointeiro`:`{book} chapter:{startVerse}${startVerse === endVerse ? '' : `-${endVerse}`}`;
+        const reference = wholeChapter ? `${book} ${chapter} — capítulo inteiro` : `${book} ${chapter}:${startVerse}${startVerse === endVerse ? '' : `-${endVerse}`}`;
         studyContext = { livro: book, capitulo: Number(chapter), versiculoInicial: wholeChapter ? null : Number(startVerse), versiculoFinal: wholeChapter ? null : Number(endVerse), escopo: wholeChapter ? 'capítulo inteiro' : 'intervalo', referenciaFormatada: reference };
         try { localStorage.setItem('palavraSerieStudyContext', JSON.stringify(studyContext)); } catch (error) {}
         const button = form?.querySelector('button');
@@ -2906,7 +2944,7 @@
         if (!chapterSelect || !startSelect || !endSelect) return;
         const count = BIBLE_CHAPTER_COUNTS[book] || 0;
         chapterSelect.disabled = !count;
-        chapterSelect.innerHTML = `<option value="">Seleccione</option>` + Array.from({ length: count }, (_, index) => `<option value="index+1">{index + 1}</option>`).join('');
+        chapterSelect.innerHTML = `<option value="">Seleccione</option>` + Array.from({ length: count }, (_, index) => `<option value="${index + 1}">${index + 1}</option>`).join('');
         startSelect.disabled = true;
         endSelect.disabled = true;
         startSelect.innerHTML = '<option value="">Seleccione primeiro o capítulo</option>';
@@ -2931,11 +2969,11 @@
         startSelect.innerHTML = '<option value="">A carregar versículos...</option>';
         endSelect.innerHTML = '<option value="">A carregar versículos...</option>';
         try {
-            const response = await fetch(`https://bible-api.com/data/almeida/bookId/{chapter}`, { headers: { 'Accept': 'application/json' } });
+            const response = await fetch(`https://bible-api.com/data/almeida/${bookId}/${chapter}`, { headers: { 'Accept': 'application/json' } });
             const data = await response.json();
             const verses = Array.isArray(data.verses) ? data.verses : [];
             if (!verses.length) throw new Error('Versículos indisponíveis');
-            const options = '<option value="">Seleccione</option>' + verses.map(verse => `<option value="escapeBibleText(String(verse.verse))">{escapeBibleText(String(verse.verse))}</option>`).join('');
+            const options = '<option value="">Seleccione</option>' + verses.map(verse => `<option value="${escapeBibleText(String(verse.verse))}">${escapeBibleText(String(verse.verse))}</option>`).join('');
             startSelect.innerHTML = options;
             endSelect.innerHTML = options;
             startSelect.disabled = false;
@@ -2981,7 +3019,7 @@
             messages.scrollTop = messages.scrollHeight;
             return;
         }
-        const reference = wholeChapter ? `${book} chapter—capítulointeiro`:`{book} chapter:{startVerse}${startVerse === endVerse ? '' : `-${endVerse}`}`;
+        const reference = wholeChapter ? `${book} ${chapter} — capítulo inteiro` : `${book} ${chapter}:${startVerse}${startVerse === endVerse ? '' : `-${endVerse}`}`;
         studyContext = { livro: book, capitulo: Number(chapter), versiculoInicial: wholeChapter ? null : Number(startVerse), versiculoFinal: wholeChapter ? null : Number(endVerse), escopo: wholeChapter ? 'capítulo inteiro' : 'intervalo', referenciaFormatada: reference };
         try { localStorage.setItem('palavraSerieStudyContext', JSON.stringify(studyContext)); } catch (error) { /* armazenamento local opcional */ }
         const creationForm = document.getElementById('pro-study-creation-form');
@@ -3029,7 +3067,7 @@
     }
 
     function getProWorkNoteKey(module, card) {
-        return `palavraSerieProWorkNote:module:{card}`;
+        return `palavraSerieProWorkNote:${module}:${card}`;
     }
 
     function saveProWorkNote(module, card, textarea) {
@@ -3053,7 +3091,7 @@
                     <section class="pro-work-sheet" aria-label="Folha de trabalho da pesquisa">
                         <h2>${escapeBibleText(card)}</h2>
                         <p>Escreva aqui o conteúdo da sua pesquisa. A folha é independente do Chat e fica associada a esta etapa.</p>
-                        <textarea id="pro-work-note" placeholder="Registe aqui dados, fontes, observações e conclusões..." oninput="saveProWorkNote(${JSON.stringify(module)}, JSON.stringify(card),this)">{escapeBibleText(savedNote)}</textarea>
+                        <textarea id="pro-work-note" placeholder="Registe aqui dados, fontes, observações e conclusões..." oninput="saveProWorkNote(${JSON.stringify(module)}, ${JSON.stringify(card)}, this)">${escapeBibleText(savedNote)}</textarea>
                         <button type="button" id="pro-work-note-save">GUARDAR</button>
                     </section>
                     <aside class="pro-analysis-panel">${renderProChat(module, card)}</aside>
@@ -3145,7 +3183,7 @@
 
     function renderProStatus(id) {
         const state = PRO_PROGRESS_STATES[getProProgressState(id)];
-        return `<span class="pro-status ${state.className}" title="Estado: state.label">{state.symbol} ${state.label}</span>`;
+        return `<span class="pro-status ${state.className}" title="Estado: ${state.label}">${state.symbol} ${state.label}</span>`;
     }
 
     function updateProProgressVisuals() {
@@ -3178,7 +3216,7 @@
                 const subitem = document.createElement('li');
                 subitem.className = 'pro-subitem';
                 subitem.dataset.proProgressId = itemName;
-                subitem.innerHTML = `<span class="pro-subitem-label">escapeBibleText(itemName)</span>{renderProStatus(itemName)}`;
+                subitem.innerHTML = `<span class="pro-subitem-label">${escapeBibleText(itemName)}</span>${renderProStatus(itemName)}`;
                 subitem.onclick = (event) => {
                     event.stopPropagation();
                     document.querySelectorAll('.pro-subitem').forEach(item => item.classList.remove('active'));
@@ -3203,9 +3241,9 @@
         const prompts = data.items.map(item => {
             const step = item.split(' — ')[0];
             const prompt = rules[step] || 'O prompt desta etapa será executado na Mesa de Análise PRO.';
-            return `<article class="pro-prompt-card"><strong>${escapeBibleText(item)} · escapeBibleText(PROPROGRESSSTATES[getProProgressState(item)]?.label||'NÃOINICIADO')</strong><p>{escapeBibleText(prompt)}</p></article>`;
+            return `<article class="pro-prompt-card"><strong>${escapeBibleText(item)} · ${escapeBibleText(PRO_PROGRESS_STATES[getProProgressState(item)]?.label || 'NÃO INICIADO')}</strong><p>${escapeBibleText(prompt)}</p></article>`;
         }).join('');
-        target.innerHTML = `<div class="pro-prompt-sheet"><h2>escapeBibleText(module)</h2><pclass="pro-prompt-sheet-intro">Promptsdetodasasetapasdestemódulo.SeleccioneumaetapanalateralparaabriraMesadeAnálisePRO.</p>{prompts}</div>`;
+        target.innerHTML = `<div class="pro-prompt-sheet"><h2>${escapeBibleText(module)}</h2><p class="pro-prompt-sheet-intro">Prompts de todas as etapas deste módulo. Seleccione uma etapa na lateral para abrir a Mesa de Análise PRO.</p>${prompts}</div>`;
     }
 
     function resetProMatrixAnalysis() {
@@ -3224,11 +3262,11 @@
 
     function ontologyBranch(discipline, open = false) {
         const subs = DATA[discipline] || {};
-        let html = `<details class="ontology-node"open?'open':''><summary>{discipline}</summary><div class="ontology-children">`;
+        let html = `<details class="ontology-node"${open ? ' open' : ''}><summary>${discipline}</summary><div class="ontology-children">`;
         Object.keys(subs).forEach(category => {
             html += `<details class="ontology-category"><summary>${category}</summary><ul class="ontology-items">`;
             subs[category].forEach(item => {
-                html += `<li><button class="ontology-item-link" onclick='openSearch(${JSON.stringify(item)}, JSON.stringify(discipline))'>{item}</button></li>`;
+                html += `<li><button class="ontology-item-link" onclick='openSearch(${JSON.stringify(item)}, ${JSON.stringify(discipline)})'>${item}</button></li>`;
             });
             html += `</ul></details>`;
         });
@@ -3267,9 +3305,9 @@
         const step = PROGRESSIVE_STEPS[progressiveInvestigation.current];
         const completed = Object.keys(progressiveInvestigation.results).map(Number);
         const result = progressiveInvestigation.results[progressiveInvestigation.current] || '';
-        const progress = PROGRESSIVE_STEPS.map((item, index) => `<button class="index===progressiveInvestigation.current?'active':''{completed.includes(index) ? 'completed' : ''}" onclick="setProgressiveStep(index)">{item.number}</button>`).join('');
+        const progress = PROGRESSIVE_STEPS.map((item, index) => `<button class="${index === progressiveInvestigation.current ? 'active ' : ''}${completed.includes(index) ? 'completed' : ''}" onclick="setProgressiveStep(${index})">${item.number}</button>`).join('');
         const technical = progressiveInvestigation.mode === 'advanced' ? `<p><strong>Módulo técnico associado:</strong> ${step.module}</p>` : '';
-        document.getElementById('mn').innerHTML = `<main class="progressive-paper"><button class="back-arrow" onclick="openProgressiveInvestigation()" title="Voltar à configuração da investigação">← VOLTAR</button><h1>INVESTIGAR UMA PASSAGEM</h1><p class="progressive-intro"><strong>Passagem:</strong> escapeBibleText(progressiveInvestigation.passage){progressiveInvestigation.translation ? ` · <strong>Tradução:</strong> ${escapeBibleText(progressiveInvestigation.translation)}` : ''}${progressiveInvestigation.objective ? `<br><strong>Objetivo:</strong> ${escapeBibleText(progressiveInvestigation.objective)}` : ''}</p><div class="progressive-progress" aria-label="Progressão da investigação">${progress}</div><section class="progressive-step"><h2>${step.number} — step.title</h2>{technical}<h3>Pergunta orientadora</h3><p>step.question</p><h3>Objetivodestaetapa</h3><p>{step.objective}</p><h3>O que será investigado</h3><p>step.investigation</p>{result ? `<h3>Resultado produzido</h3><div class="progressive-result">${escapeBibleText(result)}</div>` : '<p class="progressive-result">Ainda não há resultado nesta etapa. Inicie a investigação para produzir uma resposta organizada.</p>'}<div class="progressive-step-actions"><button onclick="requestProgressiveStepAnalysis()">${result ? 'ATUALIZAR INVESTIGAÇÃO' : 'INVESTIGAR ESTA ETAPA'}</button>progressiveInvestigation.current>0?'<buttonclass="secondary"onclick="setProgressiveStep(progressiveInvestigation.current-1)">←ETAPAANTERIOR</button>':''{progressiveInvestigation.current < PROGRESSIVE_STEPS.length - 1 ? '<button class="secondary" onclick="setProgressiveStep(progressiveInvestigation.current + 1)">PRÓXIMA ETAPA →</button>' : ''}<button class="secondary" onclick="openProgressiveAdvancedStep(${progressiveInvestigation.current})">APROFUNDAR TECNICAMENTE</button></div></section></main>`;
+        document.getElementById('mn').innerHTML = `<main class="progressive-paper"><button class="back-arrow" onclick="openProgressiveInvestigation()" title="Voltar à configuração da investigação">← VOLTAR</button><h1>INVESTIGAR UMA PASSAGEM</h1><p class="progressive-intro"><strong>Passagem:</strong> ${escapeBibleText(progressiveInvestigation.passage)}${progressiveInvestigation.translation ? ` · <strong>Tradução:</strong> ${escapeBibleText(progressiveInvestigation.translation)}` : ''}${progressiveInvestigation.objective ? `<br><strong>Objetivo:</strong> ${escapeBibleText(progressiveInvestigation.objective)}` : ''}</p><div class="progressive-progress" aria-label="Progressão da investigação">${progress}</div><section class="progressive-step"><h2>${step.number} — ${step.title}</h2>${technical}<h3>Pergunta orientadora</h3><p>${step.question}</p><h3>Objetivo desta etapa</h3><p>${step.objective}</p><h3>O que será investigado</h3><p>${step.investigation}</p>${result ? `<h3>Resultado produzido</h3><div class="progressive-result">${escapeBibleText(result)}</div>` : '<p class="progressive-result">Ainda não há resultado nesta etapa. Inicie a investigação para produzir uma resposta organizada.</p>'}<div class="progressive-step-actions"><button onclick="requestProgressiveStepAnalysis()">${result ? 'ATUALIZAR INVESTIGAÇÃO' : 'INVESTIGAR ESTA ETAPA'}</button>${progressiveInvestigation.current > 0 ? '<button class="secondary" onclick="setProgressiveStep(progressiveInvestigation.current - 1)">← ETAPA ANTERIOR</button>' : ''}${progressiveInvestigation.current < PROGRESSIVE_STEPS.length - 1 ? '<button class="secondary" onclick="setProgressiveStep(progressiveInvestigation.current + 1)">PRÓXIMA ETAPA →</button>' : ''}<button class="secondary" onclick="openProgressiveAdvancedStep(${progressiveInvestigation.current})">APROFUNDAR TECNICAMENTE</button></div></section></main>`;
     }
 
     function setProgressiveStep(index) {
@@ -3315,7 +3353,7 @@
         document.querySelectorAll('.module-item').forEach(i => i.classList.remove('active'));
         if (el) el.classList.add('active');
         const mn = document.getElementById('mn');
-        mn.innerHTML = `<main class="ontology-paper"><button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para a árvore principal">← VOLTAR</button><h1>k</h1><divclass="ontology-tree">{ontologyBranch(k, true)}</div></main>`;
+        mn.innerHTML = `<main class="ontology-paper"><button class="back-arrow" onclick="showOntologyRoot()" title="Voltar para a árvore principal">← VOLTAR</button><h1>${k}</h1><div class="ontology-tree">${ontologyBranch(k, true)}</div></main>`;
     }
 
     function mapAcademicToProModule(disc, tool) {
@@ -3445,7 +3483,7 @@
                             <p class="free-search-label">CONSULTA FREE</p>
                             <div class="question-row">
                                 <input type="text" id="q" placeholder="Escreva uma pergunta geral sobre o tema...">
-                                <button id="b" onclick="run('tool','{disc}')">EXAMINAR</button>
+                                <button id="b" onclick="run('${tool}', '${disc}')">EXAMINAR</button>
                             </div>
                             <div id="ld" class="ai-chat-loading">Consulta FREE disponível.</div>
                         </div>
@@ -3463,7 +3501,7 @@
                     <div class="pro-search-box ai-chat-input">
                         <div class="question-row">
                             <input type="text" id="pro-q" placeholder="Pesquisar na Matriz PRO...">
-                            <button id="pro-b" onclick="runPro('tool','{disc}')">PESQUISAR PRO</button>
+                            <button id="pro-b" onclick="runPro('${tool}', '${disc}')">PESQUISAR PRO</button>
                         </div>
                         <div id="pro-ld" class="ai-chat-loading">Consulta PRO disponível.</div>
                     </div>
@@ -3689,5 +3727,3 @@
 </script>
 </body>
 </html>
-
-
