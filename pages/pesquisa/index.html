@@ -612,6 +612,14 @@
         .writing-control-panel .writing-control-messages { display:none; flex:0 0 auto; max-height:96px; overflow-y:auto; padding:0 12px 8px; border-top:0; background:transparent; }
         .writing-control-panel .writing-control-messages.is-visible { display:block; }
         .writing-control-panel .writing-control-message { margin:0 0 6px; padding:6px 8px; border-radius:5px; background:#17243a; color:#cbd8e8; font-size:9px; line-height:1.35; white-space:pre-wrap; }
+        .writing-control-panel .writing-followup-form { margin:8px 12px 12px; }
+        .writing-control-result-panel { display:flex; flex-direction:column; min-width:0; margin-top:10px; border-top:1px solid #263754; }
+        .writing-control-result-header { padding:9px 0 5px; color:#20d66b; font-size:10px; font-weight:900; letter-spacing:.6px; }
+        .writing-control-result-body { min-height:150px; max-height:420px; overflow-y:auto; padding:8px 10px; color:#dbe7f5; font-size:11px; line-height:1.6; white-space:pre-wrap; }
+        .writing-control-result-body .writing-result-placeholder { padding:0; border:0; background:transparent; color:#71849e; }
+        .writing-control-result-actions { display:flex; gap:6px; padding:6px 0 0; }
+        .writing-control-result-actions button { min-height:28px; padding:0 9px; border:1px solid #344762; border-radius:5px; background:#17243a; color:#dbe7f5; font-size:9px; font-weight:900; cursor:pointer; }
+        .writing-control-result-actions button:disabled { opacity:.45; cursor:not-allowed; }
         .writing-explanation-panel { min-height:0; align-self:stretch; }
         .writing-explanation-context { margin:10px 18px 6px; padding:8px 10px; }
         .writing-explanation-status { margin:6px 18px; }
@@ -2344,14 +2352,6 @@
                     <textarea id="writing-chat-input" placeholder="Escreva uma pergunta livre..." aria-label="Pergunta livre do chat de escrita"></textarea>
                     <button type="submit">ENVIAR</button>
                 </form>
-                <form id="writing-followup-form" class="writing-followup-form" hidden onsubmit="return submitWritingFollowup(event)">
-                    <label for="writing-followup-input">PERGUNTA SOBRE O RESULTADO</label>
-                    <textarea id="writing-followup-input" placeholder="Pergunte algo sobre a resposta recebida..."></textarea>
-                    <div class="writing-followup-actions">
-                        <button type="button" class="writing-followup-clear" onclick="clearWritingFollowup()">LIMPAR</button>
-                        <button type="submit" class="writing-followup-send">ENVIAR</button>
-                    </div>
-                </form>
             </section>
             <aside class="writing-chat-panel writing-control-panel" aria-label="Controle e conversa da Sala do Escritor">
                 <header class="writing-chat-header">
@@ -2373,16 +2373,27 @@
                             <div id="writing-matrix-run" class="writing-matrix-run" hidden><button type="button" id="writing-matrix-run-button" onclick="runWritingMatrixPrompt()">EXECUTAR BUSCA DA ETAPA</button></div>
                         </div>
                     </div>
+                    <section class="writing-control-result-panel" aria-label="Resposta do controle e conversa">
+                        <div class="writing-control-result-header">RESULTADO DA EXECUÇÃO</div>
+                        <div class="writing-control-result-body" id="writing-result-body"><div class="writing-result-placeholder">A resposta gerada pela etapa aparecerá aqui.</div></div>
+                        <div class="writing-control-result-actions">
+                            <button type="button" onclick="copyWritingResult()" id="writing-result-copy" disabled>COPIAR</button>
+                            <button type="button" onclick="clearWritingResult()" id="writing-result-clear">LIMPAR</button>
+                        </div>
+                    </section>
                     <div class="writing-control-messages" id="writing-control-messages" aria-live="polite"></div>
+                    <form id="writing-followup-form" class="writing-followup-form" hidden onsubmit="return submitWritingFollowup(event)">
+                        <label for="writing-followup-input">PERGUNTA SOBRE O RESULTADO</label>
+                        <textarea id="writing-followup-input" placeholder="Pergunte algo sobre a resposta recebida..."></textarea>
+                        <div class="writing-followup-actions">
+                            <button type="button" class="writing-followup-clear" onclick="clearWritingFollowup()">LIMPAR</button>
+                            <button type="submit" class="writing-followup-send">ENVIAR</button>
+                        </div>
+                    </form>
                 </header>
             </aside>
             <aside class="writing-explanation-panel" id="writing-explanation-panel" aria-label="Mesa de Explicação da Sala do Escritor">
                 <div id="writing-explanation-inner">${renderWritingExplanationPanel()}</div>
-                <div id="writing-result-body" class="writing-result-store" hidden aria-hidden="true"></div>
-                <div class="writing-explanation-result-actions">
-                    <button type="button" onclick="copyWritingResult()" id="writing-result-copy" disabled>COPIAR RESULTADO</button>
-                    <button type="button" onclick="clearWritingResult()" id="writing-result-clear">LIMPAR RESULTADO</button>
-                </div>
             </aside>
         </div>`;
         initWritingMatrixControls();
@@ -2500,19 +2511,17 @@
         if (!moduleSelect || !stepSelect || !input) return;
         const matrixActive = Boolean(moduleSelect.value && stepSelect.value);
         if (form) {
-            form.hidden = matrixActive;
-            form.classList.toggle('writing-free-mode', !matrixActive);
+            form.hidden = false;
+            form.classList.add('writing-free-mode');
         }
         if (runBox) runBox.hidden = !matrixActive;
         if (runButton) runButton.textContent = matrixActive ? `EXECUTAR BUSCA DA ETAPA ${stepSelect.value}` : 'EXECUTAR BUSCA DA ETAPA';
-        input.placeholder = matrixActive ? 'O prompt da etapa já está definido.' : 'Escreva uma pergunta livre...';
-        input.setAttribute('aria-label', matrixActive ? 'Orientação da etapa da Matriz' : 'Pergunta livre do chat de escrita');
-        if (status) status.textContent = matrixActive
-            ? `PROMPT ${stepSelect.value} ACTIVO — a pergunta já está definida pela Sala do Escritor. Não é necessário preencher o chat.`
-            : 'MODO PERGUNTA LIVRE — BUSCA ACTIVA. Pode escrever uma pergunta livre.';
+        input.placeholder = 'Escreva uma pergunta livre...';
+        input.setAttribute('aria-label', 'Pergunta livre do chat de escrita');
+        if (status) status.textContent = 'MODO PERGUNTA LIVRE — BUSCA ACTIVA. Esta conversa não depende do módulo, da etapa ou do resultado central.';
         if (note) {
-            note.hidden = matrixActive;
-            note.textContent = matrixActive ? `MODO SALA DO ESCRITOR: a orientação será associada à etapa ${stepSelect.value}.` : 'MODO PERGUNTA LIVRE — BUSCA ACTIVA';
+            note.hidden = true;
+            note.textContent = 'CHAT LIVRE INDEPENDENTE DO CONTROLE DE ETAPAS';
         }
     }
 
@@ -2545,7 +2554,7 @@
     async function submitWritingFollowup(event) {
         event?.preventDefault();
         const input = document.getElementById('writing-followup-input');
-        const messages = document.getElementById('writing-chat-messages');
+        const messages = document.getElementById('writing-control-messages');
         const moduleSelect = document.getElementById('writing-matrix-module');
         const stepSelect = document.getElementById('writing-matrix-step');
         const text = input?.value.trim() || '';
@@ -2694,13 +2703,8 @@
         const messages = document.getElementById('writing-chat-messages');
         const text = input?.value.trim();
         if (!text || !messages) return false;
-        const moduleValue = document.getElementById('writing-matrix-module')?.value || '';
-        const stepValue = document.getElementById('writing-matrix-step')?.value || '';
-        if (moduleValue && stepValue) {
-            input.value = '';
-            return false;
-        }
-        const reference = document.getElementById('writing-bible-reference')?.textContent.replace(/^REFERÊNCIA:\s*/i, '') || 'referência não seleccionada';
+        const moduleValue = 'CHAT LIVRE — SALA DO ESCRITOR';
+        const reference = 'pergunta livre, sem vínculo com o controle de etapas';
         const userMessage = document.createElement('div');
         userMessage.className = 'writing-chat-message user';
         userMessage.textContent = text;
@@ -2722,7 +2726,7 @@
                     topic: 'CONSULTA LIVRE — SALA DE ESCRITA',
                     module: moduleValue,
                     discipline: 'SALA DE ESCRITA PRIVADA',
-                    studyContext: { referenciaFormatada: reference, passage: reference, source: 'Sala de Escrita' },
+                    studyContext: { source: 'Chat Livre da Sala do Escritor', independent: true },
                     accessLevel: 'private'
                 })
             });
