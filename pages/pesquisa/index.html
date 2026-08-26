@@ -609,6 +609,15 @@
         .writing-chat-panel .writing-matrix-prompt { margin-top:6px; padding:7px 8px; max-height:112px; font-size:9px; line-height:1.35; }
         .writing-chat-panel .writing-matrix-prompt strong { margin-bottom:3px; font-size:9px; }
         .writing-chat-panel .writing-matrix-run { margin-top:6px; }
+        .writing-control-panel .writing-control-messages { display:none; flex:0 0 auto; max-height:96px; overflow-y:auto; padding:0 12px 8px; border-top:0; background:transparent; }
+        .writing-control-panel .writing-control-messages.is-visible { display:block; }
+        .writing-control-panel .writing-control-message { margin:0 0 6px; padding:6px 8px; border-radius:5px; background:#17243a; color:#cbd8e8; font-size:9px; line-height:1.35; white-space:pre-wrap; }
+        .writing-explanation-panel { min-height:0; align-self:stretch; }
+        .writing-explanation-context { margin:10px 18px 6px; padding:8px 10px; }
+        .writing-explanation-status { margin:6px 18px; }
+        .writing-explanation-body { flex:1; min-height:0; margin:0; padding:14px 18px 18px; border:0; border-radius:0; background:transparent; }
+        .writing-explanation-placeholder { display:none; }
+        .writing-explanation-actions { padding:8px 18px; }
     </style>
 
     <style id="norma001-styles">
@@ -2237,9 +2246,9 @@
                 <h2>◈ MESA DE EXPLICAÇÃO — SALA DO ESCRITOR</h2>
                 <p>Explicação clara do resultado da Sala, sem criar uma nova pesquisa nem alterar o conteúdo original.</p>
             </header>
-            <div class="writing-explanation-context"><strong>ETAPA SELECCIONADA</strong><span>${escapeBibleText(item || 'Nenhuma etapa seleccionada')}</span><small>Módulo: ${escapeBibleText(module || 'Nenhum módulo seleccionado')}</small></div>
+            ${hasSelection ? `<div class="writing-explanation-context"><strong>ETAPA SELECCIONADA</strong><span>${escapeBibleText(item || 'Nenhuma etapa seleccionada')}</span><small>Módulo: ${escapeBibleText(module || 'Nenhum módulo seleccionado')}</small></div>` : ''}
             <div class="writing-explanation-status" id="writing-explanation-status">${escapeBibleText(sourceStatus)}</div>
-            <div class="writing-explanation-body" id="writing-explanation-body">${explanation ? escapeBibleText(explanation).replace(/\n/g, '<br>') : '<div class="writing-explanation-placeholder">A explicação aparecerá aqui depois que a Sala produzir um resultado técnico.</div>'}</div>
+            ${source ? `<div class="writing-explanation-body" id="writing-explanation-body">${explanation ? escapeBibleText(explanation).replace(/\n/g, '<br>') : ''}</div>` : ''}
             <div class="writing-explanation-actions">
                 <button type="button" class="primary" id="writing-explanation-run" onclick="runWritingExplanation()"${source ? '' : ' disabled'}>EXPLICAR RESULTADO</button>
                 <button type="button" id="writing-explanation-base-button" onclick="toggleWritingExplanationSource()"${source ? '' : ' disabled'}>VER BASE DA EXPLICAÇÃO</button>
@@ -2321,7 +2330,61 @@
         document.querySelector('.sidebar')?.classList.remove('pro-active');
         const main = document.getElementById('mn');
         if (!main) return;
-        main.innerHTML = `<div class="writing-workspace"><section class="writing-result-panel" aria-label="Resultado da pesquisa"><div class="writing-result-header"><button class="back-arrow" onclick="returnToWritingAccess()" title="Voltar para a área interna">← VOLTAR</button><h2 style="margin-top:16px">RESULTADO DA PESQUISA</h2><p>A resposta da etapa executada aparecerá aqui. O resultado fica separado do chat e da conversa livre.</p></div><div class="writing-result-body" id="writing-result-body"><div class="writing-result-placeholder">Nenhum resultado ainda. Seleccione a referência, o módulo e a etapa no painel ao lado e clique em <strong>EXECUTAR BUSCA DA ETAPA</strong>.</div></div><div class="writing-result-actions"><button type="button" onclick="copyWritingResult()" id="writing-result-copy" disabled>COPIAR</button><button type="button" onclick="clearWritingResult()" id="writing-result-clear">LIMPAR</button></div></section><aside class="writing-chat-panel" aria-label="Chat de escrita"><header class="writing-chat-header"><h2>CONTROLE E CONVERSA</h2><p>Escolha a referência e execute o método da Sala do Escritor. A conversa livre fica separada do resultado.</p><div class="writing-matrix-controls"><div class="writing-bible-grid"><label for="writing-bible-book">LIVRO<select id="writing-bible-book" onchange="updateWritingBibleChapters()"></select></label><label for="writing-bible-chapter">CAPÍTULO<select id="writing-bible-chapter" onchange="updateWritingBibleReference()"></select></label><label for="writing-bible-verse">VERSÍCULO<input id="writing-bible-verse" type="text" inputmode="text" placeholder="ex.: 1 ou 1-5" oninput="updateWritingBibleReference()"></label></div><div class="writing-bible-reference" id="writing-bible-reference">REFERÊNCIA: seleccione livro, capítulo e versículo</div><label for="writing-matrix-module">MÓDULO DA MATRIZ</label><select id="writing-matrix-module" onchange="updateWritingMatrixSteps()"></select><div id="writing-matrix-stage-controls" hidden><label for="writing-matrix-step">ETAPA / PROMPT</label><select id="writing-matrix-step" onchange="updateWritingMatrixPrompt()"></select><div class="writing-matrix-prompt" id="writing-matrix-prompt"><strong>ETAPA DA SALA DO ESCRITOR</strong>Seleccione uma etapa para ver o prompt correspondente.</div><div id="writing-matrix-run" class="writing-matrix-run" hidden><button type="button" id="writing-matrix-run-button" onclick="runWritingMatrixPrompt()">EXECUTAR BUSCA DA ETAPA</button></div></div></div></header><div class="writing-chat-messages" id="writing-chat-messages"><div class="writing-chat-message system" id="writing-chat-status">MODO PERGUNTA LIVRE — a conversa ficará aqui, sem substituir o resultado da pesquisa.</div></div><form id="writing-chat-form" class="writing-chat-form" onsubmit="return submitWritingChat(event)"><div id="writing-chat-mode-note" class="writing-chat-mode-note" hidden></div><textarea id="writing-chat-input" placeholder="Escreva uma pergunta livre..." aria-label="Pergunta livre do chat de escrita"></textarea><button type="submit">ENVIAR</button></form><form id="writing-followup-form" class="writing-followup-form" hidden onsubmit="return submitWritingFollowup(event)"><label for="writing-followup-input">PERGUNTA SOBRE O RESULTADO</label><textarea id="writing-followup-input" placeholder="Pergunte algo sobre a resposta recebida..."></textarea><div class="writing-followup-actions"><button type="button" class="writing-followup-clear" onclick="clearWritingFollowup()">LIMPAR</button><button type="submit" class="writing-followup-send">ENVIAR</button></div></form></aside><aside class="writing-explanation-panel" id="writing-explanation-panel" aria-label="Mesa de Explicação da Sala do Escritor"><div id="writing-explanation-inner">${renderWritingExplanationPanel()}</div></aside></div>`;
+        main.innerHTML = `<div class="writing-workspace">
+            <section class="writing-chat-panel writing-free-chat-panel" aria-label="Chat livre da Sala do Escritor">
+                <header class="writing-chat-header">
+                    <h2>CHAT LIVRE</h2>
+                    <p>Perguntas livres e conversa da Sala do Escritor. Esta conversa permanece independente do controle de etapas.</p>
+                </header>
+                <div class="writing-chat-messages" id="writing-chat-messages">
+                    <div class="writing-chat-message system" id="writing-chat-status">MODO PERGUNTA LIVRE — a conversa ficará aqui, sem substituir o resultado das etapas.</div>
+                </div>
+                <form id="writing-chat-form" class="writing-chat-form" onsubmit="return submitWritingChat(event)">
+                    <div id="writing-chat-mode-note" class="writing-chat-mode-note" hidden></div>
+                    <textarea id="writing-chat-input" placeholder="Escreva uma pergunta livre..." aria-label="Pergunta livre do chat de escrita"></textarea>
+                    <button type="submit">ENVIAR</button>
+                </form>
+                <form id="writing-followup-form" class="writing-followup-form" hidden onsubmit="return submitWritingFollowup(event)">
+                    <label for="writing-followup-input">PERGUNTA SOBRE O RESULTADO</label>
+                    <textarea id="writing-followup-input" placeholder="Pergunte algo sobre a resposta recebida..."></textarea>
+                    <div class="writing-followup-actions">
+                        <button type="button" class="writing-followup-clear" onclick="clearWritingFollowup()">LIMPAR</button>
+                        <button type="submit" class="writing-followup-send">ENVIAR</button>
+                    </div>
+                </form>
+            </section>
+            <aside class="writing-chat-panel writing-control-panel" aria-label="Controle e conversa da Sala do Escritor">
+                <header class="writing-chat-header">
+                    <h2>CONTROLE E CONVERSA</h2>
+                    <p>Escolha a referência, o módulo e a etapa para executar o método da Sala do Escritor.</p>
+                    <div class="writing-matrix-controls">
+                        <div class="writing-bible-grid">
+                            <label for="writing-bible-book">LIVRO<select id="writing-bible-book" onchange="updateWritingBibleChapters()"></select></label>
+                            <label for="writing-bible-chapter">CAPÍTULO<select id="writing-bible-chapter" onchange="updateWritingBibleReference()"></select></label>
+                            <label for="writing-bible-verse">VERSÍCULO<input id="writing-bible-verse" type="text" inputmode="text" placeholder="ex.: 1 ou 1-5" oninput="updateWritingBibleReference()"></label>
+                        </div>
+                        <div class="writing-bible-reference" id="writing-bible-reference">REFERÊNCIA: seleccione livro, capítulo e versículo</div>
+                        <label for="writing-matrix-module">MÓDULO DA MATRIZ</label>
+                        <select id="writing-matrix-module" onchange="updateWritingMatrixSteps()"></select>
+                        <div id="writing-matrix-stage-controls" hidden>
+                            <label for="writing-matrix-step">ETAPA / PROMPT</label>
+                            <select id="writing-matrix-step" onchange="updateWritingMatrixPrompt()"></select>
+                            <div class="writing-matrix-prompt" id="writing-matrix-prompt"><strong>ETAPA DA SALA DO ESCRITOR</strong>Seleccione uma etapa para ver o prompt correspondente.</div>
+                            <div id="writing-matrix-run" class="writing-matrix-run" hidden><button type="button" id="writing-matrix-run-button" onclick="runWritingMatrixPrompt()">EXECUTAR BUSCA DA ETAPA</button></div>
+                        </div>
+                    </div>
+                    <div class="writing-control-messages" id="writing-control-messages" aria-live="polite"></div>
+                </header>
+            </aside>
+            <aside class="writing-explanation-panel" id="writing-explanation-panel" aria-label="Mesa de Explicação da Sala do Escritor">
+                <div id="writing-explanation-inner">${renderWritingExplanationPanel()}</div>
+                <div id="writing-result-body" class="writing-result-store" hidden aria-hidden="true"></div>
+                <div class="writing-explanation-result-actions">
+                    <button type="button" onclick="copyWritingResult()" id="writing-result-copy" disabled>COPIAR RESULTADO</button>
+                    <button type="button" onclick="clearWritingResult()" id="writing-result-clear">LIMPAR RESULTADO</button>
+                </div>
+            </aside>
+        </div>`;
         initWritingMatrixControls();
     }
 
@@ -2517,7 +2580,7 @@
     async function runWritingMatrixPrompt() {
         const moduleSelect = document.getElementById('writing-matrix-module');
         const stepSelect = document.getElementById('writing-matrix-step');
-        const messages = document.getElementById('writing-chat-messages');
+        const messages = document.getElementById('writing-control-messages');
         const resultBody = document.getElementById('writing-result-body');
         const button = document.getElementById('writing-matrix-run-button');
         const moduleId = moduleSelect?.value || '';
@@ -2534,6 +2597,8 @@
         if (!moduleId || !stepCode || !rawRule || !messages || !resultBody) return false;
         const question = `Passagem actual: ${reference}\nMódulo: ${module}\nSubetapa: ${item}\nPrompt da Sala do Escritor: ${rawRule.replaceAll('{PASSAGEM_ATUAL}', reference)}\n\nExecute exclusivamente esta etapa. Não avance para outras etapas. Não invente fontes, dados ou evidências. Declare limitações e incertezas quando necessário.`;
         messages.querySelectorAll('.writing-retry-message').forEach(node => node.remove());
+        messages.classList.add('is-visible');
+        messages.innerHTML = '';
         resultBody.innerHTML = `<div class="writing-chat-message system">A executar o prompt ${escapeBibleText(stepCode)} sobre ${escapeBibleText(reference)}...</div>`;
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 45000);
@@ -2553,6 +2618,8 @@
             const answerText = neutralizeServiceText(data.text || data.answer || data.response || data.result || 'A busca não devolveu texto.');
             resultBody.innerHTML = escapeBibleText(answerText).replace(/\n/g, '<br>');
             resultBody.dataset.resultText = answerText;
+            messages.classList.remove('is-visible');
+            messages.innerHTML = '';
             refreshWritingExplanationPanel();
             document.getElementById('writing-result-copy')?.removeAttribute('disabled');
             const followup = document.getElementById('writing-followup-form');
@@ -2564,9 +2631,11 @@
             failure.className = 'writing-chat-message system writing-retry-message';
             const reason = error?.name === 'AbortError' ? 'A busca demorou mais de 45 segundos e foi interrompida.' : (error?.message || 'tente novamente mais tarde.');
             failure.innerHTML = `<span>Não foi possível executar ${escapeBibleText(item)}: ${escapeBibleText(reason)}</span><button type="button" onclick="runWritingMatrixPrompt(true)">TENTAR NOVAMENTE</button>`;
+            messages.classList.add('is-visible');
             messages.appendChild(failure);
             resultBody.innerHTML = `<div class="writing-result-placeholder"><strong>EXECUÇÃO NÃO CONCLUÍDA</strong><br>${escapeBibleText(reason)}</div>`;
             resultBody.dataset.resultText = ''; 
+            messages.classList.add('is-visible');
             refreshWritingExplanationPanel();
             document.getElementById('writing-result-copy')?.setAttribute('disabled','disabled');
         } finally {
