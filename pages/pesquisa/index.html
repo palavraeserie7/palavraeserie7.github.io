@@ -953,6 +953,22 @@
         'ponte-infantil': { legacy: 'togglePonteMenu', passButton: true },
         entrada: { legacy: 'openOwnerLogin' }
     };
+    // Camada GLOBAL somente para recursos explicitamente compartilhados.
+    // O módulo académico usa esta ponte para consultar o prompt original da Matriz PRO,
+    // sem copiar a Matriz nem transferir o seu estado para outros menus.
+    window.PalavraGlobalBridge = window.PalavraGlobalBridge || {
+        clearAcademicContext() {
+            window.activeResearchContext = null;
+            window.activeAcademicStagePrompt = null;
+            window.activeAcademicModule = '';
+        },
+        getMatrixCommand(module, step) {
+            const key = String(module || '').slice(0, 2);
+            const rules = typeof getWritingRuleMap === 'function' ? getWritingRuleMap() : {};
+            const prompt = rules[key]?.[String(step || '')] || '';
+            return { module: String(module || ''), step: String(step || ''), prompt };
+        }
+    };
     function clearMenuModuleStatus() {
         document.getElementById('menu-module-unavailable-status')?.remove();
     }
@@ -977,7 +993,16 @@
             const html = await response.text();
             const documentCopy = new DOMParser().parseFromString(html, 'text/html');
             const definition = documentCopy.body?.querySelector('[data-legacy]');
-            const legacyName = definition?.dataset?.legacy;
+            if (!definition) throw new Error('module-definition-unavailable');
+            const runtimeSource = documentCopy.querySelector('script[data-menu-runtime]')?.textContent?.trim();
+            if (runtimeSource) {
+                new Function(runtimeSource)();
+                const runtime = window.PalavraMenuRuntime?.[id];
+                if (typeof runtime?.mount !== 'function') throw new Error('module-runtime-unavailable');
+                await runtime.mount({ id, button, source: html });
+                return true;
+            }
+            const legacyName = definition.dataset?.legacy;
             const legacy = legacyName ? window[legacyName] : null;
             if (typeof legacy !== 'function') throw new Error('module-handler-unavailable');
             if (definition.dataset.passButton === 'true') legacy.call(window, button);
@@ -1112,6 +1137,7 @@
     }
 
     function openProMatrix() {
+        window.PalavraGlobalBridge?.clearAcademicContext?.();
         const overlay = document.getElementById('pro-matrix-overlay');
         const body = document.getElementById('pro-matrix-body');
         const box = document.querySelector('#pro-mode .pro-menu-box');
@@ -2911,6 +2937,7 @@
     }
 
     function openOracleChat() {
+        window.PalavraGlobalBridge?.clearAcademicContext?.();
         document.body.dataset.activeMenu = 'oracle';
         const main = document.getElementById('mn');
         if (!main) return;
@@ -4900,6 +4927,7 @@
     }
 
     function showOntologyRoot() {
+        window.PalavraGlobalBridge?.clearAcademicContext?.();
         closeOwnerLogin();
         document.body.dataset.activeMenu = 'discipline';
         document.body.classList.remove('writing-session');
@@ -4928,15 +4956,41 @@
         mn.innerHTML = `<main class="ontology-paper"><button class="back-arrow" type="button" onclick="showOntologyRoot()" title="Voltar para a árvore principal">← VOLTAR</button><h1>${escapeBibleText(found.node.title)}</h1><div class="ontology-tree">${isArea ? branch : `<div class="ontology-focused-branch">${branch}</div>`}</div></main>`;
     }
 
-    function openAcademicStudy(path) {
+    const ACADEMIC_SYSTEM_MODULE = '▤ ÁREAS ACADÉMICAS DA TEOLOGIA';
+
+    function getAcademicHierarchyContext(path, selection = null) {
         const academicPath = Array.isArray(path) ? path.filter(Boolean) : [String(path || '')];
         const topic = academicPath[academicPath.length - 1] || 'Tema acadêmico';
         const area = academicPath[0] || '';
-        const parent = academicPath.length > 1 ? academicPath[academicPath.length - 2] : area;
+        const disciplineConfig = getAcademicDisciplineMethodConfig(academicPath);
+        const discipline = disciplineConfig
+            ? (academicPath[2] || topic)
+            : (academicPath.length >= 3 ? academicPath[2] : topic);
+        const subarea = academicPath.length >= 3 ? academicPath[1] : '';
+        return {
+            module: ACADEMIC_SYSTEM_MODULE,
+            area,
+            subarea,
+            discipline,
+            topic,
+            method: selection?.module || '',
+            operation: selection?.item || '',
+            step: selection?.step || '',
+            prompt: selection?.prompt || '',
+            path: academicPath,
+            routeLabel: academicPath.join(' / ')
+        };
+    }
+
+    function openAcademicStudy(path) {
+        const academicPath = Array.isArray(path) ? path.filter(Boolean) : [String(path || '')];
+        const context = getAcademicHierarchyContext(academicPath);
+        const topic = context.topic;
+        const area = context.area;
         window.accessMode = 'free';
         window.activeAcademicStagePrompt = null;
-        window.activeResearchContext = { topic, discipline: parent, area, path: academicPath };
-        window.activeAcademicModule = getAcademicDisciplineMethodConfig(academicPath) ? '' : mapAcademicToProModule(`${area} ${parent}`, topic);
+        window.activeResearchContext = context;
+        window.activeAcademicModule = getAcademicDisciplineMethodConfig(academicPath) ? '' : mapAcademicToProModule(`${area} ${context.subarea}`, topic);
         document.body.dataset.activeMenu = 'academic-study';
         document.body.classList.remove('writing-session');
         document.querySelector('.sidebar')?.classList.remove('pro-active');
@@ -5049,6 +5103,14 @@
         const input = document.getElementById('academic-study-question');
         if (!input || !selection) return;
         window.activeAcademicStagePrompt = selection;
+        const context = currentAcademicContext();
+        window.activeResearchContext = {
+            ...context,
+            method: selection.module || context.method || '',
+            operation: selection.item || context.operation || '',
+            step: selection.step || context.step || '',
+            prompt: selection.prompt || context.prompt || ''
+        };
         input.value = `${selection.item}: `;
         input.focus();
         setAcademicStudyStatus(`Prompt ${selection.step} aplicado ao chat. Complete a pergunta e pesquise.`, 'success');
@@ -5162,7 +5224,10 @@
     }
 
     function currentAcademicContext() {
-        return window.activeResearchContext || { topic: '', discipline: '', area: '', path: [] };
+        return window.activeResearchContext || {
+            module: ACADEMIC_SYSTEM_MODULE,
+            topic: '', discipline: '', area: '', subarea: '', method: '', operation: '', step: '', prompt: '', path: [], routeLabel: ''
+        };
     }
 
     function setAcademicStudyStatus(message, state = '') {
@@ -5209,14 +5274,41 @@
             return false;
         }
         const methodInstruction = selectedPrompt?.prompt ? `\nMódulo da Matriz: ${selectedPrompt.module || window.activeAcademicModule || ''}\nEtapa do método: ${selectedPrompt.item}\nPrompt existente da Matriz: ${selectedPrompt.prompt}` : '';
-        const academicDiscipline = disciplineMap ? context.topic : context.discipline;
-        const academicSubarea = disciplineMap ? context.discipline : '';
-        const routedQuestion = `MODO PESQUISA ACADÉMICA: responda com clareza, rigor e proporcionalidade às evidências. Não invente fontes, citações ou consenso. Mantenha hipóteses acadêmicas identificadas como hipóteses.\n\nCaminho acadêmico: ${academicPathToLabel(context.path)}\nÁrea: ${context.area}\nDisciplina: ${academicDiscipline}${academicSubarea ? `\nSubárea: ${academicSubarea}` : ''}\nTema selecionado: ${context.topic}${methodInstruction}\nPergunta: ${question}`;
+        const academicDiscipline = context.discipline || context.topic;
+        const academicSubarea = context.subarea || '';
+        const academicModule = context.module || ACADEMIC_SYSTEM_MODULE;
+        const academicMethod = selectedPrompt?.module || context.method || '';
+        const academicOperation = selectedPrompt?.item || context.operation || '';
+        const routedQuestion = `MODO PESQUISA ACADÉMICA: responda com clareza, rigor e proporcionalidade às evidências. Não invente fontes, citações ou consenso. Mantenha hipóteses académicas identificadas como hipóteses.\n\nMódulo: ${academicModule}\nÁrea: ${context.area}\nSubárea: ${academicSubarea}\nDisciplina: ${academicDiscipline}\nMétodo: ${academicMethod}\nOperação: ${academicOperation}\nCaminho académico: ${academicPathToLabel(context.path)}\nTema seleccionado: ${context.topic}${methodInstruction}\nPergunta: ${question}`;
         try {
             const response = await fetch(AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: routedQuestion, topic: context.topic, discipline: academicDiscipline, academicPath: context.path, module: selectedPrompt?.module || window.activeAcademicModule || '06 — EXEGESE', accessLevel: 'free' })
+                body: JSON.stringify({
+                    question: routedQuestion,
+                    topic: context.topic,
+                    module: academicModule,
+                    discipline: academicDiscipline,
+                    academicModule,
+                    academicArea: context.area,
+                    academicSubarea,
+                    academicDiscipline,
+                    method: academicMethod,
+                    operation: academicOperation,
+                    academicPath: context.path,
+                    studyContext: {
+                        source: ACADEMIC_SYSTEM_MODULE,
+                        module: academicModule,
+                        area: context.area,
+                        subarea: academicSubarea,
+                        discipline: academicDiscipline,
+                        method: academicMethod,
+                        operation: academicOperation,
+                        path: context.path,
+                        route: context.routeLabel || academicPathToLabel(context.path)
+                    },
+                    accessLevel: 'free'
+                })
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Não foi possível concluir a pesquisa acadêmica.');
