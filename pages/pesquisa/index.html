@@ -2232,30 +2232,55 @@
 
     const WRITING_EXPLANATION_STORAGE_PREFIX = 'palavraSerieWritingExplanation:';
 
-    function getWritingExplanationKey(moduleId, stepCode) {
-        return `${WRITING_EXPLANATION_STORAGE_PREFIX}${moduleId}:${stepCode}`;
+    function getWritingExplanationKey(moduleId, stepCode, reference = '') {
+        const base = `${WRITING_EXPLANATION_STORAGE_PREFIX}${moduleId}:${stepCode}`;
+        return reference ? `${base}:${encodeURIComponent(reference)}` : base;
     }
 
-    function getStoredWritingExplanation(moduleId, stepCode) {
-        try { return localStorage.getItem(getWritingExplanationKey(moduleId, stepCode)) || ''; } catch (error) { return ''; }
+    function clearWritingExplanationCache(moduleId, stepCode) {
+        try {
+            const prefix = getWritingExplanationKey(moduleId, stepCode);
+            Object.keys(localStorage).filter(key => key === prefix || key.startsWith(prefix + ':')).forEach(key => localStorage.removeItem(key));
+        } catch (error) {}
     }
 
-    function saveWritingExplanation(moduleId, stepCode, text) {
-        try { localStorage.setItem(getWritingExplanationKey(moduleId, stepCode), text || ''); } catch (error) {}
+    function getWritingCurrentReference() {
+        const book = document.getElementById('writing-bible-book')?.value || selectedBibleBook;
+        const chapter = document.getElementById('writing-bible-chapter')?.value || selectedBibleChapter;
+        const verse = document.getElementById('writing-bible-verse')?.value.trim() || '';
+        return `${book} ${chapter}${verse ? ':' + verse : ''}`;
+    }
+
+    function getWritingResultSource() {
+        const body = document.getElementById('writing-result-body');
+        const moduleId = document.getElementById('writing-matrix-module')?.value || '';
+        const stepCode = document.getElementById('writing-matrix-step')?.value || '';
+        const source = body?.dataset.resultText || '';
+        if (!source || !moduleId || !stepCode) return '';
+        if (body.dataset.resultReference !== getWritingCurrentReference()) return '';
+        if (body.dataset.resultModule !== moduleId || body.dataset.resultStep !== stepCode) return '';
+        return source;
+    }
+
+    function getStoredWritingExplanation(moduleId, stepCode, reference = '') {
+        try { return localStorage.getItem(getWritingExplanationKey(moduleId, stepCode, reference)) || ''; } catch (error) { return ''; }
+    }
+
+    function saveWritingExplanation(moduleId, stepCode, reference, text) {
+        try { localStorage.setItem(getWritingExplanationKey(moduleId, stepCode, reference), text || ''); } catch (error) {}
     }
 
     function renderWritingExplanationPanel() {
         const moduleId = document.getElementById('writing-matrix-module')?.value || '';
         const stepCode = document.getElementById('writing-matrix-step')?.value || '';
-        const resultBody = document.getElementById('writing-result-body');
-        const source = resultBody?.dataset.resultText || '';
+        const source = getWritingResultSource();
         const moduleRecord = getWritingRoomModule(moduleId);
         const stepRecord = getWritingRoomStep(moduleId, stepCode);
         const module = moduleRecord?.label || moduleId;
         const item = stepRecord?.item || stepCode;
-        const explanation = source && moduleId && stepCode ? getStoredWritingExplanation(moduleId, stepCode) : '';
+        const explanation = source && moduleId && stepCode ? getStoredWritingExplanation(moduleId, stepCode, getWritingCurrentReference()) : '';
         const hasSelection = Boolean(moduleId && stepCode);
-        const sourceStatus = source ? 'Resultado técnico privado disponível como base desta explicação.' : (hasSelection ? 'Execute a etapa no chat da Sala para disponibilizar um resultado técnico.' : 'Seleccione primeiro um módulo e uma etapa da Sala do Escritor.');
+        const sourceStatus = source ? 'Resultado técnico privado disponível como base desta explicação.' : (hasSelection ? 'Execute a etapa actual no painel central para disponibilizar um resultado técnico correspondente.' : 'Seleccione primeiro um módulo e uma etapa da Sala do Escritor.');
         return `<div class="writing-explanation-content">
             <header class="writing-explanation-header">
                 <div class="kicker">CAMADA DE COMPREENSÃO PRIVADA</div>
@@ -2296,7 +2321,7 @@
         const button = document.getElementById('writing-explanation-run');
         const moduleId = moduleSelect?.value || '';
         const stepCode = stepSelect?.value || '';
-        const sourceResult = resultBody?.dataset.resultText || '';
+        const sourceResult = getWritingResultSource();
         if (!moduleId || !stepCode || !sourceResult || !body) {
             refreshWritingExplanationPanel();
             return false;
@@ -2305,7 +2330,7 @@
         const stepRecord = getWritingRoomStep(moduleId, stepCode);
         const module = moduleRecord?.label || moduleId;
         const item = stepRecord?.item || stepCode;
-        const reference = document.getElementById('writing-bible-reference')?.textContent.replace(/^REFERÊNCIA:\s*/i, '') || 'referência seleccionada';
+        const reference = getWritingCurrentReference();
         if (button) { button.disabled = true; button.textContent = 'A EXPLICAR...'; }
         body.innerHTML = '<div class="writing-explanation-loading">A organizar o resultado privado em linguagem clara, sem alterar o conteúdo original...</div>';
         try {
@@ -2327,7 +2352,7 @@
             const data = await response.json();
             if (!response.ok) throw new Error(data?.error || 'A explicação privada não pôde ser executada.');
             const explanation = neutralizeServiceText(data.text || data.answer || data.response || data.result || 'A Mesa não devolveu uma explicação.');
-            saveWritingExplanation(moduleId, stepCode, explanation);
+            saveWritingExplanation(moduleId, stepCode, reference, explanation);
             body.innerHTML = escapeBibleText(explanation).replace(/\n/g, '<br>');
             const status = document.getElementById('writing-explanation-status');
             if (status) status.textContent = 'Explicação gerada exclusivamente a partir do resultado técnico privado original.';
@@ -2481,6 +2506,8 @@
         const moduleSelect = document.getElementById('writing-matrix-module');
         const stepSelect = document.getElementById('writing-matrix-step');
         if (!moduleSelect || !stepSelect) return;
+        const currentResult = document.getElementById('writing-result-body');
+        if (currentResult?.dataset.resultText && (currentResult.dataset.resultModule !== moduleSelect.value || currentResult.dataset.resultStep !== stepSelect.value)) clearWritingResult();
         const id = moduleSelect.value;
         const stageControls = document.getElementById('writing-matrix-stage-controls');
         if (!id) {
@@ -2538,6 +2565,8 @@
         const verse = document.getElementById('writing-bible-verse')?.value.trim();
         const reference = `${book} ${chapter}${verse ? ':' + verse : ''}`;
         const rule = rawRule.replaceAll('{PASSAGEM_ATUAL}', reference);
+        const currentResult = document.getElementById('writing-result-body');
+        if (currentResult?.dataset.resultText && (currentResult.dataset.resultReference !== reference || currentResult.dataset.resultModule !== moduleSelect.value || currentResult.dataset.resultStep !== step)) clearWritingResult();
         const status = getWritingRoomProgressState(step);
         const statusLabel = status?.label || 'NÃO INICIADO';
         promptBox.innerHTML = `<strong>${step ? `ETAPA ${escapeBibleText(step)} · ${escapeBibleText(statusLabel)}` : 'MODO PERGUNTA LIVRE'}</strong>${escapeBibleText(rule)}`;
@@ -2605,12 +2634,17 @@
         const reference = `${book} ${chapter}${verse ? ':' + verse : ''}`;
         if (!moduleId || !stepCode || !rawRule || !messages || !resultBody) return false;
         const question = `Passagem actual: ${reference}\nMódulo: ${module}\nSubetapa: ${item}\nPrompt da Sala do Escritor: ${rawRule.replaceAll('{PASSAGEM_ATUAL}', reference)}\n\nExecute exclusivamente esta etapa. Não avance para outras etapas. Não invente fontes, dados ou evidências. Declare limitações e incertezas quando necessário.`;
+        clearWritingExplanationCache(moduleId, stepCode);
+        delete resultBody.dataset.resultText;
+        delete resultBody.dataset.resultReference;
+        delete resultBody.dataset.resultModule;
+        delete resultBody.dataset.resultStep;
         messages.querySelectorAll('.writing-retry-message').forEach(node => node.remove());
         messages.classList.add('is-visible');
         messages.innerHTML = '';
         resultBody.innerHTML = `<div class="writing-chat-message system">A executar o prompt ${escapeBibleText(stepCode)} sobre ${escapeBibleText(reference)}...</div>`;
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000);
+        const timeoutId = setTimeout(() => controller.abort(), 70000);
         const loading = document.createElement('div');
         loading.className = 'writing-chat-message system';
         loading.textContent = `A executar o prompt ${stepCode} sobre ${reference}...`;
@@ -2627,6 +2661,9 @@
             const answerText = neutralizeServiceText(data.text || data.answer || data.response || data.result || 'A busca não devolveu texto.');
             resultBody.innerHTML = escapeBibleText(answerText).replace(/\n/g, '<br>');
             resultBody.dataset.resultText = answerText;
+            resultBody.dataset.resultReference = reference;
+            resultBody.dataset.resultModule = moduleId;
+            resultBody.dataset.resultStep = stepCode;
             messages.classList.remove('is-visible');
             messages.innerHTML = '';
             refreshWritingExplanationPanel();
@@ -2638,12 +2675,15 @@
             clearTimeout(timeoutId);
             const failure = document.createElement('div');
             failure.className = 'writing-chat-message system writing-retry-message';
-            const reason = error?.name === 'AbortError' ? 'A busca demorou mais de 45 segundos e foi interrompida.' : (error?.message || 'tente novamente mais tarde.');
+            const reason = error?.name === 'AbortError' ? 'A busca demorou mais de 70 segundos e foi interrompida.' : (error?.message || 'tente novamente mais tarde.');
             failure.innerHTML = `<span>Não foi possível executar ${escapeBibleText(item)}: ${escapeBibleText(reason)}</span><button type="button" onclick="runWritingMatrixPrompt(true)">TENTAR NOVAMENTE</button>`;
             messages.classList.add('is-visible');
             messages.appendChild(failure);
             resultBody.innerHTML = `<div class="writing-result-placeholder"><strong>EXECUÇÃO NÃO CONCLUÍDA</strong><br>${escapeBibleText(reason)}</div>`;
-            resultBody.dataset.resultText = ''; 
+            resultBody.dataset.resultText = '';
+            delete resultBody.dataset.resultReference;
+            delete resultBody.dataset.resultModule;
+            delete resultBody.dataset.resultStep;
             messages.classList.add('is-visible');
             refreshWritingExplanationPanel();
             document.getElementById('writing-result-copy')?.setAttribute('disabled','disabled');
@@ -2668,9 +2708,20 @@
     function clearWritingResult() {
         const body = document.getElementById('writing-result-body');
         if (!body) return false;
+        const moduleId = document.getElementById('writing-matrix-module')?.value || '';
+        const stepCode = document.getElementById('writing-matrix-step')?.value || '';
+        const resultModule = body.dataset.resultModule || moduleId;
+        const resultStep = body.dataset.resultStep || stepCode;
+        clearWritingExplanationCache(resultModule, resultStep);
+        if (resultModule !== moduleId || resultStep !== stepCode) clearWritingExplanationCache(moduleId, stepCode);
         body.dataset.resultText = '';
+        delete body.dataset.resultReference;
+        delete body.dataset.resultModule;
+        delete body.dataset.resultStep;
         body.innerHTML = '<div class="writing-result-placeholder">Nenhum resultado ainda. Execute uma etapa da Matriz para preencher esta área.</div>';
         document.getElementById('writing-result-copy')?.setAttribute('disabled','disabled');
+        const messages = document.getElementById('writing-control-messages');
+        if (messages) { messages.classList.remove('is-visible'); messages.innerHTML = ''; }
         document.getElementById('writing-followup-form')?.setAttribute('hidden','hidden');
         refreshWritingExplanationPanel();
         return false;
