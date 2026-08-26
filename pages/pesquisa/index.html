@@ -4314,21 +4314,33 @@
 
     const PRO_EXPLANATION_STORAGE_PREFIX = 'palavraSerieProExplanation:';
 
-    function getProExplanationKey(module, topic) {
-        return `${PRO_EXPLANATION_STORAGE_PREFIX}${module}:${topic}`;
+    function getProExplanationContextKey(context = studyContext) {
+        return String(context?.referenciaFormatada || context?.passage || '').trim() || 'sem-referencia';
     }
 
-    function getStoredProExplanation(module, topic) {
-        try { return localStorage.getItem(getProExplanationKey(module, topic)) || ''; } catch (error) { return ''; }
+    function getProExplanationSourceKey(sourceResult = '') {
+        const value = String(sourceResult || '');
+        let hash = 0;
+        for (let index = 0; index < value.length; index += 1) hash = ((hash << 5) - hash + value.charCodeAt(index)) | 0;
+        return (hash >>> 0).toString(36);
     }
 
-    function saveProExplanation(module, topic, text) {
-        try { localStorage.setItem(getProExplanationKey(module, topic), text || ''); } catch (error) {}
+    function getProExplanationKey(module, topic, sourceResult = '', context = studyContext) {
+        return `${PRO_EXPLANATION_STORAGE_PREFIX}${module}:${topic}:${getProExplanationContextKey(context)}:${getProExplanationSourceKey(sourceResult)}`;
+    }
+
+    function getStoredProExplanation(module, topic, sourceResult = '', context = studyContext) {
+        try { return localStorage.getItem(getProExplanationKey(module, topic, sourceResult, context)) || ''; } catch (error) { return ''; }
+    }
+
+    function saveProExplanation(module, topic, text, sourceResult = '', context = studyContext) {
+        try { localStorage.setItem(getProExplanationKey(module, topic, sourceResult, context), text || ''); } catch (error) {}
     }
 
     function renderProExplanationPanel(module, topic) {
         const source = getProStoredResult(module, topic);
-        const explanation = source ? getStoredProExplanation(module, topic) : '';
+        const explanation = source ? getStoredProExplanation(module, topic, source) : '';
+        const reference = getProExplanationContextKey();
         const sourceStatus = source ? 'Resultado técnico disponível como base desta explicação.' : 'Ainda não há resultado técnico nesta etapa. Execute primeiro a subetapa na Mesa de Análise PRO.';
         return `<section class="pro-explanation-panel" id="pro-explanation-panel" aria-label="Mesa de Explicação PRO">
             <div class="pro-explanation-header">
@@ -4336,7 +4348,7 @@
                 <h2>◈ MESA DE EXPLICAÇÃO PRO</h2>
                 <p>Compreenda com clareza o resultado da pesquisa sem alterar seus dados, evidências ou conclusões.</p>
             </div>
-            <div class="pro-explanation-context"><strong>ETAPA SELECCIONADA</strong><span>${escapeBibleText(topic)}</span><small>Módulo: ${escapeBibleText(module)}</small></div>
+            <div class="pro-explanation-context"><strong>ETAPA SELECCIONADA</strong><span>${escapeBibleText(topic)}</span><small>Módulo: ${escapeBibleText(module)}<br>Estudo actual: ${escapeBibleText(reference)}</small></div>
             <div class="pro-explanation-source-status" id="pro-explanation-source-status">${escapeBibleText(sourceStatus)}</div>
             <div class="pro-explanation-body" id="pro-explanation-body">${explanation ? escapeBibleText(explanation).replace(/\n/g, '<br>') : '<div class="pro-explanation-placeholder">A explicação aparecerá aqui depois que houver um resultado técnico disponível.</div>'}</div>
             <div class="pro-explanation-actions">
@@ -4387,7 +4399,7 @@
             const data = await response.json();
             if (!response.ok) throw new Error(data?.error || 'A Mesa de Explicação não pôde ser executada.');
             const explanation = neutralizeServiceText(data.text || data.answer || data.response || data.result || 'A Mesa não devolveu uma explicação.');
-            saveProExplanation(module, topic, explanation);
+            saveProExplanation(module, topic, explanation, sourceResult);
             body.innerHTML = escapeBibleText(explanation).replace(/\n/g, '<br>');
             const status = document.getElementById('pro-explanation-source-status');
             if (status) status.textContent = 'Explicação gerada exclusivamente a partir do resultado técnico original.';
