@@ -934,14 +934,14 @@
     // CAMADA GLOBAL — somente registro e carregamento seguro dos HTMLs independentes.
     // A camada não contém a lógica de nenhum menu; cada botão aponta para o seu HTML.
     const MENU_MODULE_FILES = {
-        oraculo: 'oraculo.html',
-        'matriz-pro': 'matriz-pro.html',
-        estante: 'estante.html',
-        biblia: 'biblia.html',
-        'areas-academicas': 'areas-academicas.html',
-        sermoes: 'sermoes.html',
-        'ponte-infantil': 'ponte-infantil.html',
-        entrada: 'entrada.html'
+        oraculo: 'oraculo/index.html',
+        'matriz-pro': 'matriz-pro/index.html',
+        estante: 'estante/index.html',
+        biblia: 'biblia/index.html',
+        'areas-academicas': 'areas-academicas/index.html',
+        sermoes: 'sermoes/index.html',
+        'ponte-infantil': 'ponte-infantil/index.html',
+        entrada: 'entrada/index.html'
     };
     const MENU_MODULE_FALLBACKS = {
         oraculo: { legacy: 'openOracleChat' },
@@ -961,6 +961,11 @@
             window.activeResearchContext = null;
             window.activeAcademicStagePrompt = null;
             window.activeAcademicModule = '';
+        },
+        openLegacy(name, args = []) {
+            const handler = window[name];
+            if (typeof handler !== 'function') throw new Error('menu-handler-unavailable');
+            return handler.apply(window, Array.isArray(args) ? args : []);
         },
         getMatrixCommand(module, step) {
             const key = String(module || '').slice(0, 2);
@@ -994,7 +999,15 @@
             const documentCopy = new DOMParser().parseFromString(html, 'text/html');
             const definition = documentCopy.body?.querySelector('[data-legacy]');
             if (!definition) throw new Error('module-definition-unavailable');
-            const runtimeSource = documentCopy.querySelector('script[data-menu-runtime]')?.textContent?.trim();
+            const runtimeTag = documentCopy.querySelector('script[data-menu-runtime]');
+            let runtimeSource = runtimeTag?.textContent?.trim() || '';
+            const runtimeSrc = runtimeTag?.getAttribute('src');
+            if (!runtimeSource && runtimeSrc) {
+                const runtimeUrl = new URL(runtimeSrc, url.href);
+                const runtimeResponse = await fetch(runtimeUrl.href, { cache: 'no-store' });
+                if (!runtimeResponse.ok) throw new Error('module-runtime-unavailable');
+                runtimeSource = await runtimeResponse.text();
+            }
             if (runtimeSource) {
                 new Function(runtimeSource)();
                 const runtime = window.PalavraMenuRuntime?.[id];
