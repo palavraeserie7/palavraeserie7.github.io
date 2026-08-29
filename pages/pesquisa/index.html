@@ -655,7 +655,9 @@
     <style id="academic-discipline-map-styles">
       .academic-discipline-map{margin-top:16px}.academic-discipline-map>summary{font-size:11px;letter-spacing:1px}.academic-discipline-map .academic-method-description{padding-bottom:12px}.academic-method-group{padding:0 12px 12px}.academic-method-group+.academic-method-group{padding-top:2px}.academic-method-group-title{margin:6px 0 7px;padding:7px 9px;border-left:3px solid #20d66b;background:#091426;color:#50ed91;font-size:9px;letter-spacing:1px}.academic-method-group-note{margin:0 0 8px;color:#91a4bd;font-size:9px;line-height:1.45}.academic-method-module{margin:0 0 6px;border:1px solid #344762;border-radius:6px;background:#111b30}.academic-method-module>summary{padding:9px 10px;color:#dbe7f5;font-size:10px;font-weight:900;cursor:pointer;list-style-position:inside}.academic-method-module[open]>summary{border-bottom:1px solid #344762;background:#14263e;color:#50ed91}.academic-method-module .academic-method-module-note{margin:0;padding:8px 10px;color:#91a4bd;font-size:9px;line-height:1.45}.academic-method-operation-list{display:grid;gap:5px;padding:0 8px 8px}.academic-method-operation{margin:0!important;padding:8px 9px!important}.academic-method-operation strong{font-size:9px!important}.academic-method-operation span{font-size:8px!important}.academic-method-conditional-note{color:#ffd166!important}
     </style>
-</head>
+<style id="ACADEMIC_LEVEL_UI_STYLES">
+.level-badge{display:inline-block;margin-left:8px;padding:2px 6px;border:1px solid currentColor;border-radius:4px;font-size:9px;font-weight:900;letter-spacing:.5px;vertical-align:middle;line-height:1.2}.level-badge.free{color:#168448;background:#e5f8ed}.level-badge.pro{color:#0873a7;background:#e5f5ff}.level-badge.master{color:#7045ad;background:#f1e8ff}.level-badge.doctus{color:#956000;background:#fff1d9}.academic-level-filter{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 18px;padding:10px 12px;border:1px solid #d8cdb8;border-radius:7px;background:#fffdf7;color:#806f53;font-size:10px;font-weight:900}.academic-level-filter-label{margin-right:4px;letter-spacing:.6px}.academic-level-filter button{padding:6px 9px;border:1px solid #cdbfaa;border-radius:4px;background:#fffaf0;color:#6d5d45;font:inherit;font-size:10px;font-weight:900;cursor:pointer}.academic-level-filter button.active,.academic-level-filter button:hover{background:#806f53;color:#fffaf0}.academic-level-filter-count{margin-left:auto;font-weight:700;color:#9a896f}.academic-level-hidden{display:none!important}
+</style></head>
 
 <body>
     <div class="sidebar">
@@ -9329,5 +9331,55 @@ window.auditAcademicLevelMap = auditAcademicLevelMap;
 window.ACADEMIC_LEVEL_AUDIT = auditAcademicLevelMap(ACADEMIC_TREE);
 console.info('ACADEMIC_LEVEL_AUDIT', window.ACADEMIC_LEVEL_AUDIT);
 </script>
-</body>
+<script id="ACADEMIC_LEVEL_UI_APPLIED">
+(function(){
+  'use strict';
+  const LABELS={free:'FREE',pro:'PRO',master:'MASTER',doctus:'DOCTUS'};
+  let active='';
+  function pathFromButton(button){
+    const raw=button.getAttribute('onclick')||'';
+    const m=raw.match(/openAcademicStudy\((\[[\s\S]*?\])\)/);
+    if(!m)return[];
+    try{return JSON.parse(m[1]);}catch(e){return[];}
+  }
+  function levelForButton(button){
+    const path=pathFromButton(button);
+    return typeof resolveAcademicLevel==='function' ? resolveAcademicLevel(path) : null;
+  }
+  function apply(){
+    const paper=document.querySelector('.ontology-paper'); if(!paper)return;
+    let shown=0;
+    paper.querySelectorAll('.ontology-item-link').forEach(button=>{
+      const li=button.closest('li'); const level=button.dataset.nivel||'';
+      const visible=!active||level===active;
+      if(li)li.classList.toggle('academic-level-hidden',!visible);
+      if(visible)shown++;
+    });
+    const count=paper.querySelector('.academic-level-filter-count'); if(count)count.textContent=shown+' item(ns) exibido(s)';
+    paper.querySelectorAll('.academic-level-filter button').forEach(b=>b.classList.toggle('active',b.dataset.level===active));
+  }
+  function decorate(){
+    const paper=document.querySelector('.ontology-paper'); if(!paper)return;
+    let bar=paper.querySelector('.academic-level-filter');
+    if(!bar){
+      bar=document.createElement('nav'); bar.className='academic-level-filter'; bar.setAttribute('aria-label','Filtrar itens por nível');
+      bar.innerHTML='<span class="academic-level-filter-label">NÍVEL</span><button type="button" data-level="">TODOS</button><button type="button" data-level="free">FREE</button><button type="button" data-level="pro">PRO</button><button type="button" data-level="master">MASTER</button><button type="button" data-level="doctus">DOCTUS</button><span class="academic-level-filter-count"></span>';
+      const intro=paper.querySelector('.ontology-intro'); (intro||paper.querySelector('h1')).after(bar);
+      bar.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{active=b.dataset.level;apply();}));
+    }
+    paper.querySelectorAll('.ontology-item-link').forEach(button=>{
+      if(button.dataset.levelUiReady)return;
+      button.dataset.levelUiReady='1';
+      const level=levelForButton(button); if(!level){button.dataset.nivel='';return;}
+      button.dataset.nivel=level;
+      const badge=document.createElement('span'); badge.className='level-badge '+level; badge.textContent=LABELS[level]; badge.setAttribute('aria-label','Nível '+LABELS[level]); button.appendChild(badge);
+    });
+    apply();
+  }
+  const observer=new MutationObserver(()=>requestAnimationFrame(decorate));
+  observer.observe(document.getElementById('mn')||document.body,{childList:true,subtree:true});
+  window.addEventListener('load',decorate);
+  window.refreshAcademicLevelUI=decorate;
+})();
+</script></body>
 </html>
