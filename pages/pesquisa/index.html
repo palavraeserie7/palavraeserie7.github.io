@@ -7910,8 +7910,14 @@
             if (authError || !data?.session?.access_token) {
                 throw new Error(authError?.message || 'Não foi possível autenticar.');
             }
+            const adminCheck = await supabaseClient.from('academic_manual_admins').select('user_id').eq('user_id', data.user.id).maybeSingle();
+            if (adminCheck.error || !adminCheck.data) {
+                await supabaseClient.auth.signOut();
+                throw new Error('Acesso reservado ao administrador autorizado.');
+            }
             error?.classList.remove('visible');
             ownerSession = true;
+            window.setMaintenanceAdmin?.();
             if (form) form.hidden = true;
             if (accessList) accessList.hidden = false;
             document.getElementById('owner-login-close')?.setAttribute('hidden', 'hidden');
@@ -8896,6 +8902,28 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
   document.addEventListener('change',async e=>{if(e.target.matches('[data-check-item]')){try{dbError((await DB.from('academic_manual_checklist_items').update({is_completed:e.target.checked,completed_at:e.target.checked?new Date().toISOString():null}).eq('id',e.target.dataset.checkItem).eq('owner_id',state.user.id)).error);await refresh('disciplines')}catch(err){alert(err.message)}}});
   window.openAcademicNorms=async function(){const panel=$('academic-login-norms');if(!panel)return false;panel.classList.add('open');await refresh('home');panel.scrollIntoView({behavior:'smooth',block:'nearest'});return false};
   window.closeAcademicNorms=function(){const panel=$('academic-login-norms');if(panel)panel.classList.remove('open');};
+})();
+</script>
+<style id="SITE_MAINTENANCE_GATE_STYLES">
+#site-maintenance-gate{display:none;position:fixed;inset:0;z-index:250;align-items:center;justify-content:center;padding:24px;background:rgba(5,10,20,.97);color:#dbe7f5;text-align:center}#site-maintenance-gate.open{display:flex}#site-maintenance-gate .maintenance-card{width:min(560px,92vw);padding:30px;border:1px solid #35506d;border-radius:12px;background:#111b30;box-shadow:0 18px 60px rgba(0,0,0,.45)}#site-maintenance-gate h1{margin:0 0 12px;color:#20d66b;font-size:20px;letter-spacing:1px}#site-maintenance-gate p{color:#b8c9dc;line-height:1.6}#site-maintenance-gate button{margin-top:14px;padding:11px 16px;border:0;border-radius:7px;background:#20d66b;color:#07151f;font-weight:900;cursor:pointer}#site-maintenance-gate small{display:block;margin-top:15px;color:#91a4bd;line-height:1.4}</style><div id="site-maintenance-gate" role="dialog" aria-modal="true" aria-labelledby="maintenance-title"><div class="maintenance-card"><h1 id="maintenance-title">SITE EM MANUTENÇÃO</h1><p>O site está temporariamente indisponível para o público enquanto são realizadas actualizações e trabalhos de segurança.</p><button type="button" onclick="openOwnerLogin()">ENTRADA PRIVADA DO ADMINISTRADOR</button><small>O acesso administrativo exige autenticação Supabase e autorização em academic_manual_admins.</small></div></div><script id="SITE_MAINTENANCE_GATE">
+(function(){
+  const DB=window.supabaseClient;
+  const gate=()=>document.getElementById('site-maintenance-gate');
+  const isTrue=value=>value===true || value===1 || ['true','1','sim','yes','on','ativo','activa','active'].includes(String(value??'').trim().toLowerCase());
+  async function readMaintenance(){
+    if(!DB) return false;
+    const result=await DB.from('config').select('*').eq('chave','manutencao_ativa').maybeSingle();
+    if(result.error){ console.warn('Não foi possível ler config.manutencao_ativa:',result.error.message); return false; }
+    const row=result.data||{};
+    return isTrue(row.valor ?? row.value ?? row.ativo ?? row.active ?? row.estado);
+  }
+  async function apply(){
+    try{ if(await readMaintenance()) gate()?.classList.add('open'); }
+    catch(error){ console.warn('Modo de manutenção indisponível:',error.message); }
+  }
+  window.setMaintenanceAdmin=function(){ gate()?.classList.remove('open'); };
+  window.refreshMaintenanceGate=apply;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true}); else apply();
 })();
 </script>
 </body>
