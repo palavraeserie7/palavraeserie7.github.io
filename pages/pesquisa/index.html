@@ -869,6 +869,61 @@
     }
 </style>
 
+
+<style id="ACADEMIC_ORDER_LEVEL_LIST_STYLES">
+    .academic-level-filter {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+    .academic-level-filter > strong {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+    .academic-level-filter-list {
+        display: flex;
+        flex: 0 1 auto;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .academic-level-filter-list li {
+        display: block;
+        margin: 0;
+        padding: 0;
+    }
+    .academic-level-filter-list button {
+        min-width: 58px;
+    }
+    .academic-level-filter-count {
+        margin-left: auto;
+        white-space: nowrap;
+    }
+    .academic-directory-toolbar-heading {
+        white-space: nowrap;
+    }
+    @media (max-width: 760px) {
+        .academic-level-filter-count {
+            flex-basis: 100%;
+            margin-left: 0;
+        }
+        .academic-directory-toolbar-heading {
+            flex-basis: 100%;
+        }
+    }
+    @media (max-width: 520px) {
+        .academic-level-filter-list {
+            flex-basis: 100%;
+        }
+        .academic-level-filter-list button {
+            min-width: 0;
+        }
+    }
+</style>
 </head>
 
 <body>
@@ -9007,7 +9062,7 @@ function hasAcademicAccess(subscriptionLevel,contentLevel,bonusActive=false){if(
 function isAcademicContentAvailable(record){return !!record&&record.status===CONTENT_STATUS.PUBLISHED;}
 window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORDS=ACADEMIC_TAXONOMY_RECORDS;window.hasAcademicAccess=hasAcademicAccess;window.isAcademicContentAvailable=isAcademicContentAvailable;
 </script>
-<script id="ACADEMIC_OFFICIAL_LEVEL_UI">(function(){let active='';const labels={free:'FREE',pro:'PRO',master:'MASTER',doctus:'DOCTUS'};function pathOf(b){const m=(b.getAttribute('onclick')||'').match(/openAcademicStudy\((\[[\s\S]*?\])\)/);try{return m?JSON.parse(m[1]):[]}catch(e){return[]}}function apply(){const p=document.querySelector('.ontology-paper');if(!p)return;const allowedLevels={free:['free'],pro:['free','pro'],master:['free','pro','master'],doctus:['free','pro','master','doctus']};const visible=allowedLevels[active]||null;const tree=p.querySelector('.ontology-tree');if(tree)tree.classList.toggle('academic-level-tree-hidden',!visible);let n=0;p.querySelectorAll('.ontology-item-link').forEach(b=>{const li=b.closest('li'),v=b.dataset.level||'';const ok=Boolean(visible&&visible.includes(v));if(li)li.classList.toggle('academic-level-hidden',!ok);if(ok)n++});const c=p.querySelector('.academic-level-filter-count');if(c)c.textContent=visible?n+' item(ns) exibido(s)':'Selecione um nível para exibir a lista';p.querySelectorAll('.academic-level-filter button').forEach(b=>b.classList.toggle('active',b.dataset.level===active))}function decorate(){const p=document.querySelector('.ontology-paper');if(!p)return;let bar=p.querySelector('.academic-level-filter');if(!bar){bar=document.createElement('nav');bar.className='academic-level-filter';bar.setAttribute('aria-label','Filtrar itens por nível');bar.innerHTML='<strong>NÍVEL</strong><button type="button" data-level="free">FREE</button><button type="button" data-level="pro">PRO</button><button type="button" data-level="master">MASTER</button><button type="button" data-level="doctus">DOCTUS</button><span class="academic-level-filter-count"></span>';const i=p.querySelector('.ontology-intro');(i||p.querySelector('h1')).after(bar);bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{active=b.dataset.level;apply()})}p.querySelectorAll('.ontology-item-link').forEach(b=>{if(b.dataset.officialReady)return;b.dataset.officialReady='1';const l=resolveAcademicLevel(pathOf(b));if(!l)return;b.dataset.level=l;const s=document.createElement('span');s.className='level-badge '+l;s.textContent=labels[l];s.title='Nível de acesso: '+labels[l];b.appendChild(s)});apply()}new MutationObserver(()=>requestAnimationFrame(decorate)).observe(document.getElementById('mn')||document.body,{childList:true,subtree:true});addEventListener('load',decorate);window.refreshAcademicLevelUI=decorate})();</script><script id="ACADEMIC_MANUAL_DASHBOARD_LOGIC">
+<script id="ACADEMIC_OFFICIAL_LEVEL_UI">(function(){let active='';const labels={free:'FREE',pro:'PRO',master:'MASTER',doctus:'DOCTUS'};function pathOf(b){const m=(b.getAttribute('onclick')||'').match(/openAcademicStudy\((\[[\s\S]*?\])\)/);try{return m?JSON.parse(m[1]):[]}catch(e){return[]}}function apply(){const p=document.querySelector('.ontology-paper');if(!p)return;const allowedLevels={free:['free'],pro:['free','pro'],master:['free','pro','master'],doctus:['free','pro','master','doctus']};const visible=allowedLevels[active]||null;const tree=p.querySelector('.ontology-tree');if(tree)tree.classList.toggle('academic-level-tree-hidden',!visible);let n=0;p.querySelectorAll('.ontology-item-link').forEach(b=>{const li=b.closest('li'),v=b.dataset.level||'';const ok=Boolean(visible&&visible.includes(v));if(li)li.classList.toggle('academic-level-hidden',!ok);if(ok)n++});const c=p.querySelector('.academic-level-filter-count');if(c)c.textContent=visible?n+' item(ns) exibido(s)':'Selecione um nível para exibir a lista';p.querySelectorAll('.academic-level-filter button').forEach(b=>b.classList.toggle('active',b.dataset.level===active))}function decorate(){const p=document.querySelector('.ontology-paper');if(!p)return;let bar=p.querySelector('.academic-level-filter');if(!bar){bar=document.createElement('nav');bar.className='academic-level-filter';bar.setAttribute('aria-label','Filtrar itens por nível');bar.innerHTML='<strong>NÍVEL</strong><ul class="academic-level-filter-list" aria-label="Níveis acadêmicos"><li><button type="button" data-level="free">FREE</button></li><li><button type="button" data-level="pro">PRO</button></li><li><button type="button" data-level="master">MASTER</button></li><li><button type="button" data-level="doctus">DOCTUS</button></li></ul><span class="academic-level-filter-count"></span>';const i=p.querySelector('.ontology-intro');(i||p.querySelector('h1')).after(bar);bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{active=b.dataset.level;apply()})}p.querySelectorAll('.ontology-item-link').forEach(b=>{if(b.dataset.officialReady)return;b.dataset.officialReady='1';const l=resolveAcademicLevel(pathOf(b));if(!l)return;b.dataset.level=l;const s=document.createElement('span');s.className='level-badge '+l;s.textContent=labels[l];s.title='Nível de acesso: '+labels[l];b.appendChild(s)});apply()}new MutationObserver(()=>requestAnimationFrame(decorate)).observe(document.getElementById('mn')||document.body,{childList:true,subtree:true});addEventListener('load',decorate);window.refreshAcademicLevelUI=decorate})();</script><script id="ACADEMIC_MANUAL_DASHBOARD_LOGIC">
 (function(){
     const stateKey='palavraSerieAcademicManualState';
     let activeView='home';
@@ -9221,7 +9276,7 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
             ['alphabetical', 'ORDEM ALFABÉTICA'],
             ['level', 'POR NÍVEL']
         ];
-        return `<section class="academic-directory-toolbar" aria-label="Organização e busca dos menus acadêmicos"><strong class="academic-directory-toolbar-heading">ORGANIZAR / BUSCAR</strong><div class="academic-directory-mode-buttons" role="group" aria-label="Modo de visualização">${modes.map(([mode, label]) => `<button type="button" class="academic-directory-mode-button${academicDirectoryMode === mode ? ' active' : ''}" data-academic-directory-mode="${mode}" onclick="setAcademicDirectoryMode('${mode}')">${label}</button>`).join('')}</div><label class="academic-directory-search"><span class="sr-only">Buscar disciplina ou tema</span><input type="search" value="${escapeBibleText(academicDirectoryQuery)}" placeholder="Buscar disciplina ou tema..." oninput="setAcademicDirectoryQuery(this.value)"></label><p class="academic-directory-toolbar-note">A ordem original preserva a árvore existente; os outros modos reorganizam apenas a visualização e mantêm cada item clicável.</p></section>`;
+        return `<section class="academic-directory-toolbar" aria-label="Organização e busca dos menus acadêmicos"><strong class="academic-directory-toolbar-heading">ORDEM DE BUSCA ACADÊMICA</strong><div class="academic-directory-mode-buttons" role="group" aria-label="Modo de visualização">${modes.map(([mode, label]) => `<button type="button" class="academic-directory-mode-button${academicDirectoryMode === mode ? ' active' : ''}" data-academic-directory-mode="${mode}" onclick="setAcademicDirectoryMode('${mode}')">${label}</button>`).join('')}</div><label class="academic-directory-search"><span class="sr-only">Buscar disciplina ou tema</span><input type="search" value="${escapeBibleText(academicDirectoryQuery)}" placeholder="Buscar disciplina ou tema..." oninput="setAcademicDirectoryQuery(this.value)"></label><p class="academic-directory-toolbar-note">A ordem original preserva a árvore existente; os outros modos reorganizam apenas a visualização e mantêm cada item clicável.</p></section>`;
     }
 
     function ensurePage() {
