@@ -924,6 +924,69 @@
         }
     }
 </style>
+<style id="ACADEMIC_ORDER_LEVEL_INLINE_STYLES">
+    .academic-directory-toolbar {
+        align-items: center;
+    }
+    .academic-directory-toolbar-heading {
+        flex: 0 0 auto;
+    }
+    .academic-directory-toolbar .academic-level-filter {
+        display: flex;
+        flex: 0 1 auto;
+        align-items: center;
+        gap: 7px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        font-size: 10px;
+    }
+    .academic-directory-toolbar .academic-level-filter > strong {
+        display: none;
+    }
+    .academic-directory-toolbar .academic-level-filter-list {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .academic-directory-toolbar .academic-level-filter-list li {
+        display: block;
+        margin: 0;
+        padding: 0;
+    }
+    .academic-directory-toolbar .academic-level-filter-list button {
+        min-height: 34px;
+        min-width: 58px;
+        padding: 0 10px;
+        border: 1px solid #cdbfaa;
+        border-radius: 6px;
+        background: #fffaf0;
+        color: #6d5d45;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 900;
+        cursor: pointer;
+    }
+    .academic-directory-toolbar .academic-level-filter-list button.active,
+    .academic-directory-toolbar .academic-level-filter-list button:hover {
+        background: #806f53;
+        color: #fffaf0;
+    }
+    .academic-directory-toolbar .academic-level-filter-count {
+        margin-left: 2px;
+        white-space: nowrap;
+    }
+    @media (max-width: 900px) {
+        .academic-directory-toolbar .academic-level-filter {
+            flex-basis: 100%;
+        }
+    }
+</style>
 </head>
 
 <body>
@@ -9189,13 +9252,14 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
 <script id="ACADEMIC_DIRECTORY_MODES_LOGIC">
 (function () {
     let academicDirectoryMode = 'original';
+    let academicDirectoryLevel = '';
     let academicDirectoryQuery = '';
     let academicDirectoryScope = null;
     let academicDirectoryRecordsCache = [];
     const academicDirectoryModeKey = 'palavra-serie-academic-directory-mode-v1';
     try {
         const savedMode = localStorage.getItem(academicDirectoryModeKey);
-        if (['original', 'alphabetical', 'level'].includes(savedMode)) academicDirectoryMode = savedMode;
+        if (['original', 'alphabetical'].includes(savedMode)) academicDirectoryMode = savedMode;
     } catch (error) {}
 
     const levelLabels = { free: 'FREE', pro: 'PRO', master: 'MASTER', doctus: 'DOCTUS' };
@@ -9231,6 +9295,7 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
     function visibleRecords() {
         const query = normalize(academicDirectoryQuery.trim());
         const records = scopeRecords().filter(function (record) {
+            if (academicDirectoryLevel && record.level !== academicDirectoryLevel) return false;
             if (!query) return true;
             return normalize([record.title, record.area, record.parent, record.path.join(' / ')].join(' ')).includes(query);
         });
@@ -9272,11 +9337,10 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
 
     function toolbarMarkup() {
         const modes = [
-            ['original', 'COMO ESTÁ'],
-            ['alphabetical', 'ORDEM ALFABÉTICA'],
-            ['level', 'POR NÍVEL']
+            ['original', 'ACADÊMICA'],
+            ['alphabetical', 'ALFABÉTICA']
         ];
-        return `<section class="academic-directory-toolbar" aria-label="Organização e busca dos menus acadêmicos"><strong class="academic-directory-toolbar-heading">ORDEM DE BUSCA ACADÊMICA</strong><div class="academic-directory-mode-buttons" role="group" aria-label="Modo de visualização">${modes.map(([mode, label]) => `<button type="button" class="academic-directory-mode-button${academicDirectoryMode === mode ? ' active' : ''}" data-academic-directory-mode="${mode}" onclick="setAcademicDirectoryMode('${mode}')">${label}</button>`).join('')}</div><label class="academic-directory-search"><span class="sr-only">Buscar disciplina ou tema</span><input type="search" value="${escapeBibleText(academicDirectoryQuery)}" placeholder="Buscar disciplina ou tema..." oninput="setAcademicDirectoryQuery(this.value)"></label><p class="academic-directory-toolbar-note">A ordem original preserva a árvore existente; os outros modos reorganizam apenas a visualização e mantêm cada item clicável.</p></section>`;
+        return `<section class="academic-directory-toolbar" aria-label="Organização e busca dos menus acadêmicos"><strong class="academic-directory-toolbar-heading">ORDEM DE BUSCA</strong><div class="academic-directory-mode-buttons" role="group" aria-label="Modo de visualização">${modes.map(([mode, label]) => `<button type="button" class="academic-directory-mode-button${academicDirectoryMode === mode ? ' active' : ''}" data-academic-directory-mode="${mode}" onclick="setAcademicDirectoryMode('${mode}')">${label}</button>`).join('')}</div><label class="academic-directory-search"><span class="sr-only">Buscar disciplina ou tema</span><input type="search" value="${escapeBibleText(academicDirectoryQuery)}" placeholder="Buscar disciplina ou tema..." oninput="setAcademicDirectoryQuery(this.value)"></label><p class="academic-directory-toolbar-note">A ordem original preserva a árvore existente; os outros modos reorganizam apenas a visualização e mantêm cada item clicável.</p></section>`;
     }
 
     function ensurePage() {
@@ -9307,7 +9371,19 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
         const page = ensurePage();
         if (!page || !academicDirectoryScope) return;
         const officialFilter = page.paper.querySelector('.academic-level-filter');
-        if (officialFilter) officialFilter.classList.toggle('academic-directory-hidden', academicDirectoryMode !== 'original');
+        const toolbar = page.paper.querySelector('.academic-directory-toolbar');
+        if (officialFilter && toolbar && !toolbar.contains(officialFilter)) toolbar.appendChild(officialFilter);
+        if (officialFilter) {
+            officialFilter.classList.remove('academic-directory-hidden');
+            officialFilter.querySelectorAll('button[data-level]').forEach(function (button) {
+                if (button.dataset.directoryLevelBound) return;
+                button.dataset.directoryLevelBound = '1';
+                button.addEventListener('click', function () {
+                    academicDirectoryLevel = button.dataset.level || '';
+                    if (academicDirectoryMode !== 'original') renderCurrentDirectory();
+                });
+            });
+        }
         const content = page.content;
         if (academicDirectoryMode === 'alphabetical') {
             content.innerHTML = renderAlphabetical();
@@ -9318,6 +9394,10 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
         }
         const modeButtons = page.paper.querySelectorAll('[data-academic-directory-mode]');
         modeButtons.forEach(button => button.classList.toggle('active', button.dataset.academicDirectoryMode === academicDirectoryMode));
+        if (academicDirectoryMode !== 'original') {
+            const count = page.paper.querySelector('.academic-level-filter-count');
+            if (count) count.textContent = `${visibleRecords().length} item(ns) exibido(s)`;
+        }
     }
 
     function rememberScope(nodes, prefix, originalHTML) {
@@ -9325,6 +9405,26 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
         academicDirectoryQuery = '';
         const page = ensurePage();
         if (page) renderCurrentDirectory();
+    }
+
+    function moveAcademicLevelFilter() {
+        const paper = document.querySelector('.ontology-paper');
+        const toolbar = paper && paper.querySelector('.academic-directory-toolbar');
+        const filter = paper && paper.querySelector('.academic-level-filter');
+        if (toolbar && filter && !toolbar.contains(filter)) {
+            toolbar.appendChild(filter);
+            filter.classList.remove('academic-directory-hidden');
+        }
+        if (filter) {
+            filter.querySelectorAll('button[data-level]').forEach(function (button) {
+                if (button.dataset.directoryLevelBound) return;
+                button.dataset.directoryLevelBound = '1';
+                button.addEventListener('click', function () {
+                    academicDirectoryLevel = button.dataset.level || '';
+                    if (academicDirectoryMode !== 'original') renderCurrentDirectory();
+                });
+            });
+        }
     }
 
     window.academicDirectoryOpen = function (index) {
@@ -9338,7 +9438,7 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
         } catch (error) {}
     };
     window.setAcademicDirectoryMode = function (mode) {
-        if (!['original', 'alphabetical', 'level'].includes(mode)) return;
+        if (!['original', 'alphabetical'].includes(mode)) return;
         academicDirectoryMode = mode;
         try { localStorage.setItem(academicDirectoryModeKey, mode); } catch (error) {}
         renderCurrentDirectory();
@@ -9377,9 +9477,11 @@ window.resolveAcademicLevel=resolveAcademicLevel;window.ACADEMIC_TAXONOMY_RECORD
                 renderCurrentDirectory();
             }
         }
+    });    observer.observe(document.getElementById('mn') || document.body, { childList: true, subtree: true });
+    const levelFilterObserver = new MutationObserver(function () {
+        moveAcademicLevelFilter();
     });
-    observer.observe(document.getElementById('mn') || document.body, { childList: true, subtree: true });
-
+    levelFilterObserver.observe(document.getElementById('mn') || document.body, { childList: true, subtree: true });
     window.refreshAcademicDirectoryModes = function () {
         const tree = document.querySelector('.ontology-paper .ontology-tree');
         if (tree && !academicDirectoryScope && typeof ACADEMIC_TREE !== 'undefined') rememberScope(ACADEMIC_TREE, [], tree.innerHTML);
