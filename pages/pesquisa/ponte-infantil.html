@@ -1,1 +1,88 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ponte Infantil independente da plataforma Palavra & Série.">
+  <title>Ponte Infantil — Palavra &amp; Série</title>
+  <style>
+    :root { --navy:#0b1428; --surface:#111b30; --paper:#f1eadb; --card:#fffdf7; --ink:#4a443b; --muted:#806f53; --line:#d8cdb8; --blue:#18bfff; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--navy); color:var(--ink); font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:16px 24px; background:var(--surface); border-bottom:1px solid #263754; }
+    .topbar a { padding:9px 12px; border:1px solid #536780; border-radius:7px; color:#dbe7f5; text-decoration:none; font-size:11px; font-weight:900; letter-spacing:.5px; }
+    .topbar a:hover { border-color:var(--blue); background:#163451; color:#fff; }
+    .topbar .brand { margin-right:auto; border:0; color:#20d66b; letter-spacing:1.5px; }
+    main { max-width:1180px; margin:0 auto; padding:42px 28px 60px; }
+    .paper { padding:34px; border:1px solid var(--line); border-radius:12px; background:var(--paper); box-shadow:0 12px 30px rgba(0,0,0,.22); }
+    .eyebrow { margin:0 0 9px; color:#9b8b70; font-size:10px; font-weight:900; letter-spacing:1.6px; }
+    h1 { margin:0; font-size:clamp(28px,5vw,44px); letter-spacing:.6px; }
+    .intro { max-width:820px; margin:13px 0 28px; line-height:1.7; }
+    .bridge-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+    .bridge-card { padding:20px; border:1px solid var(--line); border-radius:9px; background:var(--card); }
+    .bridge-card h2 { margin:0 0 14px; color:var(--muted); font-size:14px; letter-spacing:.8px; }
+    .levels { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+    .level { min-height:42px; border:1px solid #cdbfaa; border-radius:6px; background:#fffaf0; color:var(--muted); font-weight:900; cursor:pointer; }
+    .level:hover, .level.active { border-color:var(--muted); background:var(--muted); color:#fffaf0; }
+    .status { margin-top:18px; padding:14px 16px; border-left:3px solid var(--muted); background:#eee2cd; line-height:1.55; }
+    .note { margin-top:24px; color:var(--muted); font-size:12px; line-height:1.65; }
+    code { padding:2px 4px; border-radius:4px; background:#eee2cd; }
+    @media (max-width:800px) { .bridge-grid { grid-template-columns:1fr; } .paper { padding:24px 18px; } main { padding:24px 14px 40px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top">PALAVRA &amp; SÉRIE</a>
+    <a href="#top">PONTE — INFANTIL</a>
+  </header>
+  <main id="top">
+    <section class="paper" aria-labelledby="title">
+      <p class="eyebrow">MÓDULO HTML INDEPENDENTE</p>
+      <h1 id="title">PONTE — INFANTIL</h1>
+      <p class="intro">Organize conteúdos infantis por faixa etária e categoria. Este arquivo é autônomo: seus estilos, estrutura e script ficam separados da Matriz Técnica de Pesquisa PRO, da Estante e de Sermões.</p>
+      <div class="bridge-grid">
+        <article class="bridge-card">
+          <h2>BÍBLIA DE LEITURA</h2>
+          <div class="levels" role="group" aria-label="Faixas etárias da Bíblia de leitura">
+            <button class="level" type="button" data-category="Bíblia de leitura">0–2</button>
+            <button class="level" type="button" data-category="Bíblia de leitura">3–5</button>
+            <button class="level" type="button" data-category="Bíblia de leitura">6–8</button>
+            <button class="level" type="button" data-category="Bíblia de leitura">8–10</button>
+          </div>
+        </article>
+        <article class="bridge-card">
+          <h2>DEVOCIONAL</h2>
+          <div class="levels" role="group" aria-label="Faixas etárias do devocional">
+            <button class="level" type="button" data-category="Devocional">0–2</button>
+            <button class="level" type="button" data-category="Devocional">3–5</button>
+            <button class="level" type="button" data-category="Devocional">6–8</button>
+            <button class="level" type="button" data-category="Devocional">8–10</button>
+          </div>
+        </article>
+        <article class="bridge-card">
+          <h2>HISTÓRIA</h2>
+          <div class="levels" role="group" aria-label="Faixas etárias de história">
+            <button class="level" type="button" data-category="História">0–2</button>
+            <button class="level" type="button" data-category="História">3–5</button>
+            <button class="level" type="button" data-category="História">6–8</button>
+            <button class="level" type="button" data-category="História">8–10</button>
+          </div>
+        </article>
+      </div>
+      <div class="status" id="selection-status" role="status" aria-live="polite">Selecione uma faixa etária para começar.</div>
+      <p class="note"><strong>Manutenção:</strong> este arquivo pode ser salvo como <code>ponte-infantil.html</code> em uma pasta própria. Alterações nele não modificam a Matriz PRO, a Estante ou Sermões.</p>
+    </section>
+  </main>
+  <script>
+    const status = document.getElementById('selection-status');
+    document.querySelectorAll('.level').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.level').forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        status.textContent = `${button.dataset.category}: faixa etária ${button.textContent.trim()} selecionada.`;
+      });
+    });
+  </script>
+</body>
+</html>
