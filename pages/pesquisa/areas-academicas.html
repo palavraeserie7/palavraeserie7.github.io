@@ -356,8 +356,7 @@
   function academicChatAddMessage(role, text) {
     const message = document.createElement('div');
     message.className = 'academic-chat-message ' + role;
-    message.innerHTML = academicChatEscape(text).replace(/\n/g, '  
-');
+    message.innerHTML = academicChatEscape(text).replace(/\n/g, '<br>');
     academicChatMessages.appendChild(message);
     academicChatMessages.scrollTop = academicChatMessages.scrollHeight;
   }
@@ -413,7 +412,7 @@
 
     try {
       const response = await fetch(
-        ACADEMIC_CHAT_PROXY.replace(/\\/$/, '') + '/api/pesquisa',
+        ACADEMIC_CHAT_PROXY.replace(/\/$/, '') + '/api/pesquisa',
         {
           method: 'POST',
           headers: {
