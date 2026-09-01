@@ -1,61 +1,2039 @@
--- Palavra & Série — Painel do Autor
--- Executar apenas num projecto de desenvolvimento/cópia.
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-create table if not exists public.editorial_contents (
-  id uuid primary key default gen_random_uuid(),
-  author_id uuid not null references auth.users(id) on delete cascade,
-  title text not null,
-  slug text not null,
-  category text not null check (category in ('M03 — Exegese','M02 — Mensagem','M04 — A Ponte / Infantil','CTAs V1 e V2','Social Engine','Séries','Página de Venda PRO')),
-  format text not null default 'documento',
-  age_range text,
-  access_level text not null default 'Free' check (access_level in ('Free','Pro','Privado')),
-  status text not null default 'Rascunho' check (status in ('Rascunho','Em revisão','Publicado','Arquivado')),
-  reference text,
-  summary text,
-  content jsonb not null default '{}'::jsonb,
-  sort_order integer not null default 0,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  published_at timestamptz
-);
+  <title>Painel do Autor — Palavra & Série</title>
 
-create unique index if not exists editorial_contents_author_slug_idx on public.editorial_contents(author_id, slug);
-create index if not exists editorial_contents_category_idx on public.editorial_contents(category);
-create index if not exists editorial_contents_status_idx on public.editorial_contents(status);
+  <style>
+    :root {
+      --bg: #f5f1e8;
+      --surface: #fffdf8;
+      --surface-2: #f0eadf;
+      --border: #d9d0c1;
+      --text: #2b2925;
+      --muted: #777067;
+      --accent: #7b5b35;
+      --accent-dark: #5f4528;
+      --success: #3f7653;
+      --warning: #9a6a22;
+      --danger: #9a4545;
+      --shadow: 0 8px 25px rgba(54, 43, 28, .08);
+      --radius: 14px;
+    }
 
-alter table public.profiles add column if not exists role text not null default 'user';
+    * {
+      box-sizing: border-box;
+    }
 
-alter table public.editorial_contents enable row level security;
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+    }
 
-create policy "owner can read own editorial contents"
-on public.editorial_contents for select to authenticated
-using (author_id = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'owner'));
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
 
-create policy "public can read published free contents"
-on public.editorial_contents for select to authenticated
-using (status = 'Publicado' and access_level = 'Free');
+    button {
+      cursor: pointer;
+    }
 
-create policy "owner can create editorial contents"
-on public.editorial_contents for insert to authenticated
-with check (author_id = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'owner'));
+    .page {
+      min-height: 100vh;
+    }
 
-create policy "owner can update editorial contents"
-on public.editorial_contents for update to authenticated
-using (author_id = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'owner'))
-with check (author_id = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'owner'));
+    /* =========================
+       HEADER
+       ========================= */
 
-create policy "owner can delete editorial contents"
-on public.editorial_contents for delete to authenticated
-using (author_id = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'owner'));
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 22px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
 
-create or replace function public.touch_editorial_contents_updated_at()
-returns trigger language plpgsql as $$
-begin new.updated_at = now(); return new; end; $$;
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
 
-drop trigger if exists editorial_contents_touch on public.editorial_contents;
-create trigger editorial_contents_touch before update on public.editorial_contents
-for each row execute procedure public.touch_editorial_contents_updated_at();
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
 
--- Depois de criar a sua conta Auth, marque apenas o seu perfil como proprietário:
--- update public.profiles set role = 'owner' where id = 'SEU-AUTH-USER-ID';
+    .brand h1 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: .04em;
+      font-weight: 600;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 15px;
+      background: var(--surface);
+      color: var(--text);
+      transition: .15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dark);
+    }
+
+    .btn-danger {
+      color: var(--danger);
+    }
+
+    /* =========================
+       MAIN
+       ========================= */
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .status-bar {
+      display: none;
+      margin-bottom: 20px;
+      padding: 13px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 14px;
+    }
+
+    .status-bar.visible {
+      display: block;
+    }
+
+    .status-bar.error {
+      color: var(--danger);
+      border-color: #d8aaaa;
+    }
+
+    .status-bar.success {
+      color: var(--success);
+      border-color: #a9c8b3;
+    }
+
+    /* =========================
+       STATS
+       ========================= */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .stat-number {
+      font-size: 30px;
+      font-weight: 600;
+    }
+
+    /* =========================
+       TOOLBAR
+       ========================= */
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search {
+      flex: 1 1 260px;
+    }
+
+    .field,
+    .search {
+      min-height: 42px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 8px;
+      padding: 9px 11px;
+      color: var(--text);
+    }
+
+    select.field {
+      min-width: 170px;
+    }
+
+    /* =========================
+       TABLE
+       ========================= */
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 950px;
+    }
+
+    th,
+    td {
+      padding: 15px 17px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      background: var(--surface-2);
+    }
+
+    td {
+      font-size: 14px;
+    }
+
+    tbody tr:hover {
+      background: #faf7f0;
+    }
+
+    .title-cell {
+      font-weight: 600;
+    }
+
+    .subtitle {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: normal;
+    }
+
+    /* =========================
+       BADGES
+       ========================= */
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      white-space: nowrap;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .badge-published {
+      color: var(--success);
+      border-color: #b8d1be;
+      background: #edf6ef;
+    }
+
+    .badge-review {
+      color: var(--warning);
+      border-color: #dec79d;
+      background: #faf3df;
+    }
+
+    .badge-draft {
+      color: var(--muted);
+    }
+
+    .badge-archived {
+      color: var(--danger);
+      border-color: #dfbaba;
+      background: #f9eeee;
+    }
+
+    .actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 7px 9px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 7px;
+      font-size: 12px;
+    }
+
+    /* =========================
+       EMPTY / LOADING
+       ========================= */
+
+    .empty {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-size: 17px;
+    }
+
+    .loading {
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    /* =========================
+       MODAL
+       ========================= */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 25, 18, .48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(900px, 100%);
+      max-height: 92vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+
+    .modal-header {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .close {
+      border: 0;
+      background: transparent;
+      font-size: 25px;
+      color: var(--muted);
+    }
+
+    .modal-body {
+      padding: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 17px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .form-control {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .modal-footer {
+      padding: 18px 22px;
+      border-top: 1px solid var(--border);
+
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* =========================
+       RESPONSIVE
+       ========================= */
+
+    @media (max-width: 900px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .header-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 600px) {
+      header,
+      main {
+        padding: 18px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <!-- =========================
+       CABEÇALHO
+       ========================= -->
+
+  <header>
+    <div class="header-inner">
+
+      <div class="brand">
+        <h1>PAINEL DO AUTOR</h1>
+        <p>Palavra & Série — Central de conteúdo editorial</p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn" id="refreshBtn">
+          ↻ Atualizar
+        </button>
+
+        <button class="btn btn-primary" id="newContentBtn">
+          + Novo conteúdo
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+
+  <main>
+
+    <div id="statusBar" class="status-bar"></div>
+
+
+    <!-- =========================
+         INDICADORES
+         ========================= -->
+
+    <section class="stats">
+
+      <div class="stat-card">
+        <div class="stat-label">Total de conteúdos</div>
+        <div class="stat-number" id="totalCount">—</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Rascunhos</div>
+        <div class="stat-number" id="draftCount">—</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Em revisão</div>
+        <div class="stat-number" id="reviewCount">—</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Publicados</div>
+        <div class="stat-number" id="publishedCount">—</div>
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         LISTA
+         ========================= -->
+
+    <section class="panel">
+
+      <div class="toolbar">
+
+        <input
+          id="searchInput"
+          class="search"
+          type="search"
+          placeholder="Pesquisar por título, referência ou resumo..."
+        >
+
+        <select id="categoryFilter" class="field">
+          <option value="">Todas as categorias</option>
+          <option value="M03 — Exegese">M03 — Exegese</option>
+          <option value="M02 — Mensagem">M02 — Mensagem</option>
+          <option value="M04 — A Ponte / Infantil">M04 — A Ponte / Infantil</option>
+          <option value="CTAs V1 e V2">CTAs V1 e V2</option>
+          <option value="Social Engine">Social Engine</option>
+          <option value="Séries">Séries</option>
+          <option value="Página de Venda PRO">Página de Venda PRO</option>
+        </select>
+
+        <select id="statusFilter" class="field">
+          <option value="">Todos os status</option>
+          <option value="Rascunho">Rascunho</option>
+          <option value="Em revisão">Em revisão</option>
+          <option value="Publicado">Publicado</option>
+          <option value="Arquivado">Arquivado</option>
+        </select>
+
+        <select id="accessFilter" class="field">
+          <option value="">Todos os acessos</option>
+          <option value="Free">Free</option>
+          <option value="Pro">Pro</option>
+          <option value="Privado">Privado</option>
+        </select>
+
+      </div>
+
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Conteúdo</th>
+              <th>Categoria</th>
+              <th>Formato</th>
+              <th>Acesso</th>
+              <th>Status</th>
+              <th>Atualizado</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody id="contentTableBody">
+            <tr>
+              <td colspan="7">
+                <div class="loading">
+                  Carregando conteúdos...
+                </div>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<!-- =========================
+     MODAL DE CONTEÚDO
+     ========================= -->
+
+<div id="contentModal" class="modal-backdrop">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <h2 id="modalTitle">Novo conteúdo</h2>
+
+      <button
+        class="close"
+        id="closeModalBtn"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <form id="contentForm">
+
+      <div class="modal-body">
+
+        <div class="form-grid">
+
+          <div class="form-group full">
+            <label for="title">
+              Título
+            </label>
+
+            <input
+              id="title"
+              name="title"
+              class="form-control"
+              required
+              maxlength="200"
+              placeholder="Título do conteúdo"
+            >
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="category">
+              Categoria
+            </label>
+
+            <select
+              id="category"
+              name="category"
+              class="form-control"
+              required
+            >
+
+              <option value="">
+                Selecione...
+              </option>
+
+              <option value="M03 — Exegese">
+                M03 — Exegese
+              </option>
+
+              <option value="M02 — Mensagem">
+                M02 — Mensagem
+              </option>
+
+              <option value="M04 — A Ponte / Infantil">
+                M04 — A Ponte / Infantil
+              </option>
+
+              <option value="CTAs V1 e V2">
+                CTAs V1 e V2
+              </option>
+
+              <option value="Social Engine">
+                Social Engine
+              </option>
+
+              <option value="Séries">
+                Séries
+              </option>
+
+              <option value="Página de Venda PRO">
+                Página de Venda PRO
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="format">
+              Formato
+            </label>
+
+            <input
+              id="format"
+              name="format"
+              class="form-control"
+              value="documento"
+              placeholder="documento"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="ageRange">
+              Faixa etária
+            </label>
+
+            <input
+              id="ageRange"
+              name="age_range"
+              class="form-control"
+              placeholder="Ex.: 6–8 anos"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="accessLevel">
+              Nível de acesso
+            </label>
+
+            <select
+              id="accessLevel"
+              name="access_level"
+              class="form-control"
+              required
+            >
+
+              <option value="Free">
+                Free
+              </option>
+
+              <option value="Pro">
+                Pro
+              </option>
+
+              <option value="Privado">
+                Privado
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="status">
+              Status
+            </label>
+
+            <select
+              id="status"
+              name="status"
+              class="form-control"
+              required
+            >
+
+              <option value="Rascunho">
+                Rascunho
+              </option>
+
+              <option value="Em revisão">
+                Em revisão
+              </option>
+
+              <option value="Publicado">
+                Publicado
+              </option>
+
+              <option value="Arquivado">
+                Arquivado
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group full">
+
+            <label for="reference">
+              Referência
+            </label>
+
+            <input
+              id="reference"
+              name="reference"
+              class="form-control"
+              placeholder="Ex.: João 3:16"
+            >
+
+          </div>
+
+
+          <div class="form-group full">
+
+            <label for="summary">
+              Resumo
+            </label>
+
+            <textarea
+              id="summary"
+              name="summary"
+              class="form-control"
+              placeholder="Resumo ou descrição do conteúdo..."
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-group full">
+
+            <label for="content">
+              Conteúdo
+            </label>
+
+            <textarea
+              id="content"
+              name="content"
+              class="form-control"
+              placeholder="Conteúdo principal..."
+            ></textarea>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="btn"
+          id="cancelBtn"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="saveBtn"
+        >
+          Salvar conteúdo
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<script>
+  /* =========================================================
+     CONFIGURAÇÃO SUPABASE
+     =========================================================
+
+     SUBSTITUA SOMENTE ESTES DOIS VALORES.
+
+     URL:
+       Project Settings > API > Project URL
+
+     KEY:
+       Project Settings > API > anon public
+
+     NÃO coloque a service_role key aqui.
+     ========================================================= */
+
+  const SUPABASE_URL = "COLE_AQUI_A_URL_DO_SEU_SUPABASE";
+  const SUPABASE_ANON_KEY = "COLE_AQUI_A_CHAVE_ANON_PUBLICA";
+
+
+  /* =========================================================
+     ESTADO
+     ========================================================= */
+
+  let contents = [];
+  let editingId = null;
+
+
+  /* =========================================================
+     ELEMENTOS
+     ========================================================= */
+
+  const statusBar = document.getElementById("statusBar");
+
+  const tableBody =
+    document.getElementById("contentTableBody");
+
+  const totalCount =
+    document.getElementById("totalCount");
+
+  const draftCount =
+    document.getElementById("draftCount");
+
+  const reviewCount =
+    document.getElementById("reviewCount");
+
+  const publishedCount =
+    document.getElementById("publishedCount");
+
+  const searchInput =
+    document.getElementById("searchInput");
+
+  const categoryFilter =
+    document.getElementById("categoryFilter");
+
+  const statusFilter =
+    document.getElementById("statusFilter");
+
+  const accessFilter =
+    document.getElementById("accessFilter");
+
+  const modal =
+    document.getElementById("contentModal");
+
+  const modalTitle =
+    document.getElementById("modalTitle");
+
+  const contentForm =
+    document.getElementById("contentForm");
+
+
+  /* =========================================================
+     UTILIDADES
+     ========================================================= */
+
+  function showStatus(message, type = "") {
+    statusBar.textContent = message;
+    statusBar.className = "status-bar visible " + type;
+
+    setTimeout(() => {
+      statusBar.className = "status-bar";
+    }, 5000);
+  }
+
+
+  function escapeHtml(value) {
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  function formatDate(value) {
+    if (!value) {
+      return "—";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return "—";
+    }
+
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+  }
+
+
+  function slugify(text) {
+    return text
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+
+  function statusBadge(status) {
+
+    let className = "badge-draft";
+
+    if (status === "Publicado") {
+      className = "badge-published";
+    }
+
+    if (status === "Em revisão") {
+      className = "badge-review";
+    }
+
+    if (status === "Arquivado") {
+      className = "badge-archived";
+    }
+
+    return `
+      <span class="badge ${className}">
+        ${escapeHtml(status)}
+      </span>
+    `;
+  }
+
+
+  /* =========================================================
+     SUPABASE REQUEST
+     ========================================================= */
+
+  async function supabaseRequest(
+    endpoint,
+    options = {}
+  ) {
+
+    if (
+      SUPABASE_URL.includes("COLE_AQUI") ||
+      SUPABASE_ANON_KEY.includes("COLE_AQUI")
+    ) {
+      throw new Error(
+        "Configure a URL e a chave anon pública do Supabase no código."
+      );
+    }
+
+    const response = await fetch(
+      SUPABASE_URL.replace(/\/$/, "") +
+      "/rest/v1/" +
+      endpoint,
+      {
+        ...options,
+
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization":
+            "Bearer " + SUPABASE_ANON_KEY,
+
+          "Content-Type":
+            "application/json",
+
+          "Prefer":
+            "return=representation",
+
+          ...(options.headers || {})
+        }
+      }
+    );
+
+    if (!response.ok) {
+
+      let message = "";
+
+      try {
+        const error = await response.json();
+
+        message =
+          error.message ||
+          error.hint ||
+          error.details ||
+          JSON.stringify(error);
+
+      } catch {
+        message = await response.text();
+      }
+
+      throw new Error(message || "Erro no Supabase.");
+    }
+
+    const text = await response.text();
+
+    return text ? JSON.parse(text) : null;
+  }
+
+
+  /* =========================================================
+     CARREGAR CONTEÚDOS
+     ========================================================= */
+
+  async function loadContents() {
+
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="7">
+          <div class="loading">
+            Carregando conteúdos...
+          </div>
+        </td>
+      </tr>
+    `;
+
+    try {
+
+      /*
+       * A consulta usa o usuário autenticado pelo JWT.
+       *
+       * O Supabase aplicará automaticamente as políticas
+       * RLS definidas na tabela editorial_contents.
+       */
+
+      contents = await supabaseRequest(
+        "editorial_contents?select=*&order=updated_at.desc"
+      );
+
+      updateStats();
+      renderContents();
+
+    } catch (error) {
+
+      console.error(error);
+
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7">
+            <div class="empty">
+              <strong>Não foi possível carregar os conteúdos.</strong>
+              ${escapeHtml(error.message)}
+            </div>
+          </td>
+        </tr>
+      `;
+
+      showStatus(
+        "Erro ao carregar o painel: " +
+        error.message,
+        "error"
+      );
+    }
+  }
+
+
+  /* =========================================================
+     ESTATÍSTICAS
+     ========================================================= */
+
+  function updateStats() {
+
+    totalCount.textContent =
+      contents.length;
+
+    draftCount.textContent =
+      contents.filter(
+        item => item.status === "Rascunho"
+      ).length;
+
+    reviewCount.textContent =
+      contents.filter(
+        item => item.status === "Em revisão"
+      ).length;
+
+    publishedCount.textContent =
+      contents.filter(
+        item => item.status === "Publicado"
+      ).length;
+  }
+
+
+  /* =========================================================
+     FILTRAGEM
+     ========================================================= */
+
+  function getFilteredContents() {
+
+    const search =
+      searchInput.value
+        .trim()
+        .toLowerCase();
+
+    const category =
+      categoryFilter.value;
+
+    const status =
+      statusFilter.value;
+
+    const access =
+      accessFilter.value;
+
+
+    return contents.filter(item => {
+
+      const searchableText = [
+        item.title,
+        item.reference,
+        item.summary,
+        item.slug
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+
+      if (
+        search &&
+        !searchableText.includes(search)
+      ) {
+        return false;
+      }
+
+
+      if (
+        category &&
+        item.category !== category
+      ) {
+        return false;
+      }
+
+
+      if (
+        status &&
+        item.status !== status
+      ) {
+        return false;
+      }
+
+
+      if (
+        access &&
+        item.access_level !== access
+      ) {
+        return false;
+      }
+
+
+      return true;
+    });
+  }
+
+
+  /* =========================================================
+     RENDERIZAR TABELA
+     ========================================================= */
+
+  function renderContents() {
+
+    const filtered =
+      getFilteredContents();
+
+
+    if (!filtered.length) {
+
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7">
+            <div class="empty">
+              <strong>Nenhum conteúdo encontrado.</strong>
+              Tente alterar os filtros ou crie um novo conteúdo.
+            </div>
+          </td>
+        </tr>
+      `;
+
+      return;
+    }
+
+
+    tableBody.innerHTML =
+      filtered.map(item => {
+
+        return `
+          <tr>
+
+            <td>
+              <span class="title-cell">
+                ${escapeHtml(item.title)}
+              </span>
+
+              ${
+                item.reference
+                  ? `
+                    <span class="subtitle">
+                      ${escapeHtml(item.reference)}
+                    </span>
+                  `
+                  : ""
+              }
+            </td>
+
+
+            <td>
+              ${escapeHtml(item.category)}
+            </td>
+
+
+            <td>
+              ${escapeHtml(item.format || "documento")}
+            </td>
+
+
+            <td>
+              ${escapeHtml(item.access_level)}
+            </td>
+
+
+            <td>
+              ${statusBadge(item.status)}
+            </td>
+
+
+            <td>
+              ${formatDate(item.updated_at)}
+            </td>
+
+
+            <td>
+
+              <div class="actions">
+
+                <button
+                  class="action-btn"
+                  onclick="editContent('${item.id}')"
+                >
+                  Editar
+                </button>
+
+                ${
+                  item.status === "Publicado"
+                    ? `
+                      <button
+                        class="action-btn"
+                        onclick="unpublishContent('${item.id}')"
+                      >
+                        Retirar
+                      </button>
+                    `
+                    : `
+                      <button
+                        class="action-btn"
+                        onclick="publishContent('${item.id}')"
+                      >
+                        Publicar
+                      </button>
+                    `
+                }
+
+                <button
+                  class="action-btn btn-danger"
+                  onclick="deleteContent('${item.id}')"
+                >
+                  Excluir
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+        `;
+
+      }).join("");
+  }
+
+
+  /* =========================================================
+     MODAL
+     ========================================================= */
+
+  function openModal(content = null) {
+
+    editingId =
+      content ? content.id : null;
+
+
+    modalTitle.textContent =
+      content
+        ? "Editar conteúdo"
+        : "Novo conteúdo";
+
+
+    contentForm.reset();
+
+
+    document.getElementById("format").value =
+      "documento";
+
+
+    if (content) {
+
+      document.getElementById("title").value =
+        content.title || "";
+
+      document.getElementById("category").value =
+        content.category || "";
+
+      document.getElementById("format").value =
+        content.format || "documento";
+
+      document.getElementById("ageRange").value =
+        content.age_range || "";
+
+      document.getElementById("accessLevel").value =
+        content.access_level || "Free";
+
+      document.getElementById("status").value =
+        content.status || "Rascunho";
+
+      document.getElementById("reference").value =
+        content.reference || "";
+
+      document.getElementById("summary").value =
+        content.summary || "";
+
+      const contentValue =
+        content.content || {};
+
+      document.getElementById("content").value =
+        typeof contentValue === "string"
+          ? contentValue
+          : contentValue.text || "";
+
+    }
+
+
+    modal.classList.add("open");
+  }
+
+
+  function closeModal() {
+
+    modal.classList.remove("open");
+
+    editingId = null;
+
+    contentForm.reset();
+
+    document.getElementById("format").value =
+      "documento";
+  }
+
+
+  /* =========================================================
+     NOVO CONTEÚDO
+     ========================================================= */
+
+  document
+    .getElementById("newContentBtn")
+    .addEventListener("click", () => {
+
+      openModal();
+
+    });
+
+
+  document
+    .getElementById("closeModalBtn")
+    .addEventListener("click", closeModal);
+
+
+  document
+    .getElementById("cancelBtn")
+    .addEventListener("click", closeModal);
+
+
+  modal.addEventListener("click", event => {
+
+    if (event.target === modal) {
+      closeModal();
+    }
+
+  });
+
+
+  /* =========================================================
+     EDITAR
+     ========================================================= */
+
+  window.editContent = function(id) {
+
+    const content =
+      contents.find(
+        item => item.id === id
+      );
+
+    if (!content) {
+      return;
+    }
+
+    openModal(content);
+  };
+
+
+  /* =========================================================
+     SALVAR
+     ========================================================= */
+
+  contentForm.addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+      const saveBtn =
+        document.getElementById("saveBtn");
+
+      saveBtn.disabled = true;
+
+      saveBtn.textContent =
+        "Salvando...";
+
+
+      try {
+
+        const formData =
+          new FormData(contentForm);
+
+
+        const title =
+          formData.get("title").trim();
+
+
+        const status =
+          formData.get("status");
+
+
+        const payload = {
+
+          title,
+
+          slug:
+            slugify(title) +
+            "-" +
+            Date.now().toString(36),
+
+          category:
+            formData.get("category"),
+
+          format:
+            formData.get("format") ||
+            "documento",
+
+          age_range:
+            formData.get("age_range") ||
+            null,
+
+          access_level:
+            formData.get("access_level"),
+
+          status,
+
+          reference:
+            formData.get("reference") ||
+            null,
+
+          summary:
+            formData.get("summary") ||
+            null,
+
+          content: {
+            text:
+              formData.get("content") ||
+              ""
+          },
+
+          published_at:
+            status === "Publicado"
+              ? new Date().toISOString()
+              : null
+        };
+
+
+        if (editingId) {
+
+          /*
+           * Não alteramos author_id durante a edição.
+           * O RLS do Supabase controla se o proprietário
+           * pode atualizar aquele registro.
+           */
+
+          delete payload.slug;
+
+          const result =
+            await supabaseRequest(
+              `editorial_contents?id=eq.${encodeURIComponent(editingId)}`,
+              {
+                method: "PATCH",
+                body: JSON.stringify(payload)
+              }
+            );
+
+
+          if (!result || !result.length) {
+            throw new Error(
+              "Nenhum conteúdo foi atualizado. Verifique suas permissões."
+            );
+          }
+
+
+          showStatus(
+            "Conteúdo atualizado com sucesso.",
+            "success"
+          );
+
+        } else {
+
+          /*
+           * author_id será obtido abaixo.
+           *
+           * Para isso, o usuário precisa estar autenticado
+           * no Supabase.
+           */
+
+          const session =
+            await getSupabaseSession();
+
+
+          if (!session) {
+            throw new Error(
+              "Você precisa estar autenticado no Supabase para criar conteúdos."
+            );
+          }
+
+
+          payload.author_id =
+            session.user.id;
+
+
+          const result =
+            await supabaseRequest(
+              "editorial_contents",
+              {
+                method: "POST",
+                body: JSON.stringify(payload)
+              }
+            );
+
+
+          if (!result || !result.length) {
+            throw new Error(
+              "O conteúdo não foi criado."
+            );
+          }
+
+
+          showStatus(
+            "Conteúdo criado com sucesso.",
+            "success"
+          );
+        }
+
+
+        closeModal();
+
+        await loadContents();
+
+      } catch (error) {
+
+        console.error(error);
+
+        showStatus(
+          "Erro ao salvar: " +
+          error.message,
+          "error"
+        );
+
+      } finally {
+
+        saveBtn.disabled = false;
+
+        saveBtn.textContent =
+          "Salvar conteúdo";
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     PUBLICAR
+     ========================================================= */
+
+  window.publishContent = async function(id) {
+
+    if (
+      !confirm(
+        "Publicar este conteúdo?"
+      )
+    ) {
+      return;
+    }
+
+
+    try {
+
+      const result =
+        await supabaseRequest(
+          `editorial_contents?id=eq.${encodeURIComponent(id)}`,
+          {
+            method: "PATCH",
+
+            body: JSON.stringify({
+              status: "Publicado",
+              published_at:
+                new Date().toISOString()
+            })
+          }
+        );
+
+
+      if (!result || !result.length) {
+        throw new Error(
+          "O conteúdo não pôde ser publicado."
+        );
+      }
+
+
+      showStatus(
+        "Conteúdo publicado.",
+        "success"
+      );
+
+
+      await loadContents();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showStatus(
+        "Erro ao publicar: " +
+        error.message,
+        "error"
+      );
+    }
+  };
+
+
+  /* =========================================================
+     RETIRAR PUBLICAÇÃO
+     ========================================================= */
+
+  window.unpublishContent = async function(id) {
+
+    if (
+      !confirm(
+        "Retirar este conteúdo da publicação?"
+      )
+    ) {
+      return;
+    }
+
+
+    try {
+
+      const result =
+        await supabaseRequest(
+          `editorial_contents?id=eq.${encodeURIComponent(id)}`,
+          {
+            method: "PATCH",
+
+            body: JSON.stringify({
+              status: "Rascunho",
+              published_at: null
+            })
+          }
+        );
+
+
+      if (!result || !result.length) {
+        throw new Error(
+          "Não foi possível retirar a publicação."
+        );
+      }
+
+
+      showStatus(
+        "Conteúdo voltou para Rascunho.",
+        "success"
+      );
+
+
+      await loadContents();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showStatus(
+        "Erro: " +
+        error.message,
+        "error"
+      );
+    }
+  };
+
+
+  /* =========================================================
+     EXCLUIR
+     ========================================================= */
+
+  window.deleteContent = async function(id) {
+
+    const content =
+      contents.find(
+        item => item.id === id
+      );
+
+
+    if (!content) {
+      return;
+    }
+
+
+    const confirmed =
+      confirm(
+        `Excluir definitivamente "${content.title}"?`
+      );
+
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    try {
+
+      await supabaseRequest(
+        `editorial_contents?id=eq.${encodeURIComponent(id)}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+
+      showStatus(
+        "Conteúdo excluído.",
+        "success"
+      );
+
+
+      await loadContents();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showStatus(
+        "Erro ao excluir: " +
+        error.message,
+        "error"
+      );
+    }
+  };
+
+
+  /* =========================================================
+     FILTROS
+     ========================================================= */
+
+  searchInput.addEventListener(
+    "input",
+    renderContents
+  );
+
+  categoryFilter.addEventListener(
+    "change",
+    renderContents
+  );
+
+  statusFilter.addEventListener(
+    "change",
+    renderContents
+  );
+
+  accessFilter.addEventListener(
+    "change",
+    renderContents
+  );
+
+
+  /* =========================================================
+     ATUALIZAR
+     ========================================================= */
+
+  document
+    .getElementById("refreshBtn")
+    .addEventListener(
+      "click",
+      loadContents
+    );
+
+
+  /* =========================================================
+     AUTENTICAÇÃO SUPABASE
+     =========================================================
+
+     Este painel utiliza o JWT salvo pelo Supabase
+     no navegador.
+
+     Se o seu login atual usa outro mecanismo,
+     a autenticação precisa ser integrada aqui.
+     ========================================================= */
+
+  async function getSupabaseSession() {
+
+    /*
+     * O painel não usa service_role.
+     *
+     * Procuramos a sessão armazenada pelo cliente
+     * oficial do Supabase.
+     */
+
+    const keys = Object.keys(localStorage);
+
+    const authKey =
+      keys.find(
+        key =>
+          key.startsWith("sb-") &&
+          key.endsWith("-auth-token")
+      );
+
+
+    if (!authKey) {
+      return null;
+    }
+
+
+    try {
+
+      const raw =
+        localStorage.getItem(authKey);
+
+      if (!raw) {
+        return null;
+      }
+
+
+      const data =
+        JSON.parse(raw);
+
+
+      if (
+        data &&
+        data.user &&
+        data.access_token
+      ) {
+
+        return {
+          user: data.user,
+          access_token:
+            data.access_token
+        };
+      }
+
+
+      return null;
+
+    } catch {
+
+      return null;
+    }
+  }
+
+
+  /* =========================================================
+     INICIALIZAÇÃO
+     ========================================================= */
+
+  async function init() {
+
+    try {
+
+      const session =
+        await getSupabaseSession();
+
+
+      if (!session) {
+
+        showStatus(
+          "Nenhuma sessão Supabase encontrada. Faça login antes de usar o Painel do Autor.",
+          "error"
+        );
+
+      }
+
+
+      await loadContents();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showStatus(
+        error.message,
+        "error"
+      );
+    }
+  }
+
+
+  init();
+
+</script>
+
+</body>
+</html>
