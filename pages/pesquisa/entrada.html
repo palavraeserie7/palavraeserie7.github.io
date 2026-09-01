@@ -1,117 +1,884 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Entrar — Palavra &amp; Série</title>
-  <style>
-    :root {
-      --bg: #0b1428;
-      --panel: #111b30;
-      --panel-2: #17243a;
-      --text: #dbe7f5;
-      --muted: #91a4bd;
-      --line: #536780;
-      --green: #20d66b;
-      --green-dark: #19b85a;
-      --red: #ff9f9f;
-    }
-    * { box-sizing: border-box; }
-    body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; background: var(--bg); color: var(--text); font-family: "Segoe UI", Tahoma, sans-serif; }
-    .login-page { width: min(560px, 100%); }
-    .login-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
-    .brand { color: var(--green); font-size: 12px; font-weight: 900; letter-spacing: 1.7px; text-transform: uppercase; }
-    .back-link { padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--text); font-size: 10px; font-weight: 800; text-decoration: none; }
-    .back-link:hover, .back-link:focus-visible { border-color: var(--green); color: #fff; outline: none; }
-    .login-card { padding: 28px; border: 1px solid #35506d; border-radius: 12px; background: var(--panel); box-shadow: 0 18px 60px rgba(0,0,0,.35); }
-    .login-card h1 { margin: 0 0 12px; color: var(--green); font-size: 22px; letter-spacing: 1px; }
-    .login-card > p { margin: 0; color: #b8c9dc; line-height: 1.6; }
-    .demo-label { display: inline-block; margin-top: 14px; padding: 4px 8px; border: 1px solid #806f53; border-radius: 4px; color: #ffd166; font-size: 9px; font-weight: 900; letter-spacing: .8px; }
-    .login-form { display: grid; gap: 12px; margin-top: 20px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: rgba(5,10,20,.22); }
-    .login-form label { display: grid; gap: 6px; color: #b8c9dc; font-size: 11px; font-weight: 800; letter-spacing: .4px; }
-    .login-form input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 6px; background: #0d172b; color: var(--text); font: inherit; }
-    .login-form input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 2px rgba(32,214,107,.16); }
-    .login-submit, .logout-button { margin-top: 2px; border: 0; border-radius: 7px; background: var(--green); color: #07151f; padding: 11px 14px; font-weight: 900; cursor: pointer; }
-    .login-submit:hover, .logout-button:hover { background: var(--green-dark); }
-    .login-error { display: none; margin: 0; color: var(--red); font-size: 11px; line-height: 1.4; }
-    .login-error.visible { display: block; }
-    .access-panel { display: none; margin-top: 20px; }
-    .access-panel.visible { display: block; }
-    .access-panel h2 { margin: 0 0 8px; color: var(--green); font-size: 16px; letter-spacing: .8px; }
-    .access-panel p { color: #b8c9dc; line-height: 1.55; }
-    .access-link { display: block; margin-top: 12px; padding: 12px 14px; border: 1px solid var(--green); border-radius: 7px; background: rgba(32,214,107,.08); color: var(--green); font-size: 11px; font-weight: 900; text-decoration: none; }
-    .access-link:hover, .access-link:focus-visible { background: rgba(32,214,107,.16); color: #fff; outline: none; }
-    .login-note { display: block; margin-top: 16px; color: var(--muted); line-height: 1.45; }
-    @media (max-width: 600px) { body { place-items: start center; padding: 16px; } .login-card { padding: 20px; } .login-header { align-items: flex-start; flex-direction: column; } }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Palavra & Série — Sala do Escritor</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#071411;
+  --bg-soft:#0c1d18;
+  --panel:#10251f;
+  --panel-2:#132d25;
+  --line:#29463c;
+  --green:#8fd0a8;
+  --green-strong:#b5e5c7;
+  --text:#edf6f0;
+  --muted:#9eb5aa;
+  --danger:#e5a5a5;
+  --shadow:0 18px 45px rgba(0,0,0,.35);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left, rgba(143,208,168,.08), transparent 35%),
+    linear-gradient(145deg,#071411,#091914 55%,#06100d);
+  color:var(--text);
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+/* =========================
+   TOPO
+========================= */
+
+header{
+  border-bottom:1px solid var(--line);
+  background:rgba(5,15,12,.88);
+  backdrop-filter:blur(8px);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.header-inner{
+  width:min(1180px,92%);
+  margin:auto;
+  min-height:78px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:25px;
+}
+
+.brand{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.brand-title{
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:1.8px;
+}
+
+.brand-subtitle{
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:1.2px;
+}
+
+.session{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.user-email{
+  color:var(--green-strong);
+  font-size:12px;
+  max-width:280px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.btn-logout{
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--muted);
+  padding:9px 13px;
+  border-radius:5px;
+  cursor:pointer;
+  font-size:11px;
+  letter-spacing:1px;
+}
+
+.btn-logout:hover{
+  border-color:var(--green);
+  color:var(--green-strong);
+}
+
+/* =========================
+   CONTEÚDO
+========================= */
+
+main{
+  width:min(1180px,92%);
+  margin:0 auto;
+  padding:55px 0 70px;
+}
+
+.hero{
+  margin-bottom:42px;
+}
+
+.hero-label{
+  color:var(--green);
+  font-size:11px;
+  letter-spacing:2px;
+  margin-bottom:13px;
+}
+
+.hero h1{
+  margin:0;
+  font-size:34px;
+  font-weight:500;
+  letter-spacing:1px;
+}
+
+.hero p{
+  margin:14px 0 0;
+  max-width:760px;
+  color:var(--muted);
+  line-height:1.7;
+  font-size:14px;
+}
+
+/* =========================
+   BLOCO PRINCIPAL
+========================= */
+
+.section-title{
+  color:var(--green-strong);
+  font-size:12px;
+  letter-spacing:2px;
+  margin-bottom:18px;
+}
+
+.workspace{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card{
+  position:relative;
+  background:
+    linear-gradient(145deg,rgba(19,45,37,.95),rgba(12,29,24,.96));
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:27px;
+  min-height:210px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow:var(--shadow);
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    background .2s ease;
+}
+
+.card:hover{
+  transform:translateY(-3px);
+  border-color:#456a5a;
+  background:
+    linear-gradient(145deg,rgba(22,51,42,.98),rgba(12,29,24,.98));
+}
+
+.card-main{
+  display:flex;
+  gap:20px;
+}
+
+.icon{
+  width:48px;
+  height:48px;
+  flex:0 0 48px;
+  border:1px solid var(--line);
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:21px;
+  color:var(--green-strong);
+  background:#0b1b16;
+}
+
+.card h2{
+  margin:1px 0 9px;
+  font-size:17px;
+  font-weight:600;
+  letter-spacing:.8px;
+}
+
+.card p{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.65;
+}
+
+.card-footer{
+  margin-top:27px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.card-status{
+  color:#789488;
+  font-size:10px;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+}
+
+.btn-open{
+  display:inline-block;
+  text-decoration:none;
+  border:1px solid #416553;
+  background:#10251e;
+  color:var(--green-strong);
+  padding:10px 15px;
+  border-radius:5px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1.3px;
+  transition:.2s;
+}
+
+.btn-open:hover{
+  background:#18382d;
+  border-color:var(--green);
+}
+
+/* =========================
+   MATRIZ EM DESTAQUE
+========================= */
+
+.card-primary{
+  grid-column:1 / -1;
+  min-height:235px;
+  border-color:#3b6251;
+}
+
+.card-primary .icon{
+  border-color:#456b59;
+  background:#0e211a;
+}
+
+.card-primary h2{
+  font-size:19px;
+}
+
+.card-primary .btn-open{
+  padding:12px 19px;
+}
+
+/* =========================
+   FAIXA INFORMATIVA
+========================= */
+
+.info{
+  margin-top:35px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:rgba(9,24,19,.72);
+  padding:21px 24px;
+}
+
+.info-title{
+  font-size:11px;
+  color:var(--green);
+  letter-spacing:1.7px;
+  margin-bottom:9px;
+}
+
+.info p{
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.7;
+}
+
+/* =========================
+   RODAPÉ
+========================= */
+
+footer{
+  border-top:1px solid var(--line);
+  padding:25px 0 35px;
+  background:#06100d;
+}
+
+.footer-inner{
+  width:min(1180px,92%);
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.footer-left{
+  color:#71877d;
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+.footer-link{
+  color:#8ba69a;
+  text-decoration:none;
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+.footer-link:hover{
+  color:var(--green-strong);
+}
+
+/* =========================
+   ESTADOS
+========================= */
+
+#loading{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#071411;
+  color:var(--muted);
+  font-size:12px;
+  letter-spacing:1.5px;
+}
+
+#error{
+  display:none;
+  min-height:100vh;
+  align-items:center;
+  justify-content:center;
+  padding:30px;
+  text-align:center;
+}
+
+.error-box{
+  max-width:500px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  padding:35px;
+  border-radius:7px;
+}
+
+.error-box h2{
+  margin-top:0;
+  color:var(--green-strong);
+  font-size:18px;
+}
+
+.error-box p{
+  color:var(--muted);
+  line-height:1.7;
+  font-size:13px;
+}
+
+.btn-login{
+  display:inline-block;
+  margin-top:15px;
+  padding:11px 17px;
+  border:1px solid var(--line);
+  color:var(--green-strong);
+  text-decoration:none;
+  border-radius:5px;
+  font-size:10px;
+  letter-spacing:1.2px;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media(max-width:760px){
+
+  .header-inner{
+    min-height:95px;
+    align-items:flex-start;
+    padding:17px 0;
+    flex-direction:column;
+  }
+
+  .session{
+    width:100%;
+    justify-content:space-between;
+  }
+
+  .user-email{
+    max-width:210px;
+  }
+
+  main{
+    padding-top:40px;
+  }
+
+  .hero h1{
+    font-size:27px;
+  }
+
+  .workspace{
+    grid-template-columns:1fr;
+  }
+
+  .card-primary{
+    grid-column:auto;
+  }
+
+  .footer-inner{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+}
+</style>
 </head>
+
 <body>
-  <main class="login-page">
-    <header class="login-header">
-      <div class="brand">PALAVRA &amp; SÉRIE · ACESSO</div>
-      <a class="back-link" href="matriz-pro.html">← VOLTAR À MATRIZ PRO</a>
-    </header>
-    <section class="login-card" aria-labelledby="login-title">
-      <h1 id="login-title">ENTRAR</h1>
-      <p>Aceda às ferramentas internas de produção e operação da plataforma.</p>
-      <span class="demo-label">ARQUITETURA VISUAL — MODO DEMONSTRAÇÃO</span>
-      <form class="login-form" id="login-form">
-        <label for="login-identity">UTILIZADOR / E-MAIL<input id="login-identity" name="identity" type="text" autocomplete="username" required></label>
-        <label for="login-password">SENHA<input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
-        <p class="login-error" id="login-error" role="alert">Preencha os dois campos para avançar.</p>
-        <button class="login-submit" type="submit">[&nbsp; ENTRAR &nbsp;]</button>
-      </form>
-      <div class="access-panel" id="access-panel" aria-live="polite">
-        <h2>SESSÃO AUTENTICADA</h2>
-        <p>O acesso foi confirmado. Continue pela Matriz PRO para utilizar as ferramentas internas disponíveis.</p>
-        <a class="access-link" href="matriz-pro.html">ABRIR MATRIZ PRO</a>
-        <button class="logout-button" id="logout-button" type="button">SAIR</button>
+
+<!-- =========================
+     CARREGAMENTO
+========================= -->
+
+<div id="loading">
+  ABRINDO SALA DO ESCRITOR...
+</div>
+
+<!-- =========================
+     ERRO / SEM SESSÃO
+========================= -->
+
+<div id="error">
+  <div class="error-box">
+
+    <h2>ACESSO RESTRITO</h2>
+
+    <p>
+      A Sala do Escritor é uma área privada.
+      Para entrar, é necessário estar autenticado.
+    </p>
+
+    <a class="btn-login" href="entrada.html">
+      IR PARA ENTRADA
+    </a>
+
+  </div>
+</div>
+
+<!-- =========================
+     SALA
+========================= -->
+
+<div id="app" style="display:none;">
+
+<header>
+
+  <div class="header-inner">
+
+    <div class="brand">
+      <div class="brand-title">
+        PALAVRA &amp; SÉRIE
       </div>
-      <small class="login-note" id="login-note">Nenhuma credencial é armazenada nesta página. A autenticação é processada pelo Supabase configurado no projecto.</small>
-    </section>
-  </main>
-  <script>
-    const SUPABASE_URL = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
-    const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const form = document.getElementById('login-form');
-    const identity = document.getElementById('login-identity');
-    const password = document.getElementById('login-password');
-    const error = document.getElementById('login-error');
-    const accessPanel = document.getElementById('access-panel');
-    const note = document.getElementById('login-note');
 
-    form.addEventListener('submit', async event => {
-      event.preventDefault();
-      error.classList.remove('visible');
-      if (!identity.value.trim() || !password.value) {
-        error.textContent = 'Preencha os dois campos para avançar.';
-        error.classList.add('visible');
-        return;
-      }
-      try {
-        if (!supabaseClient) throw new Error('A autenticação Supabase ainda não foi configurada.');
-        const { data, error: authError } = await supabaseClient.auth.signInWithPassword({ email: identity.value.trim(), password: password.value });
-        if (authError || !data?.session?.access_token) throw new Error(authError?.message || 'Não foi possível autenticar.');
-        form.hidden = true;
-        accessPanel.classList.add('visible');
-        note.textContent = 'Sessão autenticada. Acesso privado activo.';
-      } catch (authError) {
-        error.textContent = authError?.message || 'Não foi possível autenticar.';
-        error.classList.add('visible');
-      }
-    });
+      <div class="brand-subtitle">
+        SALA DO ESCRITOR
+      </div>
+    </div>
 
-    document.getElementById('logout-button').addEventListener('click', async () => {
-      await supabaseClient?.auth.signOut();
-      form.hidden = false;
-      form.reset();
-      accessPanel.classList.remove('visible');
-      note.textContent = 'Nenhuma credencial é armazenada nesta página. A autenticação é processada pelo Supabase configurado no projecto.';
-      identity.focus();
-    });
-  </script>
+    <div class="session">
+
+      <div id="userEmail" class="user-email">
+        —
+      </div>
+
+      <button
+        id="logoutBtn"
+        class="btn-logout"
+        type="button"
+      >
+        SAIR
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main>
+
+  <!-- =========================
+       ABERTURA
+  ========================= -->
+
+  <section class="hero">
+
+    <div class="hero-label">
+      ÁREA PRIVADA DE CRIAÇÃO
+    </div>
+
+    <h1>
+      Sala do Escritor
+    </h1>
+
+    <p>
+      Este é o espaço de trabalho do autor.
+      Aqui ficam reunidas as ferramentas de criação,
+      organização e gestão dos conteúdos produzidos
+      dentro do Palavra &amp; Série.
+    </p>
+
+  </section>
+
+
+  <!-- =========================
+       FERRAMENTAS
+  ========================= -->
+
+  <div class="section-title">
+    ESTRUTURA DE TRABALHO
+  </div>
+
+  <section class="workspace">
+
+
+    <!-- MATRIZ PRO -->
+
+    <article class="card card-primary">
+
+      <div class="card-main">
+
+        <div class="icon">
+          ✍
+        </div>
+
+        <div>
+
+          <h2>
+            Matriz Técnica de Pesquisa PRO
+          </h2>
+
+          <p>
+            Estrutura principal de criação de conteúdo.
+            Organize a pesquisa, desenvolva as etapas
+            do projeto e trabalhe sobre a folha de trabalho
+            da Matriz PRO.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="card-footer">
+
+        <span class="card-status">
+          FERRAMENTA PRINCIPAL DE CRIAÇÃO
+        </span>
+
+        <a
+          class="btn-open"
+          href="matriz-pro.html"
+        >
+          ABRIR MATRIZ PRO →
+        </a>
+
+      </div>
+
+    </article>
+
+
+    <!-- MEUS CONTEÚDOS -->
+
+    <article class="card">
+
+      <div class="card-main">
+
+        <div class="icon">
+          ◫
+        </div>
+
+        <div>
+
+          <h2>
+            Meus Conteúdos
+          </h2>
+
+          <p>
+            Área destinada à organização dos conteúdos
+            produzidos pelo autor e ao acompanhamento
+            de seus materiais.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="card-footer">
+
+        <span class="card-status">
+          ORGANIZAÇÃO
+        </span>
+
+        <a
+          class="btn-open"
+          href="painel-autor-supabase.html"
+        >
+          ABRIR →
+        </a>
+
+      </div>
+
+    </article>
+
+
+    <!-- PAINEL DO AUTOR -->
+
+    <article class="card">
+
+      <div class="card-main">
+
+        <div class="icon">
+          ⚙
+        </div>
+
+        <div>
+
+          <h2>
+            Painel do Autor
+          </h2>
+
+          <p>
+            Controle editorial dos conteúdos,
+            status de publicação, organização
+            e informações administrativas do autor.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="card-footer">
+
+        <span class="card-status">
+          GESTÃO EDITORIAL
+        </span>
+
+        <a
+          class="btn-open"
+          href="painel-autor-supabase.html"
+        >
+          ABRIR PAINEL →
+        </a>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- =========================
+       NOTA
+  ========================= -->
+
+  <section class="info">
+
+    <div class="info-title">
+      SOBRE ESTA ÁREA
+    </div>
+
+    <p>
+      A Sala do Escritor não faz parte da navegação pública
+      principal do site. O acesso é realizado após a
+      autenticação do autor. A Matriz PRO funciona aqui
+      como a estrutura de criação e desenvolvimento
+      dos conteúdos.
+    </p>
+
+  </section>
+
+</main>
+
+
+<footer>
+
+  <div class="footer-inner">
+
+    <div class="footer-left">
+      PALAVRA &amp; SÉRIE — SALA DO ESCRITOR
+    </div>
+
+    <a
+      class="footer-link"
+      href="javascript:history.back()"
+    >
+      ← VOLTAR
+    </a>
+
+  </div>
+
+</footer>
+
+</div>
+
+
+<script>
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+  "https://qmhdbuxomozdczgvpvcc.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const loading = document.getElementById("loading");
+const app = document.getElementById("app");
+const errorBox = document.getElementById("error");
+const userEmail = document.getElementById("userEmail");
+const logoutBtn = document.getElementById("logoutBtn");
+
+
+/* =====================================================
+   VERIFICAÇÃO DA SESSÃO
+===================================================== */
+
+async function verificarSessao(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.getSession();
+
+    if(error){
+      throw error;
+    }
+
+    const session = data.session;
+
+    /*
+      Sem sessão:
+      a pessoa não entra na Sala.
+    */
+
+    if(!session){
+
+      loading.style.display = "none";
+      errorBox.style.display = "flex";
+
+      return;
+    }
+
+
+    /*
+      Sessão encontrada:
+      abre a Sala.
+    */
+
+    const email =
+      session.user?.email || "AUTOR";
+
+    userEmail.textContent = email;
+
+    loading.style.display = "none";
+    app.style.display = "block";
+
+  }catch(error){
+
+    console.error(
+      "Erro ao verificar sessão:",
+      error
+    );
+
+    loading.style.display = "none";
+    errorBox.style.display = "flex";
+  }
+}
+
+
+/* =====================================================
+   SAIR
+===================================================== */
+
+logoutBtn.addEventListener(
+  "click",
+  async function(){
+
+    logoutBtn.disabled = true;
+    logoutBtn.textContent = "SAINDO...";
+
+    const {
+      error
+    } = await supabaseClient.auth.signOut();
+
+    if(error){
+
+      console.error(
+        "Erro ao sair:",
+        error
+      );
+
+      logoutBtn.disabled = false;
+      logoutBtn.textContent = "SAIR";
+
+      return;
+    }
+
+    window.location.href = "entrada.html";
+  }
+);
+
+
+/* =====================================================
+   OBSERVAR ALTERAÇÕES DE AUTENTICAÇÃO
+===================================================== */
+
+supabaseClient.auth.onAuthStateChange(
+  function(event, session){
+
+    if(event === "SIGNED_OUT"){
+
+      window.location.href = "entrada.html";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   INICIALIZAÇÃO
+===================================================== */
+
+verificarSessao();
+
+</script>
+
 </body>
 </html>
