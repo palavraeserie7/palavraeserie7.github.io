@@ -1,1 +1,106 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Estante independente da plataforma Palavra & Série.">
+  <title>Minha Estante — Palavra &amp; Série</title>
+  <style>
+    :root { --navy:#0b1428; --surface:#111b30; --paper:#f1eadb; --card:#fffdf7; --ink:#4a443b; --muted:#806f53; --line:#d8cdb8; --green:#20d66b; --blue:#18bfff; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--navy); color:var(--ink); font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:16px 24px; background:var(--surface); border-bottom:1px solid #263754; }
+    .topbar a { color:#dbe7f5; text-decoration:none; font-size:11px; font-weight:900; letter-spacing:.5px; }
+    .topbar .brand { margin-right:auto; color:var(--green); letter-spacing:1.5px; }
+    .back-link { padding:9px 12px; border:1px solid #536780; border-radius:7px; }
+    .back-link:hover { border-color:var(--blue); background:#163451; }
+    main { max-width:1240px; margin:0 auto; padding:30px 22px 58px; }
+    .paper { padding:30px; border:1px solid var(--line); border-radius:12px; background:var(--paper); box-shadow:0 12px 30px rgba(0,0,0,.22); }
+    .eyebrow { margin:0 0 8px; color:#9b8b70; font-size:10px; font-weight:900; letter-spacing:1.6px; }
+    h1 { margin:0; font-size:clamp(28px,5vw,44px); letter-spacing:.4px; }
+    .intro { max-width:850px; margin:12px 0 25px; line-height:1.7; }
+    .toolbar { display:grid; grid-template-columns:1.2fr repeat(4,1fr); gap:10px; margin-bottom:22px; }
+    .toolbar input, .toolbar select { min-width:0; padding:11px 12px; border:1px solid #cdbfaa; border-radius:6px; background:#fffaf0; color:var(--ink); font:inherit; font-size:12px; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+    .tab { padding:10px 14px; border:1px solid #cdbfaa; border-radius:7px; background:var(--card); color:var(--muted); font-weight:900; cursor:pointer; }
+    .tab:hover, .tab.active { border-color:var(--accent,var(--muted)); background:var(--muted); color:#fffaf0; }
+    .catalog { display:grid; grid-template-columns:repeat(auto-fit,minmax(245px,1fr)); gap:16px; }
+    .book { display:flex; flex-direction:column; min-height:250px; padding:18px; border:1px solid var(--line); border-radius:9px; background:var(--card); }
+    .cover { display:grid; place-items:center; min-height:72px; margin-bottom:14px; padding:10px; border-radius:7px; background:linear-gradient(135deg,#806f53,#b99b61); color:#fffaf0; text-align:center; font-size:12px; font-weight:900; letter-spacing:.8px; }
+    .book h2 { margin:0 0 6px; color:var(--ink); font-size:16px; line-height:1.3; }
+    .author { margin:0 0 10px; color:#9b8b70; font-size:11px; font-weight:800; }
+    .description { flex:1; margin:0; color:#665947; font-size:12px; line-height:1.6; }
+    .book a { align-self:flex-start; margin-top:15px; color:var(--muted); font-size:11px; font-weight:900; }
+    .empty { display:none; padding:25px; border:1px dashed #b99b61; color:var(--muted); text-align:center; }
+    .note { margin:25px 0 0; color:var(--muted); font-size:12px; line-height:1.6; }
+    code { padding:2px 4px; border-radius:4px; background:#eee2cd; }
+    @media (max-width:850px) { .toolbar { grid-template-columns:1fr 1fr; } .toolbar input { grid-column:1/-1; } .paper { padding:22px 16px; } }
+    @media (max-width:520px) { .toolbar { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top">PALAVRA &amp; SÉRIE</a>
+    <a class="back-link" href="#top">▤ MINHA ESTANTE — FREE / PRO</a>
+  </header>
+  <main id="top">
+    <section class="paper" aria-labelledby="title">
+      <p class="eyebrow">MÓDULO HTML INDEPENDENTE</p>
+      <h1 id="title">MINHA ESTANTE</h1>
+      <p class="intro">Catálogo organizado para materiais gratuitos, conteúdos PRO, livros do autor e referências externas autorizadas. Este arquivo é autônomo: seus estilos, dados e scripts ficam separados dos menus da Matriz Técnica de Pesquisa PRO.</p>
+      <div class="tabs" role="tablist" aria-label="Seções da estante">
+        <button class="tab active" type="button" data-section="free">FREE</button>
+        <button class="tab" type="button" data-section="pro">PRO</button>
+        <button class="tab" type="button" data-section="own">MEUS LIVROS</button>
+        <button class="tab" type="button" data-section="external">REFERÊNCIAS EXTERNAS</button>
+      </div>
+      <div class="toolbar" aria-label="Filtros da estante">
+        <input id="search" type="search" placeholder="Pesquisar título, autor ou descrição" aria-label="Pesquisar no catálogo">
+        <select id="contentType" aria-label="Tipo de conteúdo"><option value="">TIPO: TODOS</option><option>DEVOCIONAL</option><option>SERMÃO</option><option>ESTUDO BÍBLICO</option><option>LIVRO TEOLÓGICO</option><option>LIVRO ACADÉMICO</option><option>INFANTIL</option></select>
+        <select id="audience" aria-label="Público"><option value="">PÚBLICO: TODOS</option><option>CRIANÇAS</option><option>JOVENS</option><option>ADULTOS</option><option>ACADÉMICOS</option></select>
+        <select id="depth" aria-label="Profundidade"><option value="">NÍVEL: TODOS</option><option>BÁSICO</option><option>INTERMEDIÁRIO</option><option>AVANÇADO</option><option>ESPECIALIZADO</option></select>
+        <select id="format" aria-label="Formato"><option value="">FORMATO: TODOS</option><option>LIVRO</option><option>CURSO</option><option>ESTUDO GUIADO</option><option>MATERIAL DIDÁTICO</option></select>
+      </div>
+      <div id="catalog" class="catalog" aria-live="polite"></div>
+      <div id="empty" class="empty">Nenhum item corresponde aos filtros selecionados.</div>
+      <p class="note"><strong>Manutenção:</strong> este arquivo pode ser salvo como <code>estante.html</code> em uma pasta própria. Alterações aqui não modificam a Matriz PRO, Sermões ou Ponte Infantil.</p>
+    </section>
+  </main>
+  <script>
+    const books = {
+      free: [
+        { title:'Guia de Leitura Bíblica', author:'Palavra & Série', cover:'LEITURA BÍBLICA', description:'Orientações introdutórias para observar passagem, contexto, estrutura e aplicação responsável.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'ESTUDO GUIADO' },
+        { title:'Introdução ao Estudo Bíblico', author:'Palavra & Série', cover:'ESTUDO BÍBLICO', description:'Material de orientação para organizar uma pesquisa bíblica pessoal.', contentType:'ESTUDO BÍBLICO', audience:'JOVENS', depth:'BÁSICO', format:'MATERIAL DIDÁTICO' },
+        { title:'Glossário de Termos Bíblicos', author:'Palavra & Série', cover:'GLOSSÁRIO', description:'Vocabulário inicial para acompanhar a leitura e a investigação do texto.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO' }
+      ],
+      pro: [
+        { title:'Caderno de Grego do Novo Testamento', author:'Palavra & Série', cover:'GREGO DO NT', description:'Material de apoio para texto grego, morfologia, sintaxe e leitura do SBLGNT.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO' },
+        { title:'Caderno de Hebraico do Antigo Testamento', author:'Palavra & Série', cover:'HEBRAICO DO AT', description:'Material de apoio para texto hebraico, formas, léxico e leitura do OSHB.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO' },
+        { title:'Manual da Matriz Canónica', author:'Palavra & Série', cover:'MATRIZ CANÓNICA', description:'Guia dos módulos, fontes prioritárias e regras de investigação da plataforma.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO' }
+      ],
+      own: [
+        { title:'Além da Régua', author:'A. F. Santos', cover:'ALÉM DA RÉGUA', description:'Livro do autor. A capa pode ser divulgada na estante; o conteúdo permanece fechado nesta etapa.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO' },
+        { title:'Você Não é um Acidente', author:'A. F. Santos', cover:'VOCÊ NÃO É UM ACIDENTE', description:'Devocional de 30 dias para redescobrir o seu valor em Deus.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO' }
+      ],
+      external: [
+        { title:'Matthew Henry — Commentary on the Whole Bible', author:'Matthew Henry', cover:'COMENTÁRIO', description:'Comentário cristão clássico disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', url:'https://www.ccel.org/ccel/henry/mhc' },
+        { title:'The Pilgrim’s Progress', author:'John Bunyan', cover:'PEREGRINO', description:'Alegoria cristã clássica disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', url:'https://www.ccel.org/ccel/bunyan/pilgrim' },
+        { title:'Institutes of the Christian Religion', author:'John Calvin', cover:'INSTITUTAS', description:'Obra clássica da Reforma disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', url:'https://www.ccel.org/ccel/calvin/institutes' }
+      ]
+    };
+    let section = 'free';
+    const $ = (id) => document.getElementById(id);
+    function render() {
+      const query = $('search').value.trim().toLowerCase();
+      const filters = { contentType:$('contentType').value, audience:$('audience').value, depth:$('depth').value, format:$('format').value };
+      const list = (books[section] || []).filter(book => Object.entries(filters).every(([key, value]) => !value || book[key] === value)).filter(book => !query || `${book.title} ${book.author} ${book.description}`.toLowerCase().includes(query));
+      $('catalog').innerHTML = list.map(book => `<article class="book"><div class="cover">${book.cover}</div><h2>${book.title}</h2><p class="author">${book.author}</p><p class="description">${book.description}</p>${book.url ? `<a href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA OFICIAL ↗</a>` : ''}</article>`).join('');
+      $('empty').style.display = list.length ? 'none' : 'block';
+    }
+    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => { section = tab.dataset.section; document.querySelectorAll('.tab').forEach(item => item.classList.toggle('active', item === tab)); render(); }));
+    ['search','contentType','audience','depth','format'].forEach(id => $(id).addEventListener('input', render));
+    render();
+  </script>
+</body>
+</html>
