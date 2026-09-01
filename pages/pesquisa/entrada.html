@@ -1,19 +1,16 @@
 <!doctype html>
 <html lang="pt-BR">
-
 <head>
-
 <meta charset="utf-8">
-
 <meta
   name="viewport"
   content="width=device-width, initial-scale=1"
 >
-
 <title>Entrar — Palavra &amp; Série</title>
 
-<style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<style>
 :root {
   --bg: #0b1428;
   --panel: #111b30;
@@ -21,263 +18,437 @@
   --muted: #91a4bd;
   --line: #536780;
   --green: #20d66b;
+  --danger: #e5716a;
 }
-
 * {
   box-sizing: border-box;
 }
-
 body {
   min-height: 100vh;
   margin: 0;
-
   display: grid;
   place-items: center;
-
   padding: 24px;
-
   background: var(--bg);
   color: var(--text);
-
   font-family:
     "Segoe UI",
     Tahoma,
     sans-serif;
 }
-
 .login-page {
   width: min(560px, 100%);
 }
-
 .login-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 16px;
-
   margin-bottom: 14px;
 }
-
 .brand {
   color: var(--green);
-
   font-size: 12px;
   font-weight: 900;
-
   letter-spacing: 1.7px;
   text-transform: uppercase;
 }
-
 .back-link {
   padding: 9px 12px;
-
   border: 1px solid var(--line);
   border-radius: 6px;
-
   background: transparent;
   color: var(--text);
-
   font-size: 10px;
   font-weight: 800;
-
   text-decoration: none;
 }
-
 .back-link:hover,
 .back-link:focus-visible {
   border-color: var(--green);
   color: #fff;
-
   outline: none;
 }
-
 .login-card {
   padding: 28px;
-
   border: 1px solid #35506d;
   border-radius: 12px;
-
   background: var(--panel);
-
   box-shadow:
     0 18px 60px rgba(0, 0, 0, .35);
 }
-
 .login-card h1 {
   margin: 0 0 12px;
-
   color: var(--green);
-
   font-size: 22px;
   letter-spacing: 1px;
 }
-
 .login-card > p {
   margin: 0;
-
   color: #b8c9dc;
-
   line-height: 1.6;
 }
-
-.access-panel {
+.login-form {
   display: block;
-
-  margin-top: 20px;
+  margin-top: 22px;
 }
-
-.access-panel h2 {
-  margin: 0 0 8px;
-
-  color: var(--green);
-
-  font-size: 16px;
-  letter-spacing: .8px;
+.field {
+  margin-bottom: 16px;
 }
-
-.access-panel p {
-  color: #b8c9dc;
-
-  line-height: 1.55;
-}
-
-.access-link {
+.field label {
   display: block;
-
-  margin-top: 12px;
-  padding: 12px 14px;
-
-  border: 1px solid var(--green);
-  border-radius: 7px;
-
-  background: rgba(32, 214, 107, .08);
-  color: var(--green);
-
+  margin-bottom: 7px;
+  color: var(--muted);
   font-size: 11px;
-  font-weight: 900;
-
-  text-decoration: none;
-  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
-
-.access-link:hover,
-.access-link:focus-visible {
-  background: rgba(32, 214, 107, .16);
-  color: #fff;
-
+.field input {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #0c1730;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+.field input:focus {
+  border-color: var(--green);
   outline: none;
 }
-
-.temporary-note {
+.field input:disabled {
+  opacity: .6;
+}
+.submit-btn {
   display: block;
-
+  width: 100%;
+  margin-top: 6px;
+  padding: 13px 14px;
+  border: 1px solid var(--green);
+  border-radius: 7px;
+  background: rgba(32, 214, 107, .08);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+}
+.submit-btn:hover:not(:disabled),
+.submit-btn:focus-visible:not(:disabled) {
+  background: rgba(32, 214, 107, .16);
+  color: #fff;
+  outline: none;
+}
+.submit-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.form-message {
+  display: none;
   margin-top: 16px;
   padding: 10px 12px;
-
-  border-left: 3px solid var(--green);
-
-  background: rgba(32, 214, 107, .06);
-
-  color: var(--muted);
-
-  font-size: 10px;
+  border-left: 3px solid var(--danger);
+  background: rgba(229, 113, 106, .08);
+  color: #f2b6b1;
+  font-size: 12px;
   line-height: 1.5;
 }
-
+.form-message.visible {
+  display: block;
+}
+.form-message.success {
+  border-left-color: var(--green);
+  background: rgba(32, 214, 107, .08);
+  color: var(--green);
+}
 @media (max-width: 600px) {
-
   body {
     place-items: start center;
     padding: 16px;
   }
-
   .login-card {
     padding: 20px;
   }
-
   .login-header {
     align-items: flex-start;
     flex-direction: column;
   }
-
 }
-
 </style>
-
 </head>
-
 <body>
-
 <main class="login-page">
-
   <header class="login-header">
-
     <div class="brand">
       PALAVRA &amp; SÉRIE · ACESSO
     </div>
-
     <a
       class="back-link"
       href="index.html"
     >
       ← VOLTAR À PESQUISA
     </a>
-
   </header>
-
-
   <section
     class="login-card"
     aria-labelledby="login-title"
   >
-
     <h1 id="login-title">
       ENTRAR
     </h1>
-
     <p>
       Aceda à Sala do Escritor e às ferramentas internas
       de criação da plataforma.
     </p>
 
-
-    <div
-      class="access-panel"
-      id="access-panel"
-      aria-live="polite"
+    <form
+      class="login-form"
+      id="loginForm"
+      novalidate
     >
+      <div class="field">
+        <label for="email">
+          E-mail
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          autocomplete="username"
+          required
+        >
+      </div>
 
-      <h2>
-        ACESSO TEMPORÁRIO
-      </h2>
+      <div class="field">
+        <label for="password">
+          Senha
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
 
-      <p>
-        O login está temporariamente desativado para
-        permitir os testes da Sala do Escritor.
-      </p>
-
-      <a
-        class="access-link"
-        href="sala-do-escritor.html"
+      <button
+        type="submit"
+        id="submitBtn"
+        class="submit-btn"
       >
-        ENTRAR NA SALA DO ESCRITOR →
-      </a>
+        ENTRAR
+      </button>
 
-    </div>
-
-
-    <small class="temporary-note">
-      MODO DE TESTE: a autenticação está temporariamente
-      desativada nesta página. Ela poderá ser reativada
-      depois que o funcionamento da Sala do Escritor
-      estiver confirmado.
-    </small>
-
+      <div
+        id="formMessage"
+        class="form-message"
+        role="alert"
+      ></div>
+    </form>
   </section>
-
 </main>
 
-</body>
+<script>
 
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+  "https://qmhdbuxomozdczgvpvcc.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const loginForm =
+  document.getElementById("loginForm");
+
+const emailInput =
+  document.getElementById("email");
+
+const passwordInput =
+  document.getElementById("password");
+
+const submitBtn =
+  document.getElementById("submitBtn");
+
+const formMessage =
+  document.getElementById("formMessage");
+
+
+/* =====================================================
+   MENSAGEM
+===================================================== */
+
+function showMessage(text, type){
+
+  formMessage.textContent =
+    text;
+
+  formMessage.className =
+    "form-message visible" +
+    (type === "success" ? " success" : "");
+
+}
+
+function hideMessage(){
+
+  formMessage.className =
+    "form-message";
+
+}
+
+
+/* =====================================================
+   TRADUÇÃO DE ERROS COMUNS
+===================================================== */
+
+function traduzirErro(error){
+
+  const msg =
+    String(error?.message || "").toLowerCase();
+
+  if(msg.includes("invalid login credentials")){
+    return "E-mail ou senha incorretos.";
+  }
+
+  if(msg.includes("email not confirmed")){
+    return "Este e-mail ainda não foi confirmado.";
+  }
+
+  if(msg.includes("too many requests")){
+    return "Muitas tentativas. Aguarde um momento e tente novamente.";
+  }
+
+  return error?.message ||
+    "Não foi possível entrar. Tente novamente.";
+
+}
+
+
+/* =====================================================
+   ENVIO DO FORMULÁRIO
+===================================================== */
+
+loginForm.addEventListener(
+  "submit",
+  async function(event){
+
+    event.preventDefault();
+
+    hideMessage();
+
+    const email =
+      emailInput.value.trim();
+
+    const password =
+      passwordInput.value;
+
+    if(!email || !password){
+
+      showMessage(
+        "Preencha e-mail e senha.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "ENTRANDO...";
+
+    emailInput.disabled = true;
+    passwordInput.disabled = true;
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .auth
+        .signInWithPassword({
+          email,
+          password
+        });
+
+
+    if(error){
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "ENTRAR";
+
+      emailInput.disabled = false;
+      passwordInput.disabled = false;
+
+      showMessage(
+        traduzirErro(error),
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    if(data?.session){
+
+      showMessage(
+        "Sessão iniciada. A abrir a Sala do Escritor...",
+        "success"
+      );
+
+      window.location.href =
+        "sala-do-escritor.html";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   SE JÁ HOUVER SESSÃO ATIVA, PULA DIRETO PARA A SALA
+===================================================== */
+
+async function verificarSessaoExistente(){
+
+  const {
+    data
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+  if(data?.session){
+
+    window.location.href =
+      "sala-do-escritor.html";
+
+  }
+
+}
+
+verificarSessaoExistente();
+
+</script>
+</body>
 </html>
