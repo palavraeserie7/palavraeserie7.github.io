@@ -287,7 +287,15 @@
     treeEl.addEventListener('click', event => {
       const topic = event.target.closest('.topic');
       if (!topic) return;
-      openTopic(JSON.parse(topic.dataset.path));
+      const path = JSON.parse(topic.dataset.path || '[]');
+      openTopic(path);
+      if (typeof academicChatSetTopic === 'function') {
+        academicChatSetTopic(path);
+      }
+      document.getElementById('academic-chat')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
     });
     document.getElementById('close-modal').addEventListener('click', closeModal);
     document.getElementById('close-modal-2').addEventListener('click', closeModal);
