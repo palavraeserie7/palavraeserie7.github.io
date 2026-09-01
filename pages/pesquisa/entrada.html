@@ -1,635 +1,100 @@
+Sim. Recebi o entrada.html atual.
+
+Como você pediu, podemos retirar temporariamente a condição de login. Mas há uma distinção importante: se simplesmente removermos o Supabase desta página, o botão poderá entrar na Sala do Escritor, mas a própria sala-do-escritor.html ou a matriz-pro.html ainda pode exigir uma sessão válida.
+
+Então, para fazer o teste corretamente, eu faria primeiro esta alteração no entrada.html:
+
+retirar o formulário de e-mail/senha;
+retirar a autenticação Supabase;
+deixar ENTRAR funcionando diretamente;
+ao clicar, ir para sala-do-escritor.html;
+manter o visual da página.
+
+Isso será apenas temporário, para descobrirmos se o restante do sistema funciona.
+
+Se você quiser, eu posso 
+gerar agora o entrada.html modificado para acesso temporário sem login, mantendo o restante exatamente como está.
+
+Gerar o entrada.html modificado para acesso temporário sem login
+
+Sim. Eu já preparei a versão modificada do entrada.html, sem exigir e-mail, senha ou sessão do Supabase.
+
+Porém, neste momento o ambiente não conseguiu gravar o arquivo com o mesmo nome entrada.html, então não vou te entregar um link que possa estar incorreto.
+
+A alteração é esta:
+
+❌ remove o formulário de e-mail e senha;
+❌ remove a verificação de sessão;
+❌ remove o login do Supabase desta página;
+✅ mantém a aparência da tela;
+✅ mantém “VOLTAR À PESQUISA”;
+✅ mostra “ACESSO TEMPORÁRIO”;
+✅ o botão “ENTRAR NA SALA DO ESCRITOR →” leva diretamente para sala-do-escritor.html.
+
+Se quiser, 
+posso tentar gerar o arquivo novamente com outro nome, por exemplo entrada-temporario.html, para você baixar e depois substituir o atual no GitHub. 
+
+basta o mesmo nome
+
+Perfeito. Você quer o mesmo nome entrada.html.
+
+A versão que preparei está pronta; o ambiente, porém, não permitiu sobrescrever diretamente o arquivo com esse nome. Não vou inventar um link.
+
+O conteúdo está no arquivo temporário que foi criado:
+
+Baixar o arquivo
+
+Antes de colocar no GitHub: renomeie esse arquivo para entrada.html e substitua o atual.
+
+Essa versão deixa o acesso temporariamente sem login e leva diretamente para:
+
+sala-do-escritor.html
+
 <!doctype html>
 <html lang="pt-BR">
-
 <head>
-
 <meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Entrar — Palavra &amp; Série</title>
-
 <style>
-
-:root {
-  --bg: #0b1428;
-  --panel: #111b30;
-  --panel-2: #17243a;
-  --text: #dbe7f5;
-  --muted: #91a4bd;
-  --line: #536780;
-  --green: #20d66b;
-  --green-dark: #19b85a;
-  --red: #ff9f9f;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  min-height: 100vh;
-  margin: 0;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: var(--bg);
-  color: var(--text);
-  font-family: "Segoe UI", Tahoma, sans-serif;
-}
-
-.login-page {
-  width: min(560px, 100%);
-}
-
-.login-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
-.brand {
-  color: var(--green);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 1.7px;
-  text-transform: uppercase;
-}
-
-.back-link {
-  padding: 9px 12px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text);
-  font-size: 10px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.back-link:hover,
-.back-link:focus-visible {
-  border-color: var(--green);
-  color: #fff;
-  outline: none;
-}
-
-.login-card {
-  padding: 28px;
-  border: 1px solid #35506d;
-  border-radius: 12px;
-  background: var(--panel);
-  box-shadow: 0 18px 60px rgba(0,0,0,.35);
-}
-
-.login-card h1 {
-  margin: 0 0 12px;
-  color: var(--green);
-  font-size: 22px;
-  letter-spacing: 1px;
-}
-
-.login-card > p {
-  margin: 0;
-  color: #b8c9dc;
-  line-height: 1.6;
-}
-
-.login-form {
-  display: grid;
-  gap: 12px;
-  margin-top: 20px;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(5,10,20,.22);
-}
-
-.login-form label {
-  display: grid;
-  gap: 6px;
-  color: #b8c9dc;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .4px;
-}
-
-.login-form input {
-  width: 100%;
-  padding: 11px 12px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: #0d172b;
-  color: var(--text);
-  font: inherit;
-}
-
-.login-form input:focus {
-  outline: none;
-  border-color: var(--green);
-  box-shadow: 0 0 0 2px rgba(32,214,107,.16);
-}
-
-.login-submit,
-.logout-button {
-  margin-top: 2px;
-  border: 0;
-  border-radius: 7px;
-  background: var(--green);
-  color: #07151f;
-  padding: 11px 14px;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.login-submit:hover,
-.logout-button:hover {
-  background: var(--green-dark);
-}
-
-.login-submit:disabled {
-  opacity: .65;
-  cursor: wait;
-}
-
-.login-error {
-  display: none;
-  margin: 0;
-  color: var(--red);
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-.login-error.visible {
-  display: block;
-}
-
-.access-panel {
-  display: none;
-  margin-top: 20px;
-}
-
-.access-panel.visible {
-  display: block;
-}
-
-.access-panel h2 {
-  margin: 0 0 8px;
-  color: var(--green);
-  font-size: 16px;
-  letter-spacing: .8px;
-}
-
-.access-panel p {
-  color: #b8c9dc;
-  line-height: 1.55;
-}
-
-.access-link {
-  display: block;
-  margin-top: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--green);
-  border-radius: 7px;
-  background: rgba(32,214,107,.08);
-  color: var(--green);
-  font-size: 11px;
-  font-weight: 900;
-  text-decoration: none;
-}
-
-.access-link:hover,
-.access-link:focus-visible {
-  background: rgba(32,214,107,.16);
-  color: #fff;
-  outline: none;
-}
-
-.logout-button {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.login-note {
-  display: block;
-  margin-top: 16px;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-@media (max-width: 600px) {
-
-  body {
-    place-items: start center;
-    padding: 16px;
-  }
-
-  .login-card {
-    padding: 20px;
-  }
-
-  .login-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-}
-
+:root{--bg:#0b1428;--panel:#111b30;--text:#dbe7f5;--muted:#91a4bd;--line:#536780;--green:#20d66b}
+*{box-sizing:border-box}
+body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,sans-serif}
+.login-page{width:min(560px,100%)}
+.login-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.brand{color:var(--green);font-size:12px;font-weight:900;letter-spacing:1.7px;text-transform:uppercase}
+.back-link{padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text);font-size:10px;font-weight:800;text-decoration:none}
+.back-link:hover,.back-link:focus-visible{border-color:var(--green);color:#fff;outline:none}
+.login-card{padding:28px;border:1px solid #35506d;border-radius:12px;background:var(--panel);box-shadow:0 18px 60px rgba(0,0,0,.35)}
+.login-card h1{margin:0 0 12px;color:var(--green);font-size:22px;letter-spacing:1px}
+.login-card>p{margin:0;color:#b8c9dc;line-height:1.6}
+.access-panel{display:block;margin-top:20px}
+.access-panel h2{margin:0 0 8px;color:var(--green);font-size:16px;letter-spacing:.8px}
+.access-panel p{color:#b8c9dc;line-height:1.55}
+.access-link{display:block;margin-top:12px;padding:12px 14px;border:1px solid var(--green);border-radius:7px;background:rgba(32,214,107,.08);color:var(--green);font-size:11px;font-weight:900;text-decoration:none;text-align:center}
+.access-link:hover,.access-link:focus-visible{background:rgba(32,214,107,.16);color:#fff;outline:none}
+.temporary-note{display:block;margin-top:16px;padding:10px 12px;border-left:3px solid var(--green);background:rgba(32,214,107,.06);color:var(--muted);font-size:10px;line-height:1.5}
+@media(max-width:600px){body{place-items:start center;padding:16px}.login-card{padding:20px}.login-header{align-items:flex-start;flex-direction:column}}
 </style>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 </head>
-
-
 <body>
-
 <main class="login-page">
-
-  <header class="login-header">
-
-    <div class="brand">
-      PALAVRA &amp; SÉRIE · ACESSO
-    </div>
-
-    <a
-      class="back-link"
-      href="index.html"
-    >
-      ← VOLTAR À PESQUISA
-    </a>
-
-  </header>
-
-
-  <section
-    class="login-card"
-    aria-labelledby="login-title"
-  >
-
-    <h1 id="login-title">
-      ENTRAR
-    </h1>
-
-    <p>
-      Aceda à Sala do Escritor e às ferramentas
-      internas de criação da plataforma.
-    </p>
-
-
-    <form
-      class="login-form"
-      id="login-form"
-    >
-
-      <label for="login-identity">
-
-        UTILIZADOR / E-MAIL
-
-        <input
-          id="login-identity"
-          name="identity"
-          type="text"
-          autocomplete="username"
-          required
-        >
-
-      </label>
-
-
-      <label for="login-password">
-
-        SENHA
-
-        <input
-          id="login-password"
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          required
-        >
-
-      </label>
-
-
-      <p
-        class="login-error"
-        id="login-error"
-        role="alert"
-      >
-        Preencha os dois campos para avançar.
-      </p>
-
-
-      <button
-        class="login-submit"
-        id="login-submit"
-        type="submit"
-      >
-        [ &nbsp; ENTRAR &nbsp; ]
-      </button>
-
-    </form>
-
-
-    <div
-      class="access-panel"
-      id="access-panel"
-      aria-live="polite"
-    >
-
-      <h2>
-        SESSÃO AUTENTICADA
-      </h2>
-
-      <p>
-        O acesso foi confirmado.
-        Entre na Sala do Escritor para continuar.
-      </p>
-
-
-      <a
-        class="access-link"
-        href="sala-do-escritor.html"
-      >
-        ENTRAR NA SALA DO ESCRITOR →
-      </a>
-
-
-      <button
-        class="logout-button"
-        id="logout-button"
-        type="button"
-      >
-        SAIR
-      </button>
-
-    </div>
-
-
-    <small
-      class="login-note"
-      id="login-note"
-    >
-      Nenhuma credencial é armazenada nesta página.
-      A autenticação é processada pelo Supabase
-      configurado no projecto.
-    </small>
-
-  </section>
-
+<header class="login-header">
+<div class="brand">PALAVRA &amp; SÉRIE · ACESSO</div>
+<a class="back-link" href="index.html">← VOLTAR À PESQUISA</a>
+</header>
+<section class="login-card" aria-labelledby="login-title">
+<h1 id="login-title">ENTRAR</h1>
+<p>Aceda à Sala do Escritor e às ferramentas internas de criação da plataforma.</p>
+<div class="access-panel" id="access-panel" aria-live="polite">
+<h2>ACESSO TEMPORÁRIO</h2>
+<p>O login está temporariamente desativado para permitir os testes da Sala do Escritor.</p>
+<a class="access-link" href="sala-do-escritor.html">ENTRAR NA SALA DO ESCRITOR →</a>
+</div>
+<small class="temporary-note">MODO DE TESTE: a autenticação está temporariamente desativada nesta página. Ela poderá ser reativada depois que o funcionamento da Sala do Escritor estiver confirmado.</small>
+</section>
 </main>
-
-
-<script>
-
-/* =====================================================
-   SUPABASE
-===================================================== */
-
-const SUPABASE_URL =
-  "https://qmhdbuxomozdczgvpvcc.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
-
-const supabaseClient =
-  window.supabase?.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-
-/* =====================================================
-   ELEMENTOS
-===================================================== */
-
-const form =
-  document.getElementById("login-form");
-
-const identity =
-  document.getElementById("login-identity");
-
-const password =
-  document.getElementById("login-password");
-
-const error =
-  document.getElementById("login-error");
-
-const accessPanel =
-  document.getElementById("access-panel");
-
-const note =
-  document.getElementById("login-note");
-
-const submitButton =
-  document.getElementById("login-submit");
-
-const logoutButton =
-  document.getElementById("logout-button");
-
-
-/* =====================================================
-   MOSTRAR ÁREA AUTENTICADA
-===================================================== */
-
-function mostrarSessao() {
-
-  form.hidden = true;
-
-  accessPanel.classList.add("visible");
-
-  note.textContent =
-    "Sessão autenticada. Acesso privado activo.";
-}
-
-
-/* =====================================================
-   LOGIN
-===================================================== */
-
-form.addEventListener(
-  "submit",
-  async function(event) {
-
-    event.preventDefault();
-
-    error.classList.remove("visible");
-
-    if (
-      !identity.value.trim() ||
-      !password.value
-    ) {
-
-      error.textContent =
-        "Preencha os dois campos para avançar.";
-
-      error.classList.add("visible");
-
-      return;
-    }
-
-
-    try {
-
-      if (!supabaseClient) {
-
-        throw new Error(
-          "A autenticação Supabase ainda não foi configurada."
-        );
-
-      }
-
-
-      submitButton.disabled = true;
-
-      submitButton.textContent =
-        "[ ENTRANDO... ]";
-
-
-      const {
-        data,
-        error: authError
-      } =
-        await supabaseClient.auth.signInWithPassword({
-
-          email: identity.value.trim(),
-
-          password: password.value
-
-        });
-
-
-      if (
-        authError ||
-        !data?.session?.access_token
-      ) {
-
-        throw new Error(
-          authError?.message ||
-          "Não foi possível autenticar."
-        );
-
-      }
-
-
-      mostrarSessao();
-
-
-    } catch (authError) {
-
-      error.textContent =
-        authError?.message ||
-        "Não foi possível autenticar.";
-
-      error.classList.add("visible");
-
-      submitButton.disabled = false;
-
-      submitButton.textContent =
-        "[   ENTRAR   ]";
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   VERIFICAR SESSÃO JÁ EXISTENTE
-===================================================== */
-
-async function verificarSessao() {
-
-  if (!supabaseClient) {
-    return;
-  }
-
-
-  try {
-
-    const {
-      data,
-      error: sessionError
-    } =
-      await supabaseClient.auth.getSession();
-
-
-    if (
-      sessionError ||
-      !data?.session
-    ) {
-
-      return;
-
-    }
-
-
-    /*
-      Se o autor já estiver autenticado,
-      não precisa fazer login novamente.
-    */
-
-    mostrarSessao();
-
-
-  } catch (sessionError) {
-
-    console.error(
-      "Erro ao verificar sessão:",
-      sessionError
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   SAIR
-===================================================== */
-
-logoutButton.addEventListener(
-  "click",
-  async function() {
-
-    await supabaseClient?.auth.signOut();
-
-    form.hidden = false;
-
-    form.reset();
-
-    accessPanel.classList.remove("visible");
-
-    note.textContent =
-      "Nenhuma credencial é armazenada nesta página. " +
-      "A autenticação é processada pelo Supabase " +
-      "configurado no projecto.";
-
-    submitButton.disabled = false;
-
-    submitButton.textContent =
-      "[   ENTRAR   ]";
-
-    identity.focus();
-
-  }
-);
-
-
-/* =====================================================
-   INICIALIZAÇÃO
-===================================================== */
-
-verificarSessao();
-
-</script>
-
 </body>
-
 </html>
+entrada-temporario.html
+HTML
