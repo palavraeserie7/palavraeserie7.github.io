@@ -1,1 +1,117 @@
 
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar — Palavra &amp; Série</title>
+  <style>
+    :root {
+      --bg: #0b1428;
+      --panel: #111b30;
+      --panel-2: #17243a;
+      --text: #dbe7f5;
+      --muted: #91a4bd;
+      --line: #536780;
+      --green: #20d66b;
+      --green-dark: #19b85a;
+      --red: #ff9f9f;
+    }
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; background: var(--bg); color: var(--text); font-family: "Segoe UI", Tahoma, sans-serif; }
+    .login-page { width: min(560px, 100%); }
+    .login-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+    .brand { color: var(--green); font-size: 12px; font-weight: 900; letter-spacing: 1.7px; text-transform: uppercase; }
+    .back-link { padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--text); font-size: 10px; font-weight: 800; text-decoration: none; }
+    .back-link:hover, .back-link:focus-visible { border-color: var(--green); color: #fff; outline: none; }
+    .login-card { padding: 28px; border: 1px solid #35506d; border-radius: 12px; background: var(--panel); box-shadow: 0 18px 60px rgba(0,0,0,.35); }
+    .login-card h1 { margin: 0 0 12px; color: var(--green); font-size: 22px; letter-spacing: 1px; }
+    .login-card > p { margin: 0; color: #b8c9dc; line-height: 1.6; }
+    .demo-label { display: inline-block; margin-top: 14px; padding: 4px 8px; border: 1px solid #806f53; border-radius: 4px; color: #ffd166; font-size: 9px; font-weight: 900; letter-spacing: .8px; }
+    .login-form { display: grid; gap: 12px; margin-top: 20px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: rgba(5,10,20,.22); }
+    .login-form label { display: grid; gap: 6px; color: #b8c9dc; font-size: 11px; font-weight: 800; letter-spacing: .4px; }
+    .login-form input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 6px; background: #0d172b; color: var(--text); font: inherit; }
+    .login-form input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 2px rgba(32,214,107,.16); }
+    .login-submit, .logout-button { margin-top: 2px; border: 0; border-radius: 7px; background: var(--green); color: #07151f; padding: 11px 14px; font-weight: 900; cursor: pointer; }
+    .login-submit:hover, .logout-button:hover { background: var(--green-dark); }
+    .login-error { display: none; margin: 0; color: var(--red); font-size: 11px; line-height: 1.4; }
+    .login-error.visible { display: block; }
+    .access-panel { display: none; margin-top: 20px; }
+    .access-panel.visible { display: block; }
+    .access-panel h2 { margin: 0 0 8px; color: var(--green); font-size: 16px; letter-spacing: .8px; }
+    .access-panel p { color: #b8c9dc; line-height: 1.55; }
+    .access-link { display: block; margin-top: 12px; padding: 12px 14px; border: 1px solid var(--green); border-radius: 7px; background: rgba(32,214,107,.08); color: var(--green); font-size: 11px; font-weight: 900; text-decoration: none; }
+    .access-link:hover, .access-link:focus-visible { background: rgba(32,214,107,.16); color: #fff; outline: none; }
+    .login-note { display: block; margin-top: 16px; color: var(--muted); line-height: 1.45; }
+    @media (max-width: 600px) { body { place-items: start center; padding: 16px; } .login-card { padding: 20px; } .login-header { align-items: flex-start; flex-direction: column; } }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <main class="login-page">
+    <header class="login-header">
+      <div class="brand">PALAVRA &amp; SÉRIE · ACESSO</div>
+      <a class="back-link" href="matriz-pro.html">← VOLTAR À MATRIZ PRO</a>
+    </header>
+    <section class="login-card" aria-labelledby="login-title">
+      <h1 id="login-title">ENTRAR</h1>
+      <p>Aceda às ferramentas internas de produção e operação da plataforma.</p>
+      <span class="demo-label">ARQUITETURA VISUAL — MODO DEMONSTRAÇÃO</span>
+      <form class="login-form" id="login-form">
+        <label for="login-identity">UTILIZADOR / E-MAIL<input id="login-identity" name="identity" type="text" autocomplete="username" required></label>
+        <label for="login-password">SENHA<input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
+        <p class="login-error" id="login-error" role="alert">Preencha os dois campos para avançar.</p>
+        <button class="login-submit" type="submit">[&nbsp; ENTRAR &nbsp;]</button>
+      </form>
+      <div class="access-panel" id="access-panel" aria-live="polite">
+        <h2>SESSÃO AUTENTICADA</h2>
+        <p>O acesso foi confirmado. Continue pela Matriz PRO para utilizar as ferramentas internas disponíveis.</p>
+        <a class="access-link" href="matriz-pro.html">ABRIR MATRIZ PRO</a>
+        <button class="logout-button" id="logout-button" type="button">SAIR</button>
+      </div>
+      <small class="login-note" id="login-note">Nenhuma credencial é armazenada nesta página. A autenticação é processada pelo Supabase configurado no projecto.</small>
+    </section>
+  </main>
+  <script>
+    const SUPABASE_URL = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8';
+    const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const form = document.getElementById('login-form');
+    const identity = document.getElementById('login-identity');
+    const password = document.getElementById('login-password');
+    const error = document.getElementById('login-error');
+    const accessPanel = document.getElementById('access-panel');
+    const note = document.getElementById('login-note');
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      error.classList.remove('visible');
+      if (!identity.value.trim() || !password.value) {
+        error.textContent = 'Preencha os dois campos para avançar.';
+        error.classList.add('visible');
+        return;
+      }
+      try {
+        if (!supabaseClient) throw new Error('A autenticação Supabase ainda não foi configurada.');
+        const { data, error: authError } = await supabaseClient.auth.signInWithPassword({ email: identity.value.trim(), password: password.value });
+        if (authError || !data?.session?.access_token) throw new Error(authError?.message || 'Não foi possível autenticar.');
+        form.hidden = true;
+        accessPanel.classList.add('visible');
+        note.textContent = 'Sessão autenticada. Acesso privado activo.';
+      } catch (authError) {
+        error.textContent = authError?.message || 'Não foi possível autenticar.';
+        error.classList.add('visible');
+      }
+    });
+
+    document.getElementById('logout-button').addEventListener('click', async () => {
+      await supabaseClient?.auth.signOut();
+      form.hidden = false;
+      form.reset();
+      accessPanel.classList.remove('visible');
+      note.textContent = 'Nenhuma credencial é armazenada nesta página. A autenticação é processada pelo Supabase configurado no projecto.';
+      identity.focus();
+    });
+  </script>
+</body>
+</html>
