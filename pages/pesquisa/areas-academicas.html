@@ -468,6 +468,135 @@
    * O arquivo novo já usa o atributo data-path nos botões.
    */
 </script>
+<style id="correcao-chat-lateral">
+  #academic-chat.academic-chat-panel {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    z-index: 9999 !important;
+    display: none !important;
+    width: min(440px, 94vw) !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-left: 1px solid #35506d !important;
+    border-radius: 0 !important;
+    background: #111b30 !important;
+    box-shadow: -12px 0 35px rgba(0,0,0,.42) !important;
+  }
+
+  #academic-chat.academic-chat-panel.chat-lateral-aberto {
+    display: block !important;
+  }
+
+  #academic-chat .academic-chat-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    background: #111b30 !important;
+  }
+
+  #academic-chat .academic-chat-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 18px !important;
+    border-bottom: 1px solid #263754 !important;
+    background: #17243a !important;
+  }
+
+  #academic-chat .academic-chat-header h2 {
+    margin: 0 0 7px !important;
+    color: #20d66b !important;
+  }
+
+  #academic-chat .academic-chat-header p {
+    margin: 0 !important;
+    color: #91a4bd !important;
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+  }
+
+  #academic-chat .academic-chat-context {
+    margin: 0 !important;
+    padding: 11px 18px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #263754 !important;
+    background: #0d172b !important;
+    color: #50ed91 !important;
+    font-size: 10px !important;
+  }
+
+  #academic-chat .academic-chat-messages {
+    flex: 1 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    border: 0 !important;
+  }
+
+  #academic-chat .academic-chat-form {
+    margin: 0 !important;
+    padding: 14px 16px !important;
+    border-top: 1px solid #263754 !important;
+    background: #0d172b !important;
+  }
+
+  #academic-chat .academic-chat-status {
+    margin: 0 !important;
+    padding: 0 16px 12px !important;
+    background: #0d172b !important;
+  }
+</style>
+
+<script id="correcao-chat-lateral-script">
+(function () {
+  const chat = document.getElementById('academic-chat');
+  const tree = document.getElementById('academic-tree');
+  const context = document.getElementById('academic-chat-context');
+  const question = document.getElementById('academic-chat-question');
+  const close = document.getElementById('academic-chat-close');
+
+  if (!chat || !tree || !context) return;
+
+  function abrirChat(path) {
+    const caminho = Array.isArray(path) ? path : [];
+    const tema = caminho[caminho.length - 1] || 'Tema acadêmico';
+    context.textContent = 'Tema selecionado: ' + caminho.join(' › ');
+    chat.classList.add('chat-lateral-aberto');
+    if (question) question.focus();
+  }
+
+  tree.addEventListener('click', function (event) {
+    const botao = event.target.closest('.topic');
+    if (!botao) return;
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      abrirChat(JSON.parse(botao.dataset.path || '[]'));
+    } catch (erro) {
+      abrirChat([]);
+    }
+  }, true);
+
+  close?.addEventListener('click', function () {
+    chat.classList.remove('chat-lateral-aberto');
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') chat.classList.remove('chat-lateral-aberto');
+  });
+})();
+</script>
+<!-- FIM DA CORREÇÃO -->
 
 
 </body>
