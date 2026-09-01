@@ -324,7 +324,168 @@
   </form>
 
   <div id="academic-chat-status" class="academic-chat-status" aria-live="polite"></div>
-</section>
+</section><script>
+  const ACADEMIC_CHAT_PROXY =
+    'https://yellow-lab-f4b2.palavraeserie.workers.dev';
+
+  let academicChatTopic = '';
+  let academicChatPath = [];
+
+  const academicChatForm =
+    document.getElementById('academic-chat-form' );
+
+  const academicChatQuestion =
+    document.getElementById('academic-chat-question');
+
+  const academicChatSubmit =
+    document.getElementById('academic-chat-submit');
+
+  const academicChatMessages =
+    document.getElementById('academic-chat-messages');
+
+  const academicChatStatus =
+    document.getElementById('academic-chat-status');
+
+  const academicChatContext =
+    document.getElementById('academic-chat-context');
+
+  function academicChatEscape(value) {
+    const div = document.createElement('div');
+    div.textContent = String(value ?? '');
+    return div.innerHTML;
+  }
+
+  function academicChatAddMessage(role, text) {
+    const message = document.createElement('div');
+    message.className = 'academic-chat-message ' + role;
+    message.innerHTML = academicChatEscape(text).replace(/\n/g, '  
+');
+    academicChatMessages.appendChild(message);
+    academicChatMessages.scrollTop = academicChatMessages.scrollHeight;
+  }
+
+  function academicChatSetTopic(path) {
+    academicChatPath = Array.isArray(path) ? path : [];
+    academicChatTopic = academicChatPath[academicChatPath.length - 1] || '';
+
+    academicChatContext.textContent = academicChatTopic
+      ? 'Tema selecionado: ' + academicChatPath.join(' › ')
+      : 'Selecione um tema na árvore para iniciar.';
+
+    academicChatAddMessage(
+      'system',
+      academicChatTopic
+        ? 'Tema selecionado. Agora escreva sua pergunta.'
+        : 'Selecione um tema acadêmico e escreva sua pergunta.'
+    );
+
+    academicChatQuestion.focus();
+  }
+
+  academicChatForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const question = academicChatQuestion.value.trim();
+
+    if (!academicChatTopic) {
+      academicChatStatus.textContent =
+        'Selecione primeiro um tema acadêmico.';
+      academicChatStatus.className =
+        'academic-chat-status error';
+      return;
+    }
+
+    if (!question) return;
+
+    academicChatAddMessage('user', question);
+    academicChatQuestion.value = '';
+    academicChatSubmit.disabled = true;
+    academicChatStatus.textContent = 'Pesquisando...';
+    academicChatStatus.className = 'academic-chat-status';
+
+    const routedQuestion =
+      'MODO DE CONSULTA ACADÊMICA INDEPENDENTE. ' +
+      'Não abrir nem mencionar a Matriz Técnica PRO. ' +
+      'Responda com clareza, indique limites e diferencie fatos, ' +
+      'inferências, interpretações e hipóteses.\\n\\n' +
+      'Caminho acadêmico: ' + academicChatPath.join(' > ') + '\\n' +
+      'Tema: ' + academicChatTopic + '\\n' +
+      'Pergunta: ' + question;
+
+    try {
+      const response = await fetch(
+        ACADEMIC_CHAT_PROXY.replace(/\\/$/, '') + '/api/pesquisa',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mode: 'free',
+            accessLevel: 'free',
+            question: routedQuestion,
+            topic: academicChatTopic,
+            discipline: academicChatPath.slice(-2, -1)[0] || '',
+            academicPath: academicChatPath,
+            module: 'CONSULTA ACADÊMICA INDEPENDENTE'
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || 'Não foi possível concluir a pesquisa.'
+        );
+      }
+
+      academicChatAddMessage(
+        'assistant',
+        data.text || 'O serviço não devolveu uma resposta.'
+      );
+
+      academicChatStatus.textContent = 'Resposta recebida.';
+      academicChatStatus.className =
+        'academic-chat-status success';
+    } catch (error) {
+      academicChatAddMessage(
+        'system',
+        'Erro na pesquisa: ' + error.message
+      );
+
+      academicChatStatus.textContent =
+        'Não foi possível realizar a consulta.';
+      academicChatStatus.className =
+        'academic-chat-status error';
+    } finally {
+      academicChatSubmit.disabled = false;
+      academicChatQuestion.focus();
+    }
+  });
+
+  /*
+   * Conecta o chat ao clique dos temas da árvore.
+   * O arquivo novo já usa o atributo data-path nos botões.
+   */
+  document
+    .getElementById('academic-tree')
+    .addEventListener('click', function (event) {
+      const topicButton = event.target.closest('.topic');
+      if (!topicButton) return;
+
+      try {
+        const path = JSON.parse(topicButton.dataset.path || '[]');
+        academicChatSetTopic(path);
+      } catch {
+        academicChatStatus.textContent =
+          'Não foi possível identificar o tema selecionado.';
+        academicChatStatus.className =
+          'academic-chat-status error';
+      }
+    });
+</script>
+
 
 </body>
 </html>
