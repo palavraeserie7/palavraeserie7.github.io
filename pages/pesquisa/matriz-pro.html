@@ -4,13 +4,12 @@
 
 
 
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palavra & Série — Matriz Canônica</title>
+    <title>Palavra & Série — Matriz Técnica de Pesquisa PRO</title>
     <style>
         :root { --p: #20d66b; --bg: #0b1428; --s: #111b30; --c: #17243a; --i: #0d172b; --t: #dbe7f5; --b: #263754; --a: #18bfff; }
         * { box-sizing: border-box; }
@@ -803,12 +802,22 @@
 </style><style id="WRITER_FINAL_BUTTON_FIX">.writing-workspace-compact{display:flex!important;align-items:flex-start;justify-content:center;width:100%;max-width:none!important;padding:32px 24px}.writing-workspace-compact .writing-control-panel{width:min(760px,100%);min-height:calc(100vh - 145px)}.writing-academic-open-button{display:block!important;align-self:flex-start!important;margin:14px 0 2px!important;padding:8px 12px!important;min-height:34px!important;border:1px solid #20d66b!important;border-radius:5px!important;background:transparent!important;color:#50ed91!important;font-size:10px!important;font-weight:900!important;cursor:pointer!important}.writing-academic-open-button:hover{background:rgba(32,214,107,.14)!important}.academic-structuring-overlay{z-index:100!important}.academic-structuring-window{width:min(1080px,94vw)!important;height:min(86vh,780px)!important}</style><style id="oracle-news-enhancement">
 .oracle-news-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;padding:12px;border:1px solid #d8cdb8;border-radius:7px;background:#fffaf0;color:#6d5d45}.oracle-news-toolbar label{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:900}.oracle-news-toolbar select{padding:7px 9px;border:1px solid #cdbfaa;border-radius:5px;background:#fffdf7;color:#4a443b;font:inherit;font-size:11px}.oracle-trust-note{margin:0 0 12px;padding:10px 12px;border-left:3px solid #b99b61;background:#f1eadb;color:#6d5d45;font-size:11px;line-height:1.5}.oracle-sources{margin-top:12px;padding-top:12px;border-top:1px solid #e5dccd}.oracle-sources h4{margin:0 0 8px;color:#806f53;font-size:10px;letter-spacing:.8px}.oracle-source-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:7px}.oracle-source-card{display:block;padding:9px;border:1px solid #d8cdb8;border-radius:5px;background:#fffdf7;color:#4a443b;text-decoration:none;font-size:10px;line-height:1.35}.oracle-source-card:hover{border-color:#806f53;background:#f1eadb}.oracle-source-card strong{display:block;color:#806f53}.oracle-result-meta{margin-top:10px;padding:8px 10px;border-radius:5px;background:#f1eadb;color:#806f53;font-size:10px;line-height:1.45}.oracle-result-source{display:block;margin-top:7px;padding:8px 10px;border-left:2px solid #b99b61;background:#fffaf0;color:#5f5548;font-size:10px;line-height:1.4}.oracle-result-source a{color:#806f53;font-weight:800}.oracle-disclaimer{margin-top:10px;color:#806f53;font-size:10px;line-height:1.45}
 </style>
+
+    <style id="matriz-pro-standalone-style">
+      body.matriz-pro-standalone > .sidebar,
+      body.matriz-pro-standalone > .main { display: none !important; }
+      body.matriz-pro-standalone { display: block; overflow: hidden; background: #0b1428; }
+      body.matriz-pro-standalone #pro-matrix-overlay { display: block !important; position: fixed; inset: 0; z-index: 1000; overflow: auto; }
+      body.matriz-pro-standalone #pro-matrix-overlay .pro-matrix-window { min-height: 100vh; }
+      body.matriz-pro-standalone #pro-matrix-overlay .pro-matrix-close { display: none; }
+      body.matriz-pro-standalone #pro-matrix-overlay .pro-matrix-body { min-height: calc(100vh - 82px); }
+    </style>
 </head>
 
 <body>
     <div class="sidebar">
                 <div class="sidebar-header"><h2>PALAVRA & SÉRIE</h2><p>MATRIZ CANÔNICA V15.0</p><a class="oracle-launch" href="oraculo.html" aria-label="Abrir o Oráculo">◈ ORÁCULO — CONSULTA</a>
-<a class="pro-matrix-launch" href="matriz-pro.html" aria-label="Abrir a Matriz Técnica de Pesquisa PRO">▤ MENU 2 — MATRIZ TÉCNICA DE PESQUISA PRO</a><button class="shelf-launch" onclick="openShelf()">▤ MINHA ESTANTE — FREE / PRO</button><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button><button
+<button class="pro-matrix-launch" onclick="openProMatrix()" aria-label="Abrir a Matriz Técnica de Pesquisa PRO">▤ MENU 2 — MATRIZ TÉCNICA DE PESQUISA PRO</button><button class="shelf-launch" onclick="openShelf()">▤ MINHA ESTANTE — FREE / PRO</button><button class="bible-launch" onclick="openBibleReader()">▣ BÍBLIA — LEITURA</button><button
   class="biblio-launch"
   type="button"
   onclick="window.location.href='areas-academicas.html'"
@@ -969,6 +978,18 @@
         <div class="sidebar-menus">
 
 
+                        <section class="pro-mode" id="pro-mode" style="display:none">
+
+                <div class="pro-area">
+                <div class="pro-menu-box" data-access="pro">
+                    <div class="pro-menu-heading">
+                        <strong>MENU 2</strong>
+                        <span>MATRIZ TÉCNICA DE PESQUISA PRO</span>
+                    </div>
+                    <ul class="pro-list" id="pro-list"></ul>
+                </div>
+                </div>
+            </section>
         </div>
     </div>
     <div class="main" id="mn"></div>
@@ -1055,6 +1076,15 @@
         </div>
     </div>
 
+    <div class="pro-matrix-overlay" id="pro-matrix-overlay" role="dialog" aria-modal="true" aria-labelledby="pro-matrix-title">
+        <div class="pro-matrix-window">
+            <div class="pro-matrix-header">
+                <div><h2 id="pro-matrix-title">MATRIZ TÉCNICA DE PESQUISA PRO</h2><p>Módulos e procedimentos de investigação da Matriz Canónica.</p></div>
+                <button class="pro-matrix-close" onclick="closeProMatrix()">← FECHAR</button>
+            </div>
+            <div class="pro-matrix-body" id="pro-matrix-body"></div>
+        </div>
+    </div>
 
     <div class="book-presentation-overlay" id="book-presentation-overlay" role="dialog" aria-modal="true" aria-labelledby="book-presentation-title">
         <div class="book-presentation-window" id="book-presentation-window"></div>
@@ -1275,7 +1305,7 @@
 
     const PRO_MODULES = Object.keys(PRO_MODULE_DATA);
     const TEXT_BIBLICO_SUBMODULES = PRO_MODULE_DATA['01 — TEXTO BÍBLICO'].items;
-    
+
     let lastDisciplineKey = '1 FUNDAÇÃO BÍBLICA';
     let lastDisciplineElement = null;
 
@@ -2959,7 +2989,7 @@
         button.setAttribute('aria-expanded', String(isOpen));
     }
 
-   
+
 
     const SERMON_BUILDER_KEY = 'palavraSerieSermonBuilderV2';
     const SERMON_TYPES = ['TEXTUAL', 'TEMÁTICO', 'EXPOSITIVO', 'NARRATIVO', 'BIOGRÁFICO', 'APOLOGÉTICO'];
@@ -4195,7 +4225,7 @@
                     <div class="pro-chat-message system">${studyContext ? 'Estudo actual disponível para esta análise.' : (m01Mode ? 'Seleccione Livro, Capítulo e Versículo para iniciar a análise.' : 'Nenhum estudo foi iniciado. Crie uma passagem para começar.')}</div>
                     ${m01Mode && m01State.results[topic] ? `<div class="pro-chat-message system m01-result" id="m01-result">${escapeBibleText(m01State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 </div>
-                                
+
                 ${m02Mode && m02State.results[topic] ? `<div class="pro-chat-message system m02-result" id="m02-result">${escapeBibleText(m02State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m03Mode && m03State.results[topic] ? `<div class="pro-chat-message system m03-result" id="m03-result">${escapeBibleText(m03State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
                 ${m04Mode && m04State.results[topic] ? `<div class="pro-chat-message system m04-result" id="m04-result">${escapeBibleText(m04State.results[topic]).replace(/\\n/g, '<br>')}</div>` : ''}
@@ -8598,7 +8628,7 @@
             const temporary = /sobrecarregado|alta procura|temporar|high demand|overloaded|unavailable|quota|rate limit|exceeded your current quota/i.test(message);
             if (commentary) {
                 commentary.classList.remove('loading');
-       
+
                 commentary.style.display = 'block';
                 commentary.textContent = temporary
                     ? 'O serviço está temporariamente indisponível. O tema continua disponível nesta folha. Aguarde alguns instantes e utilize a Mesa de Análise para tentar novamente.'
@@ -8648,7 +8678,7 @@
             } else if (state.activeMenu === 'sermons') {
                 openSermonsScreen();
             } else if (state.activeMenu === 'oracle') {
-             window.location.href = 'oraculo.html'; 
+             window.location.href = 'oraculo.html';
             }
                         if (state.proOpen) {
                 openProMatrix();
@@ -9257,7 +9287,17 @@ function getItems(d){const a=[];function walk(ns,p){(ns||[]).forEach(n=>{const q
 let selected=0;
 window.openAcademicStructuringPanel=function(){let o=document.getElementById('academic-structuring-overlay');if(!o){o=document.createElement('div');o.id='academic-structuring-overlay';o.className='academic-structuring-overlay';o.innerHTML='<div class="academic-structuring-window" role="dialog" aria-modal="true"><header class="academic-structuring-head"><h2>📚 ESTRUTURAÇÃO ACADÊMICA</h2><button type="button" class="academic-structuring-close" id="academic-structuring-close">FECHAR</button></header><div class="academic-structuring-body"><aside class="academic-structuring-list"><strong>MAPA ACADÊMICO · 7 ÁREAS · 44 DISCIPLINAS</strong><div id="academic-structuring-disciplines"></div></aside><main class="academic-structuring-info" id="academic-structuring-info"></main></div></div>';document.body.appendChild(o);o.querySelector('#academic-structuring-close').onclick=window.closeAcademicStructuringPanel;o.onclick=e=>{if(e.target===o)window.closeAcademicStructuringPanel()};}o.classList.add('open');render()};window.closeAcademicStructuringPanel=function(){document.getElementById('academic-structuring-overlay')?.classList.remove('open')};function render(){const o=document.getElementById('academic-structuring-overlay'),ds=getData();if(!o||!ds.length)return;const d=ds[selected]||ds[0],list=o.querySelector('#academic-structuring-disciplines'),main=o.querySelector('#academic-structuring-info');list.innerHTML='';let area='';ds.forEach((x,i)=>{if(x.area!==area){const h=document.createElement('strong');h.textContent=x.area;list.appendChild(h);area=x.area}const b=document.createElement('button');b.type='button';b.textContent=x.title;b.className=i===selected?'active':'';b.onclick=()=>{selected=i;render()};list.appendChild(b)});const it=getItems(d),store=JSON.parse(localStorage.getItem('palavraSerieAcademicStructuring')||'{}'),done=it.filter(x=>store.done?.[x.path]).length;main.innerHTML='<h3>'+escapeBibleText(d.title)+'</h3><p>Área: '+escapeBibleText(d.area)+' · Painel privado de construção progressiva. A taxonomia oficial permanece preservada.</p><div class="academic-structuring-cards"><div class="academic-structuring-card"><b>'+it.length+'</b><span>CONTEÚDOS CADASTRADOS</span></div><div class="academic-structuring-card"><b>'+done+'</b><span>ESTRUTURADOS</span></div><div class="academic-structuring-card"><b>'+(it.length-done)+'</b><span>PENDENTES</span></div></div><h4>SUBTEMAS</h4><div class="academic-structuring-items">'+it.map(x=>'<div class="academic-structuring-item">'+escapeBibleText(x.title)+'<small>Nível: '+escapeBibleText(String(window.resolveAcademicLevel?.(x.path.split(' > '))||'SEM NÍVEL'))+'</small></div>').join('')+'</div>'}}
 window.addEventListener('click',e=>{const b=e.target.closest('.writing-academic-open-button');if(b){e.preventDefault();window.openAcademicStructuringPanel()}});
-})();</script></body>
+})();</script>
+<script id="matriz-pro-standalone-boot">
+  document.addEventListener('DOMContentLoaded', function () {
+    document.body.classList.add('matriz-pro-standalone');
+    window.setTimeout(function () {
+      if (typeof renderAllInternalProMenus === 'function') renderAllInternalProMenus();
+      if (typeof openProMatrix === 'function') openProMatrix();
+    }, 0);
+  });
+</script>
+</body>
 <style id="dynamic-sermon-styles">
 .sermon-dynamic-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 auto 16px;max-width:1180px}.sermon-dynamic-toolbar button,.dynamic-action{min-height:34px;padding:0 12px;border:1px solid #b99b61;border-radius:5px;background:#fffdf7;color:#4a443b;font-size:10px;font-weight:900;cursor:pointer}.sermon-dynamic-toolbar button.active,.dynamic-action.primary{background:#806f53;color:#fffaf0}.dynamic-intro-conclusion{display:grid;gap:12px;margin-bottom:16px}.dynamic-free-field{display:grid;gap:6px;color:#6d5d45;font-size:10px;font-weight:900;letter-spacing:.65px}.dynamic-free-field textarea{width:100%;min-height:82px;padding:11px 12px;border:1px solid #cdbfaa;border-radius:5px;background:#fffaf0;color:#4a443b;font:inherit;font-size:12px;resize:vertical}.dynamic-tree{display:grid;gap:12px}.dynamic-point{padding:14px;border:1px solid #d8cdb8;border-left:4px solid #806f53;border-radius:7px;background:#fffaf0}.dynamic-point-head,.dynamic-sub-head,.dynamic-detail-row{display:flex;align-items:flex-start;gap:7px}.dynamic-point-head input,.dynamic-sub-head input,.dynamic-detail-row input{flex:1;min-width:0;padding:9px;border:1px solid #cdbfaa;border-radius:4px;background:#fffdf7;color:#4a443b;font:inherit;font-size:11px;font-weight:800}.dynamic-number{padding-top:9px;color:#806f53;font-weight:900}.dynamic-actions{display:flex;flex-wrap:wrap;gap:5px}.dynamic-actions button{min-height:28px;padding:0 8px;border:1px solid #cdbfaa;border-radius:4px;background:#f1eadb;color:#6d5d45;font-size:9px;font-weight:900;cursor:pointer}.dynamic-subpoints{display:grid;gap:8px;margin:13px 0 0 24px;padding-left:14px;border-left:2px solid #cdbfaa}.dynamic-subpoint{padding:10px;border:1px solid #e0d5c3;border-radius:5px;background:#fffdf7}.dynamic-details{display:grid;gap:6px;margin:8px 0 0 28px}.dynamic-detail-row{align-items:center}.dynamic-detail-row span{width:22px;color:#806f53;font-weight:900}.dynamic-addbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.dynamic-pulpit{max-width:900px;margin:auto;padding:28px 34px;background:#fffdf7;color:#4a443b;font-family:Georgia,serif;line-height:1.65}.dynamic-pulpit h2{text-align:center;margin-top:0}.dynamic-pulpit .pulpit-intro,.dynamic-pulpit .pulpit-conclusion{margin:18px 0}.dynamic-pulpit ol{padding-left:28px}.dynamic-pulpit ol ol{list-style-type:lower-alpha}.dynamic-insight-modal{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:20px;background:rgba(7,13,26,.72)}.dynamic-insight-modal[hidden]{display:none}.dynamic-insight-box{width:min(620px,100%);padding:20px;border:1px solid #b99b61;border-radius:9px;background:#fffdf7;color:#4a443b;box-shadow:0 12px 35px rgba(0,0,0,.3)}.dynamic-insight-box select,.dynamic-insight-box textarea{width:100%;margin:8px 0;padding:10px;border:1px solid #cdbfaa;border-radius:5px;background:#fffaf0;color:#4a443b;font:inherit}.dynamic-insight-box textarea{min-height:100px;resize:vertical}.dynamic-insight-box footer{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
 </style>
