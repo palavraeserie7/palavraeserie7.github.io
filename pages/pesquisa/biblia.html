@@ -295,6 +295,38 @@ Biblia · HTML
       font-size:11px;
     }
  
+    .search-suggestions{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:7px;
+      padding:10px 4px;
+      border-bottom:1px solid var(--line);
+    }
+ 
+    .suggestions-label{
+      color:var(--muted);
+      font-size:11px;
+      margin-right:2px;
+    }
+ 
+    .suggestion-chip{
+      padding:6px 12px;
+      border:1px solid var(--green);
+      border-radius:999px;
+      background:rgba(32,214,107,.12);
+      color:#0f5c33;
+      font-size:12px;
+      font-weight:900;
+      cursor:pointer;
+    }
+ 
+    .suggestion-chip:hover,
+    .suggestion-chip:focus-visible{
+      background:var(--green);
+      color:#082218;
+    }
+ 
     /* ---------- Version + reading controls ---------- */
  
     .versions-bar{
@@ -815,6 +847,7 @@ Biblia · HTML
  
     const bibleCache = new Map();
     const loadingPromises = new Map();
+    const vocabularyCache = new Map();
  
     let currentBookIndex = 0;
     let currentChapter = 1;
@@ -1183,6 +1216,103 @@ Biblia · HTML
       return { node: span, matched: true };
     }
  
+    // Builds (once per version) a normalized-word -> {display, count} map
+    // from every verse, so misspelled search terms can be compared against
+    // words that actually occur in the loaded text.
+    function getVocabulary(versionIndex, bible) {
+      if (vocabularyCache.has(versionIndex)) {
+        return vocabularyCache.get(versionIndex);
+      }
+ 
+      const vocab = new Map();
+      const wordPattern = /[\p{L}]+/gu;
+ 
+      bible.forEach(book => {
+        if (!book || !Array.isArray(book.chapters)) return;
+ 
+        book.chapters.forEach(verses => {
+          if (!Array.isArray(verses)) return;
+ 
+          verses.forEach(text => {
+            const raw = String(text);
+            const words = raw.match(wordPattern);
+            if (!words) return;
+ 
+            words.forEach(word => {
+              if (word.length < 3) return;
+ 
+              const key = normalizeText(word);
+              const existing = vocab.get(key);
+ 
+              if (existing) {
+                existing.count += 1;
+              } else {
+                vocab.set(key, { display: word.toLowerCase(), count: 1 });
+              }
+            });
+          });
+        });
+      });
+ 
+      vocabularyCache.set(versionIndex, vocab);
+      return vocab;
+    }
+ 
+    // Classic Levenshtein edit distance: counts the minimum single-letter
+    // insertions, deletions or substitutions needed to turn `a` into `b`.
+    // A swapped letter (l for u, z for s, etc.) costs exactly 1.
+    function editDistance(a, b) {
+      const rows = a.length + 1;
+      const cols = b.length + 1;
+      const dp = Array.from({ length: rows }, () => new Array(cols).fill(0));
+ 
+      for (let i = 0; i < rows; i++) dp[i][0] = i;
+      for (let j = 0; j < cols; j++) dp[0][j] = j;
+ 
+      for (let i = 1; i < rows; i++) {
+        for (let j = 1; j < cols; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1,
+            dp[i][j - 1] + 1,
+            dp[i - 1][j - 1] + cost
+          );
+        }
+      }
+ 
+      return dp[rows - 1][cols - 1];
+    }
+ 
+    function getSpellingSuggestions(term, vocab, limit = 5) {
+      const maxDistance = term.length <= 4 ? 1 : term.length <= 7 ? 2 : 3;
+      const candidates = [];
+ 
+      for (const [key, info] of vocab) {
+        if (key === term) continue;
+        if (Math.abs(key.length - term.length) > maxDistance) continue;
+ 
+        const dist = editDistance(term, key);
+        if (dist <= maxDistance && dist > 0) {
+          candidates.push({ key, display: info.display, count: info.count, dist });
+        }
+      }
+ 
+      candidates.sort((a, b) =>
+        a.dist - b.dist || b.count - a.count || a.display.localeCompare(b.display)
+      );
+ 
+      const seen = new Set();
+      const unique = [];
+      for (const candidate of candidates) {
+        if (seen.has(candidate.display)) continue;
+        seen.add(candidate.display);
+        unique.push(candidate);
+        if (unique.length >= limit) break;
+      }
+ 
+      return unique;
+    }
+ 
     async function runSearch() {
       const rawTerm = searchInput.value.trim();
  
@@ -1249,21 +1379,56 @@ Biblia · HTML
       // surface "cruzar" or "encruzilhada" unless nothing exact exists.
       let matches = collectMatches(true);
       let wholeWord = true;
+      let suggestions = [];
  
       if (!matches.length) {
-        matches = collectMatches(false);
-        wholeWord = false;
+        const vocab = getVocabulary(versionIndex, bible);
+        suggestions = getSpellingSuggestions(term, vocab);
+ 
+        // Only fall back to approximate substring matches when we don't have
+        // a confident spelling suggestion to offer instead — otherwise the
+        // two features compete for the same empty-result moment.
+        if (!suggestions.length) {
+          matches = collectMatches(false);
+          wholeWord = false;
+        }
       }
  
       searchResults.innerHTML = "";
  
-      if (!matches.length) {
+      if (!matches.length && !suggestions.length) {
         searchResults.innerHTML =
           `<p class="search-empty">Nenhum resultado para “${rawTerm}” em ${versionName}.</p>`;
         return;
       }
  
-      if (!wholeWord) {
+      if (suggestions.length) {
+        const box = document.createElement("div");
+        box.className = "search-suggestions";
+ 
+        const label = document.createElement("span");
+        label.className = "suggestions-label";
+        label.textContent = `“${rawTerm}” não foi encontrada. Você quis dizer:`;
+        box.appendChild(label);
+ 
+        suggestions.forEach(suggestion => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "suggestion-chip";
+          chip.textContent = suggestion.display;
+          chip.addEventListener("click", () => {
+            searchInput.value = suggestion.display;
+            runSearch();
+          });
+          box.appendChild(chip);
+        });
+ 
+        searchResults.appendChild(box);
+ 
+        if (!matches.length) return;
+      }
+ 
+      if (!wholeWord && matches.length) {
         const approxNote = document.createElement("p");
         approxNote.className = "search-empty";
         approxNote.textContent =
