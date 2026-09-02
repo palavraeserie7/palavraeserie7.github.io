@@ -1,5 +1,6 @@
 
 
+
 Biblia · HTML
 <!doctype html>
 <html lang="pt-BR">
@@ -1313,6 +1314,41 @@ Biblia · HTML
       return unique;
     }
  
+    // Splits a normalized multi-word query into individual tokens and tries
+    // to correct each one against the vocabulary. Returns the reconstructed
+    // phrase (in display form) only when every word could be resolved
+    // (either it already exists in the vocabulary, or a confident single
+    // spelling suggestion was found for it) — otherwise returns null, so we
+    // never show a "correction" that is itself only a partial guess.
+    function getPhraseSuggestion(term, vocab) {
+      const words = term.split(/\s+/).filter(Boolean);
+      if (words.length < 2) return null;
+ 
+      const resolved = [];
+ 
+      for (const word of words) {
+        if (word.length < 3) {
+          // Short connector words ("de", "a", "o"...) are kept as-is;
+          // they're too short to spell-check reliably.
+          resolved.push(word);
+          continue;
+        }
+ 
+        const exact = vocab.get(word);
+        if (exact) {
+          resolved.push(exact.display);
+          continue;
+        }
+ 
+        const [best] = getSpellingSuggestions(word, vocab, 1);
+        if (!best) return null;
+        resolved.push(best.display);
+      }
+ 
+      const phrase = resolved.join(" ");
+      return phrase === term ? null : phrase;
+    }
+ 
     async function runSearch() {
       const rawTerm = searchInput.value.trim();
  
@@ -1338,7 +1374,7 @@ Biblia · HTML
         return;
       }
  
-      function collectMatches(wholeWord) {
+      function collectMatches(wholeWord, searchTerm) {
         const found = [];
  
         outer:
@@ -1355,8 +1391,8 @@ Biblia · HTML
               const normalized = normalizeText(text);
  
               const hit = wholeWord
-                ? findWholeWordIndex(normalized, term) !== -1
-                : normalized.includes(term);
+                ? findWholeWordIndex(normalized, searchTerm) !== -1
+                : normalized.includes(searchTerm);
  
               if (hit) {
                 found.push({
@@ -1374,31 +1410,90 @@ Biblia · HTML
         return found;
       }
  
-      // First pass: only exact whole-word hits. Only if that comes up empty
-      // do we fall back to approximate (substring) matches, so "cruz" won't
-      // surface "cruzar" or "encruzilhada" unless nothing exact exists.
-      let matches = collectMatches(true);
+      // First pass: only exact whole-word/phrase hits. Only if that comes up
+      // empty do we fall back to approximate (substring) matches, so "cruz"
+      // won't surface "cruzar" or "encruzilhada" unless nothing exact exists.
+      let matches = collectMatches(true, term);
       let wholeWord = true;
       let suggestions = [];
+      let phraseSuggestion = null;
+      let searchedTerm = term;
  
       if (!matches.length) {
         const vocab = getVocabulary(versionIndex, bible);
-        suggestions = getSpellingSuggestions(term, vocab);
+ 
+        if (term.includes(" ")) {
+          // Multi-word query ("caza de deuz"): correcting the whole phrase
+          // as one token never matches anything in the vocabulary (which is
+          // built from single words), so it has to be corrected word by word.
+          phraseSuggestion = getPhraseSuggestion(term, vocab);
+ 
+          if (phraseSuggestion) {
+            const correctedTerm = normalizeText(phraseSuggestion);
+            const correctedMatches = collectMatches(true, correctedTerm);
+ 
+            if (correctedMatches.length) {
+              matches = correctedMatches;
+              searchedTerm = correctedTerm;
+            }
+          }
+        } else {
+          suggestions = getSpellingSuggestions(term, vocab);
+        }
  
         // Only fall back to approximate substring matches when we don't have
-        // a confident spelling suggestion to offer instead — otherwise the
-        // two features compete for the same empty-result moment.
-        if (!suggestions.length) {
-          matches = collectMatches(false);
+        // a confident correction to offer instead — otherwise the two
+        // features compete for the same empty-result moment.
+        if (!matches.length && !suggestions.length && !phraseSuggestion) {
+          matches = collectMatches(false, term);
           wholeWord = false;
         }
       }
  
       searchResults.innerHTML = "";
  
-      if (!matches.length && !suggestions.length) {
+      if (!matches.length && !suggestions.length && !phraseSuggestion) {
         searchResults.innerHTML =
           `<p class="search-empty">Nenhum resultado para “${rawTerm}” em ${versionName}.</p>`;
+        return;
+      }
+ 
+      if (phraseSuggestion && matches.length && searchedTerm !== term) {
+        const box = document.createElement("div");
+        box.className = "search-suggestions";
+ 
+        const label = document.createElement("span");
+        label.className = "suggestions-label";
+        label.textContent = `Mostrando resultados para:`;
+        box.appendChild(label);
+ 
+        const chip = document.createElement("span");
+        chip.className = "suggestion-chip";
+        chip.style.cursor = "default";
+        chip.textContent = phraseSuggestion;
+        box.appendChild(chip);
+ 
+        searchResults.appendChild(box);
+      } else if (phraseSuggestion && !matches.length) {
+        const box = document.createElement("div");
+        box.className = "search-suggestions";
+ 
+        const label = document.createElement("span");
+        label.className = "suggestions-label";
+        label.textContent = `“${rawTerm}” não foi encontrada. Você quis dizer:`;
+        box.appendChild(label);
+ 
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "suggestion-chip";
+        chip.textContent = phraseSuggestion;
+        chip.addEventListener("click", () => {
+          searchInput.value = phraseSuggestion;
+          runSearch();
+        });
+        box.appendChild(chip);
+ 
+        searchResults.appendChild(box);
         return;
       }
  
@@ -1450,7 +1545,7 @@ Biblia · HTML
         refLine.className = "ref";
         refLine.textContent = `${bookName} ${match.chapter}:${match.verse}`;
  
-        const snippet = buildSnippet(match.text, term, wholeWord);
+        const snippet = buildSnippet(match.text, searchedTerm, wholeWord);
         const textLine = document.createElement("span");
         if (snippet.matched) {
           textLine.appendChild(snippet.node);
@@ -1530,5 +1625,7 @@ Biblia · HTML
 </body>
 </html>
  
+
+
 
 
