@@ -1146,9 +1146,28 @@ Biblia · HTML
         .toLowerCase();
     }
  
-    function buildSnippet(text, term) {
+    function escapeRegExp(value) {
+      return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+ 
+    // Word-boundary aware match: "cruz" finds "cruz"/"Cruz" as a standalone
+    // word but not "cruzar" or "encruzilhada". Boundaries are anything that
+    // isn't a letter or digit, so it also works at punctuation and line edges.
+    function findWholeWordIndex(normalizedText, term) {
+      const pattern = new RegExp(
+        `(^|[^\\p{L}\\p{N}])(${escapeRegExp(term)})(?=[^\\p{L}\\p{N}]|$)`,
+        "u"
+      );
+      const match = pattern.exec(normalizedText);
+      if (!match) return -1;
+      return match.index + match[1].length;
+    }
+ 
+    function buildSnippet(text, term, wholeWord) {
       const normalized = normalizeText(text);
-      const idx = normalized.indexOf(term);
+      const idx = wholeWord
+        ? findWholeWordIndex(normalized, term)
+        : normalized.indexOf(term);
  
       if (idx === -1) return { node: null, matched: false };
  
@@ -1189,30 +1208,51 @@ Biblia · HTML
         return;
       }
  
-      const matches = [];
+      function collectMatches(wholeWord) {
+        const found = [];
  
-      outer:
-      for (let bIdx = 0; bIdx < bible.length; bIdx++) {
-        const book = bible[bIdx];
-        if (!book || !Array.isArray(book.chapters)) continue;
+        outer:
+        for (let bIdx = 0; bIdx < bible.length; bIdx++) {
+          const book = bible[bIdx];
+          if (!book || !Array.isArray(book.chapters)) continue;
  
-        for (let cIdx = 0; cIdx < book.chapters.length; cIdx++) {
-          const verses = book.chapters[cIdx];
-          if (!Array.isArray(verses)) continue;
+          for (let cIdx = 0; cIdx < book.chapters.length; cIdx++) {
+            const verses = book.chapters[cIdx];
+            if (!Array.isArray(verses)) continue;
  
-          for (let vIdx = 0; vIdx < verses.length; vIdx++) {
-            const text = String(verses[vIdx]).trim();
-            if (normalizeText(text).includes(term)) {
-              matches.push({
-                bookIndex: bIdx,
-                chapter: cIdx + 1,
-                verse: vIdx + 1,
-                text
-              });
-              if (matches.length >= 60) break outer;
+            for (let vIdx = 0; vIdx < verses.length; vIdx++) {
+              const text = String(verses[vIdx]).trim();
+              const normalized = normalizeText(text);
+ 
+              const hit = wholeWord
+                ? findWholeWordIndex(normalized, term) !== -1
+                : normalized.includes(term);
+ 
+              if (hit) {
+                found.push({
+                  bookIndex: bIdx,
+                  chapter: cIdx + 1,
+                  verse: vIdx + 1,
+                  text
+                });
+                if (found.length >= 60) break outer;
+              }
             }
           }
         }
+ 
+        return found;
+      }
+ 
+      // First pass: only exact whole-word hits. Only if that comes up empty
+      // do we fall back to approximate (substring) matches, so "cruz" won't
+      // surface "cruzar" or "encruzilhada" unless nothing exact exists.
+      let matches = collectMatches(true);
+      let wholeWord = true;
+ 
+      if (!matches.length) {
+        matches = collectMatches(false);
+        wholeWord = false;
       }
  
       searchResults.innerHTML = "";
@@ -1221,6 +1261,14 @@ Biblia · HTML
         searchResults.innerHTML =
           `<p class="search-empty">Nenhum resultado para “${rawTerm}” em ${versionName}.</p>`;
         return;
+      }
+ 
+      if (!wholeWord) {
+        const approxNote = document.createElement("p");
+        approxNote.className = "search-empty";
+        approxNote.textContent =
+          `Nenhuma ocorrência exata de “${rawTerm}”. Mostrando trechos aproximados abaixo.`;
+        searchResults.appendChild(approxNote);
       }
  
       matches.forEach(match => {
@@ -1237,7 +1285,7 @@ Biblia · HTML
         refLine.className = "ref";
         refLine.textContent = `${bookName} ${match.chapter}:${match.verse}`;
  
-        const snippet = buildSnippet(match.text, term);
+        const snippet = buildSnippet(match.text, term, wholeWord);
         const textLine = document.createElement("span");
         if (snippet.matched) {
           textLine.appendChild(snippet.node);
