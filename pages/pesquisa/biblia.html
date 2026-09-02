@@ -23,7 +23,7 @@ Biblia · HTML
       --text:#dbe7f5;
       --soft:#eee2cd;
       --danger:#b94a48;
-      --verse-size:14px;
+      --verse-size:15px;
     }
  
     *{box-sizing:border-box}
@@ -86,7 +86,7 @@ Biblia · HTML
     }
  
     main{
-      width:min(1420px,100%);
+      width:min(900px,100%);
       margin:0 auto;
       padding:22px 16px 42px;
     }
@@ -295,11 +295,11 @@ Biblia · HTML
       font-size:11px;
     }
  
-    /* ---------- Versions + reading controls ---------- */
+    /* ---------- Version + reading controls ---------- */
  
     .versions-bar{
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr)) auto;
+      grid-template-columns:minmax(0,1fr) auto;
       gap:8px;
       align-items:end;
       margin-bottom:12px;
@@ -354,14 +354,7 @@ Biblia · HTML
  
     .theme-toggle:hover{background:#f1eadb}
  
-    /* ---------- Reading grid ---------- */
- 
-    .reader-grid{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:10px;
-      align-items:start;
-    }
+    /* ---------- Reading panel ---------- */
  
     .reading-panel{
       min-width:0;
@@ -371,30 +364,30 @@ Biblia · HTML
       overflow:hidden;
     }
  
-    .reader-grid[data-theme="sepia"] .reading-panel{
+    .reading-panel[data-theme="sepia"]{
       background:#f4ecd8;
     }
  
-    .reader-grid[data-theme="dark"] .reading-panel{
+    .reading-panel[data-theme="dark"]{
       background:#161f30;
       border-color:#2c3a52;
     }
  
-    .reader-grid[data-theme="dark"] .panel-heading{
+    .reading-panel[data-theme="dark"] .panel-heading{
       border-color:#2c3a52;
       color:#8ea2bd;
     }
  
-    .reader-grid[data-theme="dark"] .column-version strong,
-    .reader-grid[data-theme="dark"] .reading-content h2{
+    .reading-panel[data-theme="dark"] .column-version strong,
+    .reading-panel[data-theme="dark"] .reading-content h2{
       color:#eef2f8;
     }
  
-    .reader-grid[data-theme="dark"] .verse{border-color:#263754}
-    .reader-grid[data-theme="dark"] .verse-text{color:#cdd9e8}
-    .reader-grid[data-theme="dark"] .verses{border-color:#263754}
-    .reader-grid[data-theme="dark"] .reference{color:#8ea2bd}
-    .reader-grid[data-theme="dark"] .column-version span{color:#6d7fa0}
+    .reading-panel[data-theme="dark"] .verse{border-color:#263754}
+    .reading-panel[data-theme="dark"] .verse-text{color:#cdd9e8}
+    .reading-panel[data-theme="dark"] .verses{border-color:#263754}
+    .reading-panel[data-theme="dark"] .reference{color:#8ea2bd}
+    .reading-panel[data-theme="dark"] .column-version span{color:#6d7fa0}
  
     .panel-heading{
       padding:10px 12px;
@@ -407,7 +400,7 @@ Biblia · HTML
  
     .reading-content{
       min-height:430px;
-      padding:17px;
+      padding:20px;
     }
  
     .column-version{
@@ -420,13 +413,13 @@ Biblia · HTML
  
     .column-version strong{
       color:var(--ink);
-      font-size:13px;
+      font-size:15px;
       line-height:1.25;
     }
  
     .column-version span{
       color:#9b8b70;
-      font-size:8px;
+      font-size:9px;
       font-weight:900;
       letter-spacing:.7px;
       text-transform:uppercase;
@@ -442,9 +435,9 @@ Biblia · HTML
     }
  
     .reading-content h2{
-      margin:0 0 13px;
+      margin:0 0 15px;
       color:var(--ink);
-      font-size:21px;
+      font-size:24px;
     }
  
     .loading,
@@ -467,11 +460,11 @@ Biblia · HTML
  
     .verse{
       display:grid;
-      grid-template-columns:28px minmax(0,1fr);
-      gap:8px;
-      padding:10px 0;
+      grid-template-columns:30px minmax(0,1fr);
+      gap:10px;
+      padding:11px 0;
       border-bottom:1px solid var(--line);
-      line-height:1.68;
+      line-height:1.7;
       font-size:var(--verse-size);
       cursor:pointer;
       border-radius:4px;
@@ -483,7 +476,7 @@ Biblia · HTML
  
     .verse-number{
       color:#198b4b;
-      font-size:10px;
+      font-size:11px;
       font-weight:900;
       text-align:right;
       padding-top:2px;
@@ -562,21 +555,6 @@ Biblia · HTML
       .reader-toolbar .next{
         grid-column:span 1;
       }
- 
-      .versions-bar{
-        grid-template-columns:1fr 1fr;
-      }
- 
-      .reading-controls{
-        grid-column:1 / -1;
-        justify-content:space-between;
-      }
- 
-      .reader-grid{
-        grid-template-columns:1fr;
-      }
- 
-      .versions-label{grid-column:1 / -1}
     }
  
     @media(max-width:700px){
@@ -622,8 +600,8 @@ Biblia · HTML
         grid-template-columns:1fr;
       }
  
-      .reader-grid{
-        grid-template-columns:1fr;
+      .reading-controls{
+        justify-content:space-between;
       }
  
       .reading-content{
@@ -631,7 +609,7 @@ Biblia · HTML
       }
  
       .verse{
-        grid-template-columns:25px minmax(0,1fr);
+        grid-template-columns:26px minmax(0,1fr);
         font-size:var(--verse-size);
       }
  
@@ -676,8 +654,8 @@ Biblia · HTML
       <h1 id="page-title">BÍBLIA — LEITURA</h1>
  
       <p class="intro">
-        Consulta pública compacta. Escolha livro, capítulo e até três versões
-        para leitura simultânea, ou busque uma palavra em toda a versão carregada.
+        Consulta pública compacta. Escolha livro, capítulo e versão,
+        ou busque uma palavra em todo o texto carregado.
       </p>
  
       <div class="reader-toolbar">
@@ -704,7 +682,7 @@ Biblia · HTML
  
       <div class="search-bar">
         <label style="display:grid;gap:5px;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.7px;text-transform:uppercase">
-          BUSCAR PALAVRA OU EXPRESSÃO (na versão da Bíblia 1)
+          BUSCAR PALAVRA OU EXPRESSÃO NA VERSÃO ATUAL
           <input id="search-input" type="search" placeholder="ex.: amor, aliança, luz…"
                  aria-label="Buscar palavra na Bíblia">
         </label>
@@ -712,26 +690,14 @@ Biblia · HTML
                 style="align-self:end">BUSCAR</button>
         <button id="search-clear" class="reader-button" type="button"
                 style="align-self:end">LIMPAR</button>
-        <p class="search-hint">A busca percorre o texto completo da versão selecionada em Bíblia 1 e mostra até 60 resultados.</p>
+        <p class="search-hint">A busca percorre o texto completo da versão selecionada abaixo e mostra até 60 resultados.</p>
         <div id="search-results" class="search-results hidden" role="list" aria-label="Resultados da busca"></div>
       </div>
  
-      <div class="versions-bar" aria-label="Seleção das versões bíblicas">
-        <div class="versions-label">VERSÕES EM LEITURA SIMULTÂNEA</div>
- 
+      <div class="versions-bar" aria-label="Seleção da versão bíblica">
         <label class="version-control">
-          BÍBLIA 1
-          <select id="version-0" aria-label="Primeira versão"></select>
-        </label>
- 
-        <label class="version-control">
-          BÍBLIA 2
-          <select id="version-1" aria-label="Segunda versão"></select>
-        </label>
- 
-        <label class="version-control">
-          BÍBLIA 3
-          <select id="version-2" aria-label="Terceira versão"></select>
+          VERSÃO
+          <select id="version-select" aria-label="Versão da Bíblia"></select>
         </label>
  
         <div class="reading-controls" aria-label="Preferências de leitura">
@@ -741,46 +707,18 @@ Biblia · HTML
         </div>
       </div>
  
-      <div class="reader-grid" id="reader-grid" data-theme="light">
-        <section class="reading-panel" aria-live="polite" aria-label="Primeira versão">
-          <div class="panel-heading">LEITURA · BÍBLIA 1</div>
-          <div class="reading-content">
-            <div class="column-version">
-              <strong id="version-title-0">Almeida 1911</strong>
-              <span id="version-note-0">TEXTO HISTÓRICO</span>
-            </div>
-            <p id="reference-0" class="reference">CARREGANDO BÍBLIA</p>
-            <h2 id="reading-title-0">Bíblia</h2>
-            <div id="reading-body-0" class="loading">Carregando…</div>
+      <section class="reading-panel" id="reading-panel" data-theme="light" aria-live="polite" aria-label="Leitura bíblica">
+        <div class="panel-heading">LEITURA</div>
+        <div class="reading-content">
+          <div class="column-version">
+            <strong id="version-title">Almeida 1911</strong>
+            <span id="version-note">TEXTO HISTÓRICO</span>
           </div>
-        </section>
- 
-        <section class="reading-panel" aria-live="polite" aria-label="Segunda versão">
-          <div class="panel-heading">LEITURA · BÍBLIA 2</div>
-          <div class="reading-content">
-            <div class="column-version">
-              <strong id="version-title-1">Bíblia Livre</strong>
-              <span id="version-note-1">USO LIVRE · CC BY</span>
-            </div>
-            <p id="reference-1" class="reference">CARREGANDO BÍBLIA</p>
-            <h2 id="reading-title-1">Bíblia</h2>
-            <div id="reading-body-1" class="loading">Carregando…</div>
-          </div>
-        </section>
- 
-        <section class="reading-panel" aria-live="polite" aria-label="Terceira versão">
-          <div class="panel-heading">LEITURA · BÍBLIA 3</div>
-          <div class="reading-content">
-            <div class="column-version">
-              <strong id="version-title-2">Tradução Brasileira</strong>
-              <span id="version-note-2">EDIÇÃO DE DOMÍNIO PÚBLICO</span>
-            </div>
-            <p id="reference-2" class="reference">CARREGANDO BÍBLIA</p>
-            <h2 id="reading-title-2">Bíblia</h2>
-            <div id="reading-body-2" class="loading">Carregando…</div>
-          </div>
-        </section>
-      </div>
+          <p id="reference" class="reference">CARREGANDO BÍBLIA</p>
+          <h2 id="reading-title">Bíblia</h2>
+          <div id="reading-body" class="loading">Carregando…</div>
+        </div>
+      </section>
  
       <div class="chapter-nav">
         <button id="bottom-prev" type="button">← CAPÍTULO ANTERIOR</button>
@@ -797,9 +735,9 @@ Biblia · HTML
  
       <p class="maintenance">
         <strong>Fontes de texto:</strong> Almeida 1911 · Bíblia Livre ·
-        Tradução Brasileira. As versões são carregadas somente quando
-        necessárias e permanecem independentes da Sala do Escritor.
-        Preferências de fonte e tema valem apenas para esta sessão de leitura.
+        Tradução Brasileira. O texto é carregado somente quando necessário
+        e permanece independente da Sala do Escritor. Preferências de fonte
+        e tema valem apenas para esta sessão de leitura.
       </p>
     </section>
   </main>
@@ -843,7 +781,7 @@ Biblia · HTML
       }
     ];
  
-    const FONT_STEPS = [12, 13, 14, 15, 16, 18, 20];
+    const FONT_STEPS = [12, 13, 14, 15, 16, 18, 20, 22];
     const THEMES = ["light", "sepia", "dark"];
     const THEME_LABELS = { light: "TEMA: CLARO", sepia: "TEMA: SÉPIA", dark: "TEMA: ESCURO" };
  
@@ -863,41 +801,24 @@ Biblia · HTML
     const searchClear = document.getElementById("search-clear");
     const searchResults = document.getElementById("search-results");
  
-    const readerGrid = document.getElementById("reader-grid");
+    const readingPanel = document.getElementById("reading-panel");
     const fontMinus = document.getElementById("font-minus");
     const fontPlus = document.getElementById("font-plus");
     const themeToggle = document.getElementById("theme-toggle");
  
-    const versionSelects = [0,1,2].map(
-      index => document.getElementById(`version-${index}`)
-    );
- 
-    const versionTitles = [0,1,2].map(
-      index => document.getElementById(`version-title-${index}`)
-    );
- 
-    const versionNotes = [0,1,2].map(
-      index => document.getElementById(`version-note-${index}`)
-    );
- 
-    const references = [0,1,2].map(
-      index => document.getElementById(`reference-${index}`)
-    );
- 
-    const readingTitles = [0,1,2].map(
-      index => document.getElementById(`reading-title-${index}`)
-    );
- 
-    const readingBodies = [0,1,2].map(
-      index => document.getElementById(`reading-body-${index}`)
-    );
+    const versionSelect = document.getElementById("version-select");
+    const versionTitle = document.getElementById("version-title");
+    const versionNote = document.getElementById("version-note");
+    const reference = document.getElementById("reference");
+    const readingTitle = document.getElementById("reading-title");
+    const readingBody = document.getElementById("reading-body");
  
     const bibleCache = new Map();
     const loadingPromises = new Map();
  
     let currentBookIndex = 0;
     let currentChapter = 1;
-    let fontStepIndex = 2; // 14px
+    let fontStepIndex = 3; // 15px
     let themeIndex = 0;
  
     function createBookOptions() {
@@ -924,21 +845,19 @@ Biblia · HTML
     }
  
     function createVersionOptions() {
-      versionSelects.forEach((select, columnIndex) => {
-        VERSIONS.forEach((version, versionIndex) => {
-          const option = document.createElement("option");
-          option.value = String(versionIndex);
-          option.textContent = version.name;
-          select.appendChild(option);
-        });
- 
-        select.value = String(columnIndex);
+      VERSIONS.forEach((version, versionIndex) => {
+        const option = document.createElement("option");
+        option.value = String(versionIndex);
+        option.textContent = version.name;
+        versionSelect.appendChild(option);
       });
+ 
+      versionSelect.value = "0";
     }
  
-    function showMessage(index, message, type = "loading") {
-      readingBodies[index].className = type;
-      readingBodies[index].textContent = message;
+    function showMessage(message, type = "loading") {
+      readingBody.className = type;
+      readingBody.textContent = message;
     }
  
     function normalizeBible(raw) {
@@ -992,13 +911,9 @@ Biblia · HTML
     }
  
     function getCurrentMaxChapter() {
-      const loaded = Array.from(bibleCache.values());
- 
-      if (!loaded.length) return 1;
- 
-      return Math.max(
-        ...loaded.map(bible => getMaxChapterFromBible(bible))
-      );
+      const versionIndex = Number(versionSelect.value);
+      const bible = bibleCache.get(versionIndex);
+      return bible ? getMaxChapterFromBible(bible) : 1;
     }
  
     function updateHeaderState() {
@@ -1017,8 +932,8 @@ Biblia · HTML
       progressFill.style.width = `${pct}%`;
     }
  
-    function copyVerseToClipboard(row, reference, text) {
-      const payload = `${reference} — ${text}`;
+    function copyVerseToClipboard(row, ref, text) {
+      const payload = `${ref} — ${text}`;
       const flag = row.querySelector(".copy-flag");
  
       const markCopied = () => {
@@ -1037,36 +952,33 @@ Biblia · HTML
       }
     }
  
-    function renderVersion(index, bible) {
+    function renderVersion(bible) {
       const book = bible && bible[currentBookIndex];
  
       if (!book) {
-        showMessage(index, "Livro não encontrado nesta versão.", "error");
+        showMessage("Livro não encontrado nesta versão.", "error");
         return;
       }
  
       const verses = book.chapters && book.chapters[currentChapter - 1];
  
       if (!Array.isArray(verses)) {
-        showMessage(index, "Capítulo não encontrado nesta edição.", "error");
+        showMessage("Capítulo não encontrado nesta edição.", "error");
         return;
       }
  
-      const versionIndex = Number(versionSelects[index].value);
+      const versionIndex = Number(versionSelect.value);
       const version = VERSIONS[versionIndex];
  
-      versionTitles[index].textContent = version.name;
-      versionNotes[index].textContent = version.note;
+      versionTitle.textContent = version.name;
+      versionNote.textContent = version.note;
  
       const refText = `${book.name.toUpperCase()} ${currentChapter}`;
+      reference.textContent = refText;
+      readingTitle.textContent = `${book.name} ${currentChapter}`;
  
-      references[index].textContent = refText;
- 
-      readingTitles[index].textContent =
-        `${book.name} ${currentChapter}`;
- 
-      readingBodies[index].className = "verses";
-      readingBodies[index].innerHTML = "";
+      readingBody.className = "verses";
+      readingBody.innerHTML = "";
  
       verses.forEach((text, verseIndex) => {
         const cleanText = String(text).trim();
@@ -1102,29 +1014,28 @@ Biblia · HTML
           }
         });
  
-        readingBodies[index].appendChild(row);
+        readingBody.appendChild(row);
       });
     }
  
-    async function renderColumn(index) {
-      const versionIndex = Number(versionSelects[index].value);
+    async function renderColumn() {
+      const versionIndex = Number(versionSelect.value);
       const version = VERSIONS[versionIndex];
  
-      versionTitles[index].textContent = version.name;
-      versionNotes[index].textContent = version.note;
-      references[index].textContent =
+      versionTitle.textContent = version.name;
+      versionNote.textContent = version.note;
+      reference.textContent =
         `${BOOKS[currentBookIndex][0].toUpperCase()} ${currentChapter}`;
-      readingTitles[index].textContent =
+      readingTitle.textContent =
         `${BOOKS[currentBookIndex][0]} ${currentChapter}`;
  
-      showMessage(index, `Carregando ${version.name}…`);
+      showMessage(`Carregando ${version.name}…`);
  
       try {
         const bible = await loadVersion(versionIndex);
-        renderVersion(index, bible);
+        renderVersion(bible);
       } catch (error) {
         showMessage(
-          index,
           `Não foi possível carregar ${version.name} agora. Atualize a página e tente novamente.`,
           "error"
         );
@@ -1133,7 +1044,7 @@ Biblia · HTML
  
     async function renderAll(scroll = true) {
       updateHeaderState();
-      await Promise.all([0,1,2].map(index => renderColumn(index)));
+      await renderColumn();
       updateButtons();
       updateProgress();
       if (scroll) window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1222,7 +1133,7 @@ Biblia · HTML
     themeToggle.addEventListener("click", () => {
       themeIndex = (themeIndex + 1) % THEMES.length;
       const theme = THEMES[themeIndex];
-      readerGrid.dataset.theme = theme;
+      readingPanel.dataset.theme = theme;
       themeToggle.textContent = THEME_LABELS[theme];
     });
  
@@ -1239,7 +1150,7 @@ Biblia · HTML
       const normalized = normalizeText(text);
       const idx = normalized.indexOf(term);
  
-      if (idx === -1) return { html: text, matched: false };
+      if (idx === -1) return { node: null, matched: false };
  
       const before = text.slice(0, idx);
       const match = text.slice(idx, idx + term.length);
@@ -1263,7 +1174,7 @@ Biblia · HTML
       }
  
       const term = normalizeText(rawTerm);
-      const versionIndex = Number(versionSelects[0].value);
+      const versionIndex = Number(versionSelect.value);
       const versionName = VERSIONS[versionIndex].name;
  
       searchResults.classList.remove("hidden");
@@ -1343,7 +1254,7 @@ Biblia · HTML
  
           requestAnimationFrame(() => {
             const targetRow = Array.from(
-              readingBodies[0].querySelectorAll(".verse")
+              readingBody.querySelectorAll(".verse")
             )[match.verse - 1];
  
             if (targetRow) {
@@ -1385,10 +1296,10 @@ Biblia · HTML
       if (event.key === "Enter") openReference(0);
     });
  
-    versionSelects.forEach(select => {
-      select.addEventListener("change", () => {
-        const index = Number(select.id.replace("version-", ""));
-        renderColumn(index).then(updateProgress);
+    versionSelect.addEventListener("change", () => {
+      renderColumn().then(() => {
+        updateButtons();
+        updateProgress();
       });
     });
  
