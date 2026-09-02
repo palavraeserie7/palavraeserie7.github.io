@@ -895,11 +895,10 @@ footer{
     <div class="study-source">
       <div>
         <div class="study-source-name">Textus Receptus · Scrivener 1894</div>
-        <span class="study-source-type">Texto grego do NT</span>
+        <span class="study-source-type">Texto grego do NT · integrado</span>
       </div>
-      <a class="study-source-link"
-         href="https://github.com/blivre/BibliaLivre/tree/main/f4/tr"
-         target="_blank" rel="noopener noreferrer">FONTE →</a>
+      <a class="study-source-link study-source-internal"
+         href="#biblia-paralela">USAR NA SALA →</a>
     </div>
 
     <div class="study-source">
@@ -1007,7 +1006,13 @@ footer{
 
       <div class="source">
         <span class="source-label">GREGO</span>
-        <span class="source-name">NESTLE 1904</span>
+        <div class="source-name-line">
+          <span id="greekSourceName" class="source-name">NESTLE 1904</span>
+          <select id="greekSourceSelect" class="greek-source-select" aria-label="Fonte grega">
+            <option value="nestle">Nestle 1904</option>
+            <option value="tr">Textus Receptus · Scrivener 1894</option>
+          </select>
+        </div>
       </div>
 
       <div class="source">
@@ -1024,9 +1029,10 @@ footer{
 
   <div class="parallel-note">
     AT: WLC · OSHB + ALMEIDA 1911 &nbsp;|&nbsp;
-    NT: NESTLE 1904 + ALMEIDA 1911.
+    NT: NESTLE 1904 ou TEXTUS RECEPTUS · SCRIVENER 1894 + ALMEIDA 1911.
     A coluna sem texto correspondente permanece vazia para preservar o alinhamento dos versículos.
     Grafia histórica preservada na Almeida 1911: formas como “abysmo”, “fórma” e “vasia” pertencem à edição original.
+    Textus Receptus: texto grego de Scrivener 1894, integrado por dados do STEPBible TAGNT; o texto grego é domínio público.
   </div>
 
 </section>
@@ -1037,6 +1043,7 @@ footer{
     A Sala do Escritor é uma área privada. A Bíblia Paralela agora é tratada
     como um único leitor vertical: Hebraico, Grego e Português permanecem
     como três colunas permanentes e cada linha corresponde ao mesmo versículo.
+    A coluna grega permite alternar entre Nestle 1904 e Textus Receptus · Scrivener 1894.
   </p>
 </section>
 
@@ -1079,11 +1086,14 @@ const nextChapter = document.getElementById("nextChapter");
 const parallelBody = document.getElementById("parallelBody");
 const parallelRef = document.getElementById("parallelRef");
 const readerStatus = document.getElementById("readerStatus");
+const greekSourceSelect = document.getElementById("greekSourceSelect");
+const greekSourceName = document.getElementById("greekSourceName");
 
 /*
   Fontes:
   - WLC: textos normalizados do Biblia Libera, provenientes do Open Scriptures Hebrew Bible.
   - Nestle 1904: textos normalizados do Biblia Libera, provenientes da transcrição Biblical Humanities.
+  - Textus Receptus · Scrivener 1894: texto grego do pacote baseado no STEPBible TAGNT, carregado por capítulo.
   - Almeida 1911: JSON público do projeto Smart Bible Versions.
 */
 
@@ -1095,7 +1105,10 @@ const DATA = {
     "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/wlc/",
 
   greek:
-    "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/n4/"
+    "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/n4/",
+
+  tr:
+    "https://raw.githubusercontent.com/metaxiamultimedia/scriptures-js-source-stepbible-tagnt-tr/main/data/stepbible-tagnt-tr/"
 };
 
 const BOOKS = [
@@ -1171,6 +1184,7 @@ let portugueseBible = null;
 const sourceCache = new Map();
 let currentBookIndex = 0;
 let currentChapter = 1;
+let currentGreekSource = "nestle";
 
 function escapeHTML(value){
   return String(value ?? "")
@@ -1228,8 +1242,83 @@ async function loadPortuguese(){
 }
 
 async function loadOriginal(bookCode, testament){
-  const folder = testament === "OT" ? DATA.wlc : DATA.greek;
-  const url = `${folder}${bookCode}.txt`;
+  if(testament === "OT"){
+    const url = `${DATA.wlc}${bookCode}.txt`;
+
+    if(sourceCache.has(url)){
+      return sourceCache.get(url);
+    }
+
+    const response = await fetch(url, {
+      cache:"force-cache"
+    });
+
+    if(!response.ok){
+      sourceCache.set(url, null);
+      return null;
+    }
+
+    const text = await response.text();
+    const verses = new Map();
+
+    for(const line of text.split(/\r?\n/)){
+      if(!line.trim()) continue;
+
+      const tab = line.indexOf("\t");
+      if(tab < 0) continue;
+
+      const id = line.slice(0,tab).trim();
+      const value = line.slice(tab+1).trim();
+
+      const parts = id.split(".");
+      const chapter = Number(parts[1]);
+      const verse = Number(parts[2]);
+
+      if(Number.isInteger(chapter) && Number.isInteger(verse)){
+        verses.set(`${chapter}:${verse}`, value);
+      }
+    }
+
+    sourceCache.set(url, verses);
+    return verses;
+  }
+
+  if(currentGreekSource === "tr"){
+    const trBook = getTRBookCode(bookCode);
+    const cacheKey = `tr:${trBook}:${currentChapter}`;
+
+    if(sourceCache.has(cacheKey)){
+      return sourceCache.get(cacheKey);
+    }
+
+    const verseCount = portugueseBible?.[currentBookIndex]?.chapters?.[currentChapter-1]?.length || 0;
+    const urls = Array.from(
+      {length:verseCount},
+      (_,index) => `${DATA.tr}${trBook}/${currentChapter}/${index+1}.json`
+    );
+
+    const responses = await Promise.all(
+      urls.map(url => fetch(url,{cache:"force-cache"}))
+    );
+
+    const verses = new Map();
+
+    for(let index=0; index<responses.length; index++){
+      const response = responses[index];
+      if(!response.ok) continue;
+
+      const data = await response.json();
+      const text = typeof data?.text === "string" ? data.text.trim() : "";
+      if(text){
+        verses.set(`${currentChapter}:${index+1}`, text);
+      }
+    }
+
+    sourceCache.set(cacheKey, verses);
+    return verses;
+  }
+
+  const url = `${DATA.greek}${bookCode}.txt`;
 
   if(sourceCache.has(url)){
     return sourceCache.get(url);
@@ -1267,6 +1356,18 @@ async function loadOriginal(bookCode, testament){
 
   sourceCache.set(url, verses);
   return verses;
+}
+
+function getTRBookCode(bookCode){
+  const map = {
+    Matt:"Matt", Mark:"Mark", Luke:"Luke", John:"John", Acts:"Acts",
+    Rom:"Rom", "1Cor":"1Cor", "2Cor":"2Cor", Gal:"Gal", Eph:"Eph",
+    Phil:"Phil", Col:"Col", "1Thess":"1Thess", "2Thess":"2Thess",
+    "1Tim":"1Tim", "2Tim":"2Tim", Titus:"Titus", Phlm:"Phlm", Heb:"Heb",
+    Jas:"Jas", "1Pet":"1Pet", "2Pet":"2Pet", "1John":"1John",
+    "2John":"2John", "3John":"3John", Jude:"Jude", Rev:"Rev"
+  };
+  return map[bookCode] || bookCode;
 }
 
 function getPortugueseChapter(){
@@ -1398,9 +1499,18 @@ async function openBibleChapter(){
       setStatus("CARREGANDO WLC...");
       hebrewMap = await loadOriginal(bookCode,"OT");
     }else{
-      setStatus("CARREGANDO NESTLE 1904...");
+      const greekLabel = currentGreekSource === "tr"
+        ? "TEXTUS RECEPTUS · SCRIVENER 1894"
+        : "NESTLE 1904";
+      setStatus(`CARREGANDO ${greekLabel}...`);
       greekMap = await loadOriginal(bookCode,"NT");
     }
+
+    greekSourceName.textContent = currentGreekSource === "tr"
+      ? "TEXTUS RECEPTUS · SCRIVENER 1894"
+      : "NESTLE 1904";
+    greekSourceSelect.value = currentGreekSource;
+    greekSourceSelect.disabled = testament === "OT";
 
     renderRows(bookCode,testament,hebrewMap,greekMap);
 
@@ -1438,6 +1548,12 @@ function updateNavigation(){
     currentBookIndex === BOOKS.length-1 &&
     currentChapter >= maxChapters;
 }
+
+greekSourceSelect.addEventListener("change",()=>{
+  currentGreekSource = greekSourceSelect.value;
+  const y = window.scrollY;
+  openBibleChapter().finally(()=>requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"})));
+});
 
 bookSelect.addEventListener("change",()=>{
   currentBookIndex = Number(bookSelect.value);
