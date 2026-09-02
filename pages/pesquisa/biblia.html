@@ -19,6 +19,7 @@
       --blue:#18bfff;
       --text:#dbe7f5;
       --soft:#eee2cd;
+      --danger:#b94a48;
     }
 
     *{box-sizing:border-box}
@@ -39,7 +40,7 @@
       display:flex;
       align-items:center;
       gap:10px;
-      padding:16px 24px;
+      padding:14px 20px;
       border-bottom:1px solid #263754;
       background:var(--panel);
     }
@@ -54,7 +55,7 @@
     }
 
     .header-link{
-      padding:9px 12px;
+      padding:8px 11px;
       border:1px solid #536780;
       border-radius:7px;
       background:transparent;
@@ -62,6 +63,7 @@
       font-size:10px;
       font-weight:900;
       text-decoration:none;
+      white-space:nowrap;
     }
 
     .header-link:hover,
@@ -72,13 +74,13 @@
     }
 
     main{
-      width:min(1240px,100%);
+      width:min(1420px,100%);
       margin:0 auto;
-      padding:30px 22px 60px;
+      padding:22px 16px 42px;
     }
 
     .paper{
-      padding:30px;
+      padding:24px;
       border:1px solid var(--line);
       border-radius:12px;
       background:var(--paper);
@@ -87,7 +89,7 @@
     }
 
     .eyebrow{
-      margin:0 0 8px;
+      margin:0 0 6px;
       color:#9b8b70;
       font-size:10px;
       font-weight:900;
@@ -96,58 +98,66 @@
 
     h1{
       margin:0;
-      font-size:clamp(28px,5vw,44px);
-      letter-spacing:.4px;
+      font-size:clamp(25px,4vw,38px);
+      letter-spacing:.3px;
     }
 
     .intro{
-      max-width:900px;
-      margin:12px 0 26px;
-      line-height:1.7;
+      max-width:980px;
+      margin:8px 0 18px;
+      line-height:1.6;
+      font-size:14px;
     }
 
     .reader-toolbar{
       display:grid;
-      grid-template-columns:minmax(220px,1.2fr) minmax(150px,.6fr) auto auto auto;
-      gap:10px;
-      margin-bottom:20px;
-      padding:16px;
+      grid-template-columns:minmax(210px,1.4fr) 105px auto auto auto;
+      gap:8px;
+      align-items:end;
+      margin-bottom:12px;
+      padding:12px;
       border:1px solid var(--line);
       border-radius:9px;
       background:var(--card);
     }
 
-    .reader-toolbar label{
+    .reader-toolbar label,
+    .version-control{
       display:grid;
-      gap:6px;
+      gap:5px;
+      min-width:0;
       color:var(--muted);
-      font-size:10px;
+      font-size:9px;
       font-weight:900;
       letter-spacing:.7px;
       text-transform:uppercase;
     }
 
     .reader-toolbar select,
-    .reader-toolbar input{
+    .reader-toolbar input,
+    .version-control select{
       width:100%;
       min-width:0;
-      padding:10px 11px;
+      height:38px;
+      padding:7px 9px;
       border:1px solid #cdbfaa;
       border-radius:6px;
       background:#fffaf0;
       color:var(--ink);
+      font-size:13px;
     }
 
     .reader-button{
-      align-self:end;
-      min-height:40px;
-      padding:0 16px;
+      min-height:38px;
+      padding:0 13px;
       border:0;
       border-radius:6px;
       background:var(--muted);
       color:#fffaf0;
+      font-size:11px;
       font-weight:900;
       cursor:pointer;
+      white-space:nowrap;
     }
 
     .reader-button.primary{
@@ -157,100 +167,102 @@
 
     .reader-button:hover{filter:brightness(1.05)}
 
-    .reader-layout{
+    .versions-bar{
       display:grid;
-      grid-template-columns:minmax(180px,260px) minmax(0,1fr);
-      gap:18px;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-bottom:12px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:#eee2cd;
     }
 
-    .books-panel,
+    .versions-label{
+      grid-column:1 / -1;
+      color:var(--muted);
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.9px;
+    }
+
+    .reader-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+      align-items:start;
+    }
+
     .reading-panel{
+      min-width:0;
       border:1px solid var(--line);
       border-radius:9px;
       background:var(--card);
+      overflow:hidden;
     }
 
     .panel-heading{
-      padding:13px 15px;
+      padding:10px 12px;
       border-bottom:1px solid var(--line);
       color:var(--muted);
-      font-size:11px;
+      font-size:10px;
       font-weight:900;
       letter-spacing:.8px;
     }
 
-    .books-list{
-      max-height:650px;
-      margin:0;
-      padding:10px;
-      overflow-y:auto;
-      list-style:none;
-    }
-
-    .book-button{
-      display:block;
-      width:100%;
-      margin-bottom:5px;
-      padding:9px 10px;
-      border:1px solid transparent;
-      border-radius:6px;
-      background:transparent;
-      color:var(--ink);
-      text-align:left;
-      font-weight:800;
-      cursor:pointer;
-    }
-
-    .book-button:hover,
-    .book-button.active{
-      border-color:var(--line);
-      background:#eee2cd;
-      color:var(--muted);
-    }
-
-    .reading-panel{min-width:0}
-
     .reading-content{
-      min-height:460px;
-      padding:28px;
+      min-height:430px;
+      padding:17px;
+    }
+
+    .column-version{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .column-version strong{
+      color:var(--ink);
+      font-size:13px;
+      line-height:1.25;
+    }
+
+    .column-version span{
+      color:#9b8b70;
+      font-size:8px;
+      font-weight:900;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+      text-align:right;
     }
 
     .reference{
-      margin:0 0 8px;
+      margin:0 0 4px;
       color:var(--muted);
-      font-size:11px;
+      font-size:10px;
       font-weight:900;
       letter-spacing:.8px;
     }
 
     .reading-content h2{
-      margin:0 0 18px;
+      margin:0 0 13px;
       color:var(--ink);
-      font-size:clamp(22px,4vw,32px);
-    }
-
-    .source-line{
-      margin:-10px 0 20px;
-      color:#9b8b70;
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.8px;
-      text-transform:uppercase;
+      font-size:21px;
     }
 
     .loading,
-    .error,
-    .placeholder{
-      padding:22px;
+    .error{
+      padding:16px;
       border-left:3px solid var(--muted);
       background:#f1eadb;
       color:#665947;
-      line-height:1.7;
+      line-height:1.6;
+      font-size:12px;
     }
 
-    .error{
-      border-left-color:#b94a48;
-    }
+    .error{border-left-color:var(--danger)}
 
     .verses{
       display:grid;
@@ -260,99 +272,149 @@
 
     .verse{
       display:grid;
-      grid-template-columns:48px minmax(0,1fr);
-      gap:14px;
-      padding:18px 4px;
+      grid-template-columns:28px minmax(0,1fr);
+      gap:8px;
+      padding:10px 0;
       border-bottom:1px solid var(--line);
-      line-height:1.85;
-      font-size:16px;
+      line-height:1.68;
+      font-size:14px;
     }
 
     .verse-number{
       color:#198b4b;
-      font-size:12px;
+      font-size:10px;
       font-weight:900;
       text-align:right;
-      padding-top:3px;
+      padding-top:2px;
     }
 
     .verse-text{
       white-space:pre-line;
+      overflow-wrap:anywhere;
     }
 
     .chapter-nav{
       display:flex;
       justify-content:space-between;
-      gap:10px;
-      margin-top:22px;
+      gap:8px;
+      margin-top:14px;
     }
 
     .chapter-nav button{
-      min-height:38px;
-      padding:0 14px;
+      min-height:36px;
+      padding:0 11px;
       border:1px solid #cdbfaa;
       border-radius:6px;
       background:#fffaf0;
       color:var(--ink);
+      font-size:10px;
       font-weight:900;
       cursor:pointer;
     }
 
-    .chapter-nav button:hover{
-      background:#eee2cd;
-    }
+    .chapter-nav button:hover{background:#eee2cd}
 
     .notice{
-      margin-top:18px;
-      padding:13px 15px;
+      margin-top:14px;
+      padding:11px 13px;
       border-left:3px solid var(--blue);
       background:#eef5f8;
       color:#465b68;
-      font-size:11px;
-      line-height:1.6;
+      font-size:10px;
+      line-height:1.55;
     }
 
     .maintenance{
-      margin:22px 0 0;
+      margin:14px 0 0;
       color:var(--muted);
-      font-size:11px;
-      line-height:1.6;
+      font-size:10px;
+      line-height:1.55;
     }
 
-    @media(max-width:900px){
+    .maintenance strong{color:#665947}
+
+    @media(max-width:1050px){
       .reader-toolbar{
-        grid-template-columns:1fr 1fr;
+        grid-template-columns:minmax(190px,1fr) 90px 1fr 1fr;
       }
+
+      .reader-toolbar .next{
+        grid-column:span 1;
+      }
+
+      .versions-bar,
+      .reader-grid{
+        grid-template-columns:1fr;
+      }
+
+      .versions-label{grid-column:auto}
+    }
+
+    @media(max-width:700px){
+      .site-header{
+        align-items:flex-start;
+        flex-wrap:wrap;
+      }
+
+      .brand{
+        width:100%;
+        margin-right:0;
+      }
+
+      .header-link{
+        flex:1;
+        text-align:center;
+      }
+
+      main{padding:12px 9px 28px}
+      .paper{padding:17px 12px}
+
+      .reader-toolbar{
+        grid-template-columns:1fr 90px;
+      }
+
+      .reader-toolbar .reader-button{
+        width:100%;
+      }
+
       .reader-toolbar .primary{
         grid-column:span 2;
       }
-      .reader-layout{
+
+      .reader-toolbar .next{
+        grid-column:auto;
+      }
+
+      .versions-bar{
         grid-template-columns:1fr;
       }
-      .books-list{
-        max-height:240px;
+
+      .reader-grid{
+        grid-template-columns:1fr;
+      }
+
+      .reading-content{
+        padding:15px;
+      }
+
+      .verse{
+        grid-template-columns:25px minmax(0,1fr);
+        font-size:14px;
       }
     }
 
-    @media(max-width:520px){
-      .site-header{
-        align-items:flex-start;
-        flex-direction:column;
-      }
-      .brand{margin-right:0}
-      main{padding:18px 12px 40px}
-      .paper{padding:22px 16px}
+    @media(max-width:430px){
       .reader-toolbar{
         grid-template-columns:1fr;
       }
-      .reader-toolbar .primary{
+
+      .reader-toolbar .primary,
+      .reader-toolbar .next{
         grid-column:auto;
       }
-      .reading-content{padding:20px}
-      .verse{
-        grid-template-columns:34px minmax(0,1fr);
-        gap:10px;
-        font-size:15px;
+
+      .header-link{
+        font-size:9px;
       }
     }
   </style>
@@ -372,8 +434,8 @@
       <h1 id="page-title">BÍBLIA — LEITURA</h1>
 
       <p class="intro">
-        Consulta pública da Bíblia em português. Escolha o livro e o capítulo
-        para abrir o texto diretamente nesta página.
+        Consulta pública compacta. Escolha livro, capítulo e até três versões
+        para leitura simultânea.
       </p>
 
       <div class="reader-toolbar">
@@ -390,51 +452,90 @@
 
         <button id="prev-button" class="reader-button" type="button">← ANTERIOR</button>
         <button id="open-button" class="reader-button primary" type="button">ABRIR</button>
-        <button id="next-button" class="reader-button" type="button">PRÓXIMO →</button>
+        <button id="next-button" class="reader-button next" type="button">PRÓXIMO →</button>
       </div>
 
-      <div class="reader-layout">
-        <aside class="books-panel" aria-label="Livros da Bíblia">
-          <div class="panel-heading">LIVROS</div>
-          <ul id="books-list" class="books-list"></ul>
-        </aside>
+      <div class="versions-bar" aria-label="Seleção das versões bíblicas">
+        <div class="versions-label">VERSÕES EM LEITURA SIMULTÂNEA</div>
 
-        <section class="reading-panel" aria-live="polite" aria-label="Área de leitura">
-          <div class="panel-heading">LEITURA</div>
+        <label class="version-control">
+          BÍBLIA 1
+          <select id="version-0" aria-label="Primeira versão"></select>
+        </label>
 
+        <label class="version-control">
+          BÍBLIA 2
+          <select id="version-1" aria-label="Segunda versão"></select>
+        </label>
+
+        <label class="version-control">
+          BÍBLIA 3
+          <select id="version-2" aria-label="Terceira versão"></select>
+        </label>
+      </div>
+
+      <div class="reader-grid">
+        <section class="reading-panel" aria-live="polite" aria-label="Primeira versão">
+          <div class="panel-heading">LEITURA · BÍBLIA 1</div>
           <div class="reading-content">
-            <p id="reference" class="reference">CARREGANDO BÍBLIA</p>
-            <h2 id="reading-title">Bíblia</h2>
-            <p class="source-line">ALMEIDA 1911 · TEXTO HISTÓRICO</p>
-
-            <div id="reading-body" class="loading">
-              Carregando a edição Almeida 1911…
+            <div class="column-version">
+              <strong id="version-title-0">Almeida 1911</strong>
+              <span id="version-note-0">TEXTO HISTÓRICO</span>
             </div>
+            <p id="reference-0" class="reference">CARREGANDO BÍBLIA</p>
+            <h2 id="reading-title-0">Bíblia</h2>
+            <div id="reading-body-0" class="loading">Carregando…</div>
+          </div>
+        </section>
 
-            <div class="chapter-nav">
-              <button id="bottom-prev" type="button">← CAPÍTULO ANTERIOR</button>
-              <button id="bottom-next" type="button">PRÓXIMO CAPÍTULO →</button>
+        <section class="reading-panel" aria-live="polite" aria-label="Segunda versão">
+          <div class="panel-heading">LEITURA · BÍBLIA 2</div>
+          <div class="reading-content">
+            <div class="column-version">
+              <strong id="version-title-1">Bíblia Livre</strong>
+              <span id="version-note-1">USO LIVRE · CC BY</span>
             </div>
+            <p id="reference-1" class="reference">CARREGANDO BÍBLIA</p>
+            <h2 id="reading-title-1">Bíblia</h2>
+            <div id="reading-body-1" class="loading">Carregando…</div>
+          </div>
+        </section>
 
-            <div class="notice">
-              Grafia histórica preservada na Almeida 1911: formas como
-              “abysmo”, “fórma” e “vasia” pertencem à edição original.
+        <section class="reading-panel" aria-live="polite" aria-label="Terceira versão">
+          <div class="panel-heading">LEITURA · BÍBLIA 3</div>
+          <div class="reading-content">
+            <div class="column-version">
+              <strong id="version-title-2">Tradução Brasileira</strong>
+              <span id="version-note-2">EDIÇÃO DE DOMÍNIO PÚBLICO</span>
             </div>
+            <p id="reference-2" class="reference">CARREGANDO BÍBLIA</p>
+            <h2 id="reading-title-2">Bíblia</h2>
+            <div id="reading-body-2" class="loading">Carregando…</div>
           </div>
         </section>
       </div>
 
+      <div class="chapter-nav">
+        <button id="bottom-prev" type="button">← CAPÍTULO ANTERIOR</button>
+        <button id="bottom-next" type="button">PRÓXIMO CAPÍTULO →</button>
+      </div>
+
+      <div class="notice">
+        A Almeida 1911 preserva grafia histórica, incluindo formas como
+        “abysmo”, “fórma” e “vasia”. A Bíblia Livre é distribuída sob
+        Creative Commons Atribuição 3.0 Brasil. A Tradução Brasileira é tratada
+        no conjunto de dados consultado como domínio público.
+      </div>
+
       <p class="maintenance">
-        Texto: Almeida 1911. A consulta pública é independente da Sala do
-        Escritor e da Matriz Técnica de Pesquisa PRO.
+        <strong>Fontes de texto:</strong> Almeida 1911 · Bíblia Livre ·
+        Tradução Brasileira. As versões são carregadas somente quando
+        necessárias e permanecem independentes da Sala do Escritor.
       </p>
     </section>
   </main>
 
   <script>
-    const DATA_URL =
-      "https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/ALM1911%20-%20Almeida%201911.json";
-
     const BOOKS = [
       ["Gênesis",1],["Êxodo",2],["Levítico",3],["Números",4],
       ["Deuteronômio",5],["Josué",6],["Juízes",7],["Rute",8],
@@ -455,213 +556,325 @@
       ["2 João",63],["3 João",64],["Judas",65],["Apocalipse",66]
     ];
 
+    const VERSIONS = [
+      {
+        name: "Almeida 1911",
+        note: "TEXTO HISTÓRICO",
+        url: "https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/ALM1911%20-%20Almeida%201911.json"
+      },
+      {
+        name: "Bíblia Livre",
+        note: "USO LIVRE · CC BY 3.0 BR",
+        url: "https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/BLIVRE%20-%20B%C3%ADblia%20Livre.json"
+      },
+      {
+        name: "Tradução Brasileira",
+        note: "DOMÍNIO PÚBLICO",
+        url: "https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/TB%20-%20Tradu%C3%A7%C3%A3o%20Brasileira.json"
+      }
+    ];
+
     const bookSelect = document.getElementById("book-select");
     const chapterInput = document.getElementById("chapter-input");
-    const booksList = document.getElementById("books-list");
     const openButton = document.getElementById("open-button");
     const prevButton = document.getElementById("prev-button");
     const nextButton = document.getElementById("next-button");
     const bottomPrev = document.getElementById("bottom-prev");
     const bottomNext = document.getElementById("bottom-next");
-    const reference = document.getElementById("reference");
-    const readingTitle = document.getElementById("reading-title");
-    const readingBody = document.getElementById("reading-body");
 
-    let bible = null;
+    const versionSelects = [0,1,2].map(
+      index => document.getElementById(`version-${index}`)
+    );
+
+    const versionTitles = [0,1,2].map(
+      index => document.getElementById(`version-title-${index}`)
+    );
+
+    const versionNotes = [0,1,2].map(
+      index => document.getElementById(`version-note-${index}`)
+    );
+
+    const references = [0,1,2].map(
+      index => document.getElementById(`reference-${index}`)
+    );
+
+    const readingTitles = [0,1,2].map(
+      index => document.getElementById(`reading-title-${index}`)
+    );
+
+    const readingBodies = [0,1,2].map(
+      index => document.getElementById(`reading-body-${index}`)
+    );
+
+    const bibleCache = new Map();
+    const loadingPromises = new Map();
+
     let currentBookIndex = 0;
     let currentChapter = 1;
 
     function createBookOptions() {
-      BOOKS.forEach(([name, number], index) => {
-        const option = document.createElement("option");
-        option.value = String(index);
-        option.textContent = name;
-        bookSelect.appendChild(option);
+      const groups = [
+        ["Antigo Testamento", 0, 38],
+        ["Novo Testamento", 39, 65]
+      ];
+
+      groups.forEach(([label, start, end]) => {
+        const group = document.createElement("optgroup");
+        group.label = label;
+
+        BOOKS.slice(start, end + 1).forEach(([name], offset) => {
+          const option = document.createElement("option");
+          option.value = String(start + offset);
+          option.textContent = name;
+          group.appendChild(option);
+        });
+
+        bookSelect.appendChild(group);
       });
+
       bookSelect.value = "0";
     }
 
-    function createBookList() {
-      BOOKS.forEach(([name], index) => {
-        const item = document.createElement("li");
-        const button = document.createElement("button");
-
-        button.type = "button";
-        button.className = "book-button";
-        button.textContent = name;
-
-        button.addEventListener("click", () => {
-          currentBookIndex = index;
-          bookSelect.value = String(index);
-          chapterInput.value = "1";
-          setActiveBook();
-          openReference(0);
+    function createVersionOptions() {
+      versionSelects.forEach((select, columnIndex) => {
+        VERSIONS.forEach((version, versionIndex) => {
+          const option = document.createElement("option");
+          option.value = String(versionIndex);
+          option.textContent = version.name;
+          select.appendChild(option);
         });
 
-        item.appendChild(button);
-        booksList.appendChild(item);
-      });
-
-      setActiveBook();
-    }
-
-    function setActiveBook() {
-      document.querySelectorAll(".book-button").forEach((button, index) => {
-        button.classList.toggle("active", index === currentBookIndex);
+        select.value = String(columnIndex);
       });
     }
 
-    function showMessage(message, type = "loading") {
-      readingBody.className = type;
-      readingBody.textContent = message;
+    function showMessage(index, message, type = "loading") {
+      readingBodies[index].className = type;
+      readingBodies[index].textContent = message;
     }
 
-    function getBook() {
-      return bible && bible[currentBookIndex];
+    function normalizeBible(raw) {
+      if (!Array.isArray(raw)) {
+        throw new Error("Formato bíblico inválido.");
+      }
+
+      return raw.map((book, index) => ({
+        name: BOOKS[index] ? BOOKS[index][0] : (book.name || book.abbrev || "Livro"),
+        abbrev: book.abbrev || "",
+        chapters: Array.isArray(book.chapters) ? book.chapters : []
+      }));
     }
 
-    function maxChapter() {
-      const book = getBook();
-      return book && Array.isArray(book.chapters) ? book.chapters.length : 1;
+    async function loadVersion(versionIndex) {
+      if (bibleCache.has(versionIndex)) {
+        return bibleCache.get(versionIndex);
+      }
+
+      if (loadingPromises.has(versionIndex)) {
+        return loadingPromises.get(versionIndex);
+      }
+
+      const version = VERSIONS[versionIndex];
+
+      const promise = fetch(version.url, { cache: "force-cache" })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(normalizeBible)
+        .then(bible => {
+          bibleCache.set(versionIndex, bible);
+          return bible;
+        })
+        .finally(() => {
+          loadingPromises.delete(versionIndex);
+        });
+
+      loadingPromises.set(versionIndex, promise);
+      return promise;
     }
 
-    function renderChapter() {
-      const book = getBook();
+    function getMaxChapterFromBible(bible) {
+      const book = bible && bible[currentBookIndex];
+      return book && Array.isArray(book.chapters)
+        ? book.chapters.length
+        : 1;
+    }
+
+    function getCurrentMaxChapter() {
+      const loaded = Array.from(bibleCache.values());
+
+      if (!loaded.length) return 1;
+
+      return Math.max(
+        ...loaded.map(bible => getMaxChapterFromBible(bible))
+      );
+    }
+
+    function updateHeaderState() {
+      bookSelect.value = String(currentBookIndex);
+      chapterInput.value = String(currentChapter);
+    }
+
+    function renderVersion(index, bible) {
+      const book = bible && bible[currentBookIndex];
 
       if (!book) {
-        showMessage("Livro não encontrado.", "error");
+        showMessage(index, "Livro não encontrado nesta versão.", "error");
         return;
       }
 
-      const chapters = book.chapters || [];
-      const verses = chapters[currentChapter - 1];
+      const verses = book.chapters && book.chapters[currentChapter - 1];
 
       if (!Array.isArray(verses)) {
-        showMessage("Capítulo não encontrado nesta edição.", "error");
+        showMessage(index, "Capítulo não encontrado nesta edição.", "error");
         return;
       }
 
-      reference.textContent = `${book.name.toUpperCase()} ${currentChapter}`;
-      readingTitle.textContent = `${book.name} ${currentChapter}`;
-      readingBody.className = "verses";
-      readingBody.innerHTML = "";
+      const versionIndex = Number(versionSelects[index].value);
+      const version = VERSIONS[versionIndex];
 
-      verses.forEach((text, index) => {
+      versionTitles[index].textContent = version.name;
+      versionNotes[index].textContent = version.note;
+
+      references[index].textContent =
+        `${book.name.toUpperCase()} ${currentChapter}`;
+
+      readingTitles[index].textContent =
+        `${book.name} ${currentChapter}`;
+
+      readingBodies[index].className = "verses";
+      readingBodies[index].innerHTML = "";
+
+      verses.forEach((text, verseIndex) => {
         const row = document.createElement("article");
         row.className = "verse";
 
         const number = document.createElement("div");
         number.className = "verse-number";
-        number.textContent = String(index + 1);
+        number.textContent = String(verseIndex + 1);
 
         const verseText = document.createElement("div");
         verseText.className = "verse-text";
-        verseText.textContent = text;
+        verseText.textContent = String(text).trim();
 
         row.append(number, verseText);
-        readingBody.appendChild(row);
+        readingBodies[index].appendChild(row);
       });
+    }
 
+    async function renderColumn(index) {
+      const versionIndex = Number(versionSelects[index].value);
+      const version = VERSIONS[versionIndex];
+
+      versionTitles[index].textContent = version.name;
+      versionNotes[index].textContent = version.note;
+      references[index].textContent =
+        `${BOOKS[currentBookIndex][0].toUpperCase()} ${currentChapter}`;
+      readingTitles[index].textContent =
+        `${BOOKS[currentBookIndex][0]} ${currentChapter}`;
+
+      showMessage(index, `Carregando ${version.name}…`);
+
+      try {
+        const bible = await loadVersion(versionIndex);
+        renderVersion(index, bible);
+      } catch (error) {
+        showMessage(
+          index,
+          `Não foi possível carregar ${version.name} agora. Atualize a página e tente novamente.`,
+          "error"
+        );
+      }
+    }
+
+    async function renderAll() {
+      updateHeaderState();
+      await Promise.all([0,1,2].map(index => renderColumn(index)));
       updateButtons();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function updateButtons() {
-      const max = maxChapter();
-      const atFirstBook = currentBookIndex === 0 && currentChapter === 1;
-      const atLastBook = currentBookIndex === BOOKS.length - 1 && currentChapter === max;
+      const max = getCurrentMaxChapter();
+      const atFirst = currentBookIndex === 0 && currentChapter === 1;
+      const atLast =
+        currentBookIndex === BOOKS.length - 1 &&
+        currentChapter >= max;
 
-      prevButton.disabled = atFirstBook;
-      bottomPrev.disabled = atFirstBook;
-      nextButton.disabled = atLastBook;
-      bottomNext.disabled = atLastBook;
+      [prevButton, bottomPrev].forEach(button => {
+        button.disabled = atFirst;
+        button.style.opacity = atFirst ? ".45" : "1";
+        button.style.cursor = atFirst ? "not-allowed" : "pointer";
+      });
 
-      [prevButton, bottomPrev, nextButton, bottomNext].forEach(button => {
-        button.style.opacity = button.disabled ? ".45" : "1";
-        button.style.cursor = button.disabled ? "not-allowed" : "pointer";
+      [nextButton, bottomNext].forEach(button => {
+        button.disabled = atLast;
+        button.style.opacity = atLast ? ".45" : "1";
+        button.style.cursor = atLast ? "not-allowed" : "pointer";
       });
     }
 
-    function openReference(direction = 0) {
-      if (!bible) return;
-
-      currentBookIndex = Number(bookSelect.value);
+    async function openReference(direction = 0) {
+      let bookIndex = Number(bookSelect.value);
       let chapter = Number(chapterInput.value);
+
+      if (!Number.isInteger(bookIndex) || bookIndex < 0 ||
+          bookIndex >= BOOKS.length) {
+        bookIndex = 0;
+      }
 
       if (!Number.isInteger(chapter) || chapter < 1) {
         chapter = 1;
       }
 
       if (direction !== 0) {
+        const max = getCurrentMaxChapter();
+
         chapter += direction;
 
         if (chapter < 1) {
-          if (currentBookIndex > 0) {
-            currentBookIndex -= 1;
-            chapter = bible[currentBookIndex].chapters.length;
+          if (bookIndex > 0) {
+            bookIndex -= 1;
+            chapter = max;
           } else {
             chapter = 1;
           }
         }
 
-        if (chapter > bible[currentBookIndex].chapters.length) {
-          if (currentBookIndex < bible.length - 1) {
-            currentBookIndex += 1;
+        if (chapter > max) {
+          if (bookIndex < BOOKS.length - 1) {
+            bookIndex += 1;
             chapter = 1;
           } else {
-            chapter = bible[currentBookIndex].chapters.length;
+            chapter = max;
           }
         }
       }
 
+      currentBookIndex = bookIndex;
       currentChapter = chapter;
-      bookSelect.value = String(currentBookIndex);
-      chapterInput.value = String(currentChapter);
-      setActiveBook();
-      renderChapter();
-    }
 
-    async function loadBible() {
-      try {
-        const response = await fetch(DATA_URL, { cache: "force-cache" });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const raw = await response.json();
-
-        bible = raw.map((book, index) => ({
-          name: BOOKS[index][0],
-          abbrev: book.abbrev,
-          chapters: book.chapters
-        }));
-
-        reference.textContent = "GÊNESIS 1";
-        currentBookIndex = 0;
-        currentChapter = 1;
-        bookSelect.value = "0";
-        chapterInput.value = "1";
-        setActiveBook();
-        renderChapter();
-      } catch (error) {
-        reference.textContent = "ERRO AO CARREGAR";
-        readingTitle.textContent = "Bíblia";
-        showMessage(
-          "Não foi possível carregar o texto bíblico agora. Atualize a página e tente novamente.",
-          "error"
-        );
-      }
+      updateHeaderState();
+      await renderAll();
     }
 
     bookSelect.addEventListener("change", () => {
       currentBookIndex = Number(bookSelect.value);
       chapterInput.value = "1";
-      setActiveBook();
     });
 
     chapterInput.addEventListener("keydown", event => {
       if (event.key === "Enter") openReference(0);
+    });
+
+    versionSelects.forEach(select => {
+      select.addEventListener("change", () => {
+        const index = Number(select.id.replace("version-", ""));
+        renderColumn(index);
+      });
     });
 
     openButton.addEventListener("click", () => openReference(0));
@@ -671,8 +884,8 @@
     bottomNext.addEventListener("click", () => openReference(1));
 
     createBookOptions();
-    createBookList();
-    loadBible();
+    createVersionOptions();
+    renderAll();
   </script>
 </body>
 </html>
