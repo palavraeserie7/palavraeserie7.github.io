@@ -1,1121 +1,291 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palavra &amp; Série — Sala do Escritor</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-
 :root{
-  --p:#20d66b;
-  --bg:#0b1428;
-  --s:#111b30;
-  --c:#17243a;
-  --i:#0d172b;
-  --t:#dbe7f5;
-  --b:#263754;
-  --a:#18bfff;
-  --muted:#91a4bd;
-  --error:#ff6b6b;
-
-  --radius:8px;
-  --shadow:0 18px 45px rgba(0,0,0,.28);
+  --p:#20d66b;--bg:#0b1428;--s:#111b30;--c:#17243a;--i:#0d172b;
+  --t:#dbe7f5;--b:#263754;--a:#18bfff;--muted:#91a4bd;--error:#ff6b6b;
+  --radius:8px;--shadow:0 18px 45px rgba(0,0,0,.28);
 }
-
-*{
-  box-sizing:border-box;
-}
-
-html{
-  min-height:100%;
-}
-
+*{box-sizing:border-box}
+html{min-height:100%}
 body{
-  margin:0;
-  min-height:100vh;
-
+  margin:0;min-height:100vh;color:var(--t);
   background:
-    radial-gradient(
-      circle at 12% 0%,
-      rgba(24,191,255,.07),
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at 90% 15%,
-      rgba(32,214,107,.06),
-      transparent 28%
-    ),
-    linear-gradient(
-      145deg,
-      #0b1428,
-      #0c162b 55%,
-      #091225
-    );
-
-  color:var(--t);
-
-  font-family:
-    "Segoe UI",
-    Arial,
-    Helvetica,
-    sans-serif;
+    radial-gradient(circle at 12% 0%,rgba(24,191,255,.07),transparent 30%),
+    radial-gradient(circle at 90% 15%,rgba(32,214,107,.06),transparent 28%),
+    linear-gradient(145deg,#0b1428,#0c162b 55%,#091225);
+  font-family:"Segoe UI",Arial,Helvetica,sans-serif;
 }
-
-/* =========================
-   TOPO
-========================= */
-
-header{
-  border-bottom:1px solid var(--b);
-
-  background:rgba(11,20,40,.94);
-
-  backdrop-filter:blur(10px);
-
-  position:sticky;
-  top:0;
-  z-index:20;
-}
-
-.header-inner{
-  width:min(1180px,92%);
-  margin:auto;
-
-  min-height:54px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  gap:18px;
-}
-
-.brand{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-
-.brand-title{
-  font-size:17px;
-  font-weight:700;
-  letter-spacing:1.8px;
-}
-
-.brand-subtitle{
-  color:var(--muted);
-  font-size:10px;
-  letter-spacing:1.2px;
-}
-
-.session{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.user-email{
-  color:var(--p);
-
-  font-size:12px;
-
-  max-width:280px;
-
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-
-.btn-logout{
-  border:1px solid var(--b);
-
-  background:var(--i);
-  color:var(--muted);
-
-  padding:9px 13px;
-
-  border-radius:5px;
-
-  cursor:pointer;
-
-  font-size:11px;
-  letter-spacing:1px;
-
-  transition:.2s;
-}
-
-.btn-logout:hover{
-  border-color:var(--p);
-  color:var(--t);
-  background:#12203a;
-}
-
-.btn-logout:disabled{
-  opacity:.55;
-  cursor:wait;
-}
-
-/* =========================
-   CONTEÚDO
-========================= */
-
-main{
-  width:min(1180px,92%);
-  margin:0 auto;
-
-  padding:24px 0 50px;
-}
-
-.hero{
-  margin-bottom:18px;
-}
-
-.hero-label{
-  color:var(--p);
-
-  font-size:11px;
-
-  letter-spacing:2px;
-
-  margin-bottom:8px;
-}
-
-.hero h1{
-  margin:0;
-
-  font-size:27px;
-  font-weight:600;
-
-  letter-spacing:.3px;
-}
-
-.hero p{
-  margin:7px 0 0;
-
-  max-width:760px;
-
-  color:var(--muted);
-
-  line-height:1.55;
-
-  font-size:13px;
-}
-
-.section-title{
-  color:var(--t);
-
-  font-size:11px;
-  font-weight:700;
-
-  letter-spacing:2px;
-
-  margin-bottom:10px;
-
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.section-title::after{
-  content:"";
-
-  height:1px;
-  flex:1;
-
-  background:var(--b);
-}
-
-/* =========================
-   BLOCOS
-========================= */
-
-.workspace{
-  display:grid;
-
-  grid-template-columns:
-    repeat(2,minmax(0,1fr));
-
-  gap:18px;
-}
-
-.workspace-3{
-  grid-template-columns:
-    repeat(3,minmax(0,1fr));
-
-  margin-top:20px;
-}
-
-.bible-grid{
-  gap:14px;
-}
-
-.bible-card{
-  min-height:250px;
-  padding:22px;
-}
-
-.bible-card .card-main{
-  align-items:flex-start;
-}
-
-.bible-card .icon{
-  color:var(--a);
-  border-color:#315071;
-}
-
-.bible-card h2{
-  font-size:16px;
-}
-
-.bible-card p{
-  font-size:12px;
-  line-height:1.6;
-}
-
-.bible-card .card-footer{
-  margin-top:20px;
-}
-
-.bible-note{
-  margin-top:12px;
-  color:#7187a3;
-  font-size:9px;
-  line-height:1.5;
-  letter-spacing:.7px;
-}
-
-/* =========================
-   CARDS
-========================= */
-
+header{border-bottom:1px solid var(--b);background:rgba(11,20,40,.94);backdrop-filter:blur(10px);position:sticky;top:0;z-index:20}
+.header-inner{width:min(1180px,92%);margin:auto;min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand-title{font-size:17px;font-weight:700;letter-spacing:1.8px}
+.brand-subtitle{color:var(--muted);font-size:10px;letter-spacing:1.2px}
+.session{display:flex;align-items:center;gap:15px}
+.user-email{color:var(--p);font-size:12px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-logout{border:1px solid var(--b);background:var(--i);color:var(--muted);padding:9px 13px;border-radius:5px;cursor:pointer;font-size:11px;letter-spacing:1px;transition:.2s}
+.btn-logout:hover{border-color:var(--p);color:var(--t);background:#12203a}
+.btn-logout:disabled{opacity:.55;cursor:wait}
+
+main{width:min(1180px,92%);margin:0 auto;padding:24px 0 50px}
+.hero{margin-bottom:18px}
+.hero-label{color:var(--p);font-size:11px;letter-spacing:2px;margin-bottom:8px}
+.hero h1{margin:0;font-size:27px;font-weight:600;letter-spacing:.3px}
+.hero p{margin:7px 0 0;max-width:760px;color:var(--muted);line-height:1.55;font-size:13px}
+.section-title{color:var(--t);font-size:11px;font-weight:700;letter-spacing:2px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.section-title::after{content:"";height:1px;flex:1;background:var(--b)}
+
+.workspace{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .card{
-  position:relative;
+  position:relative;background:linear-gradient(145deg,rgba(23,36,58,.98),rgba(17,27,48,.98));
+  border:1px solid var(--b);border-radius:var(--radius);padding:27px;min-height:210px;
+  display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow);
+  transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease;
+}
+.card:hover{transform:translateY(-3px);border-color:#365276;background:linear-gradient(145deg,rgba(28,45,72,.99),rgba(17,29,51,.99));box-shadow:0 22px 50px rgba(0,0,0,.34)}
+.card-primary{grid-column:1 / -1;min-height:175px;border-color:#31566b;background:linear-gradient(145deg,rgba(23,42,63,.99),rgba(17,27,48,.99))}
+.card-primary:hover{border-color:#3e7792}
+.card-main{display:flex;gap:16px}
+.icon{width:48px;height:48px;flex:0 0 48px;border:1px solid #315071;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--a);background:var(--i)}
+.card-primary .icon{border-color:#2d7895;color:var(--p);background:#0b1a2d}
+.card h2{margin:1px 0 9px;font-size:17px;font-weight:600;letter-spacing:.4px}
+.card-primary h2{font-size:19px}
+.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}
+.card-footer{margin-top:27px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.card-status{color:#7187a3;font-size:10px;letter-spacing:1.2px;text-transform:uppercase}
+.btn-open{display:inline-block;text-decoration:none;border:1px solid #315071;background:var(--i);color:var(--t);padding:10px 15px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:1.2px;transition:.2s}
+.btn-open:hover{background:#14253e;border-color:var(--a);color:#fff}
+.card-primary .btn-open{border-color:#2d7895;color:#dff8ff;padding:12px 19px}
+.card-primary .btn-open:hover{border-color:var(--p);color:#fff}
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(23,36,58,.98),
-      rgba(17,27,48,.98)
-    );
-
-  border:1px solid var(--b);
-
+/* BÍBLIA PARALELA */
+.parallel-bible{
+  margin-top:20px;
+  padding:22px;
+  border:1px solid #31566b;
   border-radius:var(--radius);
-
-  padding:27px;
-
-  min-height:210px;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-
-  box-shadow:var(--shadow);
-
-  transition:
-    transform .2s ease,
-    border-color .2s ease,
-    background .2s ease,
-    box-shadow .2s ease;
-}
-
-.card:hover{
-  transform:translateY(-3px);
-
-  border-color:#365276;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(28,45,72,.99),
-      rgba(17,29,51,.99)
-    );
-
-  box-shadow:0 22px 50px rgba(0,0,0,.34);
-}
-
-.card-primary{
-  grid-column:1 / -1;
-  min-height:175px;
-
-  border-color:#31566b;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(23,42,63,.99),
-      rgba(17,27,48,.99)
-    );
-}
-
-.card-primary:hover{
-  border-color:#3e7792;
-}
-
-.card-main{
-  display:flex;
-  gap:16px;
-}
-
-.icon{
-  width:48px;
-  height:48px;
-
-  flex:0 0 48px;
-
-  border:1px solid #315071;
-
-  border-radius:6px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:21px;
-
-  color:var(--a);
-
-  background:var(--i);
-}
-
-.card-primary .icon{
-  border-color:#2d7895;
-  color:var(--p);
-  background:#0b1a2d;
-}
-
-.card h2{
-  margin:1px 0 9px;
-
-  font-size:17px;
-  font-weight:600;
-
-  letter-spacing:.4px;
-}
-
-.card-primary h2{
-  font-size:19px;
-}
-
-.card p{
-  margin:0;
-
-  color:var(--muted);
-
-  font-size:13px;
-  line-height:1.65;
-}
-
-.card-footer{
-  margin-top:27px;
-
-  display:flex;
-
-  align-items:center;
-  justify-content:space-between;
-
-  gap:15px;
-}
-
-.card-status{
-  color:#7187a3;
-
-  font-size:10px;
-
-  letter-spacing:1.2px;
-
-  text-transform:uppercase;
-}
-
-.btn-open{
-  display:inline-block;
-
-  text-decoration:none;
-
-  border:1px solid #315071;
-
-  background:var(--i);
-
-  color:var(--t);
-
-  padding:10px 15px;
-
-  border-radius:5px;
-
-  font-size:10px;
-  font-weight:700;
-
-  letter-spacing:1.2px;
-
-  transition:.2s;
-}
-
-.btn-open:hover{
-  background:#14253e;
-
-  border-color:var(--a);
-
-  color:#fff;
-}
-
-.card-primary .btn-open{
-  border-color:#2d7895;
-  color:#dff8ff;
-  padding:12px 19px;
-}
-
-.card-primary .btn-open:hover{
-  border-color:var(--p);
-  color:#fff;
-}
-
-/* =========================
-   FAIXA INFORMATIVA
-========================= */
-
-.info{
-  margin-top:35px;
-
-  border:1px solid var(--b);
-
-  border-radius:7px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(17,27,48,.86),
-      rgba(13,23,43,.92)
-    );
-
-  padding:21px 24px;
-}
-
-.info-title{
-  font-size:11px;
-
-  color:var(--a);
-
-  letter-spacing:1.7px;
-
-  margin-bottom:9px;
-}
-
-.info p{
-  margin:0;
-
-  color:var(--muted);
-
-  font-size:12px;
-
-  line-height:1.7;
-}
-
-/* =========================
-   RODAPÉ
-========================= */
-
-footer{
-  border-top:1px solid var(--b);
-
-  padding:25px 0 35px;
-
-  background:#091225;
-}
-
-.footer-inner{
-  width:min(1180px,92%);
-  margin:auto;
-
-  display:flex;
-
-  justify-content:space-between;
-  align-items:center;
-
-  gap:20px;
-}
-
-.footer-left{
-  color:#6f829b;
-
-  font-size:10px;
-
-  letter-spacing:1px;
-}
-
-.footer-link{
-  color:#8ca1ba;
-
-  text-decoration:none;
-
-  font-size:10px;
-
-  letter-spacing:1px;
-
-  transition:.2s;
-}
-
-.footer-link:hover{
-  color:var(--a);
-}
-
-/* =========================
-   ESTADOS
-========================= */
-
-#loading{
-  min-height:100vh;
-
-  display:flex;
-
-  align-items:center;
-  justify-content:center;
-
-  background:#0b1428;
-
-  color:var(--muted);
-
-  font-size:12px;
-
-  letter-spacing:1.5px;
-}
-
-#error{
-  display:none;
-
-  min-height:100vh;
-
-  align-items:center;
-  justify-content:center;
-
-  padding:30px;
-
-  text-align:center;
-
-  background:#0b1428;
-}
-
-.error-box{
-  width:min(500px,100%);
-
-  border:1px solid var(--b);
-
-  background:var(--s);
-
-  padding:35px;
-
-  border-radius:var(--radius);
-
+  background:linear-gradient(145deg,rgba(23,42,63,.99),rgba(17,27,48,.99));
   box-shadow:var(--shadow);
 }
-
-.error-box h2{
-  margin-top:0;
-
-  color:var(--t);
-
-  font-size:18px;
+.parallel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}
+.parallel-kicker{margin:0 0 6px;color:var(--a);font-size:10px;font-weight:700;letter-spacing:1.6px}
+.parallel-head h2{margin:0;font-size:20px;font-weight:600}
+.parallel-head p{margin:6px 0 0;max-width:700px;color:var(--muted);font-size:12px;line-height:1.6}
+.parallel-sources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.source-column{
+  min-width:0;padding:17px;border:1px solid var(--b);border-radius:7px;
+  background:rgba(13,23,43,.72)
 }
-
-.error-box p{
-  color:var(--muted);
-
-  line-height:1.7;
-
-  font-size:13px;
+.source-mark{
+  width:38px;height:38px;margin-bottom:12px;border:1px solid #315071;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;background:var(--i);color:var(--a);font-weight:700
 }
+.source-column:nth-child(2) .source-mark{color:var(--p)}
+.source-column h3{margin:0 0 6px;font-size:14px;font-weight:600}
+.source-name{margin:0 0 9px;color:#b9c9dc;font-size:10px;letter-spacing:.8px}
+.source-column p{margin:0;color:var(--muted);font-size:11px;line-height:1.6}
+.parallel-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:18px;padding-top:16px;border-top:1px solid var(--b)}
+.parallel-status{color:#7187a3;font-size:9px;letter-spacing:1.1px}
+.parallel-note{margin-top:12px;color:#7187a3;font-size:9px;line-height:1.5;letter-spacing:.5px}
 
-.btn-login{
-  display:inline-block;
+.info{margin-top:35px;border:1px solid var(--b);border-radius:7px;background:linear-gradient(145deg,rgba(17,27,48,.86),rgba(13,23,43,.92));padding:21px 24px}
+.info-title{font-size:11px;color:var(--a);letter-spacing:1.7px;margin-bottom:9px}
+.info p{margin:0;color:var(--muted);font-size:12px;line-height:1.7}
 
-  margin-top:15px;
+footer{border-top:1px solid var(--b);padding:25px 0 35px;background:#091225}
+.footer-inner{width:min(1180px,92%);margin:auto;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.footer-left{color:#6f829b;font-size:10px;letter-spacing:1px}
+.footer-link{color:#8ca1ba;text-decoration:none;font-size:10px;letter-spacing:1px;transition:.2s}
+.footer-link:hover{color:var(--a)}
 
-  padding:11px 17px;
-
-  border:1px solid #315071;
-
-  color:var(--t);
-
-  background:var(--i);
-
-  text-decoration:none;
-
-  border-radius:5px;
-
-  font-size:10px;
-
-  letter-spacing:1.2px;
-
-  transition:.2s;
-}
-
-.btn-login:hover{
-  border-color:var(--a);
-  color:#fff;
-}
-
-/* =========================
-   RESPONSIVO
-========================= */
+#loading{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0b1428;color:var(--muted);font-size:12px;letter-spacing:1.5px}
+#error{display:none;min-height:100vh;align-items:center;justify-content:center;padding:30px;text-align:center;background:#0b1428}
+.error-box{width:min(500px,100%);border:1px solid var(--b);background:var(--s);padding:35px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.error-box h2{margin-top:0;color:var(--t);font-size:18px}
+.error-box p{color:var(--muted);line-height:1.7;font-size:13px}
+.btn-login{display:inline-block;margin-top:15px;padding:11px 17px;border:1px solid #315071;color:var(--t);background:var(--i);text-decoration:none;border-radius:5px;font-size:10px;letter-spacing:1.2px;transition:.2s}
+.btn-login:hover{border-color:var(--a);color:#fff}
 
 @media(max-width:900px){
-
-  .workspace-3{
-    grid-template-columns:1fr;
-  }
-
+  .parallel-sources{grid-template-columns:1fr}
 }
-
 @media(max-width:760px){
-
-  .header-inner{
-    min-height:72px;
-
-    align-items:flex-start;
-
-    padding:12px 0;
-
-    flex-direction:column;
-  }
-
-  .session{
-    width:100%;
-
-    justify-content:space-between;
-  }
-
-  .user-email{
-    max-width:210px;
-  }
-
-  main{
-    padding-top:28px;
-  }
-
-  .hero h1{
-    font-size:27px;
-  }
-
-  .workspace{
-    grid-template-columns:1fr;
-  }
-
-  .card-primary{
-    grid-column:auto;
-  }
-
-  .card-main{
-    gap:15px;
-  }
-
-  .card-footer{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .footer-inner{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
+  .header-inner{min-height:72px;align-items:flex-start;padding:12px 0;flex-direction:column}
+  .session{width:100%;justify-content:space-between}
+  .user-email{max-width:210px}
+  main{padding-top:28px}
+  .hero h1{font-size:27px}
+  .workspace{grid-template-columns:1fr}
+  .card-primary{grid-column:auto}
+  .card-main{gap:15px}
+  .card-footer,.parallel-footer{align-items:flex-start;flex-direction:column}
+  .parallel-head{flex-direction:column}
+  .footer-inner{flex-direction:column;align-items:flex-start}
 }
-
 @media(max-width:480px){
-
-  main{
-    width:calc(100% - 30px);
-  }
-
-  .header-inner,
-  .footer-inner{
-    width:calc(100% - 30px);
-  }
-
-  .card{
-    padding:21px;
-  }
-
-  .hero h1{
-    font-size:25px;
-  }
-
-  .icon{
-    width:42px;
-    height:42px;
-    flex-basis:42px;
-    font-size:18px;
-  }
-
+  main{width:calc(100% - 30px)}
+  .header-inner,.footer-inner{width:calc(100% - 30px)}
+  .card{padding:21px}
+  .parallel-bible{padding:18px}
+  .hero h1{font-size:25px}
+  .icon{width:42px;height:42px;flex-basis:42px;font-size:18px}
 }
-
 </style>
-
 </head>
 
 <body>
 
-<div id="loading">
-  ABRINDO SALA DO ESCRITOR...
-</div>
-
+<div id="loading">ABRINDO SALA DO ESCRITOR...</div>
 
 <div id="error">
-
   <div class="error-box">
-
-    <h2>
-      ACESSO RESTRITO
-    </h2>
-
-    <p>
-      A Sala do Escritor é uma área privada.
-      Para entrar, é necessário estar autenticado.
-    </p>
-
-    <a
-      class="btn-login"
-      href="entrada.html"
-    >
-      IR PARA ENTRADA
-    </a>
-
+    <h2>ACESSO RESTRITO</h2>
+    <p>A Sala do Escritor é uma área privada. Para entrar, é necessário estar autenticado.</p>
+    <a class="btn-login" href="entrada.html">IR PARA ENTRADA</a>
   </div>
-
 </div>
 
-
-<div
-  id="app"
-  style="display:none;"
->
+<div id="app" style="display:none;">
 
 <header>
-
   <div class="header-inner">
-
     <div class="brand">
-
-      <div class="brand-title">
-        PALAVRA &amp; SÉRIE
-      </div>
-
-      <div class="brand-subtitle">
-        SALA DO ESCRITOR
-      </div>
-
+      <div class="brand-title">PALAVRA &amp; SÉRIE</div>
+      <div class="brand-subtitle">SALA DO ESCRITOR</div>
     </div>
-
-
     <div class="session">
-
-      <div
-        id="userEmail"
-        class="user-email"
-      >
-        —
-      </div>
-
-      <button
-        id="logoutBtn"
-        class="btn-logout"
-        type="button"
-      >
-        SAIR
-      </button>
-
+      <div id="userEmail" class="user-email">—</div>
+      <button id="logoutBtn" class="btn-logout" type="button">SAIR</button>
     </div>
-
   </div>
-
 </header>
-
 
 <main>
 
-  <section class="hero">
+<section class="hero">
+  <div class="hero-label">ÁREA PRIVADA DE CRIAÇÃO</div>
+  <h1>Sala do Escritor</h1>
+  <p>
+    Este é o espaço de trabalho do autor. Aqui ficam reunidas as ferramentas
+    de criação, organização e gestão dos conteúdos produzidos dentro do
+    Palavra &amp; Série.
+  </p>
+</section>
 
-    <div class="hero-label">
-      ÁREA PRIVADA DE CRIAÇÃO
+<div class="section-title">ESTRUTURA DE TRABALHO</div>
+
+<section class="workspace">
+
+<article class="card card-primary">
+  <div class="card-main">
+    <div class="icon">✍</div>
+    <div>
+      <h2>Matriz Técnica de Pesquisa PRO</h2>
+      <p>
+        Estrutura principal de criação de conteúdo. Organize a pesquisa,
+        desenvolva as etapas do projeto e trabalhe sobre a folha de trabalho
+        da Matriz PRO.
+      </p>
     </div>
+  </div>
+  <div class="card-footer">
+    <span class="card-status">FERRAMENTA PRINCIPAL DE CRIAÇÃO</span>
+    <a class="btn-open" href="matriz-pro.html">ABRIR MATRIZ PRO →</a>
+  </div>
+</article>
 
-    <h1>
-      Sala do Escritor
-    </h1>
+</section>
 
-    <p>
-      Este é o espaço de trabalho do autor.
-      Aqui ficam reunidas as ferramentas de criação,
-      organização e gestão dos conteúdos produzidos
-      dentro do Palavra &amp; Série.
-    </p>
+<div class="section-title" style="margin-top:18px;">BÍBLIAS DE CONSULTA</div>
 
-  </section>
+<section class="parallel-bible">
 
-
-  <div class="section-title">
-    ESTRUTURA DE TRABALHO
+  <div class="parallel-head">
+    <div>
+      <p class="parallel-kicker">LEITURA PARALELA · TRÊS FONTES</p>
+      <h2>Bíblia Paralela</h2>
+      <p>
+        Consulta organizada em três colunas: português, hebraico e grego.
+        A interface bíblica passa a ser um único módulo de leitura, preparado
+        para receber os textos autorizados e mantê-los alinhados por livro,
+        capítulo e versículo.
+      </p>
+    </div>
   </div>
 
+  <div class="parallel-sources">
 
-  <section class="workspace">
-
-
-    <article class="card card-primary">
-
-      <div class="card-main">
-
-        <div class="icon">
-          ✍
-        </div>
-
-        <div>
-
-          <h2>
-            Matriz Técnica de Pesquisa PRO
-          </h2>
-
-          <p>
-            Estrutura principal de criação de conteúdo.
-            Organize a pesquisa, desenvolva as etapas
-            do projeto e trabalhe sobre a folha de trabalho
-            da Matriz PRO.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="card-footer">
-
-        <span class="card-status">
-          FERRAMENTA PRINCIPAL DE CRIAÇÃO
-        </span>
-
-        <a
-          class="btn-open"
-          href="matriz-pro.html"
-        >
-          ABRIR MATRIZ PRO →
-        </a>
-
-      </div>
-
+    <article class="source-column">
+      <div class="source-mark">PT</div>
+      <h3>Português</h3>
+      <p class="source-name">ALMEIDA 1911</p>
+      <p>
+        Texto português de referência para leitura e comparação.
+        Edição histórica em domínio público.
+      </p>
     </article>
 
+    <article class="source-column">
+      <div class="source-mark">א</div>
+      <h3>Hebraico</h3>
+      <p class="source-name">WLC · OSHB</p>
+      <p>
+        Texto hebraico do Antigo Testamento, com possibilidade de acrescentar
+        posteriormente lema, morfologia e dados linguísticos do OSHB.
+      </p>
+    </article>
 
+    <article class="source-column">
+      <div class="source-mark">Ω</div>
+      <h3>Grego</h3>
+      <p class="source-name">NESTLE 1904</p>
+      <p>
+        Texto grego do Novo Testamento em edição histórica de domínio público,
+        adequado à consulta do texto original.
+      </p>
+    </article>
 
-
-
-
-  </section>
-
-
-  <div class="section-title" style="margin-top:18px;">
-    BÍBLIAS DE CONSULTA
   </div>
 
+  <div class="parallel-footer">
+    <span class="parallel-status">MÓDULO DE LEITURA PARALELA</span>
+    <a class="btn-open" href="biblia.html">ABRIR BÍBLIA PARALELA →</a>
+  </div>
 
-  <section class="workspace workspace-3 bible-grid">
+  <div class="parallel-note">
+    FONTES SELECIONADAS PARA O PROJETO · OS TEXTOS INTEGRAIS SERÃO CONECTADOS
+    AO MÓDULO DE LEITURA A PARTIR DOS ARQUIVOS TEXTUAIS AUTORIZADOS.
+  </div>
 
+</section>
 
-    <article class="card bible-card">
-
-      <div class="card-main">
-
-        <div class="icon">
-          PT
-        </div>
-
-        <div>
-
-          <h2>
-            Bíblia em Português
-          </h2>
-
-          <p>
-            Texto bíblico em português para leitura e
-            consulta, servindo como coluna de comparação
-            com os textos originais.
-          </p>
-
-          <div class="bible-note">
-            LEITURA DE APOIO / COMPARAÇÃO
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="card-footer">
-
-        <span class="card-status">
-          TEXTO EM PORTUGUÊS
-        </span>
-
-        <a
-          class="btn-open"
-          href="biblia-portugues.html"
-        >
-          ABRIR →
-        </a>
-
-      </div>
-
-    </article>
-
-
-    <article class="card bible-card">
-
-      <div class="card-main">
-
-        <div class="icon">
-          א
-        </div>
-
-        <div>
-
-          <h2>
-            Bíblia Hebraica
-          </h2>
-
-          <p>
-            Antigo Testamento em hebraico para consulta
-            do texto original e comparação com a versão
-            em português.
-          </p>
-
-          <div class="bible-note">
-            TEXTO ORIGINAL / ANTIGO TESTAMENTO
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="card-footer">
-
-        <span class="card-status">
-          ANTIGO TESTAMENTO
-        </span>
-
-        <a
-          class="btn-open"
-          href="biblia-hebraico.html"
-        >
-          ABRIR →
-        </a>
-
-      </div>
-
-    </article>
-
-
-    <article class="card bible-card">
-
-      <div class="card-main">
-
-        <div class="icon">
-          Ω
-        </div>
-
-        <div>
-
-          <h2>
-            Novo Testamento Grego
-          </h2>
-
-          <p>
-            Novo Testamento em grego para consulta do
-            texto original e comparação com a versão
-            em português.
-          </p>
-
-          <div class="bible-note">
-            TEXTO ORIGINAL / NOVO TESTAMENTO
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="card-footer">
-
-        <span class="card-status">
-          NOVO TESTAMENTO
-        </span>
-
-        <a
-          class="btn-open"
-          href="biblia-grego.html"
-        >
-          ABRIR →
-        </a>
-
-      </div>
-
-    </article>
-
-
-  </section>
-
-
-  <section class="info">
-
-    <div class="info-title">
-      SOBRE ESTA ÁREA
-    </div>
-
-    <p>
-      A Sala do Escritor não faz parte da navegação pública
-      principal do site. O acesso é realizado após a
-      autenticação do autor. A Matriz PRO funciona aqui
-      como a estrutura de criação e desenvolvimento
-      dos conteúdos.
-    </p>
-
-  </section>
+<section class="info">
+  <div class="info-title">SOBRE ESTA ÁREA</div>
+  <p>
+    A Sala do Escritor não faz parte da navegação pública principal do site.
+    O acesso é realizado após a autenticação do autor. A Matriz PRO funciona
+    aqui como a estrutura de criação e desenvolvimento dos conteúdos.
+    A Bíblia Paralela permanece como módulo independente de consulta.
+  </p>
+</section>
 
 </main>
 
-
 <footer>
-
   <div class="footer-inner">
-
-    <div class="footer-left">
-      PALAVRA &amp; SÉRIE — SALA DO ESCRITOR
-    </div>
-
-    <a
-      class="footer-link"
-      href="javascript:history.back()"
-    >
-      ← VOLTAR
-    </a>
-
+    <div class="footer-left">PALAVRA &amp; SÉRIE — SALA DO ESCRITOR</div>
+    <a class="footer-link" href="javascript:history.back()">← VOLTAR</a>
   </div>
-
 </footer>
-
 
 </div>
 
-
 <script>
-
 const SUPABASE_URL =
   "https://qmhdbuxomozdczgvpvcc.supabase.co";
 
@@ -1128,153 +298,63 @@ const supabaseClient =
     SUPABASE_ANON_KEY
   );
 
-
-const loading =
-  document.getElementById("loading");
-
-const app =
-  document.getElementById("app");
-
-const errorBox =
-  document.getElementById("error");
-
-const userEmail =
-  document.getElementById("userEmail");
-
-const logoutBtn =
-  document.getElementById("logoutBtn");
-
+const loading = document.getElementById("loading");
+const app = document.getElementById("app");
+const errorBox = document.getElementById("error");
+const userEmail = document.getElementById("userEmail");
+const logoutBtn = document.getElementById("logoutBtn");
 
 async function verificarSessao(){
-
   try{
+    const {data,error} = await supabaseClient.auth.getSession();
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .auth
-        .getSession();
+    if(error) throw error;
 
-
-    if(error){
-      throw error;
-    }
-
-
-    const session =
-      data.session;
-
+    const session = data.session;
 
     if(!session){
-
-      loading.style.display =
-        "none";
-
-      errorBox.style.display =
-        "flex";
-
+      loading.style.display = "none";
+      errorBox.style.display = "flex";
       return;
-
     }
 
+    const email = session.user?.email || "AUTOR";
 
-    const email =
-      session.user?.email ||
-      "AUTOR";
-
-
-    userEmail.textContent =
-      email;
-
-    loading.style.display =
-      "none";
-
-    app.style.display =
-      "block";
-
+    userEmail.textContent = email;
+    loading.style.display = "none";
+    app.style.display = "block";
 
   }catch(error){
-
-    console.error(
-      "Erro ao verificar sessão:",
-      error
-    );
-
-    loading.style.display =
-      "none";
-
-    errorBox.style.display =
-      "flex";
-
+    console.error("Erro ao verificar sessão:",error);
+    loading.style.display = "none";
+    errorBox.style.display = "flex";
   }
-
 }
 
+logoutBtn.addEventListener("click",async function(){
+  logoutBtn.disabled = true;
+  logoutBtn.textContent = "SAINDO...";
 
-logoutBtn.addEventListener(
-  "click",
-  async function(){
+  const {error} = await supabaseClient.auth.signOut();
 
-    logoutBtn.disabled =
-      true;
-
-    logoutBtn.textContent =
-      "SAINDO...";
-
-
-    const {
-      error
-    } =
-      await supabaseClient
-        .auth
-        .signOut();
-
-
-    if(error){
-
-      console.error(
-        "Erro ao sair:",
-        error
-      );
-
-      logoutBtn.disabled =
-        false;
-
-      logoutBtn.textContent =
-        "SAIR";
-
-      return;
-
-    }
-
-
-    window.location.href =
-      "entrada.html";
-
+  if(error){
+    console.error("Erro ao sair:",error);
+    logoutBtn.disabled = false;
+    logoutBtn.textContent = "SAIR";
+    return;
   }
-);
 
+  window.location.href = "entrada.html";
+});
 
-supabaseClient.auth.onAuthStateChange(
-  function(event, session){
-
-    if(event === "SIGNED_OUT"){
-
-      window.location.href =
-        "entrada.html";
-
-    }
-
+supabaseClient.auth.onAuthStateChange(function(event,session){
+  if(event === "SIGNED_OUT"){
+    window.location.href = "entrada.html";
   }
-);
-
+});
 
 verificarSessao();
-
 </script>
 
 </body>
-
 </html>
