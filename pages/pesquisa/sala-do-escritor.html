@@ -401,6 +401,18 @@ main{
 
 .parallel-head .source:last-child{border-right:0}
 
+/* A Bíblia escolhida ocupa toda a área de leitura. */
+.parallel-head,
+.verse-row{
+  grid-template-columns:1fr;
+  min-width:0;
+}
+
+.parallel-head .source[hidden],
+.verse-cell[hidden]{
+  display:none !important;
+}
+
 .source-label{
   display:block;
   color:var(--a);
@@ -896,6 +908,15 @@ footer{
   </div>
 
   <div class="bible-controls">
+    <label class="bible-version-control">
+      <span>BÍBLIA</span>
+      <select id="bibleSelect" aria-label="Bíblia">
+        <option value="portuguese">Português — Almeida 1911</option>
+        <option value="hebrew">Hebraico — WLC / OSHB</option>
+        <option value="greek">Grego — Nestle 1904 / Textus Receptus</option>
+      </select>
+    </label>
+
     <label>
       <span>LIVRO</span>
       <select id="bookSelect" aria-label="Livro"></select>
@@ -916,12 +937,12 @@ footer{
   <div class="parallel-reader">
 
     <div class="parallel-head">
-      <div class="source">
+      <div class="source" data-bible-source="hebrew">
         <span class="source-label">HEBRAICO</span>
         <span class="source-name">WLC · OSHB</span>
       </div>
 
-      <div class="source">
+      <div class="source" data-bible-source="greek">
         <span class="source-label">GREGO</span>
         <div class="source-name-line">
           <span id="greekSourceName" class="source-name">NESTLE 1904</span>
@@ -932,7 +953,7 @@ footer{
         </div>
       </div>
 
-      <div class="source">
+      <div class="source" data-bible-source="portuguese">
         <span class="source-label">PORTUGUÊS</span>
         <span class="source-name">ALMEIDA 1911 · TEXTO HISTÓRICO</span>
       </div>
@@ -995,6 +1016,7 @@ const errorBox = document.getElementById("error");
 const userEmail = document.getElementById("userEmail");
 const logoutBtn = document.getElementById("logoutBtn");
 
+const bibleSelect = document.getElementById("bibleSelect");
 const bookSelect = document.getElementById("bookSelect");
 const chapterSelect = document.getElementById("chapterSelect");
 const prevChapter = document.getElementById("prevChapter");
@@ -1101,6 +1123,7 @@ let portugueseBible = null;
 const sourceCache = new Map();
 let currentBookIndex = 0;
 let currentChapter = 1;
+let currentBible = "portuguese";
 let currentGreekSource = "nestle";
 
 function escapeHTML(value){
@@ -1322,20 +1345,32 @@ function buildVerseMap(items){
   return map;
 }
 
+function applyBibleLayout(){
+  document.querySelectorAll("[data-bible-source]").forEach(source => {
+    source.hidden = source.dataset.bibleSource !== currentBible;
+  });
+
+  if(bibleSelect){
+    bibleSelect.value = currentBible;
+  }
+}
+
 function renderRows(bookCode, testament, hebrewMap, greekMap){
-  const pt = getPortugueseChapter();
-  const ptMap = buildVerseMap(pt);
+  const ptMap = buildVerseMap(getPortugueseChapter());
+  const hebrew = testament === "OT"
+    ? buildVerseMap(getOriginalChapter(hebrewMap))
+    : new Map();
+  const greek = testament === "NT"
+    ? buildVerseMap(getOriginalChapter(greekMap))
+    : new Map();
 
-  const hebrew = testament === "OT" ? buildVerseMap(getOriginalChapter(hebrewMap)) : new Map();
-  const greek = testament === "NT" ? buildVerseMap(getOriginalChapter(greekMap)) : new Map();
+  const selectedMap = currentBible === "hebrew"
+    ? hebrew
+    : currentBible === "greek"
+      ? greek
+      : ptMap;
 
-  const numbers = new Set([
-    ...ptMap.keys(),
-    ...hebrew.keys(),
-    ...greek.keys()
-  ]);
-
-  const ordered = [...numbers].sort((a,b) => a-b);
+  const ordered = [...selectedMap.keys()].sort((a,b) => a-b);
 
   if(!ordered.length){
     parallelBody.innerHTML =
@@ -1344,37 +1379,17 @@ function renderRows(bookCode, testament, hebrewMap, greekMap){
   }
 
   parallelBody.innerHTML = ordered.map(verse => {
-    const h = hebrew.get(verse);
-    const g = greek.get(verse);
-    const p = ptMap.get(verse);
+    const text = selectedMap.get(verse);
 
     return `
       <div class="verse-row">
-
-        <div class="verse-cell hebrew">
+        <div class="verse-cell ${currentBible}" data-bible-source="${currentBible}">
           <div class="verse-meta">
             <span class="verse-number">${verse}</span>
             <span>${escapeHTML(bookCode)} ${currentChapter}:${verse}</span>
           </div>
-          <p class="verse-text">${h ? escapeHTML(h) : `<span class="empty-text">—</span>`}</p>
+          <p class="verse-text">${text ? escapeHTML(text) : `<span class="empty-text">—</span>`}</p>
         </div>
-
-        <div class="verse-cell greek">
-          <div class="verse-meta">
-            <span class="verse-number">${verse}</span>
-            <span>${escapeHTML(bookCode)} ${currentChapter}:${verse}</span>
-          </div>
-          <p class="verse-text">${g ? escapeHTML(g) : `<span class="empty-text">—</span>`}</p>
-        </div>
-
-        <div class="verse-cell portuguese">
-          <div class="verse-meta">
-            <span class="verse-number">${verse}</span>
-            <span>${escapeHTML(bookCode)} ${currentChapter}:${verse}</span>
-          </div>
-          <p class="verse-text">${p ? escapeHTML(p) : `<span class="empty-text">—</span>`}</p>
-        </div>
-
       </div>
     `;
   }).join("");
@@ -1394,6 +1409,10 @@ async function openBibleChapter(){
   const savedScrollY = window.scrollY;
   const book = BOOKS[currentBookIndex];
   const [bookCode,bookName,testament] = book;
+
+  if(testament === "OT" && currentBible === "greek") currentBible = "portuguese";
+  if(testament === "NT" && currentBible === "hebrew") currentBible = "portuguese";
+  applyBibleLayout();
 
   openChapter.disabled = true;
   prevChapter.disabled = true;
@@ -1466,6 +1485,12 @@ function updateNavigation(){
     currentChapter >= maxChapters;
 }
 
+bibleSelect.addEventListener("change",()=>{
+  currentBible = bibleSelect.value;
+  const y = window.scrollY;
+  openBibleChapter().finally(()=>requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"})));
+});
+
 greekSourceSelect.addEventListener("change",()=>{
   currentGreekSource = greekSourceSelect.value;
   const y = window.scrollY;
@@ -1527,6 +1552,8 @@ nextChapter.addEventListener("click",()=>{
 });
 
 async function iniciarBibliaParalela(){
+  bibleSelect.value = currentBible;
+  applyBibleLayout();
   populateBooks();
 
   try{
