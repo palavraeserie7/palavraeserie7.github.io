@@ -156,7 +156,7 @@ Oraculo · HTML
  
  
     /* =========================================================
-       ÍNDICE LATERAL DE 29 ÁREAS
+       ÍNDICE LATERAL DE 36 ÁREAS
        ========================================================= */
  
     .oracle-index-trigger {
@@ -508,6 +508,54 @@ Oraculo · HTML
       font-weight:700;
     }
  
+    /* ---- Fontes em vídeo ---- */
+ 
+    .oracle-video-wrap {
+      position:relative;
+      width:100%;
+      max-width:480px;
+      padding-top:56.25%;
+      margin-top:10px;
+      border-radius:6px;
+      overflow:hidden;
+      background:#000;
+      border:1px solid var(--paper-line);
+    }
+ 
+    .oracle-video-wrap iframe {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+    }
+ 
+    .oracle-video-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:8px;
+      padding:5px 10px;
+      border-radius:4px;
+      background:var(--navy);
+      color:#eef2f8;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.03em;
+      text-decoration:none;
+    }
+ 
+    .oracle-video-badge:hover {
+      background:var(--navy-soft);
+    }
+ 
+    .oracle-video-platform {
+      margin-top:6px;
+      color:var(--ink-soft);
+      font-size:11px;
+      line-height:1.4;
+    }
+ 
     .ai-chat-input {
       padding:20px 32px 26px;
       border-top:1px solid var(--paper-line);
@@ -585,6 +633,7 @@ Oraculo · HTML
       .ai-chat-messages { padding-left:15px; padding-right:15px; }
       .question-row { flex-direction:column; }
       .question-row button { width:100%; }
+      .oracle-video-wrap { max-width:100%; }
     }
   </style>
 </head>
@@ -601,7 +650,8 @@ Oraculo · HTML
           <h1>ORÁCULO — CONSULTA GERAL</h1>
           <p>
             Faça qualquer pergunta. O Oráculo pesquisa internamente em fontes e publicações
-            adequadas ao assunto, sem exigir que o pesquisador escolha previamente onde procurar.
+            adequadas ao assunto — incluindo texto, dados e vídeo — sem exigir que o
+            pesquisador escolha previamente onde procurar.
           </p>
         </header>
  
@@ -658,16 +708,18 @@ Oraculo · HTML
                 <strong>Regra:</strong> uma pergunta pode envolver mais de uma
                 área. O sistema deve considerar a relação entre os assuntos
                 quando isso for necessário para responder adequadamente.
+                Vídeo não é uma área separada — é um tipo de fonte que pode
+                aparecer em qualquer uma das 36 áreas.
               </div>
             </aside>
           </div>
  
           <div class="ai-chat-welcome">
             <strong>ORÁCULO</strong><br>
-            Escreva qualquer pergunta e clique em “Investigar”.
+            Escreva qualquer pergunta e clique em "Investigar".
             Você não precisa escolher uma área ou informar onde a resposta deve ser procurada.
             O sistema fará essa seleção internamente e apresentará as fontes/publicações
-            utilizadas quando estiverem disponíveis.
+            utilizadas quando estiverem disponíveis, incluindo vídeo quando for evidência relevante.
           </div>
  
           <div class="oracle-sources">
@@ -685,8 +737,9 @@ Oraculo · HTML
               </div>
  
               <div class="oracle-source-card">
-                <strong>Publicações e dados</strong>
-                Quando disponíveis, são apresentados título, veículo, data e publicação original.
+                <strong>Publicações, dados e vídeo</strong>
+                Quando disponíveis, são apresentados título, veículo, data, publicação
+                original e vídeos relevantes (incorporados quando possível).
               </div>
  
               <div class="oracle-source-card">
@@ -785,6 +838,62 @@ Oraculo · HTML
       return String(value || '').replace(/\bIA\b/gi, 'serviço de análise');
     }
  
+    // ---- Vídeo: detecção de tipo e geração de embed ----
+ 
+    function isVideoSource(source) {
+      const type = String((source && source.type) || '').toLowerCase();
+      return type.includes('vídeo') || type.includes('video');
+    }
+ 
+    function getEmbedUrl(source) {
+      const platform = String((source && source.platform) || '').toLowerCase();
+      const videoId = source && source.videoId;
+      if (!videoId) return null;
+ 
+      if (platform === 'youtube') {
+        return 'https://www.youtube.com/embed/' + encodeURIComponent(videoId);
+      }
+      if (platform === 'vimeo') {
+        return 'https://player.vimeo.com/video/' + encodeURIComponent(videoId);
+      }
+      // Outras plataformas (x, instagram, tiktok, facebook, etc.) geralmente
+      // não permitem incorporação anônima — nesses casos não geramos iframe,
+      // apenas o link/badge para abrir na fonte original.
+      return null;
+    }
+ 
+    function renderVideoBlock(source, title) {
+      const embeddable = source.embeddable !== false;
+      const embedUrl = embeddable ? getEmbedUrl(source) : null;
+ 
+      if (embedUrl) {
+        return (
+          '<div class="oracle-video-wrap">' +
+          '<iframe src="' + escapeHtml(embedUrl) + '" ' +
+          'title="' + escapeHtml(title) + '" ' +
+          'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ' +
+          'allowfullscreen loading="lazy"></iframe>' +
+          '</div>'
+        );
+      }
+ 
+      if (source.url) {
+        const platformLabel = source.platform
+          ? ' (' + escapeHtml(source.platform) + ')'
+          : '';
+        return (
+          '<a class="oracle-video-badge" href="' +
+          escapeHtml(source.url) +
+          '" target="_blank" rel="noopener noreferrer">▶ Vídeo' +
+          platformLabel + '</a>' +
+          '<div class="oracle-video-platform">' +
+          'Vídeo não incorporável nesta página — abra o link para assistir na fonte original.' +
+          '</div>'
+        );
+      }
+ 
+      return '';
+    }
  
     const indexTrigger = document.getElementById('oracle-index-trigger');
     const indexOverlay = document.getElementById('oracle-index-overlay');
@@ -954,6 +1063,10 @@ Oraculo · HTML
                 'Abrir publicação original</a>'
               : '';
  
+            const videoBlock = isVideoSource(source)
+              ? renderVideoBlock(source, title)
+              : '';
+ 
             return (
               '<div class="oracle-result-source">' +
               '<strong>' + escapeHtml(publisher) + '</strong> — ' +
@@ -963,6 +1076,7 @@ Oraculo · HTML
               date +
               author +
               url +
+              videoBlock +
               '</div>'
             );
           }).join('') +
@@ -1043,6 +1157,9 @@ REGRAS:
 14. Quando a evidência for insuficiente, declare claramente essa limitação.
 15. O pesquisador não precisa saber onde a busca foi realizada; mostre as fontes somente no resultado final.
 16. Quando possível, apresente as publicações originais utilizadas.
+17. Vídeo é um tipo de evidência válido em qualquer uma das áreas — não se limita a notícias nem a uma categoria específica. Inclua vídeos (discursos, entrevistas, sessões públicas, transmissões, registros, vídeos publicados oficialmente) sempre que forem relevantes e verificáveis para a resposta.
+18. Ao citar uma rede social como fonte (incluindo vídeos publicados em redes sociais), use apenas o perfil oficial e verificado da pessoa, instituição ou veículo mencionado. Não trate perfis não-oficiais, fanpages, réplicas ou perfis não verificados como fonte válida. Quando não for possível confirmar a autenticidade do perfil, não apresente como fonte confiável — declare isso como limitação.
+19. Para cada fonte em vídeo, informe a plataforma (ex.: youtube, vimeo, x, instagram, tiktok, facebook) e, quando aplicável, o identificador do vídeo necessário para reprodução (videoId) e se o vídeo é incorporável (embeddable).
  
 FORMATO OBRIGATÓRIO:
 Devolva JSON válido, sem markdown, contendo:
@@ -1059,10 +1176,17 @@ publisher,
 type,
 url,
 publishedAt,
-author.
+author,
+platform,
+videoId,
+embeddable.
  
 O campo type deve indicar, quando aplicável:
-notícia, artigo, documento, dado, estudo, relatório, análise, opinião, comunicado, publicação ou outro tipo identificável.
+notícia, artigo, documento, dado, estudo, relatório, análise, opinião, comunicado, publicação, vídeo ou outro tipo identificável.
+ 
+O campo platform (quando type for vídeo) deve indicar a plataforma de origem, por exemplo: youtube, vimeo, x, instagram, tiktok, facebook, site institucional.
+ 
+O campo embeddable deve ser true apenas quando a plataforma permitir incorporação direta (ex.: youtube, vimeo). Para outras plataformas, defina embeddable como false e inclua sempre a url original.
  
 confidence deve ser:
 alta, moderada ou baixa.
@@ -1118,7 +1242,3 @@ Se não houver fonte verificável suficiente, informe isso claramente na respost
 </body>
 </html>
  
-
-
-
-
