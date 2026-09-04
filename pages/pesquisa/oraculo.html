@@ -112,6 +112,129 @@
       padding:0 28px 18px;
     }
 
+    /* =========================================================
+       MENU DE ÁREAS DO ORÁCULO
+       ========================================================= */
+
+    .oracle-area-menu {
+      margin:18px 0 20px;
+      padding:16px;
+      border:1px solid var(--paper-border);
+      border-radius:7px;
+      background:#fffdf7;
+    }
+
+    .oracle-area-menu-header {
+      margin-bottom:14px;
+    }
+
+    .oracle-area-menu-header h2 {
+      margin:0 0 6px;
+      color:var(--accent);
+      font-size:11px;
+      letter-spacing:.9px;
+    }
+
+    .oracle-area-menu-header p {
+      margin:0;
+      color:#6d5d45;
+      font-size:11px;
+      line-height:1.5;
+    }
+
+    .oracle-area-grid {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:8px;
+    }
+
+    .oracle-area-card {
+      width:100%;
+      min-height:68px;
+      padding:10px;
+      border:1px solid var(--paper-border);
+      border-radius:6px;
+      background:#fffaf0;
+      color:var(--ink);
+      text-align:left;
+      cursor:pointer;
+      transition:
+        background .15s ease,
+        border-color .15s ease,
+        transform .15s ease;
+    }
+
+    .oracle-area-card:hover {
+      background:#f1eadb;
+      border-color:#b99b61;
+      transform:translateY(-1px);
+    }
+
+    .oracle-area-card.active {
+      background:#f1eadb;
+      border-color:#806f53;
+    }
+
+    .oracle-area-number {
+      display:block;
+      margin-bottom:4px;
+      color:#9b835d;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.7px;
+    }
+
+    .oracle-area-name {
+      display:block;
+      color:var(--ink);
+      font-size:10px;
+      font-weight:800;
+      line-height:1.3;
+    }
+
+    .oracle-subarea {
+      display:none;
+      margin-top:12px;
+      padding:12px;
+      border-top:1px solid #e5dccd;
+      background:#f8f2e6;
+    }
+
+    .oracle-subarea.active {
+      display:block;
+    }
+
+    .oracle-subarea-title {
+      margin:0 0 9px;
+      color:var(--accent);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.7px;
+    }
+
+    .oracle-subarea-list {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:6px;
+    }
+
+    .oracle-subarea-button {
+      padding:8px 9px;
+      border:1px solid var(--paper-border);
+      border-radius:5px;
+      background:#fffdf7;
+      color:#5f5548;
+      text-align:left;
+      font-size:10px;
+      line-height:1.35;
+      cursor:pointer;
+    }
+
+    .oracle-subarea-button:hover {
+      background:#f1eadb;
+      border-color:#b99b61;
+    }
+
     .ai-chat-welcome {
       padding:14px;
       border:1px solid var(--paper-border);
@@ -266,6 +389,16 @@
       line-height:1.45;
     }
 
+    @media (max-width:900px) {
+      .oracle-area-grid {
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+
+      .oracle-subarea-list {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
     @media (max-width:600px) {
       .oracle-page { padding:10px 0 0; }
       .oracle-chat-panel { width:100%; border-radius:0; }
@@ -274,6 +407,13 @@
       .ai-chat-input { padding-left:15px; padding-right:15px; }
       .oracle-trust-note { margin-left:15px; margin-right:15px; }
       .ai-chat-messages { padding-left:15px; padding-right:15px; }
+      .oracle-area-menu { margin-left:0; margin-right:0; }
+      .oracle-area-grid {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+      .oracle-subarea-list {
+        grid-template-columns:1fr;
+      }
       .question-row { flex-direction:column; }
       .question-row button { width:100%; }
     }
@@ -305,6 +445,23 @@
         </p>
 
         <div class="ai-chat-messages" id="oracle-chat-messages">
+
+          <div class="oracle-area-menu">
+            <div class="oracle-area-menu-header">
+              <h2>ÁREAS DE PESQUISA</h2>
+              <p>
+                Explore uma área específica ou faça diretamente qualquer pergunta
+                no campo de investigação. A seleção da área não limita a pesquisa.
+              </p>
+            </div>
+
+            <div class="oracle-area-grid" id="oracle-area-grid"></div>
+
+            <div class="oracle-subarea" id="oracle-subarea">
+              <div class="oracle-subarea-title" id="oracle-subarea-title"></div>
+              <div class="oracle-subarea-list" id="oracle-subarea-list"></div>
+            </div>
+          </div>
 
           <div class="ai-chat-welcome">
             <strong>ORÁCULO</strong><br>
@@ -380,6 +537,38 @@
     const messages = document.getElementById('oracle-chat-messages');
     const loading = document.getElementById('oracle-chat-loading');
 
+    const ORACULO_AREAS = [
+      {id:'01',name:'Governo e Estado',subareas:['Governo Federal','Presidência e Poder Executivo','Congresso e Poder Legislativo','Judiciário','Tribunais e órgãos de controle','Ministérios e órgãos públicos','Estados e municípios','Administração pública','Políticas públicas','Dados governamentais']},
+      {id:'02',name:'Direito e Justiça',subareas:['Constituição e legislação','Jurisprudência','Direito civil','Direito penal','Direito trabalhista','Direito empresarial','Direito administrativo','Direito internacional','Direitos humanos','Processos e decisões']},
+      {id:'03',name:'Economia e Finanças',subareas:['PIB e crescimento','Inflação','Juros','Câmbio','Comércio exterior','Dívida pública','Mercados financeiros','Bancos e crédito','Emprego e renda','Indicadores econômicos']},
+      {id:'04',name:'Empresas e Mercado',subareas:['Empresas','Receita e faturamento','Valor de mercado','Marcas','Empresas públicas','Empresas privadas','Mercados','Investimentos','Executivos','Rankings empresariais']},
+      {id:'05',name:'História e Arqueologia',subareas:['História antiga','História medieval','História moderna','História contemporânea','História do Brasil','Arqueologia','Museus e patrimônio','Manuscritos e documentos','Fontes primárias','Historiografia']},
+      {id:'06',name:'Ciência',subareas:['Ciências naturais','Ciências exatas','Ciências da Terra','Pesquisa científica','Experimentos','Estudos observacionais','Revisões sistemáticas','Meta-análises','Descobertas científicas','Dados científicos']},
+      {id:'07',name:'Medicina e Saúde',subareas:['Medicina','Epidemiologia','Saúde pública','Doenças','Tratamentos','Medicamentos','Ensaios clínicos','Diretrizes clínicas','Nutrição','Estatísticas de saúde']},
+      {id:'08',name:'Psicologia',subareas:['Psicologia cognitiva','Psicologia social','Psicologia clínica','Desenvolvimento humano','Personalidade','Comportamento','Neuropsicologia','Psicometria','Psicologia organizacional','Pesquisa experimental']},
+      {id:'09',name:'Sociedade e Sociologia',subareas:['Estrutura social','Desigualdade','Família','Trabalho','Religião e sociedade','Educação e sociedade','Comportamento coletivo','Demografia','Movimentos sociais','Transformações sociais']},
+      {id:'10',name:'Antropologia',subareas:['Antropologia cultural','Antropologia social','Antropologia biológica','Etnografia','Povos e culturas','Costumes','Organização social','Antropologia urbana','Antropologia histórica','Pesquisa antropológica']},
+      {id:'11',name:'Filosofia',subareas:['Filosofia antiga','Filosofia medieval','Filosofia moderna','Filosofia contemporânea','Ética','Epistemologia','Metafísica','Filosofia política','Filosofia da ciência','Filosofia da linguagem']},
+      {id:'12',name:'Ciência Política',subareas:['Estado','Democracia','Eleições','Partidos políticos','Instituições','Políticas públicas','Sistemas políticos','Ideologias políticas','Comportamento eleitoral','Governança']},
+      {id:'13',name:'Geopolítica e Relações Internacionais',subareas:['Relações internacionais','Diplomacia','Alianças','Conflitos','Sanções','Organizações internacionais','Comércio internacional','Influência internacional','Segurança internacional','Geopolítica regional']},
+      {id:'14',name:'Países e Desenvolvimento',subareas:['Perfil de países','População','Economia','Desenvolvimento humano','Educação','Saúde','Segurança','Infraestrutura','Energia','Relações com o Brasil']},
+      {id:'15',name:'Educação',subareas:['Educação básica','Ensino superior','Universidades','Pesquisa acadêmica','Pós-graduação','Avaliações educacionais','PISA','Políticas educacionais','Professores','Indicadores educacionais']},
+      {id:'16',name:'Tecnologia, Computação e IA',subareas:['Computação','Inteligência artificial','Software','Internet','Cibersegurança','Dados','Algoritmos','Robótica','Padrões técnicos','Pesquisa em IA']},
+      {id:'17',name:'Patentes, Inovação e Propriedade Intelectual',subareas:['Patentes','Marcas','Propriedade intelectual','Inovação','Tecnologias emergentes','Pesquisa e desenvolvimento','Transferência tecnológica','Startups','Indicadores de inovação','Propriedade industrial']},
+      {id:'18',name:'Engenharia e Normas Técnicas',subareas:['Engenharia civil','Engenharia mecânica','Engenharia elétrica','Engenharia química','Engenharia ambiental','Engenharia de produção','Normas técnicas','Padrões internacionais','Segurança técnica','Regulamentação']},
+      {id:'19',name:'Agricultura, Alimentos e Pecuária',subareas:['Agricultura','Pecuária','Produção de alimentos','Agropecuária','Segurança alimentar','Commodities agrícolas','Produção mundial','Clima e agricultura','Tecnologia agrícola','Dados agropecuários']},
+      {id:'20',name:'Meio Ambiente e Clima',subareas:['Mudanças climáticas','Florestas','Biodiversidade','Conservação','Água','Poluição','Desmatamento','Oceanos','Unidades de conservação','Políticas ambientais']},
+      {id:'21',name:'Energia',subareas:['Petróleo','Gás natural','Carvão','Energia nuclear','Hidrelétrica','Solar','Eólica','Biomassa','Hidrogênio','Armazenamento de energia']},
+      {id:'22',name:'Minerais e Recursos Naturais',subareas:['Minerais críticos','Minerais estratégicos','Petróleo e gás','Metais','Mineração','Reservas','Produção','Exportação','Importação','Cadeias industriais']},
+      {id:'23',name:'Geografia e Geociências',subareas:['Geografia física','Geografia humana','Cartografia','Geologia','Geodésia','Hidrologia','Oceanografia','Sensoriamento remoto','Território','Mapas e dados geográficos']},
+      {id:'24',name:'Linguística e Filologia',subareas:['Linguística','Gramática','Sintaxe','Semântica','Pragmática','Fonética e fonologia','Sociolinguística','Línguas antigas','Filologia','Dicionários e corpora']},
+      {id:'25',name:'Religião, Igrejas e Influência',subareas:['Religiões','História das religiões','Igrejas e instituições religiosas','Líderes religiosos','Discursos e declarações','Religião e política','Religião e relações internacionais','Religião e sociedade','Religião e cultura','Influência religiosa','Vaticano e Santa Sé','Estudos acadêmicos da religião']},
+      {id:'26',name:'Cultura, Artes e Mídia',subareas:['Cinema','Televisão','Música','Literatura','Artes visuais','Arquitetura','Design','Moda','Jornalismo','Mídia e comunicação']},
+      {id:'27',name:'Esportes',subareas:['Futebol','Basquete','Tênis','Fórmula 1','Atletismo','Olimpíadas','Clubes','Atletas','Rankings','Estatísticas esportivas']},
+      {id:'28',name:'Espaço e Astronomia',subareas:['Astronomia','Sistema Solar','Planetas','Estrelas','Galáxias','Cosmologia','Asteroides','Exploração espacial','Satélites','Missões espaciais']},
+      {id:'29',name:'Pessoas, Prêmios, Rankings e Reconhecimento',subareas:['Pessoas influentes','Personalidades públicas','Cientistas','Artistas','Líderes','Prêmios','Nobel','Rankings','Fama e popularidade','Influência e impacto','Produção acadêmica','Reconhecimento profissional']}
+    ];
+
     function escapeHtml(value) {
       const div = document.createElement('div');
       div.textContent = String(value ?? '');
@@ -389,6 +578,67 @@
     function cleanServiceText(value) {
       return String(value || '').replace(/\bIA\b/gi, 'serviço de análise');
     }
+
+    const areaGrid = document.getElementById('oracle-area-grid');
+    const subareaBox = document.getElementById('oracle-subarea');
+    const subareaTitle = document.getElementById('oracle-subarea-title');
+    const subareaList = document.getElementById('oracle-subarea-list');
+
+    function renderOracleAreas() {
+      areaGrid.innerHTML = ORACULO_AREAS.map(area => `
+        <button type="button" class="oracle-area-card" data-area="${area.id}">
+          <span class="oracle-area-number">${area.id}</span>
+          <span class="oracle-area-name">${escapeHtml(area.name)}</span>
+        </button>
+      `).join('');
+    }
+
+    function openOracleArea(id) {
+      const area = ORACULO_AREAS.find(item => item.id === id);
+      if (!area) return;
+
+      document.querySelectorAll('.oracle-area-card').forEach(button => {
+        button.classList.toggle('active', button.dataset.area === id);
+      });
+
+      subareaTitle.textContent = area.id + ' — ' + area.name;
+
+      subareaList.innerHTML = area.subareas.map((subarea, index) => `
+        <button
+          type="button"
+          class="oracle-subarea-button"
+          data-area="${area.id}"
+          data-subarea="${escapeHtml(subarea)}"
+        >
+          ${area.id}.${index + 1} — ${escapeHtml(subarea)}
+        </button>
+      `).join('');
+
+      subareaBox.classList.add('active');
+    }
+
+    areaGrid.addEventListener('click', event => {
+      const card = event.target.closest('.oracle-area-card');
+      if (!card) return;
+      openOracleArea(card.dataset.area);
+    });
+
+    subareaList.addEventListener('click', event => {
+      const button = event.target.closest('.oracle-subarea-button');
+      if (!button) return;
+
+      const area = ORACULO_AREAS.find(item => item.id === button.dataset.area);
+      if (!area) return;
+
+      const subarea = button.dataset.subarea;
+
+      input.value =
+        `Pesquisar sobre ${area.name}, especificamente em ${subarea}.`;
+
+      input.focus();
+    });
+
+    renderOracleAreas();
 
     function renderOracleResult(data) {
       const text = cleanServiceText(
@@ -427,37 +677,21 @@
           '<div class="oracle-sources">' +
           '<h3>PUBLICAÇÕES / FONTES ENCONTRADAS</h3>' +
           sources.map(source => {
-
-            const publisher =
-              source.publisher ||
-              source.source ||
-              'Fonte não identificada';
-
-            const type =
-              source.type ||
-              'conteúdo';
-
-            const title =
-              source.title ||
-              'Sem título';
-
-            const date =
-              source.publishedAt
-                ? ' · ' + escapeHtml(source.publishedAt)
-                : '';
-
-            const author =
-              source.author
-                ? '<br>Autor: ' + escapeHtml(source.author)
-                : '';
-
-            const url =
-              source.url
-                ? '<br><a href="' +
-                  escapeHtml(source.url) +
-                  '" target="_blank" rel="noopener noreferrer">' +
-                  'Abrir publicação original</a>'
-                : '';
+            const publisher = source.publisher || source.source || 'Fonte não identificada';
+            const type = source.type || 'conteúdo';
+            const title = source.title || 'Sem título';
+            const date = source.publishedAt
+              ? ' · ' + escapeHtml(source.publishedAt)
+              : '';
+            const author = source.author
+              ? '<br>Autor: ' + escapeHtml(source.author)
+              : '';
+            const url = source.url
+              ? '<br><a href="' +
+                escapeHtml(source.url) +
+                '" target="_blank" rel="noopener noreferrer">' +
+                'Abrir publicação original</a>'
+              : '';
 
             return (
               '<div class="oracle-result-source">' +
@@ -472,7 +706,6 @@
             );
           }).join('') +
           '</div>';
-
       } else {
         html +=
           '<div class="oracle-result-source">' +
@@ -482,10 +715,7 @@
           '</div>';
       }
 
-      if (
-        Array.isArray(data.limitations) &&
-        data.limitations.length
-      ) {
+      if (Array.isArray(data.limitations) && data.limitations.length) {
         html +=
           '<div class="oracle-result-meta">' +
           '<strong>Limitações:</strong> ' +
@@ -520,18 +750,14 @@
       messages.scrollTop = messages.scrollHeight;
 
       try {
-
         const response = await fetch(
           AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa',
           {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
               question:
-                `Atue como um mecanismo de pesquisa geral e editor responsável.
+`Atue como um mecanismo de pesquisa geral e editor responsável.
 
 Pergunta do pesquisador:
 ${question}
@@ -582,17 +808,10 @@ alta, moderada ou baixa.
 
 Se não houver fonte verificável suficiente, informe isso claramente na resposta.`,
 
-              topic: 'ORÁCULO — CONSULTA GERAL',
-
-              discipline:
-                'PESQUISA GERAL INTERDISCIPLINAR',
-
-              responseFormat:
-                'json_com_fontes_publicacoes_confianca',
-
-              oracleMode:
-                'consulta_geral_automatica'
-
+              topic:'ORÁCULO — CONSULTA GERAL',
+              discipline:'PESQUISA GERAL INTERDISCIPLINAR',
+              responseFormat:'json_com_fontes_publicacoes_confianca',
+              oracleMode:'consulta_geral_automatica'
             })
           }
         );
@@ -615,25 +834,21 @@ Se não houver fonte verificável suficiente, informe isso claramente na respost
           try {
             parsed = JSON.parse(data.text);
           } catch (_) {
-            parsed = { text: data.text };
+            parsed = {text:data.text};
           }
         }
 
         answer.innerHTML = renderOracleResult(parsed);
 
       } catch (error) {
-
         answer.textContent =
           error.message === 'Failed to fetch'
             ? 'Não foi possível ligar ao serviço de investigação neste momento.'
             : 'Não foi possível concluir a investigação neste momento.';
-
       } finally {
-
         button.disabled = false;
         loading.style.display = 'none';
         messages.scrollTop = messages.scrollHeight;
-
       }
     });
 
