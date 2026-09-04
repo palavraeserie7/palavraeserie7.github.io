@@ -7,6 +7,9 @@ Oraculo · HTML
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oráculo — Consulta Geral</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,560;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg:#0b1428;
@@ -14,10 +17,25 @@ Oraculo · HTML
       --border:#263754;
       --text:#dbe7f5;
       --muted:#91a4bd;
-      --paper:#f1eadb;
-      --ink:#4a443b;
-      --accent:#806f53;
-      --paper-border:#d8cdb8;
+ 
+      --paper:#f4eedd;
+      --paper-card:#fbf7ec;
+      --paper-line:#ddcea4;
+      --ink:#2c2418;
+      --ink-soft:#6c5c42;
+      --brass:#9c7a32;
+      --brass-deep:#7c5f26;
+      --brass-wash:#ede0bd;
+      --navy:#0e1526;
+      --navy-soft:#1b2740;
+      --verified:#4b6b4e;
+ 
+      --font-display:'Fraunces',Georgia,serif;
+      --font-body:'Inter','Segoe UI',Tahoma,sans-serif;
+ 
+      /* legacy aliases kept so nothing else on the page breaks */
+      --accent:var(--brass);
+      --paper-border:var(--paper-line);
     }
  
     * { box-sizing:border-box; }
@@ -32,7 +50,17 @@ Oraculo · HTML
       min-height:100vh;
       background:var(--paper);
       color:var(--text);
-      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+      font-family:var(--font-body);
+      -webkit-font-smoothing:antialiased;
+    }
+ 
+    :focus-visible {
+      outline:2px solid var(--brass);
+      outline-offset:2px;
+    }
+ 
+    @media (prefers-reduced-motion:reduce) {
+      * { transition-duration:.01ms !important; animation-duration:.01ms !important; }
     }
  
     .oracle-page {
@@ -50,20 +78,24 @@ Oraculo · HTML
     .back-arrow {
       display:inline-flex;
       align-items:center;
+      gap:6px;
       min-height:34px;
       margin:0 0 16px 3.8%;
-      padding:0 13px;
-      border:1px solid #344762;
+      padding:0 14px;
+      border:1px solid var(--navy-soft);
       border-radius:6px;
-      background:#17243a;
+      background:var(--navy);
       color:#dbe7f5;
-      font-weight:900;
+      font-family:var(--font-body);
+      font-weight:600;
+      font-size:13px;
       cursor:pointer;
       text-decoration:none;
+      transition:background .15s ease;
     }
  
     .back-arrow:hover {
-      background:#263754;
+      background:var(--navy-soft);
       color:#fff;
     }
  
@@ -71,41 +103,48 @@ Oraculo · HTML
       width:92.4%;
       margin:0 auto;
       overflow:hidden;
-      border:1px solid var(--paper-border);
+      border:1px solid var(--paper-line);
       border-radius:10px;
       background:var(--paper);
       color:var(--ink);
-      box-shadow:0 10px 28px rgba(0,0,0,.25);
+      box-shadow:0 18px 40px rgba(14,21,38,.16);
     }
  
     .ai-chat-header {
-      padding:24px 28px 18px;
-      border-bottom:1px solid #d8cdb8;
-      background:#fffdf7;
+      padding:28px 32px 20px;
+      border-bottom:1px solid var(--paper-line);
+      background:var(--paper-card);
     }
  
     .ai-chat-header h1 {
-      margin:0 0 9px;
+      margin:0 0 12px;
       color:var(--ink);
-      font-size:clamp(22px,4vw,32px);
-      letter-spacing:.5px;
+      font-family:var(--font-display);
+      font-weight:650;
+      font-size:clamp(24px,3.6vw,34px);
+      letter-spacing:.2px;
     }
  
     .ai-chat-header p {
-      max-width:980px;
+      max-width:640px;
       margin:0;
-      color:var(--accent);
-      line-height:1.6;
+      color:var(--ink-soft);
+      font-size:14.5px;
+      line-height:1.65;
     }
  
     .oracle-trust-note {
-      margin:14px 28px 12px;
-      padding:11px 12px;
-      border-left:3px solid #b99b61;
-      background:#f1eadb;
-      color:#6d5d45;
-      font-size:11px;
-      line-height:1.55;
+      margin:16px 32px 12px;
+      padding:12px 14px;
+      border-left:2px solid var(--brass);
+      background:var(--brass-wash);
+      color:var(--ink-soft);
+      font-size:12px;
+      line-height:1.6;
+    }
+ 
+    .oracle-trust-note strong {
+      color:var(--ink);
     }
  
     .ai-chat-messages {
@@ -126,22 +165,26 @@ Oraculo · HTML
       top:50%;
       z-index:1000;
       transform:translateY(-50%);
-      padding:11px 9px;
-      border:1px solid #344762;
+      padding:13px 10px;
+      border:1px solid var(--navy-soft);
       border-left:0;
-      border-radius:0 7px 7px 0;
-      background:#17243a;
+      border-radius:0 8px 8px 0;
+      background:var(--navy);
       color:#dbe7f5;
-      font-size:10px;
-      font-weight:900;
-      letter-spacing:.5px;
+      font-family:var(--font-body);
+      font-size:11px;
+      font-weight:600;
+      letter-spacing:.06em;
+      writing-mode:vertical-rl;
       cursor:pointer;
-      box-shadow:0 5px 14px rgba(0,0,0,.22);
+      box-shadow:0 6px 16px rgba(14,21,38,.3);
+      transition:background .15s ease, padding .15s ease;
     }
  
     .oracle-index-trigger:hover {
-      background:#263754;
+      background:var(--navy-soft);
       color:#fff;
+      padding-right:14px;
     }
  
     .oracle-index-overlay {
@@ -149,7 +192,8 @@ Oraculo · HTML
       inset:0;
       z-index:1001;
       display:none;
-      background:rgba(11,20,40,.28);
+      background:rgba(14,21,38,.45);
+      backdrop-filter:blur(1px);
     }
  
     .oracle-index-overlay.active {
@@ -161,108 +205,134 @@ Oraculo · HTML
       left:0;
       top:0;
       bottom:0;
-      width:min(390px,88vw);
+      width:min(420px,88vw);
       overflow-y:auto;
-      padding:18px 16px 24px;
-      background:#fffdf7;
+      padding:26px 24px 30px;
+      background:var(--paper-card);
       color:var(--ink);
-      box-shadow:10px 0 28px rgba(0,0,0,.25);
+      box-shadow:16px 0 40px rgba(14,21,38,.28);
     }
  
     .oracle-index-header {
       display:flex;
-      align-items:center;
+      align-items:baseline;
       justify-content:space-between;
       gap:10px;
-      margin-bottom:14px;
-      padding-bottom:12px;
-      border-bottom:1px solid var(--paper-border);
+      margin-bottom:6px;
+      padding-bottom:16px;
+      border-bottom:2px solid var(--ink);
     }
  
     .oracle-index-header h2 {
       margin:0;
-      color:var(--accent);
-      font-size:13px;
-      letter-spacing:.8px;
+      color:var(--ink);
+      font-family:var(--font-display);
+      font-weight:600;
+      font-size:19px;
+      letter-spacing:.01em;
     }
  
     .oracle-index-close {
       width:30px;
       height:30px;
-      border:1px solid var(--paper-border);
-      border-radius:5px;
-      background:#f1eadb;
-      color:var(--ink);
-      font-size:18px;
+      border:1px solid var(--paper-line);
+      border-radius:50%;
+      background:transparent;
+      color:var(--ink-soft);
+      font-size:16px;
       line-height:1;
       cursor:pointer;
+      transition:background .15s ease, color .15s ease;
+    }
+ 
+    .oracle-index-close:hover {
+      background:var(--brass-wash);
+      color:var(--ink);
     }
  
     .oracle-index-intro {
-      margin:0 0 12px;
-      color:#6d5d45;
-      font-size:10px;
-      line-height:1.5;
+      margin:14px 0 18px;
+      color:var(--ink-soft);
+      font-size:12.5px;
+      line-height:1.6;
     }
  
     .oracle-index-list {
       display:flex;
       flex-direction:column;
-      gap:5px;
     }
  
     .oracle-index-item {
-      border:1px solid var(--paper-border);
-      border-radius:5px;
-      background:#fffaf0;
-      overflow:hidden;
+      border-bottom:1px solid var(--paper-line);
+    }
+ 
+    .oracle-index-item:first-child {
+      border-top:1px solid var(--paper-line);
     }
  
     .oracle-index-area {
       display:flex;
       align-items:center;
+      gap:12px;
       width:100%;
-      min-height:40px;
-      padding:8px 10px;
+      min-height:46px;
+      padding:9px 6px;
       border:0;
       background:transparent;
       color:var(--ink);
       text-align:left;
       font:inherit;
-      font-size:10px;
-      font-weight:800;
+      font-size:13.5px;
+      font-weight:500;
       cursor:pointer;
+      transition:background .12s ease;
     }
  
-    .oracle-index-area:hover,
+    .oracle-index-area:hover {
+      background:var(--brass-wash);
+    }
+ 
     .oracle-index-area.active {
-      background:#f1eadb;
+      background:var(--brass-wash);
     }
  
     .oracle-index-number {
-      flex:0 0 30px;
-      color:#9b835d;
-      font-size:9px;
-      font-weight:900;
+      flex:0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:26px;
+      height:20px;
+      padding:0 5px;
+      border:1px solid var(--brass);
+      border-radius:4px;
+      color:var(--brass-deep);
+      font-family:var(--font-body);
+      font-size:10.5px;
+      font-weight:700;
+      letter-spacing:.02em;
     }
  
     .oracle-index-name {
       flex:1;
-      line-height:1.35;
+      line-height:1.3;
     }
  
     .oracle-index-chevron {
-      flex:0 0 18px;
-      color:#9b835d;
+      flex:0 0 14px;
+      color:var(--brass);
       text-align:right;
-      font-size:11px;
+      font-size:14px;
+      transition:transform .18s ease;
+    }
+ 
+    .oracle-index-area.active .oracle-index-chevron {
+      transform:rotate(90deg);
     }
  
     .oracle-index-subareas {
       display:none;
-      padding:5px 7px 8px;
-      border-top:1px solid #e5dccd;
-      background:#f8f2e6;
+      padding:2px 6px 14px 44px;
     }
  
     .oracle-index-subareas.active {
@@ -272,46 +342,75 @@ Oraculo · HTML
     .oracle-index-subarea {
       display:block;
       width:100%;
-      margin:3px 0;
-      padding:7px 8px;
-      border:1px solid #e4d8c5;
-      border-radius:4px;
-      background:#fffdf7;
-      color:#5f5548;
+      margin:0;
+      padding:8px 0;
+      border:0;
+      border-bottom:1px solid var(--paper-line);
+      background:transparent;
+      color:var(--ink-soft);
       text-align:left;
-      font-size:9px;
-      line-height:1.35;
+      font-family:var(--font-body);
+      font-size:12.5px;
+      line-height:1.4;
       cursor:pointer;
+      transition:color .12s ease;
+    }
+ 
+    .oracle-index-subarea:last-child {
+      border-bottom:0;
     }
  
     .oracle-index-subarea:hover {
-      background:#f1eadb;
-      border-color:#b99b61;
+      color:var(--brass-deep);
     }
  
     .oracle-index-note {
-      margin-top:13px;
-      padding:9px 10px;
-      border-left:3px solid #b99b61;
-      background:#f1eadb;
-      color:#6d5d45;
-      font-size:9px;
-      line-height:1.45;
+      margin-top:20px;
+      padding:12px 14px;
+      border-left:2px solid var(--brass);
+      background:var(--brass-wash);
+      color:var(--ink-soft);
+      font-size:11.5px;
+      line-height:1.55;
+    }
+ 
+    .oracle-index-note strong {
+      color:var(--ink);
     }
  
     .ai-chat-welcome {
-      padding:14px;
-      border:1px solid var(--paper-border);
-      border-radius:6px;
-      background:#fffdf7;
-      color:#6d5d45;
-      line-height:1.55;
+      position:relative;
+      padding:18px 20px 18px 52px;
+      background:var(--paper-card);
+      border:1px solid var(--paper-line);
+      border-radius:8px;
+      color:var(--ink-soft);
+      font-size:13.5px;
+      line-height:1.6;
+    }
+ 
+    .ai-chat-welcome::before {
+      content:'◈';
+      position:absolute;
+      left:18px;
+      top:18px;
+      color:var(--brass);
+      font-size:20px;
+    }
+ 
+    .ai-chat-welcome strong {
+      display:block;
+      margin-bottom:4px;
+      color:var(--ink);
+      font-family:var(--font-display);
+      font-size:16px;
+      font-weight:600;
     }
  
     .ai-chat-message {
       margin:10px 0;
-      padding:11px 13px;
-      border-radius:6px;
+      padding:11px 15px;
+      border-radius:8px;
       line-height:1.5;
       white-space:pre-wrap;
     }
@@ -319,118 +418,141 @@ Oraculo · HTML
     .ai-chat-message.user {
       margin-left:auto;
       max-width:85%;
-      background:#e3d8c4;
-      color:var(--ink);
+      background:var(--navy);
+      color:#eef2f8;
+      font-size:13.5px;
     }
  
     .ai-chat-answer {
       margin:10px 0;
-      padding:14px;
-      border-left:3px solid var(--accent);
-      background:#fffdf7;
+      padding:16px 18px;
+      border-left:2px solid var(--brass);
+      background:var(--paper-card);
       color:var(--ink);
-      line-height:1.6;
+      font-size:13.5px;
+      line-height:1.65;
     }
  
     .oracle-sources {
-      margin-top:12px;
-      padding-top:12px;
-      border-top:1px solid #e5dccd;
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid var(--paper-line);
     }
  
     .oracle-sources h2,
     .oracle-sources h3,
     .oracle-sources h4 {
-      margin:0 0 8px;
-      color:var(--accent);
-      font-size:10px;
-      letter-spacing:.8px;
+      margin:0 0 10px;
+      color:var(--ink-soft);
+      font-family:var(--font-body);
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.06em;
+      text-transform:uppercase;
     }
  
     .oracle-source-grid {
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-      gap:7px;
+      grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+      gap:10px;
     }
  
     .oracle-source-card {
       display:block;
-      padding:9px;
-      border:1px solid var(--paper-border);
+      padding:13px 14px;
+      border:1px solid var(--paper-line);
+      border-top:3px solid var(--brass);
       border-radius:5px;
-      background:#fffdf7;
-      color:var(--ink);
+      background:var(--paper-card);
+      color:var(--ink-soft);
       text-decoration:none;
-      font-size:10px;
-      line-height:1.35;
+      font-size:12px;
+      line-height:1.45;
     }
+ 
+    .oracle-source-card:nth-child(2) { border-top-color:var(--navy-soft); }
+    .oracle-source-card:nth-child(3) { border-top-color:var(--verified); }
+    .oracle-source-card:nth-child(4) { border-top-color:var(--brass-deep); }
  
     .oracle-source-card strong {
       display:block;
-      color:var(--accent);
+      margin-bottom:3px;
+      color:var(--ink);
+      font-size:12.5px;
+      font-weight:600;
     }
  
     .oracle-result-meta {
-      margin-top:10px;
-      padding:8px 10px;
-      border-radius:5px;
-      background:#f1eadb;
-      color:var(--accent);
-      font-size:10px;
-      line-height:1.45;
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:6px;
+      background:var(--brass-wash);
+      color:var(--brass-deep);
+      font-size:11.5px;
+      line-height:1.5;
     }
  
     .oracle-result-source {
       display:block;
-      margin-top:7px;
-      padding:8px 10px;
-      border-left:2px solid #b99b61;
-      background:#fffaf0;
-      color:#5f5548;
-      font-size:10px;
-      line-height:1.4;
+      margin-top:8px;
+      padding:10px 12px;
+      border-left:2px solid var(--verified);
+      background:var(--paper-card);
+      color:var(--ink-soft);
+      font-size:11.5px;
+      line-height:1.45;
     }
  
     .oracle-result-source a {
-      color:var(--accent);
-      font-weight:800;
+      color:var(--brass-deep);
+      font-weight:700;
     }
  
     .ai-chat-input {
-      padding:18px 28px 22px;
-      border-top:1px solid #d8cdb8;
-      background:#fffdf7;
+      padding:20px 32px 26px;
+      border-top:1px solid var(--paper-line);
+      background:var(--paper-card);
     }
  
     .question-row {
       display:flex;
-      gap:8px;
+      gap:10px;
     }
  
     .question-row input {
       flex:1;
       min-width:0;
-      padding:12px;
-      border:1px solid #cdbfaa;
-      border-radius:5px;
-      background:#fffaf0;
+      padding:13px 14px;
+      border:1px solid var(--paper-line);
+      border-radius:6px;
+      background:#fffdf6;
       color:var(--ink);
       font:inherit;
+      font-size:14px;
+      transition:border-color .15s ease;
+    }
+ 
+    .question-row input:focus {
+      border-color:var(--brass);
     }
  
     .question-row button {
-      min-height:42px;
-      padding:0 17px;
+      min-height:44px;
+      padding:0 22px;
       border:0;
       border-radius:6px;
-      background:var(--accent);
-      color:#fffaf0;
-      font-weight:900;
+      background:var(--brass);
+      color:#fffdf6;
+      font-family:var(--font-body);
+      font-weight:700;
+      font-size:13px;
+      letter-spacing:.03em;
       cursor:pointer;
+      transition:background .15s ease;
     }
  
     .question-row button:hover {
-      background:#6d5d45;
+      background:var(--brass-deep);
     }
  
     .question-row button:disabled {
@@ -440,17 +562,17 @@ Oraculo · HTML
  
     .ai-chat-loading {
       display:none;
-      margin-top:9px;
-      color:var(--accent);
-      font-size:11px;
+      margin-top:10px;
+      color:var(--brass-deep);
+      font-size:12px;
       font-style:italic;
     }
  
     .oracle-disclaimer {
-      margin-top:10px;
-      color:var(--accent);
-      font-size:10px;
-      line-height:1.45;
+      margin-top:12px;
+      color:var(--ink-soft);
+      font-size:11px;
+      line-height:1.5;
     }
  
     @media (max-width:600px) {
@@ -742,16 +864,12 @@ Oraculo · HTML
         indexList.querySelectorAll('.oracle-index-area').forEach(button => {
           button.classList.remove('active');
           button.setAttribute('aria-expanded', 'false');
-          const chevron = button.querySelector('.oracle-index-chevron');
-          if (chevron) chevron.textContent = '›';
         });
  
         if (willOpen) {
           subareas.classList.add('active');
           areaButton.classList.add('active');
           areaButton.setAttribute('aria-expanded', 'true');
-          const chevron = areaButton.querySelector('.oracle-index-chevron');
-          if (chevron) chevron.textContent = '⌄';
         }
  
         return;
