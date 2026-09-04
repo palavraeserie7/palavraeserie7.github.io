@@ -291,6 +291,26 @@ main {
   font-size:11px;
   font-weight:900;
   letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+ 
+.change-reference {
+  padding:5px 9px;
+  border:1px solid var(--b);
+  border-radius:5px;
+  background:transparent;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:700;
+  cursor:pointer;
+}
+ 
+.change-reference:hover {
+  color:#fff;
+  border-color:var(--a);
 }
  
 .messages {
@@ -505,6 +525,13 @@ main {
  
         <div class="chat-head">
           MESA DE ANÁLISE PRO — PERGUNTA LIVRE
+          <button
+            type="button"
+            class="change-reference"
+            onclick="resetReference()"
+          >
+            Trocar passagem/tema
+          </button>
         </div>
  
         <div id="messages" class="messages">
@@ -793,8 +820,197 @@ const PRO_MODULE_DATA = [
   }
 ];
  
+/* =====================================================
+   OBJETIVOS DAS SUBETAPAS
+   Usado apenas para sugerir/pré-preencher automaticamente
+   a pergunta enviada ao Worker, combinando o texto abaixo
+   com a passagem/tema informado pelo usuário. Não substitui
+   os labels do menu (PRO_MODULE_DATA) nem a metodologia real
+   aplicada pelo Worker (MATRIX_GUIDANCE por módulo).
+===================================================== */
+ 
+const objetivosDasSubetapas = {
+  "01.6": "Apresente o texto hebraico de {PASSAGEM} com transliteração e tradução literal palavra por palavra.",
+  "01.7": "Apresente o texto grego koiné (Nestle-Aland 28ª ed.) de {PASSAGEM} com transliteração e tradução literal.",
+  "01.8": "Apresente o texto da Septuaginta (LXX) para {PASSAGEM} e compare com o texto massorético hebraico.",
+  "01.9": "Identifique preliminarmente onde os manuscritos antigos divergem na transmissão textual de {PASSAGEM}.",
+  "01.10": "Levante as palavras e construções gramaticais mais relevantes no original de {PASSAGEM}.",
+  "01.11": "Estabeleça a leitura-base provisória para {PASSAGEM}.",
+ 
+  "02.1": "Identifique a variante textual exata em {PASSAGEM}.",
+  "02.2": "Localize a variante na estrutura sintática de {PASSAGEM}.",
+  "02.3": "Liste todas as leituras concorrentes da variante em {PASSAGEM}.",
+  "02.4": "Catalogue os manuscritos, códices e versões que apoiam cada leitura concorrente em {PASSAGEM}.",
+  "02.5": "Avalie o peso das evidências externas para a variante de {PASSAGEM}.",
+  "02.6": "Avalie as evidências internas (lectio difficilior, lectio brevior) da variante em {PASSAGEM}.",
+  "02.7": "Confronte forças e fraquezas das evidências externas e internas para {PASSAGEM}.",
+  "02.8": "Decodifique o aparato crítico (Nestle-Aland ou BHS) para {PASSAGEM}.",
+  "02.9": "Classifique a natureza da variante (erro acidental, teológica, harmonização) em {PASSAGEM}.",
+  "02.10": "Mapeie o impacto da divergência textual nas traduções em português para {PASSAGEM}.",
+  "02.11": "Avalie o impacto teológico da variante em {PASSAGEM}.",
+  "02.12": "Determine, com base científica, a leitura original mais provável de {PASSAGEM}.",
+ 
+  "03.1": "Identifique a macroconstrução gramatical de {PASSAGEM}.",
+  "03.2": "Realize a análise morfológica completa das palavras principais de {PASSAGEM}.",
+  "03.3": "Apresente o lema e a forma infletida de cada palavra-chave em {PASSAGEM}.",
+  "03.4": "Classifique a classe gramatical de todos os termos em {PASSAGEM}.",
+  "03.5": "Identifique o sujeito gramatical da oração em {PASSAGEM}.",
+  "03.6": "Isole o predicado da frase em {PASSAGEM}.",
+  "03.7": "Mapeie os objetos e complementos em {PASSAGEM}.",
+  "03.8": "Isole todas as formas verbais presentes em {PASSAGEM}.",
+  "03.9": "Determine o tempo e aspecto de cada verbo em {PASSAGEM}.",
+  "03.10": "Analise a voz verbal (ativa, passiva, média) em {PASSAGEM}.",
+  "03.11": "Identifique o modo verbal em {PASSAGEM}.",
+  "03.12": "Identifique construções gramaticais especiais em {PASSAGEM}.",
+  "03.13": "Mapeie as relações sintáticas internas de {PASSAGEM}.",
+  "03.14": "Analise a função lógica dos conectivos em {PASSAGEM}.",
+  "03.15": "Defina a hierarquia entre orações coordenadas e subordinadas em {PASSAGEM}.",
+  "03.16": "Elabore uma síntese esquemática da estrutura sintática de {PASSAGEM}.",
+ 
+  "04.1": "Selecione e justifique a palavra-chave de maior relevância em {PASSAGEM}.",
+  "04.2": "Apresente a forma exata da palavra-chave no texto de {PASSAGEM}.",
+  "04.3": "Apresente o lema e a raiz etimológica do termo em {PASSAGEM}.",
+  "04.4": "Apresente a transliteração do lema e da forma textual em {PASSAGEM}.",
+  "04.5": "Confirme a classe gramatical e a flexão morfológica do termo em {PASSAGEM}.",
+  "04.6": "Apresente as definições lexicais acadêmicas do termo em {PASSAGEM} (BDAG, HALOT, BDB).",
+  "04.7": "Rastreie os usos documentados do termo em {PASSAGEM} na literatura contemporânea.",
+  "04.8": "Mapeie o campo semântico do termo em {PASSAGEM}.",
+  "04.9": "Determine como o termo funciona no contexto imediato de {PASSAGEM}.",
+  "04.10": "Analise os usos do termo de {PASSAGEM} no Antigo Testamento.",
+  "04.11": "Analise a relação do termo de {PASSAGEM} com o Novo Testamento.",
+  "04.12": "Cruze os dados lexicais já levantados para o termo em {PASSAGEM}.",
+  "04.13": "Apresente a avaliação lexical final do termo em {PASSAGEM}.",
+ 
+  "05.1": "Identifique os conceitos teologicamente relevantes em {PASSAGEM}.",
+  "05.2": "Identifique o termo que veicula linguisticamente o conceito em {PASSAGEM}.",
+  "05.3": "Apresente a base lexical que sustenta o conceito em {PASSAGEM}.",
+  "05.4": "Rastreie o desenvolvimento do conceito de {PASSAGEM} no Antigo Testamento.",
+  "05.5": "Analise o uso do conceito de {PASSAGEM} na Septuaginta.",
+  "05.6": "Examine o conceito de {PASSAGEM} no Judaísmo do Segundo Templo.",
+  "05.7": "Analise a retomada do conceito de {PASSAGEM} no Novo Testamento.",
+  "05.8": "Apresente o desenvolvimento histórico e conceitual do conceito de {PASSAGEM}.",
+  "05.9": "Relacione o conceito de {PASSAGEM} com outros temas teológicos pertinentes.",
+  "05.10": "Compare os dados de uso do conceito de {PASSAGEM} ao longo do cânon.",
+  "05.11": "Construa a síntese acadêmica final do conceito de {PASSAGEM}.",
+  "05.12": "Explique como o panorama teológico do conceito esclarece {PASSAGEM}.",
+ 
+  "06.1": "Delimite as fronteiras da unidade literária de {PASSAGEM}.",
+  "06.2": "Analise o contexto imediato de {PASSAGEM}.",
+  "06.3": "Divida {PASSAGEM} em subseções lógicas.",
+  "06.4": "Reconstrua a progressão do discurso em {PASSAGEM}.",
+  "06.5": "Posicione {PASSAGEM} no desenvolvimento global do livro.",
+  "06.6": "Identifique o gênero e subgêneros literários de {PASSAGEM}.",
+  "06.7": "Examine como os versículos de {PASSAGEM} se conectam no plano do discurso.",
+  "06.8": "Analise como as unidades de pensamento de {PASSAGEM} dialogam entre si.",
+  "06.9": "Reconstrua a intenção comunicativa provável de {PASSAGEM}.",
+  "06.10": "Mapeie as ambiguidades e problemas interpretativos de {PASSAGEM}.",
+  "06.11": "Apresente as interpretações documentadas para os problemas de {PASSAGEM}.",
+  "06.12": "Exponha as evidências que cada interpretação de {PASSAGEM} utiliza.",
+  "06.13": "Avalie criticamente as interpretações de {PASSAGEM}.",
+  "06.14": "Apresente a síntese exegética final de {PASSAGEM}.",
+ 
+  "07.1": "Identifique o horizonte histórico geral de {PASSAGEM}.",
+  "07.2": "Estime o período histórico ou datação provável de {PASSAGEM}.",
+  "07.3": "Mapeie a geografia histórica pertinente a {PASSAGEM}.",
+  "07.4": "Descreva o contexto político pertinente a {PASSAGEM}.",
+  "07.5": "Examine o panorama religioso geral do período de {PASSAGEM}.",
+  "07.6": "Analise as dinâmicas sociais e socioeconômicas relevantes a {PASSAGEM}.",
+  "07.7": "Explique os costumes cotidianos pressupostos em {PASSAGEM}.",
+  "07.8": "Descreva as instituições e estruturas sociais pertinentes a {PASSAGEM}.",
+  "07.9": "Isole as mentalidades e valores culturais documentáveis no cenário de {PASSAGEM}.",
+  "07.10": "Analise as influências greco-romanas sobre {PASSAGEM}, se aplicável.",
+  "07.11": "Analise os paralelos do Antigo Oriente Próximo relevantes a {PASSAGEM}.",
+  "07.12": "Analise os grupos e divisões internas do Judaísmo pertinentes a {PASSAGEM}.",
+  "07.13": "Apresente os achados arqueológicos documentados relevantes a {PASSAGEM}.",
+  "07.14": "Liste as fontes extrabíblicas documentadas pertinentes a {PASSAGEM}.",
+  "07.15": "Consolide os achados histórico-culturais e seu impacto sobre {PASSAGEM}.",
+ 
+  "08.1": "Identifique os pressupostos presentes na interpretação de {PASSAGEM}.",
+  "08.2": "Confronte a interpretação de {PASSAGEM} com o contexto do Módulo 06.",
+  "08.3": "Confronte a interpretação de {PASSAGEM} com os dados lexicais do Módulo 04.",
+  "08.4": "Confronte a interpretação de {PASSAGEM} com os dados gramaticais do Módulo 03.",
+  "08.5": "Confronte a interpretação de {PASSAGEM} com os dados histórico-culturais do Módulo 07.",
+  "08.6": "Identifique possível eisegese na interpretação de {PASSAGEM}.",
+  "08.7": "Detecte projeções anacrônicas na interpretação de {PASSAGEM}.",
+  "08.8": "Investigue possíveis falácias lexicais na interpretação de {PASSAGEM}.",
+  "08.9": "Verifique se a interpretação de {PASSAGEM} descontextualiza o texto.",
+  "08.10": "Avalie alegorizações artificiais na interpretação de {PASSAGEM}.",
+  "08.11": "Verifique generalizações indevidas na interpretação de {PASSAGEM}.",
+  "08.12": "Avalie a relação AT-NT na interpretação de {PASSAGEM}.",
+  "08.13": "Determine se {PASSAGEM} é descritiva ou prescritiva.",
+  "08.14": "Cruze os controles de erro com os dados dos Módulos 01–07 para {PASSAGEM}.",
+  "08.15": "Classifique o grau de sustentação metodológica da interpretação de {PASSAGEM}.",
+ 
+  "09.1": "Identifique o tema teológico que emerge de {PASSAGEM}.",
+  "09.2": "Posicione {PASSAGEM} no seu bloco canônico.",
+  "09.3": "Situe {PASSAGEM} na narrativa histórico-redentiva.",
+  "09.4": "Analise o desenvolvimento da revelação do tema em {PASSAGEM}.",
+  "09.5": "Mapeie os temas bíblicos relacionados ao tema de {PASSAGEM}.",
+  "09.6": "Analise a relação do tema de {PASSAGEM} com o Antigo Testamento.",
+  "09.7": "Acompanhe o desenvolvimento canônico do tema de {PASSAGEM} no Novo Testamento.",
+  "09.8": "Avalie se há promessa e cumprimento envolvendo {PASSAGEM}.",
+  "09.9": "Identifique alianças relacionadas a {PASSAGEM}.",
+  "09.10": "Avalie a posição de {PASSAGEM} no drama Criação, Queda e Redenção.",
+  "09.11": "Avalie a presença do tema Reino de Deus em {PASSAGEM}.",
+  "09.12": "Demonstre a relação de {PASSAGEM} com Cristo.",
+  "09.13": "Rastreie a dimensão escatológica de {PASSAGEM}.",
+  "09.14": "Apresente a trajetória do tema de {PASSAGEM} na Escritura.",
+  "09.15": "Elabore a síntese teológico-bíblica de {PASSAGEM}.",
+ 
+  "10.1": "Identifique se há material do Antigo Testamento em {PASSAGEM}.",
+  "10.2": "Identifique a citação direta do AT em {PASSAGEM}, com fonte e fórmula introdutória.",
+  "10.3": "Avalie possível alusão ao AT em {PASSAGEM}.",
+  "10.4": "Avalie possíveis ecos textuais ou temáticos do AT em {PASSAGEM}.",
+  "10.5": "Identifique a passagem específica do AT de onde vem a referência em {PASSAGEM}.",
+  "10.6": "Compare a forma hebraica da passagem de origem com {PASSAGEM}.",
+  "10.7": "Compare a passagem de origem com a Septuaginta usada em {PASSAGEM}.",
+  "10.8": "Compare hebraico, LXX e grego do NT para a referência em {PASSAGEM}.",
+  "10.9": "Reconstrua o sentido histórico-literário original da fonte do AT usada em {PASSAGEM}.",
+  "10.10": "Classifique a forma técnica de uso do AT em {PASSAGEM}.",
+  "10.11": "Explique a função teológica local da referência ao AT em {PASSAGEM}.",
+  "10.12": "Analise localmente promessa e cumprimento na referência de {PASSAGEM}.",
+  "10.13": "Avalie a relação cristológica local na referência ao AT em {PASSAGEM}.",
+  "10.14": "Demonstre como a fonte do AT modifica a interpretação de {PASSAGEM}.",
+  "10.15": "Apresente o relatório técnico completo da relação intertextual de {PASSAGEM} com o AT.",
+ 
+  "11.1": "Classifique a relevância doutrinária de {PASSAGEM} para a Teologia Sistemática.",
+  "11.2": "Isole as proposições teológicas explícitas de {PASSAGEM}.",
+  "11.3": "Conecte o dado doutrinário de {PASSAGEM} ao desenvolvimento canônico do Módulo 09.",
+  "11.4": "Correlacione {PASSAGEM} com outras passagens pertinentes ao dado doutrinário.",
+  "11.5": "Mapeie as relações lógicas do dado doutrinário de {PASSAGEM} com doutrinas vizinhas.",
+  "11.6": "Identifique as formulações teológicas historicamente documentadas sobre o tema de {PASSAGEM}.",
+  "11.7": "Compare as formulações teológicas documentadas sobre {PASSAGEM}.",
+  "11.8": "Exponha os pressupostos filosóficos de cada formulação sobre {PASSAGEM}.",
+  "11.9": "Identifique os pontos de convergência entre formulações sobre {PASSAGEM}.",
+  "11.10": "Trace as divergências entre as formulações teológicas sobre {PASSAGEM}.",
+  "11.11": "Avalie qual formulação é mais compatível com os dados exegéticos de {PASSAGEM}.",
+  "11.12": "Delimite o que pode ser legitimamente afirmado a partir de {PASSAGEM} isolada.",
+  "11.13": "Redija a síntese doutrinária definitiva sobre {PASSAGEM}.",
+ 
+  "12.1": "Mapeie as interpretações historicamente documentadas para {PASSAGEM}.",
+  "12.2": "Classifique as interpretações de {PASSAGEM} em eixos hermenêuticos claros.",
+  "12.3": "Descreva a argumentação de cada interpretação de {PASSAGEM}.",
+  "12.4": "Identifique os dados textuais invocados por cada interpretação de {PASSAGEM}.",
+  "12.5": "Mapeie o uso da sintaxe e do léxico por cada interpretação de {PASSAGEM}.",
+  "12.6": "Confronte os dados histórico-culturais usados por cada interpretação de {PASSAGEM}.",
+  "12.7": "Identifique as conexões teológicas invocadas por cada interpretação de {PASSAGEM}.",
+  "12.8": "Exponha os pressupostos metodológicos de cada interpretação de {PASSAGEM}.",
+  "12.9": "Rastreie as convergências entre as interpretações de {PASSAGEM}.",
+  "12.10": "Mapeie as zonas de tensão entre as interpretações de {PASSAGEM}.",
+  "12.11": "Classifique o grau de consenso histórico de cada leitura de {PASSAGEM}.",
+  "12.12": "Avalie o grau de sustentação de cada leitura de {PASSAGEM}.",
+  "12.13": "Delimite onde terminam os dados e começam suposições em cada leitura de {PASSAGEM}.",
+  "12.14": "Apresente o relatório transversal da história da recepção interpretativa de {PASSAGEM}."
+};
+ 
+function extractStepCode(stepName) {
+  const match = String(stepName || "").match(/^\d{2}\.\d+/);
+  return match ? match[0] : "";
+}
+ 
 let activeModule = "";
 let activeStep = "";
+let awaitingReference = false;
  
  
 /* =====================================================
@@ -1075,9 +1291,9 @@ function selectStep(
  
   loadNotes();
  
-  loadMessages();
+  const hadPreviousConversation = loadMessages();
  
-  loadQuestionDraft();
+  prepareQuestionForStep(hadPreviousConversation);
 }
  
  
@@ -1194,7 +1410,7 @@ function loadMessages() {
       'A Matriz está pronta. Faça uma pergunta livre sobre a subetapa selecionada.' +
       '</div>';
  
-    return;
+    return false;
   }
  
  
@@ -1203,11 +1419,17 @@ function loadMessages() {
       messagesKey()
     );
  
+  if (saved) {
+    messages.innerHTML = saved;
+    return true;
+  }
+ 
   messages.innerHTML =
-    saved ||
     '<div class="message system">' +
     'Subetapa selecionada. Faça sua pergunta.' +
     '</div>';
+ 
+  return false;
 }
  
  
@@ -1224,17 +1446,120 @@ function persistQuestionDraft() {
 }
  
  
-function loadQuestionDraft() {
+/* =====================================================
+   REFERÊNCIA (PASSAGEM/TEMA) — GLOBAL
+   Guarda a passagem ou tema informado pelo usuário, para
+   montar automaticamente a pergunta de cada subetapa sem
+   pedir a referência de novo a cada clique.
+===================================================== */
+ 
+function globalReferenceKey() {
+  return "palavraSerieMatrizProReferenciaAtual";
+}
+ 
+ 
+function getSavedReference() {
+  return localStorage.getItem(globalReferenceKey()) || "";
+}
+ 
+ 
+function saveReference(value) {
+  localStorage.setItem(globalReferenceKey(), value);
+}
+ 
+ 
+function appendSystemMessage(text) {
+ 
+  const el =
+    document.createElement("div");
+ 
+  el.className =
+    "message system";
+ 
+  el.textContent =
+    text;
+ 
+  messages.appendChild(el);
+ 
+  messages.scrollTop =
+    messages.scrollHeight;
+ 
+  persistMessages();
+}
+ 
+ 
+function resetReference() {
+ 
+  localStorage.removeItem(
+    globalReferenceKey()
+  );
+ 
+  appendSystemMessage(
+    "Ok, nova passagem ou tema. Digite abaixo e clique em ENVIAR."
+  );
+ 
+  prepareQuestionForStep(true);
+}
+ 
+ 
+function prepareQuestionForStep(skipIntroMessage) {
+ 
+  awaitingReference =
+    false;
  
   if (!activeStep) {
     questionInput.value = "";
     return;
   }
  
-  questionInput.value =
+  const savedDraft =
     localStorage.getItem(
       questionDraftKey()
-    ) || "";
+    );
+ 
+  if (savedDraft) {
+    questionInput.value = savedDraft;
+    return;
+  }
+ 
+  const reference =
+    getSavedReference();
+ 
+  if (reference) {
+ 
+    const code =
+      extractStepCode(activeStep);
+ 
+    const template =
+      objetivosDasSubetapas[code];
+ 
+    questionInput.placeholder =
+      "Escreva sua pergunta...";
+ 
+    questionInput.value =
+      template
+        ? template.replace(/\{PASSAGEM\}/g, reference)
+        : `Analise "${activeStep}" para: ${reference}`;
+ 
+    return;
+  }
+ 
+  questionInput.value = "";
+ 
+  questionInput.placeholder =
+    "Digite a passagem bíblica ou o tema de estudo...";
+ 
+  awaitingReference =
+    true;
+ 
+  if (!skipIntroMessage) {
+ 
+    appendSystemMessage(
+      "Para continuar com \"" +
+      activeStep +
+      "\", digite a passagem bíblica ou o tema de estudo e clique em ENVIAR."
+    );
+  }
 }
  
  
@@ -1254,6 +1579,29 @@ async function sendQuestion(event) {
   }
  
  
+  let questionForApi =
+    text;
+ 
+  if (awaitingReference) {
+ 
+    saveReference(text);
+ 
+    const code =
+      extractStepCode(activeStep);
+ 
+    const template =
+      objetivosDasSubetapas[code];
+ 
+    questionForApi =
+      template
+        ? template.replace(/\{PASSAGEM\}/g, text)
+        : `Analise "${activeStep}" para: ${text}`;
+ 
+    awaitingReference =
+      false;
+  }
+ 
+ 
   const userMessage =
     document.createElement("div");
  
@@ -1266,6 +1614,23 @@ async function sendQuestion(event) {
   messages.appendChild(
     userMessage
   );
+ 
+  if (questionForApi !== text) {
+ 
+    const confirmMessage =
+      document.createElement("div");
+ 
+    confirmMessage.className =
+      "message system";
+ 
+    confirmMessage.textContent =
+      "Entendido. Perguntando: " +
+      questionForApi;
+ 
+    messages.appendChild(
+      confirmMessage
+    );
+  }
  
   persistMessages();
  
@@ -1358,7 +1723,7 @@ async function sendQuestion(event) {
               "private",
  
             question:
-              text,
+              questionForApi,
  
             topic:
               activeStep ||
@@ -1491,7 +1856,3 @@ protectPage();
 </body>
 </html>
  
-
-
-
-
