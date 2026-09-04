@@ -820,11 +820,28 @@ Oraculo · HTML
       return String(value || '').replace(/\bIA\b/gi, 'serviço de análise');
     }
  
+    const VIDEO_HOSTS = [
+      'youtube.com','m.youtube.com','youtu.be','youtube-nocookie.com',
+      'vimeo.com','player.vimeo.com',
+      'tiktok.com','x.com','twitter.com','instagram.com','facebook.com','fb.watch'
+    ];
+ 
     function isVideoSource(source) {
       const mediaType = String(source.mediaType || '').toLowerCase();
       const type = String(source.type || '').toLowerCase();
-      return mediaType.includes('víde') || mediaType.includes('vide') ||
-        type.includes('víde') || type.includes('vide');
+      if (mediaType.includes('víde') || mediaType.includes('vide') ||
+          type.includes('víde') || type.includes('vide')) {
+        return true;
+      }
+      // O Worker real (grounding do Google Search) não envia mediaType/type,
+      // então também detectamos vídeo pelo domínio da própria URL da fonte.
+      if (!source.url) return false;
+      try {
+        const host = new URL(source.url).hostname.replace(/^www\./, '');
+        return VIDEO_HOSTS.includes(host);
+      } catch (_) {
+        return false;
+      }
     }
  
     function getEmbedUrl(url) {
@@ -982,10 +999,14 @@ Oraculo · HTML
  
       const sources = Array.isArray(data.sources) ? data.sources : [];
  
-      const confidence =
-        data.confidence ||
-        data.verificationStatus ||
-        'não indicado pelo serviço';
+      let confidence = data.confidence || data.verificationStatus || '';
+      if (!confidence) {
+        // O Worker real não envia "confidence"; usamos o sinal que ele
+        // efetivamente fornece (grounded = achou fonte autorizada ou não).
+        if (data.grounded === true) confidence = 'fontes localizadas (grau não classificado pelo serviço)';
+        else if (data.grounded === false) confidence = 'nenhuma fonte autorizada localizada';
+        else confidence = 'não indicado pelo serviço';
+      }
  
       const checkedAt = data.checkedAt
         ? new Date(data.checkedAt).toLocaleString('pt-BR')
@@ -1009,8 +1030,8 @@ Oraculo · HTML
           '<div class="oracle-sources">' +
           '<h3>PUBLICAÇÕES / FONTES ENCONTRADAS</h3>' +
           sources.map(source => {
-            const publisher = source.publisher || source.source || 'Fonte não identificada';
-            const type = source.type || 'conteúdo';
+            const publisher = source.publisher || source.source || source.domain || 'Fonte não identificada';
+            const type = source.type || (source.domain ? 'resultado de busca' : 'conteúdo');
             const title = source.title || 'Sem título';
             const date = source.publishedAt
               ? ' · ' + escapeHtml(source.publishedAt)
@@ -1070,6 +1091,14 @@ Oraculo · HTML
           '<strong>Publicações estruturadas não devolvidas.</strong><br>' +
           'O serviço não apresentou links verificáveis para esta resposta. ' +
           'Trate o resultado como orientação preliminar.' +
+          '</div>';
+      }
+ 
+      if (Array.isArray(data.searchQueries) && data.searchQueries.length) {
+        html +=
+          '<div class="oracle-result-meta">' +
+          '<strong>Consultas realizadas pelo serviço:</strong> ' +
+          data.searchQueries.map(q => escapeHtml(q)).join(' · ') +
           '</div>';
       }
  
@@ -1144,41 +1173,9 @@ REGRAS:
 18. Um vídeo publicado em rede social só deve ser tratado como fonte quando vier do perfil oficial verificado da instituição, pessoa ou veículo em questão. Verifique: existe site oficial que confirme esse perfil? A URL do post é rastreável? Há data de publicação? Se não for possível confirmar a oficialidade, apresente o vídeo como "não verificado" em vez de tratá-lo como fonte primária.
 19. Para cada fonte em vídeo, informe também, quando disponível: a plataforma (YouTube, Vimeo, X, Instagram, TikTok, veículo de TV, etc.) e o canal/perfil que publicou.
  
-FORMATO OBRIGATÓRIO:
-Devolva JSON válido, sem markdown, contendo:
-answer,
-checkedAt,
-confidence,
-claims,
-sources,
-limitations.
+Se não houver fonte verificável suficiente, declare isso claramente em vez de completar a lacuna por inferência.`,
  
-Cada item de sources deve conter, quando disponível:
-title,
-publisher,
-type,
-mediaType,
-platform,
-channelOrAccount,
-url,
-publishedAt,
-author.
- 
-O campo type deve indicar, quando aplicável:
-notícia, artigo, documento, dado, estudo, relatório, análise, opinião, comunicado, publicação ou outro tipo identificável.
- 
-O campo mediaType deve ser:
-texto, vídeo, áudio ou imagem.
- 
-confidence deve ser:
-alta, moderada ou baixa.
- 
-Se não houver fonte verificável suficiente, informe isso claramente na resposta.`,
- 
-              topic:'ORÁCULO — CONSULTA GERAL',
-              discipline:'PESQUISA GERAL INTERDISCIPLINAR',
-              responseFormat:'json_com_fontes_publicacoes_confianca',
-              oracleMode:'consulta_geral_automatica'
+              topic:'ORÁCULO — CONSULTA GERAL'
             })
           }
         );
@@ -1224,6 +1221,10 @@ Se não houver fonte verificável suficiente, informe isso claramente na respost
 </body>
 </html>
  
+
+
+
+
 
 
 
