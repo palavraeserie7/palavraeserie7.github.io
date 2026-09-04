@@ -399,6 +399,18 @@ main {
   cursor:wait;
 }
  
+.clear-chat {
+  border:1px solid var(--b) !important;
+  background:transparent !important;
+  color:var(--muted) !important;
+  font-size:9px;
+}
+
+.clear-chat:hover {
+  color:#fff !important;
+  border-color:var(--a) !important;
+}
+
 /* =====================================================
    ESTADO DE AUTENTICAÇÃO
 ===================================================== */
@@ -688,6 +700,14 @@ main {
             oninput="persistQuestionDraft()"
           ></textarea>
  
+          <button
+            type="button"
+            class="clear-chat"
+            onclick="clearConversation()"
+          >
+            LIMPAR
+          </button>
+
           <button
             id="send-button"
             type="submit"
@@ -1605,6 +1625,23 @@ function saveReference(value) {
 }
  
  
+function clearConversation() {
+
+  if (!activeStep) {
+    messages.innerHTML =
+      '<div class="message system">A Matriz está pronta. Faça uma pergunta livre sobre a subetapa selecionada.</div>';
+    return;
+  }
+
+  localStorage.removeItem(messagesKey());
+
+  messages.innerHTML =
+    '<div class="message system">Pesquisa limpa. Faça uma nova pergunta sobre a subetapa selecionada.</div>';
+
+  messages.scrollTop = messages.scrollHeight;
+}
+
+
 function appendSystemMessage(text) {
  
   const el =
@@ -1630,6 +1667,8 @@ function resetReference() {
   localStorage.removeItem(
     globalReferenceKey()
   );
+
+  clearConversation();
  
   appendSystemMessage(
     "Ok, nova passagem ou tema. Digite abaixo e clique em ENVIAR."
