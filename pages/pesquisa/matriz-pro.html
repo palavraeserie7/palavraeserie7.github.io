@@ -71,6 +71,22 @@ header p {
   color:var(--muted);
   font-size:10px;
 }
+
+.help-button {
+  padding:8px 13px;
+  border:0;
+  border-radius:6px;
+  background:var(--p);
+  color:#07151f;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+  cursor:pointer;
+}
+
+.help-button:hover {
+  filter:brightness(1.08);
+}
  
 /* =====================================================
    ESTRUTURA PRINCIPAL
@@ -423,6 +439,96 @@ main {
 }
  
 /* =====================================================
+   AJUDA — TIPO DE ESTUDO
+===================================================== */
+
+#study-help {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9998;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(4,10,20,.72);
+}
+
+#study-help.open {
+  display:flex;
+}
+
+.study-help-box {
+  width:min(700px,100%);
+  max-height:85vh;
+  overflow:auto;
+  padding:26px;
+  border:1px solid var(--b);
+  border-radius:10px;
+  background:#f8f4ea;
+  color:#3f3a32;
+  box-shadow:0 18px 50px rgba(0,0,0,.35);
+}
+
+.study-help-box h2 {
+  margin:0 0 8px;
+  color:#4b453b;
+  font-size:20px;
+}
+
+.study-help-box .intro {
+  margin:0 0 18px;
+  color:#6b6458;
+  font-size:12px;
+  line-height:1.6;
+}
+
+.study-help-item {
+  margin:0 0 12px;
+  padding:12px 14px;
+  border-radius:7px;
+  background:#eee8dc;
+}
+
+.study-help-item strong {
+  display:block;
+  margin-bottom:4px;
+  color:#4b453b;
+  font-size:12px;
+}
+
+.study-help-item span {
+  color:#625b50;
+  font-size:11px;
+  line-height:1.55;
+}
+
+.study-help-note {
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid #d5cdbf;
+  color:#625b50;
+  font-size:11px;
+  line-height:1.6;
+}
+
+.study-help-actions {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:18px;
+}
+
+.study-help-close {
+  padding:8px 14px;
+  border:0;
+  border-radius:6px;
+  background:#8b7650;
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+/* =====================================================
    RESPONSIVO
 ===================================================== */
  
@@ -462,6 +568,26 @@ main {
 </section>
  
 <!-- ===================================================
+     AJUDA — TIPO DE ESTUDO
+=================================================== -->
+<section id="study-help" aria-hidden="true" onclick="closeStudyHelp(event)">
+  <div class="study-help-box" role="dialog" aria-modal="true" aria-labelledby="study-help-title">
+    <h2 id="study-help-title">Como escolher o caminho da pesquisa</h2>
+    <p class="intro">Esta orientação serve apenas para ajudar você a identificar quais módulos podem ser mais úteis conforme o objeto do estudo. Ela não seleciona, bloqueia ou altera nenhum módulo da Matriz.</p>
+
+    <div class="study-help-item"><strong>1. PALAVRA</strong><span>Principais: 04 — Léxico e 05 — Léxico Teológico. Apoio: 01, 03, 06 e 09.</span></div>
+    <div class="study-help-item"><strong>2. VERSÍCULO</strong><span>Principais: 01 — Texto Bíblico, 03 — Gramática e Sintaxe, 04 — Léxico e 06 — Exegese. Apoio: 02, 05, 07, 08, 09, 10 e 12.</span></div>
+    <div class="study-help-item"><strong>3. CAPÍTULO</strong><span>Principais: 01, 03, 04, 06, 07 e 09. Apoio: 02, 05, 08, 10 e 12.</span></div>
+    <div class="study-help-item"><strong>4. LIVRO</strong><span>Principais: 01, 06, 07 e 09. Apoio: 02, 03, 04, 05, 08, 10 e 12.</span></div>
+    <div class="study-help-item"><strong>5. TEMA</strong><span>Principais: 05 — Léxico Teológico e 09 — Teologia Bíblica. Apoio: 01, 02, 03, 04, 06, 07, 08, 10 e 12.</span></div>
+
+    <div class="study-help-note"><strong>Importante:</strong> esta lista é somente uma orientação. Você continua livre para abrir e utilizar qualquer um dos 12 módulos da Matriz. O estudo doutrinário possui sua própria página.</div>
+
+    <div class="study-help-actions"><button type="button" class="study-help-close" onclick="closeStudyHelp()">FECHAR</button></div>
+  </div>
+</section>
+ 
+<!-- ===================================================
      HEADER
 =================================================== -->
  
@@ -470,6 +596,15 @@ main {
     <h1>▤ MATRIZ TÉCNICA DE PESQUISA PRO</h1>
     <p>Estrutura de criação e desenvolvimento da Sala do Escritor.</p>
   </div>
+
+  <button
+    type="button"
+    class="help-button"
+    onclick="openStudyHelp()"
+    aria-label="Abrir ajuda sobre tipo de estudo"
+  >
+    AJUDA
+  </button>
 </header>
  
 <!-- ===================================================
@@ -1844,6 +1979,29 @@ supabaseClient.auth.onAuthStateChange(
 );
  
  
+/* =====================================================
+   AJUDA — TIPO DE ESTUDO
+===================================================== */
+
+function openStudyHelp() {
+  const help = document.getElementById("study-help");
+  if (!help) return;
+  help.classList.add("open");
+  help.setAttribute("aria-hidden", "false");
+}
+
+function closeStudyHelp(event) {
+  if (event && event.target !== event.currentTarget) return;
+  const help = document.getElementById("study-help");
+  if (!help) return;
+  help.classList.remove("open");
+  help.setAttribute("aria-hidden", "true");
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeStudyHelp();
+});
+
 /* =====================================================
    INICIALIZAÇÃO
 ===================================================== */
