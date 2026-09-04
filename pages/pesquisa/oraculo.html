@@ -1115,112 +1115,119 @@ Oraculo · HTML
  
     form.addEventListener('submit', async event => {
       event.preventDefault();
- 
+
       const question = input.value.trim();
-      if (!question) return;
- 
+      if (!question) {
+        input.focus();
+        return;
+      }
+
       const button = form.querySelector('button');
- 
       const userMessage = document.createElement('div');
+      const answer = document.createElement('div');
+
       userMessage.className = 'ai-chat-message user';
       userMessage.textContent = question;
       messages.appendChild(userMessage);
- 
-      const answer = document.createElement('div');
+
       answer.className = 'ai-chat-answer';
       answer.textContent = 'A investigar a pergunta...';
       messages.appendChild(answer);
- 
+
       input.value = '';
       button.disabled = true;
       loading.style.display = 'block';
       messages.scrollTop = messages.scrollHeight;
- 
-      try {
-        const response = await fetch(
-          AI_PROXY_URL.replace(/\/$/, '') + '/api/pesquisa',
-          {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-              question:
-`Atue como um mecanismo de pesquisa geral e editor responsável.
- 
+
+      const researchPrompt = `Atue como um mecanismo de pesquisa geral e editor responsável.
+
 Pergunta do pesquisador:
 ${question}
- 
+
 OBJETIVO:
-Responder à pergunta por meio de pesquisa interna em fontes e publicações adequadas ao assunto. O pesquisador não deve precisar indicar previamente a disciplina, área, site ou fonte onde a resposta será encontrada.
- 
+Responder à pergunta por meio de pesquisa interna em fontes e publicações adequadas ao assunto. O pesquisador não precisa indicar previamente a disciplina, área, site ou fonte.
+
 REGRAS:
-1. Classifique internamente o assunto da pergunta.
-2. Determine internamente quais tipos de fontes são adequados.
-3. Faça a pesquisa nas fontes disponíveis/configuradas para o serviço.
-4. Não obrigue o pesquisador a escolher uma área antes da pesquisa.
-5. Não restrinja o Oráculo a notícias.
-6. A consulta pode tratar de qualquer assunto secular ou geral.
-7. Priorize publicações, documentos e dados verificáveis.
-8. Para informações atuais, priorize conteúdo recente e informe a data.
-9. Quando houver divergência relevante entre fontes, apresente a divergência em vez de escolher arbitrariamente.
-10. Não invente fontes, publicações, autores, datas ou URLs.
-11. Diferencie informação publicada, interpretação, hipótese, opinião e ausência de evidência quando isso for relevante.
-12. A presença de uma fonte no catálogo não significa que todas as suas afirmações sejam verdadeiras.
-13. Uma publicação/fonte deve ser tratada como evidência verificável, não como verdade absoluta.
-14. Quando a evidência for insuficiente, declare claramente essa limitação.
-15. O pesquisador não precisa saber onde a busca foi realizada; mostre as fontes somente no resultado final.
-16. Quando possível, apresente as publicações originais utilizadas.
-17. Quando a pergunta envolver algo que provavelmente tenha registro audiovisual — discursos, entrevistas, coletivas de imprensa, transmissões, audiências públicas, sessões legislativas, eventos, jogos, declarações em vídeo —, busque também fontes em vídeo, não apenas texto. Isso vale para qualquer área do catálogo, não só mídia.
-18. Um vídeo publicado em rede social só deve ser tratado como fonte quando vier do perfil oficial verificado da instituição, pessoa ou veículo em questão. Verifique: existe site oficial que confirme esse perfil? A URL do post é rastreável? Há data de publicação? Se não for possível confirmar a oficialidade, apresente o vídeo como "não verificado" em vez de tratá-lo como fonte primária.
-19. Para cada fonte em vídeo, informe também, quando disponível: a plataforma (YouTube, Vimeo, X, Instagram, TikTok, veículo de TV, etc.) e o canal/perfil que publicou.
- 
-Se não houver fonte verificável suficiente, declare isso claramente em vez de completar a lacuna por inferência.`,
- 
-              topic:'ORÁCULO — CONSULTA GERAL'
+1. Classifique internamente o assunto e escolha os tipos de fonte adequados.
+2. Não restrinja a consulta a notícias.
+3. Priorize publicações, documentos e dados verificáveis.
+4. Para informações atuais, priorize conteúdo recente e informe a data.
+5. Não invente fontes, autores, datas, URLs ou evidências.
+6. Diferencie fatos publicados, interpretações, hipóteses, opiniões e ausência de evidência.
+7. Quando houver divergência relevante entre fontes, apresente-a claramente.
+8. Quando possível, apresente as publicações originais utilizadas.
+9. Para assuntos com provável registo audiovisual, procure também fontes em vídeo.
+10. Para vídeos de redes sociais, confirme a oficialidade do perfil; se não for possível, marque a fonte como não verificada.
+11. Se a evidência for insuficiente, declare essa limitação em vez de completar a lacuna por inferência.`;
+
+      try {
+        const response = await fetch(
+          `${AI_PROXY_URL.replace(/\/$/, '')}/api/pesquisa`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              mode: 'free',
+              accessLevel: 'free',
+              question: researchPrompt,
+              topic: 'ORÁCULO — CONSULTA GERAL',
+              module: 'ORÁCULO — CONSULTA GERAL',
+              discipline: ''
             })
           }
         );
- 
-        const data = await response.json();
- 
+
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json')
+          ? await response.json()
+          : {error: await response.text()};
+
         if (!response.ok) {
-          throw new Error(
-            data.error ||
-            'Não foi possível concluir a investigação.'
-          );
+          const serviceMessage =
+            data && typeof data.error === 'string'
+              ? data.error
+              : `O serviço devolveu HTTP ${response.status}.`;
+          throw new Error(serviceMessage);
         }
- 
-        let parsed = data;
- 
-        if (
-          typeof data.text === 'string' &&
-          data.text.trim().startsWith('{')
-        ) {
+
+        let parsed = data || {};
+        if (typeof parsed.text === 'string' && parsed.text.trim().startsWith('{')) {
           try {
-            parsed = JSON.parse(data.text);
+            parsed = JSON.parse(parsed.text);
           } catch (_) {
-            parsed = {text:data.text};
+            parsed = {text: parsed.text};
           }
         }
- 
+
         answer.innerHTML = renderOracleResult(parsed);
- 
       } catch (error) {
-        answer.textContent =
-          error.message === 'Failed to fetch'
-            ? 'Não foi possível ligar ao serviço de investigação neste momento.'
-            : 'Não foi possível concluir a investigação neste momento.';
+        console.error('Erro no chat Oráculo:', error);
+        const message = String(error && error.message || '');
+
+        if (message === 'Failed to fetch') {
+          answer.textContent =
+            'Não foi possível ligar ao serviço de investigação. Verifique a ligação e tente novamente.';
+        } else if (/quota|rate.?limit|billing|plan/i.test(message)) {
+          answer.textContent =
+            'O serviço de investigação atingiu o limite de utilização. Tente novamente mais tarde.';
+        } else {
+          answer.textContent =
+            `Não foi possível concluir a investigação: ${message}`;
+        }
       } finally {
         button.disabled = false;
         loading.style.display = 'none';
         messages.scrollTop = messages.scrollHeight;
       }
     });
- 
+
     input.focus();
   </script>
 </body>
 </html>
- 
+
 
 
 
