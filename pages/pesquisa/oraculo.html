@@ -621,6 +621,45 @@ Oraculo · HTML
       .question-row { flex-direction:column; }
       .question-row button { width:100%; }
     }
+
+
+    /* =========================================================
+       RASTREAMENTO DE FONTES — ORDEM METODOLÓGICA
+       ========================================================= */
+    .oracle-tracking-trigger{
+      position:fixed;right:0;top:50%;z-index:1000;transform:translateY(-50%);
+      padding:13px 10px;border:1px solid var(--navy-soft);border-right:0;
+      border-radius:8px 0 0 8px;background:var(--navy);color:#dbe7f5;
+      font-size:11px;font-weight:700;letter-spacing:.05em;writing-mode:vertical-rl;
+      cursor:pointer;box-shadow:0 6px 16px rgba(14,21,38,.3)
+    }
+    .oracle-tracking-trigger:hover{background:var(--navy-soft);color:#fff}
+    .oracle-tracking-overlay{position:fixed;inset:0;z-index:1100;display:none;background:rgba(14,21,38,.45);backdrop-filter:blur(1px)}
+    .oracle-tracking-overlay.active{display:block}
+    .oracle-tracking-panel{position:absolute;right:0;top:0;bottom:0;width:min(560px,94vw);overflow-y:auto;padding:24px;background:var(--paper-card);color:var(--ink);box-shadow:-16px 0 40px rgba(14,21,38,.28)}
+    .tracking-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+    .tracking-head h2{margin:0;font-family:var(--font-display);font-size:20px;font-weight:600}
+    .tracking-close{width:30px;height:30px;border:1px solid var(--paper-line);border-radius:50%;background:transparent;color:var(--ink-soft);font-size:16px;cursor:pointer}
+    .tracking-context{margin:14px 0;padding:12px;border-left:2px solid var(--brass);background:var(--brass-wash);font-size:12px;line-height:1.5}
+    .tracking-order{display:grid;gap:7px;margin:12px 0 20px}
+    .tracking-step{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--paper-line);background:#fffdf6;font-size:11.5px}
+    .tracking-step .num{font-weight:800;color:var(--brass-deep)}
+    .tracking-step .state{font-size:10px;color:var(--ink-soft)}
+    .tracking-step.active{border-color:var(--brass);background:var(--brass-wash)}
+    .tracking-form{display:grid;gap:8px;margin-top:12px}
+    .tracking-form label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
+    .tracking-form input,.tracking-form select,.tracking-form textarea{width:100%;padding:10px 11px;border:1px solid var(--paper-line);border-radius:5px;background:#fffdf6;color:var(--ink);font:inherit;font-size:12px}
+    .tracking-form textarea{min-height:72px;resize:vertical}
+    .tracking-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+    .tracking-actions button{padding:9px 13px;border:0;border-radius:5px;background:var(--brass);color:#fff;font-weight:700;font-size:11px;cursor:pointer}
+    .tracking-actions button.secondary{background:var(--navy)}
+    .tracking-publications{margin-top:20px;padding-top:16px;border-top:1px solid var(--paper-line)}
+    .tracking-publication{padding:12px;margin:8px 0;border:1px solid var(--paper-line);background:#fffdf6;font-size:11.5px;line-height:1.5}
+    .tracking-publication strong{color:var(--ink)}
+    .tracking-badge{display:inline-block;padding:2px 6px;margin-bottom:5px;border-radius:3px;background:var(--navy);color:#fff;font-size:9px;font-weight:800}
+    .tracking-publication a{color:var(--brass-deep);font-weight:700}
+    .tracking-classification{margin-top:7px;padding-top:7px;border-top:1px dashed var(--paper-line);color:var(--ink-soft);font-size:10.5px}
+    .tracking-note{margin-top:14px;color:var(--ink-soft);font-size:10.5px;line-height:1.55}
   </style>
 </head>
  
@@ -697,6 +736,55 @@ Oraculo · HTML
             </aside>
           </div>
  
+
+
+      <button type="button" class="oracle-tracking-trigger" id="oracle-tracking-trigger" aria-controls="oracle-tracking-overlay" aria-expanded="false">↗ RASTREAR</button>
+      <div class="oracle-tracking-overlay" id="oracle-tracking-overlay" aria-hidden="true">
+        <aside class="oracle-tracking-panel" role="dialog" aria-modal="true" aria-labelledby="tracking-title">
+          <div class="tracking-head">
+            <h2 id="tracking-title">RASTREAMENTO DE FONTES</h2>
+            <button type="button" class="tracking-close" id="tracking-close" aria-label="Fechar rastreamento">×</button>
+          </div>
+          <div class="tracking-context" id="tracking-context">
+            <strong>Objeto atual:</strong> consulta geral. Selecione uma área/subárea no índice ou informe uma entidade abaixo.
+          </div>
+          <strong style="font-size:11px;letter-spacing:.05em">ORDEM OBRIGATÓRIA DE BUSCA</strong>
+          <div class="tracking-order" id="tracking-order"></div>
+
+          <form class="tracking-form" id="tracking-form">
+            <label for="tracking-entity">Entidade / item pesquisado</label>
+            <input id="tracking-entity" name="entity" placeholder="Ex.: Senado Federal" required>
+            <label for="tracking-sphere">Esfera</label>
+            <select id="tracking-sphere" name="sphere">
+              <option value="federal">Federal</option><option value="estadual">Estadual</option><option value="municipal">Municipal</option><option value="outro">Outra / não definida</option>
+            </select>
+            <label for="tracking-url">URL da publicação encontrada</label>
+            <input id="tracking-url" name="url" type="url" placeholder="https://...">
+            <label for="tracking-title-input">Título da publicação</label>
+            <input id="tracking-title-input" name="title" placeholder="Título / descrição da publicação">
+            <label for="tracking-source">Fonte / veículo</label>
+            <input id="tracking-source" name="source" placeholder="Órgão, jornal, canal, perfil etc.">
+            <label for="tracking-type">Tipo</label>
+            <select id="tracking-type" name="type">
+              <option>Portal de Transparência</option><option>Acesso à Informação / LAI</option><option>Portal institucional</option><option>Diário Oficial</option><option>Tribunal de Contas</option><option>Controladoria</option><option>Base oficial de dados</option><option>Imprensa</option><option>Vídeo / audiovisual</option><option>Rede social</option><option>Outro</option>
+            </select>
+            <label for="tracking-date">Data da publicação</label>
+            <input id="tracking-date" name="date" type="date">
+            <label for="tracking-notes">Observações</label>
+            <textarea id="tracking-notes" name="notes" placeholder="Informações úteis para a análise posterior..."></textarea>
+            <div class="tracking-actions">
+              <button type="submit">REGISTRAR PUBLICAÇÃO</button>
+              <button type="button" class="secondary" id="tracking-clear">LIMPAR REGISTROS LOCAIS</button>
+            </div>
+          </form>
+
+          <div class="tracking-publications">
+            <strong style="font-size:11px;letter-spacing:.05em">PUBLICAÇÕES ENCONTRADAS</strong>
+            <div id="tracking-publications-list"></div>
+          </div>
+          <div class="tracking-note"><strong>Regra metodológica:</strong> registrar a existência da publicação antes de classificá-la. A classificação posterior poderá ser <em>Verdadeira, Mentirosa, Neutra</em> ou <em>Sem definição</em>. “Sem definição” não significa falsa; significa evidência insuficiente para concluir.</div>
+        </aside>
+      </div>
           <div class="ai-chat-welcome">
             <strong>ORÁCULO</strong><br>
             Escreva qualquer pergunta e clique em “Investigar”.
@@ -879,6 +967,69 @@ Oraculo · HTML
     const indexClose = document.getElementById('oracle-index-close');
     const indexList = document.getElementById('oracle-index-list');
  
+
+
+    const TRACKING_ORDER = [
+      ['1','Portal de Transparência próprio do órgão','official-own'],
+      ['2','Portal de Transparência do governo (federal, estadual ou municipal)','official-government'],
+      ['3','Portal oficial de Acesso à Informação / LAI','official-lai'],
+      ['4','Portal oficial institucional — Transparência, LAI, Prestação de Contas, Dados Abertos','official-institutional'],
+      ['5','Diário Oficial correspondente','official-gazette'],
+      ['6','Tribunal de Contas competente (TCU/TCE/TCM)','control-audit'],
+      ['7','Controladoria / órgão de controle competente','control'],
+      ['8','Base oficial de dados do governo','official-database'],
+      ['9','Fonte secundária — imprensa, mídia, perfis não oficiais etc.','secondary']
+    ];
+    let trackingContext = {area:'', subarea:'', entity:''};
+    const trackingOverlay = document.getElementById('oracle-tracking-overlay');
+    const trackingTrigger = document.getElementById('oracle-tracking-trigger');
+    const trackingClose = document.getElementById('tracking-close');
+    const trackingOrder = document.getElementById('tracking-order');
+    const trackingForm = document.getElementById('tracking-form');
+    const trackingList = document.getElementById('tracking-publications-list');
+    const trackingContextEl = document.getElementById('tracking-context');
+    const TRACKING_STORAGE_KEY = 'oraculo_tracking_publications_v1';
+
+    function renderTrackingOrder(){
+      trackingOrder.innerHTML = TRACKING_ORDER.map(item =>
+        `<div class="tracking-step" data-tier="${item[0]}"><span class="num">${item[0]}</span><span>${escapeHtml(item[1])}</span><span class="state">aguardar pesquisa</span></div>`
+      ).join('');
+    }
+    function getTrackingRecords(){
+      try { const v=JSON.parse(localStorage.getItem(TRACKING_STORAGE_KEY)||'[]'); return Array.isArray(v)?v:[]; }
+      catch(_){ return []; }
+    }
+    function renderTrackingRecords(){
+      const records=getTrackingRecords();
+      if(!records.length){ trackingList.innerHTML='<div class="tracking-note">Nenhuma publicação registrada ainda.</div>'; return; }
+      trackingList.innerHTML=records.slice().reverse().map(r=>`
+        <article class="tracking-publication">
+          <span class="tracking-badge">${escapeHtml(r.type||'PUBLICAÇÃO')}</span>
+          <strong>${escapeHtml(r.title||'Sem título')}</strong><br>
+          ${escapeHtml(r.source||'Fonte não identificada')}${r.date?' · '+escapeHtml(r.date):''}<br>
+          ${r.entity?'<strong>Entidade:</strong> '+escapeHtml(r.entity):''}
+          ${r.sphere?' · '+escapeHtml(r.sphere):''}
+          ${r.url?'<br><a href="'+escapeHtml(r.url)+'" target="_blank" rel="noopener noreferrer">Abrir publicação original</a>':''}
+          ${r.notes?'<div class="tracking-classification"><strong>Observações:</strong> '+escapeHtml(r.notes)+'</div>':''}
+          <div class="tracking-classification"><strong>Classificação:</strong> ainda não realizada</div>
+        </article>`).join('');
+    }
+    function updateTrackingContext(){
+      const parts=[trackingContext.entity,trackingContext.area,trackingContext.subarea].filter(Boolean);
+      trackingContextEl.innerHTML='<strong>Objeto atual:</strong> '+escapeHtml(parts.join(' · ')||'consulta geral')+'<br><span>O rastreamento registra publicações; não determina a verdade nesta etapa.</span>';
+      if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
+    }
+    function openTracking(){ trackingOverlay.classList.add('active'); trackingOverlay.setAttribute('aria-hidden','false'); trackingTrigger.setAttribute('aria-expanded','true'); updateTrackingContext(); renderTrackingOrder(); renderTrackingRecords(); }
+    function closeTracking(){ trackingOverlay.classList.remove('active'); trackingOverlay.setAttribute('aria-hidden','true'); trackingTrigger.setAttribute('aria-expanded','false'); }
+    trackingTrigger.addEventListener('click',openTracking); trackingClose.addEventListener('click',closeTracking);
+    trackingOverlay.addEventListener('click',e=>{if(e.target===trackingOverlay)closeTracking();});
+    trackingForm.addEventListener('submit',e=>{
+      e.preventDefault(); const fd=new FormData(trackingForm); const record={
+        id:Date.now().toString(36)+Math.random().toString(36).slice(2), entity:fd.get('entity')||'', sphere:fd.get('sphere')||'', url:fd.get('url')||'', title:fd.get('title')||'', source:fd.get('source')||'', type:fd.get('type')||'', date:fd.get('date')||'', notes:fd.get('notes')||'', createdAt:new Date().toISOString()
+      }; const records=getTrackingRecords(); records.push(record); localStorage.setItem(TRACKING_STORAGE_KEY,JSON.stringify(records)); renderTrackingRecords(); trackingForm.reset(); if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
+    });
+    document.getElementById('tracking-clear').addEventListener('click',()=>{ if(confirm('Apagar os registros de publicações salvos neste navegador?')){localStorage.removeItem(TRACKING_STORAGE_KEY);renderTrackingRecords();} });
+
     function renderOracleIndex() {
       indexList.innerHTML = ORACULO_AREAS.map(area => `
         <div class="oracle-index-item">
@@ -1031,6 +1182,7 @@ Oraculo · HTML
           '<h3>PUBLICAÇÕES / FONTES ENCONTRADAS</h3>' +
           sources.map(source => {
             const publisher = source.publisher || source.source || source.domain || 'Fonte não identificada';
+             const sourceTier = source.sourceTier || source.tier || source.sourceLevel || '';
             const type = source.type || (source.domain ? 'resultado de busca' : 'conteúdo');
             const title = source.title || 'Sem título';
             const date = source.publishedAt
@@ -1073,7 +1225,7 @@ Oraculo · HTML
               '<div class="oracle-result-source' + (isVideo ? ' is-video' : '') + '">' +
               badge +
               '<strong>' + escapeHtml(publisher) + '</strong> — ' +
-              escapeHtml(type) +
+              escapeHtml(type) + (sourceTier ? ' · <span class="tracking-badge">ETAPA '+escapeHtml(sourceTier)+'</span>' : '') +
               '<br>' +
               escapeHtml(title) +
               date +
@@ -1158,7 +1310,11 @@ REGRAS:
 8. Quando possível, apresente as publicações originais utilizadas.
 9. Para assuntos com provável registo audiovisual, procure também fontes em vídeo.
 10. Para vídeos de redes sociais, confirme a oficialidade do perfil; se não for possível, marque a fonte como não verificada.
-11. Se a evidência for insuficiente, declare essa limitação em vez de completar a lacuna por inferência.`;
+11. Se a evidência for insuficiente, declare essa limitação em vez de completar a lacuna por inferência.
+12. Quando a consulta envolver uma entidade ou órgão, siga esta ordem de busca: 1) Portal de Transparência próprio; 2) Portal de Transparência do governo ao qual pertence; 3) Acesso à Informação/LAI; 4) portal institucional; 5) Diário Oficial; 6) Tribunal de Contas competente; 7) Controladoria competente; 8) base oficial de dados; 9) fontes secundárias.
+13. Não pare necessariamente na primeira fonte encontrada: registre as publicações relevantes das etapas aplicáveis para formar o rastro documental.
+14. Canais oficiais do próprio órgão (site, YouTube, TV, Instagram, Facebook, X, LinkedIn, TikTok etc.) são fontes oficiais institucionais; não devem ser tratados como fonte secundária.
+15. Nesta etapa, registre a existência e os metadados da publicação. Não classifique o conteúdo como verdadeiro ou falso apenas por ter sido localizado.`;
 
       try {
         const response = await fetch(
@@ -1174,7 +1330,11 @@ REGRAS:
               question: researchPrompt,
               topic: 'ORÁCULO — CONSULTA GERAL',
               module: 'ORÁCULO — CONSULTA GERAL',
-              discipline: ''
+              discipline: '',
+              studyContext: {
+                trackingContext,
+                sourceOrder: TRACKING_ORDER.map(x => ({step:x[0], source:x[1]}))
+              }
             })
           }
         );
