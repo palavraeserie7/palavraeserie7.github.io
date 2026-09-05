@@ -1,446 +1,807 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Áreas Acadêmicas da Teologia — Palavra & Série</title>
+  <style>
+    :root {
+      --bg: #0b1428;
+      --panel: #111b30;
+      --panel-2: #17243a;
+      --paper: #f1eadb;
+      --paper-2: #fffdf7;
+      --ink: #4a443b;
+      --muted: #806f53;
+      --line: #d8cdb8;
+      --green: #20d66b;
+      --blue: #18bfff;
+      --text: #dbe7f5;
+      --side-w: 168px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; min-height:100vh; background: var(--bg); color: var(--text); font-family: "Segoe UI", Tahoma, sans-serif; }
+    button,input,select{font:inherit}
+    :focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
 
-<title>Palavra & Série — Pesquisa</title>
+    /* ---------- App shell / sidebar (igual à página da Bíblia) ---------- */
 
-<style>
-:root{
-  --p:#20d66b;
-  --bg:#0b1428;
-  --s:#111b30;
-  --t:#dbe7f5;
-  --b:#263754;
-  --a:#18bfff;
-  --paper:#f1eadb;
-  --ink:#4a443b;
-  --muted:#806f53;
+    .app-shell{
+      display:flex;
+      align-items:stretch;
+      min-height:100vh;
+    }
+
+    .side-nav{
+      flex:0 0 var(--side-w);
+      width:var(--side-w);
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      padding:16px 10px;
+      background:var(--panel);
+      border-right:1px solid #263754;
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow-y:auto;
+    }
+
+    .side-brand{
+      padding:2px 4px 12px;
+      border-bottom:1px solid #263754;
+    }
+
+    .side-brand-link{
+      display:block;
+      color:var(--green);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:1.2px;
+      text-decoration:none;
+      line-height:1.3;
+    }
+
+    .side-brand-sub{
+      display:block;
+      margin-top:3px;
+      color:#7c8fac;
+      font-size:8px;
+      font-weight:800;
+      letter-spacing:.6px;
+      text-transform:uppercase;
+    }
+
+    .side-menu{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+
+    .side-item{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      padding:8px 7px;
+      border-radius:6px;
+      border:1px solid transparent;
+      color:var(--text);
+      text-decoration:none;
+      font-size:9.5px;
+      font-weight:800;
+      letter-spacing:.3px;
+      line-height:1.25;
+    }
+
+    .side-item:hover,
+    .side-item:focus-visible{
+      background:#16233c;
+      outline:none;
+    }
+
+    .side-item.active{
+      background:rgba(32,214,107,.12);
+      border-color:var(--green);
+      color:var(--green);
+    }
+
+    .side-icon{
+      flex:0 0 auto;
+      width:13px;
+      font-size:12px;
+      text-align:center;
+      line-height:1;
+    }
+
+    .side-footer-note{
+      margin-top:auto;
+      padding-top:12px;
+      border-top:1px solid #263754;
+      color:#5f7192;
+      font-size:8px;
+      line-height:1.5;
+    }
+
+    .content-area{
+      flex:1;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .site-header{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      padding:14px 20px;
+      border-bottom:1px solid #263754;
+      background:var(--panel);
+      position:sticky;
+      top:0;
+      z-index:20;
+    }
+
+    .header-link{
+      padding:8px 11px;
+      border:1px solid #536780;
+      border-radius:7px;
+      background:transparent;
+      color:var(--text);
+      font-size:10px;
+      font-weight:900;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+
+    .header-link:hover,
+    .header-link:focus-visible{
+      border-color:var(--blue);
+      background:#163451;
+      outline:none;
+    }
+
+    /* ---------- Conteúdo da página ---------- */
+
+    .paper { flex:1; padding: clamp(24px, 5vw, 52px) clamp(18px, 5vw, 70px) 70px; background: var(--paper); color: var(--ink); }
+    .paper-inner { max-width: 1220px; margin: 0 auto; }
+    h1 { margin: 0 0 12px; color: var(--ink); font-size: clamp(25px, 4vw, 39px); letter-spacing: .5px; line-height: 1.15; }
+    .intro { max-width: 900px; margin: 0 0 20px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .filter { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin: 0 0 22px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper-2); }
+    .filter strong { margin-right: 5px; color: var(--muted); font-size: 10px; letter-spacing: 1px; }
+    .filter button { padding: 7px 10px; border: 1px solid var(--line); border-radius: 5px; background: #fffaf0; color: var(--muted); font-size: 10px; font-weight: 900; cursor: pointer; }
+    .filter button:hover, .filter button.active { border-color: var(--muted); background: var(--muted); color: #fffaf0; }
+    .count { margin-left: auto; color: var(--muted); font-size: 10px; }
+    .tree { max-width: 1120px; }
+    details.node { margin: 0 0 9px; }
+    details.node > summary { padding: 13px 15px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper-2); color: var(--ink); font-size: 14px; font-weight: 850; cursor: pointer; list-style-position: inside; }
+    details.node > summary:hover { border-color: #b99b61; background: #faf1df; }
+    details.node[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: #eee2cd; }
+    .node-children { margin: 0 0 12px 22px; padding: 10px 0 0 18px; border-left: 2px solid var(--line); }
+    details.category { margin-bottom: 8px; }
+    details.category > summary { padding: 10px 13px; border: 1px solid var(--line); border-radius: 6px; background: #f8f1e4; color: #6d5d45; font-size: 12px; font-weight: 900; letter-spacing: .4px; cursor: pointer; list-style-position: inside; }
+    details.category[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+    .items { margin: 0; padding: 8px 0 4px 28px; border-left: 1px solid var(--line); list-style: none; }
+    .items li { position: relative; margin: 0; padding: 6px 10px; color: #5f513d; font-size: 12px; line-height: 1.4; }
+    .items li::before { content: "└─"; position: absolute; left: -22px; color: #9b8b70; }
+    .items li.hidden { display: none; }
+    .topic { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+    .topic:hover { color: #806f53; text-decoration: underline; }
+    .badge { display: inline-block; margin-left: 7px; padding: 2px 6px; border: 1px solid currentColor; border-radius: 4px; font-size: 9px; font-weight: 900; letter-spacing: .5px; vertical-align: middle; line-height: 1.2; }
+    .badge.free { color: #168448; } .badge.pro { color: #0873a7; } .badge.master { color: #7045ad; } .badge.doctus { color: #956000; }
+    .empty { display: none; padding: 12px 0; color: var(--muted); font-size: 12px; }
+    .modal { position: fixed; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(3, 9, 21, .72); }
+    .modal.open { display: flex; }
+    .modal-card { width: min(680px, 100%); max-height: min(720px, 90vh); overflow: auto; border: 1px solid #35506d; border-radius: 12px; background: var(--panel); color: var(--text); box-shadow: 0 12px 36px rgba(0,0,0,.35); }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 20px 22px; border-bottom: 1px solid #263754; background: var(--panel-2); }
+    .modal-head h2 { margin: 0; color: #fff; font-size: 22px; line-height: 1.2; }
+    .close { border: 1px solid #35506d; border-radius: 5px; padding: 7px 10px; background: transparent; color: var(--text); font-weight: 900; cursor: pointer; }
+    .close:hover { border-color: var(--green); color: #fff; }
+    .modal-body { padding: 22px; }
+    .crumb { margin: 0 0 14px; color: #91a4bd; font-size: 11px; line-height: 1.55; }
+    .modal-body p { line-height: 1.6; }
+    .modal-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+    .modal-actions a, .modal-actions button { padding: 10px 13px; border: 0; border-radius: 6px; background: var(--green); color: #07151f; font-weight: 900; text-decoration: none; cursor: pointer; }
+    .modal-actions button.secondary { background: #263754; color: var(--text); }
+
+    /* ---------- Responsivo do shell (igual à página da Bíblia) ---------- */
+
+    @media(max-width:900px){
+      :root{ --side-w:100%; }
+
+      .app-shell{
+        flex-direction:column;
+      }
+
+      .side-nav{
+        position:relative;
+        top:auto;
+        height:auto;
+        width:100%;
+        flex-direction:row;
+        align-items:center;
+        gap:10px;
+        overflow-x:auto;
+        border-right:0;
+        border-bottom:1px solid #263754;
+      }
+
+      .side-brand{
+        padding:0 12px 0 0;
+        border-bottom:0;
+        border-right:1px solid #263754;
+        flex:0 0 auto;
+      }
+
+      .side-menu{
+        flex-direction:row;
+        gap:6px;
+      }
+
+      .side-item{
+        white-space:nowrap;
+      }
+
+      .side-footer-note{
+        display:none;
+      }
+    }
+
+    @media (max-width: 650px) { .node-children { margin-left: 8px; padding-left: 10px; } .items { padding-left: 22px; } }
+
+  .academic-chat-panel {
+  max-width: 1100px;
+  margin: 24px auto 0;
+  padding: 22px;
+  border: 1px solid #263754;
+  border-radius: 10px;
+  background: #111b30;
+  color: #dbe7f5;
 }
 
-*{
-  box-sizing:border-box;
+.academic-chat-panel h2 {
+  margin: 0 0 8px;
+  color: #20d66b;
+  font-size: 18px;
 }
 
-html,
-body{
-  margin:0;
-  min-height:100%;
-  font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+.academic-chat-panel p {
+  margin: 0;
+  color: #91a4bd;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
-body{
-  background:var(--bg);
-  color:var(--t);
+.academic-chat-context {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-left: 3px solid #20d66b;
+  background: #0d172b;
+  color: #b9c7d8;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
-.app{
-  min-height:100vh;
-  display:grid;
-  grid-template-columns:320px 1fr;
+.academic-chat-messages {
+  min-height: 180px;
+  max-height: 430px;
+  overflow-y: auto;
+  margin-top: 14px;
+  padding: 12px;
+  background: #0d172b;
+  border: 1px solid #263754;
+  border-radius: 7px;
 }
 
-.sidebar{
-  background:var(--s);
-  border-right:1px solid var(--b);
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
+.academic-chat-message {
+  margin-bottom: 10px;
+  padding: 11px 13px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
 }
 
-.brand{
-  padding:4px 4px 14px;
-  border-bottom:1px solid var(--b);
+.academic-chat-message.system {
+  background: #17243a;
+  color: #b9c7d8;
 }
 
-.brand h1{
-  margin:0;
-  color:var(--p);
-  font-size:16px;
-  letter-spacing:2px;
+.academic-chat-message.user {
+  background: #263754;
+  color: #fff;
 }
 
-.brand p{
-  margin:6px 0 0;
-  color:#91a4bd;
-  font-size:10px;
-  font-weight:800;
+.academic-chat-message.assistant {
+  border: 1px solid #35506d;
+  background: #111b30;
+  color: #dbe7f5;
 }
 
-.menu{
-  display:grid;
-  gap:8px;
+.academic-chat-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
 }
 
-.menu a{
-  display:block;
-  padding:12px 14px;
-  border:1px solid transparent;
-  border-radius:8px;
-  color:#b9c7d8;
-  text-decoration:none;
-  font-size:12px;
-  font-weight:800;
-  background:#0d1b31;
+.academic-chat-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #344762;
+  border-radius: 5px;
+  background: #0d172b;
+  color: #dbe7f5;
+  font: inherit;
 }
 
-.menu a:hover,
-.menu a:focus{
-  border-color:#2e6580;
-  background:#13243d;
-  color:#fff;
-  outline:none;
+.academic-chat-form button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 5px;
+  background: #20d66b;
+  color: #07151f;
+  font-weight: 900;
+  cursor: pointer;
 }
 
-.menu a.primary{
-  border-color:#20d66b;
-  background:rgba(32,214,107,.08);
-  color:#fff;
+.academic-chat-form button:disabled {
+  opacity: .55;
+  cursor: wait;
 }
 
-.menu a.external{
-  border-color:#8f7cff;
+.academic-chat-status {
+  min-height: 18px;
+  margin-top: 8px;
+  color: #91a4bd;
+  font-size: 11px;
 }
 
-.note{
-  margin-top:auto;
-  padding:12px;
-  border:1px solid var(--b);
-  border-radius:8px;
-  color:#91a4bd;
-  font-size:10px;
-  line-height:1.5;
+.academic-chat-status.error {
+  color: #ff9f9f;
 }
 
-main{
-  min-width:0;
-  overflow:auto;
-  background:var(--paper);
-  color:var(--ink);
+.academic-chat-status.success {
+  color: #50ed91;
 }
 
-.hero{
-  max-width:1050px;
-  margin:0 auto;
-  padding:70px 48px 30px;
-}
-
-.kicker{
-  color:var(--muted);
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:2px;
-}
-
-h2{
-  margin:8px 0 12px;
-  font-size:34px;
-}
-
-.hero p{
-  max-width:760px;
-  line-height:1.7;
-  color:#6d5d45;
-}
-
-.grid{
-  max-width:1050px;
-  margin:0 auto;
-  padding:10px 48px 70px;
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:14px;
-}
-
-.card{
-  padding:20px;
-  border:1px solid #d8cdb8;
-  border-radius:9px;
-  background:#fffdf7;
-  box-shadow:0 5px 16px rgba(55,45,30,.06);
-}
-
-.card h3{
-  margin:0 0 8px;
-  color:var(--ink);
-  font-size:15px;
-}
-
-.card p{
-  margin:0 0 16px;
-  color:#806f53;
-  font-size:11px;
-  line-height:1.55;
-}
-
-.card a{
-  display:inline-block;
-  padding:9px 12px;
-  border-radius:5px;
-  background:#806f53;
-  color:#fffaf0;
-  text-decoration:none;
-  font-size:10px;
-  font-weight:900;
-}
-
-.card a:hover{
-  background:#6d5d45;
-}
-
-@media(max-width:900px){
-
-  .app{
-    grid-template-columns:1fr;
+@media (max-width: 600px) {
+  .academic-chat-form {
+    flex-direction: column;
   }
 
-  .sidebar{
-    position:static;
-    border-right:0;
-    border-bottom:1px solid var(--b);
-  }
-
-  .grid{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .hero,
-  .grid{
-    padding-left:24px;
-    padding-right:24px;
+  .academic-chat-form button {
+    width: 100%;
   }
 }
 
-@media(max-width:600px){
-
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .hero{
-    padding-top:40px;
-  }
-
-  h2{
-    font-size:28px;
-  }
-}
-
-/* Shell visual padronizado com Bíblia, Áreas Acadêmicas e Estante */
-:root { --side-w:168px; }
-.app { min-height:100vh; display:flex; align-items:stretch; }
-.sidebar { flex:0 0 var(--side-w); width:var(--side-w); min-height:100vh; background:var(--s); border-right:1px solid var(--b); padding:16px 10px; display:flex; flex-direction:column; gap:16px; position:sticky; top:0; height:100vh; overflow-y:auto; }
-.brand { padding:2px 4px 12px; border-bottom:1px solid var(--b); }
-.brand h1 { margin:0; color:var(--p); font-size:12px; letter-spacing:1.2px; line-height:1.3; }
-.brand p { display:block; margin:3px 0 0; color:#7c8fac; font-size:8px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
-.menu { display:flex; flex-direction:column; gap:3px; }
-.menu a, .menu a.primary, .menu a.external { display:flex; align-items:center; gap:7px; padding:8px 7px; border:1px solid transparent; border-radius:6px; background:transparent; color:var(--t); text-decoration:none; font-size:9.5px; font-weight:800; letter-spacing:.3px; line-height:1.25; }
-.menu a:hover, .menu a:focus, .menu a.primary:hover { background:#16233c; border-color:transparent; color:var(--t); outline:none; }
-.menu a.primary { background:rgba(32,214,107,.12); border-color:var(--p); color:var(--p); }
-.note { margin-top:auto; padding:12px 4px 0; border:0; border-top:1px solid var(--b); border-radius:0; color:#5f7192; font-size:8px; line-height:1.5; }
-main { flex:1; min-width:0; overflow:auto; background:var(--paper); color:var(--ink); }
-.site-header { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-bottom:1px solid var(--b); background:var(--s); position:sticky; top:0; z-index:20; }
-.header-link { padding:8px 11px; border:1px solid #536780; border-radius:7px; background:transparent; color:var(--t); font-size:10px; font-weight:900; text-decoration:none; white-space:nowrap; }
-.header-link:hover { border-color:var(--a); background:#163451; }
-.hero { max-width:none; margin:0; padding:clamp(24px,5vw,52px) clamp(18px,5vw,70px) 20px; }
-.grid { max-width:none; margin:0; padding:10px clamp(18px,5vw,70px) 70px; }
-@media(max-width:900px){ .app{display:flex; flex-direction:column;} .sidebar{position:relative; top:auto; width:100%; min-height:0; height:auto; flex:0 0 auto; flex-direction:row; align-items:center; gap:10px; overflow-x:auto; overflow-y:hidden; border-right:0; border-bottom:1px solid var(--b); padding:12px 14px;} .brand{flex:0 0 auto; padding:0 12px 0 0; border-bottom:0; border-right:1px solid var(--b);} .menu{flex-direction:row; flex:0 0 auto;} .note{display:none;} .site-header{align-items:flex-start; flex-wrap:wrap; padding:12px 14px;} .hero,.grid{padding-left:18px;padding-right:18px;} }
+  #academic-chat.academic-chat-panel { position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center; max-width:none; margin:0; padding:22px; border:0; border-radius:0; background:rgba(3,9,21,.78); }
+  #academic-chat.academic-chat-panel.open { display:flex; }
+  #academic-chat .academic-chat-inner { width:min(900px,100%); max-height:90vh; overflow:auto; padding:22px; border:1px solid #35506d; border-radius:12px; background:#111b30; box-shadow:0 14px 45px rgba(0,0,0,.45); }
+  .academic-chat-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  .academic-chat-close { padding:8px 12px; border:1px solid #35506d; border-radius:5px; background:transparent; color:#dbe7f5; font-weight:900; cursor:pointer; }
+  .academic-chat-close:hover { border-color:#20d66b; color:#fff; }
+  @media (max-width:600px) { #academic-chat.academic-chat-panel { padding:10px; } #academic-chat .academic-chat-inner { padding:16px; } }
 
 </style>
 </head>
-
 <body>
-
-<div class="app">
-
-  <aside class="sidebar" aria-label="Menu principal">
-
-    <div class="brand">
-      <h1>PALAVRA &amp; SÉRIE</h1>
-      <p>PESQUISA · ARQUITETURA MODULAR</p>
-    </div>
-
-    <nav class="menu">
-
-      <a class="primary" href="index.html">
-        ⌂ PESQUISA
-      </a>
-
-      <a href="areas-academicas.html">
-        ▤ ÁREAS ACADÉMICAS
-      </a>
-
-      <a href="biblia.html">
-        ▣ BÍBLIA
-      </a>
-
-      <a href="estante.html">
-        ▤ MINHA ESTANTE
-      </a>
-
-      <a href="sermoes.html">
-        ▤ SERMÕES
-      </a>
-
-      <a href="oraculo.html">
-        ◈ ORÁCULO
-      </a>
-
-      <a href="ponte-infantil.html">
-        ✦ PONTE INFANTIL
-      </a>
-
-      <a href="entrada.html">
-        ↪ ENTRAR
-      </a>
-
-    </nav>
-
-    <div class="note">
-      Cada módulo possui agora a sua própria página.
-      A entrada pública mantém apenas as ferramentas
-      destinadas à navegação e pesquisa.
-      As ferramentas de criação e gestão do autor
-      permanecem dentro da Sala do Escritor.
-    </div>
-
-  </aside>
-
-
-  <main>
-    <header class="site-header"><a class="header-link" href="index.html">← VOLTAR À PESQUISA</a><a class="header-link" href="sala-do-escritor.html">SALA DO ESCRITOR</a></header>
-
-    <section class="hero">
-
-      <div class="kicker">
-        PESQUISA · ENTRADA PRINCIPAL
+  <div class="app-shell">
+    <aside class="side-nav" aria-label="Navegação da plataforma">
+      <div class="side-brand">
+        <a class="side-brand-link" href="index.html">PALAVRA &amp; SÉRIE</a>
+        <span class="side-brand-sub">Áreas acadêmicas</span>
       </div>
 
-      <h2>
-        Palavra &amp; Série
-      </h2>
+      <nav class="side-menu">
+        <a class="side-item" href="index.html"><span class="side-icon">⌂</span>PESQUISA</a>
+        <a class="side-item active" href="areas-academicas.html" aria-current="page"><span class="side-icon">▤</span>ÁREAS ACADÊMICAS</a>
+        <a class="side-item" href="biblia.html"><span class="side-icon">▤</span>BÍBLIA</a>
+        <a class="side-item" href="estante.html"><span class="side-icon">▤</span>ESTANTE</a>
+        <a class="side-item" href="sermoes.html"><span class="side-icon">▤</span>SERMÕES</a>
+        <a class="side-item" href="oraculo.html"><span class="side-icon">◆</span>ORÁCULO</a>
+        <a class="side-item" href="ponte-infantil.html"><span class="side-icon">✦</span>PONTE INFANTIL</a>
+      </nav>
 
-      <p>
-        Centro de entrada da plataforma de pesquisa.
-        A página principal mantém o menu e a navegação,
-        enquanto as ferramentas especializadas permanecem
-        independentes nos seus próprios HTMLs.
+      <p class="side-footer-note">
+        Índice acadêmico independente da Sala do Escritor.
       </p>
+    </aside>
 
-    </section>
+    <div class="content-area">
+      <header class="site-header">
+        <a class="header-link" href="index.html">← VOLTAR PARA A TELA PRINCIPAL</a>
+      </header>
 
+      <main class="paper">
+        <div class="paper-inner">
+          <h1>ÁREAS ACADÊMICAS DA TEOLOGIA</h1>
+          <p class="intro">Índice acadêmico. Abra uma área e avance pelos níveis até ao tema que deseja estudar.</p>
+          <nav class="filter" aria-label="Filtrar itens por nível">
+            <strong>NÍVEL</strong>
+            <button type="button" class="active" data-level="">TODOS</button>
+            <button type="button" data-level="free">FREE</button>
+            <button type="button" data-level="pro">PRO</button>
+            <button type="button" data-level="master">MASTER</button>
+            <button type="button" data-level="doctus">DOCTUS</button>
+            <span class="count" aria-live="polite"></span>
+          </nav>
+          <section class="tree" id="academic-tree" aria-label="Taxonomia acadêmica"></section>
+          <p class="empty" id="empty-message">Nenhum item corresponde ao filtro selecionado.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script>
+    const ACADEMIC_TREE = [{"title":"I. ESTUDOS BÍBLICOS","children":[{"title":"1. Fundamentos e Introdução Bíblica","children":[{"title":"Introdução ao Antigo Testamento / Bíblia Hebraica","kind":"item"},{"title":"Introdução ao Novo Testamento","kind":"item"},{"title":"Formação e composição dos textos bíblicos","kind":"item"},{"title":"Autoria, datação e proveniência","kind":"item"},{"title":"História da transmissão textual","kind":"item"},{"title":"Contexto histórico e cultural","kind":"item"},{"title":"Gêneros e formas literárias","kind":"item"},{"title":"História da interpretação","kind":"item"},{"title":"Questões metodológicas e debates acadêmicos","kind":"item"}]},{"title":"2. Cânon e Formação das Escrituras","children":[{"title":"História do cânon","kind":"item"},{"title":"Cânones judaicos e cristãos","kind":"item"},{"title":"Formação dos catálogos canônicos","kind":"item"},{"title":"Deuterocanônicos","kind":"item"},{"title":"Apócrifos e pseudepígrafos","kind":"item"},{"title":"Septuaginta e outras versões antigas","kind":"item"},{"title":"História do reconhecimento canônico","kind":"item"},{"title":"Cânon e autoridade das Escrituras","kind":"item"}]},{"title":"3. História e Transmissão do Texto Bíblico","children":[{"title":"História textual do Antigo Testamento","kind":"item"},{"title":"História textual do Novo Testamento","kind":"item"},{"title":"Tradições manuscritas","kind":"item"},{"title":"Massorá e tradição massorética","kind":"item"},{"title":"Transmissão e cópia","kind":"item"},{"title":"Edições antigas e modernas","kind":"item"},{"title":"Versões antigas","kind":"item"},{"title":"História da edição crítica","kind":"item"}]},{"title":"4. Crítica Textual","children":[{"title":"Crítica textual do Antigo Testamento","kind":"item"},{"title":"Crítica textual do Novo Testamento","kind":"item"},{"title":"Variantes textuais","kind":"item"},{"title":"Evidência externa","kind":"item"},{"title":"Evidência interna","kind":"item"},{"title":"Genealogia das leituras","kind":"item"},{"title":"Famílias e tradições textuais","kind":"item"},{"title":"Aparato crítico","kind":"item"},{"title":"Edições críticas","kind":"item"},{"title":"Textus Receptus e tradição majoritária","kind":"item"},{"title":"Texto crítico","kind":"item"},{"title":"História da crítica textual","kind":"item"}]},{"title":"5. Manuscritos, Paleografia e Codicologia","children":[{"title":"Papirologia","kind":"item"},{"title":"Manuscritos bíblicos","kind":"item"},{"title":"Papiros","kind":"item"},{"title":"Unciais","kind":"item"},{"title":"Minúsculos","kind":"item"},{"title":"Lectionários","kind":"item"},{"title":"Códices","kind":"item"},{"title":"Rolos","kind":"item"},{"title":"Paleografia","kind":"item"},{"title":"Codicologia","kind":"item"},{"title":"Materiais e suportes de escrita","kind":"item"},{"title":"Datação paleográfica","kind":"item"},{"title":"Proveniência","kind":"item"},{"title":"Conservação e digitalização de manuscritos","kind":"item"}]},{"title":"6. Arqueologia, Epigrafia e Cultura Material","children":[{"title":"Arqueologia do Levante","kind":"item"},{"title":"Arqueologia de Israel e Judá","kind":"item"},{"title":"Arqueologia do mundo bíblico","kind":"item"},{"title":"Estratigrafia","kind":"item"},{"title":"Sítios arqueológicos","kind":"item"},{"title":"Cultura material","kind":"item"},{"title":"Epigrafia","kind":"item"},{"title":"Inscrições","kind":"item"},{"title":"Selos e ostraca","kind":"item"},{"title":"Numismática","kind":"item"},{"title":"Arquitetura e urbanismo","kind":"item"},{"title":"Relação entre evidência arqueológica e textos bíblicos","kind":"item"}]},{"title":"7. História e Contexto do Mundo Bíblico","children":[{"title":"Antigo Oriente Próximo","kind":"item"},{"title":"Egito","kind":"item"},{"title":"Mesopotâmia","kind":"item"},{"title":"Assíria","kind":"item"},{"title":"Babilônia","kind":"item"},{"title":"Pérsia","kind":"item"},{"title":"Mundo helenístico","kind":"item"},{"title":"Mundo greco-romano","kind":"item"},{"title":"Judaísmo do Segundo Templo","kind":"item"},{"title":"Império Romano","kind":"item"},{"title":"História social","kind":"item"},{"title":"História política","kind":"item"},{"title":"Economia e instituições","kind":"item"},{"title":"Religião e sociedade","kind":"item"},{"title":"Vida cotidiana","kind":"item"}]},{"title":"8. Línguas Bíblicas","children":[{"title":"Hebraico Bíblico","children":[{"title":"Fonologia e escrita","kind":"item"},{"title":"Morfologia","kind":"item"},{"title":"Sintaxe","kind":"item"},{"title":"Semântica","kind":"item"},{"title":"Vocabulário","kind":"item"},{"title":"Hebraico bíblico e hebraico antigo","kind":"item"},{"title":"Dialetos e desenvolvimento histórico","kind":"item"},{"title":"Relação com outras línguas semíticas","kind":"item"}]},{"title":"Aramaico Bíblico","children":[{"title":"Morfologia","kind":"item"},{"title":"Sintaxe","kind":"item"},{"title":"Vocabulário","kind":"item"},{"title":"Aramaico imperial","kind":"item"},{"title":"Dialetos aramaicos","kind":"item"},{"title":"Targumim","kind":"item"},{"title":"Documentos de Elefantina","kind":"item"},{"title":"Relações com o hebraico","kind":"item"}]},{"title":"Grego do Novo Testamento","children":[{"title":"Grego koiné","kind":"item"},{"title":"Morfologia","kind":"item"},{"title":"Sintaxe","kind":"item"},{"title":"Semântica","kind":"item"},{"title":"Vocabulário","kind":"item"},{"title":"Aspecto verbal","kind":"item"},{"title":"Retórica","kind":"item"},{"title":"Helenismos","kind":"item"},{"title":"Hebraísmos","kind":"item"},{"title":"Latinismos","kind":"item"},{"title":"Grego do NT e grego helenístico","kind":"item"}]},{"title":"Línguas Cognatas","children":[{"title":"Aramaico","kind":"item"},{"title":"Siríaco","kind":"item"},{"title":"Ugarítico","kind":"item"},{"title":"Fenício","kind":"item"},{"title":"Acádio","kind":"item"},{"title":"Árabe antigo","kind":"item"},{"title":"Outras línguas semíticas relevantes","kind":"item"}]}]},{"title":"9. Linguística e Filologia Bíblica","children":[{"title":"Filologia","kind":"item"},{"title":"Linguística histórica","kind":"item"},{"title":"Linguística comparativa","kind":"item"},{"title":"Fonologia","kind":"item"},{"title":"Morfologia","kind":"item"},{"title":"Sintaxe","kind":"item"},{"title":"Semântica","kind":"item"},{"title":"Pragmática","kind":"item"},{"title":"Linguística textual","kind":"item"},{"title":"Análise do discurso","kind":"item"},{"title":"Sociolinguística","kind":"item"},{"title":"Linguística cognitiva","kind":"item"},{"title":"Teoria da tradução","kind":"item"},{"title":"Línguas em contato","kind":"item"}]},{"title":"10. Lexicografia e Semântica Bíblica","children":[{"title":"Lexicografia hebraica","kind":"item"},{"title":"Lexicografia aramaica","kind":"item"},{"title":"Lexicografia grega","kind":"item"},{"title":"Léxicos e dicionários","kind":"item"},{"title":"Campos semânticos","kind":"item"},{"title":"Polissemia","kind":"item"},{"title":"Sinonímia","kind":"item"},{"title":"Etimologia com cautela metodológica","kind":"item"},{"title":"Hapax legomena","kind":"item"},{"title":"Mudança semântica","kind":"item"},{"title":"Semântica contextual","kind":"item"},{"title":"Semântica lexical","kind":"item"},{"title":"História dos léxicos bíblicos","kind":"item"}]},{"title":"11. Literatura e Retórica Bíblica","children":[{"title":"Crítica literária","kind":"item"},{"title":"Narratologia","kind":"item"},{"title":"Poética","kind":"item"},{"title":"Retórica","kind":"item"},{"title":"Estrutura narrativa","kind":"item"},{"title":"Personagens","kind":"item"},{"title":"Enredo","kind":"item"},{"title":"Ponto de vista","kind":"item"},{"title":"Paralelismo","kind":"item"},{"title":"Quiasmo","kind":"item"},{"title":"Inclusio","kind":"item"},{"title":"Intertextualidade","kind":"item"},{"title":"Metáfora","kind":"item"},{"title":"Ironia","kind":"item"},{"title":"Análise retórica","kind":"item"}]},{"title":"12. Hermenêutica e Teoria da Interpretação","children":[{"title":"Hermenêutica bíblica","kind":"item"},{"title":"História da hermenêutica","kind":"item"},{"title":"Hermenêutica filosófica","kind":"item"},{"title":"Pré-compreensão","kind":"item"},{"title":"Contexto do intérprete","kind":"item"},{"title":"Sentido e referência","kind":"item"},{"title":"Autor, texto e leitor","kind":"item"},{"title":"Interpretação histórica","kind":"item"},{"title":"Interpretação literária","kind":"item"},{"title":"Interpretação canônica","kind":"item"},{"title":"Hermenêuticas contextuais","kind":"item"},{"title":"Critérios de argumentação e controle interpretativo","kind":"item"}]},{"title":"13. Métodos Exegéticos e Crítica Histórica","children":[{"title":"Crítica histórica","kind":"item"},{"title":"Crítica das fontes","kind":"item"},{"title":"Crítica da forma","kind":"item"},{"title":"Crítica da redação","kind":"item"},{"title":"Crítica literária","kind":"item"},{"title":"Crítica canônica","kind":"item"},{"title":"Crítica narrativa","kind":"item"},{"title":"Crítica retórica","kind":"item"},{"title":"Análise discursiva","kind":"item"},{"title":"Análise sociocientífica","kind":"item"},{"title":"Intertextualidade","kind":"item"},{"title":"Exegese histórico-gramatical","kind":"item"},{"title":"Métodos sincrônicos","kind":"item"},{"title":"Métodos diacrônicos","kind":"item"}],"note":"Métodos devem permanecer identificados como métodos, e não como áreas acadêmicas independentes."},{"title":"14. Exegese por Corpus","children":[{"title":"Pentateuco / Torá","children":[{"title":"Gênesis","kind":"item"},{"title":"Êxodo","kind":"item"},{"title":"Levítico","kind":"item"},{"title":"Números","kind":"item"},{"title":"Deuteronômio","kind":"item"},{"title":"Formação e composição da Torá","kind":"item"},{"title":"Leis e alianças","kind":"item"},{"title":"Pentateuco Samaritano","kind":"item"},{"title":"Manuscritos do Mar Morto","kind":"item"},{"title":"Debates sobre autoria e composição","kind":"item"}]},{"title":"Livros Históricos","children":[{"title":"Josué","kind":"item"},{"title":"Juízes","kind":"item"},{"title":"Samuel","kind":"item"},{"title":"Reis","kind":"item"},{"title":"Crônicas","kind":"item"},{"title":"Esdras","kind":"item"},{"title":"Neemias","kind":"item"},{"title":"Ester","kind":"item"},{"title":"Historiografia deuteronomista","kind":"item"},{"title":"Historiografia cronista","kind":"item"}]},{"title":"Atos dos Apóstolos","children":[{"title":"Historiografia de Lucas-Atos","kind":"item"},{"title":"Narrativa","kind":"item"},{"title":"Missão","kind":"item"},{"title":"Comunidades cristãs primitivas","kind":"item"},{"title":"Relação com o mundo greco-romano","kind":"item"},{"title":"Questões históricas","kind":"item"}]},{"title":"Literatura Poética e Sapiencial","children":[{"title":"Jó","kind":"item"},{"title":"Salmos","kind":"item"},{"title":"Provérbios","kind":"item"},{"title":"Eclesiastes","kind":"item"},{"title":"Cântico dos Cânticos","kind":"item"},{"title":"Poesia hebraica","kind":"item"},{"title":"Sabedoria","kind":"item"},{"title":"Sofrimento e teodiceia","kind":"item"},{"title":"Literatura sapiencial comparada","kind":"item"}]},{"title":"Profetas","children":[{"title":"Isaías","kind":"item"},{"title":"Jeremias","kind":"item"},{"title":"Ezequiel","kind":"item"},{"title":"Daniel","kind":"item"},{"title":"Profetas Menores","kind":"item"},{"title":"Literatura profética","kind":"item"},{"title":"Oráculos","kind":"item"},{"title":"Visões","kind":"item"},{"title":"Profecia e contexto histórico","kind":"item"},{"title":"Composição dos livros proféticos","kind":"item"}]},{"title":"Evangelhos","children":[{"title":"Mateus","kind":"item"},{"title":"Marcos","kind":"item"},{"title":"Lucas","kind":"item"},{"title":"João","kind":"item"},{"title":"Evangelhos sinóticos","kind":"item"},{"title":"Problema sinóptico","kind":"item"},{"title":"História das formas","kind":"item"},{"title":"Crítica da redação","kind":"item"},{"title":"Tradições orais","kind":"item"},{"title":"Jesus histórico","kind":"item"},{"title":"Narrativa e teologia dos Evangelhos","kind":"item"}],"note":"A hipótese Q deve ser apresentada como hipótese acadêmica, nunca como fato estabelecido."},{"title":"Atos dos Apóstolos","children":[{"title":"Historiografia de Lucas-Atos","kind":"item"},{"title":"Narrativa","kind":"item"},{"title":"Missão","kind":"item"},{"title":"Comunidades cristãs primitivas","kind":"item"},{"title":"Relação com o mundo greco-romano","kind":"item"},{"title":"Questões históricas","kind":"item"}]},{"title":"Literatura Paulina","children":[{"title":"Romanos","kind":"item"},{"title":"1–2 Coríntios","kind":"item"},{"title":"Gálatas","kind":"item"},{"title":"Efésios","kind":"item"},{"title":"Filipenses","kind":"item"},{"title":"Colossenses","kind":"item"},{"title":"1–2 Tessalonicenses","kind":"item"},{"title":"Pastorais","kind":"item"},{"title":"Autoria e autenticidade","kind":"item"},{"title":"Paulo e judaísmo","kind":"item"},{"title":"Justificação","kind":"item"},{"title":"União com Cristo","kind":"item"},{"title":"Eclesiologia","kind":"item"},{"title":"Nova Perspectiva sobre Paulo e debates posteriores","kind":"item"}]},{"title":"Epístolas Gerais","children":[{"title":"Hebreus","kind":"item"},{"title":"Tiago","kind":"item"},{"title":"1–2 Pedro","kind":"item"},{"title":"1–3 João","kind":"item"},{"title":"Judas","kind":"item"},{"title":"Autoria e datação","kind":"item"},{"title":"Contexto judaico e cristão","kind":"item"},{"title":"Teologia e ética","kind":"item"},{"title":"Relações literárias entre as cartas","kind":"item"}]},{"title":"Apocalipse","children":[{"title":"Literatura apocalíptica","kind":"item"},{"title":"Profecia","kind":"item"},{"title":"Epístola","kind":"item"},{"title":"Estrutura e simbolismo","kind":"item"},{"title":"Sete selos","kind":"item"},{"title":"Sete trombetas","kind":"item"},{"title":"Sete taças","kind":"item"},{"title":"Intertextualidade com a Bíblia Hebraica","kind":"item"},{"title":"Contexto romano","kind":"item"},{"title":"História da interpretação","kind":"item"},{"title":"Preterismo, historicismo, futurismo e idealismo","kind":"item"}]}]}]},{"title":"II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO","children":[{"title":"15. Teologia Bíblica","children":[{"title":"Teologia do Antigo Testamento","kind":"item"},{"title":"Teologia do Novo Testamento","kind":"item"},{"title":"Teologia bíblica canônica","kind":"item"},{"title":"Temas e motivos bíblicos","kind":"item"},{"title":"Aliança","kind":"item"},{"title":"Reino de Deus","kind":"item"},{"title":"Criação","kind":"item"},{"title":"Pecado","kind":"item"},{"title":"Salvação","kind":"item"},{"title":"Messianismo","kind":"item"},{"title":"Espírito","kind":"item"},{"title":"Templo","kind":"item"},{"title":"Sabedoria","kind":"item"},{"title":"Escatologia","kind":"item"}]},{"title":"16. Judaísmo Antigo e Literatura do Segundo Templo","children":[{"title":"Judaísmo do Segundo Templo","kind":"item"},{"title":"Manuscritos do Mar Morto","kind":"item"},{"title":"Qumran","kind":"item"},{"title":"Septuaginta","kind":"item"},{"title":"Apócrifos","kind":"item"},{"title":"Pseudepígrafos","kind":"item"},{"title":"Literatura apocalíptica","kind":"item"},{"title":"Josefo","kind":"item"},{"title":"Fílon","kind":"item"},{"title":"Literatura rabínica inicial","kind":"item"},{"title":"Relações entre judaísmo e cristianismo primitivo","kind":"item"}]},{"title":"17. Cristianismo Primitivo e Literatura Cristã Antiga","children":[{"title":"Pais Apostólicos","kind":"item"},{"title":"Apologistas","kind":"item"},{"title":"Literatura cristã antiga","kind":"item"},{"title":"Apócrifos cristãos","kind":"item"},{"title":"Gnosticismo","kind":"item"},{"title":"Nag Hammadi","kind":"item"},{"title":"Formação da literatura cristã","kind":"item"},{"title":"Relações entre cristianismo, judaísmo e mundo greco-romano","kind":"item"}]},{"title":"18. História da Interpretação e Recepção Bíblica","children":[{"title":"Patrística","kind":"item"},{"title":"Idade Média","kind":"item"},{"title":"Reforma","kind":"item"},{"title":"Pós-Reforma","kind":"item"},{"title":"Iluminismo","kind":"item"},{"title":"Método histórico-crítico","kind":"item"},{"title":"Exegese moderna","kind":"item"},{"title":"História da interpretação","kind":"item"},{"title":"História da recepção","kind":"item"},{"title":"Uso da Bíblia na liturgia, arte e cultura","kind":"item"}]}]},{"title":"III. TEOLOGIA HISTÓRICA E SISTEMÁTICA","children":[{"title":"19. História do Cristianismo","children":[{"title":"Cristianismo antigo","kind":"item"},{"title":"Patrística","kind":"item"},{"title":"Cristianismo medieval","kind":"item"},{"title":"Reforma","kind":"item"},{"title":"Pós-Reforma","kind":"item"},{"title":"Cristianismo moderno","kind":"item"},{"title":"Cristianismo contemporâneo","kind":"item"},{"title":"História das denominações","kind":"item"},{"title":"História das missões","kind":"item"},{"title":"História global do cristianismo","kind":"item"}]},{"title":"20. História da Teologia","children":[{"title":"História dos dogmas","kind":"item"},{"title":"História da doutrina","kind":"item"},{"title":"Desenvolvimento teológico","kind":"item"},{"title":"Controvérsias cristológicas","kind":"item"},{"title":"Trindade","kind":"item"},{"title":"Soteriologia histórica","kind":"item"},{"title":"Eclesiologia histórica","kind":"item"},{"title":"Escatologia histórica","kind":"item"}]},{"title":"21. Teologia Sistemática","children":[{"title":"Prolegômenos","kind":"item"},{"title":"Doutrina de Deus","kind":"item"},{"title":"Trindade","kind":"item"},{"title":"Criação","kind":"item"},{"title":"Antropologia teológica","kind":"item"},{"title":"Hamartiologia","kind":"item"},{"title":"Cristologia","kind":"item"},{"title":"Pneumatologia","kind":"item"},{"title":"Soteriologia","kind":"item"},{"title":"Eclesiologia","kind":"item"},{"title":"Escatologia","kind":"item"}]},{"title":"22. Teologia Dogmática","children":[{"title":"Credos","kind":"item"},{"title":"Concílios","kind":"item"},{"title":"Dogmas","kind":"item"},{"title":"Desenvolvimento doutrinal","kind":"item"},{"title":"Autoridade","kind":"item"},{"title":"Tradição","kind":"item"},{"title":"Escritura e tradição","kind":"item"},{"title":"Formulações confessionais","kind":"item"}]},{"title":"23. Filosofia da Religião e Teologia Filosófica","children":[{"title":"Existência de Deus","kind":"item"},{"title":"Atributos divinos","kind":"item"},{"title":"Teísmo","kind":"item"},{"title":"Ateísmo","kind":"item"},{"title":"Problema do mal","kind":"item"},{"title":"Liberdade","kind":"item"},{"title":"Conhecimento religioso","kind":"item"},{"title":"Razão e fé","kind":"item"},{"title":"Linguagem religiosa","kind":"item"},{"title":"Metafísica e teologia","kind":"item"}]},{"title":"24. Teologia Moral e Ética","children":[{"title":"Ética cristã","kind":"item"},{"title":"Ética bíblica","kind":"item"},{"title":"Ética teológica","kind":"item"},{"title":"Virtudes","kind":"item"},{"title":"Lei e moralidade","kind":"item"},{"title":"Bioética","kind":"item"},{"title":"Ética social","kind":"item"},{"title":"Justiça","kind":"item"},{"title":"Paz","kind":"item"},{"title":"Guerra","kind":"item"},{"title":"Economia","kind":"item"},{"title":"Política","kind":"item"},{"title":"Ecologia","kind":"item"}]}]},{"title":"IV. TEOLOGIA PRÁTICA E MINISTERIAL","children":[{"title":"25. Teologia Prática","children":[{"title":"Práticas eclesiais","kind":"item"},{"title":"Ministério","kind":"item"},{"title":"Comunidade","kind":"item"},{"title":"Formação cristã","kind":"item"},{"title":"Discernimento","kind":"item"},{"title":"Prática pastoral","kind":"item"},{"title":"Teologia pública","kind":"item"}]},{"title":"26. Teologia Pastoral","children":[{"title":"Cuidado pastoral","kind":"item"},{"title":"Aconselhamento pastoral","kind":"item"},{"title":"Visitação","kind":"item"},{"title":"Família","kind":"item"},{"title":"Crises e luto","kind":"item"},{"title":"Comunidade","kind":"item"},{"title":"Liderança pastoral","kind":"item"}]},{"title":"27. Pregação e Homilética","children":[{"title":"Homilética","kind":"item"},{"title":"Teologia da pregação","kind":"item"},{"title":"Exposição bíblica","kind":"item"},{"title":"Retórica homilética","kind":"item"},{"title":"Comunicação","kind":"item"},{"title":"Estrutura do sermão","kind":"item"},{"title":"Pregação expositiva","kind":"item"},{"title":"Pregação temática","kind":"item"},{"title":"Pregação narrativa","kind":"item"}]},{"title":"28. Liturgia e Teologia do Culto","children":[{"title":"Liturgia","kind":"item"},{"title":"Culto cristão","kind":"item"},{"title":"Sacramentos/ordenanças","kind":"item"},{"title":"Calendário litúrgico","kind":"item"},{"title":"Música e culto","kind":"item"},{"title":"Espaço litúrgico","kind":"item"},{"title":"História da liturgia","kind":"item"}]},{"title":"29. Educação Cristã e Formação","children":[{"title":"Educação cristã","kind":"item"},{"title":"Catequese","kind":"item"},{"title":"Formação de discípulos","kind":"item"},{"title":"Pedagogia cristã","kind":"item"},{"title":"Educação teológica","kind":"item"},{"title":"Formação ministerial","kind":"item"}]},{"title":"30. Espiritualidade Cristã","children":[{"title":"Teologia da espiritualidade","kind":"item"},{"title":"Oração","kind":"item"},{"title":"Contemplação","kind":"item"},{"title":"Disciplinas espirituais","kind":"item"},{"title":"Mística cristã","kind":"item"},{"title":"Formação espiritual","kind":"item"},{"title":"História da espiritualidade","kind":"item"}]},{"title":"31. Missiologia","children":[{"title":"Teologia da missão","kind":"item"},{"title":"Missão bíblica","kind":"item"},{"title":"História das missões","kind":"item"},{"title":"Evangelização","kind":"item"},{"title":"Plantação de igrejas","kind":"item"},{"title":"Contextualização","kind":"item"},{"title":"Missão transcultural","kind":"item"},{"title":"Missão urbana","kind":"item"},{"title":"Missão global","kind":"item"}]}]},{"title":"V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO","children":[{"title":"32. Eclesiologia","children":[{"title":"Natureza da Igreja","kind":"item"},{"title":"Marcas da Igreja","kind":"item"},{"title":"Ministério","kind":"item"},{"title":"Liderança","kind":"item"},{"title":"Sacramentos/ordenanças","kind":"item"},{"title":"Disciplina","kind":"item"},{"title":"Igreja e sociedade","kind":"item"},{"title":"Igreja local e universal","kind":"item"}]},{"title":"33. Estudos Denominacionais e Confessionais","children":[{"title":"Catolicismo","kind":"item"},{"title":"Ortodoxia","kind":"item"},{"title":"Anglicanismo","kind":"item"},{"title":"Luteranismo","kind":"item"},{"title":"Reformados","kind":"item"},{"title":"Batistas","kind":"item"},{"title":"Metodismo","kind":"item"},{"title":"Pentecostalismo","kind":"item"},{"title":"Adventismo","kind":"item"},{"title":"Movimentos evangélicos","kind":"item"},{"title":"Outros movimentos cristãos","kind":"item"}]},{"title":"34. Teologia Ecumênica","children":[{"title":"Ecumenismo","kind":"item"},{"title":"Diálogo interconfessional","kind":"item"},{"title":"Unidade cristã","kind":"item"},{"title":"Concílios e acordos","kind":"item"},{"title":"Documentos ecumênicos","kind":"item"},{"title":"Divergências doutrinárias","kind":"item"}]}]},{"title":"VI. RELIGIÃO, SOCIEDADE E CULTURA","children":[{"title":"35. Sociologia da Religião","children":[{"title":"Religião e sociedade","kind":"item"},{"title":"Instituições religiosas","kind":"item"},{"title":"Secularização","kind":"item"},{"title":"Conversão","kind":"item"},{"title":"Comunidades","kind":"item"},{"title":"Religião e classe","kind":"item"},{"title":"Religião e política","kind":"item"}]},{"title":"36. Antropologia da Religião","children":[{"title":"Cultura","kind":"item"},{"title":"Ritos","kind":"item"},{"title":"Símbolos","kind":"item"},{"title":"Religião e identidade","kind":"item"},{"title":"Religião e parentesco","kind":"item"},{"title":"Religião e comunidade","kind":"item"}]},{"title":"37. Psicologia da Religião","children":[{"title":"Experiência religiosa","kind":"item"},{"title":"Cognição religiosa","kind":"item"},{"title":"Conversão","kind":"item"},{"title":"Desenvolvimento religioso","kind":"item"},{"title":"Personalidade e religião","kind":"item"},{"title":"Psicologia pastoral","kind":"item"}]},{"title":"38. Religião, Política e Sociedade","children":[{"title":"Teologia política","kind":"item"},{"title":"Religião e Estado","kind":"item"},{"title":"Religião e democracia","kind":"item"},{"title":"Nacionalismo","kind":"item"},{"title":"Poder","kind":"item"},{"title":"Justiça social","kind":"item"},{"title":"Direitos humanos","kind":"item"}]},{"title":"39. Religião, Cultura e Mídia","children":[{"title":"Religião e literatura","kind":"item"},{"title":"Religião e cinema","kind":"item"},{"title":"Religião e música","kind":"item"},{"title":"Religião e artes visuais","kind":"item"},{"title":"Mídia religiosa","kind":"item"},{"title":"Cultura digital","kind":"item"},{"title":"Religião e tecnologia","kind":"item"}]}]},{"title":"VII. RELAÇÕES INTER-RELIGIOSAS","children":[{"title":"40. Estudos Comparativos da Religião","children":[{"title":"Comparação de tradições religiosas","kind":"item"},{"title":"Mito","kind":"item"},{"title":"Ritual","kind":"item"},{"title":"Escrituras","kind":"item"},{"title":"Sacralidade","kind":"item"},{"title":"Experiência religiosa","kind":"item"},{"title":"Sistemas religiosos","kind":"item"}]},{"title":"41. Teologia das Religiões e Diálogo Inter-religioso","children":[{"title":"Teologia das religiões","kind":"item"},{"title":"Exclusivismo","kind":"item"},{"title":"Inclusivismo","kind":"item"},{"title":"Pluralismo","kind":"item"},{"title":"Diálogo inter-religioso","kind":"item"},{"title":"Teologia comparativa","kind":"item"}]},{"title":"42. Estudos Judaicos","children":[{"title":"Judaísmo antigo","kind":"item"},{"title":"Judaísmo rabínico","kind":"item"},{"title":"Judaísmo medieval","kind":"item"},{"title":"Judaísmo moderno","kind":"item"},{"title":"Literatura judaica","kind":"item"},{"title":"Filosofia judaica","kind":"item"},{"title":"Teologia judaica","kind":"item"}]},{"title":"43. Estudos Islâmicos","children":[{"title":"Alcorão","kind":"item"},{"title":"Hadith","kind":"item"},{"title":"Teologia islâmica","kind":"item"},{"title":"Filosofia islâmica","kind":"item"},{"title":"História do Islã","kind":"item"},{"title":"Exegese corânica","kind":"item"}]},{"title":"44. Estudos de Outras Tradições Religiosas","children":[{"title":"Hinduísmo","kind":"item"},{"title":"Budismo","kind":"item"},{"title":"Jainismo","kind":"item"},{"title":"Sikhismo","kind":"item"},{"title":"Religiões chinesas","kind":"item"},{"title":"Religiões africanas","kind":"item"},{"title":"Religiões indígenas","kind":"item"},{"title":"Novos movimentos religiosos","kind":"item"}]}]},{"title":"VIII. MÉTODOS TRANSVERSAIS","children":[{"title":"Crítica histórica","kind":"item"},{"title":"Crítica textual","kind":"item"},{"title":"Crítica literária","kind":"item"},{"title":"Crítica das fontes","kind":"item"},{"title":"Crítica da forma","kind":"item"},{"title":"Crítica da redação","kind":"item"},{"title":"Análise narrativa","kind":"item"},{"title":"Análise retórica","kind":"item"},{"title":"Análise do discurso","kind":"item"},{"title":"Análise semântica","kind":"item"},{"title":"Análise pragmática","kind":"item"},{"title":"Intertextualidade","kind":"item"},{"title":"Estudos de recepção","kind":"item"},{"title":"Estudos comparativos","kind":"item"},{"title":"História social","kind":"item"},{"title":"Antropologia","kind":"item"},{"title":"Sociologia","kind":"item"},{"title":"Psicologia","kind":"item"},{"title":"Arqueologia","kind":"item"},{"title":"Epigrafia","kind":"item"},{"title":"Paleografia","kind":"item"},{"title":"Codicologia","kind":"item"},{"title":"Filologia","kind":"item"},{"title":"Linguística","kind":"item"},{"title":"Teoria da tradução","kind":"item"},{"title":"Hermenêutica","kind":"item"}],"note":"Esta seção não deve competir com as áreas acadêmicas. Ela funciona como conjunto de filtros/metodologias que podem aparecer relacionados a diferentes áreas."}];
+    const LEVEL_MAP_BY_DISCIPLINE = {"I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > Introdução ao Antigo Testamento / Bíblia Hebraica":"free","I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > Introdução ao Novo Testamento":"free","I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > Formação e composição dos textos bíblicos":"pro","I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > Autoria, datação e proveniência":"pro","I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > História da transmissão textual":"pro","I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > Contexto histórico e cultural":"free","I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > Gêneros e formas literárias":"free","I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > História da interpretação":"pro","I. ESTUDOS BÍBLICOS > 1. Fundamentos e Introdução Bíblica > Questões metodológicas e debates acadêmicos":"pro","I. ESTUDOS BÍBLICOS > 2. Cânon e Formação das Escrituras > História do cânon":"pro","I. ESTUDOS BÍBLICOS > 2. Cânon e Formação das Escrituras > Cânones judaicos e cristãos":"pro","I. ESTUDOS BÍBLICOS > 2. Cânon e Formação das Escrituras > Formação dos catálogos canônicos":"pro","I. ESTUDOS BÍBLICOS > 2. Cânon e Formação das Escrituras > Deuterocanônicos":"pro","I. ESTUDOS BÍBLICOS > 2. Cânon e Formação das Escrituras > Apócrifos e pseudepígrafos":"pro","I. ESTUDOS BÍBLICOS > 2. Cânon e Formação das Escrituras > Septuaginta e outras versões antigas":"pro","I. ESTUDOS BÍBLICOS > 2. Cânon e Formação das Escrituras > História do reconhecimento canônico":"pro","I. ESTUDOS BÍBLICOS > 2. Cânon e Formação das Escrituras > Cânon e autoridade das Escrituras":"pro","I. ESTUDOS BÍBLICOS > 3. História e Transmissão do Texto Bíblico > História textual do Antigo Testamento":"master","I. ESTUDOS BÍBLICOS > 3. História e Transmissão do Texto Bíblico > História textual do Novo Testamento":"master","I. ESTUDOS BÍBLICOS > 3. História e Transmissão do Texto Bíblico > Tradições manuscritas":"master","I. ESTUDOS BÍBLICOS > 3. História e Transmissão do Texto Bíblico > Massorá e tradição massorética":"master","I. ESTUDOS BÍBLICOS > 3. História e Transmissão do Texto Bíblico > Transmissão e cópia":"master","I. ESTUDOS BÍBLICOS > 3. História e Transmissão do Texto Bíblico > Edições antigas e modernas":"master","I. ESTUDOS BÍBLICOS > 3. História e Transmissão do Texto Bíblico > Versões antigas":"master","I. ESTUDOS BÍBLICOS > 3. História e Transmissão do Texto Bíblico > História da edição crítica":"doctus","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Crítica textual do Antigo Testamento":"master","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Crítica textual do Novo Testamento":"master","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Variantes textuais":"master","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Evidência externa":"master","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Evidência interna":"master","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Genealogia das leituras":"doctus","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Famílias e tradições textuais":"doctus","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Aparato crítico":"doctus","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Edições críticas":"doctus","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Textus Receptus e tradição majoritária":"master","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > Texto crítico":"master","I. ESTUDOS BÍBLICOS > 4. Crítica Textual > História da crítica textual":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Papirologia":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Manuscritos bíblicos":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Papiros":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Unciais":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Minúsculos":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Lectionários":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Códices":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Rolos":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Paleografia":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Codicologia":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Materiais e suportes de escrita":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Datação paleográfica":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Proveniência":"doctus","I. ESTUDOS BÍBLICOS > 5. Manuscritos, Paleografia e Codicologia > Conservação e digitalização de manuscritos":"doctus","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Arqueologia do Levante":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Arqueologia de Israel e Judá":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Arqueologia do mundo bíblico":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Estratigrafia":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Sítios arqueológicos":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Cultura material":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Epigrafia":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Inscrições":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Selos e ostraca":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Numismática":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Arquitetura e urbanismo":"pro","I. ESTUDOS BÍBLICOS > 6. Arqueologia, Epigrafia e Cultura Material > Relação entre evidência arqueológica e textos bíblicos":"pro","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Antigo Oriente Próximo":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Egito":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Mesopotâmia":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Assíria":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Babilônia":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Pérsia":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Mundo helenístico":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Mundo greco-romano":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Judaísmo do Segundo Templo":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Império Romano":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > História social":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > História política":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Economia e instituições":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Religião e sociedade":"free","I. ESTUDOS BÍBLICOS > 7. História e Contexto do Mundo Bíblico > Vida cotidiana":"free","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Hebraico Bíblico > Fonologia e escrita":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Hebraico Bíblico > Morfologia":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Hebraico Bíblico > Sintaxe":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Hebraico Bíblico > Semântica":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Hebraico Bíblico > Vocabulário":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Hebraico Bíblico > Hebraico bíblico e hebraico antigo":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Hebraico Bíblico > Dialetos e desenvolvimento histórico":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Hebraico Bíblico > Relação com outras línguas semíticas":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Aramaico Bíblico > Morfologia":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Aramaico Bíblico > Sintaxe":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Aramaico Bíblico > Vocabulário":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Aramaico Bíblico > Aramaico imperial":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Aramaico Bíblico > Dialetos aramaicos":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Aramaico Bíblico > Targumim":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Aramaico Bíblico > Documentos de Elefantina":"doctus","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Aramaico Bíblico > Relações com o hebraico":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Grego koiné":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Morfologia":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Sintaxe":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Semântica":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Vocabulário":"pro","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Aspecto verbal":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Retórica":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Helenismos":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Hebraísmos":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Latinismos":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Grego do Novo Testamento > Grego do NT e grego helenístico":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Línguas Cognatas > Aramaico":"master","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Línguas Cognatas > Siríaco":"doctus","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Línguas Cognatas > Ugarítico":"doctus","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Línguas Cognatas > Fenício":"doctus","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Línguas Cognatas > Acádio":"doctus","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Línguas Cognatas > Árabe antigo":"doctus","I. ESTUDOS BÍBLICOS > 8. Línguas Bíblicas > Línguas Cognatas > Outras línguas semíticas relevantes":"doctus","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Filologia":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Linguística histórica":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Linguística comparativa":"doctus","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Fonologia":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Morfologia":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Sintaxe":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Semântica":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Pragmática":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Linguística textual":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Análise do discurso":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Sociolinguística":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Linguística cognitiva":"doctus","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Teoria da tradução":"master","I. ESTUDOS BÍBLICOS > 9. Linguística e Filologia Bíblica > Línguas em contato":"doctus","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Lexicografia hebraica":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Lexicografia aramaica":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Lexicografia grega":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Léxicos e dicionários":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Campos semânticos":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Polissemia":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Sinonímia":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Etimologia com cautela metodológica":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Hapax legomena":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Mudança semântica":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Semântica contextual":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > Semântica lexical":"master","I. ESTUDOS BÍBLICOS > 10. Lexicografia e Semântica Bíblica > História dos léxicos bíblicos":"master","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Crítica literária":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Narratologia":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Poética":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Retórica":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Estrutura narrativa":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Personagens":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Enredo":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Ponto de vista":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Paralelismo":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Quiasmo":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Inclusio":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Intertextualidade":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Metáfora":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Ironia":"pro","I. ESTUDOS BÍBLICOS > 11. Literatura e Retórica Bíblica > Análise retórica":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Hermenêutica bíblica":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > História da hermenêutica":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Hermenêutica filosófica":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Pré-compreensão":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Contexto do intérprete":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Sentido e referência":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Autor, texto e leitor":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Interpretação histórica":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Interpretação literária":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Interpretação canônica":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Hermenêuticas contextuais":"pro","I. ESTUDOS BÍBLICOS > 12. Hermenêutica e Teoria da Interpretação > Critérios de argumentação e controle interpretativo":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Crítica histórica":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Crítica das fontes":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Crítica da forma":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Crítica da redação":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Crítica literária":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Crítica canônica":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Crítica narrativa":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Crítica retórica":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Análise discursiva":"doctus","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Análise sociocientífica":"doctus","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Intertextualidade":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Exegese histórico-gramatical":"pro","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Métodos sincrônicos":"doctus","I. ESTUDOS BÍBLICOS > 13. Métodos Exegéticos e Crítica Histórica > Métodos diacrônicos":"doctus","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Gênesis":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Êxodo":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Levítico":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Números":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Deuteronômio":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Formação e composição da Torá":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Leis e alianças":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Pentateuco Samaritano":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Manuscritos do Mar Morto":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Pentateuco / Torá > Debates sobre autoria e composição":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Josué":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Juízes":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Samuel":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Reis":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Crônicas":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Esdras":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Neemias":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Ester":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Historiografia deuteronomista":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Livros Históricos > Historiografia cronista":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Jó":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Salmos":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Provérbios":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Eclesiastes":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Cântico dos Cânticos":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Poesia hebraica":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Sabedoria":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Sofrimento e teodiceia":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Poética e Sapiencial > Literatura sapiencial comparada":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Isaías":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Jeremias":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Ezequiel":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Daniel":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Profetas Menores":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Literatura profética":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Oráculos":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Visões":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Profecia e contexto histórico":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Profetas > Composição dos livros proféticos":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Mateus":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Marcos":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Lucas":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > João":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Evangelhos sinóticos":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Problema sinóptico":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > História das formas":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Crítica da redação":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Tradições orais":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Jesus histórico":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Evangelhos > Narrativa e teologia dos Evangelhos":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Atos dos Apóstolos > Historiografia de Lucas-Atos":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Atos dos Apóstolos > Narrativa":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Atos dos Apóstolos > Missão":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Atos dos Apóstolos > Comunidades cristãs primitivas":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Atos dos Apóstolos > Relação com o mundo greco-romano":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Atos dos Apóstolos > Questões históricas":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Romanos":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > 1–2 Coríntios":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Gálatas":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Efésios":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Filipenses":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Colossenses":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > 1–2 Tessalonicenses":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Pastorais":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Autoria e autenticidade":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Paulo e judaísmo":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Justificação":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > União com Cristo":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Eclesiologia":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Literatura Paulina > Nova Perspectiva sobre Paulo e debates posteriores":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > Hebreus":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > Tiago":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > 1–2 Pedro":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > 1–3 João":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > Judas":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > Autoria e datação":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > Contexto judaico e cristão":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > Teologia e ética":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Epístolas Gerais > Relações literárias entre as cartas":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Literatura apocalíptica":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Profecia":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Epístola":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Estrutura e simbolismo":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Sete selos":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Sete trombetas":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Sete taças":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Intertextualidade com a Bíblia Hebraica":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Contexto romano":"pro","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > História da interpretação":"master","I. ESTUDOS BÍBLICOS > 14. Exegese por Corpus > Apocalipse > Preterismo, historicismo, futurismo e idealismo":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Teologia do Antigo Testamento":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Teologia do Novo Testamento":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Teologia bíblica canônica":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Temas e motivos bíblicos":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Aliança":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Reino de Deus":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Criação":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Pecado":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Salvação":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Messianismo":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Espírito":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Templo":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Sabedoria":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 15. Teologia Bíblica > Escatologia":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Judaísmo do Segundo Templo":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Manuscritos do Mar Morto":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Qumran":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Septuaginta":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Apócrifos":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Pseudepígrafos":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Literatura apocalíptica":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Josefo":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Fílon":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Literatura rabínica inicial":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 16. Judaísmo Antigo e Literatura do Segundo Templo > Relações entre judaísmo e cristianismo primitivo":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 17. Cristianismo Primitivo e Literatura Cristã Antiga > Pais Apostólicos":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 17. Cristianismo Primitivo e Literatura Cristã Antiga > Apologistas":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 17. Cristianismo Primitivo e Literatura Cristã Antiga > Literatura cristã antiga":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 17. Cristianismo Primitivo e Literatura Cristã Antiga > Apócrifos cristãos":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 17. Cristianismo Primitivo e Literatura Cristã Antiga > Gnosticismo":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 17. Cristianismo Primitivo e Literatura Cristã Antiga > Nag Hammadi":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 17. Cristianismo Primitivo e Literatura Cristã Antiga > Formação da literatura cristã":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 17. Cristianismo Primitivo e Literatura Cristã Antiga > Relações entre cristianismo, judaísmo e mundo greco-romano":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > Patrística":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > Idade Média":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > Reforma":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > Pós-Reforma":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > Iluminismo":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > Método histórico-crítico":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > Exegese moderna":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > História da interpretação":"pro","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > História da recepção":"master","II. TEOLOGIA BÍBLICA E HISTÓRIA DA RECEPÇÃO > 18. História da Interpretação e Recepção Bíblica > Uso da Bíblia na liturgia, arte e cultura":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > Cristianismo antigo":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > Patrística":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > Cristianismo medieval":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > Reforma":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > Pós-Reforma":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > Cristianismo moderno":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > Cristianismo contemporâneo":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > História das denominações":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > História das missões":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 19. História do Cristianismo > História global do cristianismo":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 20. História da Teologia > História dos dogmas":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 20. História da Teologia > História da doutrina":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 20. História da Teologia > Desenvolvimento teológico":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 20. História da Teologia > Controvérsias cristológicas":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 20. História da Teologia > Trindade":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 20. História da Teologia > Soteriologia histórica":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 20. História da Teologia > Eclesiologia histórica":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 20. História da Teologia > Escatologia histórica":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Prolegômenos":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Doutrina de Deus":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Trindade":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Criação":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Antropologia teológica":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Hamartiologia":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Cristologia":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Pneumatologia":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Soteriologia":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Eclesiologia":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 21. Teologia Sistemática > Escatologia":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 22. Teologia Dogmática > Credos":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 22. Teologia Dogmática > Concílios":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 22. Teologia Dogmática > Dogmas":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 22. Teologia Dogmática > Desenvolvimento doutrinal":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 22. Teologia Dogmática > Autoridade":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 22. Teologia Dogmática > Tradição":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 22. Teologia Dogmática > Escritura e tradição":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 22. Teologia Dogmática > Formulações confessionais":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Existência de Deus":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Atributos divinos":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Teísmo":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Ateísmo":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Problema do mal":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Liberdade":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Conhecimento religioso":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Razão e fé":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Linguagem religiosa":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 23. Filosofia da Religião e Teologia Filosófica > Metafísica e teologia":"master","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Ética cristã":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Ética bíblica":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Ética teológica":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Virtudes":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Lei e moralidade":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Bioética":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Ética social":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Justiça":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Paz":"free","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Guerra":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Economia":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Política":"pro","III. TEOLOGIA HISTÓRICA E SISTEMÁTICA > 24. Teologia Moral e Ética > Ecologia":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 25. Teologia Prática > Práticas eclesiais":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 25. Teologia Prática > Ministério":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 25. Teologia Prática > Comunidade":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 25. Teologia Prática > Formação cristã":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 25. Teologia Prática > Discernimento":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 25. Teologia Prática > Prática pastoral":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 25. Teologia Prática > Teologia pública":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 26. Teologia Pastoral > Cuidado pastoral":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 26. Teologia Pastoral > Aconselhamento pastoral":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 26. Teologia Pastoral > Visitação":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 26. Teologia Pastoral > Família":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 26. Teologia Pastoral > Crises e luto":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 26. Teologia Pastoral > Comunidade":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 26. Teologia Pastoral > Liderança pastoral":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Homilética":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Teologia da pregação":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Exposição bíblica":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Retórica homilética":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Comunicação":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Estrutura do sermão":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Pregação expositiva":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Pregação temática":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 27. Pregação e Homilética > Pregação narrativa":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 28. Liturgia e Teologia do Culto > Liturgia":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 28. Liturgia e Teologia do Culto > Culto cristão":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 28. Liturgia e Teologia do Culto > Sacramentos/ordenanças":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 28. Liturgia e Teologia do Culto > Calendário litúrgico":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 28. Liturgia e Teologia do Culto > Música e culto":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 28. Liturgia e Teologia do Culto > Espaço litúrgico":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 28. Liturgia e Teologia do Culto > História da liturgia":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 29. Educação Cristã e Formação > Educação cristã":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 29. Educação Cristã e Formação > Catequese":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 29. Educação Cristã e Formação > Formação de discípulos":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 29. Educação Cristã e Formação > Pedagogia cristã":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 29. Educação Cristã e Formação > Educação teológica":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 29. Educação Cristã e Formação > Formação ministerial":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 30. Espiritualidade Cristã > Teologia da espiritualidade":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 30. Espiritualidade Cristã > Oração":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 30. Espiritualidade Cristã > Contemplação":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 30. Espiritualidade Cristã > Disciplinas espirituais":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 30. Espiritualidade Cristã > Mística cristã":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 30. Espiritualidade Cristã > Formação espiritual":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 30. Espiritualidade Cristã > História da espiritualidade":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > Teologia da missão":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > Missão bíblica":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > História das missões":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > Evangelização":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > Plantação de igrejas":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > Contextualização":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > Missão transcultural":"pro","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > Missão urbana":"free","IV. TEOLOGIA PRÁTICA E MINISTERIAL > 31. Missiologia > Missão global":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 32. Eclesiologia > Natureza da Igreja":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 32. Eclesiologia > Marcas da Igreja":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 32. Eclesiologia > Ministério":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 32. Eclesiologia > Liderança":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 32. Eclesiologia > Sacramentos/ordenanças":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 32. Eclesiologia > Disciplina":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 32. Eclesiologia > Igreja e sociedade":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 32. Eclesiologia > Igreja local e universal":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Catolicismo":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Ortodoxia":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Anglicanismo":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Luteranismo":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Reformados":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Batistas":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Metodismo":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Pentecostalismo":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Adventismo":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Movimentos evangélicos":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 33. Estudos Denominacionais e Confessionais > Outros movimentos cristãos":"free","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 34. Teologia Ecumênica > Ecumenismo":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 34. Teologia Ecumênica > Diálogo interconfessional":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 34. Teologia Ecumênica > Unidade cristã":"pro","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 34. Teologia Ecumênica > Concílios e acordos":"master","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 34. Teologia Ecumênica > Documentos ecumênicos":"master","V. ECLESIOLOGIA, DENOMINAÇÕES E ECUMENISMO > 34. Teologia Ecumênica > Divergências doutrinárias":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 35. Sociologia da Religião > Religião e sociedade":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 35. Sociologia da Religião > Instituições religiosas":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 35. Sociologia da Religião > Secularização":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 35. Sociologia da Religião > Conversão":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 35. Sociologia da Religião > Comunidades":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 35. Sociologia da Religião > Religião e classe":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 35. Sociologia da Religião > Religião e política":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 36. Antropologia da Religião > Cultura":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 36. Antropologia da Religião > Ritos":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 36. Antropologia da Religião > Símbolos":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 36. Antropologia da Religião > Religião e identidade":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 36. Antropologia da Religião > Religião e parentesco":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 36. Antropologia da Religião > Religião e comunidade":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 37. Psicologia da Religião > Experiência religiosa":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 37. Psicologia da Religião > Cognição religiosa":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 37. Psicologia da Religião > Conversão":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 37. Psicologia da Religião > Desenvolvimento religioso":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 37. Psicologia da Religião > Personalidade e religião":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 37. Psicologia da Religião > Psicologia pastoral":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 38. Religião, Política e Sociedade > Teologia política":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 38. Religião, Política e Sociedade > Religião e Estado":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 38. Religião, Política e Sociedade > Religião e democracia":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 38. Religião, Política e Sociedade > Nacionalismo":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 38. Religião, Política e Sociedade > Poder":"pro","VI. RELIGIÃO, SOCIEDADE E CULTURA > 38. Religião, Política e Sociedade > Justiça social":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 38. Religião, Política e Sociedade > Direitos humanos":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 39. Religião, Cultura e Mídia > Religião e literatura":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 39. Religião, Cultura e Mídia > Religião e cinema":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 39. Religião, Cultura e Mídia > Religião e música":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 39. Religião, Cultura e Mídia > Religião e artes visuais":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 39. Religião, Cultura e Mídia > Mídia religiosa":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 39. Religião, Cultura e Mídia > Cultura digital":"free","VI. RELIGIÃO, SOCIEDADE E CULTURA > 39. Religião, Cultura e Mídia > Religião e tecnologia":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 40. Estudos Comparativos da Religião > Comparação de tradições religiosas":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 40. Estudos Comparativos da Religião > Mito":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 40. Estudos Comparativos da Religião > Ritual":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 40. Estudos Comparativos da Religião > Escrituras":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 40. Estudos Comparativos da Religião > Sacralidade":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 40. Estudos Comparativos da Religião > Experiência religiosa":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 40. Estudos Comparativos da Religião > Sistemas religiosos":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 41. Teologia das Religiões e Diálogo Inter-religioso > Teologia das religiões":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 41. Teologia das Religiões e Diálogo Inter-religioso > Exclusivismo":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 41. Teologia das Religiões e Diálogo Inter-religioso > Inclusivismo":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 41. Teologia das Religiões e Diálogo Inter-religioso > Pluralismo":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 41. Teologia das Religiões e Diálogo Inter-religioso > Diálogo inter-religioso":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 41. Teologia das Religiões e Diálogo Inter-religioso > Teologia comparativa":"master","VII. RELAÇÕES INTER-RELIGIOSAS > 42. Estudos Judaicos > Judaísmo antigo":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 42. Estudos Judaicos > Judaísmo rabínico":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 42. Estudos Judaicos > Judaísmo medieval":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 42. Estudos Judaicos > Judaísmo moderno":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 42. Estudos Judaicos > Literatura judaica":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 42. Estudos Judaicos > Filosofia judaica":"master","VII. RELAÇÕES INTER-RELIGIOSAS > 42. Estudos Judaicos > Teologia judaica":"master","VII. RELAÇÕES INTER-RELIGIOSAS > 43. Estudos Islâmicos > Alcorão":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 43. Estudos Islâmicos > Hadith":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 43. Estudos Islâmicos > Teologia islâmica":"pro","VII. RELAÇÕES INTER-RELIGIOSAS > 43. Estudos Islâmicos > Filosofia islâmica":"master","VII. RELAÇÕES INTER-RELIGIOSAS > 43. Estudos Islâmicos > História do Islã":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 43. Estudos Islâmicos > Exegese corânica":"master","VII. RELAÇÕES INTER-RELIGIOSAS > 44. Estudos de Outras Tradições Religiosas > Hinduísmo":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 44. Estudos de Outras Tradições Religiosas > Budismo":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 44. Estudos de Outras Tradições Religiosas > Jainismo":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 44. Estudos de Outras Tradições Religiosas > Sikhismo":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 44. Estudos de Outras Tradições Religiosas > Religiões chinesas":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 44. Estudos de Outras Tradições Religiosas > Religiões africanas":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 44. Estudos de Outras Tradições Religiosas > Religiões indígenas":"free","VII. RELAÇÕES INTER-RELIGIOSAS > 44. Estudos de Outras Tradições Religiosas > Novos movimentos religiosos":"free"};
+    const LEVEL_LABELS = Object.freeze({free: 'FREE', pro: 'PRO', master: 'MASTER', doctus: 'DOCTUS'});
+    const LEVEL_COLORS = Object.freeze({free: '#168448', pro: '#0873a7', master: '#7045ad', doctus: '#956000'});
+    const treeEl = document.getElementById('academic-tree');
+    const activeFilter = {value: ''};
 
-    <section class="grid" aria-label="Módulos">
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    }
+    function levelFor(path) { return LEVEL_MAP_BY_DISCIPLINE[path.join(' > ')] || ''; }
+    function badge(level) { return level ? `<span class="badge ${level}">${LEVEL_LABELS[level] || level.toUpperCase()}</span>` : ''; }
+    function renderItems(items, path) {
+      if (!items.length) return '';
+      return `<ul class="items">${items.map(item => {
+        const itemPath = [...path, item.title];
+        const level = levelFor(itemPath);
+        return `<li data-level="${escapeHtml(level)}"><button type="button" class="topic" data-path="${escapeHtml(JSON.stringify(itemPath))}">${escapeHtml(item.title)}</button>${badge(level)}</li>`;
+      }).join('')}</ul>`;
+    }
+    function renderNode(node, path = [], root = false) {
+      const currentPath = [...path, node.title];
+      const children = node.children || [];
+      const nested = children.filter(child => child.kind !== 'item');
+      const items = children.filter(child => child.kind === 'item');
+      const className = root ? 'node' : 'node category';
+      const inner = `${nested.map(child => renderNode(child, currentPath, false)).join('')}${renderItems(items, currentPath)}${node.note ? `<p class="intro"><strong>Nota:</strong> ${escapeHtml(node.note)}</p>` : ''}`;
+      return `<details class="${className}"><summary>${escapeHtml(node.title)}</summary><div class="node-children">${inner}</div></details>`;
+    }
+    function renderTree() { treeEl.innerHTML = ACADEMIC_TREE.map(area => renderNode(area, [], true)).join(''); }
+    function applyFilter() {
+      let visible = 0;
+      document.querySelectorAll('.items li').forEach(li => {
+        const show = !activeFilter.value || li.dataset.level === activeFilter.value;
+        li.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      document.querySelector('.count').textContent = `${visible} item(ns) exibido(s)`;
+      document.getElementById('empty-message').style.display = visible ? 'none' : 'block';
+    }
+    renderTree(); applyFilter();
+    document.querySelectorAll('.filter button').forEach(button => button.addEventListener('click', () => {
+      activeFilter.value = button.dataset.level || '';
+      document.querySelectorAll('.filter button').forEach(item => item.classList.toggle('active', item === button));
+      applyFilter();
+    }));
+    treeEl.addEventListener('click', event => {
+      const topic = event.target.closest('.topic');
+      if (!topic) return;
+      academicChatSetTopic(JSON.parse(topic.dataset.path || '[]'));
+    });
+  </script><section id="academic-chat" class="academic-chat-panel" aria-label="Chat acadêmico" role="dialog" aria-modal="true">
+  <div class="academic-chat-inner">
+  <header>
+    <h2>CHAT ACADÊMICO</h2>
+    <p>
+      Faça uma pergunta sobre o tema selecionado. Esta consulta funciona
+      independentemente da Matriz Técnica PRO.
+    </p>
+    </div>
+    <button type="button" id="academic-chat-close" class="academic-chat-close">FECHAR</button>
+  </header>
 
-      <article class="card">
+  <div id="academic-chat-context" class="academic-chat-context">
+    Selecione um tema na árvore para iniciar.
+  </div>
 
-        <h3>
-          Áreas Académicas
-        </h3>
+  <div id="academic-chat-messages" class="academic-chat-messages" aria-live="polite">
+    <div class="academic-chat-message system">
+      Selecione um tema acadêmico e escreva sua pergunta.
+    </div>
+  </div>
 
-        <p>
-          Taxonomia e navegação académica da teologia.
-        </p>
+  <form id="academic-chat-form" class="academic-chat-form">
+    <input
+      id="academic-chat-question"
+      type="text"
+      placeholder="Digite sua pergunta sobre o tema..."
+      autocomplete="off"
+      required
+    >
+    <button id="academic-chat-submit" type="submit">
+      PESQUISAR
+    </button>
+  </form>
 
-        <a href="areas-academicas.html">
-          Abrir Áreas
-        </a>
+  <div id="academic-chat-status" class="academic-chat-status" aria-live="polite"></div>
+  </div>
+</section><script>
+  const ACADEMIC_CHAT_PROXY =
+    'https://yellow-lab-f4b2.palavraeserie.workers.dev';
 
-      </article>
+  let academicChatTopic = '';
+  let academicChatPath = [];
 
+  const academicChatForm =
+    document.getElementById('academic-chat-form' );
 
-      <article class="card">
+  const academicChatQuestion =
+    document.getElementById('academic-chat-question');
 
-        <h3>
-          Sermões
-        </h3>
+  const academicChatSubmit =
+    document.getElementById('academic-chat-submit');
 
-        <p>
-          Construtor orientado pela exegese e esqueleto dinâmico.
-        </p>
+  const academicChatMessages =
+    document.getElementById('academic-chat-messages');
 
-        <a href="sermoes.html">
-          Abrir Sermões
-        </a>
+  const academicChatStatus =
+    document.getElementById('academic-chat-status');
 
-      </article>
+  const academicChatContext =
+    document.getElementById('academic-chat-context');
 
+  document.getElementById('academic-chat-close').addEventListener('click', () => document.getElementById('academic-chat')?.classList.remove('open'));
+  document.getElementById('academic-chat').addEventListener('click', event => { if (event.target.id === 'academic-chat') event.currentTarget.classList.remove('open'); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') document.getElementById('academic-chat')?.classList.remove('open'); });
 
-      <article class="card">
+  function academicChatEscape(value) {
+    const div = document.createElement('div');
+    div.textContent = String(value ?? '');
+    return div.innerHTML;
+  }
 
-        <h3>
-          Bíblia
-        </h3>
+  function academicChatAddMessage(role, text) {
+    const message = document.createElement('div');
+    message.className = 'academic-chat-message ' + role;
+    message.innerHTML = academicChatEscape(text).replace(/\n/g, '<br>');
+    academicChatMessages.appendChild(message);
+    academicChatMessages.scrollTop = academicChatMessages.scrollHeight;
+  }
 
-        <p>
-          Leitura bíblica independente.
-        </p>
+  function academicChatSetTopic(path) {
+    academicChatPath = Array.isArray(path) ? path : [];
+    academicChatTopic = academicChatPath[academicChatPath.length - 1] || '';
 
-        <a href="biblia.html">
-          Abrir Bíblia
-        </a>
+    academicChatContext.textContent = academicChatTopic
+      ? 'Tema selecionado: ' + academicChatPath.join(' › ')
+      : 'Selecione um tema na árvore para iniciar.';
 
-      </article>
+    academicChatAddMessage(
+      'system',
+      academicChatTopic
+        ? 'Tema selecionado. Agora escreva sua pergunta.'
+        : 'Selecione um tema acadêmico e escreva sua pergunta.'
+    );
 
+    document.getElementById('academic-chat')?.classList.add('open');
+    academicChatQuestion.focus();
+  }
 
-      <article class="card">
+  academicChatForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
 
-        <h3>
-          Estante
-        </h3>
+    const question = academicChatQuestion.value.trim();
 
-        <p>
-          Livros e materiais de estudo.
-        </p>
+    if (!academicChatTopic) {
+      academicChatStatus.textContent =
+        'Selecione primeiro um tema acadêmico.';
+      academicChatStatus.className =
+        'academic-chat-status error';
+      return;
+    }
 
-        <a href="estante.html">
-          Abrir Estante
-        </a>
+    if (!question) return;
 
-      </article>
+    academicChatAddMessage('user', question);
+    academicChatQuestion.value = '';
+    academicChatSubmit.disabled = true;
+    academicChatStatus.textContent = 'Pesquisando...';
+    academicChatStatus.className = 'academic-chat-status';
 
+    const routedQuestion =
+      'MODO DE CONSULTA ACADÊMICA INDEPENDENTE. ' +
+      'Não abrir nem mencionar a Matriz Técnica PRO. ' +
+      'Responda com clareza, indique limites e diferencie fatos, ' +
+      'inferências, interpretações e hipóteses.\\n\\n' +
+      'Caminho acadêmico: ' + academicChatPath.join(' > ') + '\\n' +
+      'Tema: ' + academicChatTopic + '\\n' +
+      'Pergunta: ' + question;
 
-      <article class="card">
+    try {
+      const response = await fetch(
+        ACADEMIC_CHAT_PROXY.replace(/\/$/, '') + '/api/pesquisa',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mode: 'free',
+            accessLevel: 'free',
+            question: routedQuestion,
+            topic: academicChatTopic,
+            discipline: academicChatPath.slice(-2, -1)[0] || '',
+            academicPath: academicChatPath,
+            module: 'CONSULTA ACADÊMICA INDEPENDENTE'
+          })
+        }
+      );
 
-        <h3>
-          Oráculo
-        </h3>
+      const data = await response.json();
 
-        <p>
-          Consulta e ferramenta de apoio.
-        </p>
+      if (!response.ok) {
+        throw new Error(
+          data.error || 'Não foi possível concluir a pesquisa.'
+        );
+      }
 
-        <a href="oraculo.html">
-          Abrir Oráculo
-        </a>
+      academicChatAddMessage(
+        'assistant',
+        data.text || 'O serviço não devolveu uma resposta.'
+      );
 
-      </article>
+      academicChatStatus.textContent = 'Resposta recebida.';
+      academicChatStatus.className =
+        'academic-chat-status success';
+    } catch (error) {
+      academicChatAddMessage(
+        'system',
+        'Erro na pesquisa: ' + error.message
+      );
 
+      academicChatStatus.textContent =
+        'Não foi possível realizar a consulta.';
+      academicChatStatus.className =
+        'academic-chat-status error';
+    } finally {
+      academicChatSubmit.disabled = false;
+      academicChatQuestion.focus();
+    }
+  });
 
-      <article class="card">
+  /*
+   * Conecta o chat ao clique dos temas da árvore.
+   * O arquivo novo já usa o atributo data-path nos botões.
+   */
+</script>
+<style id="correcao-chat-lateral">
+  #academic-chat.academic-chat-panel {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    z-index: 9999 !important;
+    display: none !important;
+    width: min(440px, 94vw) !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-left: 1px solid #35506d !important;
+    border-radius: 0 !important;
+    background: #111b30 !important;
+    box-shadow: -12px 0 35px rgba(0,0,0,.42) !important;
+  }
 
-        <h3>
-          Ponte Infantil
-        </h3>
+  #academic-chat.academic-chat-panel.chat-lateral-aberto {
+    display: block !important;
+  }
 
-        <p>
-          Recursos organizados para diferentes
-          faixas e necessidades.
-        </p>
+  #academic-chat .academic-chat-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    background: #111b30 !important;
+  }
 
-        <a href="ponte-infantil.html">
-          Abrir Ponte
-        </a>
+  #academic-chat .academic-chat-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 18px !important;
+    border-bottom: 1px solid #263754 !important;
+    background: #17243a !important;
+  }
 
-      </article>
+  #academic-chat .academic-chat-header h2 {
+    margin: 0 0 7px !important;
+    color: #20d66b !important;
+  }
 
-    </section>
+  #academic-chat .academic-chat-header p {
+    margin: 0 !important;
+    color: #91a4bd !important;
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+  }
 
-  </main>
+  #academic-chat .academic-chat-context {
+    margin: 0 !important;
+    padding: 11px 18px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #263754 !important;
+    background: #0d172b !important;
+    color: #50ed91 !important;
+    font-size: 10px !important;
+  }
 
-</div>
+  #academic-chat .academic-chat-messages {
+    flex: 1 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    border: 0 !important;
+  }
+
+  #academic-chat .academic-chat-form {
+    margin: 0 !important;
+    padding: 14px 16px !important;
+    border-top: 1px solid #263754 !important;
+    background: #0d172b !important;
+  }
+
+  #academic-chat .academic-chat-status {
+    margin: 0 !important;
+    padding: 0 16px 12px !important;
+    background: #0d172b !important;
+  }
+</style>
+
+<script id="correcao-chat-lateral-script">
+(function () {
+  const chat = document.getElementById('academic-chat');
+  const tree = document.getElementById('academic-tree');
+  const context = document.getElementById('academic-chat-context');
+  const question = document.getElementById('academic-chat-question');
+  const close = document.getElementById('academic-chat-close');
+
+  if (!chat || !tree || !context) return;
+
+  function abrirChat(path) {
+    const caminho = Array.isArray(path) ? path : [];
+    const tema = caminho[caminho.length - 1] || 'Tema acadêmico';
+    context.textContent = 'Tema selecionado: ' + caminho.join(' › ');
+    chat.classList.add('chat-lateral-aberto');
+    if (question) question.focus();
+  }
+
+  tree.addEventListener('click', function (event) {
+    const botao = event.target.closest('.topic');
+    if (!botao) return;
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      abrirChat(JSON.parse(botao.dataset.path || '[]'));
+    } catch (erro) {
+      abrirChat([]);
+    }
+  }, true);
+
+  close?.addEventListener('click', function () {
+    chat.classList.remove('chat-lateral-aberto');
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') chat.classList.remove('chat-lateral-aberto');
+  });
+})();
+</script>
+<!-- FIM DA CORREÇÃO -->
+
 
 </body>
 </html>
