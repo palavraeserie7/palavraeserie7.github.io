@@ -1,86 +1,571 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Estante independente da plataforma Palavra & Série.">
-  <title>Minha Estante — Palavra &amp; Série</title>
+  <title>Minha Estante | Palavra &amp; Série</title>
+
   <style>
-    :root { --navy:#0b1428; --surface:#111b30; --paper:#f1eadb; --card:#fffdf7; --ink:#4a443b; --muted:#806f53; --line:#d8cdb8; --green:#20d66b; --blue:#18bfff; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; background:var(--navy); color:var(--ink); font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
-    .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:16px 24px; background:var(--surface); border-bottom:1px solid #263754; }
-    .topbar a { color:#dbe7f5; text-decoration:none; font-size:11px; font-weight:900; letter-spacing:.5px; }
-    .topbar .brand { margin-right:auto; color:var(--green); letter-spacing:1.5px; }
-    .back-link { padding:9px 12px; border:1px solid #536780; border-radius:7px; }
-    .back-link:hover { border-color:var(--blue); background:#163451; }
-    main {
-      width:100%;
-      max-width:none;
-      min-height:calc(100vh - 76px);
+    :root{
+      --bg:#0b1428;
+      --panel:#111b30;
+      --paper:#f1eadb;
+      --card:#fffdf7;
+      --ink:#4a443b;
+      --muted:#806f53;
+      --line:#d8cdb8;
+      --green:#20d66b;
+      --blue:#18bfff;
+      --text:#dbe7f5;
+      --soft:#eee2cd;
+      --side-w:168px;
+    }
+
+    *{box-sizing:border-box}
+
+    html{scroll-behavior:smooth}
+
+    body{
       margin:0;
-      padding:30px 22px 58px;
-      background:var(--paper);
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--text);
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
     }
-    .paper {
+
+    button,input,select{font:inherit}
+
+    :focus-visible{
+      outline:2px solid var(--blue);
+      outline-offset:2px;
+    }
+
+    /* ---------- App shell / sidebar (idêntico à página Bíblia) ---------- */
+
+    .app-shell{
+      display:flex;
+      align-items:stretch;
+      min-height:100vh;
+    }
+
+    .side-nav{
+      flex:0 0 var(--side-w);
+      width:var(--side-w);
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      padding:16px 10px;
+      background:var(--panel);
+      border-right:1px solid #263754;
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow-y:auto;
+    }
+
+    .side-brand{
+      padding:2px 4px 12px;
+      border-bottom:1px solid #263754;
+    }
+
+    .side-brand-link{
+      display:block;
+      color:var(--green);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:1.2px;
+      text-decoration:none;
+      line-height:1.3;
+    }
+
+    .side-brand-sub{
+      display:block;
+      margin-top:3px;
+      color:#7c8fac;
+      font-size:8px;
+      font-weight:800;
+      letter-spacing:.6px;
+      text-transform:uppercase;
+    }
+
+    .side-menu{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+
+    .side-item{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      padding:8px 7px;
+      border-radius:6px;
+      border:1px solid transparent;
+      color:var(--text);
+      text-decoration:none;
+      font-size:9.5px;
+      font-weight:800;
+      letter-spacing:.3px;
+      line-height:1.25;
+    }
+
+    .side-item:hover,
+    .side-item:focus-visible{
+      background:#16233c;
+      outline:none;
+    }
+
+    .side-item.active{
+      background:rgba(32,214,107,.12);
+      border-color:var(--green);
+      color:var(--green);
+    }
+
+    .side-icon{
+      flex:0 0 auto;
+      width:13px;
+      font-size:12px;
+      text-align:center;
+      line-height:1;
+    }
+
+    .side-footer-note{
+      margin-top:auto;
+      padding-top:12px;
+      border-top:1px solid #263754;
+      color:#5f7192;
+      font-size:8px;
+      line-height:1.5;
+    }
+
+    .content-area{
+      flex:1;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .site-header{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      padding:14px 20px;
+      border-bottom:1px solid #263754;
+      background:var(--panel);
+      position:sticky;
+      top:0;
+      z-index:20;
+    }
+
+    .header-link{
+      padding:8px 11px;
+      border:1px solid #536780;
+      border-radius:7px;
+      background:transparent;
+      color:var(--text);
+      font-size:10px;
+      font-weight:900;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+
+    .header-link:hover,
+    .header-link:focus-visible{
+      border-color:var(--blue);
+      background:#163451;
+      outline:none;
+    }
+
+    main{
       width:100%;
       max-width:none;
-      padding:30px;
-      border:1px solid var(--line);
-      border-radius:12px;
+      flex:1;
+      margin:0;
+      padding:40px;
       background:var(--paper);
-      box-shadow:0 12px 30px rgba(0,0,0,.22);
     }
-    .eyebrow { margin:0 0 8px; color:#9b8b70; font-size:10px; font-weight:900; letter-spacing:1.6px; }
-    h1 { margin:0; font-size:clamp(28px,5vw,44px); letter-spacing:.4px; }
-    .intro { max-width:850px; margin:12px 0 25px; line-height:1.7; }
-    .toolbar { display:grid; grid-template-columns:1.2fr repeat(4,1fr); gap:10px; margin-bottom:22px; }
-    .toolbar input, .toolbar select { min-width:0; padding:11px 12px; border:1px solid #cdbfaa; border-radius:6px; background:#fffaf0; color:var(--ink); font:inherit; font-size:12px; }
-    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
-    .tab { padding:10px 14px; border:1px solid #cdbfaa; border-radius:7px; background:var(--card); color:var(--muted); font-weight:900; cursor:pointer; }
-    .tab:hover, .tab.active { border-color:var(--accent,var(--muted)); background:var(--muted); color:#fffaf0; }
-    .catalog { display:grid; grid-template-columns:repeat(auto-fit,minmax(245px,1fr)); gap:16px; }
-    .book { display:flex; flex-direction:column; min-height:250px; padding:18px; border:1px solid var(--line); border-radius:9px; background:var(--card); }
-    .cover { display:grid; place-items:center; min-height:72px; margin-bottom:14px; padding:10px; border-radius:7px; background:linear-gradient(135deg,#806f53,#b99b61); color:#fffaf0; text-align:center; font-size:12px; font-weight:900; letter-spacing:.8px; }
-    .book h2 { margin:0 0 6px; color:var(--ink); font-size:16px; line-height:1.3; }
-    .author { margin:0 0 10px; color:#9b8b70; font-size:11px; font-weight:800; }
-    .description { flex:1; margin:0; color:#665947; font-size:12px; line-height:1.6; }
-    .book a { align-self:flex-start; margin-top:15px; color:var(--muted); font-size:11px; font-weight:900; }
-    .empty { display:none; padding:25px; border:1px dashed #b99b61; color:var(--muted); text-align:center; }
-    .note { margin:25px 0 0; color:var(--muted); font-size:12px; line-height:1.6; }
-    code { padding:2px 4px; border-radius:4px; background:#eee2cd; }
-    @media (max-width:850px) { .toolbar { grid-template-columns:1fr 1fr; } .toolbar input { grid-column:1/-1; } .paper { padding:22px 16px; } }
-    @media (max-width:520px) { .toolbar { grid-template-columns:1fr; } }
+
+    .paper{
+      width:100%;
+      max-width:none;
+      margin:0;
+      padding:24px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:var(--paper);
+      color:var(--ink);
+      box-shadow:0 6px 18px rgba(55,45,30,.12);
+    }
+
+    .eyebrow{
+      margin:0 0 6px;
+      color:#9b8b70;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:1.6px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(25px,4vw,38px);
+      letter-spacing:.3px;
+    }
+
+    .intro{
+      max-width:980px;
+      margin:8px 0 18px;
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    /* ---------- Abas da estante (equivalente ao reader-toolbar) ---------- */
+
+    .shelf-tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .shelf-tab{
+      padding:9px 14px;
+      border:1px solid #cdbfaa;
+      border-radius:6px;
+      background:var(--card);
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.4px;
+      cursor:pointer;
+    }
+
+    .shelf-tab:hover{background:#f1eadb}
+
+    .shelf-tab.active{
+      background:var(--muted);
+      color:#fffaf0;
+      border-color:var(--muted);
+    }
+
+    /* ---------- Filtros (mesmo padrão visual do search-bar / reader-toolbar) ---------- */
+
+    .shelf-toolbar{
+      display:grid;
+      grid-template-columns:minmax(210px,1.4fr) repeat(4,1fr);
+      gap:8px;
+      margin-bottom:14px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:var(--card);
+    }
+
+    .shelf-toolbar label{
+      display:grid;
+      gap:5px;
+      min-width:0;
+      color:var(--muted);
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+
+    .shelf-toolbar input,
+    .shelf-toolbar select{
+      width:100%;
+      min-width:0;
+      height:38px;
+      padding:7px 30px 7px 9px;
+      border:1px solid #cdbfaa;
+      border-radius:6px;
+      background:#fffaf0;
+      color:var(--ink);
+      font-size:13px;
+    }
+
+    .shelf-toolbar select{
+      appearance:none;
+      -webkit-appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M0 0l5 7 5-7z' fill='%23806f53'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 11px center;
+    }
+
+    .shelf-toolbar input{padding:7px 9px}
+
+    /* ---------- Catálogo ---------- */
+
+    .catalog{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(245px,1fr));
+      gap:14px;
+    }
+
+    .book{
+      display:flex;
+      flex-direction:column;
+      min-height:230px;
+      padding:16px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:var(--card);
+    }
+
+    .book .cover{
+      display:grid;
+      place-items:center;
+      min-height:64px;
+      margin-bottom:12px;
+      padding:10px;
+      border-radius:6px;
+      background:linear-gradient(135deg,var(--muted),#b99b61);
+      color:#fffaf0;
+      text-align:center;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.6px;
+    }
+
+    .book h2{
+      margin:0 0 4px;
+      color:var(--ink);
+      font-size:15px;
+      line-height:1.3;
+    }
+
+    .book .author{
+      margin:0 0 8px;
+      color:#9b8b70;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+    }
+
+    .book .description{
+      flex:1;
+      margin:0;
+      color:#665947;
+      font-size:12px;
+      line-height:1.6;
+    }
+
+    .book a{
+      align-self:flex-start;
+      margin-top:12px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+      text-decoration:none;
+    }
+
+    .book a:hover{color:#0f5c33}
+
+    .shelf-empty{
+      display:none;
+      padding:20px;
+      border:1px dashed #b99b61;
+      border-radius:9px;
+      color:var(--muted);
+      text-align:center;
+      font-size:12px;
+    }
+
+    .maintenance{
+      margin:18px 0 0;
+      color:var(--muted);
+      font-size:10px;
+      line-height:1.55;
+    }
+
+    .maintenance strong{color:#665947}
+
+    code{
+      padding:2px 4px;
+      border-radius:4px;
+      background:var(--soft);
+    }
+
+    /* ---------- Responsivo (idêntico à página Bíblia) ---------- */
+
+    @media(max-width:1050px){
+      main{padding:28px}
+
+      .shelf-toolbar{
+        grid-template-columns:minmax(190px,1fr) 1fr 1fr;
+      }
+    }
+
+    @media(max-width:900px){
+      :root{ --side-w:100%; }
+
+      .app-shell{flex-direction:column}
+
+      .side-nav{
+        position:relative;
+        top:auto;
+        height:auto;
+        width:100%;
+        flex-direction:row;
+        align-items:center;
+        gap:10px;
+        overflow-x:auto;
+        border-right:0;
+        border-bottom:1px solid #263754;
+      }
+
+      .side-brand{
+        padding:0 12px 0 0;
+        border-bottom:0;
+        border-right:1px solid #263754;
+        flex:0 0 auto;
+      }
+
+      .side-menu{
+        flex-direction:row;
+        gap:6px;
+      }
+
+      .side-item{white-space:nowrap}
+
+      .side-footer-note{display:none}
+    }
+
+    @media(max-width:700px){
+      main{padding:12px 9px 28px}
+
+      .site-header{
+        align-items:flex-start;
+        flex-wrap:wrap;
+      }
+
+      .header-link{
+        flex:1;
+        text-align:center;
+      }
+
+      .paper{padding:17px 12px}
+
+      .shelf-toolbar{grid-template-columns:1fr}
+    }
   </style>
 </head>
+
 <body>
-  <header class="topbar">
-    <a class="brand" href="#top">PALAVRA &amp; SÉRIE</a>
-    <a class="back-link" href="#top">▤ MINHA ESTANTE — FREE / PRO</a>
-  </header>
-  <main id="top">
-    <section class="paper" aria-labelledby="title">
-      <p class="eyebrow">MÓDULO HTML INDEPENDENTE</p>
-      <h1 id="title">MINHA ESTANTE</h1>
-      <p class="intro">Catálogo organizado para materiais gratuitos, conteúdos PRO, livros do autor e referências externas autorizadas. Este arquivo é autônomo: seus estilos, dados e scripts ficam separados dos menus da Matriz Técnica de Pesquisa PRO.</p>
-      <div class="tabs" role="tablist" aria-label="Seções da estante">
-        <button class="tab active" type="button" data-section="free">FREE</button>
-        <button class="tab" type="button" data-section="pro">PRO</button>
-        <button class="tab" type="button" data-section="own">MEUS LIVROS</button>
-        <button class="tab" type="button" data-section="external">REFERÊNCIAS EXTERNAS</button>
+  <div class="app-shell">
+    <aside class="side-nav" aria-label="Navegação da plataforma">
+      <div class="side-brand">
+        <a class="side-brand-link" href="index.html">PALAVRA &amp; SÉRIE</a>
+        <span class="side-brand-sub">Estante</span>
       </div>
-      <div class="toolbar" aria-label="Filtros da estante">
-        <input id="search" type="search" placeholder="Pesquisar título, autor ou descrição" aria-label="Pesquisar no catálogo">
-        <select id="contentType" aria-label="Tipo de conteúdo"><option value="">TIPO: TODOS</option><option>DEVOCIONAL</option><option>SERMÃO</option><option>ESTUDO BÍBLICO</option><option>LIVRO TEOLÓGICO</option><option>LIVRO ACADÉMICO</option><option>INFANTIL</option></select>
-        <select id="audience" aria-label="Público"><option value="">PÚBLICO: TODOS</option><option>CRIANÇAS</option><option>JOVENS</option><option>ADULTOS</option><option>ACADÉMICOS</option></select>
-        <select id="depth" aria-label="Profundidade"><option value="">NÍVEL: TODOS</option><option>BÁSICO</option><option>INTERMEDIÁRIO</option><option>AVANÇADO</option><option>ESPECIALIZADO</option></select>
-        <select id="format" aria-label="Formato"><option value="">FORMATO: TODOS</option><option>LIVRO</option><option>CURSO</option><option>ESTUDO GUIADO</option><option>MATERIAL DIDÁTICO</option></select>
-      </div>
-      <div id="catalog" class="catalog" aria-live="polite"></div>
-      <div id="empty" class="empty">Nenhum item corresponde aos filtros selecionados.</div>
-      <p class="note"><strong>Manutenção:</strong> este arquivo pode ser salvo como <code>estante.html</code> em uma pasta própria. Alterações aqui não modificam a Matriz PRO, Sermões ou Ponte Infantil.</p>
-    </section>
-  </main>
+
+      <nav class="side-menu">
+        <a class="side-item" href="index.html"><span class="side-icon">⌂</span>PESQUISA</a>
+        <a class="side-item" href="matriz-pro.html"><span class="side-icon">▤</span>MATRIZ PRO</a>
+        <a class="side-item" href="areas-academicas.html"><span class="side-icon">▤</span>ÁREAS ACADÊMICAS</a>
+        <a class="side-item" href="biblia.html"><span class="side-icon">▤</span>BÍBLIA</a>
+        <a class="side-item active" href="estante.html" aria-current="page"><span class="side-icon">▤</span>ESTANTE</a>
+        <a class="side-item" href="sermoes.html"><span class="side-icon">▤</span>SERMÕES</a>
+        <a class="side-item" href="oraculo.html"><span class="side-icon">◆</span>ORÁCULO</a>
+        <a class="side-item" href="ponte-infantil.html"><span class="side-icon">✦</span>PONTE INFANTIL</a>
+      </nav>
+
+      <p class="side-footer-note">
+        Módulo público: leitura independente da Sala do Escritor.
+      </p>
+    </aside>
+
+    <div class="content-area">
+      <header class="site-header">
+        <a class="header-link" href="index.html">← VOLTAR À PESQUISA</a>
+        <a class="header-link" href="sala-do-escritor.html">SALA DO ESCRITOR</a>
+      </header>
+
+      <main>
+        <section class="paper" aria-labelledby="page-title">
+          <p class="eyebrow">MÓDULO PÚBLICO · ESTANTE</p>
+
+          <h1 id="page-title">MINHA ESTANTE</h1>
+
+          <p class="intro">
+            Catálogo organizado para materiais gratuitos, conteúdos PRO, livros do
+            autor e referências externas autorizadas. Este arquivo é autônomo:
+            seus estilos, dados e scripts ficam separados dos menus da Matriz
+            Técnica de Pesquisa PRO.
+          </p>
+
+          <div class="shelf-tabs" role="tablist" aria-label="Seções da estante">
+            <button class="shelf-tab active" type="button" data-section="free">FREE</button>
+            <button class="shelf-tab" type="button" data-section="pro">PRO</button>
+            <button class="shelf-tab" type="button" data-section="own">MEUS LIVROS</button>
+            <button class="shelf-tab" type="button" data-section="external">REFERÊNCIAS EXTERNAS</button>
+          </div>
+
+          <div class="shelf-toolbar" aria-label="Filtros da estante">
+            <label>
+              PESQUISAR
+              <input id="search" type="search" placeholder="Título, autor ou descrição" aria-label="Pesquisar no catálogo">
+            </label>
+            <label>
+              TIPO
+              <select id="contentType" aria-label="Tipo de conteúdo">
+                <option value="">TODOS</option>
+                <option>DEVOCIONAL</option>
+                <option>SERMÃO</option>
+                <option>ESTUDO BÍBLICO</option>
+                <option>LIVRO TEOLÓGICO</option>
+                <option>LIVRO ACADÉMICO</option>
+                <option>INFANTIL</option>
+              </select>
+            </label>
+            <label>
+              PÚBLICO
+              <select id="audience" aria-label="Público">
+                <option value="">TODOS</option>
+                <option>CRIANÇAS</option>
+                <option>JOVENS</option>
+                <option>ADULTOS</option>
+                <option>ACADÉMICOS</option>
+              </select>
+            </label>
+            <label>
+              NÍVEL
+              <select id="depth" aria-label="Profundidade">
+                <option value="">TODOS</option>
+                <option>BÁSICO</option>
+                <option>INTERMEDIÁRIO</option>
+                <option>AVANÇADO</option>
+                <option>ESPECIALIZADO</option>
+              </select>
+            </label>
+            <label>
+              FORMATO
+              <select id="format" aria-label="Formato">
+                <option value="">TODOS</option>
+                <option>LIVRO</option>
+                <option>CURSO</option>
+                <option>ESTUDO GUIADO</option>
+                <option>MATERIAL DIDÁTICO</option>
+              </select>
+            </label>
+          </div>
+
+          <div id="catalog" class="catalog" aria-live="polite"></div>
+          <div id="empty" class="shelf-empty">Nenhum item corresponde aos filtros selecionados.</div>
+
+          <p class="maintenance">
+            <strong>Manutenção:</strong> este arquivo pode ser salvo como
+            <code>estante.html</code> em uma pasta própria. Alterações aqui não
+            modificam a Matriz PRO, Sermões ou Ponte Infantil.
+          </p>
+        </section>
+      </main>
+    </div>
+  </div>
+
   <script>
     const books = {
       free: [
@@ -103,17 +588,39 @@
         { title:'Institutes of the Christian Religion', author:'John Calvin', cover:'INSTITUTAS', description:'Obra clássica da Reforma disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', url:'https://www.ccel.org/ccel/calvin/institutes' }
       ]
     };
+
     let section = 'free';
     const $ = (id) => document.getElementById(id);
+
     function render() {
       const query = $('search').value.trim().toLowerCase();
       const filters = { contentType:$('contentType').value, audience:$('audience').value, depth:$('depth').value, format:$('format').value };
-      const list = (books[section] || []).filter(book => Object.entries(filters).every(([key, value]) => !value || book[key] === value)).filter(book => !query || `${book.title} ${book.author} ${book.description}`.toLowerCase().includes(query));
-      $('catalog').innerHTML = list.map(book => `<article class="book"><div class="cover">${book.cover}</div><h2>${book.title}</h2><p class="author">${book.author}</p><p class="description">${book.description}</p>${book.url ? `<a href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA OFICIAL ↗</a>` : ''}</article>`).join('');
+
+      const list = (books[section] || [])
+        .filter(book => Object.entries(filters).every(([key, value]) => !value || book[key] === value))
+        .filter(book => !query || `${book.title} ${book.author} ${book.description}`.toLowerCase().includes(query));
+
+      $('catalog').innerHTML = list.map(book => `
+        <article class="book">
+          <div class="cover">${book.cover}</div>
+          <h2>${book.title}</h2>
+          <p class="author">${book.author}</p>
+          <p class="description">${book.description}</p>
+          ${book.url ? `<a href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA OFICIAL ↗</a>` : ''}
+        </article>
+      `).join('');
+
       $('empty').style.display = list.length ? 'none' : 'block';
     }
-    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => { section = tab.dataset.section; document.querySelectorAll('.tab').forEach(item => item.classList.toggle('active', item === tab)); render(); }));
+
+    document.querySelectorAll('.shelf-tab').forEach(tab => tab.addEventListener('click', () => {
+      section = tab.dataset.section;
+      document.querySelectorAll('.shelf-tab').forEach(item => item.classList.toggle('active', item === tab));
+      render();
+    }));
+
     ['search','contentType','audience','depth','format'].forEach(id => $(id).addEventListener('input', render));
+
     render();
   </script>
 </body>
