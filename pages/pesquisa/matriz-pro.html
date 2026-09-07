@@ -363,11 +363,6 @@ main {
   color:#cfe8f6;
 }
 
-.comparison-report.comparison-error {
-  border-color:var(--error);
-  color:#ffb5b5;
-}
-
 .comparison-actions {
   display:flex;
   align-items:center;
@@ -1755,10 +1750,7 @@ function persistComparisonReport() {
   if (!activeStep) {
     return;
   }
-  if (comparisonReport.classList.contains("comparison-error")) {
-    localStorage.removeItem(comparisonKey("relatorio"));
-    return;
-  }
+
   localStorage.setItem(
     comparisonKey("relatorio"),
     comparisonReport.textContent
@@ -2050,6 +2042,26 @@ function formatAuditItem(item, index) {
 }
 
 
+function formatComparisonError(error, data) {
+  const raw = String(error?.message || data?.error || "Não foi possível realizar a auditoria.");
+  const normalized = raw.toLowerCase();
+  const quota = normalized.includes("limite de requisições") ||
+    normalized.includes("limite de créditos") ||
+    normalized.includes("quota") ||
+    normalized.includes("rate limit") ||
+    normalized.includes("resource exhausted") ||
+    normalized.includes("429");
+
+  if (quota) {
+    return "RELATÓRIO DE AUDITORIA\n\n" +
+      "A análise não foi concluída porque o serviço de IA atingiu o limite de requisições ou créditos.\n\n" +
+      "O conteúdo do escritor e a referência permanecem salvos nesta sessão. Tente novamente mais tarde ou verifique a cota do projeto de IA.\n\n" +
+      "Detalhe técnico: " + raw;
+  }
+
+  return "RELATÓRIO DE AUDITORIA\n\nA análise não foi concluída.\n\n" + raw;
+}
+
 function extractAuditReport(data) {
   const candidates = [
     data?.claims,
@@ -2154,23 +2166,16 @@ async function runComparisonConsolidation() {
       throw new Error("Sua sessão expirou. Entre novamente na Sala do Escritor.");
     }
 
-    if (!response.ok || data?.ok === false) {
-      const error = new Error(data?.error || "O Worker não conseguiu concluir a comparação e consolidação.");
-      error.code = data?.code || "AI_PROVIDER_ERROR";
-      error.status = response.status;
-      throw error;
+    if (!response.ok) {
+      throw new Error(data?.error || "O Worker não conseguiu concluir a comparação e consolidação.");
     }
-    comparisonReport.classList.remove("pending", "comparison-error");
-    comparisonReport.removeAttribute("data-error-code");
+
+    comparisonReport.classList.remove("pending");
     comparisonReport.textContent = extractAuditReport(data);
   } catch (error) {
     console.error("Erro na comparação e consolidação:", error);
-    const isQuotaError = error?.code === "AI_QUOTA_EXCEEDED" || /quota|billing|rate limit|resource exhausted|exceeded your current/i.test(error?.message || "");
     comparisonReport.classList.remove("pending");
-    comparisonReport.classList.add("comparison-error");
-    comparisonReport.dataset.errorCode = isQuotaError ? "AI_QUOTA_EXCEEDED" : (error?.code || "AI_PROVIDER_ERROR");
-    comparisonReport.textContent = "RELATÓRIO DE AUDITORIA\n\n" + (isQuotaError ? "A API Gemini atingiu o limite de requisições ou créditos. Verifique a chave, a quota e o faturamento do projeto Google." : (error?.message || "Não foi possível gerar o relatório de auditoria."));
-    localStorage.removeItem(comparisonKey("relatorio"));
+    comparisonReport.textContent = formatComparisonError(error, { error: error?.message });
   } finally {
     compareButton.disabled = false;
     compareButton.textContent = "COMPARAR E CONSOLIDAR";
