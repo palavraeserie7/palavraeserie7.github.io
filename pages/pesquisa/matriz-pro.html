@@ -317,6 +317,21 @@ main {
   line-height:1.45;
 }
 
+.comparison-guidance {
+  margin-top:2px;
+  padding:9px 10px;
+  border-left:2px solid var(--a);
+  border-radius:4px;
+  background:rgba(24,191,255,.07);
+  color:#b9d2e4;
+  font-size:9px;
+  line-height:1.5;
+}
+
+.comparison-guidance strong {
+  color:var(--a);
+}
+
 .comparison-field textarea {
   flex:none;
   min-height:145px;
@@ -734,15 +749,16 @@ main {
         </h3>
  
         <div id="sheet-meta" class="meta">
-          Receba a pesquisa pronta e o conteúdo do escritor para gerar um relatório de auditoria.
+          Compare o conteúdo do escritor com uma referência de comparação e gere um relatório de auditoria.
         </div>
 
         <div class="comparison-field">
-          <label for="research-ready">PESQUISA PRONTA</label>
-          <small>Cole aqui a pesquisa pronta que servirá como base documental da comparação.</small>
+          <label for="research-ready">REFERÊNCIA DE COMPARAÇÃO</label>
+          <small>Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere e prioriza fontes da matriz canônica conforme a subetapa.</small>
+          <div id="comparison-guidance" class="comparison-guidance" role="note"></div>
           <textarea
             id="research-ready"
-            placeholder="Cole aqui a pesquisa pronta..."
+            placeholder="Cole uma referência de comparação ou deixe vazio para a sugestão do Worker..."
             oninput="persistResearchReady()"
           ></textarea>
         </div>
@@ -1267,6 +1283,94 @@ function extractStepCode(stepName) {
   const match = String(stepName || "").match(/^\d{2}\.\d+/);
   return match ? match[0] : "";
 }
+
+const CANONICAL_REFERENCE_MATRIX = {
+  "01": {
+    name: "TEXTO BÍBLICO",
+    sources: "NA28; SBLGNT; BHS; BHQ; Septuaginta SBL; Textus Receptus/Scrivener como comparação histórica.",
+    rule: "O texto bíblico é a fonte primária; o texto crítico eclético é o texto-base e tradições alternativas são testemunhos comparativos."
+  },
+  "02": {
+    name: "CRÍTICA TEXTUAL",
+    sources: "Bruce Metzger; NA28; BHS/BHQ; SBLGNT; Septuaginta.",
+    rule: "Variantes relevantes devem ser sinalizadas e nunca apresentadas como fatos indiscutíveis."
+  },
+  "03": {
+    name: "GRAMÁTICA E SINTAXE",
+    sources: "Gramáticas gregas do NT; sintaxe grega avançada; gramáticas e sintaxe hebraicas; materiais de análise gramatical.",
+    rule: "Não construir doutrina a partir de palavra isolada; considerar a palavra dentro da construção e do contexto."
+  },
+  "04": {
+    name: "LÉXICO",
+    sources: "BDAG como principal e LSJ como complementar no NT; HALOT como principal e BDB como complementar no AT.",
+    rule: "O contexto determina o sentido; possibilidades semânticas não significam que todos os sentidos foram pretendidos."
+  },
+  "05": {
+    name: "LÉXICO TEOLÓGICO",
+    sources: "TDNT; NIDNTTE; TDOT; NIDOTTE.",
+    rule: "O conceito teológico permanece subordinado ao uso efetivo da palavra no texto estudado."
+  },
+  "06": {
+    name: "EXEGESE",
+    sources: "BECNT; NIGTC; NICNT; Pillar; WBC; NICOT; Baker OT; AOTC.",
+    rule: "Integrar argumento, estrutura, contexto, gênero e intenção comunicativa sem repetir mecanicamente as etapas anteriores."
+  },
+  "07": {
+    name: "CONTEXTO HISTÓRICO-CULTURAL",
+    sources: "Zondervan Encyclopedia of the Bible; IVP Bible Background Commentary; New Bible Dictionary; ANET; COS; Zondervan Atlas; Manners and Customs.",
+    rule: "Não inserir pano de fundo especulativo sem fonte primária ou evidência material/arqueológica."
+  },
+  "08": {
+    name: "HERMENÊUTICA E CONTROLE DE ERROS",
+    sources: "Grant Osborne; D. A. Carson; Carson & Moo; Dillard & Longman; Fee & Stuart.",
+    rule: "Auditar anacronismo, eisegese, falácia lexical, descontextualização, alegorização, generalização e transferência indevida AT–NT."
+  },
+  "09": {
+    name: "TEOLOGIA BÍBLICA",
+    sources: "G. K. Beale; Beale & Carson; Geerhardus Vos; Graeme Goldsworthy; Thomas Schreiner.",
+    rule: "Localizar a passagem na trajetória temática do cânon, distinguindo-a do mecanismo textual específico do ANL-10."
+  },
+  "10": {
+    name: "USO DO AT NO NT",
+    sources: "Beale & Carson; NA28; BHS/BHQ; Septuaginta; BDAG; HALOT; NIDNTTE; NIDOTTE; TDNT; TDOT; comentários exegéticos.",
+    rule: "Detectar citações, alusões, ecos, paralelos, uso da LXX, releituras cristológicas e cumprimento de promessas."
+  },
+  "11": {
+    name: "TEOLOGIA SISTEMÁTICA",
+    sources: "Grudem; Berkhof; Frame; Evangelical Dictionary of Theology.",
+    rule: "Validar doutrinariamente sem determinar primariamente o significado; seguir texto → exegese → teologia bíblica → doutrina → teologia sistemática."
+  },
+  "12": {
+    name: "COMPARAÇÃO DE INTERPRETAÇÕES",
+    sources: "Reconsulta transversal dos ANLs 01–11, conforme as evidências e as interpretações concorrentes identificadas.",
+    rule: "Preservar o debate acadêmico, localizar argumentos, pressupostos e grau de consenso, distinguindo fato textual de interpretação."
+  }
+};
+
+
+function getCanonicalModuleCode() {
+  const candidate = String(activeStep || activeModule || "");
+  const match = candidate.match(/^\s*(\d{2})/);
+  return match ? match[1] : "";
+}
+
+
+function getCanonicalGuidance() {
+  const code = getCanonicalModuleCode();
+  return CANONICAL_REFERENCE_MATRIX[code] || {
+    name: "MATRIZ CANÔNICA",
+    sources: "Selecione uma subetapa para receber a sugestão de fontes prioritárias.",
+    rule: "A conclusão deve ser proporcional às evidências e nenhuma fonte ou localização deve ser inventada."
+  };
+}
+
+
+function renderCanonicalGuidance() {
+  const guidance = getCanonicalGuidance();
+  const prefix = activeStep ? `Para ${activeStep}: ` : "Sugestão do Worker: ";
+  comparisonGuidance.textContent =
+    prefix + "priorizar " + guidance.sources + " Regra: " + guidance.rule;
+}
  
 let activeModule = "";
 let activeStep = "";
@@ -1306,6 +1410,9 @@ const comparisonReport =
 
 const compareButton =
   document.getElementById("compare-button");
+
+const comparisonGuidance =
+  document.getElementById("comparison-guidance");
  
  
 /* =====================================================
@@ -1506,7 +1613,9 @@ function selectModule(
   document
     .getElementById("sheet-meta")
     .textContent =
-      "Selecione uma subetapa do módulo para comparar a pesquisa pronta com o conteúdo do escritor.";
+      "Selecione uma subetapa do módulo para comparar a referência de comparação com o conteúdo do escritor.";
+
+  renderCanonicalGuidance();
  
  
   messages.innerHTML =
@@ -1564,6 +1673,7 @@ function selectStep(
   loadResearchReady();
   loadWriterContent();
   loadComparisonReport();
+  renderCanonicalGuidance();
  
   const hadPreviousConversation = loadMessages();
  
@@ -1875,14 +1985,21 @@ function prepareQuestionForStep(skipIntroMessage) {
    COMPARAÇÃO E CONSOLIDAÇÃO AO WORKER
 ===================================================== */
 
-function comparisonPrompt(researchReady, writerContent) {
+function comparisonPrompt(referenceText, writerContent, guidance) {
+  const comparisonReference = referenceText || "Nenhuma referência foi colada. Use a sugestão canônica abaixo e selecione as fontes reconhecidas adequadas ao módulo e à subetapa.";
+
   return `
 ANÁLISE DE COMPARAÇÃO E CONSOLIDAÇÃO
 
-PESQUISA PRONTA — BASE DOCUMENTAL:
+REFERÊNCIA DE COMPARAÇÃO FORNECIDA PELO USUÁRIO:
 ---
-${researchReady}
+${comparisonReference}
 ---
+
+SUGESTÃO DA MATRIZ CANÔNICA DO WORKER:
+MÓDULO: ${guidance.name}
+FONTES PRIORITÁRIAS: ${guidance.sources}
+REGRA METODOLÓGICA: ${guidance.rule}
 
 CONTEÚDO DO ESCRITOR — TEXTO A SER AUDITADO:
 ---
@@ -1890,17 +2007,19 @@ ${writerContent}
 ---
 
 OBJETIVO:
-Compare a pesquisa pronta com o conteúdo do escritor e produza um relatório de auditoria em português.
+Compare o conteúdo do escritor com a referência de comparação. Quando a referência estiver vazia, selecione e priorize as fontes indicadas pela matriz canônica do Worker para o módulo e a subetapa atuais.
 
 PROCEDIMENTO OBRIGATÓRIO:
 1. Identifique cada afirmação verificável do conteúdo do escritor.
-2. Compare cada afirmação com a pesquisa pronta e com as fontes que fundamentam essa pesquisa.
+2. Compare cada afirmação com a referência fornecida ou, quando ela estiver vazia, com as fontes canônicas prioritárias sugeridas acima.
 3. Classifique cada afirmação com exatamente uma destas categorias: CONCORDÂNCIA, DIVERGÊNCIA, SUPORTE PARCIAL ou EVIDÊNCIA INSUFICIENTE.
 4. Explique o motivo da classificação, distinguindo o que está explicitamente documentado de qualquer inferência.
 5. Registre a fonte, o autor e a localização que fundamentam a classificação. Use página, capítulo, seção, verbete, referência bíblica, parágrafo ou outro local verificável.
 6. Não invente fontes, autores, páginas, citações ou localizações. Quando a localização não estiver disponível, escreva "localização não confirmada".
-7. Se a pesquisa pronta não sustentar uma afirmação, não trate isso automaticamente como refutação: classifique como EVIDÊNCIA INSUFICIENTE quando não houver base bastante para concluir.
-8. Finalize com uma síntese consolidada, principais divergências, lacunas de evidência e limitações da auditoria.
+7. O texto bíblico é a fonte primária quando o tema for textual; comentários e teologias não podem substituir o texto. Respeite também a regra metodológica específica da matriz canônica.
+8. Quando houver divergência entre intérpretes, preserve as interpretações concorrentes, localize seus argumentos e pressupostos e apresente uma conclusão proporcional às evidências.
+9. Se não houver base suficiente, classifique como EVIDÊNCIA INSUFICIENTE; ausência de evidência localizada não deve ser apresentada automaticamente como refutação.
+10. Finalize com uma síntese consolidada, principais divergências, lacunas de evidência e limitações da auditoria.
 
 FORMATO PREFERENCIAL:
 RELATÓRIO DE AUDITORIA
@@ -1960,11 +2079,12 @@ async function runComparisonConsolidation() {
     return;
   }
 
-  const researchReady = researchReadyInput.value.trim();
+  const referenceText = researchReadyInput.value.trim();
   const writerContent = writerContentInput.value.trim();
+  const guidance = getCanonicalGuidance();
 
-  if (!researchReady || !writerContent) {
-    comparisonReport.textContent = "Preencha os dois campos: PESQUISA PRONTA e CONTEÚDO DO ESCRITOR.";
+  if (!writerContent) {
+    comparisonReport.textContent = "Cole o conteúdo do escritor. A referência de comparação pode ser preenchida ou deixada vazia para a sugestão automática do Worker.";
     comparisonReport.classList.remove("pending");
     persistComparisonReport();
     return;
@@ -1999,9 +2119,14 @@ async function runComparisonConsolidation() {
           mode: "writing_private",
           accessLevel: "private",
           analysisType: "comparison_consolidation",
-          researchReady,
+          referenceText,
           writerContent,
-          question: comparisonPrompt(researchReady, writerContent),
+          canonicalGuidance: {
+            module: guidance.name,
+            sources: guidance.sources,
+            rule: guidance.rule
+          },
+          question: comparisonPrompt(referenceText, writerContent, guidance),
           topic: activeStep,
           module: activeModule,
           discipline: "MATRIZ TÉCNICA DE PESQUISA PRO"
