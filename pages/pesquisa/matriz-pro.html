@@ -363,6 +363,11 @@ main {
   color:#cfe8f6;
 }
 
+.comparison-report.comparison-error {
+  border-color:var(--error);
+  color:#ffb5b5;
+}
+
 .comparison-actions {
   display:flex;
   align-items:center;
@@ -1750,7 +1755,10 @@ function persistComparisonReport() {
   if (!activeStep) {
     return;
   }
-
+  if (comparisonReport.classList.contains("comparison-error")) {
+    localStorage.removeItem(comparisonKey("relatorio"));
+    return;
+  }
   localStorage.setItem(
     comparisonKey("relatorio"),
     comparisonReport.textContent
@@ -2146,16 +2154,23 @@ async function runComparisonConsolidation() {
       throw new Error("Sua sessão expirou. Entre novamente na Sala do Escritor.");
     }
 
-    if (!response.ok) {
-      throw new Error(data?.error || "O Worker não conseguiu concluir a comparação e consolidação.");
+    if (!response.ok || data?.ok === false) {
+      const error = new Error(data?.error || "O Worker não conseguiu concluir a comparação e consolidação.");
+      error.code = data?.code || "AI_PROVIDER_ERROR";
+      error.status = response.status;
+      throw error;
     }
-
-    comparisonReport.classList.remove("pending");
+    comparisonReport.classList.remove("pending", "comparison-error");
+    comparisonReport.removeAttribute("data-error-code");
     comparisonReport.textContent = extractAuditReport(data);
   } catch (error) {
     console.error("Erro na comparação e consolidação:", error);
+    const isQuotaError = error?.code === "AI_QUOTA_EXCEEDED" || /quota|billing|rate limit|resource exhausted|exceeded your current/i.test(error?.message || "");
     comparisonReport.classList.remove("pending");
-    comparisonReport.textContent = "COMPARAÇÃO E CONSOLIDAÇÃO\n\n" + (error?.message || "Não foi possível realizar a auditoria.");
+    comparisonReport.classList.add("comparison-error");
+    comparisonReport.dataset.errorCode = isQuotaError ? "AI_QUOTA_EXCEEDED" : (error?.code || "AI_PROVIDER_ERROR");
+    comparisonReport.textContent = "RELATÓRIO DE AUDITORIA\n\n" + (isQuotaError ? "O serviço de análise atingiu o limite de uso disponível. Tente novamente mais tarde." : (error?.message || "Não foi possível gerar o relatório de auditoria."));
+    localStorage.removeItem(comparisonKey("relatorio"));
   } finally {
     compareButton.disabled = false;
     compareButton.textContent = "COMPARAR E CONSOLIDAR";
