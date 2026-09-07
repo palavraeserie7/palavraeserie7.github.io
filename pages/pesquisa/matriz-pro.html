@@ -412,6 +412,82 @@ main {
 }
 
 /* =====================================================
+   ANÁLISE COMPARATIVA
+===================================================== */
+
+.comparative-controls {
+  padding:12px;
+  border-top:1px solid var(--b);
+  background:rgba(23,36,58,.72);
+}
+
+.comparative-controls label {
+  display:block;
+  margin-bottom:6px;
+  color:var(--a);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.7px;
+}
+
+.comparative-controls input {
+  width:100%;
+  padding:9px 10px;
+  border:1px solid #344762;
+  border-radius:6px;
+  background:#111b30;
+  color:var(--t);
+  font:inherit;
+  font-size:10px;
+  outline:none;
+}
+
+.comparative-controls input:focus {
+  border-color:var(--p);
+}
+
+.comparative-controls small {
+  display:block;
+  margin:6px 0 9px;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.45;
+}
+
+.comparative-button {
+  width:100%;
+  padding:10px 12px;
+  border:0;
+  border-radius:6px;
+  background:var(--a);
+  color:#061522;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.35px;
+  cursor:pointer;
+}
+
+.comparative-button:hover {
+  background:#55d3ff;
+}
+
+.comparative-button:disabled {
+  opacity:.55;
+  cursor:wait;
+}
+
+.comparative-report {
+  border-left:3px solid var(--a);
+  background:#14243b;
+  white-space:pre-wrap;
+}
+
+.comparative-report.pending {
+  border-left-color:var(--p);
+  color:#c8d7e7;
+}
+
+/* =====================================================
    ESTADO DE AUTENTICAÇÃO
 ===================================================== */
  
@@ -656,7 +732,7 @@ main {
  
         <textarea
           id="notes"
-          placeholder="Registe aqui dados, fontes, observações e conclusões..."
+          placeholder="Cole aqui o conteúdo gerado no painel direito para iniciar a análise comparativa..."
           oninput="persistNotes()"
         ></textarea>
  
@@ -688,6 +764,28 @@ main {
             A Matriz está pronta. Faça uma pergunta livre sobre a subetapa selecionada.
           </div>
         </div>
+
+        <section class="comparative-controls" aria-labelledby="comparative-title">
+          <label id="comparative-title" for="reference-book">REFERÊNCIA DE LIVRO (OPCIONAL)</label>
+          <input
+            id="reference-book"
+            type="text"
+            placeholder="Ex.: HALOT, BDB, TWOT, comentário ou teologia sistemática"
+            aria-describedby="reference-book-help"
+            oninput="persistComparativeReference()"
+          >
+          <small id="reference-book-help">
+            Em branco: a IA seleciona as obras mais reconhecidas e consolidadas para o tema. Preenchido: a obra indicada recebe prioridade na comparação.
+          </small>
+          <button
+            id="comparative-button"
+            class="comparative-button"
+            type="button"
+            onclick="runComparativeAnalysis()"
+          >
+            ANÁLISE COMPARATIVA
+          </button>
+        </section>
  
         <form
           class="form"
@@ -1191,6 +1289,12 @@ const questionInput =
  
 const sendButton =
   document.getElementById("send-button");
+
+const comparativeReferenceInput =
+  document.getElementById("reference-book");
+
+const comparativeButton =
+  document.getElementById("comparative-button");
  
  
 /* =====================================================
@@ -1447,6 +1551,7 @@ function selectStep(
  
  
   loadNotes();
+  loadComparativeReference();
  
   const hadPreviousConversation = loadMessages();
  
@@ -1623,6 +1728,42 @@ function getSavedReference() {
 function saveReference(value) {
   localStorage.setItem(globalReferenceKey(), value);
 }
+
+
+function comparativeReferenceKey() {
+  return (
+    "palavraSerieMatrizProReferenciaBibliografica:" +
+    activeModule +
+    ":" +
+    activeStep
+  );
+}
+
+
+function getComparativeReference() {
+  if (!activeStep) {
+    return "";
+  }
+
+  return localStorage.getItem(comparativeReferenceKey()) || "";
+}
+
+
+function persistComparativeReference() {
+  if (!activeStep) {
+    return;
+  }
+
+  localStorage.setItem(
+    comparativeReferenceKey(),
+    comparativeReferenceInput.value.trim()
+  );
+}
+
+
+function loadComparativeReference() {
+  comparativeReferenceInput.value = getComparativeReference();
+}
  
  
 function clearConversation() {
@@ -1735,6 +1876,165 @@ function prepareQuestionForStep(skipIntroMessage) {
       activeStep +
       "\", digite a passagem bíblica ou o tema de estudo e clique em ENVIAR."
     );
+  }
+}
+ 
+ 
+/* =====================================================
+   ANÁLISE COMPARATIVA AO WORKER
+===================================================== */
+
+function comparativePrompt(sourceText, referenceBook) {
+  const selectedReference = referenceBook || "nenhuma obra indicada — selecione automaticamente as obras mais reconhecidas e consolidadas para o tema";
+
+  return `
+ANÁLISE COMPARATIVA BIBLIOGRÁFICA
+
+TEXTO GERADO PELO USUÁRIO:
+---
+${sourceText}
+---
+
+REFERÊNCIA DE LIVRO:
+${selectedReference}
+
+INSTRUÇÕES:
+1. Identifique cada afirmação verificável do texto, preservando a formulação original ou resumindo-a fielmente.
+2. Para cada afirmação, atribua exatamente uma classificação: CONCORDÂNCIA, DIVERGÊNCIA, SUPORTE PARCIAL ou EVIDÊNCIA INSUFICIENTE.
+3. Compare com fontes acadêmicas reconhecidas e consolidadas para o tema. Se a referência de livro estiver preenchida, priorize-a e compare-a com outras fontes relevantes.
+4. Para cada item, informe obra, autor e localização precisa (página, verbete, seção, capítulo, artigo ou outro local disponível). Não invente páginas, verbetes ou citações: quando a localização não puder ser confirmada, escreva "localização não confirmada".
+5. Diferencie explicitamente o que a fonte afirma do que é inferência sua.
+6. Responda em português, em formato de relatório técnico, com uma síntese final e uma seção de limitações.
+7. Não trate a ausência de evidência localizada como prova de falsidade; use EVIDÊNCIA INSUFICIENTE quando for o caso.
+`;
+}
+
+
+function formatComparativeItem(item, index) {
+  const statement = item?.statement || item?.claim || item?.afirmacao || item?.text || "Afirmação não identificada";
+  const classification = item?.classification || item?.classificacao || item?.status || "EVIDÊNCIA INSUFICIENTE";
+  const work = item?.work || item?.obra || item?.source || "Obra não informada";
+  const author = item?.author || item?.autor || "Autor não informado";
+  const location = item?.location || item?.localizacao || item?.reference || "localização não confirmada";
+  const basis = item?.basis || item?.fundamentacao || item?.evidence || item?.justification || "Fundamentação não informada.";
+
+  return `${index + 1}. AFIRMAÇÃO\n${statement}\n\nCLASSIFICAÇÃO: ${classification}\nOBRA: ${work}\nAUTOR: ${author}\nLOCALIZAÇÃO: ${location}\nFUNDAMENTAÇÃO: ${basis}`;
+}
+
+
+function extractComparativeReport(data) {
+  const candidates = [
+    data?.claims,
+    data?.afirmacoes,
+    data?.items,
+    data?.report?.claims,
+    data?.report?.items,
+    data?.comparativeReport?.claims,
+    data?.comparativeReport?.items
+  ];
+
+  const items = candidates.find(Array.isArray);
+
+  if (items) {
+    const intro = data?.summary || data?.synthesis || data?.sintese || "RELATÓRIO DE ANÁLISE COMPARATIVA";
+    return `${intro}\n\n${items.map(formatComparativeItem).join("\n\n────────────────────────\n\n")}`;
+  }
+
+  if (typeof data?.report === "string") {
+    return data.report;
+  }
+
+  if (typeof data?.comparativeReport === "string") {
+    return data.comparativeReport;
+  }
+
+  return data?.text || data?.answer || data?.response || data?.result || "A análise não devolveu conteúdo.";
+}
+
+
+async function runComparativeAnalysis() {
+  if (!activeStep) {
+    appendSystemMessage("Selecione uma subetapa antes de iniciar a análise comparativa.");
+    return;
+  }
+
+  const sourceText = document.getElementById("notes").value.trim();
+  const referenceBook = comparativeReferenceInput.value.trim();
+
+  if (!sourceText) {
+    appendSystemMessage("Cole o conteúdo gerado na área de texto da Folha de trabalho antes de analisar.");
+    document.getElementById("notes").focus();
+    return;
+  }
+
+  persistComparativeReference();
+
+  const reportMessage = document.createElement("div");
+  reportMessage.className = "message system comparative-report pending";
+  reportMessage.textContent = "ANÁLISE COMPARATIVA\n\nIdentificando afirmações e consultando as fontes relevantes...";
+  messages.appendChild(reportMessage);
+  messages.scrollTop = messages.scrollHeight;
+  persistMessages();
+
+  comparativeButton.disabled = true;
+  comparativeButton.textContent = "ANALISANDO...";
+
+  try {
+    const session = await getAuthenticatedSession();
+
+    if (!session.access_token) {
+      throw new Error("O Supabase não forneceu um token de acesso.");
+    }
+
+    const response = await fetch(
+      AI_PROXY_URL + "/api/pesquisa",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + session.access_token
+        },
+        body: JSON.stringify({
+          mode: "writing_private",
+          accessLevel: "private",
+          analysisType: "comparative",
+          sourceText,
+          referenceBook,
+          question: comparativePrompt(sourceText, referenceBook),
+          topic: activeStep,
+          module: activeModule,
+          discipline: "MATRIZ TÉCNICA DE PESQUISA PRO"
+        })
+      }
+    );
+
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+
+    if (response.status === 401) {
+      await supabaseClient.auth.signOut();
+      throw new Error("Sua sessão expirou. Entre novamente na Sala do Escritor.");
+    }
+
+    if (!response.ok) {
+      throw new Error(data?.error || "O Worker não conseguiu concluir a análise comparativa.");
+    }
+
+    reportMessage.classList.remove("pending");
+    reportMessage.textContent = extractComparativeReport(data);
+  } catch (error) {
+    console.error("Erro na análise comparativa:", error);
+    reportMessage.classList.remove("pending");
+    reportMessage.textContent = "ANÁLISE COMPARATIVA\n\n" + (error?.message || "Não foi possível realizar a análise.");
+  } finally {
+    comparativeButton.disabled = false;
+    comparativeButton.textContent = "ANÁLISE COMPARATIVA";
+    messages.scrollTop = messages.scrollHeight;
+    persistMessages();
   }
 }
  
