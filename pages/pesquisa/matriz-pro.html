@@ -291,7 +291,90 @@ main {
   font-weight:900;
   cursor:pointer;
 }
- 
+
+/* =====================================================
+   ANÁLISE DE COMPARAÇÃO E CONSOLIDAÇÃO
+===================================================== */
+
+.comparison-field {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.comparison-field label,
+.comparison-report-label {
+  color:var(--a);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.7px;
+}
+
+.comparison-field small {
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.45;
+}
+
+.comparison-field textarea {
+  flex:none;
+  min-height:145px;
+  resize:vertical;
+}
+
+#writer-content,
+#research-ready {
+  width:100%;
+}
+
+.comparison-report {
+  flex:1;
+  min-height:190px;
+  overflow:auto;
+  margin-top:6px;
+  padding:14px;
+  border:1px solid #344762;
+  border-radius:6px;
+  background:#111b30;
+  color:var(--t);
+  font-size:11px;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+
+.comparison-report.pending {
+  border-color:var(--a);
+  color:#cfe8f6;
+}
+
+.comparison-actions {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:10px;
+}
+
+.compare-button {
+  padding:10px 15px;
+  border:0;
+  border-radius:6px;
+  background:var(--a);
+  color:#061522;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.compare-button:hover {
+  background:#55d3ff;
+}
+
+.compare-button:disabled {
+  opacity:.55;
+  cursor:wait;
+}
+
 /* =====================================================
    CHAT
 ===================================================== */
@@ -409,82 +492,6 @@ main {
 .clear-chat:hover {
   color:#fff !important;
   border-color:var(--a) !important;
-}
-
-/* =====================================================
-   ANÁLISE COMPARATIVA
-===================================================== */
-
-.comparative-controls {
-  padding:12px;
-  border-top:1px solid var(--b);
-  background:rgba(23,36,58,.72);
-}
-
-.comparative-controls label {
-  display:block;
-  margin-bottom:6px;
-  color:var(--a);
-  font-size:9px;
-  font-weight:900;
-  letter-spacing:.7px;
-}
-
-.comparative-controls input {
-  width:100%;
-  padding:9px 10px;
-  border:1px solid #344762;
-  border-radius:6px;
-  background:#111b30;
-  color:var(--t);
-  font:inherit;
-  font-size:10px;
-  outline:none;
-}
-
-.comparative-controls input:focus {
-  border-color:var(--p);
-}
-
-.comparative-controls small {
-  display:block;
-  margin:6px 0 9px;
-  color:var(--muted);
-  font-size:9px;
-  line-height:1.45;
-}
-
-.comparative-button {
-  width:100%;
-  padding:10px 12px;
-  border:0;
-  border-radius:6px;
-  background:var(--a);
-  color:#061522;
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:.35px;
-  cursor:pointer;
-}
-
-.comparative-button:hover {
-  background:#55d3ff;
-}
-
-.comparative-button:disabled {
-  opacity:.55;
-  cursor:wait;
-}
-
-.comparative-report {
-  border-left:3px solid var(--a);
-  background:#14243b;
-  white-space:pre-wrap;
-}
-
-.comparative-report.pending {
-  border-left-color:var(--p);
-  color:#c8d7e7;
 }
 
 /* =====================================================
@@ -723,26 +730,46 @@ main {
       <section class="sheet">
  
         <h3 id="sheet-title">
-          Folha de trabalho
+          Análise de comparação e consolidação
         </h3>
  
         <div id="sheet-meta" class="meta">
-          Nenhuma subetapa selecionada.
+          Receba a pesquisa pronta e o conteúdo do escritor para gerar um relatório de auditoria.
         </div>
- 
-        <textarea
-          id="notes"
-          placeholder="Cole aqui o conteúdo gerado no painel direito para iniciar a análise comparativa..."
-          oninput="persistNotes()"
-        ></textarea>
- 
-        <button
-          class="save"
-          type="button"
-          onclick="saveNotes()"
-        >
-          GUARDAR
-        </button>
+
+        <div class="comparison-field">
+          <label for="research-ready">PESQUISA PRONTA</label>
+          <small>Cole aqui a pesquisa pronta que servirá como base documental da comparação.</small>
+          <textarea
+            id="research-ready"
+            placeholder="Cole aqui a pesquisa pronta..."
+            oninput="persistResearchReady()"
+          ></textarea>
+        </div>
+
+        <div class="comparison-field">
+          <label for="writer-content">CONTEÚDO DO ESCRITOR</label>
+          <small>Cole aqui o conteúdo produzido pelo escritor que será auditado.</small>
+          <textarea
+            id="writer-content"
+            placeholder="Cole aqui o conteúdo do escritor..."
+            oninput="persistWriterContent()"
+          ></textarea>
+        </div>
+
+        <div class="comparison-report-label">RELATÓRIO DE AUDITORIA</div>
+        <div id="comparison-report" class="comparison-report" role="status" aria-live="polite">O relatório de auditoria aparecerá aqui depois da comparação.</div>
+
+        <div class="comparison-actions">
+          <button
+            id="compare-button"
+            class="compare-button"
+            type="button"
+            onclick="runComparisonConsolidation()"
+          >
+            COMPARAR E CONSOLIDAR
+          </button>
+        </div>
  
       </section>
  
@@ -764,28 +791,6 @@ main {
             A Matriz está pronta. Faça uma pergunta livre sobre a subetapa selecionada.
           </div>
         </div>
-
-        <section class="comparative-controls" aria-labelledby="comparative-title">
-          <label id="comparative-title" for="reference-book">REFERÊNCIA DE LIVRO (OPCIONAL)</label>
-          <input
-            id="reference-book"
-            type="text"
-            placeholder="Ex.: HALOT, BDB, TWOT, comentário ou teologia sistemática"
-            aria-describedby="reference-book-help"
-            oninput="persistComparativeReference()"
-          >
-          <small id="reference-book-help">
-            Em branco: a IA seleciona as obras mais reconhecidas e consolidadas para o tema. Preenchido: a obra indicada recebe prioridade na comparação.
-          </small>
-          <button
-            id="comparative-button"
-            class="comparative-button"
-            type="button"
-            onclick="runComparativeAnalysis()"
-          >
-            ANÁLISE COMPARATIVA
-          </button>
-        </section>
  
         <form
           class="form"
@@ -1290,11 +1295,17 @@ const questionInput =
 const sendButton =
   document.getElementById("send-button");
 
-const comparativeReferenceInput =
-  document.getElementById("reference-book");
+const researchReadyInput =
+  document.getElementById("research-ready");
 
-const comparativeButton =
-  document.getElementById("comparative-button");
+const writerContentInput =
+  document.getElementById("writer-content");
+
+const comparisonReport =
+  document.getElementById("comparison-report");
+
+const compareButton =
+  document.getElementById("compare-button");
  
  
 /* =====================================================
@@ -1489,13 +1500,13 @@ function selectModule(
   document
     .getElementById("sheet-title")
     .textContent =
-      "Folha de trabalho";
+      "Análise de comparação e consolidação";
  
  
   document
     .getElementById("sheet-meta")
     .textContent =
-      "Selecione uma subetapa do módulo.";
+      "Selecione uma subetapa do módulo para comparar a pesquisa pronta com o conteúdo do escritor.";
  
  
   messages.innerHTML =
@@ -1541,17 +1552,18 @@ function selectStep(
   document
     .getElementById("sheet-title")
     .textContent =
-      stepName;
+      "Análise de comparação e consolidação";
  
  
   document
     .getElementById("sheet-meta")
     .textContent =
-      "Subetapa selecionada. A Mesa de Análise está vinculada à sua sessão privada.";
+      "Subetapa: " + stepName + ". Compare a pesquisa pronta com o conteúdo do escritor e gere o relatório de auditoria.";
  
  
-  loadNotes();
-  loadComparativeReference();
+  loadResearchReady();
+  loadWriterContent();
+  loadComparisonReport();
  
   const hadPreviousConversation = loadMessages();
  
@@ -1560,67 +1572,82 @@ function selectStep(
  
  
 /* =====================================================
-   NOTAS
+   ANÁLISE DE COMPARAÇÃO — PERSISTÊNCIA
 ===================================================== */
- 
-function noteKey() {
- 
+
+function comparisonKey(prefix) {
   return (
-    "palavraSerieMatrizProNota:" +
+    "palavraSerieMatrizProComparacao:" +
+    prefix +
+    ":" +
     activeModule +
     ":" +
     activeStep
   );
 }
- 
- 
-function loadNotes() {
- 
-  if (!activeStep) {
-    document.getElementById("notes").value = "";
-    return;
-  }
- 
-  document.getElementById("notes").value =
-    localStorage.getItem(noteKey()) || "";
+
+
+function loadResearchReady() {
+  researchReadyInput.value = activeStep
+    ? localStorage.getItem(comparisonKey("pesquisa-pronta")) || ""
+    : "";
 }
- 
- 
-function persistNotes() {
- 
+
+
+function persistResearchReady() {
   if (!activeStep) {
     return;
   }
- 
+
   localStorage.setItem(
-    noteKey(),
-    document.getElementById("notes").value
+    comparisonKey("pesquisa-pronta"),
+    researchReadyInput.value
   );
 }
- 
- 
-function saveNotes() {
- 
-  persistNotes();
- 
+
+
+function loadWriterContent() {
+  writerContentInput.value = activeStep
+    ? localStorage.getItem(comparisonKey("conteudo-escritor")) || ""
+    : "";
+}
+
+
+function persistWriterContent() {
   if (!activeStep) {
     return;
   }
- 
- 
-  const button =
-    document.querySelector(".save");
- 
-  button.textContent =
-    "GUARDADO";
- 
-  setTimeout(() => {
-    button.textContent =
-      "GUARDAR";
-  }, 1000);
+
+  localStorage.setItem(
+    comparisonKey("conteudo-escritor"),
+    writerContentInput.value
+  );
 }
- 
- 
+
+
+function loadComparisonReport() {
+  const savedReport = activeStep
+    ? localStorage.getItem(comparisonKey("relatorio"))
+    : "";
+
+  comparisonReport.textContent = savedReport ||
+    "O relatório de auditoria aparecerá aqui depois da comparação.";
+  comparisonReport.classList.remove("pending");
+}
+
+
+function persistComparisonReport() {
+  if (!activeStep) {
+    return;
+  }
+
+  localStorage.setItem(
+    comparisonKey("relatorio"),
+    comparisonReport.textContent
+  );
+}
+
+
 /* =====================================================
    CONVERSA — PERSISTÊNCIA
    Guarda a conversa com a IA por módulo/etapa, para que
@@ -1727,42 +1754,6 @@ function getSavedReference() {
  
 function saveReference(value) {
   localStorage.setItem(globalReferenceKey(), value);
-}
-
-
-function comparativeReferenceKey() {
-  return (
-    "palavraSerieMatrizProReferenciaBibliografica:" +
-    activeModule +
-    ":" +
-    activeStep
-  );
-}
-
-
-function getComparativeReference() {
-  if (!activeStep) {
-    return "";
-  }
-
-  return localStorage.getItem(comparativeReferenceKey()) || "";
-}
-
-
-function persistComparativeReference() {
-  if (!activeStep) {
-    return;
-  }
-
-  localStorage.setItem(
-    comparativeReferenceKey(),
-    comparativeReferenceInput.value.trim()
-  );
-}
-
-
-function loadComparativeReference() {
-  comparativeReferenceInput.value = getComparativeReference();
 }
  
  
@@ -1881,103 +1872,113 @@ function prepareQuestionForStep(skipIntroMessage) {
  
  
 /* =====================================================
-   ANÁLISE COMPARATIVA AO WORKER
+   COMPARAÇÃO E CONSOLIDAÇÃO AO WORKER
 ===================================================== */
 
-function comparativePrompt(sourceText, referenceBook) {
-  const selectedReference = referenceBook || "nenhuma obra indicada — selecione automaticamente as obras mais reconhecidas e consolidadas para o tema";
-
+function comparisonPrompt(researchReady, writerContent) {
   return `
-ANÁLISE COMPARATIVA BIBLIOGRÁFICA
+ANÁLISE DE COMPARAÇÃO E CONSOLIDAÇÃO
 
-TEXTO GERADO PELO USUÁRIO:
+PESQUISA PRONTA — BASE DOCUMENTAL:
 ---
-${sourceText}
+${researchReady}
 ---
 
-REFERÊNCIA DE LIVRO:
-${selectedReference}
+CONTEÚDO DO ESCRITOR — TEXTO A SER AUDITADO:
+---
+${writerContent}
+---
 
-INSTRUÇÕES:
-1. Identifique cada afirmação verificável do texto, preservando a formulação original ou resumindo-a fielmente.
-2. Para cada afirmação, atribua exatamente uma classificação: CONCORDÂNCIA, DIVERGÊNCIA, SUPORTE PARCIAL ou EVIDÊNCIA INSUFICIENTE.
-3. Compare com fontes acadêmicas reconhecidas e consolidadas para o tema. Se a referência de livro estiver preenchida, priorize-a e compare-a com outras fontes relevantes.
-4. Para cada item, informe obra, autor e localização precisa (página, verbete, seção, capítulo, artigo ou outro local disponível). Não invente páginas, verbetes ou citações: quando a localização não puder ser confirmada, escreva "localização não confirmada".
-5. Diferencie explicitamente o que a fonte afirma do que é inferência sua.
-6. Responda em português, em formato de relatório técnico, com uma síntese final e uma seção de limitações.
-7. Não trate a ausência de evidência localizada como prova de falsidade; use EVIDÊNCIA INSUFICIENTE quando for o caso.
+OBJETIVO:
+Compare a pesquisa pronta com o conteúdo do escritor e produza um relatório de auditoria em português.
+
+PROCEDIMENTO OBRIGATÓRIO:
+1. Identifique cada afirmação verificável do conteúdo do escritor.
+2. Compare cada afirmação com a pesquisa pronta e com as fontes que fundamentam essa pesquisa.
+3. Classifique cada afirmação com exatamente uma destas categorias: CONCORDÂNCIA, DIVERGÊNCIA, SUPORTE PARCIAL ou EVIDÊNCIA INSUFICIENTE.
+4. Explique o motivo da classificação, distinguindo o que está explicitamente documentado de qualquer inferência.
+5. Registre a fonte, o autor e a localização que fundamentam a classificação. Use página, capítulo, seção, verbete, referência bíblica, parágrafo ou outro local verificável.
+6. Não invente fontes, autores, páginas, citações ou localizações. Quando a localização não estiver disponível, escreva "localização não confirmada".
+7. Se a pesquisa pronta não sustentar uma afirmação, não trate isso automaticamente como refutação: classifique como EVIDÊNCIA INSUFICIENTE quando não houver base bastante para concluir.
+8. Finalize com uma síntese consolidada, principais divergências, lacunas de evidência e limitações da auditoria.
+
+FORMATO PREFERENCIAL:
+RELATÓRIO DE AUDITORIA
+
+Para cada afirmação: número, afirmação, classificação, comparação, fonte, autor, localização e justificativa.
 `;
 }
 
 
-function formatComparativeItem(item, index) {
+function formatAuditItem(item, index) {
   const statement = item?.statement || item?.claim || item?.afirmacao || item?.text || "Afirmação não identificada";
   const classification = item?.classification || item?.classificacao || item?.status || "EVIDÊNCIA INSUFICIENTE";
-  const work = item?.work || item?.obra || item?.source || "Obra não informada";
+  const comparison = item?.comparison || item?.comparacao || item?.analysis || item?.analise || "Comparação não informada.";
+  const source = item?.source || item?.fonte || item?.work || item?.obra || "Fonte não informada";
   const author = item?.author || item?.autor || "Autor não informado";
   const location = item?.location || item?.localizacao || item?.reference || "localização não confirmada";
-  const basis = item?.basis || item?.fundamentacao || item?.evidence || item?.justification || "Fundamentação não informada.";
+  const basis = item?.basis || item?.fundamentacao || item?.justification || item?.justificativa || "Justificativa não informada.";
 
-  return `${index + 1}. AFIRMAÇÃO\n${statement}\n\nCLASSIFICAÇÃO: ${classification}\nOBRA: ${work}\nAUTOR: ${author}\nLOCALIZAÇÃO: ${location}\nFUNDAMENTAÇÃO: ${basis}`;
+  return `${index + 1}. AFIRMAÇÃO\n${statement}\n\nCLASSIFICAÇÃO: ${classification}\nCOMPARAÇÃO: ${comparison}\nFONTE: ${source}\nAUTOR: ${author}\nLOCALIZAÇÃO: ${location}\nJUSTIFICATIVA: ${basis}`;
 }
 
 
-function extractComparativeReport(data) {
+function extractAuditReport(data) {
   const candidates = [
     data?.claims,
     data?.afirmacoes,
     data?.items,
     data?.report?.claims,
     data?.report?.items,
-    data?.comparativeReport?.claims,
-    data?.comparativeReport?.items
+    data?.audit?.claims,
+    data?.audit?.items
   ];
 
   const items = candidates.find(Array.isArray);
 
   if (items) {
-    const intro = data?.summary || data?.synthesis || data?.sintese || "RELATÓRIO DE ANÁLISE COMPARATIVA";
-    return `${intro}\n\n${items.map(formatComparativeItem).join("\n\n────────────────────────\n\n")}`;
+    const summary = data?.summary || data?.synthesis || data?.sintese || "RELATÓRIO DE AUDITORIA";
+    return `${summary}\n\n${items.map(formatAuditItem).join("\n\n────────────────────────\n\n")}`;
   }
 
   if (typeof data?.report === "string") {
     return data.report;
   }
 
-  if (typeof data?.comparativeReport === "string") {
-    return data.comparativeReport;
+  if (typeof data?.auditReport === "string") {
+    return data.auditReport;
   }
 
-  return data?.text || data?.answer || data?.response || data?.result || "A análise não devolveu conteúdo.";
+  return data?.text || data?.answer || data?.response || data?.result || "A comparação não devolveu conteúdo.";
 }
 
 
-async function runComparativeAnalysis() {
+async function runComparisonConsolidation() {
   if (!activeStep) {
-    appendSystemMessage("Selecione uma subetapa antes de iniciar a análise comparativa.");
+    comparisonReport.textContent = "Selecione uma subetapa antes de iniciar a comparação e consolidação.";
+    persistComparisonReport();
     return;
   }
 
-  const sourceText = document.getElementById("notes").value.trim();
-  const referenceBook = comparativeReferenceInput.value.trim();
+  const researchReady = researchReadyInput.value.trim();
+  const writerContent = writerContentInput.value.trim();
 
-  if (!sourceText) {
-    appendSystemMessage("Cole o conteúdo gerado na área de texto da Folha de trabalho antes de analisar.");
-    document.getElementById("notes").focus();
+  if (!researchReady || !writerContent) {
+    comparisonReport.textContent = "Preencha os dois campos: PESQUISA PRONTA e CONTEÚDO DO ESCRITOR.";
+    comparisonReport.classList.remove("pending");
+    persistComparisonReport();
     return;
   }
 
-  persistComparativeReference();
+  persistResearchReady();
+  persistWriterContent();
 
-  const reportMessage = document.createElement("div");
-  reportMessage.className = "message system comparative-report pending";
-  reportMessage.textContent = "ANÁLISE COMPARATIVA\n\nIdentificando afirmações e consultando as fontes relevantes...";
-  messages.appendChild(reportMessage);
-  messages.scrollTop = messages.scrollHeight;
-  persistMessages();
+  comparisonReport.classList.add("pending");
+  comparisonReport.textContent = "COMPARAÇÃO E CONSOLIDAÇÃO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
+  persistComparisonReport();
 
-  comparativeButton.disabled = true;
-  comparativeButton.textContent = "ANALISANDO...";
+  compareButton.disabled = true;
+  compareButton.textContent = "COMPARANDO...";
 
   try {
     const session = await getAuthenticatedSession();
@@ -1997,10 +1998,10 @@ async function runComparativeAnalysis() {
         body: JSON.stringify({
           mode: "writing_private",
           accessLevel: "private",
-          analysisType: "comparative",
-          sourceText,
-          referenceBook,
-          question: comparativePrompt(sourceText, referenceBook),
+          analysisType: "comparison_consolidation",
+          researchReady,
+          writerContent,
+          question: comparisonPrompt(researchReady, writerContent),
           topic: activeStep,
           module: activeModule,
           discipline: "MATRIZ TÉCNICA DE PESQUISA PRO"
@@ -2021,20 +2022,19 @@ async function runComparativeAnalysis() {
     }
 
     if (!response.ok) {
-      throw new Error(data?.error || "O Worker não conseguiu concluir a análise comparativa.");
+      throw new Error(data?.error || "O Worker não conseguiu concluir a comparação e consolidação.");
     }
 
-    reportMessage.classList.remove("pending");
-    reportMessage.textContent = extractComparativeReport(data);
+    comparisonReport.classList.remove("pending");
+    comparisonReport.textContent = extractAuditReport(data);
   } catch (error) {
-    console.error("Erro na análise comparativa:", error);
-    reportMessage.classList.remove("pending");
-    reportMessage.textContent = "ANÁLISE COMPARATIVA\n\n" + (error?.message || "Não foi possível realizar a análise.");
+    console.error("Erro na comparação e consolidação:", error);
+    comparisonReport.classList.remove("pending");
+    comparisonReport.textContent = "COMPARAÇÃO E CONSOLIDAÇÃO\n\n" + (error?.message || "Não foi possível realizar a auditoria.");
   } finally {
-    comparativeButton.disabled = false;
-    comparativeButton.textContent = "ANÁLISE COMPARATIVA";
-    messages.scrollTop = messages.scrollHeight;
-    persistMessages();
+    compareButton.disabled = false;
+    compareButton.textContent = "COMPARAR E CONSOLIDAR";
+    persistComparisonReport();
   }
 }
  
