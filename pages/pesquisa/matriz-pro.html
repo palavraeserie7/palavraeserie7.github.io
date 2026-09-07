@@ -2169,7 +2169,7 @@ async function runComparisonConsolidation() {
     comparisonReport.classList.remove("pending");
     comparisonReport.classList.add("comparison-error");
     comparisonReport.dataset.errorCode = isQuotaError ? "AI_QUOTA_EXCEEDED" : (error?.code || "AI_PROVIDER_ERROR");
-    comparisonReport.textContent = "RELATÓRIO DE AUDITORIA\n\n" + (isQuotaError ? "O serviço de análise atingiu o limite de uso disponível. Tente novamente mais tarde." : (error?.message || "Não foi possível gerar o relatório de auditoria."));
+    comparisonReport.textContent = "RELATÓRIO DE AUDITORIA\n\n" + (isQuotaError ? "A API Gemini atingiu o limite de requisições ou créditos. Verifique a chave, a quota e o faturamento do projeto Google." : (error?.message || "Não foi possível gerar o relatório de auditoria."));
     localStorage.removeItem(comparisonKey("relatorio"));
   } finally {
     compareButton.disabled = false;
