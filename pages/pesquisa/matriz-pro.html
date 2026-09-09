@@ -862,7 +862,7 @@ main {
             class="change-reference"
             onclick="resetReference()"
           >
-            Trocar passagem/tema
+            Trocar objeto de pesquisa
           </button>
         </div>
 
@@ -1315,19 +1315,52 @@ const PRO_MODULE_DATA = [
 /* =====================================================
    OBJETIVOS DAS SUBETAPAS
    Usado apenas para sugerir/pré-preencher automaticamente
-   a pergunta enviada ao Worker, combinando o texto abaixo
-   com a passagem/tema informado pelo usuário. Não substitui
+   a pergunta enviada ao Worker, combinando o comando técnico
+   da subetapa com o objeto informado pelo usuário. Não substitui
    os labels do menu (PRO_MODULE_DATA) nem a metodologia real
    aplicada pelo Worker (CANONICAL_REFERENCE_MATRIX por módulo).
 ===================================================== */
 
+const M01_INPUT_CONFIG = {
+  "01.1": {
+    label: "LIVRO",
+    prompt: "Qual livro bíblico será objeto da pesquisa?",
+    fields: ["OBJETO"]
+  },
+  "01.2": {
+    label: "CAPÍTULO",
+    prompt: "Qual capítulo e de qual livro será objeto da pesquisa?",
+    fields: ["OBJETO", "LIVRO"]
+  },
+  "01.3": {
+    label: "PERÍCOPE",
+    prompt: "Qual perícope será objeto da pesquisa? Informe a referência bíblica.",
+    fields: ["OBJETO"]
+  },
+  "01.4": {
+    label: "VERSÍCULO",
+    prompt: "Qual versículo será objeto da pesquisa? Informe a referência bíblica.",
+    fields: ["OBJETO"]
+  },
+  "01.5": {
+    label: "UNIDADE DE SENTIDO",
+    prompt: "Qual trecho ou frase constitui a unidade de sentido que será pesquisada?",
+    fields: ["OBJETO"]
+  },
+  "01.6": {
+    label: "PALAVRA",
+    prompt: "Qual palavra ou termo será pesquisado? Informe também a referência do versículo em que ele ocorre.",
+    fields: ["PALAVRA", "REFERENCIA"]
+  }
+};
+
 const objetivosDasSubetapas = {
-  "01.1": "Identifique o livro bíblico correspondente a {PASSAGEM}.",
-  "01.2": "Identifique o capítulo bíblico correspondente a {PASSAGEM} e situe-o dentro do livro.",
-  "01.3": "Delimite preliminarmente a perícope correspondente a {PASSAGEM}, indicando seus limites e os critérios utilizados.",
-  "01.4": "Identifique a função do versículo de {PASSAGEM} dentro da unidade literária e do contexto imediato.",
-  "01.5": "Determine a unidade de sentido de {PASSAGEM}, indicando onde começa, onde termina e qual é sua função no contexto.",
-  "01.6": "Identifique preliminarmente as palavras relevantes de {PASSAGEM} que merecem atenção nas etapas posteriores, sem realizar ainda a análise lexical completa.",
+  "01.1": "Realize a análise exegética macro do Livro de {OBJETO}. Identifique e descreva de forma direta: autor autêntico, data provável de composição, público-alvo original, contexto histórico-político, gênero literário predominante e o propósito teológico central da obra. Entregue o resultado em tópicos concisos.",
+  "01.2": "Analise o Capítulo {OBJETO} do Livro de {LIVRO}. Demonstre como este capítulo se conecta logicamente com as seções anterior e posterior. Divida o capítulo em suas macroestruturas de transição narrativa ou argumentativa e aponte o tema central deste bloco.",
+  "01.3": "Faça a exegese da perícope de {OBJETO}. Delimite os versículos justificando os critérios de início e fim do texto. Analise o cenário, o fluxo de ações dos personagens, os recursos retóricos utilizados e determine a mensagem teológica central que este trecho transmite isoladamente.",
+  "01.4": "Execute a exegese detalhada do Versículo {OBJETO}. Analise a estrutura sintática da frase, a pontuação textual e a relação de dependência com os versículos vizinhos. Explique o peso e a função específica desta frase dentro do argumento da perícope atual.",
+  "01.5": "Isole e analise a Unidade de Sentido presente no trecho {OBJETO}. Ignore as divisões formais de versículos e foque no bloco lógico de pensamento (seja uma metáfora, ordem ou causa e efeito). Explique a lógica interna dessa expressão e o impacto teológico do pensamento completo do autor.",
+  "01.6": "Faça o estudo lexical e etimológico da palavra '{PALAVRA}' no versículo {REFERENCIA}. Identifique o termo correspondente no idioma original (Grego/Hebraico/Aramaico), sua raiz morfológica, os diferentes significados da época e a nuance semântica precisa adotada pelo autor neste contexto específico.",
   "01.7": "Apresente o texto hebraico de {PASSAGEM}, preservando a forma textual e a vocalização disponível, com tradução literal.",
   "01.8": "Apresente o texto grego relevante de {PASSAGEM}, identificando a tradição textual grega correspondente e apresentando tradução.",
   "01.9": "Apresente o texto da Septuaginta (LXX) para {PASSAGEM} e compare-o de forma controlada com o texto hebraico.",
@@ -2205,7 +2238,7 @@ function resetReference() {
   clearConversation();
 
   appendSystemMessage(
-    "Ok, nova passagem ou tema. Digite abaixo e clique em ENVIAR."
+    "Ok, novo objeto de pesquisa. Digite abaixo e clique em ENVIAR."
   );
 
   prepareQuestionForStep(true);
@@ -2214,8 +2247,7 @@ function resetReference() {
 
 function prepareQuestionForStep(skipIntroMessage) {
 
-  awaitingReference =
-    false;
+  awaitingReference = false;
 
   if (!activeStep) {
     questionInput.value = "";
@@ -2232,42 +2264,43 @@ function prepareQuestionForStep(skipIntroMessage) {
     return;
   }
 
-  const reference =
-    getSavedReference();
+  const code = extractStepCode(activeStep);
+  const config = M01_INPUT_CONFIG[code];
+  const reference = getSavedReference();
+  const template = objetivosDasSubetapas[code];
 
-  if (reference) {
+  questionInput.placeholder = config
+    ? config.prompt
+    : "Escreva sua pergunta...";
 
-    const code =
-      extractStepCode(activeStep);
+  if (config && !reference) {
+    questionInput.value = "";
+    awaitingReference = true;
 
-    const template =
-      objetivosDasSubetapas[code];
+    if (!skipIntroMessage) {
+      appendSystemMessage(
+        config.prompt
+      );
+    }
+    return;
+  }
 
-    questionInput.placeholder =
-      "Escreva sua pergunta...";
-
-    questionInput.value =
-      template
-        ? template.replace(/\{PASSAGEM\}/g, reference)
-        : `Analise "${activeStep}" para: ${reference}`;
-
+  if (template && reference) {
+    questionInput.value = template
+      .replace(/\{PASSAGEM\}/g, reference)
+      .replace(/\{OBJETO\}/g, reference)
+      .replace(/\{LIVRO\}/g, reference)
+      .replace(/\{PALAVRA\}/g, reference)
+      .replace(/\{REFERENCIA\}/g, reference);
     return;
   }
 
   questionInput.value = "";
 
-  questionInput.placeholder =
-    "Digite a passagem bíblica ou o tema de estudo...";
-
-  awaitingReference =
-    true;
-
   if (!skipIntroMessage) {
-
     appendSystemMessage(
-      "Para continuar com \"" +
-      activeStep +
-      "\", digite a passagem bíblica ou o tema de estudo e clique em ENVIAR."
+      "A subetapa \"" + activeStep + "\" está pronta. " +
+      "Informe o dado necessário ou escreva sua pergunta."
     );
   }
 }
@@ -2536,7 +2569,12 @@ async function sendQuestion(event) {
 
     questionForApi =
       template
-        ? template.replace(/\{PASSAGEM\}/g, text)
+        ? template
+            .replace(/\{PASSAGEM\}/g, text)
+            .replace(/\{OBJETO\}/g, text)
+            .replace(/\{LIVRO\}/g, text)
+            .replace(/\{PALAVRA\}/g, text)
+            .replace(/\{REFERENCIA\}/g, text)
         : `Analise "${activeStep}" para: ${text}`;
 
     awaitingReference =
