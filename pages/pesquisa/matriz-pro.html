@@ -866,11 +866,7 @@ main {
           </button>
         </div>
 
-        <div id="messages" class="messages">
-          <div class="message system">
-            A Matriz está pronta. Faça uma pergunta livre sobre a subetapa selecionada.
-          </div>
-        </div>
+        <div id="messages" class="messages"></div>
 
         <form
           class="form"
@@ -2128,12 +2124,7 @@ function persistMessages() {
 function loadMessages() {
 
   if (!activeStep) {
-
-    messages.innerHTML =
-      '<div class="message system">' +
-      'A Matriz está pronta. Faça uma pergunta livre sobre a subetapa selecionada.' +
-      '</div>';
-
+    messages.innerHTML = "";
     return false;
   }
 
@@ -2148,11 +2139,7 @@ function loadMessages() {
     return true;
   }
 
-  messages.innerHTML =
-    '<div class="message system">' +
-    'Subetapa selecionada. Faça sua pergunta.' +
-    '</div>';
-
+  messages.innerHTML = "";
   return false;
 }
 
@@ -2195,17 +2182,14 @@ function saveReference(value) {
 function clearConversation() {
 
   if (!activeStep) {
-    messages.innerHTML =
-      '<div class="message system">A Matriz está pronta. Faça uma pergunta livre sobre a subetapa selecionada.</div>';
+    messages.innerHTML = "";
     return;
   }
 
   localStorage.removeItem(messagesKey());
-
-  messages.innerHTML =
-    '<div class="message system">Pesquisa limpa. Faça uma nova pergunta sobre a subetapa selecionada.</div>';
-
+  messages.innerHTML = "";
   messages.scrollTop = messages.scrollHeight;
+  prepareQuestionForStep(true);
 }
 
 
@@ -2236,11 +2220,6 @@ function resetReference() {
   );
 
   clearConversation();
-
-  appendSystemMessage(
-    "Ok, novo objeto de pesquisa. Digite abaixo e clique em ENVIAR."
-  );
-
   prepareQuestionForStep(true);
 }
 
