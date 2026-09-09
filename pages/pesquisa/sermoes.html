@@ -224,6 +224,17 @@ const EXEGESIS_STAGES=[
 ];
 let exegesisStage='01.1';
 let exegesisMessages=[];
+const EXEGESIS_PROGRESSIVE_GUIDANCE=`MÓDULO 01 — TEXTO BÍBLICO | SISTEMA DE ANÁLISE EXEGÉTICA INTERNA
+Esta consulta pertence exclusivamente ao fluxo progressivo do sermoes.html:
+LIVRO → CAPÍTULO → PERÍCOPE → VERSÍCULO → UNIDADE DE SENTIDO → PALAVRA.
+Trate o módulo como uma única investigação contínua, não como seis consultas independentes.
+Preserve o contexto acumulado enviado pelo frontend e interprete cada unidade menor à luz das unidades maiores.
+Respeite a sequência TEXTO → CONTEXTO → ESTRUTURA → SENTIDO → TEOLOGIA TEXTUAL.
+Distinga sempre OBSERVAÇÃO, INFERÊNCIA, INTERPRETAÇÃO e HIPÓTESE ACADÊMICA; não apresente hipótese como fato.
+Execute somente a etapa solicitada, sem antecipar outro módulo.
+Finalize obrigatoriamente com a seção PRÓXIMA INVESTIGAÇÃO, indicando a entrada objetiva da etapa seguinte e, quando possível, opções estruturadas.
+Não peça ao usuário para repetir livro, capítulo, perícope, referência ou contexto já presentes no histórico.
+Esta orientação é exclusiva do cliente sermoes_exegese e não deve alterar a Matriz PRO.`;
 function exegesisMenu(){return `<section class="exegesis-menu"><div class="exegesis-menu-head"><div><p class="exegesis-menu-kicker">MÓDULO 01 · INVESTIGAÇÃO PROGRESSIVA</p><h2>Texto Bíblico</h2></div><span class="exegesis-context">CONTEXTO ACUMULADO</span></div><div class="exegesis-flow">${EXEGESIS_STAGES.map((s,i)=>`<button class="exegesis-stage ${exegesisStage===s.id?'active':''}" type="button" onclick="openExegesisChat('${s.id}')"><small>${s.id}</small><strong>${s.label}</strong><span>${s.desc}</span><em>◌ ABRIR CHAT</em></button>${i<EXEGESIS_STAGES.length-1?'<span class="exegesis-arrow">›</span>':''}`).join('')}</div><div class="exegesis-note">Comece pelo livro. Cada etapa abre a próxima sem perder o contexto da investigação.</div></section>`}
 function currentExegesis(){return EXEGESIS_STAGES.find(s=>s.id===exegesisStage)||EXEGESIS_STAGES[0]}
 function openExegesisChat(id){exegesisStage=id;const s=currentExegesis();if(!exegesisMessages.some(m=>m.stage===id)){exegesisMessages.push({stage:id,role:'assistant',text:`${s.id} — ${s.label}: ${s.prompt}`})}document.getElementById('exegesisChatTitle').textContent=`${s.id} — ${s.label}`;document.getElementById('exegesisChatGuide').textContent=s.prompt;document.getElementById('exegesisChatMessages').innerHTML=exegesisMessages.filter(m=>m.stage===s.id).map(m=>`<div class="exegesis-msg ${m.role}"><div class="exegesis-msg-bubble">${esc(m.text)}</div></div>`).join('');document.getElementById('exegesisSuggestion').textContent='＋ '+s.suggestion;document.getElementById('exegesisChat').hidden=false;document.getElementById('exegesisChatBackdrop').hidden=false;renderExegesisMenu()}
@@ -250,7 +261,7 @@ async function sendExegesisMessage(e){
     stage:s.id,
     question:value,
     exegesisContext:window.sermonExegesisContext||'',
-    studyContext:window.sermonExegesisContext||'',
+    studyContext:[EXEGESIS_PROGRESSIVE_GUIDANCE,window.sermonExegesisContext||''].filter(Boolean).join('\n\n'),
     previousResults:window.sermonExegesisResults||''
   };
   try{
