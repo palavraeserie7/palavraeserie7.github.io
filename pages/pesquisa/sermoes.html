@@ -227,7 +227,9 @@ let exegesisStage='01.1';
 let exegesisMessages=[];
 let exegesisCompleted=-1;
 let exegesisKnowledge={};
+let exegesisInputs={};
 try{exegesisKnowledge=JSON.parse(localStorage.getItem('sermonExegesisKnowledgeV1')||'{}');for(let i=0;i<EXEGESIS_STAGES.length&&exegesisKnowledge[EXEGESIS_STAGES[i].id];i++)exegesisCompleted=i;}catch(_){exegesisKnowledge={};}
+try{exegesisInputs=JSON.parse(localStorage.getItem('sermonExegesisInputsV1')||'{}');}catch(_){exegesisInputs={};}
 const EXEGESIS_PROGRESSIVE_GUIDANCE=`MÓDULO 01 — TEXTO BÍBLICO | SISTEMA DE ANÁLISE EXEGÉTICA INTERNA
 Esta consulta pertence exclusivamente ao fluxo progressivo do sermoes.html:
 LIVRO → HISTÓRIAS → CAPÍTULO → PERÍCOPE → VERSÍCULO → UNIDADE DE SENTIDO → PALAVRA.
@@ -241,14 +243,14 @@ Não peça ao usuário para repetir livro, capítulo, perícope, referência ou 
 Esta orientação é exclusiva do cliente sermoes_exegese e não deve alterar a Matriz PRO.`;
 const EXEGESIS_STAGE_CONTRACT={
   '01.1':'Estabeleça o MAPA DO LIVRO: autoria e segurança, data, público, contexto, gênero, macroestrutura, movimentos, temas e propósito. Termine com a lista de HISTÓRIAS, episódios e unidades narrativas contidos no livro, com referências, para o usuário escolher uma antes da classificação dos capítulos.',
-  '01.1H':'Use o MAPA DO LIVRO recebido. Para qualquer livro bíblico, liste e organize suas unidades internas relevantes: HISTÓRIAS e episódios quando existirem, ou discursos, poemas, genealogias, leis, visões, oráculos, listas e diálogos quando forem a forma própria do livro. Não force a categoria história onde ela não se aplica. Não escolha pelo usuário: apresente opções numeradas para seleção. A unidade escolhida será a entrada da etapa Capítulo.',
-  '01.2':'Use o MAPA DO LIVRO e a HISTÓRIA ESCOLHIDA recebidos. Classifique os capítulos que contêm ou desenvolvem essa história, estabeleça sua posição e seus blocos literários. Termine com PERÍCOPES CANDIDATAS, sempre tratadas como propostas a testar.',
+  '01.1H':'Use a lista de histórias ou unidades literárias já gerada em 01.1. Esta é uma etapa de SELEÇÃO, não uma nova análise: não repita nem reescreva toda a lista. Se o usuário ainda não indicou uma opção, mostre apenas as opções já disponíveis e peça que escolha uma. Quando houver escolha, registre o título e a referência exata como UNIDADE ESCOLHIDA e encaminhe para Capítulo.',
+  '01.2':'Use diretamente a UNIDADE ESCOLHIDA, seu título e sua referência, recebidos de 01.1H. Não peça a história novamente e não trate a unidade como se fosse necessariamente um capítulo inteiro. Identifique em quais capítulos ela aparece, qual intervalo ou parte do capítulo contém a unidade e como ela se relaciona com os blocos vizinhos. Depois classifique os capítulos relevantes e termine com PERÍCOPES CANDIDATAS, sempre tratadas como propostas a testar.',
   '01.3':'Use o livro, capítulo e perícope candidata recebidos. Teste a delimitação e estabeleça a PERÍCOPE DE TRABALHO, confirmando, ampliando, reduzindo ou substituindo a candidata. Termine com VERSÍCULOS E UNIDADES DE SENTIDO candidatos.',
   '01.4':'Use a perícope de trabalho recebida. Explique a função do versículo dentro dela, sem isolá-lo. Termine identificando a UNIDADE DE SENTIDO que contém o versículo.',
   '01.5':'Use livro, capítulo, perícope e versículo recebidos. Reconstrua o pensamento completo da UNIDADE DE SENTIDO, incluindo relações entre proposições. Termine com ELEMENTOS/TERMOS que merecem estudo lexical.',
   '01.6':'Use a unidade de sentido recebida. Analise a PALAVRA dentro da frase, da unidade, da perícope e do livro. Retorne o resultado ao contexto da unidade e finalize com implicações textuais para a pregação, sem criar doutrina fora do texto.'
 };
-function buildExegesisKnowledge(){return EXEGESIS_STAGES.filter(s=>exegesisKnowledge[s.id]).map(s=>`=== ${s.id} — ${s.label} ===\n${exegesisKnowledge[s.id]}`).join('\n\n')}
+function buildExegesisKnowledge(){return EXEGESIS_STAGES.filter(s=>exegesisKnowledge[s.id]||exegesisInputs[s.id]).map(s=>`=== ${s.id} — ${s.label} ===\n${exegesisInputs[s.id]?`ENTRADA DO USUÁRIO:\n${exegesisInputs[s.id]}\n`:''}${exegesisKnowledge[s.id]||''}`).join('\n\n')}
 function exegesisMenu(){return `<section class="exegesis-menu"><div class="exegesis-menu-head"><div><p class="exegesis-menu-kicker">MÓDULO 01 · INVESTIGAÇÃO PROGRESSIVA</p><h2>Texto Bíblico</h2></div><span class="exegesis-context">CONTEXTO ACUMULADO</span></div><div class="exegesis-flow">${EXEGESIS_STAGES.map((s,i)=>{const unlocked=i<=exegesisCompleted+1;const done=i<=exegesisCompleted;return `<button class="exegesis-stage ${exegesisStage===s.id?'active ':''}${done?'done ':''}${!unlocked?'locked':''}" type="button" ${unlocked?`onclick="openExegesisChat('${s.id}')"`:'disabled'}><small>${s.id}</small><strong>${s.label}</strong><span>${s.desc}</span><em>${done?'✓ CONCLUÍDO':unlocked?'◌ ABRIR CHAT':'🔒 AGUARDANDO ETAPA ANTERIOR'}</em></button>${i<EXEGESIS_STAGES.length-1?'<span class="exegesis-arrow">›</span>':''}`}).join('')}</div><div class="exegesis-note">Conclua cada etapa para liberar a próxima. O contexto acumulado acompanha toda a investigação.</div></section>`}
 function currentExegesis(){return EXEGESIS_STAGES.find(s=>s.id===exegesisStage)||EXEGESIS_STAGES[0]}
 function renderExegesisKnowledge(){const el=document.getElementById('exegesisKnowledge');if(el)el.innerHTML=buildExegesisKnowledge()?`<details><summary>CONHECIMENTO ACUMULADO · ${Object.keys(exegesisKnowledge).length} ETAPA(S)</summary><pre>${esc(buildExegesisKnowledge())}</pre></details>`:''}
@@ -260,6 +262,8 @@ async function sendExegesisMessage(e){
   const box=document.getElementById('exegesisChatInput'),value=box.value.trim();
   if(!value)return;
   const s=currentExegesis();
+  exegesisInputs[s.id]=value;
+  localStorage.setItem('sermonExegesisInputsV1',JSON.stringify(exegesisInputs));
   exegesisMessages.push({stage:s.id,role:'user',text:value});
   box.value='';
   document.getElementById('exegesisChatGuide').textContent='Consultando o worker e preservando o contexto acumulado...';
