@@ -216,6 +216,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInsight();clos
 
 const EXEGESIS_STAGES=[
   {id:'01.1',label:'Livro',desc:'Mapa macro',prompt:'Comece pelo livro bíblico que você deseja investigar.',suggestion:'Quero iniciar pelo livro de Romanos.'},
+  {id:'01.1H',label:'Histórias',desc:'Unidades narrativas',prompt:'Liste as histórias, episódios e unidades narrativas contidos no livro escolhido para que uma delas seja selecionada.',suggestion:'Quero listar e escolher as histórias contidas em Juízes.'},
   {id:'01.2',label:'Capítulo',desc:'Estrutura',prompt:'Escolha um capítulo para mapear seus movimentos e blocos literários.',suggestion:'Quero analisar Romanos 3.'},
   {id:'01.3',label:'Perícope',desc:'Delimitação',prompt:'Teste uma unidade candidata e descubra onde a perícope começa e termina.',suggestion:'Quero investigar Romanos 3:21–26.'},
   {id:'01.4',label:'Versículo',desc:'Função no contexto',prompt:'Aprofunde a função de um versículo sem separá-lo da unidade literária.',suggestion:'Quero entender Romanos 3:24.'},
@@ -226,10 +227,10 @@ let exegesisStage='01.1';
 let exegesisMessages=[];
 let exegesisCompleted=-1;
 let exegesisKnowledge={};
-try{exegesisKnowledge=JSON.parse(localStorage.getItem('sermonExegesisKnowledgeV1')||'{}');exegesisCompleted=Math.max(-1,...EXEGESIS_STAGES.map((s,i)=>exegesisKnowledge[s.id]?i:-1));}catch(_){exegesisKnowledge={};}
+try{exegesisKnowledge=JSON.parse(localStorage.getItem('sermonExegesisKnowledgeV1')||'{}');for(let i=0;i<EXEGESIS_STAGES.length&&exegesisKnowledge[EXEGESIS_STAGES[i].id];i++)exegesisCompleted=i;}catch(_){exegesisKnowledge={};}
 const EXEGESIS_PROGRESSIVE_GUIDANCE=`MÓDULO 01 — TEXTO BÍBLICO | SISTEMA DE ANÁLISE EXEGÉTICA INTERNA
 Esta consulta pertence exclusivamente ao fluxo progressivo do sermoes.html:
-LIVRO → CAPÍTULO → PERÍCOPE → VERSÍCULO → UNIDADE DE SENTIDO → PALAVRA.
+LIVRO → HISTÓRIAS → CAPÍTULO → PERÍCOPE → VERSÍCULO → UNIDADE DE SENTIDO → PALAVRA.
 Trate o módulo como uma única investigação contínua, não como seis consultas independentes.
 Preserve o contexto acumulado enviado pelo frontend e interprete cada unidade menor à luz das unidades maiores.
 Respeite a sequência TEXTO → CONTEXTO → ESTRUTURA → SENTIDO → TEOLOGIA TEXTUAL.
@@ -239,8 +240,9 @@ Finalize obrigatoriamente com a seção PRÓXIMA INVESTIGAÇÃO, indicando a ent
 Não peça ao usuário para repetir livro, capítulo, perícope, referência ou contexto já presentes no histórico.
 Esta orientação é exclusiva do cliente sermoes_exegese e não deve alterar a Matriz PRO.`;
 const EXEGESIS_STAGE_CONTRACT={
-  '01.1':'Estabeleça o MAPA DO LIVRO: autoria e segurança, data, público, contexto, gênero, macroestrutura, movimentos, temas e propósito. Termine com CAPÍTULOS CANDIDATOS para investigação.',
-  '01.2':'Use o MAPA DO LIVRO recebido. Estabeleça a posição do capítulo, seus blocos literários e conexões. Termine com PERÍCOPES CANDIDATAS, sempre tratadas como propostas a testar.',
+  '01.1':'Estabeleça o MAPA DO LIVRO: autoria e segurança, data, público, contexto, gênero, macroestrutura, movimentos, temas e propósito. Termine com a lista de HISTÓRIAS, episódios e unidades narrativas contidos no livro, com referências, para o usuário escolher uma antes da classificação dos capítulos.',
+  '01.1H':'Use o MAPA DO LIVRO recebido. Liste e organize todas as HISTÓRIAS, episódios e unidades narrativas contidos no livro, com referências e descrição objetiva. Não escolha pelo usuário: apresente opções numeradas para seleção. A história escolhida será a entrada da etapa Capítulo.',
+  '01.2':'Use o MAPA DO LIVRO e a HISTÓRIA ESCOLHIDA recebidos. Classifique os capítulos que contêm ou desenvolvem essa história, estabeleça sua posição e seus blocos literários. Termine com PERÍCOPES CANDIDATAS, sempre tratadas como propostas a testar.',
   '01.3':'Use o livro, capítulo e perícope candidata recebidos. Teste a delimitação e estabeleça a PERÍCOPE DE TRABALHO, confirmando, ampliando, reduzindo ou substituindo a candidata. Termine com VERSÍCULOS E UNIDADES DE SENTIDO candidatos.',
   '01.4':'Use a perícope de trabalho recebida. Explique a função do versículo dentro dela, sem isolá-lo. Termine identificando a UNIDADE DE SENTIDO que contém o versículo.',
   '01.5':'Use livro, capítulo, perícope e versículo recebidos. Reconstrua o pensamento completo da UNIDADE DE SENTIDO, incluindo relações entre proposições. Termine com ELEMENTOS/TERMOS que merecem estudo lexical.',
@@ -307,7 +309,7 @@ render();
 <div id="exegesisChatBackdrop" class="exegesis-chat-backdrop" hidden onclick="closeExegesisChat()"></div>
 <aside id="exegesisChat" class="exegesis-chat" hidden aria-label="Chat de investigação exegética">
   <header class="exegesis-chat-head"><div><div class="exegesis-chat-overline">ASSISTENTE DE EXEGESE</div><h2 id="exegesisChatTitle">01.1 — Livro</h2></div><button class="exegesis-chat-close" type="button" onclick="closeExegesisChat()">×</button></header>
-  <div class="exegesis-chat-context">Livro → Capítulo → Perícope → Versículo → Unidade de Sentido → Palavra</div>
+  <div class="exegesis-chat-context">Livro → Histórias → Capítulo → Perícope → Versículo → Unidade de Sentido → Palavra</div>
   <div class="exegesis-chat-body"><div id="exegesisChatGuide" class="exegesis-chat-guide"></div><div id="exegesisChatMessages" class="exegesis-chat-messages"></div></div>
   <div id="exegesisKnowledge" class="exegesis-knowledge"></div>
   <div id="exegesisNextStep" class="exegesis-next-step"></div>
