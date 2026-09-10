@@ -1,6 +1,3 @@
-
-
-Oraculo · HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -895,6 +892,39 @@ Oraculo · HTML
       }
     }
 
+
+    /* =========================================================
+       SISTEMA DE REVISÃO TEOLÓGICA — ÍNDICE EXPANSÍVEL
+       ========================================================= */
+    .side-theology-group { display:flex; flex-direction:column; gap:3px; }
+    .side-theology-toggle { width:100%; appearance:none; -webkit-appearance:none; cursor:pointer; font-family:inherit; text-align:left; }
+    .side-theology-toggle.active { background:rgba(32,214,107,.12); border-color:#20d66b; color:#20d66b; }
+    .side-theology-chevron { margin-left:auto; color:#20d66b; font-size:10px; transition:transform .18s ease; }
+    .side-theology-toggle[aria-expanded="false"] .side-theology-chevron { transform:rotate(-90deg); }
+    .side-theology-index { display:block; margin:0 0 3px 5px; padding:7px 5px 8px; border-left:1px solid #263754; max-height:52vh; overflow-y:auto; background:#0e172b; border-radius:0 5px 5px 0; }
+    .side-theology-index[aria-hidden="true"] { display:none; }
+    .side-theology-index-title { padding:4px 6px 7px; color:#9c7a32; font-size:7.5px; font-weight:900; letter-spacing:.07em; text-transform:uppercase; border-bottom:1px solid #263754; }
+    .theology-index-list { display:flex; flex-direction:column; }
+    .theology-index-item { border-bottom:1px solid #263754; }
+    .theology-index-button { display:flex; align-items:center; gap:5px; width:100%; min-height:29px; padding:5px 4px; border:0; background:transparent; color:#dbe7f5; text-align:left; font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; font-size:8px; font-weight:700; line-height:1.25; cursor:pointer; }
+    .theology-index-button:hover, .theology-index-button.active { background:#16233c; }
+    .theology-index-number { flex:0 0 auto; min-width:20px; padding:2px 3px; border:1px solid #9c7a32; border-radius:3px; color:#d7b76a; font-size:7px; font-weight:800; text-align:center; }
+    .theology-index-name { flex:1; }
+    .theology-index-tier { color:#7c8fac; font-size:6.5px; font-weight:800; }
+    .theology-index-chevron { flex:0 0 9px; color:#9c7a32; font-size:10px; text-align:right; transition:transform .18s ease; }
+    .theology-index-button.active .theology-index-chevron { transform:rotate(90deg); }
+    .theology-index-children { display:none; padding:2px 3px 7px 29px; }
+    .theology-index-children.active { display:block; }
+    .theology-index-child { display:flex; align-items:flex-start; gap:4px; width:100%; padding:5px 0; border:0; border-bottom:1px solid #263754; background:transparent; color:#91a4bd; text-align:left; font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; font-size:7.5px; line-height:1.35; cursor:pointer; }
+    .theology-index-child:last-child { border-bottom:0; }
+    .theology-index-child:hover { color:#d7b76a; }
+    .theology-index-grandchildren { display:none; padding-left:10px; }
+    .theology-index-grandchildren.active { display:block; }
+    .theology-index-grandchild { display:block; width:100%; padding:4px 0; color:#6f829f; font-size:7px; line-height:1.3; cursor:pointer; }
+    .theology-index-grandchild:hover { color:#d7b76a; }
+    .side-theology-note { margin:7px 3px 0; padding:6px; border-left:2px solid #9c7a32; background:#16233c; color:#7c8fac; font-size:7px; line-height:1.4; }
+    @media(max-width:900px){ .side-theology-group { flex:0 0 auto; } .side-theology-index { position:absolute; top:calc(100% + 3px); left:0; z-index:50; width:min(330px,88vw); max-height:60vh; margin:0; box-shadow:0 12px 28px rgba(0,0,0,.35); } }
+
 </style>
 </head>
 
@@ -934,6 +964,19 @@ Oraculo · HTML
               Selecione uma área para visualizar as subáreas. A escolha orienta a consulta,
               mas não impede o Oráculo de considerar outras áreas relevantes.
             </div>
+          </div>
+        </div>
+
+        <div class="side-theology-group">
+          <button type="button" class="side-item side-theology-toggle" id="side-theology-toggle" aria-expanded="false" aria-controls="side-theology-index">
+            <span class="side-icon">✧</span>
+            <span class="side-oracle-label">REVISÃO TEOLÓGICA</span>
+            <span class="side-theology-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="side-theology-index" id="side-theology-index" aria-hidden="true">
+            <div class="side-theology-index-title">ÍNDICE M06 — REVISÃO TEOLÓGICA</div>
+            <div class="theology-index-list" id="theology-index-list"></div>
+            <div class="side-theology-note">Abra uma seção para consultar seus recursos. Os níveis FREE, PRO, MASTER e DOCTUS indicam a profundidade mínima de cada análise.</div>
           </div>
         </div>
       </nav>
@@ -1267,6 +1310,66 @@ Oraculo · HTML
       }; const records=getTrackingRecords(); records.push(record); localStorage.setItem(TRACKING_STORAGE_KEY,JSON.stringify(records)); renderTrackingRecords(); trackingForm.reset(); if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
     });
     document.getElementById('tracking-clear').addEventListener('click',()=>{ if(confirm('Apagar os registros de publicações salvos neste navegador?')){localStorage.removeItem(TRACKING_STORAGE_KEY);renderTrackingRecords();} });
+
+    const REVISAO_TEOLOGICA = [{"id":"00","name":"Entrada","children":[{"name":"Texto do usuário","tier":"FREE"},{"name":"Referência bíblica","tier":"FREE"},{"name":"Tipo de material","tier":"FREE"},{"name":"Objetivo da análise","tier":"FREE"},{"name":"Escopo","tier":"FREE"},{"name":"Profundidade","tier":"FREE"}]},{"id":"01","name":"Identificação Textual","children":[{"name":"Livro","tier":"FREE"},{"name":"Capítulo","tier":"FREE"},{"name":"Versículo","tier":"FREE"},{"name":"Perícope","tier":"FREE"},{"name":"Testamento","tier":"FREE"},{"name":"Corpus bíblico","tier":"PRO"},{"name":"Texto-base","tier":"PRO"}]},{"id":"02","name":"Gênero Literário","children":[{"name":"Narrativa","tier":"FREE","children":[{"name":"Histórica","tier":"FREE"},{"name":"Teológica","tier":"PRO"},{"name":"Biográfica","tier":"FREE"}]},{"name":"Lei","tier":"FREE","children":[]},{"name":"Poesia","tier":"FREE","children":[{"name":"Salmo","tier":"FREE"},{"name":"Hino","tier":"PRO"},{"name":"Cântico","tier":"PRO"},{"name":"Lamento","tier":"PRO"}]},{"name":"Sabedoria","tier":"FREE","children":[{"name":"Provérbio","tier":"FREE"},{"name":"Reflexão sapiencial","tier":"PRO"}]},{"name":"Profecia","tier":"FREE","children":[{"name":"Oráculo","tier":"PRO"},{"name":"Juízo","tier":"PRO"},{"name":"Advertência","tier":"PRO"},{"name":"Promessa","tier":"FREE"},{"name":"Restauração","tier":"PRO"}]},{"name":"Evangelho","tier":"FREE","children":[{"name":"Narrativa","tier":"FREE"},{"name":"Parábola","tier":"FREE"},{"name":"Milagre","tier":"FREE"},{"name":"Discurso","tier":"PRO"}]},{"name":"Epístola","tier":"FREE","children":[{"name":"Doutrina","tier":"PRO"},{"name":"Argumentação","tier":"PRO"},{"name":"Exortação","tier":"FREE"},{"name":"Advertência","tier":"PRO"}]},{"name":"Apocalíptico","tier":"PRO","children":[{"name":"Visão","tier":"PRO"},{"name":"Símbolo","tier":"MASTER"},{"name":"Escatologia","tier":"MASTER"}]}]},{"id":"03","name":"Contexto","children":[{"name":"Contexto imediato","tier":"FREE"},{"name":"Contexto literário","tier":"FREE"},{"name":"Contexto histórico","tier":"PRO"},{"name":"Contexto cultural","tier":"PRO"},{"name":"Contexto linguístico","tier":"MASTER"},{"name":"Contexto canônico","tier":"MASTER"},{"name":"Contexto teológico","tier":"DOCTUS"}]},{"id":"04","name":"Estrutura Literária","children":[{"name":"Limites da unidade","tier":"PRO"},{"name":"Introdução","tier":"FREE"},{"name":"Desenvolvimento","tier":"FREE"},{"name":"Clímax","tier":"FREE"},{"name":"Conclusão","tier":"FREE"},{"name":"Repetição","tier":"PRO"},{"name":"Inclusio","tier":"PRO"},{"name":"Quiasmo","tier":"MASTER"},{"name":"Estrutura concêntrica","tier":"MASTER"},{"name":"Estrutura paralela","tier":"PRO"},{"name":"Progressão","tier":"PRO"},{"name":"Contraste","tier":"PRO"}]},{"id":"05","name":"Linguagem e Figuras","children":[{"name":"Metáfora","tier":"FREE"},{"name":"Símile","tier":"FREE"},{"name":"Hipérbole","tier":"FREE"},{"name":"Ironia","tier":"PRO"},{"name":"Sarcasmo","tier":"PRO"},{"name":"Metonímia","tier":"PRO"},{"name":"Sinédoque","tier":"MASTER"},{"name":"Personificação","tier":"FREE"},{"name":"Antropomorfismo","tier":"PRO"},{"name":"Antropopatismo","tier":"MASTER"},{"name":"Alegoria","tier":"PRO"},{"name":"Paradoxo","tier":"PRO"},{"name":"Antítese","tier":"PRO"},{"name":"Oxímoro","tier":"MASTER"},{"name":"Litotes","tier":"MASTER"},{"name":"Eufemismo","tier":"PRO"},{"name":"Pleonasmo","tier":"MASTER"},{"name":"Elipse","tier":"MASTER"},{"name":"Apóstrofe","tier":"MASTER"},{"name":"Pergunta retórica","tier":"FREE"},{"name":"Imprecação","tier":"MASTER"},{"name":"Zeugma","tier":"DOCTUS"},{"name":"Jogo de palavras","tier":"PRO"}]},{"id":"06","name":"Recursos Poéticos","children":[{"name":"Quiasmo","tier":"MASTER"},{"name":"Inclusio","tier":"PRO"},{"name":"Repetição","tier":"FREE"},{"name":"Refrão","tier":"FREE"},{"name":"Acróstico","tier":"PRO"},{"name":"Aliteração","tier":"MASTER"},{"name":"Assonância","tier":"MASTER"},{"name":"Ritmo","tier":"MASTER"},{"name":"Imagens poéticas","tier":"FREE"},{"name":"Contraste poético","tier":"PRO"},{"name":"Paralelismo","tier":"PRO","children":[{"name":"Sinonímico","tier":"PRO"},{"name":"Antitético","tier":"PRO"},{"name":"Sintético","tier":"MASTER"},{"name":"Climático","tier":"MASTER"}]}]},{"id":"07","name":"Recursos Narrativos","children":[{"name":"Narrador","tier":"FREE"},{"name":"Personagens","tier":"FREE"},{"name":"Diálogo","tier":"FREE"},{"name":"Monólogo","tier":"PRO"},{"name":"Discurso","tier":"PRO"},{"name":"Cena","tier":"PRO"},{"name":"Sumário","tier":"PRO"},{"name":"Descrição","tier":"FREE"},{"name":"Repetição","tier":"PRO"},{"name":"Contraste","tier":"PRO"},{"name":"Ironia narrativa","tier":"MASTER"},{"name":"Clímax","tier":"FREE"},{"name":"Suspense","tier":"PRO"},{"name":"Antecipação","tier":"MASTER"},{"name":"Retrospecção","tier":"MASTER"}]},{"id":"08","name":"Recursos Retóricos","children":[{"name":"Tese","tier":"PRO"},{"name":"Premissa","tier":"PRO"},{"name":"Argumento","tier":"PRO"},{"name":"Inferência","tier":"MASTER"},{"name":"Conclusão","tier":"PRO"},{"name":"Contraste","tier":"PRO"},{"name":"Antítese","tier":"PRO"},{"name":"Pergunta → Resposta","tier":"PRO"},{"name":"Objeção → Resposta","tier":"MASTER"},{"name":"Objeção → Refutação","tier":"MASTER"},{"name":"Causa → Efeito","tier":"PRO"},{"name":"Condição → Consequência","tier":"PRO"},{"name":"Argumento a fortiori","tier":"DOCTUS"},{"name":"Exortação","tier":"FREE"},{"name":"Advertência","tier":"FREE"},{"name":"Mandamento","tier":"FREE"},{"name":"Promessa","tier":"FREE"},{"name":"Proibição","tier":"FREE"},{"name":"Aplicação","tier":"FREE"}]},{"id":"09","name":"Profecia e Simbolismo","children":[{"name":"Oráculo","tier":"PRO"},{"name":"Visão","tier":"PRO"},{"name":"Símbolo","tier":"MASTER"},{"name":"Imagem simbólica","tier":"MASTER"},{"name":"Ato simbólico","tier":"MASTER"},{"name":"Linguagem apocalíptica","tier":"MASTER"},{"name":"Linguagem escatológica","tier":"MASTER"},{"name":"Alegoria","tier":"PRO"},{"name":"Tipologia","tier":"MASTER"},{"name":"Correspondência tipológica","tier":"DOCTUS"},{"name":"Promessa","tier":"FREE"},{"name":"Cumprimento","tier":"PRO"},{"name":"Possível cumprimento","tier":"DOCTUS"}]},{"id":"10","name":"Gramática e Sintaxe","children":[{"name":"Estrutura da frase","tier":"PRO"},{"name":"Ordem das palavras","tier":"MASTER"},{"name":"Ênfase","tier":"PRO"},{"name":"Sujeito","tier":"FREE"},{"name":"Predicado","tier":"FREE"},{"name":"Objeto","tier":"FREE"},{"name":"Coordenação","tier":"MASTER"},{"name":"Subordinação","tier":"MASTER"},{"name":"Condicional","tier":"PRO"},{"name":"Negação","tier":"PRO"},{"name":"Imperativo","tier":"FREE"},{"name":"Interrogação","tier":"FREE"},{"name":"Referência pronominal","tier":"MASTER"},{"name":"Concordância","tier":"MASTER"},{"name":"Tempo verbal","tier":"PRO"},{"name":"Aspecto verbal","tier":"MASTER"},{"name":"Voz verbal","tier":"PRO"},{"name":"Modo verbal","tier":"PRO"},{"name":"Ambiguidade sintática","tier":"DOCTUS"}]},{"id":"11","name":"Semântica e Léxico","children":[{"name":"Sentido literal","tier":"FREE"},{"name":"Sentido figurado","tier":"FREE"},{"name":"Sentido idiomático","tier":"PRO"},{"name":"Expressão idiomática","tier":"PRO"},{"name":"Polissemia","tier":"MASTER"},{"name":"Ambiguidade","tier":"MASTER"},{"name":"Campo semântico","tier":"MASTER"},{"name":"Campo lexical","tier":"MASTER"},{"name":"Termo técnico","tier":"PRO"},{"name":"Uso contextual","tier":"PRO"},{"name":"Conotação","tier":"PRO"},{"name":"Denotação","tier":"PRO"},{"name":"Intensificação","tier":"PRO"},{"name":"Restrição semântica","tier":"MASTER"},{"name":"Hebraísmo","tier":"MASTER"},{"name":"Aramaísmo","tier":"MASTER"},{"name":"Semitismo","tier":"MASTER"},{"name":"Jogo lexical","tier":"DOCTUS"}]},{"id":"12","name":"Intertextualidade","children":[{"name":"Citação explícita","tier":"PRO"},{"name":"Alusão","tier":"PRO"},{"name":"Eco textual","tier":"MASTER"},{"name":"Referência","tier":"PRO"},{"name":"Citação do AT no NT","tier":"MASTER"},{"name":"Releitura","tier":"MASTER"},{"name":"Reaplicação","tier":"MASTER"},{"name":"Cumprimento","tier":"PRO"},{"name":"Tipologia","tier":"MASTER"},{"name":"Padrão literário","tier":"MASTER"},{"name":"Padrão teológico","tier":"DOCTUS"},{"name":"Continuidade","tier":"PRO"},{"name":"Descontinuidade","tier":"DOCTUS"}]},{"id":"13","name":"Exegese","children":[{"name":"Observação","tier":"FREE"},{"name":"Delimitação","tier":"PRO"},{"name":"Contexto","tier":"PRO"},{"name":"Estrutura","tier":"PRO"},{"name":"Gramática","tier":"MASTER"},{"name":"Sintaxe","tier":"MASTER"},{"name":"Léxico","tier":"MASTER"},{"name":"Semântica","tier":"MASTER"},{"name":"Retórica","tier":"MASTER"},{"name":"Intertextualidade","tier":"MASTER"},{"name":"Sentido provável","tier":"DOCTUS"},{"name":"Interpretações possíveis","tier":"DOCTUS"},{"name":"Interpretação mais bem sustentada","tier":"DOCTUS"}]},{"id":"14","name":"Teologia Bíblica","children":[{"name":"Tema principal","tier":"PRO"},{"name":"Subtemas","tier":"PRO"},{"name":"Conceitos teológicos","tier":"MASTER"},{"name":"Desenvolvimento no livro","tier":"MASTER"},{"name":"Desenvolvimento no corpus","tier":"DOCTUS"},{"name":"Desenvolvimento AT → NT","tier":"DOCTUS"},{"name":"Continuidade","tier":"MASTER"},{"name":"Descontinuidade","tier":"DOCTUS"},{"name":"Promessa","tier":"PRO"},{"name":"Cumprimento","tier":"MASTER"},{"name":"Desenvolvimento progressivo","tier":"DOCTUS"}]},{"id":"15","name":"Revisão Doutrinária","children":[{"name":"Afirmação doutrinária","tier":"PRO"},{"name":"Base textual","tier":"PRO"},{"name":"Base contextual","tier":"MASTER"},{"name":"Base exegética","tier":"MASTER"},{"name":"Base teológica","tier":"DOCTUS"},{"name":"Inferência doutrinária","tier":"DOCTUS"},{"name":"Explicitamente afirmado","tier":"MASTER"},{"name":"Implicitamente sustentado","tier":"DOCTUS"},{"name":"Possível","tier":"DOCTUS"},{"name":"Não sustentado","tier":"DOCTUS"},{"name":"Contradição aparente/real","tier":"DOCTUS"}]},{"id":"16","name":"Controle Hermenêutico","children":[{"name":"Texto fora do contexto","tier":"FREE"},{"name":"Prova de texto","tier":"FREE"},{"name":"Palavra isolada","tier":"PRO"},{"name":"Falácia lexical","tier":"PRO"},{"name":"Falácia etimológica","tier":"PRO"},{"name":"Anacronismo","tier":"PRO"},{"name":"Eisegese","tier":"FREE"},{"name":"Alegorização indevida","tier":"MASTER"},{"name":"Simbolização indevida","tier":"MASTER"},{"name":"Tipologia indevida","tier":"MASTER"},{"name":"Literalização indevida","tier":"PRO"},{"name":"Espiritualização indevida","tier":"MASTER"},{"name":"Generalização indevida","tier":"PRO"},{"name":"Universalização indevida","tier":"MASTER"},{"name":"Particularização indevida","tier":"MASTER"},{"name":"Equívoco semântico","tier":"MASTER"},{"name":"Descrição × Prescrição","tier":"PRO"},{"name":"Relato × Aprovação","tier":"PRO"},{"name":"Possibilidade × Certeza","tier":"MASTER"},{"name":"Inferência × Afirmação textual","tier":"MASTER"},{"name":"Aplicação × Interpretação","tier":"PRO"},{"name":"Harmonização forçada","tier":"MASTER"},{"name":"Imposição doutrinária","tier":"DOCTUS"},{"name":"Ignorar gênero","tier":"FREE"},{"name":"Ignorar contexto","tier":"FREE"},{"name":"Ignorar estrutura","tier":"PRO"},{"name":"Ignorar intertextualidade","tier":"MASTER"},{"name":"Construção doutrinária por palavra isolada","tier":"DOCTUS"}]},{"id":"17","name":"Aplicação","children":[{"name":"Significado original","tier":"FREE"},{"name":"Afirmação do texto","tier":"FREE"},{"name":"O que o texto não afirma","tier":"PRO"},{"name":"Princípio extraído","tier":"PRO"},{"name":"Destinatário original","tier":"FREE"},{"name":"Aplicação contemporânea","tier":"FREE"},{"name":"Aplicação legítima","tier":"PRO"},{"name":"Aplicação possível","tier":"MASTER"},{"name":"Aplicação indevida","tier":"MASTER"}]},{"id":"18","name":"Diagnóstico","children":[{"name":"Fidelidade textual","tier":"PRO"},{"name":"Fidelidade contextual","tier":"PRO"},{"name":"Fidelidade literária","tier":"MASTER"},{"name":"Fidelidade linguística","tier":"MASTER"},{"name":"Fidelidade exegética","tier":"DOCTUS"},{"name":"Fidelidade teológica","tier":"DOCTUS"},{"name":"Coerência doutrinária","tier":"DOCTUS"},{"name":"Coerência hermenêutica","tier":"DOCTUS"},{"name":"Pontos fortes","tier":"FREE"},{"name":"Problemas","tier":"PRO"},{"name":"Alertas","tier":"PRO"},{"name":"Afirmações não sustentadas","tier":"DOCTUS"},{"name":"Afirmações parcialmente sustentadas","tier":"DOCTUS"},{"name":"Questões controversas","tier":"DOCTUS"},{"name":"Questões que exigem pesquisa","tier":"DOCTUS"}]},{"id":"19","name":"Relatório Final","children":[{"name":"Resumo executivo","tier":"FREE"},{"name":"Texto analisado","tier":"FREE"},{"name":"Interpretação identificada","tier":"PRO"},{"name":"Evidências","tier":"PRO"},{"name":"Pontos confirmados","tier":"PRO"},{"name":"Pontos de atenção","tier":"PRO"},{"name":"Erros detectados","tier":"MASTER"},{"name":"Questões controversas","tier":"DOCTUS"},{"name":"Análise exegética","tier":"DOCTUS"},{"name":"Análise teológica","tier":"DOCTUS"},{"name":"Análise doutrinária","tier":"DOCTUS"},{"name":"Aplicação","tier":"FREE"},{"name":"Recomendações","tier":"PRO"},{"name":"Conclusão","tier":"FREE"}]}];
+    const theologyToggle = document.getElementById('side-theology-toggle');
+    const theologyIndex = document.getElementById('side-theology-index');
+    const theologyList = document.getElementById('theology-index-list');
+
+    function tierBadge(tier) {
+      return tier ? `<span class="theology-index-tier">${escapeHtml(tier)}</span>` : '';
+    }
+
+    function renderTheologyIndex() {
+      theologyList.innerHTML = REVISAO_TEOLOGICA.map(section => `
+        <div class="theology-index-item">
+          <button type="button" class="theology-index-button" aria-expanded="false">
+            <span class="theology-index-number">${escapeHtml(section.id)}</span>
+            <span class="theology-index-name">${escapeHtml(section.name)}</span>
+            ${tierBadge(section.tier)}<span class="theology-index-chevron">›</span>
+          </button>
+          <div class="theology-index-children">
+            ${section.children.map((item, index) => `
+              <div>
+                <button type="button" class="theology-index-child">
+                  <span class="theology-index-name">${escapeHtml(section.id + '.' + (index + 1) + ' — ' + item.name)}</span>${tierBadge(item.tier)}
+                </button>
+                ${item.children ? `<div class="theology-index-grandchildren">${item.children.map((child, childIndex) => `<button type="button" class="theology-index-grandchild">${escapeHtml(section.id + '.' + (index + 1) + '.' + (childIndex + 1) + ' — ' + child.name)} ${child.tier ? '(' + child.tier + ')' : ''}</button>`).join('')}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setTheologyOpen(open) {
+      theologyToggle.setAttribute('aria-expanded', String(open));
+      theologyToggle.classList.toggle('active', open);
+      theologyIndex.setAttribute('aria-hidden', String(!open));
+    }
+
+    theologyToggle.addEventListener('click', () => {
+      setTheologyOpen(theologyToggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    theologyList.addEventListener('click', event => {
+      const button = event.target.closest('.theology-index-button');
+      if (button) {
+        const children = button.nextElementSibling;
+        const open = !children.classList.contains('active');
+        theologyList.querySelectorAll('.theology-index-children, .theology-index-grandchildren').forEach(node => node.classList.remove('active'));
+        theologyList.querySelectorAll('.theology-index-button').forEach(node => { node.classList.remove('active'); node.setAttribute('aria-expanded', 'false'); });
+        if (open) { children.classList.add('active'); button.classList.add('active'); button.setAttribute('aria-expanded', 'true'); }
+        return;
+      }
+      const child = event.target.closest('.theology-index-child');
+      if (child) {
+        const nested = child.parentElement.querySelector('.theology-index-grandchildren');
+        if (nested) nested.classList.toggle('active');
+      }
+    });
+
+    renderTheologyIndex();
 
     function renderOracleIndex() {
       indexList.innerHTML = ORACULO_AREAS.map(area => `
