@@ -876,6 +876,35 @@ Oraculo · HTML
 @media (max-width:900px) { .oracle-page { padding:0; } }
 /* Fim do ajuste de largura do painel ao shell padrão */
 
+
+    /* Índice expansível da Análise Textual */
+    .side-textual-group { display:flex; flex-direction:column; gap:3px; }
+    .side-textual-toggle { width:100%; appearance:none; -webkit-appearance:none; cursor:pointer; font-family:inherit; text-align:left; }
+    .side-textual-label { flex:1; }
+    .side-textual-chevron { margin-left:auto; color:#18bfff; font-size:10px; transition:transform .18s ease; }
+    .side-textual-toggle[aria-expanded="false"] .side-textual-chevron { transform:rotate(-90deg); }
+    .side-textual-index { display:block; margin:0 0 3px 5px; padding:7px 5px 8px; border-left:1px solid #263754; max-height:52vh; overflow-y:auto; background:#0e172b; border-radius:0 5px 5px 0; }
+    .side-textual-index[aria-hidden="true"] { display:none; }
+    .side-textual-index-title { padding:4px 6px 7px; color:#18bfff; font-size:7.5px; font-weight:900; letter-spacing:.07em; text-transform:uppercase; border-bottom:1px solid #263754; }
+    .textual-index-item { border-bottom:1px solid #263754; }
+    .textual-index-area { display:flex; align-items:center; gap:5px; width:100%; min-height:29px; padding:5px 4px; border:0; background:transparent; color:#dbe7f5; text-align:left; font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; font-size:8px; font-weight:700; line-height:1.25; cursor:pointer; }
+    .textual-index-area:hover,.textual-index-area.active { background:#16233c; }
+    .textual-index-number { min-width:20px; height:16px; display:inline-flex; align-items:center; justify-content:center; padding:0 3px; border:1px solid #18bfff; border-radius:3px; color:#8edfff; font-size:7px; font-weight:800; }
+    .textual-index-name { flex:1; line-height:1.2; }
+    .textual-index-chevron { flex:0 0 9px; color:#18bfff; font-size:10px; text-align:right; transition:transform .18s ease; }
+    .textual-index-area.active .textual-index-chevron { transform:rotate(90deg); }
+    .textual-index-subareas { display:none; padding:2px 3px 7px 29px; }
+    .textual-index-subareas.active { display:block; }
+    .textual-index-subarea { display:flex; align-items:center; justify-content:space-between; gap:4px; width:100%; padding:5px 0; border:0; border-bottom:1px solid #263754; background:transparent; color:#91a4bd; text-align:left; font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; font-size:7.5px; line-height:1.35; cursor:pointer; }
+    .textual-index-subarea:last-child { border-bottom:0; }
+    .textual-index-subarea:hover { color:#fff; }
+    .textual-tier { flex:0 0 auto; font-size:6px; font-weight:900; letter-spacing:.03em; }
+    .textual-tier-free { color:#20d66b; }
+    .textual-tier-pro { color:#d7b76a; }
+    .textual-tier-master { color:#ff9f68; }
+    .textual-tier-doctus { color:#c79cff; }
+    @media(max-width:900px){ .side-textual-group { flex:0 0 auto; } .side-textual-index { position:absolute; top:calc(100% + 3px); left:0; z-index:50; width:min(360px,88vw); max-height:60vh; margin:0; box-shadow:0 12px 28px rgba(0,0,0,.35); } }
+
     /* Ajustes do índice incorporado ao menu lateral */
     .side-oracle-group { position:relative; }
     .side-oracle-toggle { border:1px solid transparent; }
@@ -933,6 +962,505 @@ Oraculo · HTML
             <div class="side-oracle-index-note">
               Selecione uma área para visualizar as subáreas. A escolha orienta a consulta,
               mas não impede o Oráculo de considerar outras áreas relevantes.
+            </div>
+          </div>
+        </div>
+
+        <div class="side-textual-group">
+          <button type="button" class="side-item side-textual-toggle" id="side-textual-toggle" aria-expanded="false" aria-controls="side-textual-index">
+            <span class="side-icon">✎</span>
+            <span class="side-textual-label">ANÁLISE TEXTUAL</span>
+            <span class="side-textual-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="side-textual-index" id="side-textual-index" aria-hidden="true">
+            <div class="side-textual-index-title">ÍNDICE DE ANÁLISE TEXTUAL</div>
+            <div class="textual-index-list" id="textual-index-list">
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="A" aria-expanded="false">
+                  <span class="textual-index-number">A</span>
+                  <span class="textual-index-name">FIGURAS DE LINGUAGEM</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="A">
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Metáfora">
+                      <span>A.1 — Metáfora</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Símile">
+                      <span>A.2 — Símile</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Hipérbole">
+                      <span>A.3 — Hipérbole</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Ironia">
+                      <span>A.4 — Ironia</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Eufemismo">
+                      <span>A.5 — Eufemismo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Personificação">
+                      <span>A.6 — Personificação</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Antropomorfismo">
+                      <span>A.7 — Antropomorfismo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Metonímia">
+                      <span>A.8 — Metonímia</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Sinédoque">
+                      <span>A.9 — Sinédoque</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Apóstrofe">
+                      <span>A.10 — Apóstrofe</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Paradoxo">
+                      <span>A.11 — Paradoxo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Pergunta retórica">
+                      <span>A.12 — Pergunta retórica</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Elipse">
+                      <span>A.13 — Elipse</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Zeugma">
+                      <span>A.14 — Zeugma</span><span class="textual-tier textual-tier-doctus">DOCTUS</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="A" data-textual-resource="Graduação / Clímax">
+                      <span>A.15 — Graduação / Clímax</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="B" aria-expanded="false">
+                  <span class="textual-index-number">B</span>
+                  <span class="textual-index-name">ESTRUTURAS LITERÁRIAS E RETÓRICAS</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="B">
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Paralelismo">
+                      <span>B.1 — Paralelismo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Antítese">
+                      <span>B.2 — Antítese</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Repetição">
+                      <span>B.3 — Repetição</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Quiasmo">
+                      <span>B.4 — Quiasmo</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Inclusio">
+                      <span>B.5 — Inclusio</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Merismo">
+                      <span>B.6 — Merismo</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Estrutura concêntrica">
+                      <span>B.7 — Estrutura concêntrica</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Contraste narrativo">
+                      <span>B.8 — Contraste narrativo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Refrão">
+                      <span>B.9 — Refrão</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="B" data-textual-resource="Inclusão temática">
+                      <span>B.10 — Inclusão temática</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="C" aria-expanded="false">
+                  <span class="textual-index-number">C</span>
+                  <span class="textual-index-name">RECURSOS SONOROS E POÉTICOS</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="C">
+                    <button type="button" class="textual-index-subarea" data-textual-category="C" data-textual-resource="Aliteração">
+                      <span>C.1 — Aliteração</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="C" data-textual-resource="Assonância">
+                      <span>C.2 — Assonância</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="C" data-textual-resource="Paronomásia / jogo de palavras">
+                      <span>C.3 — Paronomásia / jogo de palavras</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="C" data-textual-resource="Trocadilho / jogo fonético-semântico">
+                      <span>C.4 — Trocadilho / jogo fonético-semântico</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="C" data-textual-resource="Ritmo poético">
+                      <span>C.5 — Ritmo poético</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="C" data-textual-resource="Repetição sonora">
+                      <span>C.6 — Repetição sonora</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="D" aria-expanded="false">
+                  <span class="textual-index-number">D</span>
+                  <span class="textual-index-name">FORMAS LITERÁRIAS E DISCURSIVAS</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="D">
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Parábola">
+                      <span>D.1 — Parábola</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Provérbio">
+                      <span>D.2 — Provérbio</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Enigma / Adivinha">
+                      <span>D.3 — Enigma / Adivinha</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Discurso argumentativo">
+                      <span>D.4 — Discurso argumentativo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Diatribe">
+                      <span>D.5 — Diatribe</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Discurso de despedida">
+                      <span>D.6 — Discurso de despedida</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Hino / Cântico">
+                      <span>D.7 — Hino / Cântico</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Oração">
+                      <span>D.8 — Oração</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Lamento">
+                      <span>D.9 — Lamento</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Bênção">
+                      <span>D.10 — Bênção</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Maldição / Oráculo de juízo">
+                      <span>D.11 — Maldição / Oráculo de juízo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Genealogia">
+                      <span>D.12 — Genealogia</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Narrativa de vocação">
+                      <span>D.13 — Narrativa de vocação</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="D" data-textual-resource="Relato de aliança">
+                      <span>D.14 — Relato de aliança</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="E" aria-expanded="false">
+                  <span class="textual-index-number">E</span>
+                  <span class="textual-index-name">GÊNEROS LITERÁRIOS</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="E">
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Narrativa histórica / bíblica">
+                      <span>E.1 — Narrativa histórica / bíblica</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Poesia hebraica">
+                      <span>E.2 — Poesia hebraica</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Literatura sapiencial">
+                      <span>E.3 — Literatura sapiencial</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Lei / Torá">
+                      <span>E.4 — Lei / Torá</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Literatura profética">
+                      <span>E.5 — Literatura profética</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Literatura apocalíptica">
+                      <span>E.6 — Literatura apocalíptica</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Evangelho">
+                      <span>E.7 — Evangelho</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Epístola / Carta">
+                      <span>E.8 — Epístola / Carta</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="E" data-textual-resource="Literatura narrativa-teológica">
+                      <span>E.9 — Literatura narrativa-teológica</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="F" aria-expanded="false">
+                  <span class="textual-index-number">F</span>
+                  <span class="textual-index-name">LINGUAGEM PROFÉTICA E VISIONÁRIA</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="F">
+                    <button type="button" class="textual-index-subarea" data-textual-category="F" data-textual-resource="Linguagem profética">
+                      <span>F.1 — Linguagem profética</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="F" data-textual-resource="Linguagem visionária">
+                      <span>F.2 — Linguagem visionária</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="F" data-textual-resource="Simbolismo apocalíptico">
+                      <span>F.3 — Simbolismo apocalíptico</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="F" data-textual-resource="Imagem profética">
+                      <span>F.4 — Imagem profética</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="F" data-textual-resource="Ato simbólico profético">
+                      <span>F.5 — Ato simbólico profético</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="F" data-textual-resource="Oráculo profético">
+                      <span>F.6 — Oráculo profético</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="G" aria-expanded="false">
+                  <span class="textual-index-number">G</span>
+                  <span class="textual-index-name">RELAÇÕES INTERTEXTUAIS</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="G">
+                    <button type="button" class="textual-index-subarea" data-textual-category="G" data-textual-resource="Citação explícita">
+                      <span>G.1 — Citação explícita</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="G" data-textual-resource="Alusão">
+                      <span>G.2 — Alusão</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="G" data-textual-resource="Eco intertextual">
+                      <span>G.3 — Eco intertextual</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="G" data-textual-resource="Intertextualidade">
+                      <span>G.4 — Intertextualidade</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="G" data-textual-resource="Uso do AT no NT">
+                      <span>G.5 — Uso do AT no NT</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="G" data-textual-resource="Releitura de tradição anterior">
+                      <span>G.6 — Releitura de tradição anterior</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="G" data-textual-resource="Eco temático">
+                      <span>G.7 — Eco temático</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="H" aria-expanded="false">
+                  <span class="textual-index-number">H</span>
+                  <span class="textual-index-name">CATEGORIAS INTERPRETATIVAS</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="H">
+                    <button type="button" class="textual-index-subarea" data-textual-category="H" data-textual-resource="Tipologia">
+                      <span>H.1 — Tipologia</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="H" data-textual-resource="Alegoria">
+                      <span>H.2 — Alegoria</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="H" data-textual-resource="Simbolismo">
+                      <span>H.3 — Simbolismo</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="H" data-textual-resource="Representação simbólica">
+                      <span>H.4 — Representação simbólica</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="H" data-textual-resource="Leitura figurada">
+                      <span>H.5 — Leitura figurada</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="H" data-textual-resource="Linguagem literal">
+                      <span>H.6 — Linguagem literal</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="H" data-textual-resource="Linguagem figurada">
+                      <span>H.7 — Linguagem figurada</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="I" aria-expanded="false">
+                  <span class="textual-index-number">I</span>
+                  <span class="textual-index-name">RECURSOS DE ARGUMENTAÇÃO E RETÓRICA</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="I">
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Tese">
+                      <span>I.1 — Tese</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Argumento">
+                      <span>I.2 — Argumento</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Contraste argumentativo">
+                      <span>I.3 — Contraste argumentativo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Pergunta-objeção">
+                      <span>I.4 — Pergunta-objeção</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Resposta à objeção">
+                      <span>I.5 — Resposta à objeção</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Conclusão / inferência">
+                      <span>I.6 — Conclusão / inferência</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Exortação">
+                      <span>I.7 — Exortação</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Advertência">
+                      <span>I.8 — Advertência</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Consolação">
+                      <span>I.9 — Consolação</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Acusação">
+                      <span>I.10 — Acusação</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="I" data-textual-resource="Apelo à memória">
+                      <span>I.11 — Apelo à memória</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="J" aria-expanded="false">
+                  <span class="textual-index-number">J</span>
+                  <span class="textual-index-name">RECURSOS SEMÂNTICOS E CONTEXTUAIS</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="J">
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Campo semântico">
+                      <span>J.1 — Campo semântico</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Polissemia">
+                      <span>J.2 — Polissemia</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Ambiguidade lexical">
+                      <span>J.3 — Ambiguidade lexical</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Ambiguidade sintática">
+                      <span>J.4 — Ambiguidade sintática</span><span class="textual-tier textual-tier-doctus">DOCTUS</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Idiomatismo">
+                      <span>J.5 — Idiomatismo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Expressão convencional">
+                      <span>J.6 — Expressão convencional</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Fórmula literária">
+                      <span>J.7 — Fórmula literária</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Termo-chave">
+                      <span>J.8 — Termo-chave</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Mudança de sentido contextual">
+                      <span>J.9 — Mudança de sentido contextual</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="J" data-textual-resource="Ambiguidade intencional">
+                      <span>J.10 — Ambiguidade intencional</span><span class="textual-tier textual-tier-doctus">DOCTUS</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="K" aria-expanded="false">
+                  <span class="textual-index-number">K</span>
+                  <span class="textual-index-name">RECURSOS NARRATIVOS</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="K">
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Caracterização">
+                      <span>K.1 — Caracterização</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Caracterização direta">
+                      <span>K.2 — Caracterização direta</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Caracterização indireta">
+                      <span>K.3 — Caracterização indireta</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Ironia narrativa">
+                      <span>K.4 — Ironia narrativa</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Ironia dramática">
+                      <span>K.5 — Ironia dramática</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Repetição narrativa">
+                      <span>K.6 — Repetição narrativa</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Padrão narrativo">
+                      <span>K.7 — Padrão narrativo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Inclusão narrativa">
+                      <span>K.8 — Inclusão narrativa</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Suspense narrativo">
+                      <span>K.9 — Suspense narrativo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Ponto de vista narrativo">
+                      <span>K.10 — Ponto de vista narrativo</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="K" data-textual-resource="Cena e sumário">
+                      <span>K.11 — Cena e sumário</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                </div>
+              </div>
+              <div class="textual-index-item">
+                <button type="button" class="textual-index-area" data-textual-category="L" aria-expanded="false">
+                  <span class="textual-index-number">L</span>
+                  <span class="textual-index-name">PRINCÍPIOS DE CONTROLE INTERPRETATIVO</span>
+                  <span class="textual-index-chevron" aria-hidden="true">›</span>
+                </button>
+                <div class="textual-index-subareas" data-textual-subareas="L">
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Contexto imediato">
+                      <span>L.1 — Contexto imediato</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Contexto literário">
+                      <span>L.2 — Contexto literário</span><span class="textual-tier textual-tier-free">FREE</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Contexto histórico-cultural">
+                      <span>L.3 — Contexto histórico-cultural</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Contexto canônico">
+                      <span>L.4 — Contexto canônico</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Contexto autoral">
+                      <span>L.5 — Contexto autoral</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Contexto do destinatário">
+                      <span>L.6 — Contexto do destinatário</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Unidade literária">
+                      <span>L.7 — Unidade literária</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Estrutura argumentativa">
+                      <span>L.8 — Estrutura argumentativa</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Estrutura temática">
+                      <span>L.9 — Estrutura temática</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Significado × aplicação">
+                      <span>L.10 — Significado × aplicação</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Interpretação × inferência teológica">
+                      <span>L.11 — Interpretação × inferência teológica</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de anacronismo">
+                      <span>L.12 — Controle de anacronismo</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de eisegese">
+                      <span>L.13 — Controle de eisegese</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de alegorização arbitrária">
+                      <span>L.14 — Controle de alegorização arbitrária</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de falácia lexical">
+                      <span>L.15 — Controle de falácia lexical</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de prova-texto">
+                      <span>L.16 — Controle de prova-texto</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de generalização indevida">
+                      <span>L.17 — Controle de generalização indevida</span><span class="textual-tier textual-tier-pro">PRO</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de transferência indevida">
+                      <span>L.18 — Controle de transferência indevida</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de contradição contextual">
+                      <span>L.19 — Controle de contradição contextual</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                    <button type="button" class="textual-index-subarea" data-textual-category="L" data-textual-resource="Controle de sobreinterpretação">
+                      <span>L.20 — Controle de sobreinterpretação</span><span class="textual-tier textual-tier-master">MASTER</span>
+                    </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1364,6 +1892,36 @@ Oraculo · HTML
           `Pesquisar sobre ${area.name}, especificamente em ${subareaButton.dataset.subarea}.`;
 
         setOracleIndexOpen(false);
+        input.focus();
+      }
+    });
+
+    const textualToggle = document.getElementById('side-textual-toggle');
+    const textualIndex = document.getElementById('side-textual-index');
+    const textualList = document.getElementById('textual-index-list');
+
+    textualToggle.addEventListener('click', () => {
+      const open = textualToggle.getAttribute('aria-expanded') === 'true';
+      textualToggle.setAttribute('aria-expanded', String(!open));
+      textualToggle.classList.toggle('active', !open);
+      textualIndex.setAttribute('aria-hidden', String(open));
+    });
+
+    textualList.addEventListener('click', event => {
+      const categoryButton = event.target.closest('.textual-index-area');
+      if (categoryButton) {
+        const id = categoryButton.dataset.textualCategory;
+        const subareas = textualList.querySelector(`[data-textual-subareas="${id}"]`);
+        if (!subareas) return;
+        const willOpen = !subareas.classList.contains('active');
+        textualList.querySelectorAll('.textual-index-subareas').forEach(box => box.classList.remove('active'));
+        textualList.querySelectorAll('.textual-index-area').forEach(button => { button.classList.remove('active'); button.setAttribute('aria-expanded', 'false'); });
+        if (willOpen) { subareas.classList.add('active'); categoryButton.classList.add('active'); categoryButton.setAttribute('aria-expanded', 'true'); }
+        return;
+      }
+      const resourceButton = event.target.closest('.textual-index-subarea');
+      if (resourceButton) {
+        input.value = `Realizar análise textual sobre ${resourceButton.dataset.textualResource}.`;
         input.focus();
       }
     });
