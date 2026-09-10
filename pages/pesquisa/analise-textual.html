@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise Textual</title>
+<style>
+:root{--bg:#0b1428;--panel:#111b30;--line:#263754;--text:#dbe7f5;--muted:#91a4bd;--blue:#18bfff;--green:#20d66b;--paper:#f4eedd;--ink:#2c2418}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,sans-serif}.shell{display:flex;min-height:100vh}.sidebar{width:230px;flex:0 0 230px;padding:18px 12px;background:var(--panel);border-right:1px solid var(--line)}.brand{display:block;padding:0 6px 16px;border-bottom:1px solid var(--line);color:var(--green);font-size:13px;font-weight:900;letter-spacing:1px;text-decoration:none}.brand small{display:block;margin-top:4px;color:#7c8fac;font-size:9px;letter-spacing:.5px}.back{display:block;margin:16px 4px;padding:9px 8px;border:1px solid #536780;border-radius:6px;color:var(--text);font-size:10px;font-weight:800;text-decoration:none}.back:hover{background:#16233c}.menu-title{padding:8px 6px;color:var(--blue);font-size:9px;font-weight:900;letter-spacing:.08em}.index{border-left:1px solid var(--line);background:#0e172b;padding:6px;max-height:calc(100vh - 150px);overflow:auto}.category{border-bottom:1px solid var(--line)}.category-toggle{display:flex;align-items:center;gap:7px;width:100%;min-height:34px;padding:6px 4px;border:0;background:transparent;color:var(--text);text-align:left;font:700 9px/1.25 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.category-toggle:hover,.category-toggle.active{background:#16233c}.category-code{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:16px;border:1px solid var(--blue);border-radius:3px;color:#8edfff;font-size:8px}.category-toggle strong{flex:1}.arrow{color:var(--blue);font-size:14px;transition:transform .18s}.category-toggle.active .arrow{transform:rotate(90deg)}.resources{display:none;padding:2px 3px 7px 28px}.resources.open{display:block}.resource{display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:6px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--muted);text-align:left;font:7.5px/1.35 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.resource:last-child{border-bottom:0}.resource:hover{color:#fff}.tier{font-size:6px;letter-spacing:.03em}.tier-free{color:var(--green)}.tier-pro{color:#d7b76a}.tier-master{color:#ff9f68}.tier-doctus{color:#c79cff}.main{flex:1;min-width:0;padding:40px;background:var(--paper);color:var(--ink)}.card{max-width:1000px;margin:0 auto;padding:36px;border:1px solid #ddcea4;border-radius:10px;background:#fbf7ec;box-shadow:0 8px 24px #0002}.card h1{margin:0 0 12px;font-family:Georgia,serif;font-size:32px}.card p{color:#6c5c42;line-height:1.6}.notice{margin-top:24px;padding:16px;border-left:3px solid #18bfff;background:#e8f5fa;color:#385466}.selected{margin-top:20px;padding:16px;border:1px solid #ddcea4;background:#f4eedd;color:#6c5c42}.selected strong{color:var(--ink)}
+@media(max-width:800px){.shell{display:block}.sidebar{width:100%;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.index{max-height:48vh}.main{padding:18px 10px}.card{padding:22px}.card h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<a class="brand" href="index.html">PALAVRA &amp; SÉRIE<small>Leitura bíblica</small></a>
+<a class="back" href="oraculo.html">← VOLTAR AO ORÁCULO</a>
+<div class="menu-title">ÍNDICE DE ANÁLISE TEXTUAL</div>
+<nav class="index" aria-label="Índice de Análise Textual">
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">A</span>
+            <strong>FIGURAS DE LINGUAGEM</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Metáfora">
+            <span>A.1 — Metáfora</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Símile">
+            <span>A.2 — Símile</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Hipérbole">
+            <span>A.3 — Hipérbole</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ironia">
+            <span>A.4 — Ironia</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Eufemismo">
+            <span>A.5 — Eufemismo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Personificação">
+            <span>A.6 — Personificação</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Antropomorfismo">
+            <span>A.7 — Antropomorfismo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Metonímia">
+            <span>A.8 — Metonímia</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Sinédoque">
+            <span>A.9 — Sinédoque</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Apóstrofe">
+            <span>A.10 — Apóstrofe</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Paradoxo">
+            <span>A.11 — Paradoxo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Pergunta retórica">
+            <span>A.12 — Pergunta retórica</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Elipse">
+            <span>A.13 — Elipse</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Zeugma">
+            <span>A.14 — Zeugma</span>
+            <b class="tier tier-doctus">DOCTUS</b>
+          </button>
+          <button class="resource" type="button" data-resource="Graduação / Clímax">
+            <span>A.15 — Graduação / Clímax</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">B</span>
+            <strong>ESTRUTURAS LITERÁRIAS E RETÓRICAS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Paralelismo">
+            <span>B.1 — Paralelismo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Antítese">
+            <span>B.2 — Antítese</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Repetição">
+            <span>B.3 — Repetição</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Quiasmo">
+            <span>B.4 — Quiasmo</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Inclusio">
+            <span>B.5 — Inclusio</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Merismo">
+            <span>B.6 — Merismo</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Estrutura concêntrica">
+            <span>B.7 — Estrutura concêntrica</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contraste narrativo">
+            <span>B.8 — Contraste narrativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Refrão">
+            <span>B.9 — Refrão</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Inclusão temática">
+            <span>B.10 — Inclusão temática</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">C</span>
+            <strong>RECURSOS SONOROS E POÉTICOS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Aliteração">
+            <span>C.1 — Aliteração</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Assonância">
+            <span>C.2 — Assonância</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Paronomásia / jogo de palavras">
+            <span>C.3 — Paronomásia / jogo de palavras</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Trocadilho / jogo fonético-semântico">
+            <span>C.4 — Trocadilho / jogo fonético-semântico</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ritmo poético">
+            <span>C.5 — Ritmo poético</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Repetição sonora">
+            <span>C.6 — Repetição sonora</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">D</span>
+            <strong>FORMAS LITERÁRIAS E DISCURSIVAS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Parábola">
+            <span>D.1 — Parábola</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Provérbio">
+            <span>D.2 — Provérbio</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Enigma / Adivinha">
+            <span>D.3 — Enigma / Adivinha</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Discurso argumentativo">
+            <span>D.4 — Discurso argumentativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Diatribe">
+            <span>D.5 — Diatribe</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Discurso de despedida">
+            <span>D.6 — Discurso de despedida</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Hino / Cântico">
+            <span>D.7 — Hino / Cântico</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Oração">
+            <span>D.8 — Oração</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Lamento">
+            <span>D.9 — Lamento</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Bênção">
+            <span>D.10 — Bênção</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Maldição / Oráculo de juízo">
+            <span>D.11 — Maldição / Oráculo de juízo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Genealogia">
+            <span>D.12 — Genealogia</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Narrativa de vocação">
+            <span>D.13 — Narrativa de vocação</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Relato de aliança">
+            <span>D.14 — Relato de aliança</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">E</span>
+            <strong>GÊNEROS LITERÁRIOS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Narrativa histórica / bíblica">
+            <span>E.1 — Narrativa histórica / bíblica</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Poesia hebraica">
+            <span>E.2 — Poesia hebraica</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Literatura sapiencial">
+            <span>E.3 — Literatura sapiencial</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Lei / Torá">
+            <span>E.4 — Lei / Torá</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Literatura profética">
+            <span>E.5 — Literatura profética</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Literatura apocalíptica">
+            <span>E.6 — Literatura apocalíptica</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Evangelho">
+            <span>E.7 — Evangelho</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Epístola / Carta">
+            <span>E.8 — Epístola / Carta</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Literatura narrativa-teológica">
+            <span>E.9 — Literatura narrativa-teológica</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">F</span>
+            <strong>LINGUAGEM PROFÉTICA E VISIONÁRIA</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Linguagem profética">
+            <span>F.1 — Linguagem profética</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Linguagem visionária">
+            <span>F.2 — Linguagem visionária</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Simbolismo apocalíptico">
+            <span>F.3 — Simbolismo apocalíptico</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Imagem profética">
+            <span>F.4 — Imagem profética</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ato simbólico profético">
+            <span>F.5 — Ato simbólico profético</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Oráculo profético">
+            <span>F.6 — Oráculo profético</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">G</span>
+            <strong>RELAÇÕES INTERTEXTUAIS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Citação explícita">
+            <span>G.1 — Citação explícita</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Alusão">
+            <span>G.2 — Alusão</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Eco intertextual">
+            <span>G.3 — Eco intertextual</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Intertextualidade">
+            <span>G.4 — Intertextualidade</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Uso do AT no NT">
+            <span>G.5 — Uso do AT no NT</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Releitura de tradição anterior">
+            <span>G.6 — Releitura de tradição anterior</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Eco temático">
+            <span>G.7 — Eco temático</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">H</span>
+            <strong>CATEGORIAS INTERPRETATIVAS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Tipologia">
+            <span>H.1 — Tipologia</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Alegoria">
+            <span>H.2 — Alegoria</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Simbolismo">
+            <span>H.3 — Simbolismo</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Representação simbólica">
+            <span>H.4 — Representação simbólica</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Leitura figurada">
+            <span>H.5 — Leitura figurada</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Linguagem literal">
+            <span>H.6 — Linguagem literal</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Linguagem figurada">
+            <span>H.7 — Linguagem figurada</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">I</span>
+            <strong>RECURSOS DE ARGUMENTAÇÃO E RETÓRICA</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Tese">
+            <span>I.1 — Tese</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Argumento">
+            <span>I.2 — Argumento</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contraste argumentativo">
+            <span>I.3 — Contraste argumentativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Pergunta-objeção">
+            <span>I.4 — Pergunta-objeção</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Resposta à objeção">
+            <span>I.5 — Resposta à objeção</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Conclusão / inferência">
+            <span>I.6 — Conclusão / inferência</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Exortação">
+            <span>I.7 — Exortação</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Advertência">
+            <span>I.8 — Advertência</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Consolação">
+            <span>I.9 — Consolação</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Acusação">
+            <span>I.10 — Acusação</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Apelo à memória">
+            <span>I.11 — Apelo à memória</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">J</span>
+            <strong>RECURSOS SEMÂNTICOS E CONTEXTUAIS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Campo semântico">
+            <span>J.1 — Campo semântico</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Polissemia">
+            <span>J.2 — Polissemia</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ambiguidade lexical">
+            <span>J.3 — Ambiguidade lexical</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ambiguidade sintática">
+            <span>J.4 — Ambiguidade sintática</span>
+            <b class="tier tier-doctus">DOCTUS</b>
+          </button>
+          <button class="resource" type="button" data-resource="Idiomatismo">
+            <span>J.5 — Idiomatismo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Expressão convencional">
+            <span>J.6 — Expressão convencional</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Fórmula literária">
+            <span>J.7 — Fórmula literária</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Termo-chave">
+            <span>J.8 — Termo-chave</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Mudança de sentido contextual">
+            <span>J.9 — Mudança de sentido contextual</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ambiguidade intencional">
+            <span>J.10 — Ambiguidade intencional</span>
+            <b class="tier tier-doctus">DOCTUS</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">K</span>
+            <strong>RECURSOS NARRATIVOS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Caracterização">
+            <span>K.1 — Caracterização</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Caracterização direta">
+            <span>K.2 — Caracterização direta</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Caracterização indireta">
+            <span>K.3 — Caracterização indireta</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ironia narrativa">
+            <span>K.4 — Ironia narrativa</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ironia dramática">
+            <span>K.5 — Ironia dramática</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Repetição narrativa">
+            <span>K.6 — Repetição narrativa</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Padrão narrativo">
+            <span>K.7 — Padrão narrativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Inclusão narrativa">
+            <span>K.8 — Inclusão narrativa</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Suspense narrativo">
+            <span>K.9 — Suspense narrativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ponto de vista narrativo">
+            <span>K.10 — Ponto de vista narrativo</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Cena e sumário">
+            <span>K.11 — Cena e sumário</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">L</span>
+            <strong>PRINCÍPIOS DE CONTROLE INTERPRETATIVO</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Contexto imediato">
+            <span>L.1 — Contexto imediato</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto literário">
+            <span>L.2 — Contexto literário</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto histórico-cultural">
+            <span>L.3 — Contexto histórico-cultural</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto canônico">
+            <span>L.4 — Contexto canônico</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto autoral">
+            <span>L.5 — Contexto autoral</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto do destinatário">
+            <span>L.6 — Contexto do destinatário</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Unidade literária">
+            <span>L.7 — Unidade literária</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Estrutura argumentativa">
+            <span>L.8 — Estrutura argumentativa</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Estrutura temática">
+            <span>L.9 — Estrutura temática</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Significado × aplicação">
+            <span>L.10 — Significado × aplicação</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Interpretação × inferência teológica">
+            <span>L.11 — Interpretação × inferência teológica</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de anacronismo">
+            <span>L.12 — Controle de anacronismo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de eisegese">
+            <span>L.13 — Controle de eisegese</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de alegorização arbitrária">
+            <span>L.14 — Controle de alegorização arbitrária</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de falácia lexical">
+            <span>L.15 — Controle de falácia lexical</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de prova-texto">
+            <span>L.16 — Controle de prova-texto</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de generalização indevida">
+            <span>L.17 — Controle de generalização indevida</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de transferência indevida">
+            <span>L.18 — Controle de transferência indevida</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de contradição contextual">
+            <span>L.19 — Controle de contradição contextual</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de sobreinterpretação">
+            <span>L.20 — Controle de sobreinterpretação</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          </div>
+        </section>
+</nav>
+</aside>
+<main class="main">
+<section class="card">
+<h1>ANÁLISE TEXTUAL</h1>
+<p>Selecione uma categoria no índice lateral para visualizar seus recursos de análise textual.</p>
+<div class="notice"><strong>Como usar:</strong> abra uma categoria e selecione um recurso. A seleção ficará registrada abaixo para orientar a próxima análise.</div>
+<div class="selected" id="selected"><strong>Recurso selecionado:</strong> nenhum recurso selecionado.</div>
+</section>
+</main>
+</div>
+<script>
+const selected = document.getElementById('selected');
+document.querySelectorAll('.category-toggle').forEach(button => {
+  button.addEventListener('click', () => {
+    const resources = button.nextElementSibling;
+    const open = resources.classList.toggle('open');
+    button.classList.toggle('active', open);
+    button.setAttribute('aria-expanded', String(open));
+  });
+});
+document.querySelectorAll('.resource').forEach(button => {
+  button.addEventListener('click', () => {
+    selected.innerHTML = '<strong>Recurso selecionado:</strong> ' + button.dataset.resource;
+  });
+});
+</script>
+</body>
+</html>
