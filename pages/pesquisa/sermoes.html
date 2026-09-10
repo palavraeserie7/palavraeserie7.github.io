@@ -1,4 +1,7 @@
 
+
+Sermoes · HTML
+ 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -69,7 +72,7 @@ body{background:var(--bg);color:var(--t)}
 .modal-box select,.modal-box textarea{width:100%;margin:8px 0;padding:10px;border:1px solid #cdbfaa;border-radius:5px;background:var(--soft2);color:var(--ink);font:inherit}.modal-box textarea{min-height:100px;resize:vertical}.modal-box footer{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
 .help-btn{position:fixed;top:16px;right:18px;z-index:10;min-width:44px;height:36px;padding:0 12px;border:1px solid var(--green);border-radius:20px;background:#0d1b31;color:var(--green);font-size:10px;font-weight:900;cursor:pointer}
 @media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid var(--b)}.grid,.choice-grid{grid-template-columns:1fr}.sermon-builder-paper{padding:24px 18px 45px}.sermon-builder-header{display:block}.sermon-builder-header .btn{margin-top:12px}.point-head,.sub-head{flex-wrap:wrap}}
-
+ 
 /* Shell visual padronizado com Bíblia, Áreas Acadêmicas e Estante */
 :root { --side-w:168px; --panel:#111b30; --text:#dbe7f5; }
 .app { min-height:100vh; display:flex; align-items:stretch; }
@@ -104,7 +107,7 @@ body{background:var(--bg);color:var(--t)}
   .help{display:none;}
   .workspace .site-header{padding:12px 14px;}
 }
-
+ 
 </style>
 </head>
 <body>
@@ -119,6 +122,7 @@ body{background:var(--bg);color:var(--t)}
     <a class="active" href="sermoes.html">▤ SERMÕES</a>
     <a href="oraculo.html">◈ ORÁCULO</a>
     <a href="ponte-infantil.html">✦ PONTE INFANTIL</a>
+    <a href="matriz-pro.html">★ MATRIZ PRO</a>
   </nav>
   <div class="help">Página independente: não carrega Matriz PRO, árvore académica, Bíblia, Estante ou código de outros módulos.</div>
 </aside>
@@ -128,12 +132,12 @@ body{background:var(--bg);color:var(--t)}
 <div id="mn"></div>
 </main>
 </div>
-
+ 
 <script>
 const SERMON_KEY='palavraSerieSermonBuilderV2';
 const SERMON_TYPES=['TEXTUAL','TEMÁTICO','EXPOSITIVO','NARRATIVO','BIOGRÁFICO','APOLOGÉTICO'];
 const SERMON_LOGICS=['LÓGICA DO TEXTO','LÓGICA DO PERSONAGEM','LÓGICA DA NARRATIVA','LÓGICA DO MISTÉRIO','LÓGICA DA CONTRADIÇÃO','LÓGICA LIVRE'];
-
+ 
 function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function cloneBlocks(bs){return (bs||[]).map(b=>({...b,subpoints:(b.subpoints||[]).map(s=>({...s,details:(s.details||[]).map(d=>({...d}))}))}))}
 function defaultState(){return{currentStage:1,initialDirection:{biblicalText:'',reference:'',theme:'',desiredForm:'',messageLogic:'',messageLogicCustom:''},expositoryOutline:{title:'',blocks:[],conclusion:'',introduction:''},finalSermon:{title:'',introduction:'',development:'',applications:'',conclusion:''},status:'FICHA INICIAL PENDENTE'}}
@@ -156,14 +160,14 @@ function setInitial(field,value){
   state.initialDirection[field]=String(value||'');
   if(field==='messageLogic'&&value!=='LÓGICA LIVRE')state.initialDirection.messageLogicCustom='';
   save();
-
+ 
   // Não recriar o DOM enquanto o usuário digita.
   // O render() anterior substituía o <input> a cada tecla e fazia o foco/cursor saltar.
   if(field==='desiredForm'||field==='messageLogic'){
     render();
     return;
   }
-
+ 
   const startBtn=document.getElementById('startConstruction');
   if(startBtn)startBtn.disabled=!valid();
   const statusEl=document.getElementById('initialStatus');
@@ -207,7 +211,7 @@ function closeHelp(){document.getElementById('helpModal').hidden=true}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInsight();closeHelp()}})
 render();
 </script>
-
+ 
 <div class="modal" id="insight" hidden>
   <div class="modal-box">
     <h2>ENVIAR INSIGHT PARA O ESQUELETO</h2>
@@ -216,7 +220,7 @@ render();
     <footer><button class="btn secondary" onclick="closeInsight()">CANCELAR</button><button class="btn" onclick="confirmInsight()">INSERIR</button></footer>
   </div>
 </div>
-
+ 
 <div class="modal" id="helpModal" hidden>
   <div class="modal-box">
     <h2>Como construir o seu sermão</h2>
@@ -231,6 +235,7 @@ render();
 </div>
 </body>
 </html>
-
-
-
+ 
+ 
+ 
+ 
