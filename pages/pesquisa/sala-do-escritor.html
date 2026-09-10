@@ -1528,12 +1528,27 @@ logoutBtn.addEventListener("click",async function(){
   window.location.replace("entrada.html");
 });
  
+let sessaoInicialResolvida = false;
+ 
 supabaseClient.auth.onAuthStateChange(function(event){
+  if(event === "INITIAL_SESSION"){
+    sessaoInicialResolvida = true;
+    verificarSessao();
+  }
   if(event === "SIGNED_OUT"){
     prepararNovaVerificacao();
     window.location.replace("entrada.html");
   }
 });
+ 
+/*
+  Rede de segurança: em casos raros o evento INITIAL_SESSION pode
+  demorar. Se depois de 3s ele ainda não tiver disparado, verifica
+  a sessão do mesmo jeito para a página não travar carregando.
+*/
+setTimeout(function(){
+  if(!sessaoInicialResolvida) verificarSessao();
+},3000);
  
 /*
   A navegação pelo histórico pode restaurar esta página a partir da
@@ -1558,8 +1573,6 @@ document.addEventListener("visibilitychange",function(){
     verificarSessao({revalidar:true});
   }
 });
- 
-verificarSessao();
 </script>
 </body>
 </html>
