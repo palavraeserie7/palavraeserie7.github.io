@@ -1,5 +1,8 @@
 
 
+Entrada · HTML
+ 
+ 
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -459,13 +462,29 @@ async function verificarSessaoExistente(){
  
 }
  
-verificarSessaoExistente();
+let sessaoInicialResolvida = false;
+ 
+supabaseClient.auth.onAuthStateChange(function(event){
+  if(event === "INITIAL_SESSION"){
+    sessaoInicialResolvida = true;
+    verificarSessaoExistente();
+  }
+});
+ 
+/*
+  Rede de segurança: se o evento INITIAL_SESSION demorar,
+  verifica a sessão do mesmo jeito depois de 3s.
+*/
+setTimeout(function(){
+  if(!sessaoInicialResolvida) verificarSessaoExistente();
+},3000);
  
 </script>
 </body>
 </html>
  
-
-
-
-
+ 
+ 
+ 
+ 
+ 
