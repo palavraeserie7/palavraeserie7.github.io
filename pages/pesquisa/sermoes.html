@@ -283,3 +283,239 @@
 </body>
 </html>
 ```
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construtor de Sermões — Palavra & Série</title>
+<style>
+:root{--bg:#0b1428;--s:#111b30;--t:#dbe7f5;--b:#263754;--green:#20d66b;--paper:#f1eadb;--ink:#4a443b;--muted:#806f53;--line:#d8cdb8;--soft:#fffdf7;--soft2:#fffaf0}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif}
+body{background:var(--bg);color:var(--t)}
+.app{min-height:100vh;display:grid;grid-template-columns:270px 1fr}
+.sidebar{background:var(--s);border-right:1px solid var(--b);padding:18px;display:flex;flex-direction:column;gap:12px}
+.brand{padding:4px 4px 14px;border-bottom:1px solid var(--b)}
+.brand h1{margin:0;color:var(--green);font-size:15px;letter-spacing:2px}
+.brand p{margin:5px 0 0;color:#91a4bd;font-size:9px;font-weight:800}
+.menu{display:grid;gap:7px}
+.menu a{display:block;padding:10px 12px;border:1px solid transparent;border-radius:7px;background:#0d1b31;color:#b9c7d8;text-decoration:none;font-size:10px;font-weight:900}
+.menu a:hover{border-color:#2e6580;color:#fff}
+.menu a.active{border-color:var(--green);color:#fff;background:rgba(32,214,107,.08)}
+.help{margin-top:auto;padding:10px;border:1px solid var(--b);border-radius:7px;color:#91a4bd;font-size:9px;line-height:1.5}
+.workspace{min-width:0;background:var(--paper);color:var(--ink);overflow:auto}
+.sermon-builder-paper{min-height:100vh;padding:30px 38px 54px}
+.sermon-builder-header{display:flex;align-items:flex-start;justify-content:space-between;gap:22px;max-width:1180px;margin:0 auto 20px}
+.sermon-builder-kicker{margin:0 0 7px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:1.6px}
+.sermon-builder-header h1{margin:0 0 8px;color:var(--ink);font-size:28px;letter-spacing:1px}
+.sermon-builder-header p{max-width:780px;margin:0;color:var(--muted);font-size:12px;line-height:1.55}
+.btn{min-height:36px;padding:0 13px;border:1px solid #b99b61;border-radius:6px;background:#806f53;color:#fffaf0;font-size:10px;font-weight:900;cursor:pointer}
+.btn.secondary{background:transparent;color:var(--ink)}
+.status{max-width:1180px;margin:0 auto 12px;padding:10px 12px;border-left:3px solid #806f53;background:#ebe0cd;color:#6d5d45;font-size:10px;font-weight:900;line-height:1.4}
+.flow{max-width:1180px;margin:0 auto 16px;display:flex;flex-wrap:wrap;gap:6px}
+.flow button{padding:8px 10px;border:1px solid #cdbfaa;border-radius:5px;background:#fffdf7;color:#806f53;font-size:9px;font-weight:900;cursor:pointer}
+.flow button.active{background:#806f53;color:#fffaf0}
+.card{max-width:1180px;margin:0 auto 14px;border:1px solid var(--line);border-radius:8px;background:var(--soft);box-shadow:0 4px 12px rgba(55,45,30,.06)}
+.card-head{padding:15px 17px;border-bottom:1px solid #e5dccd}
+.card-head h2{margin:0;color:var(--ink);font-size:16px}
+.card-body{padding:17px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.field{display:grid;gap:5px;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.7px}
+.field input,.field textarea{width:100%;padding:10px;border:1px solid #cdbfaa;border-radius:5px;background:var(--soft2);color:var(--ink);font:inherit;font-size:11px}
+.field textarea{min-height:85px;resize:vertical;line-height:1.5}
+.choice-block{margin-top:16px}.choice-block h3{margin:0 0 8px;color:var(--muted);font-size:10px;letter-spacing:.8px}
+.choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.choice{position:relative}.choice input{position:absolute;opacity:0}.choice span{display:block;padding:10px;border:1px solid #d8cdb8;border-radius:5px;background:#fffaf0;color:#6d5d45;font-size:9px;font-weight:900;cursor:pointer}.choice input:checked+span{border-color:#806f53;background:#e3d8c4;color:var(--ink);box-shadow:inset 3px 0 #806f53}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:15px}.actions small{color:#9a896f;font-size:9px}
+.summary{display:grid;gap:4px;margin-bottom:14px;padding:11px 12px;border-left:3px solid #b99b61;background:var(--paper);color:#6d5d45;font-size:10px;line-height:1.45}
+.summary strong{color:var(--muted)}
+.dynamic-toolbar{display:flex;flex-wrap:wrap;gap:8px;max-width:1180px;margin:0 auto 14px}
+.dynamic-workspace{max-width:1180px;margin:0 auto}
+.dynamic-intro{display:grid;gap:10px;margin-bottom:15px}
+.dynamic-free{display:grid;gap:5px;color:#6d5d45;font-size:9px;font-weight:900;letter-spacing:.65px}
+.dynamic-free input,.dynamic-free textarea{width:100%;padding:10px;border:1px solid #cdbfaa;border-radius:5px;background:var(--soft2);color:var(--ink);font:inherit;font-size:11px}
+.dynamic-free textarea{min-height:82px;resize:vertical}
+.dynamic-tree{display:grid;gap:12px}
+.point{padding:14px;border:1px solid var(--line);border-left:4px solid #806f53;border-radius:7px;background:var(--soft2)}
+.point-head,.sub-head,.detail-row{display:flex;align-items:flex-start;gap:7px}
+.point-head input,.sub-head input,.detail-row input{flex:1;min-width:0;padding:9px;border:1px solid #cdbfaa;border-radius:4px;background:var(--soft);color:var(--ink);font:inherit;font-size:11px;font-weight:800}
+.num{padding-top:9px;color:#806f53;font-weight:900}
+.row-actions{display:flex;flex-wrap:wrap;gap:5px}.row-actions button{min-height:28px;padding:0 8px;border:1px solid #cdbfaa;border-radius:4px;background:#f1eadb;color:#6d5d45;font-size:8px;font-weight:900;cursor:pointer}
+.subpoints{display:grid;gap:8px;margin:13px 0 0 24px;padding-left:14px;border-left:2px solid #cdbfaa}
+.subpoint{padding:10px;border:1px solid #e0d5c3;border-radius:5px;background:var(--soft)}
+.details{display:grid;gap:6px;margin:8px 0 0 28px}.detail-row{align-items:center}.detail-row span{width:22px;color:#806f53;font-weight:900}
+.addbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pulpit{max-width:900px;margin:auto;padding:28px 34px;background:var(--soft);color:var(--ink);font-family:Georgia,serif;line-height:1.65}
+.pulpit h2{text-align:center;margin-top:0}.pulpit p{margin:18px 0}.pulpit ol{padding-left:28px}.pulpit ol ol{list-style-type:lower-alpha}
+.modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:20px;background:rgba(7,13,26,.72)}.modal[hidden]{display:none}
+.modal-box{width:min(620px,100%);padding:20px;border:1px solid #b99b61;border-radius:9px;background:var(--soft);color:var(--ink);box-shadow:0 12px 35px rgba(0,0,0,.3)}
+.modal-box select,.modal-box textarea{width:100%;margin:8px 0;padding:10px;border:1px solid #cdbfaa;border-radius:5px;background:var(--soft2);color:var(--ink);font:inherit}.modal-box textarea{min-height:100px;resize:vertical}.modal-box footer{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.help-btn{position:fixed;top:16px;right:18px;z-index:10;min-width:44px;height:36px;padding:0 12px;border:1px solid var(--green);border-radius:20px;background:#0d1b31;color:var(--green);font-size:10px;font-weight:900;cursor:pointer}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid var(--b)}.grid,.choice-grid{grid-template-columns:1fr}.sermon-builder-paper{padding:24px 18px 45px}.sermon-builder-header{display:block}.sermon-builder-header .btn{margin-top:12px}.point-head,.sub-head{flex-wrap:wrap}}
+
+/* Shell visual padronizado com Bíblia, Áreas Acadêmicas e Estante */
+:root { --side-w:168px; --panel:#111b30; --text:#dbe7f5; }
+.app { min-height:100vh; display:flex; align-items:stretch; }
+.sidebar {
+  flex:0 0 var(--side-w); width:var(--side-w); min-height:100vh;
+  background:var(--panel); border-right:1px solid var(--b); padding:16px 10px;
+  display:flex; flex-direction:column; gap:16px; position:sticky; top:0;
+  height:100vh; overflow-y:auto;
+}
+.brand { padding:2px 4px 12px; border-bottom:1px solid var(--b); }
+.brand h1 { margin:0; color:var(--green); font-size:12px; letter-spacing:1.2px; line-height:1.3; }
+.brand p { display:block; margin:3px 0 0; color:#7c8fac; font-size:8px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
+.menu { display:flex; flex-direction:column; gap:3px; }
+.menu a {
+  display:flex; align-items:center; gap:7px; padding:8px 7px; border:1px solid transparent;
+  border-radius:6px; background:transparent; color:var(--text); text-decoration:none;
+  font-size:9.5px; font-weight:800; letter-spacing:.3px; line-height:1.25;
+}
+.menu a:hover { background:#16233c; border-color:transparent; color:var(--text); }
+.menu a.active { background:rgba(32,214,107,.12); border-color:var(--green); color:var(--green); }
+.help { margin-top:auto; padding:12px 4px 0; border:0; border-top:1px solid var(--b); border-radius:0; color:#5f7192; font-size:8px; line-height:1.5; }
+.workspace { flex:1; min-width:0; display:flex; flex-direction:column; overflow:auto; background:var(--paper); color:var(--ink); }
+.workspace .site-header { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-bottom:1px solid var(--b); background:var(--panel); position:sticky; top:0; z-index:20; }
+.workspace .header-link { padding:8px 11px; border:1px solid #536780; border-radius:7px; background:transparent; color:var(--text); font-size:10px; font-weight:900; text-decoration:none; white-space:nowrap; }
+.workspace .header-link:hover { border-color:#18bfff; background:#163451; }
+.sermon-builder-paper { flex:1; min-height:0; }
+@media(max-width:900px){
+  .app{display:flex; flex-direction:column;}
+  .sidebar{position:relative; top:auto; width:100%; min-height:0; height:auto; flex:0 0 auto; flex-direction:row; align-items:center; gap:10px; overflow-x:auto; overflow-y:hidden; border-right:0; border-bottom:1px solid var(--b); padding:12px 14px;}
+  .brand{flex:0 0 auto; padding:0 12px 0 0; border-bottom:0; border-right:1px solid var(--b);}
+  .menu{flex-direction:row; flex:0 0 auto;}
+  .help{display:none;}
+  .workspace .site-header{padding:12px 14px;}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><h1>PALAVRA & SÉRIE</h1><p>CONSTRUTOR DE SERMÕES</p></div>
+  <nav class="menu">
+    <a href="index.html">⌂ PESQUISA</a>
+    <a href="areas-academicas.html">▤ ÁREAS ACADÉMICAS</a>
+    <a href="biblia.html">▣ BÍBLIA</a>
+    <a href="estante.html">▤ ESTANTE</a>
+    <a class="active" href="sermoes.html">▤ SERMÕES</a>
+    <a href="oraculo.html">◈ ORÁCULO</a>
+    <a href="ponte-infantil.html">✦ PONTE INFANTIL</a>
+  </nav>
+  <div class="help">Página independente: não carrega Matriz PRO, árvore académica, Bíblia, Estante ou código de outros módulos.</div>
+</aside>
+<main class="workspace">
+<header class="site-header"><a class="header-link" href="index.html">← VOLTAR À PESQUISA</a><a class="header-link" href="sala-do-escritor.html">SALA DO ESCRITOR</a></header>
+<button class="help-btn" type="button" onclick="openHelp()">AJUDA</button>
+<div id="mn"></div>
+</main>
+</div>
+
+<script>
+const SERMON_KEY='palavraSerieSermonBuilderV2';
+const SERMON_TYPES=['TEXTUAL','TEMÁTICO','EXPOSITIVO','NARRATIVO','BIOGRÁFICO','APOLOGÉTICO'];
+const SERMON_LOGICS=['LÓGICA DO TEXTO','LÓGICA DO PERSONAGEM','LÓGICA DA NARRATIVA','LÓGICA DO MISTÉRIO','LÓGICA DA CONTRADIÇÃO','LÓGICA LIVRE'];
+
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function cloneBlocks(bs){return (bs||[]).map(b=>({...b,subpoints:(b.subpoints||[]).map(s=>({...s,details:(s.details||[]).map(d=>({...d}))}))}))}
+function defaultState(){return{currentStage:1,initialDirection:{biblicalText:'',reference:'',theme:'',desiredForm:'',messageLogic:'',messageLogicCustom:''},expositoryOutline:{title:'',blocks:[],conclusion:'',introduction:''},finalSermon:{title:'',introduction:'',development:'',applications:'',conclusion:''},status:'FICHA INICIAL PENDENTE'}}
+function loadState(){
+  try{
+    const cur=JSON.parse(localStorage.getItem(SERMON_KEY)||'null');
+    if(cur&&cur.initialDirection)return Object.assign(defaultState(),cur,{initialDirection:Object.assign(defaultState().initialDirection,cur.initialDirection||{}),expositoryOutline:Object.assign(defaultState().expositoryOutline,cur.expositoryOutline||{}),finalSermon:Object.assign(defaultState().finalSermon,cur.finalSermon||{})});
+  }catch(e){}
+  try{
+    const old=JSON.parse(localStorage.getItem('palavraSerieSermonBuilderV1')||'null');
+    if(old){const s=defaultState();s.initialDirection={biblicalText:old.biblicalText||'',reference:old.reference||'',theme:old.theme||'',desiredForm:old.sermonType||'',messageLogic:old.messageLogic||'',messageLogicCustom:old.messageLogicCustom||''};return s}
+  }catch(e){}
+  return defaultState();
+}
+let state=loadState();
+function save(){try{localStorage.setItem(SERMON_KEY,JSON.stringify(state))}catch(e){}}
+function valid(){const d=state.initialDirection;return ['biblicalText','reference','theme','desiredForm','messageLogic'].every(k=>String(d[k]||'').trim())}
+function setInitial(field,value){
+  if(!(field in state.initialDirection))return;
+  state.initialDirection[field]=String(value||'');
+  if(field==='messageLogic'&&value!=='LÓGICA LIVRE')state.initialDirection.messageLogicCustom='';
+  save();
+
+  // Não recriar o DOM enquanto o usuário digita.
+  // O render() anterior substituía o <input> a cada tecla e fazia o foco/cursor saltar.
+  if(field==='desiredForm'||field==='messageLogic'){
+    render();
+    return;
+  }
+
+  const startBtn=document.getElementById('startConstruction');
+  if(startBtn)startBtn.disabled=!valid();
+  const statusEl=document.getElementById('initialStatus');
+  if(statusEl)statusEl.textContent=valid()?'DIREÇÃO INICIAL PREENCHIDA — PRONTA PARA SER REGISTADA.':state.status;
+}
+function choice(field,options,selected){return options.map((o,i)=>{const id='c-'+field+'-'+i;return `<label class="choice"><input id="${id}" type="radio" name="${field}" value="${esc(o)}" ${selected===o?'checked':''} onchange="setInitial('${field}',this.value)"><span>${esc(o)}</span></label>`}).join('')}
+function segments(text){return String(text||'').split(/\n+|(?<=[.!?;])\s+/).map(x=>x.trim()).filter(Boolean).slice(0,12)}
+function start(){if(!valid()){state.status='PREENCHA TEXTO, REFERÊNCIA, TEMA, FORMA E LÓGICA DA MENSAGEM.';save();render();return}const d=state.initialDirection;const bs=segments(d.biblicalText);state.expositoryOutline={title:d.theme,introduction:'',blocks:bs.length?bs.map((x,i)=>({id:'p-'+Date.now()+'-'+i,title:'MOVIMENTO '+(i+1)+' — '+x.slice(0,72),reference:d.reference,subpoints:[{id:'s-'+Date.now()+'-'+i,title:'Subtópico inicial',details:[]}]})):[{id:'p-'+Date.now(),title:'PRIMEIRO PONTO PRINCIPAL',reference:d.reference,subpoints:[{id:'s-'+Date.now(),title:'Subtópico inicial',details:[]}]}],conclusion:''};state.currentStage=2;state.status='ESQUELETO DINÂMICO PRONTO PARA EDIÇÃO.';save();render()}
+function blocks(){state.expositoryOutline.blocks=state.expositoryOutline.blocks||[];state.expositoryOutline.blocks.forEach((b,i)=>{b.subpoints=b.subpoints||[];b.subpoints.forEach(s=>s.details=s.details||[]);if(!b.id)b.id='p-'+Date.now()+'-'+i});return state.expositoryOutline.blocks}
+function updateFree(field,value){state.expositoryOutline[field]=String(value||'');save()}
+function updatePoint(id,value){const b=blocks().find(x=>x.id===id);if(b)b.title=String(value||'');save()}
+function updateSub(bid,sid,value){const b=blocks().find(x=>x.id===bid),s=b?.subpoints.find(x=>x.id===sid);if(s)s.title=String(value||'');save()}
+function updateDetail(bid,sid,did,value){const b=blocks().find(x=>x.id===bid),s=b?.subpoints.find(x=>x.id===sid),d=s?.details.find(x=>x.id===did);if(d)d.title=String(value||'');save()}
+function addPoint(){blocks().push({id:'p-'+Date.now(),title:'NOVO PONTO PRINCIPAL',reference:state.initialDirection.reference,subpoints:[{id:'s-'+Date.now(),title:'NOVO SUBTÓPICO',details:[{id:'d-'+Date.now(),title:'NOVO DETALHE'}]}]});save();render()}
+function delPoint(id){state.expositoryOutline.blocks=blocks().filter(b=>b.id!==id);save();render()}
+function addSub(id){const b=blocks().find(x=>x.id===id);if(b)b.subpoints.push({id:'s-'+Date.now(),title:'NOVO SUBTÓPICO',details:[]});save();render()}
+function delSub(bid,sid){const b=blocks().find(x=>x.id===bid);if(b)b.subpoints=b.subpoints.filter(s=>s.id!==sid);save();render()}
+function addDetail(bid,sid){const b=blocks().find(x=>x.id===bid),s=b?.subpoints.find(x=>x.id===sid);if(s)s.details.push({id:'d-'+Date.now(),title:'NOVO DETALHE / INSIGHT'});save();render()}
+function delDetail(bid,sid,did){const b=blocks().find(x=>x.id===bid),s=b?.subpoints.find(x=>x.id===sid);if(s)s.details=s.details.filter(d=>d.id!==did);save();render()}
+function movePoint(id,dir){const a=blocks(),i=a.findIndex(b=>b.id===id),j=i+dir;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save();render()}
+function resetSermon(){if(!confirm('Reiniciar todo o estado persistente deste sermão?'))return;state=defaultState();save();render()}
+function buildMessage(){const o=state.expositoryOutline;const development=(o.blocks||[]).map((b,i)=>`${i+1}. ${b.title}\n${(b.subpoints||[]).map((s,j)=>`   ${String.fromCharCode(65+j)}. ${s.title}`).join('\n')}`).join('\n\n');state.finalSermon={title:o.title,introduction:o.introduction||'Introdução a construir a partir da direção inicial.',development,applications:'Aplicações a derivar dos movimentos e da ideia central.',conclusion:o.conclusion};state.status='MENSAGEM-BASE CRIADA — REVISE E EDITE ANTES DA PREGAÇÃO.';save();render()}
+function updateFinal(field,value){if(field in state.finalSermon)state.finalSermon[field]=String(value||'');save()}
+function inject(target,text){text=String(text||'').trim();if(!text)return;for(const b of blocks()){if(b.id===target){b.subpoints.push({id:'s-'+Date.now(),title:text,details:[]});break}for(const s of b.subpoints){if(s.id===target){s.details.push({id:'d-'+Date.now(),title:text});save();render();return}}}save();render()}
+function openInsight(){const m=document.getElementById('insight');const sel=document.getElementById('target');sel.innerHTML=blocks().flatMap((b,i)=>[{id:b.id,label:'Inserir no Ponto '+roman(i+1)}].concat((b.subpoints||[]).map((s,j)=>({id:s.id,label:'  '+roman(i+1)+' → Subtópico '+(j+1)})))).map(x=>`<option value="${esc(x.id)}">${esc(x.label)}</option>`).join('');document.getElementById('insightText').value='';m.hidden=false}
+function closeInsight(){document.getElementById('insight').hidden=true}
+function confirmInsight(){inject(document.getElementById('target').value,document.getElementById('insightText').value);closeInsight()}
+function roman(n){return['I','II','III','IV','V','VI','VII','VIII','IX','X'][n-1]||String(n)}
+function pulpit(){const o=state.expositoryOutline;const items=blocks().map(b=>`<li><strong>${esc(b.title)}</strong>${b.subpoints?.length?'<ol>'+b.subpoints.map(s=>`<li>${esc(s.title)}${s.details?.length?'<ol>'+s.details.map(d=>`<li>${esc(d.title)}</li>`).join('')+'</ol>':''}</li>`).join('')+'</ol>':''}</li>`).join('');return `<article class="pulpit"><h2>${esc(o.title||state.initialDirection.theme||'Esqueleto de Púlpito')}</h2><p>${esc(state.finalSermon.introduction||o.introduction||'')}</p><ol>${items}</ol><p>${esc(o.conclusion||'')}</p></article>`}
+function renderDynamic(){
+  const o=state.expositoryOutline,d=state.initialDirection;
+  const tree=blocks().map((b,i)=>`<article class="point"><div class="point-head"><span class="num">${roman(i+1)}.</span><input value="${esc(b.title)}" oninput="updatePoint('${b.id}',this.value)"><span class="row-actions"><button onclick="movePoint('${b.id}',-1)">↑</button><button onclick="movePoint('${b.id}',1)">↓</button><button onclick="delPoint('${b.id}')">EXCLUIR</button><button onclick="addSub('${b.id}')">+ SUBTÓPICO</button></span></div><div class="subpoints">${(b.subpoints||[]).map((s,j)=>`<div class="subpoint"><div class="sub-head"><span class="num">${j+1}.</span><input value="${esc(s.title)}" oninput="updateSub('${b.id}','${s.id}',this.value)"><span class="row-actions"><button onclick="delSub('${b.id}','${s.id}')">EXCLUIR</button><button onclick="addDetail('${b.id}','${s.id}')">+ DETALHE</button></span></div><div class="details">${(s.details||[]).map((x,k)=>`<div class="detail-row"><span>${String.fromCharCode(97+k)})</span><input value="${esc(x.title)}" oninput="updateDetail('${b.id}','${s.id}','${x.id}',this.value)"><button onclick="delDetail('${b.id}','${s.id}','${x.id}')">EXCLUIR</button></div>`).join('')}</div></div>`).join('')}</div></article>`).join('');
+  return `<div class="dynamic-toolbar"><button class="btn" onclick="render()">ABA: GABINETE / EDIÇÃO</button><button class="btn secondary" onclick="showPulpit()">ABA: ESQUELETO DE PÚLPITO</button><button class="btn secondary" onclick="buildMessage()">GERAR MENSAGEM-BASE</button></div><div class="dynamic-workspace"><div class="summary"><strong>DIREÇÃO INICIAL</strong><span><b>Texto:</b> ${esc(d.reference)}</span><span><b>Tema:</b> ${esc(d.theme)}</span><span><b>Forma:</b> ${esc(d.desiredForm)}</span><span><b>Lógica:</b> ${esc(d.messageLogic)}</span></div><div class="dynamic-intro"><label class="dynamic-free">INTRODUÇÃO (LIVRE)<textarea oninput="updateFree('introduction',this.value)">${esc(o.introduction||'')}</textarea></label><label class="dynamic-free">TÍTULO DO SERMÃO<input value="${esc(o.title||d.theme)}" oninput="updateFree('title',this.value)"></label></div><div class="card"><div class="card-head"><h2>ESTRUTURA HOMILÉTICA DINÂMICA</h2></div><div class="card-body"><div class="dynamic-tree">${tree||'<p>Nenhum ponto ainda.</p>'}</div><div class="addbar"><button class="btn" onclick="addPoint()">+ ADICIONAR NOVO PONTO PRINCIPAL</button><button class="btn secondary" onclick="openInsight()">ENVIAR INSIGHT PARA O ESQUELETO</button></div><label class="dynamic-free" style="margin-top:18px">CONCLUSÃO (LIVRE)<textarea oninput="updateFree('conclusion',this.value)">${esc(o.conclusion||'')}</textarea></label></div></div></div>`}
+function showPulpit(){document.getElementById('mn').innerHTML=`<section class="sermon-builder-paper"><header class="sermon-builder-header"><div><div class="sermon-builder-kicker">CONSTRUTOR DE SERMÕES</div><h1>ESQUELETO DE PÚLPITO</h1><p>Versão limpa da estrutura atual para consulta durante a pregação.</p></div><button class="btn secondary" onclick="render()">← VOLTAR À EDIÇÃO</button></header>${pulpit()}</section>`}
+function renderInitial(){
+  const d=state.initialDirection;
+  document.getElementById('mn').innerHTML=`<section class="sermon-builder-paper"><header class="sermon-builder-header"><div><div class="sermon-builder-kicker">NOVO SERMÃO · CONSTRUÇÃO ORIENTADA PELA EXEGESE</div><h1>CONSTRUTOR DE SERMÕES</h1><p>O texto conduz a construção inicial. A forma desejada permanece como preferência homilética e não substitui a estrutura construída a partir do texto.</p></div><button class="btn secondary" onclick="resetSermon()">REINICIAR SERMÃO</button></header><div class="status" id="initialStatus">${esc(valid()?'DIREÇÃO INICIAL PREENCHIDA — PRONTA PARA SER REGISTADA.':state.status)}</div><div class="card"><div class="card-head"><h2>1. Definição da direção inicial</h2></div><div class="card-body"><div class="grid"><label class="field">TEXTO BÍBLICO<input value="${esc(d.biblicalText)}" oninput="setInitial('biblicalText',this.value)" placeholder="Cole o texto bíblico a trabalhar"></label><label class="field">REFERÊNCIA<input value="${esc(d.reference)}" oninput="setInitial('reference',this.value)" placeholder="Ex.: Salmo 1:1–3"></label><label class="field">TEMA / DIREÇÃO INICIAL<input value="${esc(d.theme)}" oninput="setInitial('theme',this.value)" placeholder="Tema ou pergunta inicial"></label></div><div class="choice-block"><h3>TIPO DE SERMÃO / FORMA DESEJADA</h3><div class="choice-grid">${choice('desiredForm',SERMON_TYPES,d.desiredForm)}</div></div><div class="choice-block"><h3>LÓGICA DA MENSAGEM</h3><div class="choice-grid">${choice('messageLogic',SERMON_LOGICS,d.messageLogic)}</div>${d.messageLogic==='LÓGICA LIVRE'?`<label class="field" style="margin-top:10px">DIREÇÃO DA LÓGICA LIVRE<textarea oninput="setInitial('messageLogicCustom',this.value)">${esc(d.messageLogicCustom)}</textarea></label>`:''}</div><div class="actions"><button id="startConstruction" class="btn" ${valid()?'':'disabled'} onclick="start()">INICIAR CONSTRUÇÃO PELA EXEGESE</button><small>Preencha texto, referência, tema/direção, forma desejada e lógica da mensagem.</small></div></div></div></section>`}
+function render(){if(state.currentStage>1&&blocks().length){document.getElementById('mn').innerHTML=`<section class="sermon-builder-paper"><header class="sermon-builder-header"><div><div class="sermon-builder-kicker">CONSTRUTOR DE SERMÕES DINÂMICO</div><h1>CONSTRUTOR DE SERMÕES</h1><p>Organize a mensagem em Romanos, números e letras; edite, exclua e envie insights para qualquer nó.</p></div><button class="btn secondary" onclick="resetSermon()">REINICIAR SERMÃO</button></header><div class="status">${esc(state.status)}</div>${renderDynamic()}</section>`}else renderInitial()}
+function openHelp(){const m=document.getElementById('helpModal');m.hidden=false}
+function closeHelp(){document.getElementById('helpModal').hidden=true}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInsight();closeHelp()}})
+render();
+</script>
+
+<div class="modal" id="insight" hidden>
+  <div class="modal-box">
+    <h2>ENVIAR INSIGHT PARA O ESQUELETO</h2>
+    <select id="target"></select>
+    <textarea id="insightText" placeholder="Escreva ou cole o insight..."></textarea>
+    <footer><button class="btn secondary" onclick="closeInsight()">CANCELAR</button><button class="btn" onclick="confirmInsight()">INSERIR</button></footer>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" hidden>
+  <div class="modal-box">
+    <h2>Como construir o seu sermão</h2>
+    <p><b>1.</b> Preencha texto, referência, tema, forma e lógica.</p>
+    <p><b>2.</b> Inicie a construção pela exegese.</p>
+    <p><b>3.</b> Edite os pontos principais, subtópicos e detalhes.</p>
+    <p><b>4.</b> Adicione, exclua e reorganize os elementos.</p>
+    <p><b>5.</b> Envie insights diretamente para um ponto ou subtópico.</p>
+    <p><b>6.</b> Abra o esqueleto de púlpito para uma leitura limpa.</p>
+    <footer><button class="btn" onclick="closeHelp()">FECHAR</button></footer>
+  </div>
+</div>
+</body>
+</html>
+
+
+
