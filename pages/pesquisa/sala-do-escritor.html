@@ -1508,24 +1508,14 @@ async function verificarSessao(opcoes = {}){
   }
 }
  
-logoutBtn.addEventListener("click",async function(){
-  logoutBtn.disabled = true;
-  logoutBtn.textContent = "SAINDO...";
-  prepararNovaVerificacao();
- 
-  const {error} =
-    await supabaseClient.auth.signOut();
- 
-  if(error){
-    console.error("Erro ao sair:",error);
-    loading.style.display = "none";
-    errorBox.style.display = "flex";
-    logoutBtn.disabled = false;
-    logoutBtn.textContent = "SAIR";
-    return;
-  }
- 
-  window.location.replace("entrada.html");
+logoutBtn.addEventListener("click",function(){
+  /*
+    "SAIR" agora só sai da Sala do Escritor e volta para o site
+    principal — não encerra a sessão da conta. Assim, ao clicar em
+    "Sala do Escritor" novamente, a entrada é direta, sem pedir login
+    de novo. O login continua sendo o único portão de entrada da Sala.
+  */
+  window.location.href = "index.html";
 });
  
 let sessaoInicialResolvida = false;
