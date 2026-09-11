@@ -181,6 +181,79 @@ main{
 }
 .btn-open:hover{background:#14253e;border-color:var(--a);color:#fff}
  
+.stats-card .card-main{width:100%}
+.stats-summary{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.stats-summary .stat-box{
+  flex:1 1 140px;
+  border:1px solid var(--b);
+  border-radius:6px;
+  background:var(--i);
+  padding:14px 16px;
+}
+.stats-summary .stat-box .stat-num{
+  font-size:24px;
+  font-weight:700;
+  color:var(--p);
+}
+.stats-summary .stat-box .stat-label{
+  font-size:10px;
+  letter-spacing:1px;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-top:4px;
+}
+.stats-rank{display:flex;flex-direction:column;gap:8px}
+.stats-rank .rank-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.stats-rank .rank-name{
+  flex:0 0 150px;
+  font-size:12px;
+  color:var(--t);
+  font-weight:600;
+}
+.stats-rank .rank-bar-wrap{
+  flex:1;
+  height:8px;
+  background:var(--i);
+  border-radius:4px;
+  overflow:hidden;
+}
+.stats-rank .rank-bar{
+  height:100%;
+  background:linear-gradient(90deg,var(--p),var(--a));
+  border-radius:4px;
+}
+.stats-rank .rank-count{
+  flex:0 0 40px;
+  text-align:right;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:700;
+}
+.stats-refresh{
+  border:1px solid #315071;
+  background:var(--i);
+  color:var(--t);
+  padding:8px 13px;
+  border-radius:5px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:.2s;
+}
+.stats-refresh:hover{background:#14253e;border-color:var(--a);color:#fff}
+.stats-refresh:disabled{opacity:.6;cursor:default}
+.stats-msg{color:var(--muted);font-size:12px}
+ 
  
 /* =====================================================
    BÍBLIA PARALELA — OS TRÊS BLOCOS SÃO O LEITOR
@@ -779,6 +852,36 @@ main{
     de criação, organização e gestão dos conteúdos produzidos dentro do
     Palavra &amp; Série.
   </p>
+</section>
+ 
+<div class="section-title">VISITANTES E SETORES MAIS CONSULTADOS</div>
+ 
+<section class="workspace">
+  <article class="card stats-card">
+    <div class="card-main">
+      <div>
+        <div class="stats-summary">
+          <div class="stat-box">
+            <div class="stat-num" id="statTotalVisitas">—</div>
+            <div class="stat-label">Visitas registradas</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statVisitantesUnicos">—</div>
+            <div class="stat-label">Visitantes (aprox.)</div>
+          </div>
+        </div>
+ 
+        <div class="stats-rank" id="statsRank">
+          <span class="stats-msg">Carregando estatísticas…</span>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="card-footer">
+      <span class="card-status" id="statsUpdatedAt">—</span>
+      <button class="stats-refresh" id="statsRefreshBtn" type="button">ATUALIZAR</button>
+    </div>
+  </article>
 </section>
  
 <div id="biblia-paralela" class="section-title">BÍBLIA PARALELA</div>
@@ -1454,6 +1557,90 @@ async function iniciarBibliaParalela(){
 let verificacaoEmAndamento = false;
 let leitorInicializado = false;
  
+/* =====================================================
+   VISITANTES E SETORES MAIS CONSULTADOS
+===================================================== */
+ 
+const statTotalVisitas = document.getElementById("statTotalVisitas");
+const statVisitantesUnicos = document.getElementById("statVisitantesUnicos");
+const statsRank = document.getElementById("statsRank");
+const statsUpdatedAt = document.getElementById("statsUpdatedAt");
+const statsRefreshBtn = document.getElementById("statsRefreshBtn");
+ 
+async function carregarEstatisticasVisitas(){
+  if(!statsRefreshBtn) return;
+ 
+  statsRefreshBtn.disabled = true;
+  statsRefreshBtn.textContent = "ATUALIZANDO...";
+ 
+  try{
+    const {data,error} =
+      await supabaseClient
+        .from("visitas")
+        .select("pagina,visitante_id");
+ 
+    if(error) throw error;
+ 
+    const linhas = data || [];
+ 
+    // total de visitas
+    statTotalVisitas.textContent = linhas.length;
+ 
+    // visitantes únicos (aproximado por visitante_id salvo no navegador)
+    const idsUnicos = new Set(
+      linhas.map(function(l){ return l.visitante_id; }).filter(Boolean)
+    );
+    statVisitantesUnicos.textContent = idsUnicos.size;
+ 
+    // ranking por setor/página
+    const contagem = {};
+    linhas.forEach(function(l){
+      const nome = l.pagina || "Desconhecido";
+      contagem[nome] = (contagem[nome] || 0) + 1;
+    });
+ 
+    const ranking = Object.keys(contagem)
+      .map(function(nome){ return {nome:nome, total:contagem[nome]}; })
+      .sort(function(a,b){ return b.total - a.total; });
+ 
+    if(ranking.length === 0){
+      statsRank.innerHTML =
+        '<span class="stats-msg">Ainda não há visitas registradas.</span>';
+    }else{
+      const maior = ranking[0].total;
+ 
+      statsRank.innerHTML = ranking.map(function(item){
+        const pct = Math.max(6, Math.round((item.total / maior) * 100));
+        return (
+          '<div class="rank-row">' +
+            '<div class="rank-name">' + item.nome + '</div>' +
+            '<div class="rank-bar-wrap"><div class="rank-bar" style="width:' + pct + '%"></div></div>' +
+            '<div class="rank-count">' + item.total + '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+ 
+    const agora = new Date();
+    statsUpdatedAt.textContent =
+      "ATUALIZADO ÀS " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+ 
+  }catch(error){
+    console.error("Erro ao carregar estatísticas:",error);
+    statsRank.innerHTML =
+      '<span class="stats-msg">Não foi possível carregar as estatísticas agora.</span>';
+  }finally{
+    statsRefreshBtn.disabled = false;
+    statsRefreshBtn.textContent = "ATUALIZAR";
+  }
+}
+ 
+if(statsRefreshBtn){
+  statsRefreshBtn.addEventListener("click",function(){
+    carregarEstatisticasVisitas();
+  });
+}
+ 
 function prepararNovaVerificacao(){
   app.style.display = "none";
   errorBox.style.display = "none";
@@ -1496,6 +1683,8 @@ async function verificarSessao(opcoes = {}){
       leitorInicializado = true;
       iniciarBibliaParalela();
     }
+ 
+    carregarEstatisticasVisitas();
  
   }catch(error){
     console.error("Erro ao verificar sessão:",error);
@@ -1563,6 +1752,34 @@ document.addEventListener("visibilitychange",function(){
     verificarSessao({revalidar:true});
   }
 });
+</script>
+<script>
+(function(){
+  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+  var PAGINA = "Sala do Escritor";
+ 
+  try{
+    var vid = localStorage.getItem("ps_visitante_id");
+    if(!vid){
+      vid = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+      localStorage.setItem("ps_visitante_id", vid);
+    }
+ 
+    fetch(SUPABASE_URL + "/rest/v1/visitas", {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
+    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
+  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
+})();
 </script>
 </body>
 </html>
