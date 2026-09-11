@@ -22,6 +22,7 @@ Analise textual · HTML
 .question-box .qtext{font-size:15px;line-height:1.6;color:#183042}
 .question-box .qcopy{margin-top:12px;padding:8px 14px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;font-size:12px;cursor:pointer}
 .pending-hint{margin-top:8px;font-size:12px;color:#a15b1f}
+.scan-box{margin-top:20px;padding:18px;border:1px solid #b9d8e6;border-radius:8px;background:#eef8fb}.scan-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.scan-head h2{margin:0;color:#183042;font-size:18px}.scan-btn{padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#04202f;font-weight:800;cursor:pointer}.scan-btn:disabled{opacity:.55;cursor:wait}.scan-status{margin-top:12px;color:#385466;font-size:13px}.scan-list{display:grid;gap:8px;margin-top:14px}.scan-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #d7e5ea;border-radius:6px;background:#fff}.scan-item h3{margin:0;color:#183042;font-size:13px}.scan-item p{margin:4px 0 0;color:#587080;font-size:12px;line-height:1.45}.scan-badge{flex:0 0 auto;padding:4px 7px;border-radius:4px;font-size:10px;font-weight:900}.badge-found{background:#d9f7e4;color:#087332}.badge-uncertain{background:#fff1ce;color:#8a5a00}.badge-absent{background:#edf1f4;color:#607080}.detail-btn{margin-top:8px;padding:5px 9px;border:1px solid #b5cbd5;border-radius:5px;background:#fff;color:#183042;font-size:11px;font-weight:700;cursor:pointer}.detail-btn.locked{color:#8a5a00;border-color:#e0c47b}.account-box{margin-top:20px;padding:14px;border:1px solid #ddcea4;border-radius:8px;background:#fff}.account-row{display:flex;gap:8px;flex-wrap:wrap}.account-row input{flex:1;min-width:180px;padding:9px;border:1px solid #ccb98a;border-radius:6px}.account-row button{padding:9px 13px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;cursor:pointer}.account-status{margin-top:8px;color:#6c5c42;font-size:12px}
 @media(max-width:800px){.shell{display:block}.sidebar{width:100%;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.index{max-height:48vh}.main{padding:18px 10px}.card{padding:22px}.card h1{font-size:26px}}
 </style>
 </head>
@@ -663,259 +664,68 @@ Analise textual · HTML
  
 <div class="selected" id="selected"><strong>Recurso selecionado:</strong> nenhum recurso selecionado.</div>
  
+<div class="account-box" id="accountBox">
+  <strong>Conta e acesso</strong>
+  <div class="account-row" id="accountForm" style="margin-top:10px">
+    <input type="email" id="authEmail" placeholder="Seu e-mail" autocomplete="email">
+    <input type="password" id="authPassword" placeholder="Senha" autocomplete="current-password">
+    <button type="button" id="authButton">Entrar</button>
+  </div>
+  <div class="account-status" id="accountStatus">A varredura do grupo é visível para todos. A análise completa respeita o nível da sua assinatura.</div>
+</div>
+
+<div class="scan-box" id="scanBox" hidden>
+  <div class="scan-head"><h2 id="scanTitle">Varredura do grupo</h2><button class="scan-btn" type="button" id="scanButton">Analisar grupo</button></div>
+  <div class="scan-status" id="scanStatus">Salve uma passagem ou tema e clique em “Analisar grupo”.</div>
+  <div class="scan-list" id="scanList"></div>
+</div>
+
 <div id="questionArea"></div>
  
 </section>
 </main>
 </div>
 <script>
-// ============================================================
-// Análise Textual — módulo independente (não compartilha código
-// com a Matriz Técnica PRO nem com nenhum outro menu do site)
-// ============================================================
- 
-// 126 formulações-modelo, uma por operação (A.1 a L.20).
-// {P} é substituído pela referência (passagem/tema) salva pelo pesquisador.
-const perguntasAnaliseTextual = {
-  'A.1': 'Existe uma metáfora pontual ou continuada em {P}, e qual é a base teológica e cultural dessa transferência de sentido?',
-  'A.2': 'Que símiles aparecem em {P}, quais conectivos de comparação os introduzem, e o que está sendo comparado?',
-  'A.3': 'Que hipérboles aparecem em {P}, e que verdade ou emoção elas enfatizam sem exigir leitura literal?',
-  'A.4': 'Há ironia verbal em {P} — seja num comentário de personagem, seja no tom crítico do texto — e qual é o subtexto por trás da literalidade?',
-  'A.5': 'Há eufemismos em {P} — que expressão atenuante é usada, e qual é o conceito real e cru que ela suaviza?',
-  'A.6': 'Que elementos não humanos são humanizados em {P}, e que efeito poético ou dramático isso gera?',
-  'A.7': 'Há antropomorfismo em {P} (mãos, olhos, arrependimento etc.), e qual é o propósito pedagógico dessa descrição, sem cair em leitura literal da natureza divina?',
-  'A.8': 'Há metonímia em {P} — qual termo substitui qual, e que relação lógica valida essa troca no contexto histórico-cultural?',
-  'A.9': 'Há sinédoque em {P} — que fragmento representa a totalidade (ou vice-versa), e como isso refina o vocabulário bíblico ali?',
-  'A.10': 'Há apóstrofe em {P} — a quem ou a que o autor se dirige de forma abrupta, e que carga emocional essa quebra injeta no texto?',
-  'A.11': 'Há paradoxo em {P} — qual é a contradição aparente, e que verdade teológica ela resolve ao ser examinada de perto?',
-  'A.12': 'Que perguntas retóricas aparecem em {P}, e que impacto argumentativo ou exortativo elas exercem sobre a audiência original?',
-  'A.13': 'Há elipse em {P} — qual termo foi omitido, e como reconstituí-lo entre colchetes para completar o sentido?',
-  'A.14': 'Há zeugma em {P} — qual é o termo-âncora, e em que orações seguintes ele é reaproveitado sem repetição explícita?',
-  'A.15': 'Há graduação/clímax em {P} — qual é a progressão degrau a degrau, e onde está o ponto culminante do pensamento do autor?',
-  'B.1': 'Há paralelismo em {P} — que tipo é, e como a segunda linha se relaciona com a primeira?',
-  'B.2': 'Há antítese em {P} — quais polos opostos são colocados lado a lado, e que verdade isso reforça?',
-  'B.3': 'Que repetições de palavra/termo aparecem em {P}, e que ênfase, solenidade ou urgência elas comunicam?',
-  'B.4': 'Há quiasmo em {P} — qual é o padrão de espelhamento, e o que ele revela ao ler de fora para dentro?',
-  'B.5': 'Há inclusio em {P} — que frase/palavra abre e fecha o trecho, e que tema ela emoldura?',
-  'B.6': 'Há merismo em {P} — que par de extremos é mencionado, e que totalidade ele representa?',
-  'B.7': 'Há estrutura concêntrica em {P} — quais são as camadas emparelhadas, e qual é o elemento central?',
-  'B.8': 'Há contraste narrativo em {P} — que elementos são justapostos, e que julgamento moral isso sugere ao leitor?',
-  'B.9': 'Há refrão em {P} — qual é a linha recorrente, e que função rítmica/litúrgica ela cumpre?',
-  'B.10': 'Há inclusão temática em {P} — que tema abre e retorna ao final, e como ele amarra o raciocínio?',
-  'C.1': 'Há aliteração no original de {P} — quais consoantes se repetem, e que efeito isso causava na leitura em voz alta?',
-  'C.2': 'Há assonância no original de {P} — quais vogais se repetem, e que musicalidade/ligação conceitual isso cria?',
-  'C.3': 'Há paronomásia em {P} — quais palavras parecidas são contrastadas no original, e que efeito retórico isso gera?',
-  'C.4': 'Há trocadilho oculto em {P} — qual é o duplo sentido no original, e que humor/ironia/sátira cultural ele carrega?',
-  'C.5': 'Como é o ritmo poético de {P} no original — rápido, lento, fúnebre, festivo — e como isso dita o tom da leitura?',
-  'C.6': 'Há repetição sonora no original de {P} — que sufixos/terminações se repetem, e que efeito de memorização oral isso gera?',
-  'D.1': '{P} é uma parábola — quais são seus elementos narrativos, a reviravolta, e a lição espiritual central?',
-  'D.2': '{P} é um provérbio — que conselho prático ele contém, e como se aplica à vida cotidiana?',
-  'D.3': 'Há enigma em {P} — qual é o mistério proposto, e qual é sua resposta/simbolismo oculto?',
-  'D.4': 'Qual é o discurso argumentativo de {P} — tese, argumentos, e resposta a objeções?',
-  'D.5': 'Há diatribe em {P} — quais são as falas do \'adversário imaginário\', e como o autor as rebate?',
-  'D.6': '{P} segue o formato de testamento literário — quais são as instruções finais e o tom emocional da transição?',
-  'D.7': '{P} é um hino/cântico — quais são seus blocos de louvor, e que tema teológico central ele celebra?',
-  'D.8': '{P} contém uma oração — quais elementos formais aparecem, e qual é a postura do intercessor?',
-  'D.9': '{P} é um lamento — como se divide entre queixa, clamor e virada de confiança?',
-  'D.10': 'Há bênção em {P} — qual é a fórmula pronunciada, e que autoridade espiritual a sustenta?',
-  'D.11': 'Há oráculo de juízo em {P} — qual é a punição concreta anunciada, e sua gravidade?',
-  'D.12': '{P} traz uma genealogia — que função (messiânica, sacerdotal, jurídica) essa lista de nomes cumpre?',
-  'D.13': '{P} é uma narrativa de vocação — como se encaixam encontro, comissão, objeção, garantia divina e sinal confirmatório?',
-  'D.14': '{P} relata uma aliança — quais são as cláusulas, obrigações mútuas e o sinal que sela o pacto?',
-  'E.1': '{P} é narrativa histórica — qual o cenário, os personagens, o enredo e o ponto de vista narrativo?',
-  'E.2': '{P} pertence ao gênero poético — que marcas de lirismo e concisão confirmam isso?',
-  'E.3': '{P} é literatura sapiencial — o tom é prático-cotidiano ou filosófico-existencial?',
-  'E.4': '{P} contém lei/Torá — os mandamentos são apodíticos ou casuísticos, e qual sua função civil/religiosa?',
-  'E.5': '{P} é literatura profética — é proclamação atual ou predição futura, e onde está a fórmula \'assim diz o Senhor\'?',
-  'E.6': '{P} é apocalíptico — que símbolos codificados aparecem, e que consolo trazem à comunidade perseguida?',
-  'E.7': '{P} está no gênero evangelho — como essa ação/palavra de Jesus contribui para o retrato messiânico do autor?',
-  'E.8': '{P} é uma epístola — quais elementos estruturais aparecem, e qual foi a situação pastoral que motivou a carta?',
-  'E.9': '{P} é narrativa-teológica — como o autor seleciona/organiza os fatos para revelar o caráter e o propósito de Deus?',
-  'F.1': '{P} usa linguagem profética — qual é o alvo da denúncia, e qual o apelo ao arrependimento?',
-  'F.2': 'Há linguagem visionária em {P} — como é descrita a experiência mística, e qual o impacto na recepção da mensagem?',
-  'F.3': 'Que símbolos apocalípticos aparecem em {P}, e que mensagem codificada revelam no pano de fundo histórico?',
-  'F.4': 'Que imagens proféticas aparecem em {P}, e que choque visual elas pretendem causar na mente do ouvinte?',
-  'F.5': 'Há ato simbólico profético em {P} — qual é a ação física executada, o público, e o significado embutido?',
-  'F.6': '{P} é um oráculo profético — como se divide entre acusação e sentença, e onde aparece \'assim diz o Senhor\'?',
-  'G.1': 'Há citação explícita em {P} — qual é a fonte original, e como ela valida o argumento atual?',
-  'G.2': 'Há alusão em {P} — a que fato/texto/personagem anterior ela remete, e o que o leitor original precisava saber para captá-la?',
-  'G.3': 'Há eco intertextual em {P} — que vocabulário específico ecoa qual texto anterior, e como isso revela a formação do autor?',
-  'G.4': 'Que rede de intertextualidade conecta {P} a obras anteriores — citação, alusão, eco e releitura combinados?',
-  'G.5': 'Como {P} usa o Antigo Testamento — que tipo de aplicação hermenêutica é essa, e qual fonte textual (hebraico/LXX) foi usada?',
-  'G.6': 'Como {P} relê uma tradição anterior — qual era o sentido original, e que novo significado o autor dá a ele agora?',
-  'G.7': 'Que eco temático conecta {P} a outros pontos das Escrituras — qual motivo teológico é esse, e como ele atravessa a Bíblia?',
-  'H.1': 'Há tipologia em {P} — qual é o Tipo histórico, e qual o Antítipo (Cristo/Igreja) que ele prefigura?',
-  'H.2': '{P} funciona como alegoria — qual é o sistema de significados por trás dos personagens/ações, além da leitura literal?',
-  'H.3': 'Que elementos simbólicos aparecem em {P}, e que realidade espiritual/abstrata eles representam?',
-  'H.4': 'Há representação simbólica em {P} — que instituição/ritual/personagem encena qual verdade teológica de forma estruturada?',
-  'H.5': '{P} exige leitura figurada — que absurdo teológico/lógico ocorreria com leitura literal, justificando a leitura por tropos?',
-  'H.6': '{P} usa linguagem literal — o significado coincide exatamente com a literalidade gramatical, sem rodeio poético?',
-  'H.7': 'Faça um inventário da linguagem figurada em {P} — que recursos conotativos aparecem, e que impacto estético geram?',
-  'I.1': 'Qual é a tese central de {P}?',
-  'I.2': 'Que argumentos o autor usa em {P} para sustentar sua tese?',
-  'I.3': 'Que contraste argumentativo aparece em {P}, e como ele fortalece a posição do autor?',
-  'I.4': 'Que pergunta-objeção aparece em {P}, representando o questionamento da audiência?',
-  'I.5': 'Como o autor responde à objeção em {P} — que lógica, autoridade ou ironia ele usa para desarmá-la?',
-  'I.6': 'Qual é a conclusão/inferência de {P} — que veredito final o autor extrai das premissas?',
-  'I.7': 'Que exortação aparece em {P}, e que mudança de atitude ela pede?',
-  'I.8': 'Há advertência em {P} — qual é a ameaça identificada, e o comportamento a evitar?',
-  'I.9': 'Há consolação em {P} — que promessa de paz/alívio espiritual é oferecida, e a quem?',
-  'I.10': 'Há acusação em {P} — qual é a transgressão apontada, e quem é responsabilizado?',
-  'I.11': 'Há apelo à memória em {P} — que evento histórico é evocado, e como serve de alavanca moral para o argumento atual?',
-  'J.1': 'Qual é o campo semântico predominante em {P} no original, e como essa atmosfera lexical reforça a mensagem?',
-  'J.2': 'Há polissemia em {P} — que sentidos coexistem no termo original, e como eles enriquecem a interpretação sem exigir escolha?',
-  'J.3': 'Há ambiguidade lexical em {P} — que traduções competem no termo original, e qual faz mais sentido no contexto?',
-  'J.4': 'Há ambiguidade sintática em {P} no original — quais são as leituras gramaticais possíveis, e qual seu impacto teológico?',
-  'J.5': 'Há idiomatismo em {P} — qual é a expressão cultural, e qual sua tradução funcional equivalente hoje?',
-  'J.6': 'Há expressão convencional em {P} — qual é o jargão/fórmula usada, e qual seu peso social/literário na época?',
-  'J.7': 'Há fórmula literária em {P} — qual é a frase fixa, e como ela marca os blocos/divisões do texto?',
-  'J.8': 'Qual é o termo-chave de {P} — qual sua raiz no original, e sua importância para o desfecho do texto?',
-  'J.9': 'Há mudança de sentido contextual em {P} — como o significado de um termo repetido muda entre um trecho e outro?',
-  'J.10': 'Há ambiguidade intencional em {P} — quais dois sentidos operam ao mesmo tempo, e como isso aprofunda o ensinamento?',
-  'K.1': 'Quem são os personagens de {P}, e que papel moral/social/teológico cada um cumpre?',
-  'K.2': 'Há caracterização direta em {P} — que afirmação explícita descreve o personagem?',
-  'K.3': 'Há caracterização indireta em {P} — que ação/palavra/reação de terceiros revela o caráter do personagem?',
-  'K.4': 'Há ironia narrativa em {P} — qual era a expectativa, e como o desfecho a inverteu?',
-  'K.5': 'Há ironia dramática em {P} — que informação o leitor tem que o personagem não tem, e que tensão isso gera?',
-  'K.6': 'Há repetição narrativa em {P} — que cena/comando se repete, e que ênfase ou transição isso marca?',
-  'K.7': '{P} segue um padrão narrativo — qual é o molde (ex: pecado → opressão → clamor → libertação), e como os fatos se encaixam nele?',
-  'K.8': 'Há intercalação narrativa em {P} — qual história está \'ensanduichada\' dentro de qual, e como uma ilumina a outra?',
-  'K.9': 'Há suspense narrativo em {P} — onde o autor estica a tensão, e como isso prende a atenção do leitor?',
-  'K.10': 'Qual é o ponto de vista narrativo em {P} — onisciente ou restrito a um personagem — e como isso afeta a percepção dos fatos?',
-  'K.11': 'Como {P} alterna cena e sumário — onde há diálogo em tempo real, e onde há condensação rápida de eventos?',
-  'L.1': 'Qual é o contexto imediato de {P} — o que os versículos vizinhos revelam sobre seu real significado?',
-  'L.2': 'Qual é o contexto literário de {P} dentro da macroestrutura do livro?',
-  'L.3': 'Qual é o contexto histórico-cultural de {P} — que costumes/eventos da época explicam o texto?',
-  'L.4': 'Qual é o contexto canônico de {P} — como ela se harmoniza com o restante da Bíblia e a teologia bíblica geral?',
-  'L.5': 'Qual é o contexto autoral de {P} — que marcas do estilo/teologia do autor ajudam a decifrá-la?',
-  'L.6': 'Qual é o contexto do destinatário de {P} — quem recebeu o texto, e que crise moldou seu tom?',
-  'L.7': 'Quais são os limites da unidade literária que contém {P} — onde a perícope começa e termina?',
-  'L.8': 'Qual é a estrutura argumentativa de {P} — como as orações se hierarquizam logicamente?',
-  'L.9': 'Qual é a estrutura temática de {P} — como os assuntos se organizam e transitam ao longo do texto?',
-  'L.10': 'Qual é o significado histórico de {P}, e que aplicação contemporânea legítima decorre dele?',
-  'L.11': 'O que {P} afirma explicitamente, e o que é inferência teológica secundária — e essa inferência é válida?',
-  'L.12': 'Que leitura anacrônica é comumente aplicada a {P}, e por que ela projeta pensamento moderno sobre o texto antigo?',
-  'L.13': 'A interpretação comum de {P} é exegese ou eisegese — ela extrai ou força um sentido preestabelecido?',
-  'L.14': 'A leitura de {P} está alegorizando arbitrariamente detalhes literais — há justificativa literária no próprio texto para isso?',
-  'L.15': 'Há falácia lexical no uso do termo original em {P} — etimologia forçada, sentidos empilhados, ou anacronismo semântico?',
-  'L.16': '{P} está sendo usado como prova-texto isolado — o que o parágrafo/contexto completo realmente sustenta?',
-  'L.17': 'A instrução de {P} é um mandamento particular/local ou um princípio universal — e ela está sendo generalizada indevidamente?',
-  'L.18': 'Um termo/conceito de outro livro está sendo transferido indevidamente para {P} — os autores/épocas são compatíveis?',
-  'L.19': 'A interpretação de {P} contradiz a mensagem geral do livro/bloco — como harmonizar, ou a leitura deve ser revista?',
-  'L.20': 'A leitura de {P} está sobreinterpretando um detalhe trivial — o texto realmente sustenta essa mensagem secreta?'
-};
- 
+// Análise Textual: a IA trabalha por grupo. O frontend nunca presume uma detecção.
+const ANALISE_TEXTUAL_WORKER_URL = window.ANALISE_TEXTUAL_WORKER_URL || '';
+const SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+const REF_KEY = 'pes_analise_textual_referencia';
+const SESSION_KEY = 'pes_supabase_session';
+const TIER_RANK = { FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 };
 const refInput = document.getElementById('refInput');
 const refSave = document.getElementById('refSave');
 const refCurrent = document.getElementById('refCurrent');
 const selected = document.getElementById('selected');
 const questionArea = document.getElementById('questionArea');
- 
-const REF_KEY = 'pes_analise_textual_referencia';
- 
-function getReferencia(){
-  try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; }
-}
-function setReferencia(v){
-  try { localStorage.setItem(REF_KEY, v); } catch(e) { /* ignora */ }
-}
-function clearReferencia(){
-  try { localStorage.removeItem(REF_KEY); } catch(e) { /* ignora */ }
-}
- 
-function renderReferencia(){
-  const ref = getReferencia();
-  if(ref){
-    refCurrent.innerHTML = '<strong>Referência atual:</strong> ' + ref +
-      ' — <button type="button" class="secondary" id="refChange" style="padding:4px 10px;border:1px solid #ccb98a;border-radius:5px;background:transparent;color:#6c5c42;font-size:11px;cursor:pointer">Trocar passagem/tema</button>';
-    const btn = document.getElementById('refChange');
-    if(btn){
-      btn.addEventListener('click', () => {
-        clearReferencia();
-        refInput.value = '';
-        questionArea.innerHTML = '';
-        selected.innerHTML = '<strong>Recurso selecionado:</strong> nenhum recurso selecionado.';
-        renderReferencia();
-        refInput.focus();
-      });
-    }
-  } else {
-    refCurrent.textContent = 'Nenhuma referência salva ainda.';
-  }
-}
- 
-refSave.addEventListener('click', () => {
-  const v = refInput.value.trim();
-  if(!v){
-    refInput.focus();
-    return;
-  }
-  setReferencia(v);
-  renderReferencia();
-});
- 
-refInput.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter'){
-    e.preventDefault();
-    refSave.click();
-  }
-});
- 
-// pré-carrega referência salva de sessões anteriores
-(function initRef(){
-  const ref = getReferencia();
-  if(ref) refInput.value = ref;
-  renderReferencia();
-})();
- 
-document.querySelectorAll('.category-toggle').forEach(button => {
-  button.addEventListener('click', () => {
-    const resources = button.nextElementSibling;
-    const open = resources.classList.toggle('open');
-    button.classList.toggle('active', open);
-    button.setAttribute('aria-expanded', String(open));
-  });
-});
- 
-document.querySelectorAll('.resource').forEach(button => {
-  button.addEventListener('click', () => {
-    const code = button.dataset.code;
-    const label = button.dataset.resource;
-    selected.innerHTML = '<strong>Recurso selecionado:</strong> ' + code + ' — ' + label;
- 
-    const ref = getReferencia();
-    if(!ref){
-      questionArea.innerHTML = '<div class="pending-hint">⚠ Informe e salve uma passagem ou tema de estudo acima para gerar a pergunta de pesquisa deste recurso.</div>';
-      refInput.focus();
-      return;
-    }
- 
-    const template = perguntasAnaliseTextual[code];
-    if(!template){
-      questionArea.innerHTML = '';
-      return;
-    }
-    const pergunta = template.split('{P}').join(ref);
- 
-    questionArea.innerHTML =
-      '<div class="question-box">' +
-        '<span class="qcode">' + code + '</span>' +
-        '<div class="qtext" id="qtext">' + pergunta + '</div>' +
-        '<button type="button" class="qcopy" id="qcopy">Copiar pergunta</button>' +
-      '</div>';
- 
-    const copyBtn = document.getElementById('qcopy');
-    copyBtn.addEventListener('click', () => {
-      const text = document.getElementById('qtext').textContent;
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(text).then(() => {
-          copyBtn.textContent = 'Copiado!';
-          setTimeout(() => { copyBtn.textContent = 'Copiar pergunta'; }, 1500);
-        }).catch(() => {});
-      }
-    });
-  });
-});
+const scanBox = document.getElementById('scanBox');
+const scanTitle = document.getElementById('scanTitle');
+const scanButton = document.getElementById('scanButton');
+const scanStatus = document.getElementById('scanStatus');
+const scanList = document.getElementById('scanList');
+const accountForm = document.getElementById('accountForm');
+const accountStatus = document.getElementById('accountStatus');
+let activeCategory = null;
+let lastScan = null;
+function esc(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function getReferencia(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; } }
+function setReferencia(v){ try { localStorage.setItem(REF_KEY, v); } catch(e) {} }
+function getSession(){ try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch(e) { return null; } }
+function setSession(v){ try { localStorage.setItem(SESSION_KEY, JSON.stringify(v)); } catch(e) {} }
+function clearSession(){ try { localStorage.removeItem(SESSION_KEY); } catch(e) {} }
+function currentPlan(){ return String(getSession()?.profile?.plano || 'FREE').toUpperCase(); }
+function canOpen(required){ return !!getSession() && (TIER_RANK[currentPlan()] ?? 0) >= (TIER_RANK[String(required).toUpperCase()] ?? 99); }
+function categoriesFor(button){ const section=button.closest('.category'); return {code:button.querySelector('.category-code')?.textContent.trim()||'',name:button.querySelector('strong')?.textContent.trim()||'',resources:[...section.querySelectorAll('.resource')].map(r=>({code:r.dataset.code,name:r.dataset.resource,tier:r.querySelector('.tier')?.textContent.trim()||'FREE'}))}; }
+function renderReferencia(){ const ref=getReferencia(); refCurrent.innerHTML=ref?'<strong>Referência atual:</strong> '+esc(ref)+' — <button type="button" class="secondary" id="refChange" style="padding:4px 10px;border:1px solid #ccb98a;border-radius:5px;background:transparent;color:#6c5c42;font-size:11px;cursor:pointer">Trocar passagem/tema</button>':'Nenhuma referência salva ainda.'; document.getElementById('refChange')?.addEventListener('click',()=>{localStorage.removeItem(REF_KEY);refInput.value='';lastScan=null;scanBox.hidden=true;questionArea.innerHTML='';renderReferencia();refInput.focus();}); }
+function renderAccount(){ const session=getSession(); if(session){ accountForm.innerHTML='<span style="padding:9px 0;color:#385466">'+esc(session.email||'')+' · plano <strong>'+esc(currentPlan())+'</strong></span><button type="button" id="authButton">Sair</button>';accountStatus.textContent='Sessão ativa. Os detalhes liberados seguem o plano informado em profiles.plano.';document.getElementById('authButton').onclick=()=>{clearSession();renderAccount();renderScan();}; } else accountStatus.textContent='A varredura do grupo é visível para todos. A análise completa respeita o nível da sua assinatura.'; }
+async function login(){ const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;if(!email||!password){accountStatus.textContent='Informe e-mail e senha para entrar.';return;}accountStatus.textContent='Entrando…';try{const auth=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});const data=await auth.json();if(!auth.ok)throw new Error(data.error_description||data.msg||'Não foi possível entrar.');const profileRes=await fetch(SUPABASE_URL+'/rest/v1/profiles?select=plano&id=eq.'+encodeURIComponent(data.user.id)+'&limit=1',{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+data.access_token}});const profiles=profileRes.ok?await profileRes.json():[];setSession({access_token:data.access_token,user_id:data.user.id,email:data.user.email,profile:profiles[0]||{plano:'FREE'}});renderAccount();renderScan();}catch(err){accountStatus.textContent=err.message||'Falha de autenticação.';} }
+async function scanGroup(){ const ref=getReferencia();if(!ref){scanStatus.textContent='Salve primeiro uma passagem ou tema de estudo.';refInput.focus();return;}if(!ANALISE_TEXTUAL_WORKER_URL){scanStatus.textContent='Worker-AnaliseTextual ainda não está configurado nesta publicação. Nenhum resultado foi presumido.';return;}scanButton.disabled=true;scanStatus.textContent='IA verificando cada etapa com critério conservador…';scanList.innerHTML='';try{const response=await fetch(ANALISE_TEXTUAL_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',...(getSession()?.access_token?{Authorization:'Bearer '+getSession().access_token}: {})},body:JSON.stringify({reference:ref,group:{code:activeCategory.code,name:activeCategory.name,resources:activeCategory.resources}})});const payload=await response.json();if(!response.ok)throw new Error(payload.error||'O Worker não respondeu corretamente.');lastScan=payload;renderScan();scanStatus.textContent='Varredura concluída. “Encontrado” exige evidência; “incerto” não é tratado como confirmação.';}catch(err){scanStatus.textContent='Não foi possível concluir a varredura: '+(err.message||'erro desconhecido');}finally{scanButton.disabled=false;} }
+function renderScan(){ if(!activeCategory)return;scanBox.hidden=false;scanTitle.textContent=activeCategory.code+' — '+activeCategory.name;if(!lastScan){scanList.innerHTML='';return;}const byCode=Object.fromEntries((lastScan.results||[]).map(x=>[x.code,x]));scanList.innerHTML=activeCategory.resources.map(r=>{const item=byCode[r.code]||{status:'uncertain',reason:'Sem resultado confiável.'};const status=String(item.status||'uncertain').toLowerCase(),label=status==='found'?'ENCONTRADO':status==='absent'?'NÃO ENCONTRADO':'INCERTO',cls=status==='found'?'found':status==='absent'?'absent':'uncertain',can=canOpen(r.tier);return '<article class="scan-item"><div><h3>'+esc(r.code+' — '+r.name)+'</h3><p>'+esc(item.reason||'Sem evidência suficiente.')+'</p><button class="detail-btn '+(can?'':'locked')+'" data-detail="'+esc(r.code)+'">'+(can?'Abrir análise completa':'Exige '+esc(r.tier))+'</button></div><span class="scan-badge badge-'+cls+'">'+label+'</span></article>';}).join('');scanList.querySelectorAll('[data-detail]').forEach(btn=>btn.onclick=()=>openDetail(btn.dataset.detail)); }
+function openDetail(code){ const resource=activeCategory.resources.find(r=>r.code===code);if(!resource)return;if(!canOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;}const result=(lastScan?.results||[]).find(x=>x.code===code);questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br>'+esc(result?.analysis||result?.reason||'A análise detalhada ainda não foi disponibilizada pelo Worker.')+'</div></div>'; }
+refSave.onclick=()=>{const value=refInput.value.trim();if(!value){refInput.focus();return;}setReferencia(value);lastScan=null;renderReferencia();if(activeCategory){renderScan();scanStatus.textContent='Referência salva. Clique em “Analisar grupo”.';}};refInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();refSave.click();}};scanButton.onclick=scanGroup;document.getElementById('authButton').onclick=login;
+document.querySelectorAll('.category-toggle').forEach(button=>button.addEventListener('click',()=>{const resources=button.nextElementSibling,open=resources.classList.toggle('open');button.classList.toggle('active',open);button.setAttribute('aria-expanded',String(open));if(open){activeCategory=categoriesFor(button);lastScan=null;selected.innerHTML='<strong>Grupo selecionado:</strong> '+esc(activeCategory.code+' — '+activeCategory.name);questionArea.innerHTML='';scanStatus.textContent=getReferencia()?'Clique em “Analisar grupo” para verificar as '+activeCategory.resources.length+' etapas.':'Salve uma passagem ou tema de estudo primeiro.';renderScan();}}));
+document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(activeCategory)openDetail(button.dataset.code);}));
+const saved=getReferencia();if(saved)refInput.value=saved;renderReferencia();renderAccount();
 </script>
 <script>
 (function(){
