@@ -1623,6 +1623,34 @@ REGRAS:
  
     input.focus();
   </script>
+<script>
+(function(){
+  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+  var PAGINA = "Oráculo";
+ 
+  try{
+    var vid = localStorage.getItem("ps_visitante_id");
+    if(!vid){
+      vid = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+      localStorage.setItem("ps_visitante_id", vid);
+    }
+ 
+    fetch(SUPABASE_URL + "/rest/v1/visitas", {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
+    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
+  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
+})();
+</script>
 </body>
 </html>
  
