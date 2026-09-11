@@ -26,9 +26,7 @@ Painel autor supabase · HTML
       --radius: 14px;
     }
  
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
  
     body {
       margin: 0;
@@ -37,20 +35,91 @@ Painel autor supabase · HTML
       font-family: Georgia, "Times New Roman", serif;
     }
  
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
  
-    button {
-      cursor: pointer;
-    }
+    .page { min-height: 100vh; }
  
-    .page {
+    /* =========================
+       TELA DE LOGIN
+       ========================= */
+ 
+    #authGate {
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
+ 
+    .auth-card {
+      width: min(380px, 100%);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 28px;
+    }
+ 
+    .auth-card h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+ 
+    .auth-card p.sub {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+ 
+    .auth-field {
+      margin-bottom: 14px;
+    }
+ 
+    .auth-field label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+ 
+    .auth-field input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--text);
+    }
+ 
+    .auth-error {
+      display: none;
+      background: #f9eeee;
+      border: 1px solid #dfbaba;
+      color: var(--danger);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+ 
+    .auth-error.visible { display: block; }
+ 
+    .auth-submit {
+      width: 100%;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      border-radius: 9px;
+      padding: 11px 15px;
+      font-size: 15px;
+      transition: .15s ease;
+    }
+ 
+    .auth-submit:hover { background: var(--accent-dark); }
+    .auth-submit:disabled { opacity: .6; cursor: default; }
+ 
+    #appRoot { display: none; }
  
     /* =========================
        HEADER
@@ -68,31 +137,16 @@ Painel autor supabase · HTML
     .header-inner {
       max-width: 1400px;
       margin: 0 auto;
- 
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 20px;
     }
  
-    .brand h1 {
-      margin: 0;
-      font-size: 25px;
-      letter-spacing: .04em;
-      font-weight: 600;
-    }
+    .brand h1 { margin: 0; font-size: 25px; letter-spacing: .04em; font-weight: 600; }
+    .brand p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
  
-    .brand p {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
- 
-    .header-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
  
     .btn {
       border: 1px solid var(--border);
@@ -103,34 +157,16 @@ Painel autor supabase · HTML
       transition: .15s ease;
     }
  
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
- 
-    .btn-primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
- 
-    .btn-primary:hover {
-      background: var(--accent-dark);
-    }
- 
-    .btn-danger {
-      color: var(--danger);
-    }
+    .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-dark); }
+    .btn-danger { color: var(--danger); }
  
     /* =========================
        MAIN
        ========================= */
  
-    main {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 28px;
-    }
+    main { max-width: 1400px; margin: 0 auto; padding: 28px; }
  
     .status-bar {
       display: none;
@@ -142,30 +178,11 @@ Painel autor supabase · HTML
       font-size: 14px;
     }
  
-    .status-bar.visible {
-      display: block;
-    }
+    .status-bar.visible { display: block; }
+    .status-bar.error { color: var(--danger); border-color: #d8aaaa; }
+    .status-bar.success { color: var(--success); border-color: #a9c8b3; }
  
-    .status-bar.error {
-      color: var(--danger);
-      border-color: #d8aaaa;
-    }
- 
-    .status-bar.success {
-      color: var(--success);
-      border-color: #a9c8b3;
-    }
- 
-    /* =========================
-       STATS
-       ========================= */
- 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 25px;
-    }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
  
     .stat-card {
       background: var(--surface);
@@ -175,20 +192,8 @@ Painel autor supabase · HTML
       box-shadow: var(--shadow);
     }
  
-    .stat-label {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
- 
-    .stat-number {
-      font-size: 30px;
-      font-weight: 600;
-    }
- 
-    /* =========================
-       TOOLBAR
-       ========================= */
+    .stat-label { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .stat-number { font-size: 30px; font-weight: 600; }
  
     .panel {
       background: var(--surface);
@@ -200,19 +205,15 @@ Painel autor supabase · HTML
     .toolbar {
       padding: 18px;
       border-bottom: 1px solid var(--border);
- 
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       align-items: center;
     }
  
-    .search {
-      flex: 1 1 260px;
-    }
+    .search { flex: 1 1 260px; }
  
-    .field,
-    .search {
+    .field, .search {
       min-height: 42px;
       border: 1px solid var(--border);
       background: #fff;
@@ -221,26 +222,13 @@ Painel autor supabase · HTML
       color: var(--text);
     }
  
-    select.field {
-      min-width: 170px;
-    }
+    select.field { min-width: 170px; }
  
-    /* =========================
-       TABLE
-       ========================= */
+    .table-wrap { overflow-x: auto; }
  
-    .table-wrap {
-      overflow-x: auto;
-    }
+    table { width: 100%; border-collapse: collapse; min-width: 950px; }
  
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 950px;
-    }
- 
-    th,
-    td {
+    th, td {
       padding: 15px 17px;
       border-bottom: 1px solid var(--border);
       text-align: left;
@@ -255,29 +243,10 @@ Painel autor supabase · HTML
       background: var(--surface-2);
     }
  
-    td {
-      font-size: 14px;
-    }
- 
-    tbody tr:hover {
-      background: #faf7f0;
-    }
- 
-    .title-cell {
-      font-weight: 600;
-    }
- 
-    .subtitle {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: normal;
-    }
- 
-    /* =========================
-       BADGES
-       ========================= */
+    td { font-size: 14px; }
+    tbody tr:hover { background: #faf7f0; }
+    .title-cell { font-weight: 600; }
+    .subtitle { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: normal; }
  
     .badge {
       display: inline-flex;
@@ -290,33 +259,12 @@ Painel autor supabase · HTML
       background: var(--surface-2);
     }
  
-    .badge-published {
-      color: var(--success);
-      border-color: #b8d1be;
-      background: #edf6ef;
-    }
+    .badge-published { color: var(--success); border-color: #b8d1be; background: #edf6ef; }
+    .badge-review { color: var(--warning); border-color: #dec79d; background: #faf3df; }
+    .badge-draft { color: var(--muted); }
+    .badge-archived { color: var(--danger); border-color: #dfbaba; background: #f9eeee; }
  
-    .badge-review {
-      color: var(--warning);
-      border-color: #dec79d;
-      background: #faf3df;
-    }
- 
-    .badge-draft {
-      color: var(--muted);
-    }
- 
-    .badge-archived {
-      color: var(--danger);
-      border-color: #dfbaba;
-      background: #f9eeee;
-    }
- 
-    .actions {
-      display: flex;
-      gap: 7px;
-      flex-wrap: wrap;
-    }
+    .actions { display: flex; gap: 7px; flex-wrap: wrap; }
  
     .action-btn {
       padding: 7px 9px;
@@ -326,32 +274,9 @@ Painel autor supabase · HTML
       font-size: 12px;
     }
  
-    /* =========================
-       EMPTY / LOADING
-       ========================= */
- 
-    .empty {
-      padding: 60px 20px;
-      text-align: center;
-      color: var(--muted);
-    }
- 
-    .empty strong {
-      display: block;
-      color: var(--text);
-      margin-bottom: 8px;
-      font-size: 17px;
-    }
- 
-    .loading {
-      padding: 40px;
-      text-align: center;
-      color: var(--muted);
-    }
- 
-    /* =========================
-       MODAL
-       ========================= */
+    .empty { padding: 60px 20px; text-align: center; color: var(--muted); }
+    .empty strong { display: block; color: var(--text); margin-bottom: 8px; font-size: 17px; }
+    .loading { padding: 40px; text-align: center; color: var(--muted); }
  
     .modal-backdrop {
       position: fixed;
@@ -364,9 +289,7 @@ Painel autor supabase · HTML
       z-index: 100;
     }
  
-    .modal-backdrop.open {
-      display: flex;
-    }
+    .modal-backdrop.open { display: flex; }
  
     .modal {
       width: min(900px, 100%);
@@ -381,54 +304,20 @@ Painel autor supabase · HTML
     .modal-header {
       padding: 20px 22px;
       border-bottom: 1px solid var(--border);
- 
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 15px;
     }
  
-    .modal-header h2 {
-      margin: 0;
-      font-size: 20px;
-    }
- 
-    .close {
-      border: 0;
-      background: transparent;
-      font-size: 25px;
-      color: var(--muted);
-    }
- 
-    .modal-body {
-      padding: 22px;
-    }
- 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 17px;
-    }
- 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
- 
-    .form-group.full {
-      grid-column: 1 / -1;
-    }
- 
-    label {
-      font-size: 13px;
-      color: var(--muted);
-    }
- 
-    textarea {
-      min-height: 150px;
-      resize: vertical;
-    }
+    .modal-header h2 { margin: 0; font-size: 20px; }
+    .close { border: 0; background: transparent; font-size: 25px; color: var(--muted); }
+    .modal-body { padding: 22px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+    .form-group { display: flex; flex-direction: column; gap: 7px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 13px; color: var(--muted); }
+    textarea { min-height: 150px; resize: vertical; }
  
     .form-control {
       width: 100%;
@@ -442,55 +331,62 @@ Painel autor supabase · HTML
     .modal-footer {
       padding: 18px 22px;
       border-top: 1px solid var(--border);
- 
       display: flex;
       justify-content: flex-end;
       gap: 10px;
     }
  
-    /* =========================
-       RESPONSIVE
-       ========================= */
- 
     @media (max-width: 900px) {
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
- 
-      .header-inner {
-        align-items: flex-start;
-        flex-direction: column;
-      }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .header-inner { align-items: flex-start; flex-direction: column; }
     }
  
     @media (max-width: 600px) {
-      header,
-      main {
-        padding: 18px;
-      }
- 
-      .stats {
-        grid-template-columns: 1fr 1fr;
-      }
- 
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
- 
-      .form-group.full {
-        grid-column: auto;
-      }
+      header, main { padding: 18px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: auto; }
     }
   </style>
 </head>
  
 <body>
  
-<div class="page">
+<!-- =========================
+     TELA DE LOGIN (bloqueia tudo até autenticar)
+     ========================= -->
  
-  <!-- =========================
-       CABEÇALHO
-       ========================= -->
+<div id="authGate">
+  <div class="auth-card">
+    <h1>Painel do Autor</h1>
+    <p class="sub">Acesso restrito. Entre com sua conta autorizada.</p>
+ 
+    <div id="authError" class="auth-error"></div>
+ 
+    <form id="authForm">
+ 
+      <div class="auth-field">
+        <label for="authEmail">E-mail</label>
+        <input id="authEmail" type="email" required autocomplete="username">
+      </div>
+ 
+      <div class="auth-field">
+        <label for="authPassword">Senha</label>
+        <input id="authPassword" type="password" required autocomplete="current-password">
+      </div>
+ 
+      <button type="submit" class="auth-submit" id="authSubmit">Entrar</button>
+ 
+    </form>
+  </div>
+</div>
+ 
+ 
+<!-- =========================
+     APLICAÇÃO (só aparece após login + verificação)
+     ========================= -->
+ 
+<div id="appRoot" class="page">
  
   <header>
     <div class="header-inner">
@@ -501,13 +397,9 @@ Painel autor supabase · HTML
       </div>
  
       <div class="header-actions">
-        <button class="btn" id="refreshBtn">
-          ↻ Atualizar
-        </button>
- 
-        <button class="btn btn-primary" id="newContentBtn">
-          + Novo conteúdo
-        </button>
+        <button class="btn" id="refreshBtn">↻ Atualizar</button>
+        <button class="btn btn-primary" id="newContentBtn">+ Novo conteúdo</button>
+        <button class="btn btn-danger" id="logoutBtn">Sair</button>
       </div>
  
     </div>
@@ -518,50 +410,30 @@ Painel autor supabase · HTML
  
     <div id="statusBar" class="status-bar"></div>
  
- 
-    <!-- =========================
-         INDICADORES
-         ========================= -->
- 
     <section class="stats">
- 
       <div class="stat-card">
         <div class="stat-label">Total de conteúdos</div>
         <div class="stat-number" id="totalCount">—</div>
       </div>
- 
       <div class="stat-card">
         <div class="stat-label">Rascunhos</div>
         <div class="stat-number" id="draftCount">—</div>
       </div>
- 
       <div class="stat-card">
         <div class="stat-label">Em revisão</div>
         <div class="stat-number" id="reviewCount">—</div>
       </div>
- 
       <div class="stat-card">
         <div class="stat-label">Publicados</div>
         <div class="stat-number" id="publishedCount">—</div>
       </div>
- 
     </section>
- 
- 
-    <!-- =========================
-         LISTA
-         ========================= -->
  
     <section class="panel">
  
       <div class="toolbar">
  
-        <input
-          id="searchInput"
-          class="search"
-          type="search"
-          placeholder="Pesquisar por título, referência ou resumo..."
-        >
+        <input id="searchInput" class="search" type="search" placeholder="Pesquisar por título, referência ou resumo...">
  
         <select id="categoryFilter" class="field">
           <option value="">Todas as categorias</option>
@@ -591,11 +463,8 @@ Painel autor supabase · HTML
  
       </div>
  
- 
       <div class="table-wrap">
- 
         <table>
- 
           <thead>
             <tr>
               <th>Conteúdo</th>
@@ -607,19 +476,10 @@ Painel autor supabase · HTML
               <th>Ações</th>
             </tr>
           </thead>
- 
           <tbody id="contentTableBody">
-            <tr>
-              <td colspan="7">
-                <div class="loading">
-                  Carregando conteúdos...
-                </div>
-              </td>
-            </tr>
+            <tr><td colspan="7"><div class="loading">Carregando conteúdos...</div></td></tr>
           </tbody>
- 
         </table>
- 
       </div>
  
     </section>
@@ -634,290 +494,102 @@ Painel autor supabase · HTML
      ========================= -->
  
 <div id="contentModal" class="modal-backdrop">
- 
   <div class="modal">
- 
     <div class="modal-header">
- 
       <h2 id="modalTitle">Novo conteúdo</h2>
- 
-      <button
-        class="close"
-        id="closeModalBtn"
-        aria-label="Fechar"
-      >
-        ×
-      </button>
- 
+      <button class="close" id="closeModalBtn" aria-label="Fechar">×</button>
     </div>
  
- 
     <form id="contentForm">
- 
       <div class="modal-body">
- 
         <div class="form-grid">
  
           <div class="form-group full">
-            <label for="title">
-              Título
-            </label>
- 
-            <input
-              id="title"
-              name="title"
-              class="form-control"
-              required
-              maxlength="200"
-              placeholder="Título do conteúdo"
-            >
+            <label for="title">Título</label>
+            <input id="title" name="title" class="form-control" required maxlength="200" placeholder="Título do conteúdo">
           </div>
  
- 
           <div class="form-group">
- 
-            <label for="category">
-              Categoria
-            </label>
- 
-            <select
-              id="category"
-              name="category"
-              class="form-control"
-              required
-            >
- 
-              <option value="">
-                Selecione...
-              </option>
- 
-              <option value="M03 — Exegese">
-                M03 — Exegese
-              </option>
- 
-              <option value="M02 — Mensagem">
-                M02 — Mensagem
-              </option>
- 
-              <option value="M04 — A Ponte / Infantil">
-                M04 — A Ponte / Infantil
-              </option>
- 
-              <option value="CTAs V1 e V2">
-                CTAs V1 e V2
-              </option>
- 
-              <option value="Social Engine">
-                Social Engine
-              </option>
- 
-              <option value="Séries">
-                Séries
-              </option>
- 
-              <option value="Página de Venda PRO">
-                Página de Venda PRO
-              </option>
- 
+            <label for="category">Categoria</label>
+            <select id="category" name="category" class="form-control" required>
+              <option value="">Selecione...</option>
+              <option value="M03 — Exegese">M03 — Exegese</option>
+              <option value="M02 — Mensagem">M02 — Mensagem</option>
+              <option value="M04 — A Ponte / Infantil">M04 — A Ponte / Infantil</option>
+              <option value="CTAs V1 e V2">CTAs V1 e V2</option>
+              <option value="Social Engine">Social Engine</option>
+              <option value="Séries">Séries</option>
+              <option value="Página de Venda PRO">Página de Venda PRO</option>
             </select>
- 
           </div>
  
- 
           <div class="form-group">
- 
-            <label for="format">
-              Formato
-            </label>
- 
-            <input
-              id="format"
-              name="format"
-              class="form-control"
-              value="documento"
-              placeholder="documento"
-            >
- 
+            <label for="format">Formato</label>
+            <input id="format" name="format" class="form-control" value="documento" placeholder="documento">
           </div>
  
- 
           <div class="form-group">
- 
-            <label for="ageRange">
-              Faixa etária
-            </label>
- 
-            <input
-              id="ageRange"
-              name="age_range"
-              class="form-control"
-              placeholder="Ex.: 6–8 anos"
-            >
- 
+            <label for="ageRange">Faixa etária</label>
+            <input id="ageRange" name="age_range" class="form-control" placeholder="Ex.: 6–8 anos">
           </div>
  
- 
           <div class="form-group">
- 
-            <label for="accessLevel">
-              Nível de acesso
-            </label>
- 
-            <select
-              id="accessLevel"
-              name="access_level"
-              class="form-control"
-              required
-            >
- 
-              <option value="Free">
-                Free
-              </option>
- 
-              <option value="Pro">
-                Pro
-              </option>
- 
-              <option value="Privado">
-                Privado
-              </option>
- 
+            <label for="accessLevel">Nível de acesso</label>
+            <select id="accessLevel" name="access_level" class="form-control" required>
+              <option value="Free">Free</option>
+              <option value="Pro">Pro</option>
+              <option value="Privado">Privado</option>
             </select>
- 
           </div>
- 
  
           <div class="form-group">
- 
-            <label for="status">
-              Status
-            </label>
- 
-            <select
-              id="status"
-              name="status"
-              class="form-control"
-              required
-            >
- 
-              <option value="Rascunho">
-                Rascunho
-              </option>
- 
-              <option value="Em revisão">
-                Em revisão
-              </option>
- 
-              <option value="Publicado">
-                Publicado
-              </option>
- 
-              <option value="Arquivado">
-                Arquivado
-              </option>
- 
+            <label for="status">Status</label>
+            <select id="status" name="status" class="form-control" required>
+              <option value="Rascunho">Rascunho</option>
+              <option value="Em revisão">Em revisão</option>
+              <option value="Publicado">Publicado</option>
+              <option value="Arquivado">Arquivado</option>
             </select>
- 
           </div>
- 
  
           <div class="form-group full">
- 
-            <label for="reference">
-              Referência
-            </label>
- 
-            <input
-              id="reference"
-              name="reference"
-              class="form-control"
-              placeholder="Ex.: João 3:16"
-            >
- 
+            <label for="reference">Referência</label>
+            <input id="reference" name="reference" class="form-control" placeholder="Ex.: João 3:16">
           </div>
  
- 
           <div class="form-group full">
- 
-            <label for="summary">
-              Resumo
-            </label>
- 
-            <textarea
-              id="summary"
-              name="summary"
-              class="form-control"
-              placeholder="Resumo ou descrição do conteúdo..."
-            ></textarea>
- 
+            <label for="summary">Resumo</label>
+            <textarea id="summary" name="summary" class="form-control" placeholder="Resumo ou descrição do conteúdo..."></textarea>
           </div>
  
- 
           <div class="form-group full">
- 
-            <label for="content">
-              Conteúdo
-            </label>
- 
-            <textarea
-              id="content"
-              name="content"
-              class="form-control"
-              placeholder="Conteúdo principal..."
-            ></textarea>
- 
+            <label for="content">Conteúdo</label>
+            <textarea id="content" name="content" class="form-control" placeholder="Conteúdo principal..."></textarea>
           </div>
  
         </div>
- 
       </div>
- 
  
       <div class="modal-footer">
- 
-        <button
-          type="button"
-          class="btn"
-          id="cancelBtn"
-        >
-          Cancelar
-        </button>
- 
-        <button
-          type="submit"
-          class="btn btn-primary"
-          id="saveBtn"
-        >
-          Salvar conteúdo
-        </button>
- 
+        <button type="button" class="btn" id="cancelBtn">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="saveBtn">Salvar conteúdo</button>
       </div>
- 
     </form>
- 
   </div>
- 
 </div>
  
+ 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
  
 <script>
   /* =========================================================
      CONFIGURAÇÃO SUPABASE
-     =========================================================
- 
-     SUBSTITUA SOMENTE ESTES DOIS VALORES.
- 
-     URL:
-       Project Settings > API > Project URL
- 
-     KEY:
-       Project Settings > API > anon public
- 
-     NÃO coloque a service_role key aqui.
      ========================================================= */
  
-  const SUPABASE_URL = "COLE_AQUI_A_URL_DO_SEU_SUPABASE";
-  const SUPABASE_ANON_KEY = "COLE_AQUI_A_CHAVE_ANON_PUBLICA";
+  const SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+ 
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
  
  
   /* =========================================================
@@ -926,49 +598,38 @@ Painel autor supabase · HTML
  
   let contents = [];
   let editingId = null;
+  let currentUser = null;
  
  
   /* =========================================================
-     ELEMENTOS
+     ELEMENTOS — AUTH
+     ========================================================= */
+ 
+  const authGate = document.getElementById("authGate");
+  const appRoot = document.getElementById("appRoot");
+  const authForm = document.getElementById("authForm");
+  const authError = document.getElementById("authError");
+  const authSubmit = document.getElementById("authSubmit");
+  const logoutBtn = document.getElementById("logoutBtn");
+ 
+ 
+  /* =========================================================
+     ELEMENTOS — APP
      ========================================================= */
  
   const statusBar = document.getElementById("statusBar");
- 
-  const tableBody =
-    document.getElementById("contentTableBody");
- 
-  const totalCount =
-    document.getElementById("totalCount");
- 
-  const draftCount =
-    document.getElementById("draftCount");
- 
-  const reviewCount =
-    document.getElementById("reviewCount");
- 
-  const publishedCount =
-    document.getElementById("publishedCount");
- 
-  const searchInput =
-    document.getElementById("searchInput");
- 
-  const categoryFilter =
-    document.getElementById("categoryFilter");
- 
-  const statusFilter =
-    document.getElementById("statusFilter");
- 
-  const accessFilter =
-    document.getElementById("accessFilter");
- 
-  const modal =
-    document.getElementById("contentModal");
- 
-  const modalTitle =
-    document.getElementById("modalTitle");
- 
-  const contentForm =
-    document.getElementById("contentForm");
+  const tableBody = document.getElementById("contentTableBody");
+  const totalCount = document.getElementById("totalCount");
+  const draftCount = document.getElementById("draftCount");
+  const reviewCount = document.getElementById("reviewCount");
+  const publishedCount = document.getElementById("publishedCount");
+  const searchInput = document.getElementById("searchInput");
+  const categoryFilter = document.getElementById("categoryFilter");
+  const statusFilter = document.getElementById("statusFilter");
+  const accessFilter = document.getElementById("accessFilter");
+  const modal = document.getElementById("contentModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const contentForm = document.getElementById("contentForm");
  
  
   /* =========================================================
@@ -978,18 +639,20 @@ Painel autor supabase · HTML
   function showStatus(message, type = "") {
     statusBar.textContent = message;
     statusBar.className = "status-bar visible " + type;
- 
-    setTimeout(() => {
-      statusBar.className = "status-bar";
-    }, 5000);
+    setTimeout(() => { statusBar.className = "status-bar"; }, 5000);
   }
  
+  function showAuthError(message) {
+    authError.textContent = message;
+    authError.className = "auth-error visible";
+  }
+ 
+  function hideAuthError() {
+    authError.className = "auth-error";
+  }
  
   function escapeHtml(value) {
-    if (value === null || value === undefined) {
-      return "";
-    }
- 
+    if (value === null || value === undefined) return "";
     return String(value)
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
@@ -998,127 +661,94 @@ Painel autor supabase · HTML
       .replaceAll("'", "&#039;");
   }
  
- 
   function formatDate(value) {
-    if (!value) {
-      return "—";
-    }
- 
+    if (!value) return "—";
     const date = new Date(value);
- 
-    if (Number.isNaN(date.getTime())) {
-      return "—";
-    }
- 
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    });
+    if (Number.isNaN(date.getTime())) return "—";
+    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
   }
- 
  
   function slugify(text) {
-    return text
-      .toString()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+    return text.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   }
  
- 
   function statusBadge(status) {
- 
     let className = "badge-draft";
- 
-    if (status === "Publicado") {
-      className = "badge-published";
-    }
- 
-    if (status === "Em revisão") {
-      className = "badge-review";
-    }
- 
-    if (status === "Arquivado") {
-      className = "badge-archived";
-    }
- 
-    return `
-      <span class="badge ${className}">
-        ${escapeHtml(status)}
-      </span>
-    `;
+    if (status === "Publicado") className = "badge-published";
+    if (status === "Em revisão") className = "badge-review";
+    if (status === "Arquivado") className = "badge-archived";
+    return `<span class="badge ${className}">${escapeHtml(status)}</span>`;
   }
  
  
   /* =========================================================
-     SUPABASE REQUEST
+     AUTENTICAÇÃO — TELA DE LOGIN
      ========================================================= */
  
-  async function supabaseRequest(
-    endpoint,
-    options = {}
-  ) {
+  authForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    hideAuthError();
  
-    if (
-      SUPABASE_URL.includes("COLE_AQUI") ||
-      SUPABASE_ANON_KEY.includes("COLE_AQUI")
-    ) {
-      throw new Error(
-        "Configure a URL e a chave anon pública do Supabase no código."
-      );
-    }
+    authSubmit.disabled = true;
+    authSubmit.textContent = "Entrando...";
  
-    const response = await fetch(
-      SUPABASE_URL.replace(/\/$/, "") +
-      "/rest/v1/" +
-      endpoint,
-      {
-        ...options,
+    try {
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
  
-        headers: {
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization":
-            "Bearer " + SUPABASE_ANON_KEY,
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
  
-          "Content-Type":
-            "application/json",
- 
-          "Prefer":
-            "return=representation",
- 
-          ...(options.headers || {})
-        }
-      }
-    );
- 
-    if (!response.ok) {
- 
-      let message = "";
- 
-      try {
-        const error = await response.json();
- 
-        message =
-          error.message ||
-          error.hint ||
-          error.details ||
-          JSON.stringify(error);
- 
-      } catch {
-        message = await response.text();
+      if (error) {
+        throw new Error("E-mail ou senha incorretos.");
       }
  
-      throw new Error(message || "Erro no Supabase.");
+      await checkAdminAndEnter(data.user);
+ 
+    } catch (error) {
+      console.error(error);
+      showAuthError(error.message);
+      await supabaseClient.auth.signOut();
+    } finally {
+      authSubmit.disabled = false;
+      authSubmit.textContent = "Entrar";
+    }
+  });
+ 
+ 
+  /*
+   * Mesmo depois de logar, confirmamos que o usuário está
+   * cadastrado como admin (tabela academic_manual_admins,
+   * já protegida por RLS no banco). Isso impede que qualquer
+   * conta autenticada — não só a sua — acesse o painel.
+   */
+  async function checkAdminAndEnter(user) {
+ 
+    const { data: adminRows, error: adminError } = await supabaseClient
+      .from("academic_manual_admins")
+      .select("user_id")
+      .eq("user_id", user.id);
+ 
+    if (adminError || !adminRows || !adminRows.length) {
+      await supabaseClient.auth.signOut();
+      throw new Error("Sua conta não tem permissão de autor neste painel.");
     }
  
-    const text = await response.text();
+    currentUser = user;
+    authGate.style.display = "none";
+    appRoot.style.display = "block";
  
-    return text ? JSON.parse(text) : null;
+    await init();
   }
+ 
+ 
+  logoutBtn.addEventListener("click", async () => {
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+    appRoot.style.display = "none";
+    authGate.style.display = "flex";
+    authForm.reset();
+  });
  
  
   /* =========================================================
@@ -1127,274 +757,100 @@ Painel autor supabase · HTML
  
   async function loadContents() {
  
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="7">
-          <div class="loading">
-            Carregando conteúdos...
-          </div>
-        </td>
-      </tr>
-    `;
+    tableBody.innerHTML = `<tr><td colspan="7"><div class="loading">Carregando conteúdos...</div></td></tr>`;
  
     try {
  
-      /*
-       * A consulta usa o usuário autenticado pelo JWT.
-       *
-       * O Supabase aplicará automaticamente as políticas
-       * RLS definidas na tabela editorial_contents.
-       */
+      const { data, error } = await supabaseClient
+        .from("editorial_contents")
+        .select("*")
+        .order("updated_at", { ascending: false });
  
-      contents = await supabaseRequest(
-        "editorial_contents?select=*&order=updated_at.desc"
-      );
+      if (error) throw error;
+ 
+      contents = data || [];
  
       updateStats();
       renderContents();
  
     } catch (error) {
- 
       console.error(error);
  
       tableBody.innerHTML = `
-        <tr>
-          <td colspan="7">
-            <div class="empty">
-              <strong>Não foi possível carregar os conteúdos.</strong>
-              ${escapeHtml(error.message)}
-            </div>
-          </td>
-        </tr>
+        <tr><td colspan="7"><div class="empty">
+          <strong>Não foi possível carregar os conteúdos.</strong>
+          ${escapeHtml(error.message)}
+        </div></td></tr>
       `;
  
-      showStatus(
-        "Erro ao carregar o painel: " +
-        error.message,
-        "error"
-      );
+      showStatus("Erro ao carregar o painel: " + error.message, "error");
     }
   }
  
  
-  /* =========================================================
-     ESTATÍSTICAS
-     ========================================================= */
- 
   function updateStats() {
- 
-    totalCount.textContent =
-      contents.length;
- 
-    draftCount.textContent =
-      contents.filter(
-        item => item.status === "Rascunho"
-      ).length;
- 
-    reviewCount.textContent =
-      contents.filter(
-        item => item.status === "Em revisão"
-      ).length;
- 
-    publishedCount.textContent =
-      contents.filter(
-        item => item.status === "Publicado"
-      ).length;
+    totalCount.textContent = contents.length;
+    draftCount.textContent = contents.filter(item => item.status === "Rascunho").length;
+    reviewCount.textContent = contents.filter(item => item.status === "Em revisão").length;
+    publishedCount.textContent = contents.filter(item => item.status === "Publicado").length;
   }
  
  
-  /* =========================================================
-     FILTRAGEM
-     ========================================================= */
- 
   function getFilteredContents() {
- 
-    const search =
-      searchInput.value
-        .trim()
-        .toLowerCase();
- 
-    const category =
-      categoryFilter.value;
- 
-    const status =
-      statusFilter.value;
- 
-    const access =
-      accessFilter.value;
- 
+    const search = searchInput.value.trim().toLowerCase();
+    const category = categoryFilter.value;
+    const status = statusFilter.value;
+    const access = accessFilter.value;
  
     return contents.filter(item => {
+      const searchableText = [item.title, item.reference, item.summary, item.slug]
+        .filter(Boolean).join(" ").toLowerCase();
  
-      const searchableText = [
-        item.title,
-        item.reference,
-        item.summary,
-        item.slug
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
- 
- 
-      if (
-        search &&
-        !searchableText.includes(search)
-      ) {
-        return false;
-      }
- 
- 
-      if (
-        category &&
-        item.category !== category
-      ) {
-        return false;
-      }
- 
- 
-      if (
-        status &&
-        item.status !== status
-      ) {
-        return false;
-      }
- 
- 
-      if (
-        access &&
-        item.access_level !== access
-      ) {
-        return false;
-      }
- 
+      if (search && !searchableText.includes(search)) return false;
+      if (category && item.category !== category) return false;
+      if (status && item.status !== status) return false;
+      if (access && item.access_level !== access) return false;
  
       return true;
     });
   }
  
  
-  /* =========================================================
-     RENDERIZAR TABELA
-     ========================================================= */
- 
   function renderContents() {
- 
-    const filtered =
-      getFilteredContents();
- 
+    const filtered = getFilteredContents();
  
     if (!filtered.length) {
- 
       tableBody.innerHTML = `
-        <tr>
-          <td colspan="7">
-            <div class="empty">
-              <strong>Nenhum conteúdo encontrado.</strong>
-              Tente alterar os filtros ou crie um novo conteúdo.
-            </div>
-          </td>
-        </tr>
+        <tr><td colspan="7"><div class="empty">
+          <strong>Nenhum conteúdo encontrado.</strong>
+          Tente alterar os filtros ou crie um novo conteúdo.
+        </div></td></tr>
       `;
- 
       return;
     }
  
- 
-    tableBody.innerHTML =
-      filtered.map(item => {
- 
-        return `
-          <tr>
- 
-            <td>
-              <span class="title-cell">
-                ${escapeHtml(item.title)}
-              </span>
- 
-              ${
-                item.reference
-                  ? `
-                    <span class="subtitle">
-                      ${escapeHtml(item.reference)}
-                    </span>
-                  `
-                  : ""
-              }
-            </td>
- 
- 
-            <td>
-              ${escapeHtml(item.category)}
-            </td>
- 
- 
-            <td>
-              ${escapeHtml(item.format || "documento")}
-            </td>
- 
- 
-            <td>
-              ${escapeHtml(item.access_level)}
-            </td>
- 
- 
-            <td>
-              ${statusBadge(item.status)}
-            </td>
- 
- 
-            <td>
-              ${formatDate(item.updated_at)}
-            </td>
- 
- 
-            <td>
- 
-              <div class="actions">
- 
-                <button
-                  class="action-btn"
-                  onclick="editContent('${item.id}')"
-                >
-                  Editar
-                </button>
- 
-                ${
-                  item.status === "Publicado"
-                    ? `
-                      <button
-                        class="action-btn"
-                        onclick="unpublishContent('${item.id}')"
-                      >
-                        Retirar
-                      </button>
-                    `
-                    : `
-                      <button
-                        class="action-btn"
-                        onclick="publishContent('${item.id}')"
-                      >
-                        Publicar
-                      </button>
-                    `
-                }
- 
-                <button
-                  class="action-btn btn-danger"
-                  onclick="deleteContent('${item.id}')"
-                >
-                  Excluir
-                </button>
- 
-              </div>
- 
-            </td>
- 
-          </tr>
-        `;
- 
-      }).join("");
+    tableBody.innerHTML = filtered.map(item => `
+      <tr>
+        <td>
+          <span class="title-cell">${escapeHtml(item.title)}</span>
+          ${item.reference ? `<span class="subtitle">${escapeHtml(item.reference)}</span>` : ""}
+        </td>
+        <td>${escapeHtml(item.category)}</td>
+        <td>${escapeHtml(item.format || "documento")}</td>
+        <td>${escapeHtml(item.access_level)}</td>
+        <td>${statusBadge(item.status)}</td>
+        <td>${formatDate(item.updated_at)}</td>
+        <td>
+          <div class="actions">
+            <button class="action-btn" onclick="editContent('${item.id}')">Editar</button>
+            ${item.status === "Publicado"
+              ? `<button class="action-btn" onclick="unpublishContent('${item.id}')">Retirar</button>`
+              : `<button class="action-btn" onclick="publishContent('${item.id}')">Publicar</button>`}
+            <button class="action-btn btn-danger" onclick="deleteContent('${item.id}')">Excluir</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
   }
  
  
@@ -1403,125 +859,48 @@ Painel autor supabase · HTML
      ========================================================= */
  
   function openModal(content = null) {
- 
-    editingId =
-      content ? content.id : null;
- 
- 
-    modalTitle.textContent =
-      content
-        ? "Editar conteúdo"
-        : "Novo conteúdo";
- 
+    editingId = content ? content.id : null;
+    modalTitle.textContent = content ? "Editar conteúdo" : "Novo conteúdo";
  
     contentForm.reset();
- 
- 
-    document.getElementById("format").value =
-      "documento";
- 
+    document.getElementById("format").value = "documento";
  
     if (content) {
+      document.getElementById("title").value = content.title || "";
+      document.getElementById("category").value = content.category || "";
+      document.getElementById("format").value = content.format || "documento";
+      document.getElementById("ageRange").value = content.age_range || "";
+      document.getElementById("accessLevel").value = content.access_level || "Free";
+      document.getElementById("status").value = content.status || "Rascunho";
+      document.getElementById("reference").value = content.reference || "";
+      document.getElementById("summary").value = content.summary || "";
  
-      document.getElementById("title").value =
-        content.title || "";
- 
-      document.getElementById("category").value =
-        content.category || "";
- 
-      document.getElementById("format").value =
-        content.format || "documento";
- 
-      document.getElementById("ageRange").value =
-        content.age_range || "";
- 
-      document.getElementById("accessLevel").value =
-        content.access_level || "Free";
- 
-      document.getElementById("status").value =
-        content.status || "Rascunho";
- 
-      document.getElementById("reference").value =
-        content.reference || "";
- 
-      document.getElementById("summary").value =
-        content.summary || "";
- 
-      const contentValue =
-        content.content || {};
- 
+      const contentValue = content.content || {};
       document.getElementById("content").value =
-        typeof contentValue === "string"
-          ? contentValue
-          : contentValue.text || "";
- 
+        typeof contentValue === "string" ? contentValue : (contentValue.text || "");
     }
- 
  
     modal.classList.add("open");
   }
  
- 
   function closeModal() {
- 
     modal.classList.remove("open");
- 
     editingId = null;
- 
     contentForm.reset();
- 
-    document.getElementById("format").value =
-      "documento";
+    document.getElementById("format").value = "documento";
   }
  
- 
-  /* =========================================================
-     NOVO CONTEÚDO
-     ========================================================= */
- 
-  document
-    .getElementById("newContentBtn")
-    .addEventListener("click", () => {
- 
-      openModal();
- 
-    });
- 
- 
-  document
-    .getElementById("closeModalBtn")
-    .addEventListener("click", closeModal);
- 
- 
-  document
-    .getElementById("cancelBtn")
-    .addEventListener("click", closeModal);
- 
+  document.getElementById("newContentBtn").addEventListener("click", () => openModal());
+  document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+  document.getElementById("cancelBtn").addEventListener("click", closeModal);
  
   modal.addEventListener("click", event => {
- 
-    if (event.target === modal) {
-      closeModal();
-    }
- 
+    if (event.target === modal) closeModal();
   });
  
- 
-  /* =========================================================
-     EDITAR
-     ========================================================= */
- 
   window.editContent = function(id) {
- 
-    const content =
-      contents.find(
-        item => item.id === id
-      );
- 
-    if (!content) {
-      return;
-    }
- 
+    const content = contents.find(item => item.id === id);
+    if (!content) return;
     openModal(content);
   };
  
@@ -1530,542 +909,223 @@ Painel autor supabase · HTML
      SALVAR
      ========================================================= */
  
-  contentForm.addEventListener(
-    "submit",
-    async event => {
+  contentForm.addEventListener("submit", async event => {
+    event.preventDefault();
  
-      event.preventDefault();
+    const saveBtn = document.getElementById("saveBtn");
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Salvando...";
  
-      const saveBtn =
-        document.getElementById("saveBtn");
+    try {
+      const formData = new FormData(contentForm);
+      const title = formData.get("title").trim();
+      const status = formData.get("status");
  
-      saveBtn.disabled = true;
+      const payload = {
+        title,
+        category: formData.get("category"),
+        format: formData.get("format") || "documento",
+        age_range: formData.get("age_range") || null,
+        access_level: formData.get("access_level"),
+        status,
+        reference: formData.get("reference") || null,
+        summary: formData.get("summary") || null,
+        content: { text: formData.get("content") || "" },
+        published_at: status === "Publicado" ? new Date().toISOString() : null
+      };
  
-      saveBtn.textContent =
-        "Salvando...";
+      if (editingId) {
  
+        const { data, error } = await supabaseClient
+          .from("editorial_contents")
+          .update(payload)
+          .eq("id", editingId)
+          .select();
  
-      try {
- 
-        const formData =
-          new FormData(contentForm);
- 
- 
-        const title =
-          formData.get("title").trim();
- 
- 
-        const status =
-          formData.get("status");
- 
- 
-        const payload = {
- 
-          title,
- 
-          slug:
-            slugify(title) +
-            "-" +
-            Date.now().toString(36),
- 
-          category:
-            formData.get("category"),
- 
-          format:
-            formData.get("format") ||
-            "documento",
- 
-          age_range:
-            formData.get("age_range") ||
-            null,
- 
-          access_level:
-            formData.get("access_level"),
- 
-          status,
- 
-          reference:
-            formData.get("reference") ||
-            null,
- 
-          summary:
-            formData.get("summary") ||
-            null,
- 
-          content: {
-            text:
-              formData.get("content") ||
-              ""
-          },
- 
-          published_at:
-            status === "Publicado"
-              ? new Date().toISOString()
-              : null
-        };
- 
- 
-        if (editingId) {
- 
-          /*
-           * Não alteramos author_id durante a edição.
-           * O RLS do Supabase controla se o proprietário
-           * pode atualizar aquele registro.
-           */
- 
-          delete payload.slug;
- 
-          const result =
-            await supabaseRequest(
-              `editorial_contents?id=eq.${encodeURIComponent(editingId)}`,
-              {
-                method: "PATCH",
-                body: JSON.stringify(payload)
-              }
-            );
- 
- 
-          if (!result || !result.length) {
-            throw new Error(
-              "Nenhum conteúdo foi atualizado. Verifique suas permissões."
-            );
-          }
- 
- 
-          showStatus(
-            "Conteúdo atualizado com sucesso.",
-            "success"
-          );
- 
-        } else {
- 
-          /*
-           * author_id será obtido abaixo.
-           *
-           * Para isso, o usuário precisa estar autenticado
-           * no Supabase.
-           */
- 
-          const session =
-            await getSupabaseSession();
- 
- 
-          if (!session) {
-            throw new Error(
-              "Você precisa estar autenticado no Supabase para criar conteúdos."
-            );
-          }
- 
- 
-          payload.author_id =
-            session.user.id;
- 
- 
-          const result =
-            await supabaseRequest(
-              "editorial_contents",
-              {
-                method: "POST",
-                body: JSON.stringify(payload)
-              }
-            );
- 
- 
-          if (!result || !result.length) {
-            throw new Error(
-              "O conteúdo não foi criado."
-            );
-          }
- 
- 
-          showStatus(
-            "Conteúdo criado com sucesso.",
-            "success"
-          );
+        if (error) throw error;
+        if (!data || !data.length) {
+          throw new Error("Nenhum conteúdo foi atualizado. Verifique suas permissões.");
         }
  
+        showStatus("Conteúdo atualizado com sucesso.", "success");
  
-        closeModal();
+      } else {
  
-        await loadContents();
+        payload.slug = slugify(title) + "-" + Date.now().toString(36);
+        payload.author_id = currentUser.id;
  
-      } catch (error) {
+        const { data, error } = await supabaseClient
+          .from("editorial_contents")
+          .insert(payload)
+          .select();
  
-        console.error(error);
+        if (error) throw error;
+        if (!data || !data.length) {
+          throw new Error("O conteúdo não foi criado.");
+        }
  
-        showStatus(
-          "Erro ao salvar: " +
-          error.message,
-          "error"
-        );
- 
-      } finally {
- 
-        saveBtn.disabled = false;
- 
-        saveBtn.textContent =
-          "Salvar conteúdo";
+        showStatus("Conteúdo criado com sucesso.", "success");
       }
  
+      closeModal();
+      await loadContents();
+ 
+    } catch (error) {
+      console.error(error);
+      showStatus("Erro ao salvar: " + error.message, "error");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Salvar conteúdo";
     }
-  );
+  });
  
  
   /* =========================================================
-     PUBLICAR
+     PUBLICAR / RETIRAR / EXCLUIR
      ========================================================= */
  
   window.publishContent = async function(id) {
- 
-    if (
-      !confirm(
-        "Publicar este conteúdo?"
-      )
-    ) {
-      return;
-    }
- 
+    if (!confirm("Publicar este conteúdo?")) return;
  
     try {
+      const { data, error } = await supabaseClient
+        .from("editorial_contents")
+        .update({ status: "Publicado", published_at: new Date().toISOString() })
+        .eq("id", id)
+        .select();
  
-      const result =
-        await supabaseRequest(
-          `editorial_contents?id=eq.${encodeURIComponent(id)}`,
-          {
-            method: "PATCH",
+      if (error) throw error;
+      if (!data || !data.length) throw new Error("O conteúdo não pôde ser publicado.");
  
-            body: JSON.stringify({
-              status: "Publicado",
-              published_at:
-                new Date().toISOString()
-            })
-          }
-        );
- 
- 
-      if (!result || !result.length) {
-        throw new Error(
-          "O conteúdo não pôde ser publicado."
-        );
-      }
- 
- 
-      showStatus(
-        "Conteúdo publicado.",
-        "success"
-      );
- 
- 
+      showStatus("Conteúdo publicado.", "success");
       await loadContents();
  
     } catch (error) {
- 
       console.error(error);
- 
-      showStatus(
-        "Erro ao publicar: " +
-        error.message,
-        "error"
-      );
+      showStatus("Erro ao publicar: " + error.message, "error");
     }
   };
- 
- 
-  /* =========================================================
-     RETIRAR PUBLICAÇÃO
-     ========================================================= */
  
   window.unpublishContent = async function(id) {
- 
-    if (
-      !confirm(
-        "Retirar este conteúdo da publicação?"
-      )
-    ) {
-      return;
-    }
- 
+    if (!confirm("Retirar este conteúdo da publicação?")) return;
  
     try {
+      const { data, error } = await supabaseClient
+        .from("editorial_contents")
+        .update({ status: "Rascunho", published_at: null })
+        .eq("id", id)
+        .select();
  
-      const result =
-        await supabaseRequest(
-          `editorial_contents?id=eq.${encodeURIComponent(id)}`,
-          {
-            method: "PATCH",
+      if (error) throw error;
+      if (!data || !data.length) throw new Error("Não foi possível retirar a publicação.");
  
-            body: JSON.stringify({
-              status: "Rascunho",
-              published_at: null
-            })
-          }
-        );
- 
- 
-      if (!result || !result.length) {
-        throw new Error(
-          "Não foi possível retirar a publicação."
-        );
-      }
- 
- 
-      showStatus(
-        "Conteúdo voltou para Rascunho.",
-        "success"
-      );
- 
- 
+      showStatus("Conteúdo voltou para Rascunho.", "success");
       await loadContents();
  
     } catch (error) {
- 
       console.error(error);
- 
-      showStatus(
-        "Erro: " +
-        error.message,
-        "error"
-      );
+      showStatus("Erro: " + error.message, "error");
     }
   };
- 
- 
-  /* =========================================================
-     EXCLUIR
-     ========================================================= */
  
   window.deleteContent = async function(id) {
+    const content = contents.find(item => item.id === id);
+    if (!content) return;
  
-    const content =
-      contents.find(
-        item => item.id === id
-      );
- 
- 
-    if (!content) {
-      return;
-    }
- 
- 
-    const confirmed =
-      confirm(
-        `Excluir definitivamente "${content.title}"?`
-      );
- 
- 
-    if (!confirmed) {
-      return;
-    }
- 
+    if (!confirm(`Excluir definitivamente "${content.title}"?`)) return;
  
     try {
+      const { error } = await supabaseClient
+        .from("editorial_contents")
+        .delete()
+        .eq("id", id);
  
-      await supabaseRequest(
-        `editorial_contents?id=eq.${encodeURIComponent(id)}`,
-        {
-          method: "DELETE"
-        }
-      );
+      if (error) throw error;
  
- 
-      showStatus(
-        "Conteúdo excluído.",
-        "success"
-      );
- 
- 
+      showStatus("Conteúdo excluído.", "success");
       await loadContents();
  
     } catch (error) {
- 
       console.error(error);
- 
-      showStatus(
-        "Erro ao excluir: " +
-        error.message,
-        "error"
-      );
+      showStatus("Erro ao excluir: " + error.message, "error");
     }
   };
  
  
   /* =========================================================
-     FILTROS
+     FILTROS / ATUALIZAR
      ========================================================= */
  
-  searchInput.addEventListener(
-    "input",
-    renderContents
-  );
- 
-  categoryFilter.addEventListener(
-    "change",
-    renderContents
-  );
- 
-  statusFilter.addEventListener(
-    "change",
-    renderContents
-  );
- 
-  accessFilter.addEventListener(
-    "change",
-    renderContents
-  );
+  searchInput.addEventListener("input", renderContents);
+  categoryFilter.addEventListener("change", renderContents);
+  statusFilter.addEventListener("change", renderContents);
+  accessFilter.addEventListener("change", renderContents);
+  document.getElementById("refreshBtn").addEventListener("click", loadContents);
  
  
   /* =========================================================
-     ATUALIZAR
-     ========================================================= */
- 
-  document
-    .getElementById("refreshBtn")
-    .addEventListener(
-      "click",
-      loadContents
-    );
- 
- 
-  /* =========================================================
-     AUTENTICAÇÃO SUPABASE
-     =========================================================
- 
-     Este painel utiliza o JWT salvo pelo Supabase
-     no navegador.
- 
-     Se o seu login atual usa outro mecanismo,
-     a autenticação precisa ser integrada aqui.
-     ========================================================= */
- 
-  async function getSupabaseSession() {
- 
-    /*
-     * O painel não usa service_role.
-     *
-     * Procuramos a sessão armazenada pelo cliente
-     * oficial do Supabase.
-     */
- 
-    const keys = Object.keys(localStorage);
- 
-    const authKey =
-      keys.find(
-        key =>
-          key.startsWith("sb-") &&
-          key.endsWith("-auth-token")
-      );
- 
- 
-    if (!authKey) {
-      return null;
-    }
- 
- 
-    try {
- 
-      const raw =
-        localStorage.getItem(authKey);
- 
-      if (!raw) {
-        return null;
-      }
- 
- 
-      const data =
-        JSON.parse(raw);
- 
- 
-      if (
-        data &&
-        data.user &&
-        data.access_token
-      ) {
- 
-        return {
-          user: data.user,
-          access_token:
-            data.access_token
-        };
-      }
- 
- 
-      return null;
- 
-    } catch {
- 
-      return null;
-    }
-  }
- 
- 
-  /* =========================================================
-     INICIALIZAÇÃO
+     INICIALIZAÇÃO DO APP (só roda após login confirmado)
      ========================================================= */
  
   async function init() {
- 
     try {
- 
-      const session =
-        await getSupabaseSession();
- 
- 
-      if (!session) {
- 
-        showStatus(
-          "Nenhuma sessão Supabase encontrada. Faça login antes de usar o Painel do Autor.",
-          "error"
-        );
- 
-      }
- 
- 
       await loadContents();
- 
     } catch (error) {
- 
       console.error(error);
- 
-      showStatus(
-        error.message,
-        "error"
-      );
+      showStatus(error.message, "error");
     }
   }
  
  
-  init();
+  /* =========================================================
+     AO CARREGAR A PÁGINA: checa se já existe sessão válida
+     ========================================================= */
  
-</script>
+  (async function bootstrap() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
  
-<script>
-(function(){
-  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
-  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
-  var PAGINA = "Painel do Autor";
- 
-  try{
-    var vid = localStorage.getItem("ps_visitante_id");
-    if(!vid){
-      vid = (window.crypto && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-      localStorage.setItem("ps_visitante_id", vid);
+    if (session && session.user) {
+      try {
+        await checkAdminAndEnter(session.user);
+      } catch (error) {
+        showAuthError(error.message);
+      }
     }
+  })();
  
-    fetch(SUPABASE_URL + "/rest/v1/visitas", {
-      method: "POST",
-      headers: {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
-    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
-  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
-})();
+ 
+  /* =========================================================
+     CONTADOR DE VISITAS (mantido, não sensível)
+     ========================================================= */
+ 
+  (function(){
+    var PAGINA = "Painel do Autor";
+ 
+    try{
+      var vid = localStorage.getItem("ps_visitante_id");
+      if(!vid){
+        vid = (window.crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+        localStorage.setItem("ps_visitante_id", vid);
+      }
+ 
+      fetch(SUPABASE_URL + "/rest/v1/visitas", {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
+      }).catch(function(){ /* falha silenciosa */ });
+    }catch(e){ /* localStorage bloqueado ou indisponível */ }
+  })();
+ 
 </script>
 </body>
 </html>
  
+
+
