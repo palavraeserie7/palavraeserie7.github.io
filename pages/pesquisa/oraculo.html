@@ -1,75 +1,198 @@
-<!-- BOTAO LATERAL FIXO -->
-<button type="button" class="oracle-tracking-trigger" id="oracle-tracking-trigger" aria-controls="oracle-tracking-overlay" aria-expanded="false">↗ RASTREAR</button>
+<!-- ESTRUTURA DA FICHA DO ÓRGÃO (ACIONADA PELO ÍNDICE) -->
+<div class="oracle-organ-container" id="oracle-organ-container">
+  
+  <!-- CABEÇALHO DO ÓRGÃO SELECIONADO NO ÍNDICE -->
+  <header class="organ-header">
+    <div class="organ-title-group">
+      <span class="organ-badge" id="organ-sphere-badge">ESFERA FEDERAL</span>
+      <h1 id="organ-name-title">STF — Supremo Tribunal Federal</h1>
+      <p class="organ-description" id="organ-description">
+        Protocolo de auditoria, checagem e rastreamento de evidências por ordem de valor probatório.
+      </p>
+    </div>
+  </header>
 
-<!-- JANELA SLIDE-OVER DE RASTREAMENTO E AUDITORIA DE FONTES -->
-<div class="oracle-tracking-overlay" id="oracle-tracking-overlay" aria-hidden="true">
-  <aside class="oracle-tracking-panel" role="dialog" aria-modal="true" aria-labelledby="tracking-title">
-    
-    <!-- CABEÇALHO -->
-    <div class="tracking-head">
-      <div>
-        <h2 id="tracking-title">RASTREAMENTO DE FONTES</h2>
-        <span class="tracking-subtitle">Protocolo de Auditoria e Registro de Evidências</span>
-      </div>
-      <button type="button" class="tracking-close" id="tracking-close" aria-label="Fechar rastreamento">×</button>
+  <!-- PROTOCOLO DE BUSCA E RASTREAMENTO POR ORDEM DE VALOR -->
+  <section class="organ-section">
+    <div class="section-header">
+      <h2>1. RASTREAMENTO METODOLÓGICO (ORDEM DE VALOR DE EVIDÊNCIA)</h2>
+      <p>Execute a busca respeitando a hierarquia das fontes antes de registrar uma evidência.</p>
     </div>
 
-    <!-- CONTEXTO DA BUSCA -->
-    <div class="tracking-context" id="tracking-context">
-      <strong>Objeto atual:</strong> Consulta geral. Selecione um bloco ou informe a entidade abaixo.
+    <!-- NÍVEL 1: FONTES OFICIAIS PRIMÁRIAS -->
+    <div class="value-level-box level-1">
+      <div class="level-badge">NÍVEL 1 — PROVAS OFICIAIS DIRETAS (MAIOR VALOR)</div>
+      <div class="step-list">
+        
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">01</span>
+            <div>
+              <strong>Portal de Transparência do Órgão</strong>
+              <small>Execução orçamentária, contratos, licitações e folha de pagamento.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Portal de Transparência', 'transparencia')">+ Registrar Achado</button>
+        </div>
+
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">02</span>
+            <div>
+              <strong>Portal de Transparência do Governo Central</strong>
+              <small>Portal da Transparência Executivo / Base Geral da Esfera.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Transparência do Governo', 'transparencia')">+ Registrar Achado</button>
+        </div>
+
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">03</span>
+            <div>
+              <strong>Portal oficial de Acesso à Informação / LAI</strong>
+              <small>Pedidos respondidos, relatórios de dados públicos e e-SIC.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Portal LAI', 'lai')">+ Registrar Achado</button>
+        </div>
+
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">04</span>
+            <div>
+              <strong>Portal Institucional e Dados Abertos</strong>
+              <small>Prestação de contas, estatísticas e atos administrativos institucionais.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Portal Institucional', 'institucional')">+ Registrar Achado</button>
+        </div>
+
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">05</span>
+            <div>
+              <strong>Diário Oficial Correspondente</strong>
+              <small>DOU, DJE, Diários Estaduais/Municipais — Atos, Decretos, Portarias e Acórdãos.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Diário Oficial', 'diario_oficial')">+ Registrar Achado</button>
+        </div>
+
+      </div>
     </div>
 
-    <!-- BLOCO 1: ORDEM OBRIGATÓRIA DE BUSCA (1 A 12) -->
-    <div class="tracking-section-title">ORDEM OBRIGATÓRIA DE BUSCA</div>
-    
-    <div class="tracking-order-group">
-      <div class="tracking-group-label">Fontes Oficiais</div>
-      <div class="tracking-order">
-        <div class="tracking-step"><span class="num">1</span> <span>Portal de Transparência próprio do órgão</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">2</span> <span>Portal de Transparência do governo (Federal, Estadual, Municipal)</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">3</span> <span>Portal oficial de Acesso à Informação / LAI</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">4</span> <span>Portal oficial institucional (Dados Abertos, Prestação de Contas)</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">5</span> <span>Diário Oficial correspondente (Atos, Decretos, Portarias)</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">6</span> <span>Tribunal de Contas competente (TCU, TCE, TCM)</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">7</span> <span>Controladoria / Órgão de controle (CGU, Controladorias)</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">8</span> <span>Base oficial de dados do governo</span> <span class="state pending">Aguardando</span></div>
-      </div>
+    <!-- NÍVEL 2: ÓRGÃOS DE CONTROLE E BASE DE DADOS -->
+    <div class="value-level-box level-2">
+      <div class="level-badge">NÍVEL 2 — ÓRGÃOS DE CONTROLE E FISCALIZAÇÃO</div>
+      <div class="step-list">
+        
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">06</span>
+            <div>
+              <strong>Tribunal de Contas Competente</strong>
+              <small>TCU, TCE ou TCM — Auditorias, julgamentos de contas e tomadas de contas especiais.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Tribunal de Contas', 'tribunal_contas')">+ Registrar Achado</button>
+        </div>
 
-      <div class="tracking-group-label" style="margin-top:14px;">Outras Fontes (Canais Secundários)</div>
-      <div class="tracking-order">
-        <div class="tracking-step"><span class="num">9</span> <span>Jornais / Imprensa (Notícias, investigações, reportagens)</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">10</span> <span>Vídeos (YouTube oficial, TV institucional, audiências, debates)</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">11</span> <span>Outras fontes secundárias (Revistas, relatórios independentes)</span> <span class="state pending">Aguardando</span></div>
-        <div class="tracking-step"><span class="num">12</span> <span>Redes sociais oficiais (Instagram, X, Facebook, LinkedIn, TikTok)</span> <span class="state pending">Aguardando</span></div>
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">07</span>
+            <div>
+              <strong>Controladoria e Órgão de Controle Interno</strong>
+              <small>CGU, Controladorias Estaduais ou Municipais — Relatórios de fiscalização.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Controladoria', 'controladoria')">+ Registrar Achado</button>
+        </div>
+
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">08</span>
+            <div>
+              <strong>Base Oficial de Dados Centralizada</strong>
+              <small>SISTN, SICONFI, Comprasnet e registros públicos oficiais.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Base Oficial de Dados', 'bases_oficiais')">+ Registrar Achado</button>
+        </div>
+
       </div>
     </div>
 
-    <!-- BLOCO 2: FORMULÁRIO DE REGISTRO E MAPA DE FONTES -->
-    <div class="tracking-section-title">REGISTRO DA PUBLICAÇÃO ENCONTRADA</div>
+    <!-- NÍVEL 3: FONTES COMPLEMENTARES (IMPRENSA, AUDIOVISUAL E REDES) -->
+    <div class="value-level-box level-3">
+      <div class="level-badge">NÍVEL 3 — CANAIS SECUNDÁRIOS E REPERCUSSÃO</div>
+      <div class="step-list">
+        
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">09</span>
+            <div>
+              <strong>Jornais / Imprensa de Cobertura</strong>
+              <small>Reportagens investigativas, matérias de veículos jornalísticos e notícias.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Jornal / Imprensa', 'jornal')">+ Registrar Achado</button>
+        </div>
 
-    <form class="tracking-form" id="tracking-form">
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">10</span>
+            <div>
+              <strong>Vídeos e Audiovisual Oficial / Jornalístico</strong>
+              <small>TV Justiça, sessões transmitidas, YouTube oficial, pronunciamentos e entrevistas.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Vídeo / Audiovisual', 'youtube')">+ Registrar Achado</button>
+        </div>
+
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">11</span>
+            <div>
+              <strong>Outras Fontes Secundárias</strong>
+              <small>Revistas especializadas, relatórios de ONGs e pareceres independentes.</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Outras Fontes', 'revista')">+ Registrar Achado</button>
+        </div>
+
+        <div class="step-card">
+          <div class="step-info">
+            <span class="step-number">12</span>
+            <div>
+              <strong>Redes Sociais Oficiais do Órgão</strong>
+              <small>Notas oficiais, perfis institucionais verificados (X, Instagram, LinkedIn, YouTube).</small>
+            </div>
+          </div>
+          <button type="button" class="btn-step-action" onclick="preencherFormularioFonte('Redes Sociais', 'instagram')">+ Registrar Achado</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FORMULÁRIO DE REGISTRO INTEGRADO DA FICHA -->
+  <section class="organ-section" id="section-form-registro">
+    <div class="section-header">
+      <h2>2. CAPTURA E CLASSIFICAÇÃO DA EVIDÊNCIA</h2>
+      <p>Registre a publicação localizada informando o canal, metadados e o julgamento probatório.</p>
+    </div>
+
+    <form class="organ-form" id="organ-evidence-form">
       
       <div class="form-row">
         <div class="form-group">
-          <label for="tracking-entity">Entidade / Item pesquisado</label>
-          <input id="tracking-entity" name="entity" placeholder="Ex.: Senado Federal" required>
+          <label for="form-source-type">Tipo de Fonte / Canal Selecionado</label>
+          <input type="text" id="form-source-type" name="source_type" readonly placeholder="Clique em '+ Registrar Achado' acima" required style="background:#f0eae0; font-weight:700;">
         </div>
         <div class="form-group">
-          <label for="tracking-sphere">Esfera</label>
-          <select id="tracking-sphere" name="sphere">
-            <option value="federal">Federal</option>
-            <option value="estadual">Estadual</option>
-            <option value="municipal">Municipal</option>
-            <option value="outro">Outra / Não definida</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- MAPA DE FONTES POR CATEGORIA -->
-      <div class="form-group">
-        <label for="tracking-category">Mapa de Fontes (Categoria / Canal)</label>
-        <select id="tracking-category" name="category" required>
-          <optgroup label="1. Institucional / Oficial">
+          <label for="form-category">Categoria Metodológica</label>
+          <select id="form-category" name="category" required>
             <option value="transparencia">Portal de Transparência</option>
             <option value="institucional">Portal Institucional</option>
             <option value="diario_oficial">Diário Oficial</option>
@@ -77,239 +200,252 @@
             <option value="controladoria">Controladoria</option>
             <option value="bases_oficiais">Bases Oficiais</option>
             <option value="lai">Acesso à Informação / LAI</option>
-          </optgroup>
-          <optgroup label="2. Imprensa">
-            <option value="jornal">Jornal</option>
-            <option value="revista">Revista</option>
-            <option value="portal_noticias">Portal de Notícias</option>
-            <option value="agencia_noticias">Agência de Notícias</option>
-          </optgroup>
-          <optgroup label="3. Audiovisual">
-            <option value="youtube">YouTube</option>
-            <option value="tv">TV / Emissora</option>
-            <option value="entrevista">Entrevista / Pronunciamento</option>
-            <option value="debate">Debate / Sessão</option>
-            <option value="audiencia">Audiência Pública</option>
-            <option value="video_jornalistico">Vídeo Jornalístico</option>
-          </optgroup>
-          <optgroup label="4. Redes Sociais">
-            <option value="instagram">Instagram</option>
-            <option value="x">X (antigo Twitter)</option>
-            <option value="facebook">Facebook</option>
-            <option value="linkedin">LinkedIn</option>
-            <option value="tiktok">TikTok</option>
-          </optgroup>
-        </select>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="tracking-title-input">Título / Assunto da Publicação</label>
-          <input id="tracking-title-input" name="title" placeholder="Título completo ou objeto do documento" required>
-        </div>
-        <div class="form-group">
-          <label for="tracking-date">Data da Publicação</label>
-          <input id="tracking-date" name="date" type="date" required>
+            <option value="jornal">Imprensa / Jornal</option>
+            <option value="youtube">Vídeo / Audiovisual</option>
+            <option value="instagram">Redes Sociais Oficiais</option>
+          </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="tracking-author">Autor / Órgão Responsável</label>
-          <input id="tracking-author" name="author" placeholder="Quem escreveu ou emitiu">
+          <label for="form-title">Título / Assunto da Publicação</label>
+          <input type="text" id="form-title" name="title" placeholder="Ex.: Contrato de Prestação de Serviços nº 12/2024" required>
         </div>
         <div class="form-group">
-          <label for="tracking-source">Fonte / Veículo de Divulgação</label>
-          <input id="tracking-source" name="source" placeholder="Ex.: Portal G1, TV Senado, DOU">
+          <label for="form-date">Data da Publicação</label>
+          <input type="date" id="form-date" name="date" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="form-author">Autor / Setor Emissor</label>
+          <input type="text" id="form-author" name="author" placeholder="Ex.: Presidência, Secretaria de Administração">
+        </div>
+        <div class="form-group">
+          <label for="form-vehicle">Veículo de Divulgação</label>
+          <input type="text" id="form-vehicle" name="vehicle" placeholder="Ex.: DJE, Portal do STF, TV Justiça">
         </div>
       </div>
 
       <div class="form-group">
-        <label for="tracking-url">URL Principal da Publicação</label>
-        <input id="tracking-url" name="url" type="url" placeholder="https://..." required>
+        <label for="form-url">URL / Link Principal da Publicação</label>
+        <input type="url" id="form-url" name="url" placeholder="https://..." required>
       </div>
 
-      <!-- CAMPOS COMPLEMENTARES DE ANEXOS E MÍDIA -->
       <div class="form-row">
         <div class="form-group">
-          <label for="tracking-video-url">Vídeo Anexo (se houver)</label>
-          <input id="tracking-video-url" name="video_url" type="url" placeholder="Link do YouTube, TV ou sessão">
+          <label for="form-video-url">Vídeo Anexo (se houver)</label>
+          <input type="url" id="form-video-url" name="video_url" placeholder="Link do vídeo no YouTube, TV ou sessão">
         </div>
         <div class="form-group">
-          <label for="tracking-doc-url">Documento / PDF Anexo (se houver)</label>
-          <input id="tracking-doc-url" name="doc_url" type="url" placeholder="Link do relatório, portaria ou contrato">
+          <label for="form-doc-url">Documento / PDF Anexo (se houver)</label>
+          <input type="url" id="form-doc-url" name="doc_url" placeholder="Link do PDF do contrato, portaria ou certidão">
         </div>
       </div>
 
-      <!-- BLOCO 3: CLASSIFICAÇÃO POSTERIOR DA CONFIABILIDADE -->
-      <div class="tracking-classification-box">
-        <label class="classification-label">Classificação da Fonte / Conteúdo (Análise Posterior)</label>
-        <p class="classification-note">
-          <strong>Regra metodológica:</strong> Registrar a existência da publicação antes de classificá-la.
-        </p>
-
-        <div class="classification-options">
-          <label class="class-btn btn-true">
+      <!-- MATRIZ DE CLASSIFICAÇÃO DA EVIDÊNCIA -->
+      <div class="classification-wrapper">
+        <span class="class-title">CLASSIFICAÇÃO POSTERIOR DA EVIDÊNCIA</span>
+        <p class="class-desc">Regra: Primeiro registra-se a existência da publicação; a classificação ocorre mediante análise probatória.</p>
+        
+        <div class="class-options">
+          <label class="class-card btn-true">
             <input type="radio" name="classification" value="verdadeira">
             <span>🟢 Verdadeira</span>
           </label>
-          <label class="class-btn btn-false">
+          <label class="class-card btn-false">
             <input type="radio" name="classification" value="mentirosa">
             <span>🔴 Mentirosa</span>
           </label>
-          <label class="class-btn btn-neutral">
+          <label class="class-card btn-neutral">
             <input type="radio" name="classification" value="neutra">
             <span>⚪ Neutra</span>
           </label>
-          <label class="class-btn btn-undefined">
+          <label class="class-card btn-undefined">
             <input type="radio" name="classification" value="sem_definicao" checked>
             <span>⬜ Sem Definição</span>
           </label>
         </div>
-        <span class="undefined-hint">* "Sem definição" significa evidência insuficiente no momento para concluir, não significa falsa.</span>
       </div>
 
-      <div class="tracking-actions">
-        <button type="submit" class="btn-primary">REGISTRAR EIXO DE EVIDÊNCIA</button>
-        <button type="button" class="btn-secondary" id="tracking-clear">LIMPAR REGISTROS LOCAIS</button>
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">REGISTRAR EVIDÊNCIA NA FICHA DESTE ÓRGÃO</button>
       </div>
+
     </form>
+  </section>
 
-    <!-- LISTA DE PUBLICAÇÕES CADASTRADAS -->
-    <div class="tracking-section-title" style="margin-top:28px;">PUBLICAÇÕES REGISTRADAS</div>
-    <div class="tracking-records" id="tracking-records-list">
-      <div class="empty-records">Nenhuma publicação registrada para esta consulta ainda.</div>
+  <!-- LISTA DE EVIDÊNCIAS REGISTRADAS NESTE ÓRGÃO -->
+  <section class="organ-section">
+    <div class="section-header">
+      <h2>3. EVIDÊNCIAS VINCULADAS A ESTE ÓRGÃO</h2>
+      <p>Histórico de publicações capturadas e auditadas para este item do índice.</p>
     </div>
 
-  </aside>
+    <div class="records-feed" id="organ-records-list">
+      <div class="empty-feed">Nenhuma evidência vinculada a este órgão ainda.</div>
+    </div>
+  </section>
+
 </div>
 
-<!-- ESTILIZAÇÃO DO TEMA ORÁCULO / PERGAMINHO INSTITUCIONAL -->
+<!-- CSS REFINADO DA FICHA INSTITUCIONAL -->
 <style>
   :root {
-    --oracle-bg: #f8f5eb;
-    --oracle-card: #ffffff;
-    --oracle-border: #d2c8b0;
-    --oracle-text: #2c251e;
-    --oracle-muted: #6b6355;
-    --oracle-gold: #9c7a32;
-    --oracle-gold-hover: #7d6124;
-    --oracle-gold-light: #f3edd9;
+    --bg-pergaminho: #f7f4eb;
+    --card-bg: #ffffff;
+    --border-color: #d8d0c0;
+    --text-primary: #2b251f;
+    --text-muted: #6e6557;
+    --gold-primary: #9c7a32;
+    --gold-dark: #785d20;
+    --gold-bg: #f2ebd9;
   }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: var(--oracle-text);
-  }
-
-  /* PAINEL BASE */
-  .oracle-tracking-overlay {
-    background: rgba(20, 16, 12, 0.4);
-  }
-
-  .oracle-tracking-panel {
-    background-color: var(--oracle-bg) !important;
-    color: var(--oracle-text);
-    padding: 24px;
-    box-shadow: -6px 0 24px rgba(0,0,0,0.15);
-    max-width: 780px;
-    width: 100%;
+  .oracle-organ-container {
+    max-width: 900px;
     margin: 0 auto;
+    padding: 24px;
+    background-color: var(--bg-pergaminho);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
-  /* CABEÇALHO */
-  .tracking-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding-bottom: 16px;
-    border-bottom: 2px solid var(--oracle-border);
+  /* CABEÇALHO DA FICHA */
+  .organ-header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 24px;
   }
 
-  .tracking-head h2 {
-    font-family: 'Cinzel', 'Georgia', serif;
-    font-size: 20px;
-    letter-spacing: .05em;
-    margin: 0;
-    color: #1a1510;
-  }
-
-  .tracking-subtitle {
-    display: block;
-    color: var(--oracle-muted);
-    font-size: 12px;
-    margin-top: 4px;
-  }
-
-  .tracking-close {
-    background: transparent;
-    border: 1px solid var(--oracle-border);
-    font-size: 18px;
-    border-radius: 4px;
-    cursor: pointer;
-    padding: 2px 8px;
-    color: var(--oracle-muted);
-  }
-
-  .tracking-context {
-    background: var(--oracle-gold-light);
-    border: 1px solid var(--oracle-border);
-    padding: 10px 14px;
-    border-radius: 6px;
-    margin: 16px 0;
-    font-size: 13px;
-  }
-
-  .tracking-section-title {
-    margin: 24px 0 12px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--oracle-border);
-    color: var(--oracle-gold);
-    font-size: 11px;
+  .organ-badge {
+    background: var(--gold-bg);
+    color: var(--gold-dark);
+    font-size: 10px;
     font-weight: 800;
-    letter-spacing: .1em;
+    padding: 4px 8px;
+    border-radius: 3px;
+    letter-spacing: .08em;
     text-transform: uppercase;
   }
 
-  .tracking-group-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--oracle-muted);
-    margin-bottom: 6px;
+  .organ-header h1 {
+    font-family: 'Cinzel', 'Georgia', serif;
+    font-size: 26px;
+    margin: 10px 0 6px;
+    color: #1a1510;
   }
 
-  /* ETAPAS 1 A 12 */
-  .tracking-order {
+  .organ-description {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* SEÇÕES DA FICHA */
+  .organ-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+
+  .section-header {
+    margin-bottom: 16px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
+  }
+
+  .section-header h2 {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--gold-primary);
+    letter-spacing: .06em;
+    margin: 0 0 4px;
+  }
+
+  .section-header p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* NÍVEIS DE VALOR */
+  .value-level-box {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .value-level-box.level-1 { background: #faf8f2; border-left: 4px solid var(--gold-primary); }
+  .value-level-box.level-2 { background: #fdfdfd; border-left: 4px solid #7d8b99; }
+  .value-level-box.level-3 { background: #ffffff; border-left: 4px solid #a3a3a3; }
+
+  .level-badge {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    color: var(--gold-dark);
+    margin-bottom: 10px;
+  }
+
+  .step-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
 
-  .tracking-step {
-    display: grid;
-    grid-template-columns: 28px 1fr auto;
+  .step-card {
+    display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
     padding: 8px 12px;
-    border: 1px solid var(--oracle-border);
-    background: var(--oracle-card);
-    font-size: 12px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
   }
 
-  .tracking-step .num {
-    font-weight: 800;
-    color: var(--oracle-gold);
+  .step-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
-  .tracking-step .state.pending {
-    font-size: 10px;
-    color: #8c7b60;
-    background: #f0eada;
-    padding: 3px 6px;
-    border-radius: 3px;
+  .step-number {
+    font-weight: 800;
+    font-size: 12px;
+    color: var(--gold-primary);
+  }
+
+  .step-info strong {
+    display: block;
+    font-size: 12.5px;
+  }
+
+  .step-info small {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .btn-step-action {
+    background: var(--gold-bg);
+    border: 1px solid var(--border-color);
+    color: var(--gold-dark);
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: .05em;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .btn-step-action:hover {
+    background: var(--gold-primary);
+    color: #fff;
   }
 
   /* FORMULÁRIO */
@@ -323,227 +459,185 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
 
   .form-group label {
-    font-size: 10px;
+    font-size: 10.5px;
     font-weight: 800;
     text-transform: uppercase;
-    color: var(--oracle-muted);
-    letter-spacing: .04em;
+    color: var(--text-muted);
   }
 
-  .form-group input, 
-  .form-group select {
+  .form-group input, .form-group select {
     padding: 9px 12px;
-    border: 1px solid var(--oracle-border);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: var(--oracle-card);
     font-size: 13px;
-    color: var(--oracle-text);
     outline: none;
   }
 
-  .form-group input:focus, 
-  .form-group select:focus {
-    border-color: var(--oracle-gold);
-    box-shadow: 0 0 0 2px rgba(156, 122, 50, 0.15);
-  }
-
-  /* CAIXA DE CLASSIFICAÇÃO */
-  .tracking-classification-box {
-    margin: 18px 0;
+  /* CLASSIFICAÇÃO */
+  .classification-wrapper {
+    background: var(--bg-pergaminho);
+    border: 1px solid var(--border-color);
     padding: 14px;
-    border: 1px solid var(--oracle-border);
     border-radius: 6px;
-    background: var(--oracle-card);
+    margin: 16px 0;
   }
 
-  .classification-label {
+  .class-title {
     font-size: 11px;
     font-weight: 800;
-    text-transform: uppercase;
-    color: var(--oracle-text);
-    display: block;
-    margin-bottom: 4px;
+    letter-spacing: .05em;
   }
 
-  .classification-note {
-    margin: 0 0 12px;
-    font-size: 12px;
-    color: var(--oracle-muted);
+  .class-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin: 2px 0 10px;
   }
 
-  .classification-options {
+  .class-options {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 8px;
   }
 
-  .class-btn {
+  .class-card {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 9px 6px;
-    border: 1px solid var(--oracle-border);
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    background: #fff;
     border-radius: 4px;
-    background: var(--oracle-bg);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
-    transition: all .15s ease;
   }
 
-  .class-btn input { display: none; }
+  .class-card input { display: none; }
 
-  .class-btn:has(input:checked) {
-    border-color: var(--oracle-gold);
-    background: var(--oracle-gold-light);
+  .class-card:has(input:checked) {
+    border-color: var(--gold-primary);
+    background: var(--gold-bg);
     font-weight: 800;
-    box-shadow: 0 0 0 1px var(--oracle-gold);
   }
 
-  .undefined-hint {
-    display: block;
-    margin-top: 10px;
-    font-size: 11px;
-    color: var(--oracle-muted);
-    font-style: italic;
-  }
-
-  /* BOTOES DE AÇÃO */
-  .tracking-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  .btn-primary {
-    flex: 1;
+  .btn-submit {
+    width: 100%;
     padding: 12px;
+    background: var(--gold-primary);
+    color: #fff;
     border: 0;
-    border-radius: 5px;
-    background: var(--oracle-gold);
-    color: #ffffff;
+    border-radius: 4px;
     font-weight: 800;
     font-size: 12px;
-    letter-spacing: .05em;
-    cursor: pointer;
-    transition: background .15s ease;
-  }
-
-  .btn-primary:hover {
-    background: var(--oracle-gold-hover);
-  }
-
-  .btn-secondary {
-    padding: 12px 16px;
-    border: 1px solid var(--oracle-border);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--oracle-muted);
-    font-weight: 700;
-    font-size: 11px;
     cursor: pointer;
   }
 
-  .btn-secondary:hover {
-    background: var(--oracle-gold-light);
+  .btn-submit:hover {
+    background: var(--gold-dark);
   }
 
-  .tracking-records {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .empty-records {
-    font-size: 12px;
-    color: var(--oracle-muted);
-    font-style: italic;
-    padding: 16px;
+  .empty-feed {
     text-align: center;
-    border: 1px dashed var(--oracle-border);
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 16px;
+    border: 1px dashed var(--border-color);
     border-radius: 4px;
+    font-style: italic;
   }
 
   @media(max-width: 600px) {
     .form-row { grid-template-columns: 1fr; }
-    .classification-options { grid-template-columns: 1fr 1fr; }
+    .step-card { flex-direction: column; align-items: flex-start; gap: 8px; }
   }
 </style>
 
-<!-- LÓGICA DE PERSISTÊNCIA DOS REGISTROS -->
+<!-- JS: CONEXÃO COM O ÍNDICE E PERSISTÊNCIA DAS EVIDÊNCIAS DA FICHA -->
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const trackingForm = document.getElementById('tracking-form');
-    const recordsContainer = document.getElementById('tracking-records-list');
-    const btnClear = document.getElementById('tracking-clear');
+  // Função que o seu ÍNDICE vai chamar ao clicar no órgão
+  function carregarFichaDoOrgano(nomeOrgano, esfera, descricao) {
+    document.getElementById('organ-name-title').innerText = nomeOrgano;
+    document.getElementById('organ-sphere-badge').innerText = esfera.toUpperCase();
+    document.getElementById('organ-description').innerText = descricao || 'Protocolo de auditoria e rastreamento probatório.';
+    
+    // Atualiza a lista de evidências exclusivas deste órgão
+    carregarEvidenciasDoOrgano(nomeOrgano);
+  }
 
-    function carregarRegistros() {
-      const salvos = JSON.parse(localStorage.getItem('oracle_tracking_records') || '[]');
-      if (salvos.length === 0) {
-        recordsContainer.innerHTML = '<div class="empty-records">Nenhuma publicação registrada para esta consulta ainda.</div>';
-        return;
-      }
+  // Preenche automaticamente o tipo de fonte ao clicar em "+ Registrar Achado"
+  function preencherFormularioFonte(nomeFonte, valorCategoria) {
+    document.getElementById('form-source-type').value = nomeFonte;
+    document.getElementById('form-category').value = valorCategoria;
+    
+    // Rola a tela até o formulário de registro
+    document.getElementById('section-form-registro').scrollIntoView({ behavior: 'smooth' });
+  }
 
-      recordsContainer.innerHTML = salvos.map((item) => `
-        <div style="padding:12px; border:1px solid var(--oracle-border); border-left:4px solid var(--oracle-gold); background:var(--oracle-card); border-radius:4px; font-size:12px;">
-          <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--oracle-text);">
-            <span>${item.entidade} (${item.esfera.toUpperCase()})</span>
-            <span>${classificacaoIcone(item.classificacao)}</span>
-          </div>
-          <div style="margin:6px 0; color:var(--oracle-text); font-weight:600;">${item.titulo}</div>
-          <div style="font-size:11px; color:var(--oracle-muted);">Fonte: ${item.fonte} | Categoria: ${item.categoria} | Data: ${item.data}</div>
-          ${item.url ? `<a href="${item.url}" target="_blank" style="font-size:11px; color:var(--oracle-gold); font-weight:700; text-decoration:underline; display:block; margin-top:6px;">Acessar Publicação Original ↗</a>` : ''}
+  // Carrega do localStorage as evidências salvas APENAS para este órgão
+  function carregarEvidenciasDoOrgano(nomeOrgano) {
+    const feed = document.getElementById('organ-records-list');
+    const salvos = JSON.parse(localStorage.getItem('oracle_organ_records') || '[]');
+    
+    const registradasNesteOrgano = salvos.filter(item => item.organo === nomeOrgano);
+
+    if (registradasNesteOrgano.length === 0) {
+      feed.innerHTML = '<div class="empty-feed">Nenhuma evidência vinculada a este órgão ainda.</div>';
+      return;
+    }
+
+    feed.innerHTML = registradasNesteOrgano.map(item => `
+      <div style="padding:12px; border:1px solid var(--border-color); border-left:4px solid var(--gold-primary); background:#fff; border-radius:4px; margin-bottom:8px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between; font-weight:bold;">
+          <span>${item.fonte_tipo} (${item.categoria.toUpperCase()})</span>
+          <span>${iconeClassificacao(item.classificacao)}</span>
         </div>
-      `).join('');
+        <div style="margin:4px 0; font-weight:600; font-size:13px;">${item.titulo}</div>
+        <div style="font-size:11px; color:var(--text-muted);">Data: ${item.data} | Autor: ${item.autor || 'Não informado'} | Veículo: ${item.veiculo || 'N/A'}</div>
+        ${item.url ? `<a href="${item.url}" target="_blank" style="color:var(--gold-primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Acessar Fonte Probatória ↗</a>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function iconeClassificacao(val) {
+    switch(val) {
+      case 'verdadeira': return '🟢 Verdadeira';
+      case 'mentirosa': return '🔴 Mentirosa';
+      case 'neutra': return '⚪ Neutra';
+      default: return '⬜ Sem Definição';
     }
+  }
 
-    function classificacaoIcone(val) {
-      switch(val) {
-        case 'verdadeira': return '🟢 Verdadeira';
-        case 'mentirosa': return '🔴 Mentirosa';
-        case 'neutra': return '⚪ Neutra';
-        default: return '⬜ Sem Definição';
-      }
-    }
+  // Grava a evidência atrelada ao Órgão Atual
+  document.getElementById('organ-evidence-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const organoAtual = document.getElementById('organ-name-title').innerText;
+    
+    const formData = new FormData(e.target);
+    const novoRegistro = {
+      organo: organoAtual,
+      fonte_tipo: formData.get('source_type'),
+      categoria: formData.get('category'),
+      titulo: formData.get('title'),
+      data: formData.get('date'),
+      autor: formData.get('author'),
+      veiculo: formData.get('vehicle'),
+      url: formData.get('url'),
+      video_url: formData.get('video_url'),
+      doc_url: formData.get('doc_url'),
+      classificacao: formData.get('classification')
+    };
 
-    trackingForm?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const formData = new FormData(trackingForm);
-      const novoRegistro = {
-        entidade: formData.get('entity'),
-        esfera: formData.get('sphere'),
-        categoria: formData.get('category'),
-        titulo: formData.get('title'),
-        data: formData.get('date'),
-        autor: formData.get('author'),
-        fonte: formData.get('source'),
-        url: formData.get('url'),
-        video_url: formData.get('video_url'),
-        doc_url: formData.get('doc_url'),
-        classificacao: formData.get('classification')
-      };
+    const salvos = JSON.parse(localStorage.getItem('oracle_organ_records') || '[]');
+    salvos.push(novoRegistro);
+    localStorage.setItem('oracle_organ_records', JSON.stringify(salvos));
 
-      const salvos = JSON.parse(localStorage.getItem('oracle_tracking_records') || '[]');
-      salvos.push(novoRegistro);
-      localStorage.setItem('oracle_tracking_records', JSON.stringify(salvos));
-
-      trackingForm.reset();
-      carregarRegistros();
-    });
-
-    btnClear?.addEventListener('click', () => {
-      if (confirm('Deseja limpar todos os registros salvos nesta sessão?')) {
-        localStorage.removeItem('oracle_tracking_records');
-        carregarRegistros();
-      }
-    });
-
-    carregarRegistros();
+    e.target.reset();
+    document.getElementById('form-source-type').value = '';
+    carregarEvidenciasDoOrgano(organoAtual);
   });
 </script>
