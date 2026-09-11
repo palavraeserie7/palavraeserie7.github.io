@@ -1673,68 +1673,30 @@ const comparisonGuidance =
    AUTENTICAÇÃO
 ===================================================== */
  
-async function getAuthenticatedSession() {
- 
-  const {
-    data,
-    error
-  } = await supabaseClient.auth.getSession();
- 
-  if (error) {
-    throw new Error(
-      "Não foi possível verificar a sessão."
-    );
-  }
- 
-  if (!data?.session) {
-    throw new Error(
-      "Sessão não encontrada."
-    );
-  }
- 
-  return data.session;
-}
- 
- 
 async function protectPage() {
  
-  authStatus.style.display = "flex";
- 
-  authTitle.textContent =
-    "VERIFICANDO ACESSO";
- 
-  authMessage.textContent =
-    "Validando sua sessão no Supabase...";
+  /*
+    A Matriz PRO não exige mais login para ser acessada.
+    Se, por acaso, já existir uma sessão ativa (por exemplo,
+    porque a pessoa está logada na Sala do Escritor), o plano
+    dela é lido normalmente. Caso contrário, segue como FREE,
+    sem bloquear ou redirecionar ninguém.
+  */
  
   try {
  
-    const session = await getAuthenticatedSession();
+    const { data } = await supabaseClient.auth.getSession();
  
-    currentUserPlan = getUserPlan(session);
-    updatePlanBadge();
-    renderModules();
- 
-    authStatus.style.display =
-      "none";
+    if (data?.session) {
+      currentUserPlan = getUserPlan(data.session);
+    }
  
   } catch (error) {
- 
-    authTitle.textContent =
-      "ACESSO RESTRITO";
- 
-    authMessage.textContent =
-      "Sua sessão não está ativa. Você será encaminhada para a Entrada.";
- 
-    authMessage.classList.add(
-      "auth-error"
-    );
- 
-    setTimeout(() => {
-      window.location.href =
-        "entrada.html";
-    }, 900);
- 
+    console.error("Erro ao verificar sessão (não bloqueante):", error);
   }
+ 
+  updatePlanBadge();
+  renderModules();
 }
  
  
@@ -2812,33 +2774,18 @@ async function sendQuestion(event) {
    ALTERAÇÕES DE AUTENTICAÇÃO
 ===================================================== */
  
-let sessaoInicialResolvida = false;
- 
+/*
+  A página não exige mais login. Este listener só serve para
+  atualizar o plano exibido (badge) caso uma sessão apareça ou
+  desapareça em segundo plano — nunca bloqueia ou redireciona.
+*/
 supabaseClient.auth.onAuthStateChange(
   (event) => {
- 
-    if (event === "INITIAL_SESSION") {
-      sessaoInicialResolvida = true;
+    if (event === "INITIAL_SESSION" || event === "SIGNED_OUT") {
       protectPage();
     }
- 
-    if (event === "SIGNED_OUT") {
- 
-      window.location.href =
-        "entrada.html";
-    }
- 
   }
 );
- 
-/*
-  Rede de segurança: em casos raros o evento INITIAL_SESSION pode
-  demorar. Se depois de 3s ele ainda não tiver disparado, verifica
-  a sessão do mesmo jeito para a página não travar carregando.
-*/
-setTimeout(() => {
-  if (!sessaoInicialResolvida) protectPage();
-}, 3000);
  
  
 /* =====================================================
