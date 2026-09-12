@@ -254,6 +254,106 @@ main{
 .stats-refresh:disabled{opacity:.6;cursor:default}
 .stats-msg{color:var(--muted);font-size:12px}
  
+/* ---- painel de visitantes ampliado ---- */
+.stats-grid{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:20px;
+  width:100%;
+}
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:1fr;}
+}
+.stats-block{
+  border:1px solid var(--b);
+  border-radius:6px;
+  background:var(--i);
+  padding:16px 18px;
+}
+.stats-block h3{
+  margin:0 0 14px;
+  font-size:10px;
+  letter-spacing:1.6px;
+  color:var(--muted);
+  font-weight:700;
+  text-transform:uppercase;
+}
+.stats-live{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-size:10px;
+  letter-spacing:.8px;
+  color:var(--p);
+  border:1px solid rgba(32,214,107,.35);
+  background:rgba(32,214,107,.08);
+  padding:5px 10px;
+  border-radius:20px;
+  margin-left:auto;
+}
+.stats-live i{
+  width:6px;height:6px;border-radius:50%;background:var(--p);
+  box-shadow:0 0 0 0 rgba(32,214,107,.6);
+  animation:statsPulse 2s infinite;
+}
+@keyframes statsPulse{
+  0%{box-shadow:0 0 0 0 rgba(32,214,107,.55);}
+  70%{box-shadow:0 0 0 7px rgba(32,214,107,0);}
+  100%{box-shadow:0 0 0 0 rgba(32,214,107,0);}
+}
+.stats-summary-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.stats-hours{
+  display:flex;
+  align-items:flex-end;
+  gap:3px;
+  height:74px;
+}
+.stats-hour-col{
+  flex:1;
+  height:100%;
+  display:flex;
+  align-items:flex-end;
+}
+.stats-hour-bar{
+  width:100%;
+  min-height:2px;
+  border-radius:2px 2px 0 0;
+  background:var(--b);
+}
+.stats-hour-col.peak .stats-hour-bar{
+  background:linear-gradient(180deg,var(--a),var(--p));
+}
+.stats-hour-labels{
+  display:flex;
+  justify-content:space-between;
+  margin-top:6px;
+  color:#7187a3;
+  font-size:9px;
+  letter-spacing:.4px;
+}
+.stats-peak-note{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--b);
+  color:var(--muted);
+  font-size:11.5px;
+  line-height:1.6;
+}
+.stats-peak-note b{color:var(--p);font-weight:700;}
+.stats-loc-row{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:8px 0;
+  border-bottom:1px solid var(--b);
+}
+.stats-loc-row:last-child{border-bottom:none;}
+.stats-loc-name{flex:1;font-size:12.5px;color:var(--t);}
+.stats-loc-city{display:block;color:#7187a3;font-size:10px;margin-top:2px;}
+.stats-loc-bar{width:56px;height:5px;border-radius:4px;background:var(--b);overflow:hidden;}
+.stats-loc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--a));}
+.stats-loc-count{width:32px;text-align:right;font-size:12.5px;color:var(--muted);}
+ 
  
 /* =====================================================
    BÍBLIA PARALELA — OS TRÊS BLOCOS SÃO O LEITOR
@@ -859,7 +959,8 @@ main{
 <section class="workspace">
   <article class="card stats-card">
     <div class="card-main">
-      <div>
+      <div style="width:100%">
+ 
         <div class="stats-summary">
           <div class="stat-box">
             <div class="stat-num" id="statTotalVisitas">—</div>
@@ -869,11 +970,41 @@ main{
             <div class="stat-num" id="statVisitantesUnicos">—</div>
             <div class="stat-label">Visitantes (aprox.)</div>
           </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statMediaPorVisitante">—</div>
+            <div class="stat-label">Visitas por visitante</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statSetorTopo">—</div>
+            <div class="stat-label">Setor mais consultado</div>
+          </div>
         </div>
  
-        <div class="stats-rank" id="statsRank">
-          <span class="stats-msg">Carregando estatísticas…</span>
+        <div class="stats-grid">
+ 
+          <div class="stats-block">
+            <h3>Setores mais consultados</h3>
+            <div class="stats-rank" id="statsRank">
+              <span class="stats-msg">Carregando estatísticas…</span>
+            </div>
+          </div>
+ 
+          <div class="stats-block">
+            <h3>Localização dos visitantes</h3>
+            <div id="statsLocations">
+              <span class="stats-msg">Carregando localização…</span>
+            </div>
+          </div>
+ 
         </div>
+ 
+        <div class="stats-block" style="margin-top:18px;">
+          <h3>Atividade por horário (horário local do navegador)</h3>
+          <div id="statsHoursWrap">
+            <span class="stats-msg">Carregando atividade por horário…</span>
+          </div>
+        </div>
+ 
       </div>
     </div>
  
@@ -1563,9 +1694,31 @@ let leitorInicializado = false;
  
 const statTotalVisitas = document.getElementById("statTotalVisitas");
 const statVisitantesUnicos = document.getElementById("statVisitantesUnicos");
+const statMediaPorVisitante = document.getElementById("statMediaPorVisitante");
+const statSetorTopo = document.getElementById("statSetorTopo");
 const statsRank = document.getElementById("statsRank");
+const statsLocations = document.getElementById("statsLocations");
+const statsHoursWrap = document.getElementById("statsHoursWrap");
 const statsUpdatedAt = document.getElementById("statsUpdatedAt");
 const statsRefreshBtn = document.getElementById("statsRefreshBtn");
+ 
+/*
+  Nomes possíveis de cada coluna, caso já existam na tabela "visitas"
+  com nomes diferentes dos usados aqui. Ajuste esta lista se sua
+  coluna de data/país/cidade tiver outro nome.
+*/
+const COLUNAS_DATA = ["created_at","criado_em","inserted_at","data_criacao","timestamp"];
+const COLUNAS_PAIS = ["pais","country","country_name"];
+const COLUNAS_CIDADE = ["cidade","city"];
+ 
+function primeiraColunaPresente(linha, candidatos){
+  for(const nome of candidatos){
+    if(linha && Object.prototype.hasOwnProperty.call(linha, nome) && linha[nome]){
+      return nome;
+    }
+  }
+  return null;
+}
  
 async function carregarEstatisticasVisitas(){
   if(!statsRefreshBtn) return;
@@ -1574,25 +1727,35 @@ async function carregarEstatisticasVisitas(){
   statsRefreshBtn.textContent = "ATUALIZANDO...";
  
   try{
+    // select("*") em vez de listar colunas: assim funciona mesmo que
+    // "visitas" ainda não tenha as colunas de data/país/cidade.
     const {data,error} =
       await supabaseClient
         .from("visitas")
-        .select("pagina,visitante_id");
+        .select("*");
  
     if(error) throw error;
  
     const linhas = data || [];
+    const primeira = linhas[0] || {};
+    const colData = primeiraColunaPresente(primeira, COLUNAS_DATA);
+    const colPais = primeiraColunaPresente(primeira, COLUNAS_PAIS);
+    const colCidade = primeiraColunaPresente(primeira, COLUNAS_CIDADE);
  
-    // total de visitas
+    // ---- total de visitas ----
     statTotalVisitas.textContent = linhas.length;
  
-    // visitantes únicos (aproximado por visitante_id salvo no navegador)
+    // ---- visitantes únicos (aproximado por visitante_id salvo no navegador) ----
     const idsUnicos = new Set(
       linhas.map(function(l){ return l.visitante_id; }).filter(Boolean)
     );
     statVisitantesUnicos.textContent = idsUnicos.size;
  
-    // ranking por setor/página
+    statMediaPorVisitante.textContent = idsUnicos.size
+      ? (linhas.length / idsUnicos.size).toFixed(1)
+      : "—";
+ 
+    // ---- ranking por setor/página ----
     const contagem = {};
     linhas.forEach(function(l){
       const nome = l.pagina || "Desconhecido";
@@ -1602,6 +1765,8 @@ async function carregarEstatisticasVisitas(){
     const ranking = Object.keys(contagem)
       .map(function(nome){ return {nome:nome, total:contagem[nome]}; })
       .sort(function(a,b){ return b.total - a.total; });
+ 
+    statSetorTopo.textContent = ranking.length ? ranking[0].nome : "—";
  
     if(ranking.length === 0){
       statsRank.innerHTML =
@@ -1619,6 +1784,95 @@ async function carregarEstatisticasVisitas(){
           '</div>'
         );
       }).join("");
+    }
+ 
+    // ---- localização ----
+    if(!colPais){
+      statsLocations.innerHTML =
+        '<span class="stats-msg">Ainda sem coluna de país/cidade na tabela ' +
+        '"visitas". Assim que ela existir e novas visitas forem registradas, ' +
+        'a localização aparece aqui automaticamente.</span>';
+    }else{
+      const porPais = {};
+      linhas.forEach(function(l){
+        const pais = l[colPais] || "Não identificado";
+        const cidade = colCidade ? (l[colCidade] || "") : "";
+        if(!porPais[pais]) porPais[pais] = { total:0, cidades:{} };
+        porPais[pais].total++;
+        if(cidade){
+          porPais[pais].cidades[cidade] = (porPais[pais].cidades[cidade] || 0) + 1;
+        }
+      });
+ 
+      const listaPaises = Object.keys(porPais)
+        .map(function(nome){ return {nome:nome, total:porPais[nome].total, cidades:porPais[nome].cidades}; })
+        .sort(function(a,b){ return b.total - a.total; });
+ 
+      if(!listaPaises.length){
+        statsLocations.innerHTML =
+          '<span class="stats-msg">Ainda não há visitas com localização registrada.</span>';
+      }else{
+        const maiorPais = listaPaises[0].total;
+ 
+        statsLocations.innerHTML = listaPaises.slice(0,6).map(function(item){
+          const pct = Math.max(6, Math.round((item.total / maiorPais) * 100));
+          const cidadesOrdenadas = Object.keys(item.cidades)
+            .sort(function(a,b){ return item.cidades[b]-item.cidades[a]; })
+            .slice(0,3)
+            .join(" · ");
+ 
+          return (
+            '<div class="stats-loc-row">' +
+              '<div class="stats-loc-name">' + item.nome +
+                (cidadesOrdenadas ? '<span class="stats-loc-city">' + cidadesOrdenadas + '</span>' : '') +
+              '</div>' +
+              '<div class="stats-loc-bar"><i style="width:' + pct + '%"></i></div>' +
+              '<div class="stats-loc-count">' + item.total + '</div>' +
+            '</div>'
+          );
+        }).join("");
+      }
+    }
+ 
+    // ---- atividade por horário ----
+    if(!colData){
+      statsHoursWrap.innerHTML =
+        '<span class="stats-msg">Ainda sem coluna de data/hora na tabela ' +
+        '"visitas" (ex.: created_at). Adicione essa coluna para ver o ' +
+        'gráfico de horário.</span>';
+    }else{
+      const porHora = new Array(24).fill(0);
+      linhas.forEach(function(l){
+        const valor = l[colData];
+        if(!valor) return;
+        const data = new Date(valor);
+        if(Number.isNaN(data.getTime())) return;
+        porHora[data.getHours()]++;
+      });
+ 
+      const maiorHora = Math.max(1, ...porHora);
+      const horaPico = porHora.indexOf(maiorHora);
+ 
+      const barrasHtml = porHora.map(function(qtd, hora){
+        const alturaPct = Math.max(3, Math.round((qtd / maiorHora) * 100));
+        const ehPico = qtd === maiorHora && qtd > 0;
+        return (
+          '<div class="stats-hour-col' + (ehPico ? ' peak' : '') + '" title="' + hora + 'h — ' + qtd + ' visitas">' +
+            '<div class="stats-hour-bar" style="height:' + alturaPct + '%"></div>' +
+          '</div>'
+        );
+      }).join("");
+ 
+      const labelsHtml = [0,4,8,12,16,20].map(function(h){ return '<span>' + h + 'h</span>'; }).join("");
+ 
+      const totalComData = porHora.reduce(function(a,b){ return a+b; }, 0);
+ 
+      statsHoursWrap.innerHTML =
+        '<div class="stats-hours">' + barrasHtml + '</div>' +
+        '<div class="stats-hour-labels">' + labelsHtml + '</div>' +
+        (totalComData
+          ? '<div class="stats-peak-note">Pico de acessos por volta das <b>' + horaPico + 'h</b>.</div>'
+          : '<div class="stats-peak-note">Ainda não há visitas com horário registrado.</div>');
     }
  
     const agora = new Date();
@@ -1759,28 +2013,59 @@ document.addEventListener("visibilitychange",function(){
   var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
   var PAGINA = "Sala do Escritor";
  
-  try{
-    var vid = localStorage.getItem("ps_visitante_id");
-    if(!vid){
-      vid = (window.crypto && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-      localStorage.setItem("ps_visitante_id", vid);
-    }
+  function registrarVisita(pais, cidade){
+    try{
+      var vid = localStorage.getItem("ps_visitante_id");
+      if(!vid){
+        vid = (window.crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+        localStorage.setItem("ps_visitante_id", vid);
+      }
  
-    fetch(SUPABASE_URL + "/rest/v1/visitas", {
-      method: "POST",
-      headers: {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
-    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
-  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
+      var payload = { pagina: PAGINA, visitante_id: vid };
+      if(pais) payload.pais = pais;
+      if(cidade) payload.cidade = cidade;
+ 
+      fetch(SUPABASE_URL + "/rest/v1/visitas", {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(payload)
+      }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
+    }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
+  }
+ 
+  /*
+    Localização aproximada por IP, via serviço gratuito (sem chave).
+    Se falhar ou demorar mais de 2.5s, a visita é registrada mesmo
+    assim, só que sem país/cidade — nunca trava a navegação.
+  */
+  var jaRegistrou = false;
+  function concluir(pais, cidade){
+    if(jaRegistrou) return;
+    jaRegistrou = true;
+    registrarVisita(pais, cidade);
+  }
+ 
+  setTimeout(function(){ concluir(null, null); }, 2500);
+ 
+  fetch("https://ipapi.co/json/")
+    .then(function(r){ return r.json(); })
+    .then(function(info){
+      concluir(info && info.country_name, info && info.city);
+    })
+    .catch(function(){ concluir(null, null); });
 })();
 </script>
 </body>
 </html>
  
+
+
+
+
