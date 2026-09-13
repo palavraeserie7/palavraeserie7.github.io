@@ -21,7 +21,7 @@
 .question-box .qtext{font-size:15px;line-height:1.6;color:#183042}
 .question-box .qcopy{margin-top:12px;padding:8px 14px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;font-size:12px;cursor:pointer}
 .pending-hint{margin-top:8px;font-size:12px;color:#a15b1f}
-.scan-box{margin-top:20px;padding:18px;border:1px solid #b9d8e6;border-radius:8px;background:#eef8fb}.scan-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.scan-head h2{margin:0;color:#183042;font-size:18px}.scan-btn{padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#04202f;font-weight:800;cursor:pointer}.scan-btn:disabled{opacity:.55;cursor:wait}.scan-status{margin-top:12px;color:#385466;font-size:13px}.scan-list{display:grid;gap:8px;margin-top:14px}.scan-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #d7e5ea;border-radius:6px;background:#fff}.scan-item h3{margin:0;color:#183042;font-size:13px}.scan-item p{margin:4px 0 0;color:#587080;font-size:12px;line-height:1.45}.scan-badge{flex:0 0 auto;padding:4px 7px;border-radius:4px;font-size:10px;font-weight:900}.badge-found{background:#d9f7e4;color:#087332}.badge-uncertain{background:#fff1ce;color:#8a5a00}.badge-absent{background:#edf1f4;color:#607080}.detail-btn{margin-top:8px;padding:5px 9px;border:1px solid #b5cbd5;border-radius:5px;background:#fff;color:#183042;font-size:11px;font-weight:700;cursor:pointer}.detail-btn.locked{color:#8a5a00;border-color:#e0c47b}.account-box{margin-top:20px;padding:14px;border:1px solid #ddcea4;border-radius:8px;background:#fff}.account-row{display:flex;gap:8px;flex-wrap:wrap}.account-row input{flex:1;min-width:180px;padding:9px;border:1px solid #ccb98a;border-radius:6px}.account-row button{padding:9px 13px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;cursor:pointer}.account-status{margin-top:8px;color:#6c5c42;font-size:12px}.resource.scan-found{background:#123b2b;color:#d9f7e4}.resource.scan-uncertain{background:#3b3015;color:#fff1ce}.resource.scan-absent{opacity:.7}.scan-mark{margin-left:4px;font-size:9px;font-weight:900}.scan-found .scan-mark{color:#20d66b}.scan-uncertain .scan-mark{color:#e8b94f}.scan-absent .scan-mark{color:#91a4bd}
+.scan-box{margin-top:20px;padding:18px;border:1px solid #b9d8e6;border-radius:8px;background:#eef8fb}.scan-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.scan-head h2{margin:0;color:#183042;font-size:18px}.scan-btn{padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#04202f;font-weight:800;cursor:pointer}.scan-btn:disabled{opacity:.55;cursor:wait}.scan-status{margin-top:12px;color:#385466;font-size:13px}.scan-list{display:grid;gap:8px;margin-top:14px}.scan-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #d7e5ea;border-radius:6px;background:#fff}.scan-item h3{margin:0;color:#183042;font-size:13px}.scan-item p{margin:4px 0 0;color:#587080;font-size:12px;line-height:1.45}.scan-badge{flex:0 0 auto;padding:4px 7px;border-radius:4px;font-size:10px;font-weight:900}.badge-found{background:#d9f7e4;color:#087332}.badge-uncertain{background:#fff1ce;color:#8a5a00}.badge-absent{background:#edf1f4;color:#607080}.detail-btn{margin-top:8px;padding:5px 9px;border:1px solid #b5cbd5;border-radius:5px;background:#fff;color:#183042;font-size:11px;font-weight:700;cursor:pointer}.detail-btn.locked{color:#8a5a00;border-color:#e0c47b}.account-box{margin-top:20px;padding:14px;border:1px solid #ddcea4;border-radius:8px;background:#fff}.account-row{display:flex;gap:8px;flex-wrap:wrap}.account-row input{flex:1;min-width:180px;padding:9px;border:1px solid #ccb98a;border-radius:6px}.account-row button{padding:9px 13px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;cursor:pointer}.account-status{margin-top:8px;color:#6c5c42;font-size:12px}.resource.selected-resource{background:#1d3556;color:#fff}.resource.scan-found{background:#123b2b;color:#d9f7e4}.resource.scan-uncertain{background:#3b3015;color:#fff1ce}.resource.scan-absent{opacity:.7}.scan-mark{margin-left:4px;font-size:9px;font-weight:900}.scan-found .scan-mark{color:#20d66b}.scan-uncertain .scan-mark{color:#e8b94f}.scan-absent .scan-mark{color:#91a4bd}
 @media(max-width:800px){.shell{display:block}.sidebar{width:100%;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.index{max-height:48vh}.main{padding:18px 10px}.card{padding:22px}.card h1{font-size:26px}}
 </style>
 </head>
@@ -162,187 +162,24 @@ const scanStatus = document.getElementById('scanStatus');
 const scanList = document.getElementById('scanList');
 const accountForm = document.getElementById('accountForm');
 const accountStatus = document.getElementById('accountStatus');
-let activeCategory = null;
-let lastScan = null;
+let selectedResourceCode=null;
 function esc(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getReferencia(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; } }
 function setReferencia(v){ try { localStorage.setItem(REF_KEY, v); } catch(e) {} }
 function getSession(){ try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch(e) { return null; } }
-function setSession(v){ try { localStorage.setItem(SESSION_KEY, JSON.stringify(v)); } catch(e) {} }
-function clearSession(){ try { localStorage.removeItem(SESSION_KEY); } catch(e) {} }
-function currentPlan(){
-  const session=getSession()||{};
-  const user=session.user||{};
-  return String(
-    session.profile?.plano||
-    session.plano||
-    user.user_metadata?.plano||
-    user.app_metadata?.plano||
-    user.profile?.plano||
-    'FREE'
-  ).trim().toUpperCase();
-}
-function textualCanOpen(required){
-  const session=getSession();
-  if(!session?.access_token) return false;
-  const requiredPlan=String(required||'FREE').toUpperCase();
-  return (TEXTUAL_TIER_RANK[currentPlan()] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99);
-}
-function categoriesFor(button){
-  const section=button.closest('.category');
-  return {
-    code:button.querySelector('.category-code')?.textContent.trim()||'',
-    name:button.querySelector('strong')?.textContent.trim()||'',
-    resources:[...section.querySelectorAll('.resource')].map(r=>({
-      code:r.dataset.code,
-      name:r.dataset.resource,
-      tier:TEXTUAL_ACCESS_LEVELS[r.dataset.code]||'DOCTUS'
-    }))
-  };
-}
-function renderReferencia(){ const ref=getReferencia(); refCurrent.innerHTML=ref?'<strong>Referência atual:</strong> '+esc(ref)+' — <button type="button" class="secondary" id="refChange" style="padding:4px 10px;border:1px solid #ccb98a;border-radius:5px;background:transparent;color:#6c5c42;font-size:11px;cursor:pointer">Trocar passagem/tema</button>':'Nenhuma referência salva ainda.'; document.getElementById('refChange')?.addEventListener('click',()=>{localStorage.removeItem(REF_KEY);refInput.value='';lastScan=null;scanBox.hidden=true;questionArea.innerHTML='';renderReferencia();refInput.focus();}); }
-function renderAccount(){
-  const session=getSession();
-  accountStatus.textContent=session
-    ? 'Sessão reconhecida: plano '+currentPlan()+'. As análises completas liberadas aparecem conforme o nível de cada etapa.'
-    : 'A varredura do grupo e os sinais de correspondência são visíveis para todos. Para abrir uma análise completa, entre pelo acesso principal do site.';
-}
-async function scanGroup(){ const ref=getReferencia();if(!ref){scanStatus.textContent='Salve primeiro uma passagem ou tema de estudo.';refInput.focus();return;}scanButton.disabled=true;scanStatus.textContent='IA verificando cada etapa com critério conservador…';scanList.innerHTML='';try{const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(getSession()?.access_token?{Authorization:'Bearer '+getSession().access_token}: {})},body:JSON.stringify({question:'Faça uma varredura textual do grupo inteiro. Retorne SOMENTE JSON válido no formato {\"results\":[{\"code\":\"A.1\",\"status\":\"found|absent|uncertain\",\"reason\":\"evidência curta\",\"analysis\":\"detalhe somente se autorizado\"}]}. Use found apenas com evidência suficiente; use uncertain quando não for possível concluir. Não invente.',referenceText:ref,studyContext:JSON.stringify({group:activeCategory,rule:'verificar cada etapa contra sua definição exata',public_scan:true,systemPrompt:GRUPO_A_PROMPTS.general,resourcePrompts:Object.fromEntries(activeCategory.resources.map(r=>[r.code,GRUPO_A_PROMPTS.resources[r.code]||'']))}),analysisType:'textual_group_scan',mode:'free',group:activeCategory,resources:activeCategory.resources})});const payload=await response.json();if(!response.ok)throw new Error(payload.error||'A API de pesquisa não respondeu corretamente.');let normalized=payload;if(!Array.isArray(normalized.results)){const raw=payload.answer||payload.text||payload.response||'';const match=String(raw).match(/\{[\s\S]*\}/);try{normalized=match?JSON.parse(match[0]):null;}catch(e){normalized=null;}}if(!normalized||!Array.isArray(normalized.results))throw new Error('A API retornou texto sem a lista estruturada de etapas.');lastScan=normalized;renderScan();scanStatus.textContent='Varredura concluída. “Encontrado” exige evidência; “incerto” não é tratado como confirmação.';}catch(err){scanStatus.textContent='Não foi possível concluir a varredura: '+(err.message||'erro desconhecido');}finally{scanButton.disabled=false;} }
-function clearIndexSignals(){
-  document.querySelectorAll('.resource').forEach(button=>{
-    button.classList.remove('scan-found','scan-uncertain','scan-absent');
-    button.querySelector('.scan-mark')?.remove();
-  });
-}
-function updateIndexSignals(results){
-  clearIndexSignals();
-  const byCode=Object.fromEntries((results||[]).map(item=>[item.code,item]));
-  document.querySelectorAll('.resource').forEach(button=>{
-    const item=byCode[button.dataset.code];
-    if(!item) return;
-    const status=String(item.status||'uncertain').toLowerCase();
-    const normalized=status==='found'?'found':status==='absent'?'absent':'uncertain';
-    button.classList.add('scan-'+normalized);
-    const mark=document.createElement('span');
-    mark.className='scan-mark';
-    mark.textContent=normalized==='found'?'✓':normalized==='uncertain'?'?':'—';
-    mark.title=normalized==='found'?'Correspondência encontrada':normalized==='uncertain'?'Correspondência incerta':'Não encontrado';
-    button.appendChild(mark);
-  });
-}
-function renderScan(){ if(!activeCategory)return;scanBox.hidden=false;scanTitle.textContent=activeCategory.code+' — '+activeCategory.name;if(!lastScan){scanList.innerHTML='';clearIndexSignals();return;}updateIndexSignals(lastScan.results);const byCode=Object.fromEntries((lastScan.results||[]).map(x=>[x.code,x]));scanList.innerHTML=activeCategory.resources.map(r=>{const item=byCode[r.code]||{status:'uncertain',reason:'Sem resultado confiável.'};const status=String(item.status||'uncertain').toLowerCase(),label=status==='found'?'ENCONTRADO':status==='absent'?'NÃO ENCONTRADO':'INCERTO',cls=status==='found'?'found':status==='absent'?'absent':'uncertain',can=textualCanOpen(r.tier);return '<article class="scan-item"><div><h3>'+esc(r.code+' — '+r.name)+'</h3><p>'+esc(item.reason||'Sem evidência suficiente.')+'</p><button class="detail-btn '+(can?'':'locked')+'" data-detail="'+esc(r.code)+'">'+(can?'Abrir análise completa':'Exige '+esc(r.tier))+'</button></div><span class="scan-badge badge-'+cls+'">'+label+'</span></article>';}).join('');scanList.querySelectorAll('[data-detail]').forEach(btn=>btn.onclick=()=>openDetail(btn.dataset.detail)); }
-async function openDetail(code){
-  const resource=activeCategory.resources.find(r=>r.code===code);
-
-  if(!resource){
-    return;
-  }
-
-  if(!textualCanOpen(resource.tier)){
-    questionArea.innerHTML=
-      '<div class="pending-hint">'+
-      'Para abrir a análise completa de <strong>'+
-      esc(resource.code+' — '+resource.name)+
-      '</strong>, entre na conta com uma assinatura '+
-      esc(resource.tier)+
-      ' ou superior.'+
-      '</div>';
-    return;
-  }
-
-  const result=(lastScan?.results||[]).find(item=>item.code===code);
-  const session=getSession();
-
-  questionArea.innerHTML=
-    '<div class="question-box">'+
-    '<span class="qcode">'+esc(code)+'</span>'+
-    '<div class="qtext">Carregando a análise técnica completa...</div>'+
-    '</div>';
-
-  try{
-    const response=await fetch(PESQUISA_API_URL,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        ...(session?.access_token
-          ? {Authorization:'Bearer '+session.access_token}
-          : {})
-      },
-      body:JSON.stringify({
-        question:'Produza a análise textual acadêmica completa da etapa solicitada.',
-        referenceText:getReferencia(),
-        analysisType:'textual_step_detail',
-        mode:'free',
-        stepCode:code,
-        plan:currentPlan(),
-        group:activeCategory,
-        resource:{
-          code:resource.code,
-          name:resource.name,
-          tier:resource.tier
-        },
-        scanResult:result||{
-          code:code,
-          status:'uncertain',
-          reason:'Nenhum resultado específico foi localizado na varredura.',
-          evidence:[]
-        }
-      })
-    });
-
-    const payload=await response.json();
-
-    if(!response.ok){
-      throw new Error(
-        payload.error||
-        'O Worker não autorizou ou não concluiu a análise detalhada.'
-      );
-    }
-
-    const analysis=
-      payload.analysis||
-      payload.text||
-      payload.answer||
-      payload.response||
-      '';
-
-    if(!analysis){
-      throw new Error(
-        'O Worker respondeu sem conteúdo de análise detalhada.'
-      );
-    }
-
-    const analysisHtml=esc(analysis).replace(/\r?\n/g,'<br>');
-
-    questionArea.innerHTML=
-      '<div class="question-box">'+
-      '<span class="qcode">'+esc(code)+'</span>'+
-      '<div class="qtext">'+
-      '<strong>'+esc(resource.name)+'</strong><br>'+
-      analysisHtml+
-      '</div>'+
-      '</div>';
-
-  }catch(error){
-    questionArea.innerHTML=
-      '<div class="question-box">'+
-      '<span class="qcode">'+esc(code)+'</span>'+
-      '<div class="qtext">'+
-      '<strong>'+esc(resource.name)+'</strong><br>'+
-      '<span class="pending-hint">'+
-      esc(error.message||'Não foi possível carregar a análise detalhada.')+
-      '</span>'+
-      '</div>'+
-      '</div>';
-  }
-}
-refSave.onclick=()=>{const value=refInput.value.trim();if(!value){refInput.focus();return;}setReferencia(value);lastScan=null;clearIndexSignals();renderReferencia();if(activeCategory){renderScan();scanStatus.textContent='Referência salva. Clique em “Analisar grupo”.';}};refInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();refSave.click();}};scanButton.onclick=scanGroup;
-document.querySelectorAll('.category-toggle').forEach(button=>button.addEventListener('click',()=>{const resources=button.nextElementSibling,open=resources.classList.toggle('open');button.classList.toggle('active',open);button.setAttribute('aria-expanded',String(open));if(open){activeCategory=categoriesFor(button);lastScan=null;clearIndexSignals();selected.innerHTML='<strong>Grupo selecionado:</strong> '+esc(activeCategory.code+' — '+activeCategory.name);questionArea.innerHTML='';scanStatus.textContent=getReferencia()?'A IA iniciará a verificação das '+activeCategory.resources.length+' etapas.':'Salve uma passagem ou tema de estudo primeiro.';renderScan();if(getReferencia())scanGroup();}}));
-document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(activeCategory)openDetail(button.dataset.code);}));
-
-// Abre automaticamente o Grupo A para que os recursos fiquem imediatamente visíveis.
+function currentPlan(){ const session=getSession()||{}; const user=session.user||{}; return String(session.profile?.plano||session.plano||user.user_metadata?.plano||user.app_metadata?.plano||'FREE').trim().toUpperCase(); }
+function textualCanOpen(required){ const session=getSession(); if(!session?.access_token) return false; const requiredPlan=String(required||'FREE').toUpperCase(); return (TEXTUAL_TIER_RANK[currentPlan()] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99); }
+function categoriesFor(button){ const section=button.closest('.category'); return {code:button.querySelector('.category-code')?.textContent.trim()||'',name:button.querySelector('strong')?.textContent.trim()||'',resources:[...section.querySelectorAll('.resource')].map(r=>({code:r.dataset.code,name:r.dataset.resource,tier:TEXTUAL_ACCESS_LEVELS[r.dataset.code]||'DOCTUS'}))}; }
+function renderReferencia(){ const ref=getReferencia(); refCurrent.innerHTML=ref?'<strong>Referência atual:</strong> '+esc(ref)+' — <button type="button" class="secondary" id="refChange" style="padding:4px 10px;border:1px solid #ccb98a;border-radius:5px;background:transparent;color:#6c5c42;font-size:11px;cursor:pointer">Trocar passagem/tema</button>':'Nenhuma referência salva ainda.'; document.getElementById('refChange')?.addEventListener('click',()=>{localStorage.removeItem(REF_KEY);refInput.value='';selected.innerHTML='<strong>Recurso selecionado:</strong> nenhum recurso selecionado.';scanBox.hidden=true;questionArea.innerHTML='';renderReferencia();refInput.focus();}); }
+function renderAccount(){ const session=getSession(); accountStatus.textContent=session?'Sessão reconhecida: plano '+currentPlan()+'. As análises individuais liberadas aparecem conforme o nível de cada etapa.':'Para analisar uma figura, entre pelo acesso principal do site.'; }
+function clearSelection(){ document.querySelectorAll('.resource').forEach(button=>button.classList.remove('selected-resource')); }
+function selectResource(code){ if(!activeCategory)return; const resource=activeCategory.resources.find(r=>r.code===code); if(!resource)return; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]')?.classList.add('selected-resource'); selected.innerHTML='<strong>Figura selecionada:</strong> '+esc(resource.code+' — '+resource.name); scanBox.hidden=false; scanTitle.textContent=resource.code+' — '+resource.name; scanStatus.textContent=getReferencia()?'Clique em “Analisar figura” para consultar somente esta figura na passagem salva.':'Salve uma passagem ou tema antes de analisar.'; scanButton.textContent='Analisar figura'; scanButton.disabled=!getReferencia(); scanList.innerHTML='<div class="scan-item"><div><h3>'+esc(resource.code+' — '+resource.name)+'</h3><p>A consulta ainda não foi executada.</p></div></div>'; questionArea.innerHTML=''; }
+async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Salve primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=getSession(); scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; try{ const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},scanResult:{code:resource.code,status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise individual concluída.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br>'+esc(analysis).replace(/\r?\n/g,'<br>')+'</div></div>'; }catch(error){ scanStatus.textContent='Não foi possível concluir a análise individual.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
+refSave.onclick=()=>{const value=refInput.value.trim();if(!value){refInput.focus();return;}setReferencia(value);selectedResourceCode=null;clearSelection();questionArea.innerHTML='';renderReferencia();if(activeCategory){scanBox.hidden=true;scanStatus.textContent='Referência salva. Selecione uma figura e clique em “Analisar figura”.';}};refInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();refSave.click();}};scanButton.onclick=analyzeSelected;
+document.querySelectorAll('.category-toggle').forEach(button=>button.addEventListener('click',()=>{const resources=button.nextElementSibling,open=resources.classList.toggle('open');button.classList.toggle('active',open);button.setAttribute('aria-expanded',String(open));if(open){activeCategory=categoriesFor(button);selectedResourceCode=null;clearSelection();selected.innerHTML='<strong>Grupo selecionado:</strong> '+esc(activeCategory.code+' — '+activeCategory.name);questionArea.innerHTML='';scanBox.hidden=true;scanStatus.textContent=getReferencia()?'Selecione uma figura no índice lateral. Nenhuma consulta será feita automaticamente.':'Salve uma passagem ou tema de estudo primeiro.';}}));
+document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(activeCategory){selectedResourceCode=button.dataset.code;selectResource(selectedResourceCode);}}));
+// Abre a categoria, mas não executa nenhuma consulta automaticamente.
 document.querySelector('.category-toggle')?.click();
-
 const saved=getReferencia();if(saved)refInput.value=saved;renderReferencia();renderAccount();
 </script>
 <script>
