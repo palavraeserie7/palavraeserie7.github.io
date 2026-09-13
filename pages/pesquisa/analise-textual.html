@@ -306,6 +306,10 @@ async function openDetail(code){
 refSave.onclick=()=>{const value=refInput.value.trim();if(!value){refInput.focus();return;}setReferencia(value);lastScan=null;clearIndexSignals();renderReferencia();if(activeCategory){renderScan();scanStatus.textContent='Referência salva. Clique em “Analisar grupo”.';}};refInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();refSave.click();}};scanButton.onclick=scanGroup;
 document.querySelectorAll('.category-toggle').forEach(button=>button.addEventListener('click',()=>{const resources=button.nextElementSibling,open=resources.classList.toggle('open');button.classList.toggle('active',open);button.setAttribute('aria-expanded',String(open));if(open){activeCategory=categoriesFor(button);lastScan=null;clearIndexSignals();selected.innerHTML='<strong>Grupo selecionado:</strong> '+esc(activeCategory.code+' — '+activeCategory.name);questionArea.innerHTML='';scanStatus.textContent=getReferencia()?'A IA iniciará a verificação das '+activeCategory.resources.length+' etapas.':'Salve uma passagem ou tema de estudo primeiro.';renderScan();if(getReferencia())scanGroup();}}));
 document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(activeCategory)openDetail(button.dataset.code);}));
+
+// Abre automaticamente o Grupo A para que os recursos fiquem imediatamente visíveis.
+document.querySelector('.category-toggle')?.click();
+
 const saved=getReferencia();if(saved)refInput.value=saved;renderReferencia();renderAccount();
 </script>
 <script>
