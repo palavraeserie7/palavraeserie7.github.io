@@ -284,9 +284,8 @@ let activeCategory=null;
 function esc(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getReferencia(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; } }
 function setReferencia(v){ try { localStorage.setItem(REF_KEY, v); } catch(e) {} }
-function getSession(){ try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch(e) { return null; } }
-function currentPlan(){ const session=getSession()||{}; const user=session.user||{}; return String(session.profile?.plano||session.plano||user.user_metadata?.plano||user.app_metadata?.plano||'FREE').trim().toUpperCase(); }
-function textualCanOpen(required){ const requiredPlan=String(required||'FREE').toUpperCase(); const session=getSession(); if(requiredPlan==='FREE') return true; if(!session?.access_token) return false; return (TEXTUAL_TIER_RANK[currentPlan()] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99); }
+function currentPlan(){ return currentUserPlan; }
+function textualCanOpen(required){ const requiredPlan=String(required||'FREE').toUpperCase(); if(requiredPlan==='FREE') return true; if(!currentSession?.access_token) return false; return (TEXTUAL_TIER_RANK[currentUserPlan] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99); }
 function categoriesFor(button){ const section=button.closest('.category'); return {code:button.querySelector('.category-code')?.textContent.trim()||'',name:button.querySelector('strong')?.textContent.trim()||'',resources:[...section.querySelectorAll('.resource')].map(r=>({code:r.dataset.code,name:r.dataset.resource,tier:TEXTUAL_ACCESS_LEVELS[r.dataset.code]||'DOCTUS'}))}; }
 function findCategoryForCode(code){ const btn=document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]'); if(!btn)return null; const toggle=btn.closest('.category')?.querySelector('.category-toggle'); return toggle?categoriesFor(toggle):null; }
  
