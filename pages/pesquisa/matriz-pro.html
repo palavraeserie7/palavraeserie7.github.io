@@ -1679,32 +1679,19 @@ const comparisonGuidance =
 /* =====================================================
    AUTENTICAÇÃO
 ===================================================== */
- 
-async function protectPage() {
- 
-  /*
-    A Matriz PRO não exige mais login para ser acessada.
-    Se, por acaso, já existir uma sessão ativa (por exemplo,
-    porque a pessoa está logada na Sala do Escritor), o plano
-    dela é lido normalmente. Caso contrário, segue como FREE,
-    sem bloquear ou redirecionar ninguém.
-  */
- 
+ async function protectPage() {
   try {
- 
     const { data } = await supabaseClient.auth.getSession();
- 
     if (data?.session) {
-      currentUserPlan = getUserPlan(data.session);
+      currentUserPlan = await getUserPlan(data.session);
     }
- 
   } catch (error) {
     console.error("Erro ao verificar sessão (não bloqueante):", error);
   }
- 
   updatePlanBadge();
   renderModules();
 }
+
  
  
 /* =====================================================
