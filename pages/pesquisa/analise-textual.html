@@ -303,7 +303,7 @@ function renderHistory(){ const list=readHistory(); historyCount.textContent=Str
 function reopenFromHistory(entry){ refInput.value=entry.ref; setReferencia(entry.ref); activeCategory=findCategoryForCode(entry.code)||activeCategory; selectedResourceCode=entry.code; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(entry.code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=entry.code+' — '+entry.name; queryChip.classList.remove('empty'); scanButton.disabled=false; const cached=readCacheEntry(entry.ref,entry.code); if(cached){ scanStatus.textContent='Reaberto do histórico (nenhuma nova chamada à IA foi feita).'; renderResult(entry.code,entry.name,cached.analysis,true); } else { scanStatus.textContent='Pronto para analisar novamente.'; questionArea.innerHTML=''; } }
  
 function renderReferencia(){ /* mantido por compatibilidade; a barra de consulta já mostra o valor no próprio input */ }
-function renderAccount(){ const session=getSession(); accountStatus.textContent=session?'Sessão reconhecida: plano '+currentPlan()+'. As análises individuais liberadas aparecem conforme o nível de cada etapa.':'Para analisar uma figura, entre pelo acesso principal do site.'; }
+function renderAccount(){ accountStatus.textContent=currentSession?'Sessão reconhecida: plano '+currentPlan()+'. As análises individuais liberadas aparecem conforme o nível de cada etapa.':'Para analisar uma figura, entre pelo acesso principal do site.'; }
 function clearSelection(){ document.querySelectorAll('.resource').forEach(button=>button.classList.remove('selected-resource')); }
  
 function updateRunState(){ scanButton.disabled = !(getReferencia() && selectedResourceCode); }
