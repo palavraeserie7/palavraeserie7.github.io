@@ -1748,7 +1748,13 @@ const comparisonGuidance =
   updatePlanBadge();
   renderModules();
 }
-
+async function getAuthenticatedSession() {
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data?.session) {
+    throw new Error("Sessão não encontrada. Faça login novamente na Sala do Escritor.");
+  }
+  return data.session;
+}
  
  
 /* =====================================================
