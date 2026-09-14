@@ -240,8 +240,34 @@ const TEXTUAL_ACCESS_LEVELS = Object.freeze({
   'A.6':'FREE','A.7':'PRO','A.8':'PRO','A.9':'MASTER','A.10':'MASTER',
   'A.11':'PRO','A.12':'FREE','A.13':'MASTER','A.14':'DOCTUS','A.15':'PRO'
 });
-const SESSION_KEY = 'pes_supabase_session';
 const TEXTUAL_TIER_RANK = Object.freeze({ FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 });
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentSession = null;
+let currentUserPlan = 'FREE';
+
+async function getUserPlanFromSession(session){
+  if(!session?.user?.id) return 'FREE';
+  try{
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('plano')
+      .eq('id', session.user.id)
+      .single();
+    if(error || !data) return 'FREE';
+    return String(data.plano || 'FREE').trim().toUpperCase();
+  }catch(e){
+    return 'FREE';
+  }
+}
+
+async function refreshSession(){
+  const { data } = await supabaseClient.auth.getSession();
+  currentSession = data?.session || null;
+  currentUserPlan = await getUserPlanFromSession(currentSession);
+  renderAccount();
+  updateRunState();
+}
 const CACHE_KEY = 'pes_analise_cache_v1';   // resultados já obtidos: referência+figura -> análise
 const HIST_KEY  = 'pes_analise_historico_v1'; // lista de consultas já executadas, mais recente primeiro
 const HIST_MAX = 30;
