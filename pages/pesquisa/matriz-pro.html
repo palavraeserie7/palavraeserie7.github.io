@@ -1041,12 +1041,20 @@ let currentUserPlan = "FREE";
    de fato (user_metadata, app_metadata, ou uma tabela
    própria como "assinaturas"/"perfis" consultada à parte).
 ----------------------------------------------------- */
-function getUserPlan(session) {
-  const raw =
-    session?.user?.user_metadata?.plano ||
-    session?.user?.app_metadata?.plano ||
-    "FREE";
-  return String(raw).toUpperCase();
+async function getUserPlan(session) {
+  if (!session?.user?.id) return "FREE";
+  try {
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('plano')
+      .eq('id', session.user.id)
+      .single();
+    if (error || !data) return "FREE";
+    return String(data.plano || "FREE").toUpperCase();
+  } catch (e) {
+    console.error("Erro ao buscar plano do usuário:", e);
+    return "FREE";
+  }
 }
  
 /* -----------------------------------------------------
