@@ -1015,6 +1015,68 @@ main{
   </article>
 </section>
  
+<div class="section-title">ASSINANTES E PLANOS</div>
+ 
+<section class="workspace">
+  <article class="card stats-card">
+    <div class="card-main">
+      <div style="width:100%">
+ 
+        <div class="stats-summary">
+          <div class="stat-box">
+            <div class="stat-num" id="planTotalAssinantes">—</div>
+            <div class="stat-label">Total de contas</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="planPagantes">—</div>
+            <div class="stat-label">Pagantes (Pro+Master+Doctus)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="planTaxaConversao">—</div>
+            <div class="stat-label">Taxa de conversão</div>
+          </div>
+        </div>
+ 
+        <div class="stats-grid">
+ 
+          <div class="stats-block">
+            <h3>Distribuição por plano</h3>
+            <div class="stats-rank" id="planRank">
+              <span class="stats-msg">Carregando planos…</span>
+            </div>
+          </div>
+ 
+          <div class="stats-block">
+            <h3>Tempo médio de conta por plano</h3>
+            <div id="planTempo">
+              <span class="stats-msg">Carregando…</span>
+            </div>
+          </div>
+ 
+        </div>
+ 
+        <div class="stats-block" style="margin-top:18px;">
+          <h3>Desistência / cancelamentos</h3>
+          <div id="planDesistencia">
+            <span class="stats-msg">
+              Ainda não é possível calcular desistência: não existe registro de
+              cancelamento (nem coluna de data, nem o evento "Assinatura cancelada"
+              está configurado no webhook da Kiwify). Assim que isso for ligado,
+              essa área passa a mostrar quantas pessoas cancelaram e quando.
+            </span>
+          </div>
+        </div>
+ 
+      </div>
+    </div>
+ 
+    <div class="card-footer">
+      <span class="card-status" id="planUpdatedAt">—</span>
+      <button class="stats-refresh" id="planRefreshBtn" type="button">ATUALIZAR</button>
+    </div>
+  </article>
+</section>
+ 
 <div id="biblia-paralela" class="section-title">BÍBLIA PARALELA</div>
  
 <section class="parallel-wrap">
@@ -1895,6 +1957,129 @@ if(statsRefreshBtn){
   });
 }
  
+/* =====================================================
+   ASSINANTES E PLANOS
+===================================================== */
+ 
+const PLANOS_ORDEM = ["doctus","master","pro","free"];
+const PLANOS_LABEL = { doctus:"Doctus", master:"Master", pro:"Pro", free:"Free" };
+ 
+const planTotalAssinantes = document.getElementById("planTotalAssinantes");
+const planPagantes = document.getElementById("planPagantes");
+const planTaxaConversao = document.getElementById("planTaxaConversao");
+const planRank = document.getElementById("planRank");
+const planTempo = document.getElementById("planTempo");
+const planUpdatedAt = document.getElementById("planUpdatedAt");
+const planRefreshBtn = document.getElementById("planRefreshBtn");
+ 
+function diasDesde(dataIso){
+  const data = new Date(dataIso);
+  if(Number.isNaN(data.getTime())) return null;
+  const diffMs = Date.now() - data.getTime();
+  return Math.max(0, Math.floor(diffMs / 86400000));
+}
+ 
+function formatarDias(dias){
+  if(dias === null) return "—";
+  if(dias < 1) return "hoje";
+  if(dias < 30) return dias + " dia" + (dias === 1 ? "" : "s");
+  const meses = Math.round(dias / 30);
+  return meses + " mês" + (meses === 1 ? "" : "es");
+}
+ 
+async function carregarEstatisticasPlanos(){
+  if(!planRefreshBtn) return;
+ 
+  planRefreshBtn.disabled = true;
+  planRefreshBtn.textContent = "ATUALIZANDO...";
+ 
+  try{
+    const {data,error} =
+      await supabaseClient
+        .from("profiles")
+        .select("plano,criado_em");
+ 
+    if(error) throw error;
+ 
+    const linhas = data || [];
+ 
+    planTotalAssinantes.textContent = linhas.length;
+ 
+    const contagem = {};
+    const diasPorPlano = {};
+ 
+    linhas.forEach(function(l){
+      const plano = (l.plano || "free").toLowerCase();
+      contagem[plano] = (contagem[plano] || 0) + 1;
+ 
+      const dias = diasDesde(l.criado_em);
+      if(dias !== null){
+        if(!diasPorPlano[plano]) diasPorPlano[plano] = [];
+        diasPorPlano[plano].push(dias);
+      }
+    });
+ 
+    const pagantes = (contagem.pro||0) + (contagem.master||0) + (contagem.doctus||0);
+    planPagantes.textContent = pagantes;
+    planTaxaConversao.textContent = linhas.length
+      ? Math.round((pagantes / linhas.length) * 100) + "%"
+      : "—";
+ 
+    const maior = Math.max(1, ...PLANOS_ORDEM.map(function(p){ return contagem[p] || 0; }));
+ 
+    planRank.innerHTML = PLANOS_ORDEM.map(function(plano){
+      const total = contagem[plano] || 0;
+      const pct = Math.max(4, Math.round((total / maior) * 100));
+      return (
+        '<div class="rank-row">' +
+          '<div class="rank-name">' + PLANOS_LABEL[plano] + '</div>' +
+          '<div class="rank-bar-wrap"><div class="rank-bar" style="width:' + pct + '%"></div></div>' +
+          '<div class="rank-count">' + total + '</div>' +
+        '</div>'
+      );
+    }).join("");
+ 
+    planTempo.innerHTML = PLANOS_ORDEM.map(function(plano){
+      const lista = diasPorPlano[plano] || [];
+      if(!lista.length){
+        return (
+          '<div class="stats-loc-row">' +
+            '<div class="stats-loc-name">' + PLANOS_LABEL[plano] + '</div>' +
+            '<div class="stats-loc-count">—</div>' +
+          '</div>'
+        );
+      }
+      const media = Math.round(lista.reduce(function(a,b){return a+b;},0) / lista.length);
+      return (
+        '<div class="stats-loc-row">' +
+          '<div class="stats-loc-name">' + PLANOS_LABEL[plano] +
+            '<span class="stats-loc-city">conta criada há, em média, ' + formatarDias(media) + '</span>' +
+          '</div>' +
+          '<div class="stats-loc-count">' + lista.length + '</div>' +
+        '</div>'
+      );
+    }).join("");
+ 
+    const agora = new Date();
+    planUpdatedAt.textContent =
+      "ATUALIZADO ÀS " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+ 
+  }catch(error){
+    console.error("Erro ao carregar planos:",error);
+    planRank.innerHTML =
+      '<span class="stats-msg">Não foi possível carregar os planos agora.</span>';
+  }finally{
+    planRefreshBtn.disabled = false;
+    planRefreshBtn.textContent = "ATUALIZAR";
+  }
+}
+ 
+if(planRefreshBtn){
+  planRefreshBtn.addEventListener("click",function(){
+    carregarEstatisticasPlanos();
+  });
+}
+ 
 function prepararNovaVerificacao(){
   app.style.display = "none";
   errorBox.style.display = "none";
@@ -1939,6 +2124,7 @@ async function verificarSessao(opcoes = {}){
     }
  
     carregarEstatisticasVisitas();
+    carregarEstatisticasPlanos();
  
   }catch(error){
     console.error("Erro ao verificar sessão:",error);
@@ -2065,6 +2251,10 @@ document.addEventListener("visibilitychange",function(){
 </body>
 </html>
  
+
+
+
+
 
 
 
