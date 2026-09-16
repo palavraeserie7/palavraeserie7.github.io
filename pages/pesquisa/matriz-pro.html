@@ -1089,6 +1089,16 @@ const MATRIX_LEVELS = {
 };
  
 const LEVEL_RANK = { FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 };
+
+const CHECKOUT_LINKS = {
+  PRO: "https://pay.kiwify.com.br/4m4qdH7",
+  MASTER: "https://pay.kiwify.com.br/tqJboGn",
+  DOCTUS: "https://kiwify.app/ZHRYMmy"
+};
+
+function getCheckoutLink(level) {
+  return CHECKOUT_LINKS[level] || "#";
+}
  
 let currentUserPlan = "FREE";
  
@@ -1998,6 +2008,11 @@ function selectStep(
       '<div class="message system locked-notice">' +
       'A subetapa "' + stepName + '" requer o plano ' + level +
       '. Faça upgrade para liberar esta análise.' +
+      '<br><br>' +
+      '<a href="' + getCheckoutLink(level) + '" target="_blank" ' +
+      'style="display:inline-block;padding:8px 14px;background:#20d66b;' +
+      'color:#07151f;border-radius:6px;text-decoration:none;' +
+      'font-weight:900;font-size:11px;">ASSINAR ' + level + '</a>' +
       '</div>';
  
     questionInput.value = "";
@@ -2235,6 +2250,20 @@ function appendSystemMessage(text) {
 }
  
  
+function appendLockedMessage(text, level) {
+  const el = document.createElement("div");
+  el.className = "message system locked-notice";
+  el.innerHTML = text + '<br><br>' +
+    '<a href="' + getCheckoutLink(level) + '" target="_blank" ' +
+    'style="display:inline-block;padding:8px 14px;background:#20d66b;' +
+    'color:#07151f;border-radius:6px;text-decoration:none;' +
+    'font-weight:900;font-size:11px;">ASSINAR ' + level + '</a>';
+  messages.appendChild(el);
+  messages.scrollTop = messages.scrollHeight;
+  persistMessages();
+}
+
+
 function resetReference() {
  
   localStorage.removeItem(
@@ -2428,7 +2457,12 @@ async function runComparisonConsolidation() {
   const stepCode = extractStepCode(activeStep);
  
   if (!stepIsAllowed(stepCode, currentUserPlan)) {
-    comparisonReport.textContent = "Esta subetapa requer o plano " + getStepLevel(stepCode) + ". Faça upgrade para liberar a comparação e consolidação.";
+    comparisonReport.innerHTML = "Esta subetapa requer o plano " + getStepLevel(stepCode) +
+      ". Faça upgrade para liberar a comparação e consolidação.<br><br>" +
+      '<a href="' + getCheckoutLink(getStepLevel(stepCode)) + '" target="_blank" ' +
+      'style="display:inline-block;padding:8px 14px;background:#18bfff;' +
+      'color:#061522;border-radius:6px;text-decoration:none;' +
+      'font-weight:900;font-size:11px;">ASSINAR ' + getStepLevel(stepCode) + '</a>';
     comparisonReport.classList.remove("pending");
     persistComparisonReport();
     return;
@@ -2545,10 +2579,11 @@ async function sendQuestion(event) {
  
   if (activeStep && !stepIsAllowed(stepCode, currentUserPlan)) {
  
-    appendSystemMessage(
+    appendLockedMessage(
       "A subetapa \"" + activeStep + "\" requer o plano " +
       getStepLevel(stepCode) +
-      ". Faça upgrade para continuar."
+      ". Faça upgrade para continuar.",
+      getStepLevel(stepCode)
     );
  
     return false;
