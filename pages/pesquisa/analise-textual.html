@@ -1,5 +1,68 @@
+BLOQUEI HTML
 
-<head>
+Analise textual · HTML
+<!doctype html>
+<html lang="pt-BR">
+<head><style>
+ html{visibility:hidden}
+ #gateManutencao{
+   display:none;
+   position:fixed; inset:0; z-index:99999;
+   background:#f5f1e8; color:#2b2925;
+   font-family:Georgia,"Times New Roman",serif;
+   align-items:center; justify-content:center; text-align:center;
+   padding:24px;
+ }
+ #gateManutencao.visivel{display:flex}
+ #gateManutencao .caixa{max-width:420px}
+ #gateManutencao h1{font-size:22px;margin:0 0 10px}
+ #gateManutencao p{color:#777067;margin:0 0 20px;font-size:15px;line-height:1.5}
+ #gateManutencao a{
+   display:inline-block;border:1px solid #7b5b35;background:#7b5b35;color:#fff;
+   padding:10px 18px;border-radius:9px;text-decoration:none;font-size:14px;
+ }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+ var GATE_SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+ var GATE_SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+ var gateClient = window.supabase.createClient(GATE_SUPABASE_URL, GATE_SUPABASE_ANON_KEY);
+ 
+ function mostrarManutencao(){
+   document.documentElement.style.visibility = "visible";
+   document.addEventListener("DOMContentLoaded", function(){
+     var overlay = document.createElement("div");
+     overlay.id = "gateManutencao";
+     overlay.className = "visivel";
+     overlay.innerHTML =
+       '<div class="caixa">' +
+         '<h1>Página em manutenção</h1>' +
+         '<p>Esta página ainda está sendo preparada e não está disponível no momento.</p>' +
+         '<a href="entrada.html">Fazer login</a>' +
+       '</div>';
+     document.body.appendChild(overlay);
+     document.body.style.overflow = "hidden";
+   });
+ }
+ 
+ gateClient.auth.getSession().then(function(res){
+   if (res.data && res.data.session) {
+     document.documentElement.style.visibility = "visible";
+   } else {
+     mostrarManutencao();
+   }
+ }).catch(function(){
+   mostrarManutencao();
+ });
+})();
+</script>
+<!-- ==================================================================== -->
+ 
+
+
+
+ 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Análise Textual</title>
@@ -179,8 +242,6 @@ const TEXTUAL_ACCESS_LEVELS = Object.freeze({
 });
 const TEXTUAL_TIER_RANK = Object.freeze({ FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 });
 
-const TEXTUAL_RISK_PAIRS = {  'A.1':['A.2'], 'A.2':['A.1'],  'A.6':['A.7','A.10'], 'A.7':['A.6'], 'A.10':['A.6'],  'A.8':['A.9'], 'A.9':['A.8'],  'A.3':['A.11'], 'A.11':['A.3'],  'A.4':['A.12'], 'A.12':['A.4'],  'A.13':['A.14'], 'A.14':['A.13']};
-
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentSession = null;
 let currentUserPlan = 'FREE';
@@ -254,10 +315,7 @@ function parseSections(markdown){ const lines=String(markdown||'').replace(/\r\n
 function mdInlineToHtml(text){ return esc(text).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^-\s+(.*)$/,'• $1'); }
 function renderResult(code,name,analysisText,fromCache){ const sections=parseSections(analysisText); const html=sections.map((s,i)=>'<details class="result-section"'+(i<2?' open':'')+'><summary>'+esc(s.title)+'</summary><div class="result-body">'+s.body.map(l=>mdInlineToHtml(l)).join('<br>')+'</div></details>').join(''); questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(code)+'</span>'+(fromCache?'<span class="cached-badge">DO HISTÓRICO</span>':'')+'<div class="qtext"><strong>'+esc(name)+'</strong></div><div class="result-sections">'+html+'</div></div>'; }
  
-async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=currentSession; scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; try{ 
-const rivals = (TEXTUAL_RISK_PAIRS[resource.code] || [])  .map(c => findCategoryForCode(c)?.resources.find(r => r.code === c))  .filter(Boolean)  .map(r => ({code: r.code, name: r.name}));
-
-const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(resource.tier!=='FREE'&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},riskPairs: rivals,scanResult:{code:resource.code,status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise concluída.'; writeCacheEntry(ref,resource.code,analysis); pushHistory({ref,code:resource.code,name:resource.name,ts:Date.now()}); renderResult(resource.code,resource.name,analysis,false); }catch(error){ scanStatus.textContent='Não foi possível concluir a análise.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
+async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=currentSession; scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; try{ const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(resource.tier!=='FREE'&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},scanResult:{code:resource.code,status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise concluída.'; writeCacheEntry(ref,resource.code,analysis); pushHistory({ref,code:resource.code,name:resource.name,ts:Date.now()}); renderResult(resource.code,resource.name,analysis,false); }catch(error){ scanStatus.textContent='Não foi possível concluir a análise.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
  
 let refSaveTimer=null;
 refInput.addEventListener('input',()=>{ clearTimeout(refSaveTimer); refSaveTimer=setTimeout(()=>{ setReferencia(refInput.value.trim()); updateRunState(); if(selectedResourceCode){ const ref=getReferencia(); const cached=ref?readCacheEntry(ref,selectedResourceCode):null; scanStatus.textContent = ref ? (cached?'Já existe uma análise salva para esta combinação.':'Clique em “Analisar” para consultar.') : 'Informe uma passagem ou tema antes de analisar.'; if(cached){ const resource=activeCategory?.resources.find(r=>r.code===selectedResourceCode); if(resource) renderResult(resource.code,resource.name,cached.analysis,true); } } },350); });
@@ -274,50 +332,32 @@ const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();update
   var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
   var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
   var PAGINA = "Análise Textual";
-
-  function registrarVisita(pais, cidade){
-    try{
-      var vid = localStorage.getItem("ps_visitante_id");
-      if(!vid){
-        vid = (window.crypto && crypto.randomUUID)
-          ? crypto.randomUUID()
-          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-        localStorage.setItem("ps_visitante_id", vid);
-      }
-
-      var payload = { pagina: PAGINA, visitante_id: vid };
-      if(pais) payload.pais = pais;
-      if(cidade) payload.cidade = cidade;
-
-      fetch(SUPABASE_URL + "/rest/v1/visitas", {
-        method: "POST",
-        headers: {
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-          "Content-Type": "application/json",
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify(payload)
-      }).catch(function(){});
-    }catch(e){}
-  }
-
-  var jaRegistrou = false;
-  function concluir(pais, cidade){
-    if(jaRegistrou) return;
-    jaRegistrou = true;
-    registrarVisita(pais, cidade);
-  }
-
-  setTimeout(function(){ concluir(null, null); }, 2500);
-
-  fetch("https://ipapi.co/json/")
-    .then(function(r){ return r.json(); })
-    .then(function(info){
-      concluir(info && info.country_name, info && info.city);
-    })
-    .catch(function(){ concluir(null, null); });
+ 
+  try{
+    var vid = localStorage.getItem("ps_visitante_id");
+    if(!vid){
+      vid = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+      localStorage.setItem("ps_visitante_id", vid);
+    }
+ 
+    fetch(SUPABASE_URL + "/rest/v1/visitas", {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
+    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
+  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
 })();
 </script>
 </body>
 </html>
+ 
+
+
+
