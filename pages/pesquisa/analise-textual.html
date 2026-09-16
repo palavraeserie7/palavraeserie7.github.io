@@ -222,6 +222,13 @@ Analise textual · HTML
 <div class="account-box" id="accountBox">
   <strong>Acesso à análise completa</strong>
   <div class="account-status" id="accountStatus">A análise está configurada exclusivamente para o Grupo A — FIGURAS DE LINGUAGEM, usando as regras de evidência e os prompts fornecidos. A explicação completa de cada etapa exige o plano correspondente e usa a sessão já existente do site.</div>
+  <a
+    id="upgradeButton"
+    href="#"
+    target="_blank"
+    rel="noopener noreferrer"
+    style="display:none;align-items:center;justify-content:center;margin-top:12px;padding:10px 16px;border:1px solid #20d66b;border-radius:6px;background:rgba(32,214,107,.1);color:#087332;font-size:12px;font-weight:900;letter-spacing:.3px;text-decoration:none;"
+  ></a>
 </div>
  
 <div id="questionArea"></div>
@@ -241,6 +248,13 @@ const TEXTUAL_ACCESS_LEVELS = Object.freeze({
   'A.11':'PRO','A.12':'FREE','A.13':'MASTER','A.14':'DOCTUS','A.15':'PRO'
 });
 const TEXTUAL_TIER_RANK = Object.freeze({ FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 });
+const CHECKOUT_LINKS = Object.freeze({
+  PRO: "https://pay.kiwify.com.br/4m4qdH7",
+  MASTER: "https://pay.kiwify.com.br/tqJboGn",
+  DOCTUS: "https://kiwify.app/ZHRYMmy"
+});
+const NEXT_TIER = Object.freeze({ FREE: "PRO", PRO: "MASTER", MASTER: "DOCTUS" });
+function getCheckoutLink(level){ return CHECKOUT_LINKS[level] || "#"; }
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentSession = null;
@@ -266,6 +280,7 @@ async function refreshSession(){
   currentSession = data?.session || null;
   currentUserPlan = await getUserPlanFromSession(currentSession);
   renderAccount();
+  updateUpgradeButton();
   updateRunState();
 }
 const CACHE_KEY = 'pes_analise_cache_v1';   // resultados já obtidos: referência+figura -> análise
@@ -285,6 +300,32 @@ function esc(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'
 function getReferencia(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; } }
 function setReferencia(v){ try { localStorage.setItem(REF_KEY, v); } catch(e) {} }
 function currentPlan(){ return currentUserPlan; }
+function updateUpgradeButton(){
+  const button = document.getElementById('upgradeButton');
+  if(!button) return;
+
+  if(currentUserPlan === 'DOCTUS'){
+    button.style.display = 'none';
+    return;
+  }
+
+  if(selectedResourceCode){
+    const required = String(TEXTUAL_ACCESS_LEVELS[selectedResourceCode] || 'DOCTUS').toUpperCase();
+    const userRank = TEXTUAL_TIER_RANK[currentUserPlan] ?? 0;
+    const requiredRank = TEXTUAL_TIER_RANK[required] ?? 3;
+    if(userRank < requiredRank){
+      button.style.display = 'inline-flex';
+      button.textContent = 'ASSINAR ' + required;
+      button.href = getCheckoutLink(required);
+      return;
+    }
+  }
+
+  const nextLevel = NEXT_TIER[currentUserPlan] || 'PRO';
+  button.style.display = 'inline-flex';
+  button.textContent = 'FAZER UPGRADE';
+  button.href = getCheckoutLink(nextLevel);
+}
 function textualCanOpen(required){ const requiredPlan=String(required||'FREE').toUpperCase(); if(requiredPlan==='FREE') return true; if(!currentSession?.access_token) return false; return (TEXTUAL_TIER_RANK[currentUserPlan] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99); }
 function categoriesFor(button){ const section=button.closest('.category'); return {code:button.querySelector('.category-code')?.textContent.trim()||'',name:button.querySelector('strong')?.textContent.trim()||'',resources:[...section.querySelectorAll('.resource')].map(r=>({code:r.dataset.code,name:r.dataset.resource,tier:TEXTUAL_ACCESS_LEVELS[r.dataset.code]||'DOCTUS'}))}; }
 function findCategoryForCode(code){ const btn=document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]'); if(!btn)return null; const toggle=btn.closest('.category')?.querySelector('.category-toggle'); return toggle?categoriesFor(toggle):null; }
@@ -308,7 +349,7 @@ function clearSelection(){ document.querySelectorAll('.resource').forEach(button
  
 function updateRunState(){ scanButton.disabled = !(getReferencia() && selectedResourceCode); }
  
-function selectResource(code){ if(!activeCategory)return; const resource=activeCategory.resources.find(r=>r.code===code); if(!resource)return; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=resource.code+' — '+resource.name; queryChip.classList.remove('empty'); updateRunState(); const ref=getReferencia(); const cached=ref?readCacheEntry(ref,code):null; if(cached){ scanStatus.textContent='Já existe uma análise salva para esta combinação — exibindo do histórico.'; renderResult(resource.code,resource.name,cached.analysis,true); } else { scanStatus.textContent=ref?'Clique em “Analisar” para consultar esta figura na passagem informada.':'Informe uma passagem ou tema antes de analisar.'; questionArea.innerHTML=''; } }
+function selectResource(code){ if(!activeCategory)return; const resource=activeCategory.resources.find(r=>r.code===code); if(!resource)return; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=resource.code+' — '+resource.name; queryChip.classList.remove('empty'); updateUpgradeButton(); updateRunState(); const ref=getReferencia(); const cached=ref?readCacheEntry(ref,code):null; if(cached){ scanStatus.textContent='Já existe uma análise salva para esta combinação — exibindo do histórico.'; renderResult(resource.code,resource.name,cached.analysis,true); } else { scanStatus.textContent=ref?'Clique em “Analisar” para consultar esta figura na passagem informada.':'Informe uma passagem ou tema antes de analisar.'; questionArea.innerHTML=''; } }
  
 // ---- Parser leve de markdown -> seções colapsáveis (## Título) ----
 function parseSections(markdown){ const lines=String(markdown||'').replace(/\r\n/g,'\n').split('\n'); const sections=[]; let current={title:'Análise',body:[]}; for(const line of lines){ const m=line.match(/^#{1,3}\s+(.*)/); if(m){ if(current.body.length||sections.length===0) sections.push(current); current={title:m[1].trim(),body:[]}; } else { current.body.push(line); } } sections.push(current); return sections.filter(s=>s.body.join('').trim().length||s.title); }
@@ -325,7 +366,7 @@ document.querySelectorAll('.category-toggle').forEach(button=>button.addEventLis
 document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(!activeCategory){ activeCategory=categoriesFor(button.closest('.category').querySelector('.category-toggle')); } selectedResourceCode=button.dataset.code;selectResource(selectedResourceCode);}));
 // Abre a categoria, mas não executa nenhuma consulta automaticamente.
 document.querySelector('.category-toggle')?.click();
-const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();updateRunState();refreshSession();
+const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();updateUpgradeButton();updateRunState();refreshSession();
 </script>
 <script>
 (function(){
