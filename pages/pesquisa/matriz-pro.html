@@ -1102,6 +1102,12 @@ const CHECKOUT_LINKS = {
   DOCTUS: "https://kiwify.app/ZHRYMmy"
 };
 
+const NEXT_TIER = {
+  FREE: "PRO",
+  PRO: "MASTER",
+  MASTER: "DOCTUS"
+};
+
 function getCheckoutLink(level) {
   return CHECKOUT_LINKS[level] || "#";
 }
@@ -1161,23 +1167,33 @@ function updateUpgradeButton() {
   const btn = document.getElementById("upgrade-button");
   if (!btn) return;
 
-  if (!activeStep) {
+  // Quem já tem DOCTUS não tem para onde fazer upgrade.
+  if (currentUserPlan === "DOCTUS") {
     btn.style.display = "none";
     return;
   }
 
-  const code = extractStepCode(activeStep);
-  const level = getStepLevel(code);
-  const allowed = stepIsAllowed(code, currentUserPlan);
+  // Se houver uma subetapa ativa e ela estiver bloqueada,
+  // o botão fica específico para o nível exigido por ela.
+  if (activeStep) {
+    const code = extractStepCode(activeStep);
+    const level = getStepLevel(code);
+    const allowed = stepIsAllowed(code, currentUserPlan);
 
-  if (allowed) {
-    btn.style.display = "none";
-    return;
+    if (!allowed) {
+      btn.style.display = "inline-block";
+      btn.textContent = "ASSINAR " + level;
+      btn.href = getCheckoutLink(level);
+      return;
+    }
   }
 
+  // Caso padrão: nenhuma subetapa bloqueada selecionada.
+  // Mostra uma chamada genérica para o próximo nível acima do atual.
+  const nextLevel = NEXT_TIER[currentUserPlan] || "PRO";
   btn.style.display = "inline-block";
-  btn.textContent = "ASSINAR " + level;
-  btn.href = getCheckoutLink(level);
+  btn.textContent = "FAZER UPGRADE";
+  btn.href = getCheckoutLink(nextLevel);
 }
  
  
@@ -1785,6 +1801,7 @@ const comparisonGuidance =
     console.error("Erro ao verificar sessão (não bloqueante):", error);
   }
   updatePlanBadge();
+  updateUpgradeButton();
   renderModules();
 }
 async function getAuthenticatedSession() {
@@ -2938,6 +2955,8 @@ document.addEventListener("keydown", (event) => {
    INICIALIZAÇÃO
 ===================================================== */
  
+updatePlanBadge();
+updateUpgradeButton();
 renderModules();
 </script>
  
