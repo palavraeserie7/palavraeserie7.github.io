@@ -1,11 +1,9 @@
 
 
+Estante · HTML
 <!doctype html>
 <html lang="pt-BR">
 <head>
-
-
-Bloqueio paginas manutencao · HTML
 <!-- ====================================================================
      BLOQUEIO DE ACESSO — cole este bloco logo depois da tag <head>,
      ANTES de qualquer outra coisa dentro do <head>.
@@ -68,7 +66,7 @@ Bloqueio paginas manutencao · HTML
 </script>
 <!-- ==================================================================== -->
  
-
+ 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Estante independente da plataforma Palavra & Série.">
@@ -561,8 +559,8 @@ Bloqueio paginas manutencao · HTML
           <p class="intro">
             Catálogo organizado para materiais gratuitos, conteúdos PRO, livros do
             autor e referências externas autorizadas. Este arquivo é autônomo:
-            seus estilos, dados e scripts ficam separados dos menus da Matriz
-            Técnica de Pesquisa PRO.
+            seus estilos, dados e scripts ficam separados dos menus do MÉTODO
+            TÉCNICO DE PESQUISA.
           </p>
  
           <div class="shelf-tabs" role="tablist" aria-label="Seções da estante">
@@ -690,12 +688,13 @@ Bloqueio paginas manutencao · HTML
     ['search','contentType','audience','depth','format'].forEach(id => $(id).addEventListener('input', render));
  
     render();
+  </script>
   <script>
 (function(){
   var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
   var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
   var PAGINA = "Oráculo";
-
+ 
   function registrarVisita(pais, cidade){
     try{
       var vid = localStorage.getItem("ps_visitante_id");
@@ -705,11 +704,11 @@ Bloqueio paginas manutencao · HTML
           : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
         localStorage.setItem("ps_visitante_id", vid);
       }
-
+ 
       var payload = { pagina: PAGINA, visitante_id: vid };
       if(pais) payload.pais = pais;
       if(cidade) payload.cidade = cidade;
-
+ 
       fetch(SUPABASE_URL + "/rest/v1/visitas", {
         method: "POST",
         headers: {
@@ -722,16 +721,16 @@ Bloqueio paginas manutencao · HTML
       }).catch(function(){});
     }catch(e){}
   }
-
+ 
   var jaRegistrou = false;
   function concluir(pais, cidade){
     if(jaRegistrou) return;
     jaRegistrou = true;
     registrarVisita(pais, cidade);
   }
-
+ 
   setTimeout(function(){ concluir(null, null); }, 2500);
-
+ 
   fetch("https://ipapi.co/json/")
     .then(function(r){ return r.json(); })
     .then(function(info){
