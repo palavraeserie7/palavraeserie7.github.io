@@ -1608,23 +1608,15 @@ REGRAS:
  
       try {
         const response = await fetch(
-          `${AI_PROXY_URL.replace(/\/$/, '')}/api/pesquisa`,
+          `${AI_PROXY_URL.replace(/\/$/, '')}/api/oraculo`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              mode: 'free',
-              accessLevel: 'free',
               question: researchPrompt,
-              topic: 'ORÁCULO — CONSULTA GERAL',
-              module: 'ORÁCULO — CONSULTA GERAL',
-              discipline: '',
-              studyContext: {
-                trackingContext,
-                sourceOrder: TRACKING_ORDER.map(x => ({step:x[0], source:x[1]}))
-              }
+              topic: trackingContext.subarea || trackingContext.area || 'consulta geral'
             })
           }
         );
