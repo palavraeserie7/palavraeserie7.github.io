@@ -542,6 +542,58 @@ main {
   opacity:.55;
   cursor:wait;
 }
+
+.external-review-box {
+  margin: 14px 0 18px;
+  padding: 14px;
+  border: 1px solid rgba(24,191,255,.35);
+  border-radius: 8px;
+  background: rgba(24,191,255,.06);
+}
+
+.external-review-box h4 {
+  margin: 0 0 7px;
+  color: #18bfff;
+  font-size: 12px;
+  letter-spacing: .7px;
+}
+
+.external-review-box p {
+  margin: 0 0 12px;
+  color: #aebbd0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.external-review-box input,
+.external-review-box textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 7px;
+  padding: 10px;
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 6px;
+  background: #0b1729;
+  color: #e7eefb;
+  font: inherit;
+}
+
+.external-review-box textarea { min-height: 70px; resize: vertical; }
+
+.external-review-button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 14px;
+  border: 1px solid #18bfff;
+  border-radius: 6px;
+  background: rgba(24,191,255,.16);
+  color: #dff7ff;
+  font-weight: 900;
+  letter-spacing: .35px;
+  cursor: pointer;
+}
+
+.external-review-button:hover { background: rgba(24,191,255,.28); }
  
 /* =====================================================
    CHAT
@@ -1054,6 +1106,18 @@ main {
 
         <div id="sheet-meta" class="meta">
           Compare o conteúdo do escritor com uma referência de comparação e gere um relatório de auditoria.
+        </div>
+
+        <div class="external-review-box">
+          <h4>REVISÃO DE CONTEÚDO EXTERNO</h4>
+          <p>Use esta entrada para revisar um texto produzido fora da plataforma. O Revisor aplica a mesma auditoria de comparação e consolidação. Este fluxo não exige MASTER e consome 1 unidade disponível.</p>
+          <label for="external-review-topic">TEMA / ASSUNTO</label>
+          <input id="external-review-topic" type="text" placeholder="Informe o tema ou assunto do texto...">
+          <label for="external-review-context">SUBETAPA / CONTEXTO METODOLÓGICO (opcional)</label>
+          <textarea id="external-review-context" placeholder="Informe a subetapa, módulo ou contexto metodológico, se aplicável..."></textarea>
+          <button id="external-review-button" class="external-review-button" type="button" onclick="startExternalReview()">
+            REVISAR TEXTO EXTERNO — 1 UNIDADE
+          </button>
         </div>
  
         <div class="comparison-field">
@@ -1932,6 +1996,9 @@ function renderCanonicalGuidance() {
 let activeModule = "";
 let activeStep = "";
 let awaitingReference = false;
+let reviewOrigin = "platform_pergunta_livre";
+let externalReviewTopic = "";
+let externalReviewContext = "";
  
  
 /* =====================================================
@@ -2336,11 +2403,11 @@ function persistWriterContent() {
  
  
 function loadComparisonReport() {
-  const savedReport = activeStep
-    ? localStorage.getItem(comparisonKey("relatorio"))
-    : "";
- 
-  comparisonReport.textContent = savedReport ||
+  if (activeStep) {
+    localStorage.removeItem(comparisonKey("relatorio"));
+  }
+
+  comparisonReport.textContent =
     "O relatório de auditoria aparecerá aqui depois da comparação.";
   comparisonReport.classList.remove("pending");
 }
@@ -2485,7 +2552,35 @@ function reviewerAccessIsIncluded() {
 }
 
 
+function startExternalReview() {
+  const topic = document.getElementById("external-review-topic")?.value.trim() || "";
+  const context = document.getElementById("external-review-context")?.value.trim() || "";
+  const writer = writerContentInput.value.trim();
+
+  if (!writer) {
+    comparisonReport.textContent = "Cole primeiro o conteúdo externo no campo CONTEÚDO DO ESCRITOR.";
+    comparisonReport.classList.remove("pending");
+    return;
+  }
+
+  if (!topic) {
+    comparisonReport.textContent = "Informe o tema ou assunto do conteúdo externo antes de iniciar a revisão.";
+    comparisonReport.classList.remove("pending");
+    return;
+  }
+
+  reviewOrigin = "external_unit";
+  externalReviewTopic = topic;
+  externalReviewContext = context;
+  runComparisonConsolidation();
+}
+
+
 function sendToTheologicalReviewer() {
+  reviewOrigin = "platform_mesa";
+  externalReviewTopic = "";
+  externalReviewContext = "";
+
   if (!reviewerAccessIsIncluded()) {
     openReviewerAccess();
     return;
@@ -2550,15 +2645,30 @@ function saveReference(value) {
  
  
 function clearConversation() {
- 
-  if (!activeStep) {
-    messages.innerHTML = "";
-    return;
+  if (activeStep) {
+    localStorage.removeItem(messagesKey());
+    localStorage.removeItem(comparisonKey("pesquisa-pronta"));
+    localStorage.removeItem(comparisonKey("conteudo-escritor"));
+    localStorage.removeItem(comparisonKey("relatorio"));
+    localStorage.removeItem(questionDraftKey());
   }
- 
-  localStorage.removeItem(messagesKey());
+
   messages.innerHTML = "";
   messages.scrollTop = messages.scrollHeight;
+  questionInput.value = "";
+  researchReadyInput.value = "";
+  writerContentInput.value = "";
+  comparisonReport.textContent = "O relatório de auditoria aparecerá aqui depois da comparação.";
+  comparisonReport.classList.remove("pending");
+  reviewOrigin = "platform_pergunta_livre";
+  externalReviewTopic = "";
+  externalReviewContext = "";
+
+  if (document.getElementById("external-review-topic")) {
+    document.getElementById("external-review-topic").value = "";
+    document.getElementById("external-review-context").value = "";
+  }
+
   prepareQuestionForStep(true);
 }
  
@@ -2781,15 +2891,17 @@ function extractAuditReport(data) {
  
  
 async function runComparisonConsolidation() {
-  if (!activeStep) {
+  const isExternalReview = reviewOrigin === "external_unit";
+
+  if (!activeStep && !isExternalReview) {
     comparisonReport.textContent = "Selecione uma subetapa antes de iniciar a comparação e consolidação.";
     persistComparisonReport();
     return;
   }
- 
-  const stepCode = extractStepCode(activeStep);
- 
-  if (!stepIsAllowed(stepCode, currentUserPlan)) {
+
+  const stepCode = isExternalReview ? "" : extractStepCode(activeStep);
+
+  if (!isExternalReview && !stepIsAllowed(stepCode, currentUserPlan)) {
     comparisonReport.innerHTML = "Esta subetapa requer o plano " + getStepLevel(stepCode) +
       ". Faça upgrade para liberar a comparação e consolidação.<br><br>" +
       '<a href="' + getCheckoutLink(getStepLevel(stepCode)) + '" target="_blank" ' +
@@ -2841,8 +2953,9 @@ async function runComparisonConsolidation() {
           mode: "writing_private",
           accessLevel: "private",
           analysisType: "comparison_consolidation",
-          stepCode,
-          requiredLevel: getStepLevel(stepCode),
+          origin: reviewOrigin,
+          stepCode: isExternalReview ? "" : stepCode,
+          requiredLevel: isExternalReview ? "UNIT" : getStepLevel(stepCode),
           referenceText,
           writerContent,
           canonicalGuidance: {
@@ -2851,8 +2964,10 @@ async function runComparisonConsolidation() {
             rule: guidance.rule
           },
           question: comparisonPrompt(referenceText, writerContent, guidance),
-          topic: activeStep,
-          module: activeModule,
+          topic: isExternalReview ? externalReviewTopic : activeStep,
+          module: isExternalReview ? externalReviewContext : activeModule,
+          externalTopic: isExternalReview ? externalReviewTopic : "",
+          externalContext: isExternalReview ? externalReviewContext : "",
           discipline: "MÉTODO TÉCNICO DE PESQUISA"
         })
       }
@@ -2872,6 +2987,10 @@ async function runComparisonConsolidation() {
  
     if (response.status === 403) {
       throw new Error(data?.error || "Este item requer um plano superior ao seu plano atual.");
+    }
+
+    if (response.status === 402) {
+      throw new Error(data?.error || "Você não tem unidades disponíveis. Compre um pacote para continuar.");
     }
  
     if (!response.ok) {
