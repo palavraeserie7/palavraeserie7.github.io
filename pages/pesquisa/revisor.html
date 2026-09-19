@@ -2645,15 +2645,30 @@ function saveReference(value) {
  
  
 function clearConversation() {
- 
-  if (!activeStep) {
-    messages.innerHTML = "";
-    return;
+  if (activeStep) {
+    localStorage.removeItem(messagesKey());
+    localStorage.removeItem(comparisonKey("pesquisa-pronta"));
+    localStorage.removeItem(comparisonKey("conteudo-escritor"));
+    localStorage.removeItem(comparisonKey("relatorio"));
+    localStorage.removeItem(questionDraftKey());
   }
- 
-  localStorage.removeItem(messagesKey());
+
   messages.innerHTML = "";
   messages.scrollTop = messages.scrollHeight;
+  questionInput.value = "";
+  researchReadyInput.value = "";
+  writerContentInput.value = "";
+  comparisonReport.textContent = "O relatório de auditoria aparecerá aqui depois da comparação.";
+  comparisonReport.classList.remove("pending");
+  reviewOrigin = "platform_pergunta_livre";
+  externalReviewTopic = "";
+  externalReviewContext = "";
+
+  if (document.getElementById("external-review-topic")) {
+    document.getElementById("external-review-topic").value = "";
+    document.getElementById("external-review-context").value = "";
+  }
+
   prepareQuestionForStep(true);
 }
  
