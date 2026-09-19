@@ -1,0 +1,3398 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><style>
+ html{visibility:hidden}
+ #gateManutencao{
+   display:none;
+   position:fixed; inset:0; z-index:99999;
+   background:#f5f1e8; color:#2b2925;
+   font-family:Georgia,"Times New Roman",serif;
+   align-items:center; justify-content:center; text-align:center;
+   padding:24px;
+ }
+ #gateManutencao.visivel{display:flex}
+ #gateManutencao .caixa{max-width:420px}
+ #gateManutencao h1{font-size:22px;margin:0 0 10px}
+ #gateManutencao p{color:#777067;margin:0 0 20px;font-size:15px;line-height:1.5}
+ #gateManutencao a{
+   display:inline-block;border:1px solid #7b5b35;background:#7b5b35;color:#fff;
+   padding:10px 18px;border-radius:9px;text-decoration:none;font-size:14px;
+ }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+ var GATE_SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+ var GATE_SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+ var gateClient = window.supabase.createClient(GATE_SUPABASE_URL, GATE_SUPABASE_ANON_KEY);
+ 
+ function mostrarManutencao(){
+   document.documentElement.style.visibility = "visible";
+   document.addEventListener("DOMContentLoaded", function(){
+     var overlay = document.createElement("div");
+     overlay.id = "gateManutencao";
+     overlay.className = "visivel";
+     overlay.innerHTML =
+       '<div class="caixa">' +
+         '<h1>Página em manutenção</h1>' +
+         '<p>Esta página ainda está sendo preparada e não está disponível no momento.</p>' +
+         '<a href="entrada.html">Fazer login</a>' +
+       '</div>';
+     document.body.appendChild(overlay);
+     document.body.style.overflow = "hidden";
+   });
+ }
+ 
+ gateClient.auth.getSession().then(function(res){
+   if (res.data && res.data.session) {
+     document.documentElement.style.visibility = "visible";
+   } else {
+     mostrarManutencao();
+   }
+ }).catch(function(){
+   mostrarManutencao();
+ });
+})();
+</script>
+<!-- ==================================================================== -->
+ 
+
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palavra & Série — Método Técnico de Pesquisa</title>
+ 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ 
+<style>
+:root {
+  --p:#20d66b;
+  --bg:#0b1428;
+  --s:#111b30;
+  --c:#17243a;
+  --i:#0d172b;
+  --t:#dbe7f5;
+  --b:#263754;
+  --a:#18bfff;
+  --muted:#91a4bd;
+  --error:#ff6b6b;
+  --lock:#5a6b85;
+}
+ 
+* {
+  box-sizing:border-box;
+}
+ 
+html,
+body {
+  margin:0;
+  width:100%;
+  height:100%;
+}
+ 
+body {
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  background:var(--bg);
+  color:var(--t);
+  font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+}
+ 
+/* =====================================================
+   HEADER
+===================================================== */
+ 
+header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 28px;
+  border-bottom:1px solid var(--b);
+  background:#111b30;
+}
+ 
+header h1 {
+  margin:0;
+  color:var(--p);
+  font-size:17px;
+  letter-spacing:1.4px;
+}
+ 
+header p {
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:10px;
+}
+ 
+.header-right {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+ 
+.plan-badge {
+  padding:6px 10px;
+  border:1px solid var(--b);
+  border-radius:6px;
+  color:var(--a);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.6px;
+}
+ 
+.help-button {
+  padding:9px 14px;
+  border:1px solid #425674;
+  border-radius:6px;
+  background:transparent;
+  color:#dbe7f5;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+  cursor:pointer;
+}
+ 
+.help-button:hover {
+  border-color:var(--p);
+  color:var(--p);
+  background:rgba(32,214,107,.06);
+}
+ 
+/* =====================================================
+   ESTRUTURA PRINCIPAL
+===================================================== */
+ 
+main {
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(240px, 280px) minmax(0, 1fr);
+  gap:18px;
+  padding:18px;
+}
+ 
+.panel {
+  min-height:0;
+  border:1px solid var(--b);
+  border-radius:10px;
+  background:var(--s);
+  overflow:hidden;
+}
+ 
+/* =====================================================
+   MÓDULOS
+===================================================== */
+ 
+.modules {
+  display:flex;
+  flex-direction:column;
+}
+ 
+.panel-title {
+  padding:14px 16px;
+  border-bottom:1px solid var(--b);
+  color:var(--a);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+ 
+.module-list {
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  padding:10px;
+}
+ 
+.module {
+  margin-bottom:6px;
+  border:1px solid transparent;
+  border-radius:7px;
+  overflow:hidden;
+}
+ 
+.module > button {
+  width:100%;
+  padding:11px 12px;
+  border:0;
+  background:transparent;
+  color:#b5c5d8;
+  text-align:left;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+}
+ 
+.module > button:hover,
+.module.active > button {
+  background:rgba(24,191,255,.12);
+  color:#fff;
+}
+ 
+.steps {
+  display:none;
+  padding:4px 8px 8px 18px;
+  border-left:2px solid #2e6580;
+}
+ 
+.module.active .steps {
+  display:block;
+}
+ 
+.step {
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  padding:8px;
+  border:0;
+  border-radius:5px;
+  background:transparent;
+  color:#9fb9cc;
+  text-align:left;
+  font-size:9px;
+  line-height:1.35;
+  cursor:pointer;
+}
+ 
+.step:hover,
+.step.active {
+  background:rgba(24,191,255,.10);
+  color:#fff;
+}
+ 
+.step-label {
+  flex:1;
+  min-width:0;
+}
+ 
+.step-level {
+  flex:none;
+  padding:2px 6px;
+  border-radius:4px;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.4px;
+  color:#07151f;
+  background:var(--p);
+}
+ 
+.step-level[data-level="FREE"] { background:#4a9bd6; color:#04121f; }
+.step-level[data-level="PRO"] { background:var(--p); color:#07151f; }
+.step-level[data-level="MASTER"] { background:#f2b23c; color:#221503; }
+.step-level[data-level="DOCTUS"] { background:#d65fe0; color:#1a0620; }
+ 
+.step.locked {
+  color:var(--lock);
+  cursor:pointer;
+}
+ 
+.step.locked .step-level {
+  background:transparent;
+  border:1px solid var(--lock);
+  color:var(--lock);
+}
+ 
+.step.locked::after {
+  content:"🔒";
+  flex:none;
+  font-size:9px;
+}
+ 
+/* =====================================================
+   WORKSPACE
+===================================================== */
+ 
+.workspace {
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+  /* O workspace concentra investigação e auditoria nas duas colunas internas. */
+}
+ 
+.workspace-head {
+  padding:20px;
+  border-bottom:1px solid var(--b);
+  background:var(--c);
+}
+ 
+.workspace-head h2 {
+  margin:0;
+  color:var(--p);
+  font-size:18px;
+}
+ 
+.workspace-head p {
+  margin:7px 0 0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+}
+
+.workspace-context {
+  display:inline-flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:12px;
+  color:#cfe8f6;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.45px;
+  text-transform:uppercase;
+}
+
+.workspace-context::before {
+  content:"CONTEXTO";
+  padding:3px 6px;
+  border:1px solid rgba(24,191,255,.35);
+  border-radius:4px;
+  color:var(--a);
+  font-size:8px;
+  letter-spacing:.8px;
+}
+ 
+.content {
+  flex:1;
+  min-height:0;
+  display:grid;
+  /* Fluxo visual: investigação no centro, auditoria permanentemente à direita. */
+  grid-template-columns:minmax(0, 1.18fr) minmax(330px, .82fr);
+  gap:16px;
+  padding:16px;
+  overflow:auto;
+}
+
+/* A ordem do DOM é preservada para não afetar IDs/eventos; a ordem visual segue a arquitetura. */
+.content > .chat {
+  order:1;
+  min-width:0;
+}
+
+.content > .sheet {
+  order:2;
+  min-width:0;
+}
+ 
+/* =====================================================
+   FOLHA DE TRABALHO
+===================================================== */
+ 
+.sheet,
+.chat {
+  min-width:0;
+  border:1px solid var(--b);
+  border-radius:9px;
+  background:var(--i);
+}
+ 
+.sheet {
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  padding:20px;
+  border-color:#2d4965;
+  box-shadow:inset 0 2px 0 rgba(24,191,255,.06);
+}
+ 
+.sheet h3 {
+  margin:0 0 6px;
+  color:var(--t);
+  font-size:15px;
+}
+ 
+.sheet .meta {
+  margin-bottom:14px;
+  color:#8196ad;
+  font-size:10px;
+}
+ 
+.sheet textarea {
+  flex:1;
+  min-height:300px;
+  width:100%;
+  resize:none;
+  padding:14px;
+  border:1px solid #344762;
+  border-radius:6px;
+  background:#111b30;
+  color:var(--t);
+  font:inherit;
+  font-size:12px;
+  line-height:1.6;
+  outline:none;
+}
+ 
+.sheet textarea:focus {
+  border-color:var(--p);
+}
+ 
+.save {
+  align-self:flex-end;
+  margin-top:10px;
+  padding:9px 15px;
+  border:0;
+  border-radius:6px;
+  background:var(--p);
+  color:#07151f;
+  font-weight:900;
+  cursor:pointer;
+}
+ 
+/* =====================================================
+   ANÁLISE DE COMPARAÇÃO E CONSOLIDAÇÃO
+===================================================== */
+ 
+.comparison-field {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:12px;
+}
+ 
+.comparison-field label,
+.comparison-report-label {
+  color:var(--a);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.7px;
+}
+ 
+.comparison-field small {
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.45;
+}
+ 
+.comparison-guidance {
+  margin-top:2px;
+  padding:9px 10px;
+  border-left:2px solid var(--a);
+  border-radius:4px;
+  background:rgba(24,191,255,.07);
+  color:#b9d2e4;
+  font-size:9px;
+  line-height:1.5;
+}
+ 
+.comparison-guidance strong {
+  color:var(--a);
+}
+ 
+.comparison-field textarea {
+  flex:none;
+  min-height:145px;
+  resize:vertical;
+}
+ 
+#writer-content,
+#research-ready {
+  width:100%;
+}
+ 
+.comparison-report {
+  flex:1;
+  min-height:190px;
+  overflow:auto;
+  margin-top:6px;
+  padding:14px;
+  border:1px solid #344762;
+  border-radius:6px;
+  background:#111b30;
+  color:var(--t);
+  font-size:11px;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+ 
+.comparison-report.pending {
+  border-color:var(--a);
+  color:#cfe8f6;
+}
+ 
+.comparison-actions {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:10px;
+}
+ 
+.compare-button {
+  padding:10px 15px;
+  border:0;
+  border-radius:6px;
+  background:var(--a);
+  color:#061522;
+  font-weight:900;
+  cursor:pointer;
+}
+ 
+.compare-button:hover {
+  background:#55d3ff;
+}
+ 
+.compare-button:disabled {
+  opacity:.55;
+  cursor:wait;
+}
+
+.external-review-box {
+  margin: 14px 0 18px;
+  padding: 14px;
+  border: 1px solid rgba(24,191,255,.35);
+  border-radius: 8px;
+  background: rgba(24,191,255,.06);
+}
+
+.external-review-box h4 {
+  margin: 0 0 7px;
+  color: #18bfff;
+  font-size: 12px;
+  letter-spacing: .7px;
+}
+
+.external-review-box p {
+  margin: 0 0 12px;
+  color: #aebbd0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.external-review-box input,
+.external-review-box textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 7px;
+  padding: 10px;
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 6px;
+  background: #0b1729;
+  color: #e7eefb;
+  font: inherit;
+}
+
+.external-review-box textarea { min-height: 70px; resize: vertical; }
+
+.external-review-button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 14px;
+  border: 1px solid #18bfff;
+  border-radius: 6px;
+  background: rgba(24,191,255,.16);
+  color: #dff7ff;
+  font-weight: 900;
+  letter-spacing: .35px;
+  cursor: pointer;
+}
+
+.external-review-button:hover { background: rgba(24,191,255,.28); }
+ 
+/* =====================================================
+   CHAT
+===================================================== */
+ 
+.chat {
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-color:#24526c;
+  box-shadow:inset 0 2px 0 rgba(32,214,107,.10);
+}
+ 
+.chat-head {
+  padding:15px;
+  border-bottom:1px solid var(--b);
+  color:var(--p);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+ 
+.change-reference {
+  padding:5px 9px;
+  border:1px solid var(--b);
+  border-radius:5px;
+  background:transparent;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:700;
+  cursor:pointer;
+}
+ 
+.change-reference:hover {
+  color:#fff;
+  border-color:var(--a);
+}
+ 
+.messages {
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  padding:15px;
+}
+ 
+.message {
+  margin:0 0 10px;
+  padding:10px 12px;
+  border-radius:7px;
+  font-size:11px;
+  line-height:1.55;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+ 
+.system {
+  background:var(--c);
+  color:#b9c7d8;
+}
+ 
+.system.locked-notice {
+  border-left:3px solid var(--error);
+  color:#ffd7d7;
+}
+ 
+.user {
+  margin-left:12%;
+  background:#263754;
+  color:var(--t);
+}
+ 
+.form {
+  display:flex;
+  gap:8px;
+  padding:12px;
+  border-top:1px solid var(--b);
+}
+
+.review-transfer {
+  margin:0 12px 12px;
+  padding:9px 12px;
+  border:1px solid rgba(32,214,107,.45);
+  border-radius:6px;
+  background:rgba(32,214,107,.08);
+  color:var(--p);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.45px;
+  cursor:pointer;
+}
+
+.review-transfer:hover {
+  background:rgba(32,214,107,.16);
+  border-color:var(--p);
+}
+ 
+.form textarea {
+  flex:1;
+  min-height:58px;
+  resize:vertical;
+  padding:10px;
+  border:1px solid #344762;
+  border-radius:6px;
+  background:#111b30;
+  color:var(--t);
+  font:inherit;
+  font-size:11px;
+  outline:none;
+}
+ 
+.form textarea:focus {
+  border-color:var(--p);
+}
+ 
+.form button {
+  padding:0 15px;
+  border:0;
+  border-radius:6px;
+  background:var(--p);
+  color:#07151f;
+  font-weight:900;
+  cursor:pointer;
+}
+ 
+.form button:disabled {
+  opacity:.55;
+  cursor:wait;
+}
+ 
+.clear-chat {
+  border:1px solid var(--b) !important;
+  background:transparent !important;
+  color:var(--muted) !important;
+  font-size:9px;
+}
+ 
+.clear-chat:hover {
+  color:#fff !important;
+  border-color:var(--a) !important;
+}
+ 
+/* =====================================================
+   ESTADO DE AUTENTICAÇÃO
+===================================================== */
+ 
+#auth-status {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+  padding:30px;
+  background:#07101f;
+}
+ 
+.auth-box {
+  width:min(460px,100%);
+  padding:30px;
+  border:1px solid var(--b);
+  border-radius:10px;
+  background:var(--s);
+  text-align:center;
+}
+ 
+.auth-box h2 {
+  margin:0 0 10px;
+  color:var(--p);
+  font-size:18px;
+}
+ 
+.auth-box p {
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.6;
+}
+ 
+.auth-error {
+  color:var(--error) !important;
+}
+ 
+/* =====================================================
+   AJUDA — TIPO DE ESTUDO
+===================================================== */
+ 
+#study-help {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9998;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(4,10,20,.72);
+}
+ 
+#study-help.open {
+  display:flex;
+}
+ 
+.study-help-box {
+  width:min(700px,100%);
+  max-height:85vh;
+  overflow:auto;
+  padding:26px;
+  border:1px solid var(--b);
+  border-radius:10px;
+  background:#f8f4ea;
+  color:#3f3a32;
+  box-shadow:0 18px 50px rgba(0,0,0,.35);
+}
+ 
+.study-help-box h2 {
+  margin:0 0 8px;
+  color:#4b453b;
+  font-size:20px;
+}
+ 
+.study-help-box .intro {
+  margin:0 0 18px;
+  color:#6b6458;
+  font-size:13px;
+  line-height:1.65;
+}
+ 
+.study-help-item {
+  margin:0 0 12px;
+  padding:12px 14px;
+  border-radius:7px;
+  background:#eee8dc;
+}
+ 
+.study-help-item strong {
+  display:block;
+  margin-bottom:4px;
+  color:#4b453b;
+  font-size:12px;
+}
+ 
+.study-help-item span {
+  color:#625b50;
+  font-size:12px;
+  line-height:1.6;
+}
+ 
+.study-help-note {
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid #d5cdbf;
+  color:#625b50;
+  font-size:11px;
+  line-height:1.6;
+}
+ 
+.study-help-actions {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:18px;
+}
+ 
+.study-help-close {
+  padding:8px 14px;
+  border:0;
+  border-radius:6px;
+  background:#8b7650;
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+/* =====================================================
+   ACESSO AO REVISOR TEOLÓGICO
+===================================================== */
+
+#review-access-modal {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9997;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(4,10,20,.78);
+}
+
+#review-access-modal.open {
+  display:flex;
+}
+
+.review-access-box {
+  width:min(520px,100%);
+  padding:28px;
+  border:1px solid #3b725b;
+  border-radius:10px;
+  background:var(--s);
+  box-shadow:0 18px 50px rgba(0,0,0,.4);
+}
+
+.review-access-box h2 {
+  margin:0 0 10px;
+  color:var(--p);
+  font-size:19px;
+}
+
+.review-access-box p {
+  margin:0 0 12px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.65;
+}
+
+.review-access-box strong {
+  color:var(--t);
+}
+
+.review-access-actions {
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:20px;
+}
+
+.review-upgrade-button,
+.review-access-close {
+  padding:9px 14px;
+  border-radius:6px;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.review-upgrade-button {
+  border:1px solid var(--p);
+  background:var(--p);
+  color:#07151f;
+  text-decoration:none;
+}
+
+.review-access-close {
+  border:1px solid var(--b);
+  background:transparent;
+  color:var(--muted);
+}
+ 
+/* =====================================================
+   RESPONSIVO
+===================================================== */
+ 
+@media(max-width:1180px) and (min-width:951px) {
+  main {
+    grid-template-columns:230px minmax(0, 1fr);
+    gap:12px;
+    padding:12px;
+  }
+
+  .content {
+    grid-template-columns:minmax(0, 1fr) minmax(285px, .86fr);
+    gap:12px;
+    padding:12px;
+  }
+}
+
+@media(max-width:950px) {
+  body {
+    height:auto;
+    min-height:100vh;
+    overflow:auto;
+  }
+
+  main {
+    grid-template-columns:1fr;
+  }
+
+  .modules {
+    max-height:40vh;
+  }
+
+  .content {
+    grid-template-columns:1fr;
+    overflow:visible;
+  }
+
+  .content > .chat,
+  .content > .sheet {
+    order:initial;
+    min-height:560px;
+  }
+
+  .content > .chat {
+    order:1;
+  }
+
+  .content > .sheet {
+    order:2;
+  }
+}
+</style>
+</head>
+ 
+<body>
+ 
+<!-- ===================================================
+     ESTADO DE AUTENTICAÇÃO
+=================================================== -->
+ 
+<section id="auth-status">
+  <div class="auth-box">
+    <h2 id="auth-title">VERIFICANDO ACESSO</h2>
+    <p id="auth-message">Validando sua sessão...</p>
+  </div>
+</section>
+ 
+<!-- ===================================================
+     AJUDA — TIPO DE ESTUDO
+=================================================== -->
+<section id="study-help" aria-hidden="true" onclick="closeStudyHelp(event)">
+  <div class="study-help-box" role="dialog" aria-modal="true" aria-labelledby="study-help-title">
+    <h2 id="study-help-title">Como escolher o módulo de pesquisa</h2>
+    <p class="intro">Esta orientação serve apenas para ajudar você a identificar quais módulos podem ser mais úteis conforme o objeto do estudo. Ela não seleciona, bloqueia ou altera nenhum módulo da Matriz.</p>
+ 
+    <div class="study-help-item"><strong>1. PALAVRA</strong><span>Principais: 04 — Léxico e 05 — Léxico Teológico. Apoio: 01, 03, 06 e 09.</span></div>
+    <div class="study-help-item"><strong>2. VERSÍCULO</strong><span>Principais: 01 — Texto Bíblico, 03 — Gramática e Sintaxe, 04 — Léxico e 06 — Exegese. Apoio: 02, 05, 07, 08, 09, 10 e 12.</span></div>
+    <div class="study-help-item"><strong>3. CAPÍTULO</strong><span>Principais: 01, 03, 04, 06, 07 e 09. Apoio: 02, 05, 08, 10 e 12.</span></div>
+    <div class="study-help-item"><strong>4. LIVRO</strong><span>Principais: 01, 06, 07 e 09. Apoio: 02, 03, 04, 05, 08, 10 e 12.</span></div>
+    <div class="study-help-item"><strong>5. TEMA</strong><span>Principais: 05 — Léxico Teológico e 09 — Teologia Bíblica. Apoio: 01, 02, 03, 04, 06, 07, 08, 10 e 12.</span></div>
+ 
+    <div class="study-help-note"><strong>Importante:</strong> esta lista é somente uma orientação. Você continua livre para abrir e utilizar qualquer um dos 12 módulos da Matriz, dentro do seu plano. O estudo doutrinário possui sua própria página.</div>
+ 
+    <div class="study-help-actions"><button type="button" class="study-help-close" onclick="closeStudyHelp()">FECHAR</button></div>
+  </div>
+</section>
+
+<section id="review-access-modal" aria-hidden="true" onclick="closeReviewerAccess(event)">
+  <div class="review-access-box" role="dialog" aria-modal="true" aria-labelledby="review-access-title">
+    <h2 id="review-access-title">REVISOR TEOLÓGICO</h2>
+    <p><strong>O Revisor Teológico transforma a pesquisa da Mesa em uma auditoria estruturada</strong>, comparando o conteúdo produzido com a referência e apresentando um relatório de consistência.</p>
+    <p>Para conteúdo produzido dentro da plataforma, o acesso completo ao Revisor está incluído no plano <strong>MASTER</strong>, sem cobrança unitária por revisão.</p>
+    <div class="review-access-actions">
+      <button type="button" class="review-access-close" onclick="closeReviewerAccess()">FECHAR</button>
+      <a id="review-upgrade-button" class="review-upgrade-button" href="#" target="_blank" rel="noopener">CONHECER O MASTER</a>
+    </div>
+  </div>
+</section>
+ 
+<!-- ===================================================
+     HEADER
+=================================================== -->
+ 
+<header>
+  <div>
+    <h1>▤ MÉTODO TÉCNICO DE PESQUISA</h1>
+    <p>Estrutura de criação e desenvolvimento </p>
+  </div>
+ 
+  <div class="header-right">
+    <span id="plan-badge" class="plan-badge">PLANO: —</span>
+    <a
+      id="upgrade-button"
+      href="#"
+      target="_blank"
+      style="display:none;padding:9px 14px;border:1px solid #20d66b;border-radius:6px;background:rgba(32,214,107,.1);color:#20d66b;font-size:10px;font-weight:900;letter-spacing:.5px;text-decoration:none;"
+    ></a>
+    <button
+      type="button"
+      class="help-button"
+      onclick="openStudyHelp()"
+      aria-label="Abrir ajuda sobre tipo de estudo"
+    >
+      ▤ AJUDA
+    </button>
+  </div>
+</header>
+ 
+<!-- ===================================================
+     CONTEÚDO
+=================================================== -->
+ 
+<main>
+ 
+  <section class="panel modules">
+    <div class="panel-title">MÓDULOS DO MÉTODO</div>
+    <div id="module-list" class="module-list"></div>
+  </section>
+ 
+  <section class="panel workspace">
+ 
+    <div id="workspace-head" class="workspace-head">
+      <h2>MÉTODO TÉCNICO DE PESQUISA</h2>
+      <p>
+       SELECIONE UM MÓDULO E UMA SUBETAPA PARA FAZER SEUS ESTUDOS
+      </p>
+      <div id="workspace-context" class="workspace-context">Nenhum módulo ou subetapa selecionado</div>
+    </div>
+ 
+    <div class="content">
+ 
+      <section class="sheet">
+ 
+        <h3 id="sheet-title">
+          REVISOR TEOLÓGICO
+        </h3>
+
+        <div class="meta reviewer-subtitle">Análise de comparação e consolidação</div>
+
+        <div id="sheet-meta" class="meta">
+          Compare o conteúdo do escritor com uma referência de comparação e gere um relatório de auditoria.
+        </div>
+
+        <div class="external-review-box">
+          <h4>REVISÃO DE CONTEÚDO EXTERNO</h4>
+          <p>Use esta entrada para revisar um texto produzido fora da plataforma. O Revisor aplica a mesma auditoria de comparação e consolidação. Este fluxo não exige MASTER e consome 1 unidade disponível.</p>
+          <label for="external-review-topic">TEMA / ASSUNTO</label>
+          <input id="external-review-topic" type="text" placeholder="Informe o tema ou assunto do texto...">
+          <label for="external-review-context">SUBETAPA / CONTEXTO METODOLÓGICO (opcional)</label>
+          <textarea id="external-review-context" placeholder="Informe a subetapa, módulo ou contexto metodológico, se aplicável..."></textarea>
+          <button id="external-review-button" class="external-review-button" type="button" onclick="startExternalReview()">
+            REVISAR TEXTO EXTERNO — 1 UNIDADE
+          </button>
+        </div>
+ 
+        <div class="comparison-field">
+          <label for="research-ready">REFERÊNCIA DE COMPARAÇÃO</label>
+          <small>Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere e prioriza fontes da matriz canônica conforme a subetapa.</small>
+          <div id="comparison-guidance" class="comparison-guidance" role="note"></div>
+          <textarea
+            id="research-ready"
+            placeholder="Cole uma referência de comparação ou deixe vazio para a sugestão do Worker..."
+            oninput="persistResearchReady()"
+          ></textarea>
+        </div>
+ 
+        <div class="comparison-field">
+          <label for="writer-content">CONTEÚDO DO ESCRITOR</label>
+          <small>Cole aqui o conteúdo produzido pelo escritor que será auditado.</small>
+          <textarea
+            id="writer-content"
+            placeholder="Cole aqui o conteúdo do escritor..."
+            oninput="persistWriterContent()"
+          ></textarea>
+        </div>
+ 
+        <div class="comparison-report-label">RELATÓRIO DE AUDITORIA</div>
+        <div id="comparison-report" class="comparison-report" role="status" aria-live="polite">O relatório de auditoria aparecerá aqui depois da comparação.</div>
+ 
+        <div class="comparison-actions">
+          <button
+            id="compare-button"
+            class="compare-button"
+            type="button"
+            onclick="runComparisonConsolidation()"
+          >
+            COMPARAR E CONSOLIDAR
+          </button>
+        </div>
+ 
+      </section>
+ 
+      <aside class="chat">
+ 
+        <div class="chat-head">
+          MESA DE ANÁLISE PRO — PERGUNTA LIVRE
+          <button
+            type="button"
+            class="change-reference"
+            onclick="resetReference()"
+          >
+            Trocar objeto de pesquisa
+          </button>
+        </div>
+ 
+        <div id="messages" class="messages"></div>
+
+        <button
+          id="send-to-reviewer"
+          class="review-transfer"
+          type="button"
+          onclick="sendToTheologicalReviewer()"
+        >
+          ENVIAR PARA REVISÃO TEOLÓGICA
+        </button>
+ 
+        <form
+          class="form"
+          onsubmit="return sendQuestion(event)"
+        >
+          <textarea
+            id="question"
+            placeholder="Escreva sua pergunta..."
+            aria-label="Pergunta livre"
+            oninput="persistQuestionDraft()"
+          ></textarea>
+ 
+          <button
+            type="button"
+            class="clear-chat"
+            onclick="clearConversation()"
+          >
+            LIMPAR
+          </button>
+ 
+          <button
+            id="send-button"
+            type="submit"
+          >
+            ENVIAR
+          </button>
+        </form>
+ 
+      </aside>
+ 
+    </div>
+ 
+  </section>
+ 
+</main>
+ 
+<script>
+/* =====================================================
+   SUPABASE
+===================================================== */
+ 
+const SUPABASE_URL =
+  "https://qmhdbuxomozdczgvpvcc.supabase.co";
+ 
+const SUPABASE_ANON_KEY =
+  "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+ 
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+ 
+ 
+/* =====================================================
+   CLOUDFLARE WORKER
+===================================================== */
+ 
+const AI_PROXY_URL =
+  "https://yellow-lab-f4b2.palavraeserie.workers.dev";
+ 
+ 
+/* =====================================================
+   NÍVEL MÍNIMO POR SUBETAPA — FONTE ÚNICA DA VERDADE
+   FREE < PRO < MASTER < DOCTUS
+   166 códigos, alinhados aos 12 módulos de PRO_MODULE_DATA.
+   Qualquer ajuste de plano/preço deve ser feito SOMENTE
+   aqui — nunca dentro de selectStep(), sendQuestion() ou
+   diretamente em cada botão.
+ 
+   IMPORTANTE: o Worker (Cloudflare) deve manter uma cópia
+   sincronizada deste objeto e repetir a validação do lado
+   do servidor. O gate no frontend é apenas para UX; o gate
+   real, que impede uso indevido de créditos de IA, precisa
+   estar no /api/pesquisa.
+===================================================== */
+ 
+const MATRIX_LEVELS = {
+  // 01 — TEXTO BÍBLICO
+  "01.1": "FREE",   // Livro
+  "01.2": "FREE",   // Capítulo
+  "01.3": "PRO",   // Perícope
+  "01.4": "PRO",   // Versículo
+  "01.5": "PRO",   // Unidade de Sentido
+  "01.6": "PRO",    // Palavra
+  "01.7": "PRO",    // Texto Hebraico
+  "01.8": "PRO",    // Texto Grego
+  "01.9": "PRO",    // Texto da Septuaginta (LXX)
+  "01.10": "MASTER", // Identificação preliminar de tradições textuais divergentes
+  "01.11": "PRO",   // Palavras e Construções no Original
+  "01.12": "MASTER",// Determinação do Texto-Base
+ 
+  // 02 — CRÍTICA TEXTUAL
+  "02.1": "PRO", "02.2": "PRO", "02.3": "PRO", "02.4": "PRO",
+  "02.5": "MASTER", "02.6": "MASTER", "02.7": "MASTER", "02.8": "MASTER",
+  "02.9": "MASTER", "02.10": "MASTER", "02.11": "MASTER",
+  "02.12": "DOCTUS",
+ 
+  // 03 — GRAMÁTICA E SINTAXE
+  "03.1": "PRO", "03.2": "PRO", "03.3": "PRO", "03.4": "PRO",
+  "03.5": "PRO", "03.6": "PRO", "03.7": "PRO", "03.8": "PRO",
+  "03.9": "MASTER", "03.10": "MASTER", "03.11": "MASTER", "03.12": "MASTER",
+  "03.13": "MASTER", "03.14": "MASTER", "03.15": "MASTER", "03.16": "MASTER",
+ 
+  // 04 — LÉXICO
+  "04.1": "PRO", "04.2": "PRO", "04.3": "PRO", "04.4": "PRO",
+  "04.5": "PRO", "04.6": "PRO", "04.7": "PRO",
+  "04.8": "MASTER", "04.9": "MASTER", "04.10": "MASTER",
+  "04.11": "MASTER", "04.12": "MASTER", "04.13": "MASTER",
+ 
+  // 05 — LÉXICO TEOLÓGICO
+  "05.1": "MASTER", "05.2": "MASTER", "05.3": "MASTER", "05.4": "MASTER",
+  "05.5": "MASTER", "05.6": "MASTER", "05.7": "MASTER", "05.8": "MASTER",
+  "05.9": "MASTER", "05.12": "MASTER",
+  "05.10": "DOCTUS", "05.11": "DOCTUS",
+ 
+  // 06 — EXEGESE
+  "06.1": "PRO", "06.2": "PRO", "06.3": "PRO", "06.4": "PRO",
+  "06.5": "PRO", "06.6": "PRO", "06.7": "PRO",
+  "06.8": "MASTER", "06.9": "MASTER", "06.10": "MASTER",
+  "06.11": "MASTER", "06.12": "MASTER",
+  "06.13": "DOCTUS", "06.14": "DOCTUS",
+ 
+  // 07 — CONTEXTO HISTÓRICO-CULTURAL
+  "07.1": "PRO", "07.2": "PRO", "07.3": "PRO", "07.4": "PRO",
+  "07.5": "PRO", "07.6": "PRO", "07.7": "PRO",
+  "07.8": "MASTER", "07.9": "MASTER", "07.10": "MASTER", "07.11": "MASTER",
+  "07.12": "MASTER", "07.13": "MASTER", "07.14": "MASTER",
+  "07.15": "DOCTUS",
+ 
+  // 08 — HERMENÊUTICA E CONTROLE DE ERROS
+  "08.1": "MASTER", "08.2": "MASTER", "08.3": "MASTER", "08.4": "MASTER",
+  "08.5": "MASTER", "08.6": "MASTER", "08.7": "MASTER", "08.8": "MASTER",
+  "08.9": "MASTER", "08.10": "MASTER", "08.11": "MASTER", "08.13": "MASTER",
+  "08.12": "DOCTUS", "08.14": "DOCTUS", "08.15": "DOCTUS",
+ 
+  // 09 — TEOLOGIA BÍBLICA
+  "09.1": "MASTER", "09.2": "MASTER", "09.3": "MASTER", "09.4": "MASTER",
+  "09.5": "MASTER", "09.6": "MASTER", "09.7": "MASTER", "09.8": "MASTER",
+  "09.9": "MASTER", "09.10": "MASTER", "09.11": "MASTER", "09.12": "MASTER",
+  "09.13": "MASTER",
+  "09.14": "DOCTUS", "09.15": "DOCTUS",
+ 
+  // 10 — USO DO AT NO NT
+  "10.1": "MASTER", "10.2": "MASTER", "10.3": "MASTER", "10.4": "MASTER",
+  "10.5": "MASTER", "10.6": "MASTER", "10.7": "MASTER", "10.8": "MASTER",
+  "10.9": "MASTER", "10.10": "MASTER", "10.11": "MASTER", "10.12": "MASTER",
+  "10.13": "DOCTUS", "10.14": "DOCTUS", "10.15": "DOCTUS",
+ 
+  // 11 — TEOLOGIA SISTEMÁTICA
+  "11.1": "MASTER", "11.2": "MASTER", "11.3": "MASTER",
+  "11.4": "MASTER", "11.5": "MASTER", "11.6": "MASTER",
+  "11.7": "DOCTUS", "11.8": "DOCTUS", "11.9": "DOCTUS", "11.10": "DOCTUS",
+  "11.11": "DOCTUS", "11.12": "DOCTUS", "11.13": "DOCTUS",
+ 
+  // 12 — COMPARAÇÃO DE INTERPRETAÇÕES
+  "12.1": "MASTER", "12.2": "MASTER", "12.3": "MASTER",
+  "12.4": "MASTER", "12.5": "MASTER", "12.6": "MASTER", "12.7": "MASTER",
+  "12.8": "DOCTUS", "12.9": "DOCTUS", "12.10": "DOCTUS", "12.11": "DOCTUS",
+  "12.12": "DOCTUS", "12.13": "DOCTUS", "12.14": "DOCTUS"
+};
+ 
+const LEVEL_RANK = { FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 };
+
+const CHECKOUT_LINKS = {
+  PRO: "https://pay.kiwify.com.br/4m4qdH7",
+  MASTER: "https://pay.kiwify.com.br/tqJboGn",
+  DOCTUS: "https://kiwify.app/ZHRYMmy"
+};
+
+const NEXT_TIER = {
+  FREE: "PRO",
+  PRO: "MASTER",
+  MASTER: "DOCTUS"
+};
+
+function getCheckoutLink(level) {
+  return CHECKOUT_LINKS[level] || "#";
+}
+ 
+let currentUserPlan = "FREE";
+ 
+/* -----------------------------------------------------
+   Lê o plano do usuário a partir da sessão Supabase.
+   Ajuste o caminho conforme onde o plano é armazenado
+   de fato (user_metadata, app_metadata, ou uma tabela
+   própria como "assinaturas"/"perfis" consultada à parte).
+----------------------------------------------------- */
+async function getUserPlan(session) {
+  if (!session?.user?.id) return "FREE";
+  try {
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('plano')
+      .eq('id', session.user.id)
+      .single();
+    if (error || !data) return "FREE";
+    return String(data.plano || "FREE").toUpperCase();
+  } catch (e) {
+    console.error("Erro ao buscar plano do usuário:", e);
+    return "FREE";
+  }
+}
+ 
+/* -----------------------------------------------------
+   Verifica se o plano do usuário cobre o nível mínimo
+   exigido pela subetapa. Fail-safe: código não catalogado
+   exige DOCTUS (nunca libera por engano).
+----------------------------------------------------- */
+function stepIsAllowed(stepCode, userPlan) {
+  const required = MATRIX_LEVELS[stepCode] || "DOCTUS";
+  const userRank = LEVEL_RANK[userPlan] ?? 0;
+  const requiredRank = LEVEL_RANK[required] ?? 3;
+  return userRank >= requiredRank;
+}
+ 
+/* -----------------------------------------------------
+   Retorna o nível mínimo exigido por uma subetapa,
+   para exibir badge/cadeado na interface.
+----------------------------------------------------- */
+function getStepLevel(stepCode) {
+  return MATRIX_LEVELS[stepCode] || "DOCTUS";
+}
+ 
+function updatePlanBadge() {
+  const badge = document.getElementById("plan-badge");
+  if (badge) {
+    badge.textContent = "PLANO: " + currentUserPlan;
+  }
+}
+
+function updateUpgradeButton() {
+  const btn = document.getElementById("upgrade-button");
+  if (!btn) return;
+
+  // Quem já tem DOCTUS não tem para onde fazer upgrade.
+  if (currentUserPlan === "DOCTUS") {
+    btn.style.display = "none";
+    return;
+  }
+
+  // Se houver uma subetapa ativa e ela estiver bloqueada,
+  // o botão fica específico para o nível exigido por ela.
+  if (activeStep) {
+    const code = extractStepCode(activeStep);
+    const level = getStepLevel(code);
+    const allowed = stepIsAllowed(code, currentUserPlan);
+
+    if (!allowed) {
+      btn.style.display = "inline-block";
+      btn.textContent = "ASSINAR " + level;
+      btn.href = getCheckoutLink(level);
+      return;
+    }
+  }
+
+  // Caso padrão: nenhuma subetapa bloqueada selecionada.
+  // Mostra uma chamada genérica para o próximo nível acima do atual.
+  const nextLevel = NEXT_TIER[currentUserPlan] || "PRO";
+  btn.style.display = "inline-block";
+  btn.textContent = "FAZER UPGRADE";
+  btn.href = getCheckoutLink(nextLevel);
+}
+ 
+ 
+/* =====================================================
+   DADOS DA MATRIZ
+===================================================== */
+ 
+const PRO_MODULE_DATA = [
+  {
+    name: "01 — TEXTO BÍBLICO",
+    items: [
+      "01.1 — Livro",
+      "01.2 — Capítulo",
+      "01.3 — Perícope",
+      "01.4 — Versículo",
+      "01.5 — Unidade de Sentido",
+      "01.6 — Palavra",
+      "01.7 — Texto Hebraico",
+      "01.8 — Texto Grego",
+      "01.9 — Texto da Septuaginta (LXX)",
+      "01.10 — Identificação preliminar de tradições textuais divergentes",
+      "01.11 — Palavras e Construções no Original",
+      "01.12 — Determinação do Texto-Base"
+    ]
+  },
+  {
+    name: "02 — CRÍTICA TEXTUAL",
+    items: [
+      "02.1 — Identificação da variante textual",
+      "02.2 — Localização da variante",
+      "02.3 — Testemunhos textuais",
+      "02.4 — Manuscritos e versões envolvidos",
+      "02.5 — Evidências externas",
+      "02.6 — Evidências internas",
+      "02.7 — Comparação das leituras",
+      "02.8 — Aparato crítico",
+      "02.9 — Avaliação da variante",
+      "02.10 — Impacto na tradução",
+      "02.11 — Impacto na interpretação",
+      "02.12 — Determinação textual"
+    ]
+  },
+  {
+    name: "03 — GRAMÁTICA E SINTAXE",
+    items: [
+      "03.1 — Identificação da construção",
+      "03.2 — Morfologia",
+      "03.3 — Lema e forma lexical",
+      "03.4 — Classe gramatical",
+      "03.5 — Sujeito",
+      "03.6 — Predicado",
+      "03.7 — Objeto",
+      "03.8 — Verbos",
+      "03.9 — Tempo e aspecto",
+      "03.10 — Voz",
+      "03.11 — Modo",
+      "03.12 — Construções gramaticais",
+      "03.13 — Relações sintáticas",
+      "03.14 — Conectivos",
+      "03.15 — Relações entre cláusulas",
+      "03.16 — Estrutura da frase (síntese)"
+    ]
+  },
+  {
+    name: "04 — LÉXICO",
+    items: [
+      "04.1 — Identificação da palavra",
+      "04.2 — Forma encontrada no texto",
+      "04.3 — Lema",
+      "04.4 — Transliteração",
+      "04.5 — Classe gramatical",
+      "04.6 — Definições lexicais",
+      "04.7 — Usos da palavra",
+      "04.8 — Campo semântico",
+      "04.9 — Uso no contexto",
+      "04.10 — Uso no Antigo Testamento",
+      "04.11 — Uso no Novo Testamento",
+      "04.12 — Comparação das evidências lexicais",
+      "04.13 — Sentido provável no contexto"
+    ]
+  },
+  {
+    name: "05 — LÉXICO TEOLÓGICO",
+    items: [
+      "05.1 — Identificação do conceito",
+      "05.2 — Termo no texto",
+      "05.3 — Base lexical do conceito",
+      "05.4 — Uso no Antigo Testamento",
+      "05.5 — Uso na Septuaginta",
+      "05.6 — Uso no Judaísmo",
+      "05.7 — Uso no Novo Testamento",
+      "05.8 — Desenvolvimento do conceito",
+      "05.9 — Relações teológicas",
+      "05.10 — Comparação das evidências",
+      "05.11 — Síntese do conceito teológico",
+      "05.12 — Relação com o contexto da passagem"
+    ]
+  },
+  {
+    name: "06 — EXEGESE",
+    items: [
+      "06.1 — Delimitação da passagem",
+      "06.2 — Contexto imediato",
+      "06.3 — Estrutura da passagem",
+      "06.4 — Argumento da passagem",
+      "06.5 — Contexto literário",
+      "06.6 — Gênero literário",
+      "06.7 — Relação entre versículos",
+      "06.8 — Relações entre unidades de pensamento",
+      "06.9 — Intenção comunicativa",
+      "06.10 — Problemas interpretativos",
+      "06.11 — Interpretações existentes",
+      "06.12 — Argumentos das interpretações",
+      "06.13 — Avaliação exegética",
+      "06.14 — Síntese exegética"
+    ]
+  },
+  {
+    name: "07 — CONTEXTO HISTÓRICO-CULTURAL",
+    items: [
+      "07.1 — Identificação do contexto histórico",
+      "07.2 — Período histórico",
+      "07.3 — Localização geográfica",
+      "07.4 — Contexto político",
+      "07.5 — Contexto religioso",
+      "07.6 — Contexto social",
+      "07.7 — Costumes e práticas",
+      "07.8 — Instituições e estruturas sociais",
+      "07.9 — Cultura e valores",
+      "07.10 — Mundo greco-romano",
+      "07.11 — Antigo Oriente Próximo",
+      "07.12 — Judaísmo e contexto religioso",
+      "07.13 — Arqueologia e evidências materiais",
+      "07.14 — Literatura e fontes extrabíblicas",
+      "07.15 — Impacto do contexto na interpretação"
+    ]
+  },
+  {
+    name: "08 — HERMENÊUTICA E CONTROLE DE ERROS",
+    items: [
+      "08.1 — Identificação dos pressupostos",
+      "08.2 — Controle do contexto",
+      "08.3 — Controle do sentido lexical",
+      "08.4 — Controle gramatical e sintático",
+      "08.5 — Controle do contexto histórico-cultural",
+      "08.6 — Detecção de eisegese",
+      "08.7 — Detecção de anacronismo",
+      "08.8 — Detecção de falácia lexical",
+      "08.9 — Detecção de descontextualização",
+      "08.10 — Controle de alegorização indevida",
+      "08.11 — Controle de generalização indevida",
+      "08.12 — Controle da relação AT–NT",
+      "08.13 — Descrição versus prescrição",
+      "08.14 — Coerência da interpretação com as evidências",
+      "08.15 — Veredito hermenêutico"
+    ]
+  },
+  {
+    name: "09 — TEOLOGIA BÍBLICA",
+    items: [
+      "09.1 — Localização do tema na passagem",
+      "09.2 — Relação com o contexto canônico",
+      "09.3 — História da redenção",
+      "09.4 — Desenvolvimento da revelação",
+      "09.5 — Temas bíblicos relacionados",
+      "09.6 — Relação com o Antigo Testamento",
+      "09.7 — Relação com o Novo Testamento",
+      "09.8 — Promessa e cumprimento",
+      "09.9 — Alianças e desenvolvimento pactual",
+      "09.10 — Criação, queda e redenção",
+      "09.11 — Reino de Deus",
+      "09.12 — Relação com Cristo",
+      "09.13 — Consumação",
+      "09.14 — Trajetória do tema na Escritura",
+      "09.15 — Síntese teológico-bíblica"
+    ]
+  },
+  {
+    name: "10 — USO DO AT NO NT",
+    items: [
+      "10.1 — Identificação da referência ao AT",
+      "10.2 — Citação explícita",
+      "10.3 — Alusão",
+      "10.4 — Eco textual ou temático",
+      "10.5 — Identificação da passagem de origem",
+      "10.6 — Comparação com o texto hebraico",
+      "10.7 — Comparação com a Septuaginta",
+      "10.8 — Comparação com o texto grego do NT",
+      "10.9 — Contexto da passagem do AT",
+      "10.10 — Forma como o NT utiliza o AT",
+      "10.11 — Função teológica da referência",
+      "10.12 — Relação com promessa e cumprimento",
+      "10.13 — Relação cristológica",
+      "10.14 — Impacto na interpretação do NT",
+      "10.15 — Síntese do uso do AT no NT"
+    ]
+  },
+  {
+    name: "11 — TEOLOGIA SISTEMÁTICA",
+    items: [
+      "11.1 — Identificação da questão doutrinária",
+      "11.2 — Dados doutrinários encontrados no texto",
+      "11.3 — Relação com a teologia bíblica",
+      "11.4 — Relação com outras passagens bíblicas",
+      "11.5 — Doutrinas relacionadas",
+      "11.6 — Formulações teológicas existentes",
+      "11.7 — Comparação das formulações",
+      "11.8 — Pressupostos teológicos",
+      "11.9 — Convergências",
+      "11.10 — Divergências",
+      "11.11 — Avaliação da coerência doutrinária",
+      "11.12 — Limites da conclusão doutrinária",
+      "11.13 — Síntese doutrinária"
+    ]
+  },
+  {
+    name: "12 — COMPARAÇÃO DE INTERPRETAÇÕES",
+    items: [
+      "12.1 — Identificação das interpretações existentes (N)",
+      "12.2 — Classificação das interpretações",
+      "12.3 — Argumentos de cada interpretação (N)",
+      "12.4 — Evidências textuais",
+      "12.5 — Evidências gramaticais e lexicais",
+      "12.6 — Evidências históricas e culturais",
+      "12.7 — Evidências teológicas",
+      "12.8 — Pressupostos de cada interpretação",
+      "12.9 — Pontos de convergência",
+      "12.10 — Pontos de divergência",
+      "12.11 — Grau de consenso",
+      "12.12 — Força das evidências",
+      "12.13 — Limites da conclusão",
+      "12.14 — Síntese comparativa"
+    ]
+  }
+];
+ 
+/* =====================================================
+   OBJETIVOS DAS SUBETAPAS
+   Usado apenas para sugerir/pré-preencher automaticamente
+   a pergunta enviada ao Worker, combinando o comando técnico
+   da subetapa com o objeto informado pelo usuário. Não substitui
+   os labels do menu (PRO_MODULE_DATA) nem a metodologia real
+   aplicada pelo Worker (CANONICAL_REFERENCE_MATRIX por módulo).
+===================================================== */
+ 
+const M01_INPUT_CONFIG = {
+  "01.1": {
+    label: "LIVRO",
+    prompt: "Qual livro bíblico será objeto da pesquisa?",
+    fields: ["OBJETO"]
+  },
+  "01.2": {
+    label: "CAPÍTULO",
+    prompt: "Qual capítulo e de qual livro será objeto da pesquisa?",
+    fields: ["OBJETO", "LIVRO"]
+  },
+  "01.3": {
+    label: "PERÍCOPE",
+    prompt: "Qual perícope será objeto da pesquisa? Informe a referência bíblica.",
+    fields: ["OBJETO"]
+  },
+  "01.4": {
+    label: "VERSÍCULO",
+    prompt: "Qual versículo será objeto da pesquisa? Informe a referência bíblica.",
+    fields: ["OBJETO"]
+  },
+  "01.5": {
+    label: "UNIDADE DE SENTIDO",
+    prompt: "Qual trecho ou frase constitui a unidade de sentido que será pesquisada?",
+    fields: ["OBJETO"]
+  },
+  "01.6": {
+    label: "PALAVRA",
+    prompt: "Qual palavra ou termo será pesquisado? Informe também a referência do versículo em que ele ocorre.",
+    fields: ["PALAVRA", "REFERENCIA"]
+  }
+};
+ 
+const objetivosDasSubetapas = {
+  "01.1": "Realize a análise exegética macro do Livro de {OBJETO}. Identifique e descreva de forma direta: autor autêntico, data provável de composição, público-alvo original, contexto histórico-político, gênero literário predominante e o propósito teológico central da obra. Entregue o resultado em tópicos concisos.",
+  "01.2": "Analise o Capítulo {OBJETO} do Livro de {LIVRO}. Demonstre como este capítulo se conecta logicamente com as seções anterior e posterior. Divida o capítulo em suas macroestruturas de transição narrativa ou argumentativa e aponte o tema central deste bloco.",
+  "01.3": "Faça a exegese da perícope de {OBJETO}. Delimite os versículos justificando os critérios de início e fim do texto. Analise o cenário, o fluxo de ações dos personagens, os recursos retóricos utilizados e determine a mensagem teológica central que este trecho transmite isoladamente.",
+  "01.4": "Execute a exegese detalhada do Versículo {OBJETO}. Analise a estrutura sintática da frase, a pontuação textual e a relação de dependência com os versículos vizinhos. Explique o peso e a função específica desta frase dentro do argumento da perícope atual.",
+  "01.5": "Isole e analise a Unidade de Sentido presente no trecho {OBJETO}. Ignore as divisões formais de versículos e foque no bloco lógico de pensamento (seja uma metáfora, ordem ou causa e efeito). Explique a lógica interna dessa expressão e o impacto teológico do pensamento completo do autor.",
+  "01.6": "Faça o estudo lexical e etimológico da palavra '{PALAVRA}' no versículo {REFERENCIA}. Identifique o termo correspondente no idioma original (Grego/Hebraico/Aramaico), sua raiz morfológica, os diferentes significados da época e a nuance semântica precisa adotada pelo autor neste contexto específico.",
+  "01.7": "Apresente o texto hebraico de {PASSAGEM}, preservando a forma textual e a vocalização disponível, com tradução literal.",
+  "01.8": "Apresente o texto grego relevante de {PASSAGEM}, identificando a tradição textual grega correspondente e apresentando tradução.",
+  "01.9": "Apresente o texto da Septuaginta (LXX) para {PASSAGEM} e compare-o de forma controlada com o texto hebraico.",
+  "01.10": "Identifique preliminarmente as divergências textuais relevantes entre as tradições consultadas para {PASSAGEM}, indicando onde ocorrem e o que precisa ser investigado posteriormente.",
+  "01.11": "Identifique as palavras, formas e construções do texto original de {PASSAGEM} que merecem atenção para as etapas seguintes da pesquisa.",
+  "01.12": "Estabeleça um texto-base operacional e provisório para {PASSAGEM}, indicando o grau de segurança e as incertezas.\n\n",
+ 
+  "02.1": "Identifique a variante textual exata em {PASSAGEM}.",
+  "02.2": "Localize a variante na estrutura sintática de {PASSAGEM}.",
+  "02.3": "Liste todas as leituras concorrentes da variante em {PASSAGEM}.",
+  "02.4": "Catalogue os manuscritos, códices e versões que apoiam cada leitura concorrente em {PASSAGEM}.",
+  "02.5": "Avalie o peso das evidências externas para a variante de {PASSAGEM}.",
+  "02.6": "Avalie as evidências internas (lectio difficilior, lectio brevior) da variante em {PASSAGEM}.",
+  "02.7": "Confronte forças e fraquezas das evidências externas e internas para {PASSAGEM}.",
+  "02.8": "Decodifique o aparato crítico (Nestle-Aland ou BHS) para {PASSAGEM}.",
+  "02.9": "Classifique a natureza da variante (erro acidental, teológica, harmonização) em {PASSAGEM}.",
+  "02.10": "Mapeie o impacto da divergência textual nas traduções em português para {PASSAGEM}.",
+  "02.11": "Avalie o impacto teológico da variante em {PASSAGEM}.",
+  "02.12": "Determine, com base científica, a leitura original mais provável de {PASSAGEM}.",
+ 
+  "03.1": "Identifique a macroconstrução gramatical de {PASSAGEM}.",
+  "03.2": "Realize a análise morfológica completa das palavras principais de {PASSAGEM}.",
+  "03.3": "Apresente o lema e a forma infletida de cada palavra-chave em {PASSAGEM}.",
+  "03.4": "Classifique a classe gramatical de todos os termos em {PASSAGEM}.",
+  "03.5": "Identifique o sujeito gramatical da oração em {PASSAGEM}.",
+  "03.6": "Isole o predicado da frase em {PASSAGEM}.",
+  "03.7": "Mapeie os objetos e complementos em {PASSAGEM}.",
+  "03.8": "Isole todas as formas verbais presentes em {PASSAGEM}.",
+  "03.9": "Determine o tempo e aspecto de cada verbo em {PASSAGEM}.",
+  "03.10": "Analise a voz verbal (ativa, passiva, média) em {PASSAGEM}.",
+  "03.11": "Identifique o modo verbal em {PASSAGEM}.",
+  "03.12": "Identifique construções gramaticais especiais em {PASSAGEM}.",
+  "03.13": "Mapeie as relações sintáticas internas de {PASSAGEM}.",
+  "03.14": "Analise a função lógica dos conectivos em {PASSAGEM}.",
+  "03.15": "Defina a hierarquia entre orações coordenadas e subordinadas em {PASSAGEM}.",
+  "03.16": "Elabore uma síntese esquemática da estrutura sintática de {PASSAGEM}.",
+ 
+  "04.1": "Selecione e justifique a palavra-chave de maior relevância em {PASSAGEM}.",
+  "04.2": "Apresente a forma exata da palavra-chave no texto de {PASSAGEM}.",
+  "04.3": "Apresente o lema e a raiz etimológica do termo em {PASSAGEM}.",
+  "04.4": "Apresente a transliteração do lema e da forma textual em {PASSAGEM}.",
+  "04.5": "Confirme a classe gramatical e a flexão morfológica do termo em {PASSAGEM}.",
+  "04.6": "Apresente as definições lexicais acadêmicas do termo em {PASSAGEM} (BDAG, HALOT, BDB).",
+  "04.7": "Rastreie os usos documentados do termo em {PASSAGEM} na literatura contemporânea.",
+  "04.8": "Mapeie o campo semântico do termo em {PASSAGEM}.",
+  "04.9": "Determine como o termo funciona no contexto imediato de {PASSAGEM}.",
+  "04.10": "Analise os usos do termo de {PASSAGEM} no Antigo Testamento.",
+  "04.11": "Analise a relação do termo de {PASSAGEM} com o Novo Testamento.",
+  "04.12": "Cruze os dados lexicais já levantados para o termo em {PASSAGEM}.",
+  "04.13": "Apresente a avaliação lexical final do termo em {PASSAGEM}.",
+ 
+  "05.1": "Identifique os conceitos teologicamente relevantes em {PASSAGEM}.",
+  "05.2": "Identifique o termo que veicula linguisticamente o conceito em {PASSAGEM}.",
+  "05.3": "Apresente a base lexical que sustenta o conceito em {PASSAGEM}.",
+  "05.4": "Rastreie o desenvolvimento do conceito de {PASSAGEM} no Antigo Testamento.",
+  "05.5": "Analise o uso do conceito de {PASSAGEM} na Septuaginta.",
+  "05.6": "Examine o conceito de {PASSAGEM} no Judaísmo do Segundo Templo.",
+  "05.7": "Analise a retomada do conceito de {PASSAGEM} no Novo Testamento.",
+  "05.8": "Apresente o desenvolvimento histórico e conceitual do conceito de {PASSAGEM}.",
+  "05.9": "Relacione o conceito de {PASSAGEM} com outros temas teológicos pertinentes.",
+  "05.10": "Compare os dados de uso do conceito de {PASSAGEM} ao longo do cânon.",
+  "05.11": "Construa a síntese acadêmica final do conceito de {PASSAGEM}.",
+  "05.12": "Explique como o panorama teológico do conceito esclarece {PASSAGEM}.",
+ 
+  "06.1": "Delimite as fronteiras da unidade literária de {PASSAGEM}.",
+  "06.2": "Analise o contexto imediato de {PASSAGEM}.",
+  "06.3": "Divida {PASSAGEM} em subseções lógicas.",
+  "06.4": "Reconstrua a progressão do discurso em {PASSAGEM}.",
+  "06.5": "Posicione {PASSAGEM} no desenvolvimento global do livro.",
+  "06.6": "Identifique o gênero e subgêneros literários de {PASSAGEM}.",
+  "06.7": "Examine como os versículos de {PASSAGEM} se conectam no plano do discurso.",
+  "06.8": "Analise como as unidades de pensamento de {PASSAGEM} dialogam entre si.",
+  "06.9": "Reconstrua a intenção comunicativa provável de {PASSAGEM}.",
+  "06.10": "Mapeie as ambiguidades e problemas interpretativos de {PASSAGEM}.",
+  "06.11": "Apresente as interpretações documentadas para os problemas de {PASSAGEM}.",
+  "06.12": "Exponha as evidências que cada interpretação de {PASSAGEM} utiliza.",
+  "06.13": "Avalie criticamente as interpretações de {PASSAGEM}.",
+  "06.14": "Apresente a síntese exegética final de {PASSAGEM}.",
+ 
+  "07.1": "Identifique o horizonte histórico geral de {PASSAGEM}.",
+  "07.2": "Estime o período histórico ou datação provável de {PASSAGEM}.",
+  "07.3": "Mapeie a geografia histórica pertinente a {PASSAGEM}.",
+  "07.4": "Descreva o contexto político pertinente a {PASSAGEM}.",
+  "07.5": "Examine o panorama religioso geral do período de {PASSAGEM}.",
+  "07.6": "Analise as dinâmicas sociais e socioeconômicas relevantes a {PASSAGEM}.",
+  "07.7": "Explique os costumes cotidianos pressupostos em {PASSAGEM}.",
+  "07.8": "Descreva as instituições e estruturas sociais pertinentes a {PASSAGEM}.",
+  "07.9": "Isole as mentalidades e valores culturais documentáveis no cenário de {PASSAGEM}.",
+  "07.10": "Analise as influências greco-romanas sobre {PASSAGEM}, se aplicável.",
+  "07.11": "Analise os paralelos do Antigo Oriente Próximo relevantes a {PASSAGEM}.",
+  "07.12": "Analise os grupos e divisões internas do Judaísmo pertinentes a {PASSAGEM}.",
+  "07.13": "Apresente os achados arqueológicos documentados relevantes a {PASSAGEM}.",
+  "07.14": "Liste as fontes extrabíblicas documentadas pertinentes a {PASSAGEM}.",
+  "07.15": "Consolide os achados histórico-culturais e seu impacto sobre {PASSAGEM}.",
+ 
+  "08.1": "Identifique os pressupostos presentes na interpretação de {PASSAGEM}.",
+  "08.2": "Confronte a interpretação de {PASSAGEM} com o contexto do Módulo 06.",
+  "08.3": "Confronte a interpretação de {PASSAGEM} com os dados lexicais do Módulo 04.",
+  "08.4": "Confronte a interpretação de {PASSAGEM} com os dados gramaticais do Módulo 03.",
+  "08.5": "Confronte a interpretação de {PASSAGEM} com os dados histórico-culturais do Módulo 07.",
+  "08.6": "Identifique possível eisegese na interpretação de {PASSAGEM}.",
+  "08.7": "Detecte projeções anacrônicas na interpretação de {PASSAGEM}.",
+  "08.8": "Investigue possíveis falácias lexicais na interpretação de {PASSAGEM}.",
+  "08.9": "Verifique se a interpretação de {PASSAGEM} descontextualiza o texto.",
+  "08.10": "Avalie alegorizações artificiais na interpretação de {PASSAGEM}.",
+  "08.11": "Verifique generalizações indevidas na interpretação de {PASSAGEM}.",
+  "08.12": "Avalie a relação AT-NT na interpretação de {PASSAGEM}.",
+  "08.13": "Determine se {PASSAGEM} é descritiva ou prescritiva.",
+  "08.14": "Cruze os controles de erro com os dados dos Módulos 01–07 para {PASSAGEM}.",
+  "08.15": "Classifique o grau de sustentação metodológica da interpretação de {PASSAGEM}.",
+ 
+  "09.1": "Identifique o tema teológico que emerge de {PASSAGEM}.",
+  "09.2": "Posicione {PASSAGEM} no seu bloco canônico.",
+  "09.3": "Situe {PASSAGEM} na narrativa histórico-redentiva.",
+  "09.4": "Analise o desenvolvimento da revelação do tema em {PASSAGEM}.",
+  "09.5": "Mapeie os temas bíblicos relacionados ao tema de {PASSAGEM}.",
+  "09.6": "Analise a relação do tema de {PASSAGEM} com o Antigo Testamento.",
+  "09.7": "Acompanhe o desenvolvimento canônico do tema de {PASSAGEM} no Novo Testamento.",
+  "09.8": "Avalie se há promessa e cumprimento envolvendo {PASSAGEM}.",
+  "09.9": "Identifique alianças relacionadas a {PASSAGEM}.",
+  "09.10": "Avalie a posição de {PASSAGEM} no drama Criação, Queda e Redenção.",
+  "09.11": "Avalie a presença do tema Reino de Deus em {PASSAGEM}.",
+  "09.12": "Demonstre a relação de {PASSAGEM} com Cristo.",
+  "09.13": "Rastreie a dimensão escatológica de {PASSAGEM}.",
+  "09.14": "Apresente a trajetória do tema de {PASSAGEM} na Escritura.",
+  "09.15": "Elabore a síntese teológico-bíblica de {PASSAGEM}.",
+ 
+  "10.1": "Identifique se há material do Antigo Testamento em {PASSAGEM}.",
+  "10.2": "Identifique a citação direta do AT em {PASSAGEM}, com fonte e fórmula introdutória.",
+  "10.3": "Avalie possível alusão ao AT em {PASSAGEM}.",
+  "10.4": "Avalie possíveis ecos textuais ou temáticos do AT em {PASSAGEM}.",
+  "10.5": "Identifique a passagem específica do AT de onde vem a referência em {PASSAGEM}.",
+  "10.6": "Compare a forma hebraica da passagem de origem com {PASSAGEM}.",
+  "10.7": "Compare a passagem de origem com a Septuaginta usada em {PASSAGEM}.",
+  "10.8": "Compare hebraico, LXX e grego do NT para a referência em {PASSAGEM}.",
+  "10.9": "Reconstrua o sentido histórico-literário original da fonte do AT usada em {PASSAGEM}.",
+  "10.10": "Classifique a forma técnica de uso do AT em {PASSAGEM}.",
+  "10.11": "Explique a função teológica local da referência ao AT em {PASSAGEM}.",
+  "10.12": "Analise localmente promessa e cumprimento na referência de {PASSAGEM}.",
+  "10.13": "Avalie a relação cristológica local na referência ao AT em {PASSAGEM}.",
+  "10.14": "Demonstre como a fonte do AT modifica a interpretação de {PASSAGEM}.",
+  "10.15": "Apresente o relatório técnico completo da relação intertextual de {PASSAGEM} com o AT.",
+ 
+  "11.1": "Classifique a relevância doutrinária de {PASSAGEM} para a Teologia Sistemática.",
+  "11.2": "Isole as proposições teológicas explícitas de {PASSAGEM}.",
+  "11.3": "Conecte o dado doutrinário de {PASSAGEM} ao desenvolvimento canônico do Módulo 09.",
+  "11.4": "Correlacione {PASSAGEM} com outras passagens pertinentes ao dado doutrinário.",
+  "11.5": "Mapeie as relações lógicas do dado doutrinário de {PASSAGEM} com doutrinas vizinhas.",
+  "11.6": "Identifique as formulações teológicas historicamente documentadas sobre o tema de {PASSAGEM}.",
+  "11.7": "Compare as formulações teológicas documentadas sobre {PASSAGEM}.",
+  "11.8": "Exponha os pressupostos filosóficos de cada formulação sobre {PASSAGEM}.",
+  "11.9": "Identifique os pontos de convergência entre formulações sobre {PASSAGEM}.",
+  "11.10": "Trace as divergências entre as formulações teológicas sobre {PASSAGEM}.",
+  "11.11": "Avalie qual formulação é mais compatível com os dados exegéticos de {PASSAGEM}.",
+  "11.12": "Delimite o que pode ser legitimamente afirmado a partir de {PASSAGEM} isolada.",
+  "11.13": "Redija a síntese doutrinária proporcional às evidências analisadas sobre {PASSAGEM}.",
+ 
+  "12.1": "Mapeie as interpretações historicamente documentadas para {PASSAGEM}.",
+  "12.2": "Classifique as interpretações de {PASSAGEM} em eixos hermenêuticos claros.",
+  "12.3": "Descreva a argumentação de cada interpretação de {PASSAGEM}.",
+  "12.4": "Identifique os dados textuais invocados por cada interpretação de {PASSAGEM}.",
+  "12.5": "Mapeie o uso da sintaxe e do léxico por cada interpretação de {PASSAGEM}.",
+  "12.6": "Confronte os dados histórico-culturais usados por cada interpretação de {PASSAGEM}.",
+  "12.7": "Identifique as conexões teológicas invocadas por cada interpretação de {PASSAGEM}.",
+  "12.8": "Exponha os pressupostos metodológicos de cada interpretação de {PASSAGEM}.",
+  "12.9": "Rastreie as convergências entre as interpretações de {PASSAGEM}.",
+  "12.10": "Mapeie as zonas de tensão entre as interpretações de {PASSAGEM}.",
+  "12.11": "Classifique o grau de consenso histórico de cada leitura de {PASSAGEM}.",
+  "12.12": "Avalie o grau de sustentação de cada leitura de {PASSAGEM}.",
+  "12.13": "Delimite onde terminam os dados e começam suposições em cada leitura de {PASSAGEM}.",
+  "12.14": "Apresente o relatório transversal da história da recepção interpretativa de {PASSAGEM}."
+};
+ 
+function extractStepCode(stepName) {
+  const match = String(stepName || "").match(/^\d{2}\.\d+/);
+  return match ? match[0] : "";
+}
+ 
+const CANONICAL_REFERENCE_MATRIX = {
+  "01": {
+    name: "TEXTO BÍBLICO",
+    sources: "NA28; SBLGNT; BHS; BHQ; Septuaginta SBL; Textus Receptus/Scrivener como comparação histórica.",
+    rule: "O texto bíblico é a fonte primária; o texto crítico eclético é o texto-base e tradições alternativas são testemunhos comparativos."
+  },
+  "02": {
+    name: "CRÍTICA TEXTUAL",
+    sources: "Bruce Metzger; NA28; BHS/BHQ; SBLGNT; Septuaginta.",
+    rule: "Variantes relevantes devem ser sinalizadas e nunca apresentadas como fatos indiscutíveis."
+  },
+  "03": {
+    name: "GRAMÁTICA E SINTAXE",
+    sources: "Gramáticas gregas do NT; sintaxe grega avançada; gramáticas e sintaxe hebraicas; materiais de análise gramatical.",
+    rule: "Não construir doutrina a partir de palavra isolada; considerar a palavra dentro da construção e do contexto."
+  },
+  "04": {
+    name: "LÉXICO",
+    sources: "BDAG como principal e LSJ como complementar no NT; HALOT como principal e BDB como complementar no AT.",
+    rule: "O contexto determina o sentido; possibilidades semânticas não significam que todos os sentidos foram pretendidos."
+  },
+  "05": {
+    name: "LÉXICO TEOLÓGICO",
+    sources: "TDNT; NIDNTTE; TDOT; NIDOTTE.",
+    rule: "O conceito teológico permanece subordinado ao uso efetivo da palavra no texto estudado."
+  },
+  "06": {
+    name: "EXEGESE",
+    sources: "BECNT; NIGTC; NICNT; Pillar; WBC; NICOT; Baker OT; AOTC.",
+    rule: "Integrar argumento, estrutura, contexto, gênero e intenção comunicativa sem repetir mecanicamente as etapas anteriores."
+  },
+  "07": {
+    name: "CONTEXTO HISTÓRICO-CULTURAL",
+    sources: "Zondervan Encyclopedia of the Bible; IVP Bible Background Commentary; New Bible Dictionary; ANET; COS; Zondervan Atlas; Manners and Customs.",
+    rule: "Não inserir pano de fundo especulativo sem fonte primária ou evidência material/arqueológica."
+  },
+  "08": {
+    name: "HERMENÊUTICA E CONTROLE DE ERROS",
+    sources: "Grant Osborne; D. A. Carson; Carson & Moo; Dillard & Longman; Fee & Stuart.",
+    rule: "Auditar anacronismo, eisegese, falácia lexical, descontextualização, alegorização, generalização e transferência indevida AT–NT."
+  },
+  "09": {
+    name: "TEOLOGIA BÍBLICA",
+    sources: "G. K. Beale; Beale & Carson; Geerhardus Vos; Graeme Goldsworthy; Thomas Schreiner.",
+    rule: "Localizar a passagem na trajetória temática do cânon, distinguindo-a do mecanismo textual específico do ANL-10."
+  },
+  "10": {
+    name: "USO DO AT NO NT",
+    sources: "Beale & Carson; NA28; BHS/BHQ; Septuaginta; BDAG; HALOT; NIDNTTE; NIDOTTE; TDNT; TDOT; comentários exegéticos.",
+    rule: "Detectar citações, alusões, ecos, paralelos, uso da LXX, releituras cristológicas e cumprimento de promessas."
+  },
+  "11": {
+    name: "TEOLOGIA SISTEMÁTICA",
+    sources: "Grudem; Berkhof; Frame; Evangelical Dictionary of Theology.",
+    rule: "Validar doutrinariamente sem determinar primariamente o significado; seguir texto → exegese → teologia bíblica → doutrina → teologia sistemática."
+  },
+  "12": {
+    name: "COMPARAÇÃO DE INTERPRETAÇÕES",
+    sources: "Reconsulta transversal dos ANLs 01–11, conforme as evidências e as interpretações concorrentes identificadas.",
+    rule: "Preservar o debate acadêmico, localizar argumentos, pressupostos e grau de consenso, distinguindo fato textual de interpretação."
+  }
+};
+ 
+ 
+function getCanonicalModuleCode() {
+  const candidate = String(activeStep || activeModule || "");
+  const match = candidate.match(/^\s*(\d{2})/);
+  return match ? match[1] : "";
+}
+ 
+ 
+function getCanonicalGuidance() {
+  const code = getCanonicalModuleCode();
+  return CANONICAL_REFERENCE_MATRIX[code] || {
+    name: "MATRIZ CANÔNICA",
+    sources: "Selecione uma subetapa para receber a sugestão de fontes prioritárias.",
+    rule: "A conclusão deve ser proporcional às evidências e nenhuma fonte ou localização deve ser inventada."
+  };
+}
+ 
+ 
+function renderCanonicalGuidance() {
+  const guidance = getCanonicalGuidance();
+  const prefix = activeStep ? `Para ${activeStep}: ` : "Sugestão do Worker: ";
+  comparisonGuidance.textContent =
+    prefix + "priorizar " + guidance.sources + " Regra: " + guidance.rule;
+}
+ 
+let activeModule = "";
+let activeStep = "";
+let awaitingReference = false;
+let reviewOrigin = "platform_pergunta_livre";
+let externalReviewTopic = "";
+let externalReviewContext = "";
+ 
+ 
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+ 
+const authStatus =
+  document.getElementById("auth-status");
+ 
+const authTitle =
+  document.getElementById("auth-title");
+ 
+const authMessage =
+  document.getElementById("auth-message");
+ 
+const messages =
+  document.getElementById("messages");
+ 
+const questionInput =
+  document.getElementById("question");
+ 
+const sendButton =
+  document.getElementById("send-button");
+ 
+const researchReadyInput =
+  document.getElementById("research-ready");
+ 
+const writerContentInput =
+  document.getElementById("writer-content");
+ 
+const comparisonReport =
+  document.getElementById("comparison-report");
+ 
+const compareButton =
+  document.getElementById("compare-button");
+ 
+const comparisonGuidance =
+  document.getElementById("comparison-guidance");
+ 
+ 
+/* =====================================================
+   AUTENTICAÇÃO
+===================================================== */
+ async function protectPage() {
+  try {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data?.session) {
+      currentUserPlan = await getUserPlan(data.session);
+    }
+  } catch (error) {
+    console.error("Erro ao verificar sessão (não bloqueante):", error);
+  }
+  updatePlanBadge();
+  updateUpgradeButton();
+  renderModules();
+}
+async function getAuthenticatedSession() {
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data?.session) {
+    throw new Error("Sessão não encontrada. Faça login novamente na Sala do Escritor.");
+  }
+  return data.session;
+}
+ 
+ 
+/* =====================================================
+   RENDERIZAÇÃO DOS MÓDULOS
+===================================================== */
+ 
+function renderModules() {
+ 
+  const root =
+    document.getElementById("module-list");
+ 
+  root.innerHTML = "";
+ 
+  PRO_MODULE_DATA.forEach(module => {
+ 
+    const box =
+      document.createElement("div");
+ 
+    box.className =
+      "module";
+ 
+ 
+    const button =
+      document.createElement("button");
+ 
+    button.type =
+      "button";
+ 
+    button.textContent =
+      module.name;
+ 
+    button.onclick =
+      () => selectModule(
+        module.name,
+        box
+      );
+ 
+    box.appendChild(button);
+ 
+ 
+    const steps =
+      document.createElement("div");
+ 
+    steps.className =
+      "steps";
+ 
+ 
+    module.items.forEach(stepName => {
+ 
+      const code =
+        extractStepCode(stepName);
+ 
+      const level =
+        getStepLevel(code);
+ 
+      const allowed =
+        stepIsAllowed(code, currentUserPlan);
+ 
+      const step =
+        document.createElement("button");
+ 
+      step.type =
+        "button";
+ 
+      step.className =
+        "step" + (allowed ? "" : " locked");
+ 
+      step.dataset.code = code;
+ 
+      const label =
+        document.createElement("span");
+ 
+      label.className =
+        "step-label";
+ 
+      label.textContent =
+        stepName;
+ 
+      const levelTag =
+        document.createElement("span");
+ 
+      levelTag.className =
+        "step-level";
+ 
+      levelTag.dataset.level = level;
+ 
+      levelTag.textContent = level;
+ 
+      step.appendChild(label);
+      step.appendChild(levelTag);
+ 
+      step.onclick =
+        event => {
+ 
+          event.stopPropagation();
+ 
+          selectStep(
+            module.name,
+            stepName,
+            step
+          );
+ 
+        };
+ 
+      steps.appendChild(step);
+ 
+    });
+ 
+ 
+    box.appendChild(steps);
+ 
+    root.appendChild(box);
+ 
+  });
+}
+ 
+ 
+/* =====================================================
+   SELEÇÃO DE MÓDULO
+===================================================== */
+ 
+function selectModule(
+  name,
+  element
+) {
+ 
+  activeModule =
+    name;
+ 
+  activeStep =
+    "";
+ 
+ 
+  document
+    .querySelectorAll(".module")
+    .forEach(item =>
+      item.classList.remove("active")
+    );
+ 
+  element.classList.add("active");
+ 
+ 
+  document
+    .querySelectorAll(".step")
+    .forEach(item =>
+      item.classList.remove("active")
+    );
+ 
+ 
+  document
+    .getElementById("workspace-head")
+    .querySelector("h2")
+    .textContent =
+      name;
+
+
+  document
+    .getElementById("sheet-title")
+    .textContent =
+      "REVISOR TEOLÓGICO";
+
+  const moduleContext = document.getElementById("workspace-context");
+  if (moduleContext) {
+    moduleContext.textContent = name + " • selecione uma subetapa";
+  }
+ 
+ 
+  document
+    .getElementById("sheet-meta")
+    .textContent =
+      "Selecione uma subetapa do módulo para comparar a referência de comparação com o conteúdo do escritor.";
+ 
+  renderCanonicalGuidance();
+  updateUpgradeButton();
+ 
+ 
+  messages.innerHTML =
+    '<div class="message system">' +
+    'Módulo selecionado. Escolha uma subetapa para organizar a pesquisa.' +
+    '</div>';
+}
+ 
+ 
+/* =====================================================
+   SELEÇÃO DE SUBETAPA
+===================================================== */
+ 
+function selectStep(
+  module,
+  stepName,
+  element
+) {
+ 
+  const code =
+    extractStepCode(stepName);
+ 
+  const level =
+    getStepLevel(code);
+ 
+  const allowed =
+    stepIsAllowed(code, currentUserPlan);
+ 
+ 
+  activeModule =
+    module;
+ 
+  activeStep =
+    stepName;
+ 
+ 
+  document
+    .querySelectorAll(".step")
+    .forEach(item =>
+      item.classList.remove("active")
+    );
+ 
+  element.classList.add("active");
+ 
+ 
+  document
+    .getElementById("workspace-head")
+    .querySelector("h2")
+    .textContent =
+      module;
+
+
+  document
+    .getElementById("sheet-title")
+    .textContent =
+      "REVISOR TEOLÓGICO";
+
+  const stepContext = document.getElementById("workspace-context");
+  if (stepContext) {
+    stepContext.textContent = module + " • " + stepName;
+  }
+ 
+ 
+  renderCanonicalGuidance();
+  updateUpgradeButton();
+ 
+  if (!allowed) {
+ 
+    document
+      .getElementById("sheet-meta")
+      .textContent =
+        "Subetapa: " + stepName + ". Este item requer o plano " + level + ".";
+ 
+    loadResearchReady();
+    loadWriterContent();
+    loadComparisonReport();
+ 
+    messages.innerHTML =
+      '<div class="message system locked-notice">' +
+      'A subetapa "' + stepName + '" requer o plano ' + level +
+      '. Faça upgrade para liberar esta análise.' +
+      '<br><br>' +
+      '<a href="' + getCheckoutLink(level) + '" target="_blank" ' +
+      'style="display:inline-block;padding:8px 14px;background:#20d66b;' +
+      'color:#07151f;border-radius:6px;text-decoration:none;' +
+      'font-weight:900;font-size:11px;">ASSINAR ' + level + '</a>' +
+      '</div>';
+ 
+    questionInput.value = "";
+    questionInput.placeholder = "Disponível a partir do plano " + level + ".";
+    awaitingReference = false;
+ 
+    return;
+  }
+ 
+ 
+  document
+    .getElementById("sheet-meta")
+    .textContent =
+      "Subetapa: " + stepName + ". Compare a pesquisa pronta com o conteúdo do escritor e gere o relatório de auditoria.";
+ 
+ 
+  loadResearchReady();
+  loadWriterContent();
+  loadComparisonReport();
+ 
+  const hadPreviousConversation = loadMessages();
+ 
+  prepareQuestionForStep(hadPreviousConversation);
+}
+ 
+ 
+/* =====================================================
+   ANÁLISE DE COMPARAÇÃO — PERSISTÊNCIA
+===================================================== */
+ 
+function comparisonKey(prefix) {
+  return (
+    "palavraSerieMatrizProComparacao:" +
+    prefix +
+    ":" +
+    activeModule +
+    ":" +
+    activeStep
+  );
+}
+ 
+ 
+function loadResearchReady() {
+  researchReadyInput.value = activeStep
+    ? localStorage.getItem(comparisonKey("pesquisa-pronta")) || ""
+    : "";
+}
+ 
+ 
+function persistResearchReady() {
+  if (!activeStep) {
+    return;
+  }
+ 
+  localStorage.setItem(
+    comparisonKey("pesquisa-pronta"),
+    researchReadyInput.value
+  );
+}
+ 
+ 
+function loadWriterContent() {
+  writerContentInput.value = activeStep
+    ? localStorage.getItem(comparisonKey("conteudo-escritor")) || ""
+    : "";
+}
+ 
+ 
+function persistWriterContent() {
+  if (!activeStep) {
+    return;
+  }
+ 
+  localStorage.setItem(
+    comparisonKey("conteudo-escritor"),
+    writerContentInput.value
+  );
+}
+ 
+ 
+function loadComparisonReport() {
+  const savedReport = activeStep
+    ? localStorage.getItem(comparisonKey("relatorio"))
+    : "";
+ 
+  comparisonReport.textContent = savedReport ||
+    "O relatório de auditoria aparecerá aqui depois da comparação.";
+  comparisonReport.classList.remove("pending");
+}
+ 
+ 
+function persistComparisonReport() {
+  if (!activeStep) {
+    return;
+  }
+ 
+  localStorage.setItem(
+    comparisonKey("relatorio"),
+    comparisonReport.textContent
+  );
+}
+ 
+ 
+/* =====================================================
+   CONVERSA — PERSISTÊNCIA
+   Guarda a conversa com a IA por módulo/etapa, para que
+   sair da página (ex.: copiar uma passagem bíblica noutra
+   aba) e voltar não apague a pesquisa em curso.
+===================================================== */
+ 
+function messagesKey() {
+ 
+  return (
+    "palavraSerieMatrizProChat:" +
+    activeModule +
+    ":" +
+    activeStep
+  );
+}
+ 
+ 
+function questionDraftKey() {
+ 
+  return (
+    "palavraSerieMatrizProRascunho:" +
+    activeModule +
+    ":" +
+    activeStep
+  );
+}
+ 
+ 
+function persistMessages() {
+ 
+  if (!activeStep) {
+    return;
+  }
+ 
+  localStorage.setItem(
+    messagesKey(),
+    messages.innerHTML
+  );
+}
+ 
+ 
+function loadMessages() {
+ 
+  if (!activeStep) {
+    messages.innerHTML = "";
+    return false;
+  }
+ 
+ 
+  const saved =
+    localStorage.getItem(
+      messagesKey()
+    );
+ 
+  if (saved) {
+    messages.innerHTML = saved;
+    return true;
+  }
+ 
+  messages.innerHTML = "";
+  return false;
+}
+ 
+ 
+function persistQuestionDraft() {
+ 
+  if (!activeStep) {
+    return;
+  }
+ 
+  localStorage.setItem(
+    questionDraftKey(),
+    questionInput.value
+  );
+}
+
+
+/* =====================================================
+   MESA → REVISOR TEOLÓGICO
+   Transfere a pesquisa exibida na conversa sem alterar
+   o motor de análise ou o payload do Worker.
+===================================================== */
+
+function getConversationForReview() {
+  return Array.from(messages.querySelectorAll(".message"))
+    .map(message => {
+      const role = message.classList.contains("user")
+        ? "PESQUISADOR"
+        : "MESA DE ANÁLISE PRO";
+      return role + ":\n" + message.textContent.trim();
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+
+function openReviewerAccess() {
+  const modal = document.getElementById("review-access-modal");
+  const upgrade = document.getElementById("review-upgrade-button");
+  if (upgrade) {
+    upgrade.href = getCheckoutLink("MASTER");
+  }
+  if (modal) {
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+  }
+}
+
+
+function closeReviewerAccess(event) {
+  if (event && event.target !== event.currentTarget) {
+    return;
+  }
+  const modal = document.getElementById("review-access-modal");
+  if (modal) {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  }
+}
+
+
+function reviewerAccessIsIncluded() {
+  return (LEVEL_RANK[currentUserPlan] ?? 0) >= LEVEL_RANK.MASTER;
+}
+
+
+function startExternalReview() {
+  const topic = document.getElementById("external-review-topic")?.value.trim() || "";
+  const context = document.getElementById("external-review-context")?.value.trim() || "";
+  const writer = writerContentInput.value.trim();
+
+  if (!writer) {
+    comparisonReport.textContent = "Cole primeiro o conteúdo externo no campo CONTEÚDO DO ESCRITOR.";
+    comparisonReport.classList.remove("pending");
+    return;
+  }
+
+  if (!topic) {
+    comparisonReport.textContent = "Informe o tema ou assunto do conteúdo externo antes de iniciar a revisão.";
+    comparisonReport.classList.remove("pending");
+    return;
+  }
+
+  reviewOrigin = "external_unit";
+  externalReviewTopic = topic;
+  externalReviewContext = context;
+  runComparisonConsolidation();
+}
+
+
+function sendToTheologicalReviewer() {
+  reviewOrigin = "platform_mesa";
+  externalReviewTopic = "";
+  externalReviewContext = "";
+
+  if (!reviewerAccessIsIncluded()) {
+    openReviewerAccess();
+    return;
+  }
+
+  if (!activeModule && !activeStep) {
+    alert("Selecione um módulo e uma subetapa antes de enviar para revisão.");
+    return;
+  }
+
+  const conversation = getConversationForReview();
+  const question = questionInput.value.trim();
+  const reference = getSavedReference();
+  const context = document.getElementById("workspace-context")?.textContent || "";
+
+  if (!conversation && !question) {
+    alert("Faça uma pergunta na Mesa de Análise antes de enviar para revisão.");
+    return;
+  }
+
+  const reviewPackage = [
+    "CONTEÚDO ENCAMINHADO PELA MESA DE ANÁLISE PRO",
+    "",
+    "MÓDULO: " + (activeModule || "não informado"),
+    "SUBETAPA: " + (activeStep || "não informada"),
+    "ASSUNTO/TEMA: " + (reference || activeStep || "não informado"),
+    "CONTEXTO: " + (context || "não informado"),
+    "ORIGEM: Mesa de Análise Pro — Pergunta Livre",
+    "",
+    "HISTÓRICO DA PESQUISA:",
+    conversation || "Pergunta em elaboração: " + question
+  ].join("\n");
+
+  writerContentInput.value = reviewPackage;
+  persistWriterContent();
+
+  document.querySelector(".sheet")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  writerContentInput.focus();
+}
+ 
+ 
+/* =====================================================
+   REFERÊNCIA (PASSAGEM/TEMA) — GLOBAL
+   Guarda a passagem ou tema informado pelo usuário, para
+   montar automaticamente a pergunta de cada subetapa sem
+   pedir a referência de novo a cada clique.
+===================================================== */
+ 
+function globalReferenceKey() {
+  return "palavraSerieMatrizProReferenciaAtual";
+}
+ 
+ 
+function getSavedReference() {
+  return localStorage.getItem(globalReferenceKey()) || "";
+}
+ 
+ 
+function saveReference(value) {
+  localStorage.setItem(globalReferenceKey(), value);
+}
+ 
+ 
+function clearConversation() {
+ 
+  if (!activeStep) {
+    messages.innerHTML = "";
+    return;
+  }
+ 
+  localStorage.removeItem(messagesKey());
+  messages.innerHTML = "";
+  messages.scrollTop = messages.scrollHeight;
+  prepareQuestionForStep(true);
+}
+ 
+ 
+function appendSystemMessage(text) {
+ 
+  const el =
+    document.createElement("div");
+ 
+  el.className =
+    "message system";
+ 
+  el.textContent =
+    text;
+ 
+  messages.appendChild(el);
+ 
+  messages.scrollTop =
+    messages.scrollHeight;
+ 
+  persistMessages();
+}
+ 
+ 
+function appendLockedMessage(text, level) {
+  const el = document.createElement("div");
+  el.className = "message system locked-notice";
+  el.innerHTML = text + '<br><br>' +
+    '<a href="' + getCheckoutLink(level) + '" target="_blank" ' +
+    'style="display:inline-block;padding:8px 14px;background:#20d66b;' +
+    'color:#07151f;border-radius:6px;text-decoration:none;' +
+    'font-weight:900;font-size:11px;">ASSINAR ' + level + '</a>';
+  messages.appendChild(el);
+  messages.scrollTop = messages.scrollHeight;
+  persistMessages();
+}
+
+
+function resetReference() {
+ 
+  localStorage.removeItem(
+    globalReferenceKey()
+  );
+ 
+  clearConversation();
+  prepareQuestionForStep(true);
+}
+ 
+ 
+function prepareQuestionForStep(skipIntroMessage) {
+ 
+  awaitingReference = false;
+ 
+  if (!activeStep) {
+    questionInput.value = "";
+    return;
+  }
+ 
+  const savedDraft =
+    localStorage.getItem(
+      questionDraftKey()
+    );
+ 
+  if (savedDraft) {
+    questionInput.value = savedDraft;
+    return;
+  }
+ 
+  const code = extractStepCode(activeStep);
+  const config = M01_INPUT_CONFIG[code];
+  const reference = getSavedReference();
+  const template = objetivosDasSubetapas[code];
+ 
+  questionInput.placeholder = config
+    ? config.prompt
+    : "Escreva sua pergunta...";
+ 
+  if (config && !reference) {
+    questionInput.value = "";
+    awaitingReference = true;
+ 
+    if (!skipIntroMessage) {
+      appendSystemMessage(
+        config.prompt
+      );
+    }
+    return;
+  }
+ 
+  if (template && reference) {
+    questionInput.value = template
+      .replace(/\{PASSAGEM\}/g, reference)
+      .replace(/\{OBJETO\}/g, reference)
+      .replace(/\{LIVRO\}/g, reference)
+      .replace(/\{PALAVRA\}/g, reference)
+      .replace(/\{REFERENCIA\}/g, reference);
+    return;
+  }
+ 
+  questionInput.value = "";
+ 
+  if (!skipIntroMessage) {
+    appendSystemMessage(
+      "A subetapa \"" + activeStep + "\" está pronta. " +
+      "Informe o dado necessário ou escreva sua pergunta."
+    );
+  }
+}
+ 
+ 
+/* =====================================================
+   COMPARAÇÃO E CONSOLIDAÇÃO AO WORKER
+===================================================== */
+ 
+function comparisonPrompt(referenceText, writerContent, guidance) {
+  const comparisonReference = referenceText || "Nenhuma referência foi colada. Use a sugestão canônica abaixo e selecione as fontes reconhecidas adequadas ao módulo e à subetapa.";
+ 
+  return `
+ANÁLISE DE COMPARAÇÃO E CONSOLIDAÇÃO
+ 
+REFERÊNCIA DE COMPARAÇÃO FORNECIDA PELO USUÁRIO:
+---
+${comparisonReference}
+---
+ 
+SUGESTÃO DA MATRIZ CANÔNICA DO WORKER:
+MÓDULO: ${guidance.name}
+FONTES PRIORITÁRIAS: ${guidance.sources}
+REGRA METODOLÓGICA: ${guidance.rule}
+ 
+CONTEÚDO DO ESCRITOR — TEXTO A SER AUDITADO:
+---
+${writerContent}
+---
+ 
+OBJETIVO:
+Compare o conteúdo do escritor com a referência de comparação. Quando a referência estiver vazia, selecione e priorize as fontes indicadas pela matriz canônica do Worker para o módulo e a subetapa atuais.
+ 
+PROCEDIMENTO OBRIGATÓRIO:
+1. Identifique cada afirmação verificável do conteúdo do escritor.
+2. Compare cada afirmação com a referência fornecida ou, quando ela estiver vazia, com as fontes canônicas prioritárias sugeridas acima.
+3. Classifique cada afirmação com exatamente uma destas categorias: CONCORDÂNCIA, DIVERGÊNCIA, SUPORTE PARCIAL ou EVIDÊNCIA INSUFICIENTE.
+4. Explique o motivo da classificação, distinguindo o que está explicitamente documentado de qualquer inferência.
+5. Registre a fonte, o autor e a localização que fundamentam a classificação. Use página, capítulo, seção, verbete, referência bíblica, parágrafo ou outro local verificável.
+6. Não invente fontes, autores, páginas, citações ou localizações. Quando a localização não estiver disponível, escreva "localização não confirmada".
+7. O texto bíblico é a fonte primária quando o tema for textual; comentários e teologias não podem substituir o texto. Respeite também a regra metodológica específica da matriz canônica.
+8. Quando houver divergência entre intérpretes, preserve as interpretações concorrentes, localize seus argumentos e pressupostos e apresente uma conclusão proporcional às evidências.
+9. Se não houver base suficiente, classifique como EVIDÊNCIA INSUFICIENTE; ausência de evidência localizada não deve ser apresentada automaticamente como refutação.
+10. Finalize com uma síntese consolidada, principais divergências, lacunas de evidência e limitações da auditoria.
+ 
+FORMATO PREFERENCIAL:
+RELATÓRIO DE AUDITORIA
+ 
+Para cada afirmação: número, afirmação, classificação, comparação, fonte, autor, localização e justificativa.
+`;
+}
+ 
+ 
+function formatAuditItem(item, index) {
+  const statement = item?.statement || item?.claim || item?.afirmacao || item?.text || "Afirmação não identificada";
+  const classification = item?.classification || item?.classificacao || item?.status || "EVIDÊNCIA INSUFICIENTE";
+  const comparison = item?.comparison || item?.comparacao || item?.analysis || item?.analise || "Comparação não informada.";
+  const source = item?.source || item?.fonte || item?.work || item?.obra || "Fonte não informada";
+  const author = item?.author || item?.autor || "Autor não informado";
+  const location = item?.location || item?.localizacao || item?.reference || "localização não confirmada";
+  const basis = item?.basis || item?.fundamentacao || item?.justification || item?.justificativa || "Justificativa não informada.";
+ 
+  return `${index + 1}. AFIRMAÇÃO\n${statement}\n\nCLASSIFICAÇÃO: ${classification}\nCOMPARAÇÃO: ${comparison}\nFONTE: ${source}\nAUTOR: ${author}\nLOCALIZAÇÃO: ${location}\nJUSTIFICATIVA: ${basis}`;
+}
+ 
+ 
+function formatComparisonError(error, data) {
+  const raw = String(error?.message || data?.error || "Não foi possível realizar a auditoria.");
+  const normalized = raw.toLowerCase();
+  const quota = normalized.includes("limite de requisições") ||
+    normalized.includes("limite de créditos") ||
+    normalized.includes("quota") ||
+    normalized.includes("rate limit") ||
+    normalized.includes("resource exhausted") ||
+    normalized.includes("429");
+ 
+  if (quota) {
+    return "RELATÓRIO DE AUDITORIA\n\n" +
+      "A análise não foi concluída porque o serviço de IA atingiu o limite de requisições ou créditos.\n\n" +
+      "O conteúdo do escritor e a referência permanecem salvos nesta sessão. Tente novamente mais tarde ou verifique a cota do projeto de IA.\n\n" +
+      "Detalhe técnico: " + raw;
+  }
+ 
+  return "RELATÓRIO DE AUDITORIA\n\nA análise não foi concluída.\n\n" + raw;
+}
+ 
+function extractAuditReport(data) {
+  const candidates = [
+    data?.claims,
+    data?.afirmacoes,
+    data?.items,
+    data?.report?.claims,
+    data?.report?.items,
+    data?.audit?.claims,
+    data?.audit?.items
+  ];
+ 
+  const items = candidates.find(Array.isArray);
+ 
+  if (items) {
+    const summary = data?.summary || data?.synthesis || data?.sintese || "RELATÓRIO DE AUDITORIA";
+    return `${summary}\n\n${items.map(formatAuditItem).join("\n\n────────────────────────\n\n")}`;
+  }
+ 
+  if (typeof data?.report === "string") {
+    return data.report;
+  }
+ 
+  if (typeof data?.auditReport === "string") {
+    return data.auditReport;
+  }
+ 
+  return data?.text || data?.answer || data?.response || data?.result || "A comparação não devolveu conteúdo.";
+}
+ 
+ 
+async function runComparisonConsolidation() {
+  const isExternalReview = reviewOrigin === "external_unit";
+
+  if (!activeStep && !isExternalReview) {
+    comparisonReport.textContent = "Selecione uma subetapa antes de iniciar a comparação e consolidação.";
+    persistComparisonReport();
+    return;
+  }
+
+  const stepCode = isExternalReview ? "" : extractStepCode(activeStep);
+
+  if (!isExternalReview && !stepIsAllowed(stepCode, currentUserPlan)) {
+    comparisonReport.innerHTML = "Esta subetapa requer o plano " + getStepLevel(stepCode) +
+      ". Faça upgrade para liberar a comparação e consolidação.<br><br>" +
+      '<a href="' + getCheckoutLink(getStepLevel(stepCode)) + '" target="_blank" ' +
+      'style="display:inline-block;padding:8px 14px;background:#18bfff;' +
+      'color:#061522;border-radius:6px;text-decoration:none;' +
+      'font-weight:900;font-size:11px;">ASSINAR ' + getStepLevel(stepCode) + '</a>';
+    comparisonReport.classList.remove("pending");
+    persistComparisonReport();
+    return;
+  }
+ 
+  const referenceText = researchReadyInput.value.trim();
+  const writerContent = writerContentInput.value.trim();
+  const guidance = getCanonicalGuidance();
+ 
+  if (!writerContent) {
+    comparisonReport.textContent = "Cole o conteúdo do escritor. A referência de comparação pode ser preenchida ou deixada vazia para a sugestão automática do Worker.";
+    comparisonReport.classList.remove("pending");
+    persistComparisonReport();
+    return;
+  }
+ 
+  persistResearchReady();
+  persistWriterContent();
+ 
+  comparisonReport.classList.add("pending");
+  comparisonReport.textContent = "COMPARAÇÃO E CONSOLIDAÇÃO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
+  persistComparisonReport();
+ 
+  compareButton.disabled = true;
+  compareButton.textContent = "COMPARANDO...";
+ 
+  try {
+    const session = await getAuthenticatedSession();
+ 
+    if (!session.access_token) {
+      throw new Error("O Supabase não forneceu um token de acesso.");
+    }
+ 
+    const response = await fetch(
+      AI_PROXY_URL + "/api/pesquisa",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + session.access_token
+        },
+        body: JSON.stringify({
+          mode: "writing_private",
+          accessLevel: "private",
+          analysisType: "comparison_consolidation",
+          origin: reviewOrigin,
+          stepCode: isExternalReview ? "" : stepCode,
+          requiredLevel: isExternalReview ? "UNIT" : getStepLevel(stepCode),
+          referenceText,
+          writerContent,
+          canonicalGuidance: {
+            module: guidance.name,
+            sources: guidance.sources,
+            rule: guidance.rule
+          },
+          question: comparisonPrompt(referenceText, writerContent, guidance),
+          topic: isExternalReview ? externalReviewTopic : activeStep,
+          module: isExternalReview ? externalReviewContext : activeModule,
+          externalTopic: isExternalReview ? externalReviewTopic : "",
+          externalContext: isExternalReview ? externalReviewContext : "",
+          discipline: "MÉTODO TÉCNICO DE PESQUISA"
+        })
+      }
+    );
+ 
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+ 
+    if (response.status === 401) {
+      await supabaseClient.auth.signOut();
+      throw new Error("Sua sessão expirou. Entre novamente na Sala do Escritor.");
+    }
+ 
+    if (response.status === 403) {
+      throw new Error(data?.error || "Este item requer um plano superior ao seu plano atual.");
+    }
+
+    if (response.status === 402) {
+      throw new Error(data?.error || "Você não tem unidades disponíveis. Compre um pacote para continuar.");
+    }
+ 
+    if (!response.ok) {
+      throw new Error(data?.error || "O Worker não conseguiu concluir a comparação e consolidação.");
+    }
+ 
+    comparisonReport.classList.remove("pending");
+    comparisonReport.textContent = extractAuditReport(data);
+  } catch (error) {
+    console.error("Erro na comparação e consolidação:", error);
+    comparisonReport.classList.remove("pending");
+    comparisonReport.textContent = formatComparisonError(error, { error: error?.message });
+  } finally {
+    compareButton.disabled = false;
+    compareButton.textContent = "COMPARAR E CONSOLIDAR";
+    persistComparisonReport();
+  }
+}
+ 
+ 
+/* =====================================================
+   CONSULTA AO WORKER
+===================================================== */
+ 
+async function sendQuestion(event) {
+ 
+  event.preventDefault();
+ 
+  const text =
+    questionInput.value.trim();
+ 
+  if (!text) {
+    return false;
+  }
+ 
+  const stepCode =
+    extractStepCode(activeStep);
+ 
+  if (activeStep && !stepIsAllowed(stepCode, currentUserPlan)) {
+ 
+    appendLockedMessage(
+      "A subetapa \"" + activeStep + "\" requer o plano " +
+      getStepLevel(stepCode) +
+      ". Faça upgrade para continuar.",
+      getStepLevel(stepCode)
+    );
+ 
+    return false;
+  }
+ 
+ 
+  let questionForApi =
+    text;
+ 
+  if (awaitingReference) {
+ 
+    saveReference(text);
+ 
+    const code =
+      extractStepCode(activeStep);
+ 
+    const template =
+      objetivosDasSubetapas[code];
+ 
+    questionForApi =
+      template
+        ? template
+            .replace(/\{PASSAGEM\}/g, text)
+            .replace(/\{OBJETO\}/g, text)
+            .replace(/\{LIVRO\}/g, text)
+            .replace(/\{PALAVRA\}/g, text)
+            .replace(/\{REFERENCIA\}/g, text)
+        : `Analise "${activeStep}" para: ${text}`;
+ 
+    awaitingReference =
+      false;
+  }
+ 
+ 
+  const userMessage =
+    document.createElement("div");
+ 
+  userMessage.className =
+    "message user";
+ 
+  userMessage.textContent =
+    text;
+ 
+  messages.appendChild(
+    userMessage
+  );
+ 
+  if (questionForApi !== text) {
+ 
+    const confirmMessage =
+      document.createElement("div");
+ 
+    confirmMessage.className =
+      "message system";
+ 
+    confirmMessage.textContent =
+      "Entendido. Perguntando: " +
+      questionForApi;
+ 
+    messages.appendChild(
+      confirmMessage
+    );
+  }
+ 
+  persistMessages();
+ 
+ 
+  const answerMessage =
+    document.createElement("div");
+ 
+  answerMessage.className =
+    "message system";
+ 
+  answerMessage.textContent =
+    "Verificando sua sessão...";
+ 
+  messages.appendChild(
+    answerMessage
+  );
+ 
+ 
+  questionInput.value = "";
+ 
+  localStorage.removeItem(
+    questionDraftKey()
+  );
+ 
+  sendButton.disabled =
+    true;
+ 
+  sendButton.textContent =
+    "PROCESSANDO...";
+ 
+ 
+  try {
+ 
+    /* ---------------------------------------------
+       1. RECUPERA A SESSÃO ATUAL
+    --------------------------------------------- */
+ 
+    const session =
+      await getAuthenticatedSession();
+ 
+ 
+    /* ---------------------------------------------
+       2. CONFIRMA O TOKEN
+    --------------------------------------------- */
+ 
+    if (!session.access_token) {
+      throw new Error(
+        "O Supabase não forneceu um token de acesso."
+      );
+    }
+ 
+ 
+    answerMessage.textContent =
+      "Consultando a Mesa de Análise PRO...";
+ 
+ 
+    /* ---------------------------------------------
+       3. ENVIA A PERGUNTA AO WORKER
+    --------------------------------------------- */
+ 
+    const response =
+      await fetch(
+        AI_PROXY_URL +
+        "/api/pesquisa",
+        {
+          method:"POST",
+ 
+          headers:{
+            "Content-Type":
+              "application/json",
+ 
+            "Authorization":
+              "Bearer " +
+              session.access_token
+          },
+ 
+          body:JSON.stringify({
+ 
+            /*
+             * O Worker transforma esse modo
+             * em writing_private.
+             */
+            mode:
+              "writing_private",
+ 
+            /*
+             * A Sala do Escritor é privada.
+             */
+            accessLevel:
+              "private",
+ 
+            question:
+              questionForApi,
+ 
+            topic:
+              activeStep ||
+              "CONSULTA LIVRE",
+ 
+            module:
+              activeModule ||
+              "",
+ 
+            stepCode:
+              stepCode || "",
+ 
+            requiredLevel:
+              stepCode ? getStepLevel(stepCode) : "FREE",
+ 
+            discipline:
+              "MÉTODO TÉCNICO DE PESQUISA"
+ 
+          })
+        }
+      );
+ 
+ 
+    /* ---------------------------------------------
+       4. TENTA LER O JSON
+    --------------------------------------------- */
+ 
+    let data = {};
+ 
+    try {
+      data =
+        await response.json();
+    } catch {
+      data = {};
+    }
+ 
+ 
+    /* ---------------------------------------------
+       5. SESSÃO INVÁLIDA
+    --------------------------------------------- */
+ 
+    if (response.status === 401) {
+ 
+      await supabaseClient.auth.signOut();
+ 
+      throw new Error(
+        "Sua sessão expirou. Entre novamente na Sala do Escritor."
+      );
+    }
+ 
+ 
+    /* ---------------------------------------------
+       6. ACESSO NEGADO PELO PLANO (VALIDAÇÃO NO SERVIDOR)
+    --------------------------------------------- */
+ 
+    if (response.status === 403) {
+ 
+      throw new Error(
+        data?.error ||
+        "Este item requer um plano superior ao seu plano atual."
+      );
+    }
+ 
+ 
+    /* ---------------------------------------------
+       7. OUTROS ERROS
+    --------------------------------------------- */
+ 
+    if (!response.ok) {
+ 
+      throw new Error(
+        data?.error ||
+        "O Worker não conseguiu concluir a consulta."
+      );
+    }
+ 
+ 
+    /* ---------------------------------------------
+       8. RESPOSTA DO WORKER
+    --------------------------------------------- */
+ 
+    answerMessage.textContent =
+      data?.text ||
+      data?.answer ||
+      data?.response ||
+      data?.result ||
+      "A consulta não devolveu conteúdo.";
+ 
+ 
+  } catch (error) {
+ 
+    console.error(
+      "Erro na Método Técnico de Pesquisa:",
+      error
+    );
+ 
+ 
+    answerMessage.textContent =
+      error?.message ||
+      "Não foi possível realizar a consulta.";
+ 
+  } finally {
+ 
+    sendButton.disabled =
+      false;
+ 
+    sendButton.textContent =
+      "ENVIAR";
+ 
+    messages.scrollTop =
+      messages.scrollHeight;
+ 
+    persistMessages();
+ 
+    questionInput.focus();
+  }
+ 
+ 
+  return false;
+}
+ 
+ 
+/* =====================================================
+   ALTERAÇÕES DE AUTENTICAÇÃO
+===================================================== */
+ 
+/*
+  A página não exige mais login. Este listener só serve para
+  atualizar o plano exibido (badge) caso uma sessão apareça ou
+  desapareça em segundo plano — nunca bloqueia ou redireciona.
+*/
+supabaseClient.auth.onAuthStateChange(
+  (event) => {
+    if (event === "INITIAL_SESSION" || event === "SIGNED_OUT") {
+      protectPage();
+    }
+  }
+);
+ 
+ 
+/* =====================================================
+   AJUDA — TIPO DE ESTUDO
+===================================================== */
+ 
+function openStudyHelp() {
+  const help = document.getElementById("study-help");
+  if (!help) return;
+  help.classList.add("open");
+  help.setAttribute("aria-hidden", "false");
+}
+ 
+function closeStudyHelp(event) {
+  if (event && event.target !== event.currentTarget) return;
+  const help = document.getElementById("study-help");
+  if (!help) return;
+  help.classList.remove("open");
+  help.setAttribute("aria-hidden", "true");
+}
+ 
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeStudyHelp();
+  if (event.key === "Escape") closeReviewerAccess();
+});
+ 
+/* =====================================================
+   INICIALIZAÇÃO
+===================================================== */
+ 
+updatePlanBadge();
+updateUpgradeButton();
+renderModules();
+</script>
+ 
+<script>
+(function(){
+  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+  var PAGINA = "Método Técnico de Pesquisa";
+
+  function registrarVisita(pais, cidade){
+    try{
+      var vid = localStorage.getItem("ps_visitante_id");
+      if(!vid){
+        vid = (window.crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+        localStorage.setItem("ps_visitante_id", vid);
+      }
+      var payload = { pagina: PAGINA, visitante_id: vid };
+      if(pais) payload.pais = pais;
+      if(cidade) payload.cidade = cidade;
+      fetch(SUPABASE_URL + "/rest/v1/visitas", {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(payload)
+      }).catch(function(){});
+    }catch(e){}
+  }
+  var jaRegistrou = false;
+  function concluir(pais, cidade){
+    if(jaRegistrou) return;
+    jaRegistrou = true;
+    registrarVisita(pais, cidade);
+  }
+  setTimeout(function(){ concluir(null, null); }, 2500);
+  fetch("https://ipapi.co/json/")
+    .then(function(r){ return r.json(); })
+    .then(function(info){ concluir(info && info.country_name, info && info.city); })
+    .catch(function(){ concluir(null, null); });
+})();
+</script>
+</body>
+</html>
+ 
