@@ -2403,11 +2403,11 @@ function persistWriterContent() {
  
  
 function loadComparisonReport() {
-  const savedReport = activeStep
-    ? localStorage.getItem(comparisonKey("relatorio"))
-    : "";
- 
-  comparisonReport.textContent = savedReport ||
+  if (activeStep) {
+    localStorage.removeItem(comparisonKey("relatorio"));
+  }
+
+  comparisonReport.textContent =
     "O relatório de auditoria aparecerá aqui depois da comparação.";
   comparisonReport.classList.remove("pending");
 }
