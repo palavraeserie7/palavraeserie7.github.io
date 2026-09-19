@@ -1,6 +1,14 @@
+
+
+Matriz pro · HTML
 <!doctype html>
 <html lang="pt-BR">
-<head><style>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palavra & Série — Método Técnico de Pesquisa</title>
+ 
+<style>
  html{visibility:hidden}
  #gateManutencao{
    display:none;
@@ -19,6 +27,8 @@
    padding:10px 18px;border-radius:9px;text-decoration:none;font-size:14px;
  }
 </style>
+ 
+<!-- Supabase (carregado uma única vez; usado pelo gate abaixo e pelo script principal) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
@@ -55,15 +65,6 @@
 })();
 </script>
 <!-- ==================================================================== -->
- 
-
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palavra & Série — Método Técnico de Pesquisa</title>
- 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  
 <style>
 :root {
@@ -334,7 +335,7 @@ main {
   font-size:11px;
   line-height:1.5;
 }
-
+ 
 .workspace-context {
   display:inline-flex;
   align-items:center;
@@ -347,7 +348,7 @@ main {
   letter-spacing:.45px;
   text-transform:uppercase;
 }
-
+ 
 .workspace-context::before {
   content:"CONTEXTO";
   padding:3px 6px;
@@ -368,13 +369,13 @@ main {
   padding:16px;
   overflow:auto;
 }
-
+ 
 /* A ordem do DOM é preservada para não afetar IDs/eventos; a ordem visual segue a arquitetura. */
 .content > .chat {
   order:1;
   min-width:0;
 }
-
+ 
 .content > .sheet {
   order:2;
   min-width:0;
@@ -491,7 +492,6 @@ main {
   resize:vertical;
 }
  
-#writer-content,
 #research-ready {
   width:100%;
 }
@@ -542,58 +542,157 @@ main {
   opacity:.55;
   cursor:wait;
 }
-
-.external-review-box {
-  margin: 14px 0 18px;
-  padding: 14px;
-  border: 1px solid rgba(24,191,255,.35);
-  border-radius: 8px;
-  background: rgba(24,191,255,.06);
-}
-
-.external-review-box h4 {
-  margin: 0 0 7px;
-  color: #18bfff;
-  font-size: 12px;
-  letter-spacing: .7px;
-}
-
-.external-review-box p {
-  margin: 0 0 12px;
-  color: #aebbd0;
-  font-size: 11px;
-  line-height: 1.55;
-}
-
-.external-review-box input,
-.external-review-box textarea {
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 7px;
-  padding: 10px;
-  border: 1px solid rgba(148,163,184,.22);
-  border-radius: 6px;
-  background: #0b1729;
-  color: #e7eefb;
-  font: inherit;
-}
-
-.external-review-box textarea { min-height: 70px; resize: vertical; }
-
+ 
 .external-review-button {
-  width: 100%;
-  margin-top: 10px;
-  padding: 11px 14px;
-  border: 1px solid #18bfff;
-  border-radius: 6px;
-  background: rgba(24,191,255,.16);
-  color: #dff7ff;
-  font-weight: 900;
-  letter-spacing: .35px;
-  cursor: pointer;
+  padding:10px 15px;
+  border:1px solid var(--a);
+  border-radius:6px;
+  background:rgba(24,191,255,.16);
+  color:#dff7ff;
+  font-weight:900;
+  letter-spacing:.35px;
+  cursor:pointer;
 }
-
-.external-review-button:hover { background: rgba(24,191,255,.28); }
+ 
+.external-review-button:hover {
+  background:rgba(24,191,255,.28);
+}
+ 
+.external-review-button:disabled {
+  opacity:.55;
+  cursor:wait;
+}
+ 
+/* =====================================================
+   TRILHAS DO REVISOR TEOLÓGICO
+   Mesa de Análise (incluso no MASTER) e Texto Externo
+   (cobrança por unidade). Cada trilha tem seu próprio campo.
+===================================================== */
+ 
+.reviewer-track {
+  margin:0 0 18px;
+  padding:16px;
+  border:1px solid var(--b);
+  border-radius:9px;
+  background:rgba(255,255,255,.015);
+}
+ 
+.reviewer-track--external {
+  border-color:rgba(24,191,255,.35);
+  background:rgba(24,191,255,.05);
+}
+ 
+.reviewer-track-head {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:6px;
+}
+ 
+.reviewer-track-head h4 {
+  margin:0;
+  color:var(--t);
+  font-size:12px;
+  letter-spacing:.6px;
+}
+ 
+.track-tag {
+  padding:3px 8px;
+  border-radius:5px;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+ 
+.track-tag--master {
+  background:rgba(32,214,107,.15);
+  color:var(--p);
+  border:1px solid rgba(32,214,107,.4);
+}
+ 
+.track-tag--unit {
+  background:rgba(24,191,255,.15);
+  color:var(--a);
+  border:1px solid rgba(24,191,255,.4);
+}
+ 
+.reviewer-track p {
+  margin:0 0 12px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.55;
+}
+ 
+.reviewer-track label {
+  display:block;
+  margin:10px 0 4px;
+  color:var(--a);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+ 
+.reviewer-track input,
+.reviewer-track textarea {
+  width:100%;
+  box-sizing:border-box;
+  padding:10px;
+  border:1px solid #344762;
+  border-radius:6px;
+  background:#111b30;
+  color:var(--t);
+  font:inherit;
+  font-size:11px;
+  line-height:1.55;
+  outline:none;
+}
+ 
+.reviewer-track input:focus,
+.reviewer-track textarea:focus {
+  border-color:var(--p);
+}
+ 
+.reviewer-track textarea {
+  flex:none;
+  min-height:100px;
+  margin-top:0;
+  resize:vertical;
+}
+ 
+/* Trilha travada: o campo fica inerte, mas o botão continua clicável
+   para abrir a janela explicando o plano MASTER. */
+.reviewer-track.locked textarea {
+  opacity:.55;
+  pointer-events:none;
+}
+ 
+.reviewer-track.locked .compare-button {
+  opacity:.7;
+}
+ 
+.track-lock {
+  margin-bottom:12px;
+  padding:9px 10px;
+  border-left:2px solid var(--error);
+  border-radius:4px;
+  background:rgba(255,107,107,.08);
+  color:#ffd7d7;
+  font-size:10px;
+  line-height:1.5;
+}
+ 
+.track-lock a {
+  display:inline-block;
+  margin-left:6px;
+  padding:4px 8px;
+  border-radius:5px;
+  background:var(--p);
+  color:#07151f;
+  font-weight:900;
+  font-size:9px;
+  text-decoration:none;
+}
  
 /* =====================================================
    CHAT
@@ -675,7 +774,7 @@ main {
   padding:12px;
   border-top:1px solid var(--b);
 }
-
+ 
 .review-transfer {
   margin:0 12px 12px;
   padding:9px 12px;
@@ -688,7 +787,7 @@ main {
   letter-spacing:.45px;
   cursor:pointer;
 }
-
+ 
 .review-transfer:hover {
   background:rgba(32,214,107,.16);
   border-color:var(--p);
@@ -869,11 +968,11 @@ main {
   font-weight:900;
   cursor:pointer;
 }
-
+ 
 /* =====================================================
    ACESSO AO REVISOR TEOLÓGICO
 ===================================================== */
-
+ 
 #review-access-modal {
   display:none;
   position:fixed;
@@ -884,11 +983,11 @@ main {
   padding:24px;
   background:rgba(4,10,20,.78);
 }
-
+ 
 #review-access-modal.open {
   display:flex;
 }
-
+ 
 .review-access-box {
   width:min(520px,100%);
   padding:28px;
@@ -897,31 +996,31 @@ main {
   background:var(--s);
   box-shadow:0 18px 50px rgba(0,0,0,.4);
 }
-
+ 
 .review-access-box h2 {
   margin:0 0 10px;
   color:var(--p);
   font-size:19px;
 }
-
+ 
 .review-access-box p {
   margin:0 0 12px;
   color:var(--muted);
   font-size:12px;
   line-height:1.65;
 }
-
+ 
 .review-access-box strong {
   color:var(--t);
 }
-
+ 
 .review-access-actions {
   display:flex;
   justify-content:flex-end;
   gap:8px;
   margin-top:20px;
 }
-
+ 
 .review-upgrade-button,
 .review-access-close {
   padding:9px 14px;
@@ -930,14 +1029,14 @@ main {
   font-weight:900;
   cursor:pointer;
 }
-
+ 
 .review-upgrade-button {
   border:1px solid var(--p);
   background:var(--p);
   color:#07151f;
   text-decoration:none;
 }
-
+ 
 .review-access-close {
   border:1px solid var(--b);
   background:transparent;
@@ -954,44 +1053,44 @@ main {
     gap:12px;
     padding:12px;
   }
-
+ 
   .content {
     grid-template-columns:minmax(0, 1fr) minmax(285px, .86fr);
     gap:12px;
     padding:12px;
   }
 }
-
+ 
 @media(max-width:950px) {
   body {
     height:auto;
     min-height:100vh;
     overflow:auto;
   }
-
+ 
   main {
     grid-template-columns:1fr;
   }
-
+ 
   .modules {
     max-height:40vh;
   }
-
+ 
   .content {
     grid-template-columns:1fr;
     overflow:visible;
   }
-
+ 
   .content > .chat,
   .content > .sheet {
     order:initial;
     min-height:560px;
   }
-
+ 
   .content > .chat {
     order:1;
   }
-
+ 
   .content > .sheet {
     order:2;
   }
@@ -1031,7 +1130,7 @@ main {
     <div class="study-help-actions"><button type="button" class="study-help-close" onclick="closeStudyHelp()">FECHAR</button></div>
   </div>
 </section>
-
+ 
 <section id="review-access-modal" aria-hidden="true" onclick="closeReviewerAccess(event)">
   <div class="review-access-box" role="dialog" aria-modal="true" aria-labelledby="review-access-title">
     <h2 id="review-access-title">REVISOR TEOLÓGICO</h2>
@@ -1101,27 +1200,51 @@ main {
         <h3 id="sheet-title">
           REVISOR TEOLÓGICO
         </h3>
-
+ 
         <div class="meta reviewer-subtitle">Análise de comparação e consolidação</div>
-
+ 
         <div id="sheet-meta" class="meta">
-          Compare o conteúdo do escritor com uma referência de comparação e gere um relatório de auditoria.
+          Escolha uma das duas trilhas: auditar a pesquisa da Mesa de Análise (incluso no MASTER) ou revisar um texto externo (1 unidade por revisão).
         </div>
-
-        <div class="external-review-box">
-          <h4>REVISÃO DE CONTEÚDO EXTERNO</h4>
-          <p>Use esta entrada para revisar um texto produzido fora da plataforma. O Revisor aplica a mesma auditoria de comparação e consolidação. Este fluxo não exige MASTER e consome 1 unidade disponível.</p>
+ 
+        <!-- TRILHA 1 — MESA DE ANÁLISE (incluso no MASTER) -->
+        <div class="reviewer-track" id="mesa-review-track">
+          <div class="reviewer-track-head">
+            <h4>REVISÃO DA MESA DE ANÁLISE</h4>
+            <span class="track-tag track-tag--master">INCLUSO NO MASTER</span>
+          </div>
+          <p>Audite a pesquisa gerada nas etapas do Método Técnico. Disponível apenas para o plano MASTER — não consome unidade avulsa.</p>
+          <div id="mesa-track-lock" class="track-lock" style="display:none;">
+            Disponível apenas para assinantes MASTER.
+            <a id="mesa-track-upgrade" href="#" target="_blank" rel="noopener">ASSINAR MASTER</a>
+          </div>
+          <label for="mesa-review-content">CONTEÚDO RECEBIDO DA MESA</label>
+          <textarea id="mesa-review-content" placeholder='Ainda vazio. Clique em "Enviar para revisão teológica" na conversa ao lado.' oninput="persistMesaReviewContent()"></textarea>
+          <div class="comparison-actions">
+            <button id="mesa-review-button" class="compare-button" type="button" onclick="runMesaReview()">AUDITAR PESQUISA DA MESA</button>
+          </div>
+        </div>
+ 
+        <!-- TRILHA 2 — TEXTO EXTERNO (taxa por revisão) -->
+        <div class="reviewer-track reviewer-track--external" id="external-review-track">
+          <div class="reviewer-track-head">
+            <h4>REVISÃO DE TEXTO EXTERNO</h4>
+            <span class="track-tag track-tag--unit">TAXA POR REVISÃO</span>
+          </div>
+          <p>Cole um texto produzido fora da plataforma. Cada revisão consome 1 unidade do pacote avulso — disponível para qualquer plano.</p>
           <label for="external-review-topic">TEMA / ASSUNTO</label>
           <input id="external-review-topic" type="text" placeholder="Informe o tema ou assunto do texto...">
           <label for="external-review-context">SUBETAPA / CONTEXTO METODOLÓGICO (opcional)</label>
           <textarea id="external-review-context" placeholder="Informe a subetapa, módulo ou contexto metodológico, se aplicável..."></textarea>
-          <button id="external-review-button" class="external-review-button" type="button" onclick="startExternalReview()">
-            REVISAR TEXTO EXTERNO — 1 UNIDADE
-          </button>
+          <label for="external-review-content">CONTEÚDO A REVISAR</label>
+          <textarea id="external-review-content" placeholder="Cole aqui o texto produzido fora da plataforma..." oninput="persistExternalReviewContent()"></textarea>
+          <div class="comparison-actions">
+            <button id="external-review-button" class="external-review-button" type="button" onclick="startExternalReview()">REVISAR TEXTO EXTERNO — 1 UNIDADE</button>
+          </div>
         </div>
  
         <div class="comparison-field">
-          <label for="research-ready">REFERÊNCIA DE COMPARAÇÃO</label>
+          <label for="research-ready">REFERÊNCIA DE COMPARAÇÃO (opcional — vale para as duas trilhas)</label>
           <small>Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere e prioriza fontes da matriz canônica conforme a subetapa.</small>
           <div id="comparison-guidance" class="comparison-guidance" role="note"></div>
           <textarea
@@ -1131,29 +1254,8 @@ main {
           ></textarea>
         </div>
  
-        <div class="comparison-field">
-          <label for="writer-content">CONTEÚDO DO ESCRITOR</label>
-          <small>Cole aqui o conteúdo produzido pelo escritor que será auditado.</small>
-          <textarea
-            id="writer-content"
-            placeholder="Cole aqui o conteúdo do escritor..."
-            oninput="persistWriterContent()"
-          ></textarea>
-        </div>
- 
         <div class="comparison-report-label">RELATÓRIO DE AUDITORIA</div>
         <div id="comparison-report" class="comparison-report" role="status" aria-live="polite">O relatório de auditoria aparecerá aqui depois da comparação.</div>
- 
-        <div class="comparison-actions">
-          <button
-            id="compare-button"
-            class="compare-button"
-            type="button"
-            onclick="runComparisonConsolidation()"
-          >
-            COMPARAR E CONSOLIDAR
-          </button>
-        </div>
  
       </section>
  
@@ -1171,7 +1273,7 @@ main {
         </div>
  
         <div id="messages" class="messages"></div>
-
+ 
         <button
           id="send-to-reviewer"
           class="review-transfer"
@@ -1343,19 +1445,19 @@ const MATRIX_LEVELS = {
 };
  
 const LEVEL_RANK = { FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 };
-
+ 
 const CHECKOUT_LINKS = {
   PRO: "https://pay.kiwify.com.br/4m4qdH7",
   MASTER: "https://pay.kiwify.com.br/tqJboGn",
   DOCTUS: "https://kiwify.app/ZHRYMmy"
 };
-
+ 
 const NEXT_TIER = {
   FREE: "PRO",
   PRO: "MASTER",
   MASTER: "DOCTUS"
 };
-
+ 
 function getCheckoutLink(level) {
   return CHECKOUT_LINKS[level] || "#";
 }
@@ -1410,24 +1512,24 @@ function updatePlanBadge() {
     badge.textContent = "PLANO: " + currentUserPlan;
   }
 }
-
+ 
 function updateUpgradeButton() {
   const btn = document.getElementById("upgrade-button");
   if (!btn) return;
-
+ 
   // Quem já tem DOCTUS não tem para onde fazer upgrade.
   if (currentUserPlan === "DOCTUS") {
     btn.style.display = "none";
     return;
   }
-
+ 
   // Se houver uma subetapa ativa e ela estiver bloqueada,
   // o botão fica específico para o nível exigido por ela.
   if (activeStep) {
     const code = extractStepCode(activeStep);
     const level = getStepLevel(code);
     const allowed = stepIsAllowed(code, currentUserPlan);
-
+ 
     if (!allowed) {
       btn.style.display = "inline-block";
       btn.textContent = "ASSINAR " + level;
@@ -1435,7 +1537,7 @@ function updateUpgradeButton() {
       return;
     }
   }
-
+ 
   // Caso padrão: nenhuma subetapa bloqueada selecionada.
   // Mostra uma chamada genérica para o próximo nível acima do atual.
   const nextLevel = NEXT_TIER[currentUserPlan] || "PRO";
@@ -2026,14 +2128,15 @@ const sendButton =
 const researchReadyInput =
   document.getElementById("research-ready");
  
-const writerContentInput =
-  document.getElementById("writer-content");
+/* Cada trilha do Revisor tem o seu próprio campo de conteúdo. */
+const mesaReviewContentInput =
+  document.getElementById("mesa-review-content");
+ 
+const externalReviewContentInput =
+  document.getElementById("external-review-content");
  
 const comparisonReport =
   document.getElementById("comparison-report");
- 
-const compareButton =
-  document.getElementById("compare-button");
  
 const comparisonGuidance =
   document.getElementById("comparison-guidance");
@@ -2053,6 +2156,7 @@ const comparisonGuidance =
   }
   updatePlanBadge();
   updateUpgradeButton();
+  updateMesaTrackLock();
   renderModules();
 }
 async function getAuthenticatedSession() {
@@ -2216,13 +2320,13 @@ function selectModule(
     .querySelector("h2")
     .textContent =
       name;
-
-
+ 
+ 
   document
     .getElementById("sheet-title")
     .textContent =
       "REVISOR TEOLÓGICO";
-
+ 
   const moduleContext = document.getElementById("workspace-context");
   if (moduleContext) {
     moduleContext.textContent = name + " • selecione uma subetapa";
@@ -2232,7 +2336,7 @@ function selectModule(
   document
     .getElementById("sheet-meta")
     .textContent =
-      "Selecione uma subetapa do módulo para comparar a referência de comparação com o conteúdo do escritor.";
+      "Selecione uma subetapa do módulo para auditar a pesquisa da Mesa de Análise. A revisão de texto externo continua disponível.";
  
   renderCanonicalGuidance();
   updateUpgradeButton();
@@ -2286,13 +2390,13 @@ function selectStep(
     .querySelector("h2")
     .textContent =
       module;
-
-
+ 
+ 
   document
     .getElementById("sheet-title")
     .textContent =
       "REVISOR TEOLÓGICO";
-
+ 
   const stepContext = document.getElementById("workspace-context");
   if (stepContext) {
     stepContext.textContent = module + " • " + stepName;
@@ -2310,7 +2414,8 @@ function selectStep(
         "Subetapa: " + stepName + ". Este item requer o plano " + level + ".";
  
     loadResearchReady();
-    loadWriterContent();
+    loadMesaReviewContent();
+    updateMesaTrackLock();
     loadComparisonReport();
  
     messages.innerHTML =
@@ -2335,11 +2440,12 @@ function selectStep(
   document
     .getElementById("sheet-meta")
     .textContent =
-      "Subetapa: " + stepName + ". Compare a pesquisa pronta com o conteúdo do escritor e gere o relatório de auditoria.";
+      "Subetapa: " + stepName + ". Envie a pesquisa da Mesa para auditoria ou revise um texto externo e gere o relatório.";
  
  
   loadResearchReady();
-  loadWriterContent();
+  loadMesaReviewContent();
+  updateMesaTrackLock();
   loadComparisonReport();
  
   const hadPreviousConversation = loadMessages();
@@ -2383,22 +2489,64 @@ function persistResearchReady() {
 }
  
  
-function loadWriterContent() {
-  writerContentInput.value = activeStep
-    ? localStorage.getItem(comparisonKey("conteudo-escritor")) || ""
-    : "";
-}
+/* --- Trilha 1: conteúdo recebido da Mesa (por módulo/subetapa) --- */
  
- 
-function persistWriterContent() {
+function persistMesaReviewContent() {
   if (!activeStep) {
     return;
   }
  
   localStorage.setItem(
-    comparisonKey("conteudo-escritor"),
-    writerContentInput.value
+    comparisonKey("mesa-review"),
+    mesaReviewContentInput.value
   );
+}
+ 
+ 
+function loadMesaReviewContent() {
+  mesaReviewContentInput.value = activeStep
+    ? localStorage.getItem(comparisonKey("mesa-review")) || ""
+    : "";
+}
+ 
+ 
+/* --- Trilha 2: texto externo (independe de subetapa) --- */
+ 
+function persistExternalReviewContent() {
+  localStorage.setItem(
+    "palavraSerieMatrizProExternalContent",
+    externalReviewContentInput.value
+  );
+}
+ 
+ 
+function loadExternalReviewContent() {
+  externalReviewContentInput.value =
+    localStorage.getItem("palavraSerieMatrizProExternalContent") || "";
+}
+ 
+ 
+/* --- Cadeado visual da trilha da Mesa (MASTER ou superior) --- */
+ 
+function updateMesaTrackLock() {
+  const track = document.getElementById("mesa-review-track");
+  const lock = document.getElementById("mesa-track-lock");
+  const upgrade = document.getElementById("mesa-track-upgrade");
+  const included = reviewerAccessIsIncluded();
+ 
+  if (track) track.classList.toggle("locked", !included);
+  if (lock) lock.style.display = included ? "none" : "block";
+  if (upgrade) upgrade.href = getCheckoutLink("MASTER");
+  if (mesaReviewContentInput) mesaReviewContentInput.readOnly = !included;
+}
+ 
+ 
+/* Conteúdo que será auditado, conforme a trilha ativa. */
+ 
+function getActiveWriterContent() {
+  return reviewOrigin === "external_unit"
+    ? externalReviewContentInput.value.trim()
+    : mesaReviewContentInput.value.trim();
 }
  
  
@@ -2406,7 +2554,7 @@ function loadComparisonReport() {
   if (activeStep) {
     localStorage.removeItem(comparisonKey("relatorio"));
   }
-
+ 
   comparisonReport.textContent =
     "O relatório de auditoria aparecerá aqui depois da comparação.";
   comparisonReport.classList.remove("pending");
@@ -2501,14 +2649,15 @@ function persistQuestionDraft() {
     questionInput.value
   );
 }
-
-
+ 
+ 
 /* =====================================================
    MESA → REVISOR TEOLÓGICO
-   Transfere a pesquisa exibida na conversa sem alterar
-   o motor de análise ou o payload do Worker.
+   Transfere a pesquisa exibida na conversa para o campo
+   próprio da trilha da Mesa, sem alterar o motor de análise
+   ou o payload do Worker.
 ===================================================== */
-
+ 
 function getConversationForReview() {
   return Array.from(messages.querySelectorAll(".message"))
     .map(message => {
@@ -2520,8 +2669,8 @@ function getConversationForReview() {
     .filter(Boolean)
     .join("\n\n");
 }
-
-
+ 
+ 
 function openReviewerAccess() {
   const modal = document.getElementById("review-access-modal");
   const upgrade = document.getElementById("review-upgrade-button");
@@ -2533,8 +2682,8 @@ function openReviewerAccess() {
     modal.setAttribute("aria-hidden", "false");
   }
 }
-
-
+ 
+ 
 function closeReviewerAccess(event) {
   if (event && event.target !== event.currentTarget) {
     return;
@@ -2545,62 +2694,84 @@ function closeReviewerAccess(event) {
     modal.setAttribute("aria-hidden", "true");
   }
 }
-
-
+ 
+ 
 function reviewerAccessIsIncluded() {
   return (LEVEL_RANK[currentUserPlan] ?? 0) >= LEVEL_RANK.MASTER;
 }
-
-
+ 
+ 
+/* Trilha 2 — texto externo: qualquer plano, cobra 1 unidade. */
 function startExternalReview() {
   const topic = document.getElementById("external-review-topic")?.value.trim() || "";
   const context = document.getElementById("external-review-context")?.value.trim() || "";
-  const writer = writerContentInput.value.trim();
-
-  if (!writer) {
-    comparisonReport.textContent = "Cole primeiro o conteúdo externo no campo CONTEÚDO DO ESCRITOR.";
+  const content = externalReviewContentInput.value.trim();
+ 
+  if (!content) {
+    comparisonReport.textContent = "Cole o texto externo no campo CONTEÚDO A REVISAR.";
     comparisonReport.classList.remove("pending");
     return;
   }
-
+ 
   if (!topic) {
     comparisonReport.textContent = "Informe o tema ou assunto do conteúdo externo antes de iniciar a revisão.";
     comparisonReport.classList.remove("pending");
     return;
   }
-
+ 
   reviewOrigin = "external_unit";
   externalReviewTopic = topic;
   externalReviewContext = context;
   runComparisonConsolidation();
 }
-
-
-function sendToTheologicalReviewer() {
+ 
+ 
+/* Trilha 1 — Mesa de Análise: exige MASTER (gate também neste botão). */
+function runMesaReview() {
   reviewOrigin = "platform_mesa";
   externalReviewTopic = "";
   externalReviewContext = "";
-
+ 
   if (!reviewerAccessIsIncluded()) {
     openReviewerAccess();
     return;
   }
-
+ 
+  if (!mesaReviewContentInput.value.trim()) {
+    comparisonReport.textContent = 'Ainda não há conteúdo da Mesa. Clique em "Enviar para revisão teológica" na conversa ao lado.';
+    comparisonReport.classList.remove("pending");
+    return;
+  }
+ 
+  runComparisonConsolidation();
+}
+ 
+ 
+function sendToTheologicalReviewer() {
+  reviewOrigin = "platform_mesa";
+  externalReviewTopic = "";
+  externalReviewContext = "";
+ 
+  if (!reviewerAccessIsIncluded()) {
+    openReviewerAccess();
+    return;
+  }
+ 
   if (!activeModule && !activeStep) {
     alert("Selecione um módulo e uma subetapa antes de enviar para revisão.");
     return;
   }
-
+ 
   const conversation = getConversationForReview();
   const question = questionInput.value.trim();
   const reference = getSavedReference();
   const context = document.getElementById("workspace-context")?.textContent || "";
-
+ 
   if (!conversation && !question) {
     alert("Faça uma pergunta na Mesa de Análise antes de enviar para revisão.");
     return;
   }
-
+ 
   const reviewPackage = [
     "CONTEÚDO ENCAMINHADO PELA MESA DE ANÁLISE PRO",
     "",
@@ -2613,12 +2784,12 @@ function sendToTheologicalReviewer() {
     "HISTÓRICO DA PESQUISA:",
     conversation || "Pergunta em elaboração: " + question
   ].join("\n");
-
-  writerContentInput.value = reviewPackage;
-  persistWriterContent();
-
-  document.querySelector(".sheet")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  writerContentInput.focus();
+ 
+  mesaReviewContentInput.value = reviewPackage;
+  persistMesaReviewContent();
+ 
+  document.getElementById("mesa-review-track")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  mesaReviewContentInput.focus();
 }
  
  
@@ -2648,27 +2819,27 @@ function clearConversation() {
   if (activeStep) {
     localStorage.removeItem(messagesKey());
     localStorage.removeItem(comparisonKey("pesquisa-pronta"));
-    localStorage.removeItem(comparisonKey("conteudo-escritor"));
+    localStorage.removeItem(comparisonKey("mesa-review"));
     localStorage.removeItem(comparisonKey("relatorio"));
     localStorage.removeItem(questionDraftKey());
   }
-
+ 
   messages.innerHTML = "";
   messages.scrollTop = messages.scrollHeight;
   questionInput.value = "";
   researchReadyInput.value = "";
-  writerContentInput.value = "";
+  mesaReviewContentInput.value = "";
   comparisonReport.textContent = "O relatório de auditoria aparecerá aqui depois da comparação.";
   comparisonReport.classList.remove("pending");
   reviewOrigin = "platform_pergunta_livre";
-  externalReviewTopic = "";
-  externalReviewContext = "";
-
-  if (document.getElementById("external-review-topic")) {
-    document.getElementById("external-review-topic").value = "";
-    document.getElementById("external-review-context").value = "";
-  }
-
+ 
+  /*
+   * A trilha de texto externo (tema, contexto e conteúdo) NÃO é limpa aqui:
+   * ela não depende de subetapa e não deve sumir quando o usuário limpa
+   * apenas a conversa da Mesa.
+   */
+ 
+  updateMesaTrackLock();
   prepareQuestionForStep(true);
 }
  
@@ -2705,8 +2876,8 @@ function appendLockedMessage(text, level) {
   messages.scrollTop = messages.scrollHeight;
   persistMessages();
 }
-
-
+ 
+ 
 function resetReference() {
  
   localStorage.removeItem(
@@ -2892,15 +3063,15 @@ function extractAuditReport(data) {
  
 async function runComparisonConsolidation() {
   const isExternalReview = reviewOrigin === "external_unit";
-
+ 
   if (!activeStep && !isExternalReview) {
-    comparisonReport.textContent = "Selecione uma subetapa antes de iniciar a comparação e consolidação.";
+    comparisonReport.textContent = "Selecione uma subetapa antes de iniciar a auditoria da Mesa.";
     persistComparisonReport();
     return;
   }
-
+ 
   const stepCode = isExternalReview ? "" : extractStepCode(activeStep);
-
+ 
   if (!isExternalReview && !stepIsAllowed(stepCode, currentUserPlan)) {
     comparisonReport.innerHTML = "Esta subetapa requer o plano " + getStepLevel(stepCode) +
       ". Faça upgrade para liberar a comparação e consolidação.<br><br>" +
@@ -2914,25 +3085,40 @@ async function runComparisonConsolidation() {
   }
  
   const referenceText = researchReadyInput.value.trim();
-  const writerContent = writerContentInput.value.trim();
+  const writerContent = getActiveWriterContent();
   const guidance = getCanonicalGuidance();
  
   if (!writerContent) {
-    comparisonReport.textContent = "Cole o conteúdo do escritor. A referência de comparação pode ser preenchida ou deixada vazia para a sugestão automática do Worker.";
+    comparisonReport.textContent = isExternalReview
+      ? "Cole o texto externo no campo CONTEÚDO A REVISAR."
+      : 'Ainda não há conteúdo da Mesa. Clique em "Enviar para revisão teológica" na conversa ao lado.';
     comparisonReport.classList.remove("pending");
     persistComparisonReport();
     return;
   }
  
   persistResearchReady();
-  persistWriterContent();
+  if (isExternalReview) {
+    persistExternalReviewContent();
+  } else {
+    persistMesaReviewContent();
+  }
  
   comparisonReport.classList.add("pending");
   comparisonReport.textContent = "COMPARAÇÃO E CONSOLIDAÇÃO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
   persistComparisonReport();
+  comparisonReport.scrollIntoView({ behavior: "smooth", block: "nearest" });
  
-  compareButton.disabled = true;
-  compareButton.textContent = "COMPARANDO...";
+  /* Botões das duas trilhas: trava ambos durante a análise e restaura o rótulo do que foi usado. */
+  const mesaButton = document.getElementById("mesa-review-button");
+  const externalButton = document.getElementById("external-review-button");
+  const activeButton = isExternalReview ? externalButton : mesaButton;
+  const originalLabel = activeButton ? activeButton.textContent : "";
+ 
+  [mesaButton, externalButton].forEach(button => {
+    if (button) button.disabled = true;
+  });
+  if (activeButton) activeButton.textContent = "COMPARANDO...";
  
   try {
     const session = await getAuthenticatedSession();
@@ -2988,7 +3174,7 @@ async function runComparisonConsolidation() {
     if (response.status === 403) {
       throw new Error(data?.error || "Este item requer um plano superior ao seu plano atual.");
     }
-
+ 
     if (response.status === 402) {
       throw new Error(data?.error || "Você não tem unidades disponíveis. Compre um pacote para continuar.");
     }
@@ -3004,8 +3190,10 @@ async function runComparisonConsolidation() {
     comparisonReport.classList.remove("pending");
     comparisonReport.textContent = formatComparisonError(error, { error: error?.message });
   } finally {
-    compareButton.disabled = false;
-    compareButton.textContent = "COMPARAR E CONSOLIDAR";
+    [mesaButton, externalButton].forEach(button => {
+      if (button) button.disabled = false;
+    });
+    if (activeButton) activeButton.textContent = originalLabel;
     persistComparisonReport();
   }
 }
@@ -3362,6 +3550,8 @@ document.addEventListener("keydown", (event) => {
  
 updatePlanBadge();
 updateUpgradeButton();
+updateMesaTrackLock();
+loadExternalReviewContent();
 renderModules();
 </script>
  
@@ -3370,7 +3560,7 @@ renderModules();
   var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
   var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
   var PAGINA = "Método Técnico de Pesquisa";
-
+ 
   function registrarVisita(pais, cidade){
     try{
       var vid = localStorage.getItem("ps_visitante_id");
@@ -3411,3 +3601,7 @@ renderModules();
 </body>
 </html>
  
+
+
+
+
