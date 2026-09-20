@@ -1,3 +1,6 @@
+
+
+Matriz pro · HTML
 <!doctype html>
 <html lang="pt-BR">
 <head><style>
@@ -56,8 +59,8 @@
 </script>
 <!-- ==================================================================== -->
  
-
-
+ 
+ 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -334,7 +337,7 @@ main {
   font-size:11px;
   line-height:1.5;
 }
-
+ 
 .workspace-context {
   display:inline-flex;
   align-items:center;
@@ -347,7 +350,7 @@ main {
   letter-spacing:.45px;
   text-transform:uppercase;
 }
-
+ 
 .workspace-context::before {
   content:"CONTEXTO";
   padding:3px 6px;
@@ -368,13 +371,13 @@ main {
   padding:16px;
   overflow:auto;
 }
-
+ 
 /* A ordem do DOM é preservada para não afetar IDs/eventos; a ordem visual segue a arquitetura. */
 .content > .chat {
   order:1;
   min-width:0;
 }
-
+ 
 .content > .sheet {
   order:2;
   min-width:0;
@@ -810,44 +813,44 @@ main {
     gap:12px;
     padding:12px;
   }
-
+ 
   .content {
     grid-template-columns:minmax(0, 1fr) minmax(285px, .86fr);
     gap:12px;
     padding:12px;
   }
 }
-
+ 
 @media(max-width:950px) {
   body {
     height:auto;
     min-height:100vh;
     overflow:auto;
   }
-
+ 
   main {
     grid-template-columns:1fr;
   }
-
+ 
   .modules {
     max-height:40vh;
   }
-
+ 
   .content {
     grid-template-columns:1fr;
     overflow:visible;
   }
-
+ 
   .content > .chat,
   .content > .sheet {
     order:initial;
     min-height:560px;
   }
-
+ 
   .content > .chat {
     order:1;
   }
-
+ 
   .content > .sheet {
     order:2;
   }
@@ -906,7 +909,7 @@ main {
       target="_blank"
       style="display:none;padding:9px 14px;border:1px solid #20d66b;border-radius:6px;background:rgba(32,214,107,.1);color:#20d66b;font-size:10px;font-weight:900;letter-spacing:.5px;text-decoration:none;"
     ></a>
-       <button
+    <button
       type="button"
       class="help-button"
       onclick="openRevisor('external_unit')"
@@ -1042,12 +1045,13 @@ main {
     </div>
  
   </section>
- </main>
-
-<script>
 </main>
-
-<section id="revisor-overlay" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;background:rgba(4,10,20,.78);">
+ 
+<!-- ===================================================
+     REVISOR TEOLÓGICO
+=================================================== -->
+ 
+<section id="revisor-overlay" aria-hidden="true" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;background:rgba(4,10,20,.78);">
   <div style="width:min(760px,100%);max-height:88vh;overflow:auto;padding:26px;border:1px solid #263754;border-radius:10px;background:#111b30;color:#dbe7f5;">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;">
       <div>
@@ -1058,44 +1062,46 @@ main {
       </div>
       <button type="button" onclick="closeRevisor()" style="border:1px solid #35506d;border-radius:5px;padding:7px 10px;background:transparent;color:#dbe7f5;font-weight:900;cursor:pointer;">FECHAR</button>
     </div>
-
+ 
     <div id="revisor-origin-note" style="margin:14px 0;padding:10px 12px;border-left:3px solid #20d66b;background:#0d172b;color:#b9c7d8;font-size:11px;"></div>
-
+ 
     <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">TEMA / ASSUNTO</label>
       <input id="revisor-tema" type="text" placeholder="Ex.: A doutrina da justificação em Romanos 3" style="padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;">
     </div>
-
+ 
     <div id="revisor-subetapa-field" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">SUBETAPA OU CONTEXTO METODOLÓGICO (opcional)</label>
       <input id="revisor-subetapa" type="text" placeholder="Ex.: 06.14 — Síntese exegética (deixe vazio se não se aplicar)" style="padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;">
     </div>
-
+ 
     <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">REFERÊNCIA DE COMPARAÇÃO</label>
       <small style="color:#91a4bd;font-size:9px;">Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere fontes reconhecidas.</small>
       <textarea id="revisor-referencia" placeholder="Cole uma referência de comparação ou deixe vazio..." style="min-height:110px;resize:vertical;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;"></textarea>
     </div>
-
+ 
     <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">CONTEÚDO DO ESCRITOR</label>
       <small style="color:#91a4bd;font-size:9px;">Cole aqui o texto a ser auditado (produzido por você, por outra IA, artigo, rascunho etc.).</small>
       <textarea id="revisor-conteudo" placeholder="Cole aqui o conteúdo..." style="min-height:180px;resize:vertical;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;"></textarea>
     </div>
-
+ 
     <div style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;margin-bottom:6px;">RELATÓRIO DE AUDITORIA</div>
     <div id="revisor-report" style="min-height:150px;max-height:320px;overflow:auto;padding:14px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font-size:11px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px;">O relatório de auditoria aparecerá aqui depois da revisão.</div>
-
+ 
     <div style="display:flex;justify-content:flex-end;">
       <button id="revisor-submit" type="button" onclick="submitRevisor()" style="padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;cursor:pointer;">ENVIAR PARA REVISÃO</button>
     </div>
   </div>
 </section>
-
+ 
 <script>
 /* =====================================================
    SUPABASE
 ===================================================== */
+ 
+ 
 const SUPABASE_URL =
   "https://qmhdbuxomozdczgvpvcc.supabase.co";
  
@@ -1107,10 +1113,6 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
- 
-
-
-
  
  
 /* =====================================================
@@ -1222,19 +1224,19 @@ const MATRIX_LEVELS = {
 };
  
 const LEVEL_RANK = { FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 };
-
+ 
 const CHECKOUT_LINKS = {
   PRO: "https://pay.kiwify.com.br/4m4qdH7",
   MASTER: "https://pay.kiwify.com.br/tqJboGn",
   DOCTUS: "https://kiwify.app/ZHRYMmy"
 };
-
+ 
 const NEXT_TIER = {
   FREE: "PRO",
   PRO: "MASTER",
   MASTER: "DOCTUS"
 };
-
+ 
 function getCheckoutLink(level) {
   return CHECKOUT_LINKS[level] || "#";
 }
@@ -1289,24 +1291,24 @@ function updatePlanBadge() {
     badge.textContent = "PLANO: " + currentUserPlan;
   }
 }
-
+ 
 function updateUpgradeButton() {
   const btn = document.getElementById("upgrade-button");
   if (!btn) return;
-
+ 
   // Quem já tem DOCTUS não tem para onde fazer upgrade.
   if (currentUserPlan === "DOCTUS") {
     btn.style.display = "none";
     return;
   }
-
+ 
   // Se houver uma subetapa ativa e ela estiver bloqueada,
   // o botão fica específico para o nível exigido por ela.
   if (activeStep) {
     const code = extractStepCode(activeStep);
     const level = getStepLevel(code);
     const allowed = stepIsAllowed(code, currentUserPlan);
-
+ 
     if (!allowed) {
       btn.style.display = "inline-block";
       btn.textContent = "ASSINAR " + level;
@@ -1314,7 +1316,7 @@ function updateUpgradeButton() {
       return;
     }
   }
-
+ 
   // Caso padrão: nenhuma subetapa bloqueada selecionada.
   // Mostra uma chamada genérica para o próximo nível acima do atual.
   const nextLevel = NEXT_TIER[currentUserPlan] || "PRO";
@@ -1918,7 +1920,7 @@ const comparisonGuidance =
 /* =====================================================
    AUTENTICAÇÃO
 ===================================================== */
- async function protectPage() {
+async function protectPage() {
   try {
     const { data } = await supabaseClient.auth.getSession();
     if (data?.session) {
@@ -2098,7 +2100,7 @@ function selectModule(
     .getElementById("sheet-title")
     .textContent =
       "Análise de comparação e consolidação";
-
+ 
   const moduleContext = document.getElementById("workspace-context");
   if (moduleContext) {
     moduleContext.textContent = name + " • selecione uma subetapa";
@@ -2168,7 +2170,7 @@ function selectStep(
     .getElementById("sheet-title")
     .textContent =
       "Análise de comparação e consolidação";
-
+ 
   const stepContext = document.getElementById("workspace-context");
   if (stepContext) {
     stepContext.textContent = module + " • " + stepName;
@@ -2447,8 +2449,8 @@ function appendLockedMessage(text, level) {
   messages.scrollTop = messages.scrollHeight;
   persistMessages();
 }
-
-
+ 
+ 
 function resetReference() {
  
   localStorage.removeItem(
@@ -3088,6 +3090,158 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeStudyHelp();
 });
  
+ 
+/* =====================================================
+   REVISOR TEOLÓGICO
+   Segunda camada de pesquisa: audita conteúdo externo.
+   Reaproveita o mesmo pipeline de comparação/consolidação
+   (comparisonPrompt, extractAuditReport, formatComparisonError)
+   e envia origin:"external_unit" ao Worker, que nesse caso
+   não exige plano por subetapa.
+===================================================== */
+ 
+let revisorOrigin = "external_unit";
+ 
+function openRevisor(origin) {
+  const overlay = document.getElementById("revisor-overlay");
+  if (!overlay) return;
+ 
+  revisorOrigin = origin || "external_unit";
+ 
+  const note = document.getElementById("revisor-origin-note");
+  if (note) {
+    note.textContent = revisorOrigin === "external_unit"
+      ? "Entrada direta: audite um texto externo sem depender do plano exigido por uma subetapa da Matriz. A subetapa abaixo é opcional."
+      : "Revisor aberto a partir da Matriz.";
+  }
+ 
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+ 
+  const tema = document.getElementById("revisor-tema");
+  if (tema) tema.focus();
+}
+ 
+function closeRevisor() {
+  const overlay = document.getElementById("revisor-overlay");
+  if (!overlay) return;
+  overlay.style.display = "none";
+  overlay.setAttribute("aria-hidden", "true");
+}
+ 
+function getRevisorGuidance(stepCode) {
+  const moduleCode = stepCode ? stepCode.split(".")[0].padStart(2, "0") : "";
+  return CANONICAL_REFERENCE_MATRIX[moduleCode] || {
+    name: "MATRIZ CANÔNICA",
+    sources: "Selecione fontes reconhecidas adequadas ao tema informado (texto bíblico como fonte primária, léxicos, comentários exegéticos e teologias de referência).",
+    rule: "A conclusão deve ser proporcional às evidências e nenhuma fonte ou localização deve ser inventada."
+  };
+}
+ 
+async function submitRevisor() {
+  const temaEl = document.getElementById("revisor-tema");
+  const subetapaEl = document.getElementById("revisor-subetapa");
+  const referenciaEl = document.getElementById("revisor-referencia");
+  const conteudoEl = document.getElementById("revisor-conteudo");
+  const report = document.getElementById("revisor-report");
+  const submitBtn = document.getElementById("revisor-submit");
+ 
+  if (!report || !submitBtn) return;
+ 
+  const tema = (temaEl?.value || "").trim();
+  const subetapaRaw = (subetapaEl?.value || "").trim();
+  const referenceText = (referenciaEl?.value || "").trim();
+  const writerContent = (conteudoEl?.value || "").trim();
+ 
+  if (!writerContent) {
+    report.textContent = "Cole o conteúdo do escritor. A referência de comparação pode ficar vazia para a sugestão automática de fontes.";
+    return;
+  }
+ 
+  const stepCode = extractStepCode(subetapaRaw);
+  const guidance = getRevisorGuidance(stepCode);
+  const topic = tema || subetapaRaw || "REVISOR TEOLÓGICO";
+ 
+  const question =
+    (tema ? "TEMA / ASSUNTO: " + tema + "\n" : "") +
+    (subetapaRaw ? "SUBETAPA / CONTEXTO METODOLÓGICO: " + subetapaRaw + "\n" : "") +
+    comparisonPrompt(referenceText, writerContent, guidance);
+ 
+  report.textContent = "REVISOR TEOLÓGICO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
+  submitBtn.disabled = true;
+  submitBtn.textContent = "REVISANDO...";
+ 
+  try {
+    const session = await getAuthenticatedSession();
+ 
+    if (!session.access_token) {
+      throw new Error("O Supabase não forneceu um token de acesso.");
+    }
+ 
+    const response = await fetch(
+      AI_PROXY_URL + "/api/pesquisa",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + session.access_token
+        },
+        body: JSON.stringify({
+          mode: "writing_private",
+          accessLevel: "private",
+          analysisType: "comparison_consolidation",
+          origin: revisorOrigin,
+          stepCode: stepCode || "",
+          requiredLevel: stepCode ? getStepLevel(stepCode) : "FREE",
+          referenceText,
+          writerContent,
+          canonicalGuidance: {
+            module: guidance.name,
+            sources: guidance.sources,
+            rule: guidance.rule
+          },
+          question,
+          topic,
+          module: guidance.name,
+          discipline: "REVISOR TEOLÓGICO"
+        })
+      }
+    );
+ 
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+ 
+    if (response.status === 401) {
+      await supabaseClient.auth.signOut();
+      throw new Error("Sua sessão expirou. Entre novamente na Sala do Escritor.");
+    }
+ 
+    if (response.status === 403) {
+      throw new Error(data?.error || "Este recurso requer um plano ou unidade disponível na sua conta.");
+    }
+ 
+    if (!response.ok) {
+      throw new Error(data?.error || "O Worker não conseguiu concluir a revisão.");
+    }
+ 
+    report.textContent = extractAuditReport(data);
+  } catch (error) {
+    console.error("Erro no Revisor Teológico:", error);
+    report.textContent = formatComparisonError(error, { error: error?.message });
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "ENVIAR PARA REVISÃO";
+  }
+}
+ 
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeRevisor();
+});
+ 
 /* =====================================================
    INICIALIZAÇÃO
 ===================================================== */
@@ -3102,7 +3256,7 @@ renderModules();
   var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
   var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
   var PAGINA = "Método Técnico de Pesquisa";
-
+ 
   function registrarVisita(pais, cidade){
     try{
       var vid = localStorage.getItem("ps_visitante_id");
@@ -3143,5 +3297,7 @@ renderModules();
 </body>
 </html>
  
+
+
 
 
