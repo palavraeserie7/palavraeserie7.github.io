@@ -954,9 +954,8 @@ main {
       <section class="sheet">
  
         <h3 id="sheet-title">
-          REVISOR TEOLÓGICO
+          Análise de comparação e consolidação
         </h3>
-        <div style="margin:-2px 0 10px;color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.6px;">Análise de comparação e consolidação</div>
  
         <div id="sheet-meta" class="meta">
           Compare o conteúdo do escritor com uma referência de comparação e gere um relatório de auditoria.
@@ -1091,24 +1090,8 @@ main {
     <div style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;margin-bottom:6px;">RELATÓRIO DE AUDITORIA</div>
     <div id="revisor-report" style="min-height:150px;max-height:320px;overflow:auto;padding:14px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font-size:11px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px;">O relatório de auditoria aparecerá aqui depois da revisão.</div>
  
-    <div id="revisor-packs" style="display:none;margin-bottom:12px;padding:12px;border:1px solid #263754;border-radius:6px;background:#0d172b;"></div>
- 
     <div style="display:flex;justify-content:flex-end;">
       <button id="revisor-submit" type="button" onclick="submitRevisor()" style="padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;cursor:pointer;">ENVIAR PARA REVISÃO</button>
-    </div>
-  </div>
-</section>
- 
-<section id="revisor-upsell" aria-hidden="true" style="display:none;position:fixed;inset:0;z-index:10001;align-items:center;justify-content:center;padding:24px;background:rgba(4,10,20,.82);">
-  <div style="width:min(560px,100%);max-height:88vh;overflow:auto;padding:28px;border:1px solid #263754;border-radius:10px;background:#111b30;color:#dbe7f5;">
-    <h2 style="margin:0 0 4px;color:#18bfff;font-size:18px;">REVISOR TEOLÓGICO</h2>
-    <div style="margin-bottom:14px;color:#20d66b;font-size:11px;font-weight:900;letter-spacing:.6px;">PESQUISAR → ANALISAR → REVISAR → CONSOLIDAR</div>
-    <p style="margin:0 0 12px;font-size:13px;line-height:1.6;">Transforme sua pesquisa em uma etapa adicional de auditoria.</p>
-    <p style="margin:0 0 12px;color:#b9c7d8;font-size:12px;line-height:1.65;">O Revisor compara o conteúdo produzido com o contexto metodológico selecionado, identifica afirmações, evidencia lacunas, confronta dados, registra pressupostos, divergências e pontos que exigem verificação, e produz uma síntese de auditoria.</p>
-    <p style="margin:0 0 18px;padding:10px 12px;border-left:3px solid #20d66b;background:#0d172b;color:#dbe7f5;font-size:12px;line-height:1.6;">Pesquisar produz conteúdo. Revisar audita o conteúdo.<br>Disponível integralmente para usuários <strong>MASTER</strong>, sem cobrança adicional sobre as pesquisas feitas na plataforma.</p>
-    <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;">
-      <button type="button" onclick="closeRevisorUpsell()" style="padding:10px 14px;border:1px solid #35506d;border-radius:6px;background:transparent;color:#dbe7f5;font-weight:900;cursor:pointer;">AGORA NÃO</button>
-      <a id="revisor-upsell-link" href="#" target="_blank" rel="noopener" style="padding:10px 16px;border-radius:6px;background:#20d66b;color:#07151f;font-weight:900;text-decoration:none;">CONHECER O PLANO MASTER</a>
     </div>
   </div>
 </section>
@@ -1242,30 +1225,11 @@ const MATRIX_LEVELS = {
  
 const LEVEL_RANK = { FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 };
  
-/* -----------------------------------------------------
-   LINKS DE PAGAMENTO (Kiwify)
-   Use SEMPRE o link do tipo "Checkout" (pay.kiwify.com.br/...),
-   nunca o "Sales Page" (kiwify.app/...), que só redireciona
-   para a Página de vendas do produto.
-   CONFERIR: PRO e MASTER abaixo ainda não foram validados.
-   O DOCTUS (tqJboGn) foi validado: abre "Acesso DOCTUS".
------------------------------------------------------ */
 const CHECKOUT_LINKS = {
   PRO: "https://pay.kiwify.com.br/4m4qdH7",
   MASTER: "https://pay.kiwify.com.br/tqJboGn",
-  DOCTUS: "https://pay.kiwify.com.br/tqJboGn"
+  DOCTUS: "https://kiwify.app/ZHRYMmy"
 };
- 
-/* -----------------------------------------------------
-   PACOTES DE REVISÃO AVULSA (pagamento único)
-   Cole em "link" o checkout (pay.kiwify.com.br/...) de cada
-   pacote. Pacote com link vazio NÃO aparece no site.
------------------------------------------------------ */
-const UNIT_PACKS = [
-  { units: 3,  price: "R$ 9,90",  link: "" },
-  { units: 5,  price: "R$ 14,90", link: "" },
-  { units: 10, price: "R$ 24,90", link: "" }
-];
  
 const NEXT_TIER = {
   FREE: "PRO",
@@ -2139,7 +2103,7 @@ function selectModule(
   document
     .getElementById("sheet-title")
     .textContent =
-      "REVISOR TEOLÓGICO";
+      "Análise de comparação e consolidação";
  
   const moduleContext = document.getElementById("workspace-context");
   if (moduleContext) {
@@ -2209,7 +2173,7 @@ function selectStep(
   document
     .getElementById("sheet-title")
     .textContent =
-      "REVISOR TEOLÓGICO";
+      "Análise de comparação e consolidação";
  
   const stepContext = document.getElementById("workspace-context");
   if (stepContext) {
@@ -2790,58 +2754,11 @@ async function runComparisonConsolidation() {
    REVISOR TEOLÓGICO
 ===================================================== */
  
-function userIsMasterOrAbove() {
-  return (LEVEL_RANK[currentUserPlan] ?? 0) >= LEVEL_RANK.MASTER;
-}
- 
-function openRevisorUpsell() {
-  const box = document.getElementById("revisor-upsell");
-  const link = document.getElementById("revisor-upsell-link");
-  if (!box) return;
-  if (link) link.href = getCheckoutLink("MASTER");
-  box.style.display = "flex";
-  box.setAttribute("aria-hidden", "false");
-}
- 
-function closeRevisorUpsell() {
-  const box = document.getElementById("revisor-upsell");
-  if (!box) return;
-  box.style.display = "none";
-  box.setAttribute("aria-hidden", "true");
-}
- 
-function renderRevisorPacks(show) {
-  const box = document.getElementById("revisor-packs");
-  if (!box) return;
-  const available = UNIT_PACKS.filter(p => p.link);
-  if (!show || !available.length) {
-    box.style.display = "none";
-    box.innerHTML = "";
-    return;
-  }
-  box.innerHTML =
-    '<div style="margin-bottom:8px;color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">REVISÃO AVULSA — COMPRE UNIDADES</div>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-    available.map(p =>
-      '<a href="' + p.link + '" target="_blank" rel="noopener" ' +
-      'style="padding:8px 12px;border:1px solid #20d66b;border-radius:6px;background:rgba(32,214,107,.08);color:#20d66b;font-size:11px;font-weight:900;text-decoration:none;">' +
-      p.units + ' revisões · ' + p.price + '</a>'
-    ).join("") +
-    '</div>';
-  box.style.display = "block";
-}
- 
 function openRevisor(origin) {
   revisorOrigin = origin || "external_unit";
   const overlay = document.getElementById("revisor-overlay");
   const note = document.getElementById("revisor-origin-note");
   if (!overlay) return;
- 
-  // Conteúdo produzido na plataforma: exige MASTER (ou DOCTUS).
-  if (revisorOrigin !== "external_unit" && !userIsMasterOrAbove()) {
-    openRevisorUpsell();
-    return;
-  }
  
   if (revisorOrigin === "platform_mesa") {
     note.textContent = "Origem: conteúdo produzido na Mesa de Análise PRO. Incluído no seu plano MASTER — não consome unidade.";
@@ -2858,7 +2775,6 @@ function openRevisor(origin) {
   }
  
   document.getElementById("revisor-report").textContent = "O relatório de auditoria aparecerá aqui depois da revisão.";
-  renderRevisorPacks(revisorOrigin === "external_unit");
   overlay.style.display = "flex";
 }
  
@@ -2877,12 +2793,6 @@ async function submitRevisor() {
  
   if (!conteudo) {
     report.textContent = "Cole o conteúdo do escritor antes de enviar para revisão.";
-    return;
-  }
- 
-  if (revisorOrigin !== "external_unit" && !userIsMasterOrAbove()) {
-    closeRevisor();
-    openRevisorUpsell();
     return;
   }
  
@@ -2946,7 +2856,6 @@ async function submitRevisor() {
     }
  
     if (response.status === 402) {
-      renderRevisorPacks(true);
       throw new Error(data?.error || "Você não tem unidades disponíveis. Compre um pacote para continuar.");
     }
  
@@ -3326,7 +3235,7 @@ document.addEventListener("keydown", (event) => {
  
  
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") { closeRevisor(); closeRevisorUpsell(); }
+  if (event.key === "Escape") closeRevisor();
 });
  
 /* =====================================================
@@ -3384,9 +3293,6 @@ renderModules();
 </body>
 </html>
  
-
-
-
 
 
 
