@@ -1877,6 +1877,10 @@ function renderCanonicalGuidance() {
 let activeModule = "";
 let activeStep = "";
 let awaitingReference = false;
+let lastMesaAnswer = "";
+let lastMesaModule = "";
+let lastMesaStep = "";
+let revisorOrigin = "external_unit";
  
  
 /* =====================================================
@@ -2747,6 +2751,134 @@ async function runComparisonConsolidation() {
  
  
 /* =====================================================
+   REVISOR TEOLÓGICO
+===================================================== */
+ 
+function openRevisor(origin) {
+  revisorOrigin = origin || "external_unit";
+  const overlay = document.getElementById("revisor-overlay");
+  const note = document.getElementById("revisor-origin-note");
+  if (!overlay) return;
+ 
+  if (revisorOrigin === "platform_mesa") {
+    note.textContent = "Origem: conteúdo produzido na Mesa de Análise PRO. Incluído no seu plano MASTER — não consome unidade.";
+    document.getElementById("revisor-tema").value = lastMesaModule || "";
+    document.getElementById("revisor-subetapa").value = lastMesaStep || "";
+    document.getElementById("revisor-conteudo").value = lastMesaAnswer || "";
+    document.getElementById("revisor-referencia").value = "";
+  } else {
+    note.textContent = "Origem: conteúdo externo colado por você. Não exige plano MASTER — consome 1 unidade de revisão.";
+    document.getElementById("revisor-tema").value = "";
+    document.getElementById("revisor-subetapa").value = "";
+    document.getElementById("revisor-conteudo").value = "";
+    document.getElementById("revisor-referencia").value = "";
+  }
+ 
+  document.getElementById("revisor-report").textContent = "O relatório de auditoria aparecerá aqui depois da revisão.";
+  overlay.style.display = "flex";
+}
+ 
+function closeRevisor() {
+  const overlay = document.getElementById("revisor-overlay");
+  if (overlay) overlay.style.display = "none";
+}
+ 
+async function submitRevisor() {
+  const tema = document.getElementById("revisor-tema").value.trim();
+  const subetapaInput = document.getElementById("revisor-subetapa").value.trim();
+  const referencia = document.getElementById("revisor-referencia").value.trim();
+  const conteudo = document.getElementById("revisor-conteudo").value.trim();
+  const report = document.getElementById("revisor-report");
+  const submitBtn = document.getElementById("revisor-submit");
+ 
+  if (!conteudo) {
+    report.textContent = "Cole o conteúdo do escritor antes de enviar para revisão.";
+    return;
+  }
+ 
+  const guidance = tema
+    ? { name: tema, sources: "Selecionar fontes reconhecidas adequadas ao tema.", rule: "Aplicar a regra normativa do módulo/tema informado, quando identificável." }
+    : getCanonicalGuidance();
+ 
+  report.textContent = "REVISÃO EM ANDAMENTO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
+  submitBtn.disabled = true;
+  submitBtn.textContent = "REVISANDO...";
+ 
+  try {
+    const session = await getAuthenticatedSession();
+    if (!session.access_token) {
+      throw new Error("O Supabase não forneceu um token de acesso.");
+    }
+ 
+    const payload = {
+      mode: "writing_private",
+      accessLevel: "private",
+      analysisType: "comparison_consolidation",
+      origin: revisorOrigin,
+      referenceText: referencia,
+      writerContent: conteudo,
+      canonicalGuidance: {
+        module: guidance.name,
+        sources: guidance.sources,
+        rule: guidance.rule
+      },
+      question: comparisonPrompt(referencia, conteudo, guidance),
+      topic: subetapaInput || tema || "REVISOR TEOLÓGICO",
+      module: tema || "REVISOR TEOLÓGICO",
+      discipline: "MÉTODO TÉCNICO DE PESQUISA"
+    };
+ 
+    // Importante: NÃO enviar stepCode quando a origem é external_unit,
+    // para não disparar a exigência de plano por subetapa no Worker.
+    if (revisorOrigin === "platform_mesa" && subetapaInput) {
+      const code = extractStepCode(subetapaInput);
+      if (code) {
+        payload.stepCode = code;
+        payload.requiredLevel = getStepLevel(code);
+      }
+    }
+ 
+    const response = await fetch(AI_PROXY_URL + "/api/pesquisa", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + session.access_token
+      },
+      body: JSON.stringify(payload)
+    });
+ 
+    let data = {};
+    try { data = await response.json(); } catch { data = {}; }
+ 
+    if (response.status === 401) {
+      await supabaseClient.auth.signOut();
+      throw new Error("Sua sessão expirou. Entre novamente.");
+    }
+ 
+    if (response.status === 402) {
+      throw new Error(data?.error || "Você não tem unidades disponíveis. Compre um pacote para continuar.");
+    }
+ 
+    if (response.status === 403) {
+      throw new Error(data?.error || "Este item requer um plano superior ao seu plano atual.");
+    }
+ 
+    if (!response.ok) {
+      throw new Error(data?.error || "O Worker não conseguiu concluir a revisão.");
+    }
+ 
+    report.textContent = extractAuditReport(data);
+  } catch (error) {
+    console.error("Erro na Revisão Teológica:", error);
+    report.textContent = formatComparisonError(error, { error: error?.message });
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "ENVIAR PARA REVISÃO";
+  }
+}
+ 
+ 
+/* =====================================================
    CONSULTA AO WORKER
 ===================================================== */
  
@@ -3015,6 +3147,17 @@ async function sendQuestion(event) {
       data?.result ||
       "A consulta não devolveu conteúdo.";
  
+    lastMesaAnswer = answerMessage.textContent;
+    lastMesaModule = activeModule || "";
+    lastMesaStep = activeStep || "";
+ 
+    const sendToRevisorBtn = document.createElement("button");
+    sendToRevisorBtn.type = "button";
+    sendToRevisorBtn.textContent = "ENVIAR PARA REVISÃO TEOLÓGICA";
+    sendToRevisorBtn.style.cssText = "display:block;margin-top:10px;padding:8px 12px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;font-size:10px;cursor:pointer;";
+    sendToRevisorBtn.onclick = function(){ openRevisor('platform_mesa'); };
+    answerMessage.appendChild(sendToRevisorBtn);
+ 
  
   } catch (error) {
  
@@ -3091,153 +3234,6 @@ document.addEventListener("keydown", (event) => {
 });
  
  
-/* =====================================================
-   REVISOR TEOLÓGICO
-   Segunda camada de pesquisa: audita conteúdo externo.
-   Reaproveita o mesmo pipeline de comparação/consolidação
-   (comparisonPrompt, extractAuditReport, formatComparisonError)
-   e envia origin:"external_unit" ao Worker, que nesse caso
-   não exige plano por subetapa.
-===================================================== */
- 
-let revisorOrigin = "external_unit";
- 
-function openRevisor(origin) {
-  const overlay = document.getElementById("revisor-overlay");
-  if (!overlay) return;
- 
-  revisorOrigin = origin || "external_unit";
- 
-  const note = document.getElementById("revisor-origin-note");
-  if (note) {
-    note.textContent = revisorOrigin === "external_unit"
-      ? "Entrada direta: audite um texto externo sem depender do plano exigido por uma subetapa da Matriz. A subetapa abaixo é opcional."
-      : "Revisor aberto a partir da Matriz.";
-  }
- 
-  overlay.style.display = "flex";
-  overlay.setAttribute("aria-hidden", "false");
- 
-  const tema = document.getElementById("revisor-tema");
-  if (tema) tema.focus();
-}
- 
-function closeRevisor() {
-  const overlay = document.getElementById("revisor-overlay");
-  if (!overlay) return;
-  overlay.style.display = "none";
-  overlay.setAttribute("aria-hidden", "true");
-}
- 
-function getRevisorGuidance(stepCode) {
-  const moduleCode = stepCode ? stepCode.split(".")[0].padStart(2, "0") : "";
-  return CANONICAL_REFERENCE_MATRIX[moduleCode] || {
-    name: "MATRIZ CANÔNICA",
-    sources: "Selecione fontes reconhecidas adequadas ao tema informado (texto bíblico como fonte primária, léxicos, comentários exegéticos e teologias de referência).",
-    rule: "A conclusão deve ser proporcional às evidências e nenhuma fonte ou localização deve ser inventada."
-  };
-}
- 
-async function submitRevisor() {
-  const temaEl = document.getElementById("revisor-tema");
-  const subetapaEl = document.getElementById("revisor-subetapa");
-  const referenciaEl = document.getElementById("revisor-referencia");
-  const conteudoEl = document.getElementById("revisor-conteudo");
-  const report = document.getElementById("revisor-report");
-  const submitBtn = document.getElementById("revisor-submit");
- 
-  if (!report || !submitBtn) return;
- 
-  const tema = (temaEl?.value || "").trim();
-  const subetapaRaw = (subetapaEl?.value || "").trim();
-  const referenceText = (referenciaEl?.value || "").trim();
-  const writerContent = (conteudoEl?.value || "").trim();
- 
-  if (!writerContent) {
-    report.textContent = "Cole o conteúdo do escritor. A referência de comparação pode ficar vazia para a sugestão automática de fontes.";
-    return;
-  }
- 
-  const stepCode = extractStepCode(subetapaRaw);
-  const guidance = getRevisorGuidance(stepCode);
-  const topic = tema || subetapaRaw || "REVISOR TEOLÓGICO";
- 
-  const question =
-    (tema ? "TEMA / ASSUNTO: " + tema + "\n" : "") +
-    (subetapaRaw ? "SUBETAPA / CONTEXTO METODOLÓGICO: " + subetapaRaw + "\n" : "") +
-    comparisonPrompt(referenceText, writerContent, guidance);
- 
-  report.textContent = "REVISOR TEOLÓGICO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
-  submitBtn.disabled = true;
-  submitBtn.textContent = "REVISANDO...";
- 
-  try {
-    const session = await getAuthenticatedSession();
- 
-    if (!session.access_token) {
-      throw new Error("O Supabase não forneceu um token de acesso.");
-    }
- 
-    const response = await fetch(
-      AI_PROXY_URL + "/api/pesquisa",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + session.access_token
-        },
-        body: JSON.stringify({
-          mode: "writing_private",
-          accessLevel: "private",
-          analysisType: "comparison_consolidation",
-          origin: revisorOrigin,
-          stepCode: stepCode || "",
-          requiredLevel: stepCode ? getStepLevel(stepCode) : "FREE",
-          referenceText,
-          writerContent,
-          canonicalGuidance: {
-            module: guidance.name,
-            sources: guidance.sources,
-            rule: guidance.rule
-          },
-          question,
-          topic,
-          module: guidance.name,
-          discipline: "REVISOR TEOLÓGICO"
-        })
-      }
-    );
- 
-    let data = {};
-    try {
-      data = await response.json();
-    } catch {
-      data = {};
-    }
- 
-    if (response.status === 401) {
-      await supabaseClient.auth.signOut();
-      throw new Error("Sua sessão expirou. Entre novamente na Sala do Escritor.");
-    }
- 
-    if (response.status === 403) {
-      throw new Error(data?.error || "Este recurso requer um plano ou unidade disponível na sua conta.");
-    }
- 
-    if (!response.ok) {
-      throw new Error(data?.error || "O Worker não conseguiu concluir a revisão.");
-    }
- 
-    report.textContent = extractAuditReport(data);
-  } catch (error) {
-    console.error("Erro no Revisor Teológico:", error);
-    report.textContent = formatComparisonError(error, { error: error?.message });
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "ENVIAR PARA REVISÃO";
-  }
-}
- 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeRevisor();
 });
@@ -3297,6 +3293,8 @@ renderModules();
 </body>
 </html>
  
+
+
 
 
 
