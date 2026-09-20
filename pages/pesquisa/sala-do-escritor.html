@@ -2233,8 +2233,15 @@ async function carregarEstatisticasPlanos(){
  
   }catch(error){
     console.error("Erro ao carregar planos:",error);
+    const motivo = error && error.message
+      ? ' Motivo: ' + escapeHTML(error.message)
+      : '';
     planRank.innerHTML =
-      '<span class="stats-msg">Não foi possível carregar os planos agora.</span>';
+      '<span class="stats-msg">Não foi possível carregar os planos agora.' + motivo + '</span>';
+    planTempo.innerHTML =
+      '<span class="stats-msg">Sem dados de contas.</span>';
+    // O quadro de preços e margens não depende da contagem de assinantes.
+    renderFinanceiro({});
   }finally{
     planRefreshBtn.disabled = false;
     planRefreshBtn.textContent = "ATUALIZAR";
