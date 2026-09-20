@@ -363,6 +363,47 @@ main{
 .stats-loc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--a));}
 .stats-loc-count{width:32px;text-align:right;font-size:12.5px;color:var(--muted);}
  
+/* ---- botão que abre o painel de gestão ---- */
+.panel-toggle{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:6px 0 4px;
+  padding:18px 22px;
+  border:1px solid #315071;
+  border-radius:var(--radius);
+  background:linear-gradient(145deg,rgba(23,36,58,.98),rgba(17,27,48,.98));
+  color:var(--t);
+  cursor:pointer;
+  text-align:left;
+  font-family:inherit;
+  box-shadow:var(--shadow);
+  transition:.2s;
+}
+.panel-toggle:hover{border-color:var(--a);background:#14253e}
+.panel-toggle:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.panel-toggle-title{display:block;font-size:15px;font-weight:600;letter-spacing:.4px}
+.panel-toggle-sub{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.5}
+.panel-toggle-action{
+  flex:0 0 auto;
+  border:1px solid #315071;
+  border-radius:5px;
+  padding:9px 15px;
+  background:var(--i);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1.2px;
+}
+.panel-toggle[aria-expanded="true"] .panel-toggle-action{
+  border-color:var(--p);
+  color:var(--p);
+}
+@media(max-width:600px){
+  .panel-toggle{flex-direction:column;align-items:flex-start}
+}
+ 
 /* ---- receita e margem por plano ---- */
 .fin-row{
   display:grid;
@@ -1016,6 +1057,16 @@ main{
   </p>
 </section>
  
+<button id="painelToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="painelGestao">
+  <span>
+    <span class="panel-toggle-title">Painel de gestão</span>
+    <span class="panel-toggle-sub">Visitantes, setores mais consultados, assinantes, planos e receita.</span>
+  </span>
+  <span id="painelToggleAcao" class="panel-toggle-action">ABRIR</span>
+</button>
+ 
+<div id="painelGestao" hidden>
+ 
 <div class="section-title">VISITANTES E SETORES MAIS CONSULTADOS</div>
  
 <section class="workspace">
@@ -1145,6 +1196,8 @@ main{
     </div>
   </article>
 </section>
+ 
+</div>
  
 <div id="biblia-paralela" class="section-title">BÍBLIA PARALELA</div>
  
@@ -2254,6 +2307,31 @@ if(planRefreshBtn){
   });
 }
  
+/* =====================================================
+   BOTÃO DO PAINEL DE GESTÃO
+   O painel fica fechado ao entrar e só carrega os dados
+   quando é aberto.
+===================================================== */
+ 
+const painelGestao = document.getElementById("painelGestao");
+const painelToggle = document.getElementById("painelToggle");
+const painelToggleAcao = document.getElementById("painelToggleAcao");
+ 
+if(painelToggle){
+  painelToggle.addEventListener("click",function(){
+    const abrir = painelGestao.hidden;
+ 
+    painelGestao.hidden = !abrir;
+    painelToggle.setAttribute("aria-expanded", String(abrir));
+    painelToggleAcao.textContent = abrir ? "FECHAR" : "ABRIR";
+ 
+    if(abrir){
+      carregarEstatisticasVisitas();
+      carregarEstatisticasPlanos();
+    }
+  });
+}
+ 
 function prepararNovaVerificacao(){
   app.style.display = "none";
   errorBox.style.display = "none";
@@ -2297,8 +2375,10 @@ async function verificarSessao(opcoes = {}){
       iniciarBibliaParalela();
     }
  
-    carregarEstatisticasVisitas();
-    carregarEstatisticasPlanos();
+    if(!painelGestao.hidden){
+      carregarEstatisticasVisitas();
+      carregarEstatisticasPlanos();
+    }
  
   }catch(error){
     console.error("Erro ao verificar sessão:",error);
