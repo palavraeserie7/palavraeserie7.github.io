@@ -363,6 +363,57 @@ main{
 .stats-loc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--a));}
 .stats-loc-count{width:32px;text-align:right;font-size:12.5px;color:var(--muted);}
  
+/* ---- receita e margem por plano ---- */
+.fin-row{
+  display:grid;
+  grid-template-columns:170px 1fr 190px;
+  gap:12px;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid var(--b);
+}
+.fin-row:last-child{border-bottom:none}
+.fin-name{font-size:12.5px;color:var(--t);font-weight:600}
+.fin-name small{
+  display:block;
+  color:#7187a3;
+  font-size:10px;
+  font-weight:400;
+  margin-top:2px;
+}
+.fin-bar{
+  display:flex;
+  height:12px;
+  border-radius:4px;
+  overflow:hidden;
+  background:var(--b);
+}
+.fin-bar i{display:block;height:100%}
+.fin-taxa{background:#e0a030}
+.fin-ia{background:var(--a)}
+.fin-sobra{background:var(--p)}
+.fin-total{text-align:right;font-size:12px;color:var(--muted)}
+.fin-total b{color:var(--t)}
+.fin-legend{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-top:12px;
+  font-size:10.5px;
+  color:var(--muted);
+}
+.fin-legend b{
+  display:inline-block;
+  width:9px;
+  height:9px;
+  border-radius:2px;
+  margin-right:6px;
+}
+@media(max-width:700px){
+  .fin-row{grid-template-columns:1fr}
+  .fin-total{text-align:left}
+}
+ 
  
 /* =====================================================
    BÍBLIA PARALELA — OS TRÊS BLOCOS SÃO O LEITOR
@@ -1064,6 +1115,13 @@ main{
             </div>
           </div>
  
+        </div>
+ 
+        <div class="stats-block" style="margin-top:18px;">
+          <h3>Receita e margem por plano (200 toques por mês)</h3>
+          <div id="planFinanceiro">
+            <span class="stats-msg">Carregando…</span>
+          </div>
         </div>
  
         <div class="stats-block" style="margin-top:18px;">
@@ -1851,7 +1909,7 @@ async function carregarEstatisticasVisitas(){
         const pct = Math.max(6, Math.round((item.total / maior) * 100));
         return (
           '<div class="rank-row">' +
-            '<div class="rank-name">' + item.nome + '</div>' +
+            '<div class="rank-name">' + escapeHTML(item.nome) + '</div>' +
             '<div class="rank-bar-wrap"><div class="rank-bar" style="width:' + pct + '%"></div></div>' +
             '<div class="rank-count">' + item.total + '</div>' +
           '</div>'
@@ -1896,8 +1954,8 @@ async function carregarEstatisticasVisitas(){
  
           return (
             '<div class="stats-loc-row">' +
-              '<div class="stats-loc-name">' + item.nome +
-                (cidadesOrdenadas ? '<span class="stats-loc-city">' + cidadesOrdenadas + '</span>' : '') +
+              '<div class="stats-loc-name">' + escapeHTML(item.nome) +
+                (cidadesOrdenadas ? '<span class="stats-loc-city">' + escapeHTML(cidadesOrdenadas) + '</span>' : '') +
               '</div>' +
               '<div class="stats-loc-bar"><i style="width:' + pct + '%"></i></div>' +
               '<div class="stats-loc-count">' + item.total + '</div>' +
@@ -1998,6 +2056,99 @@ function formatarDias(dias){
   return meses + " mês" + (meses === 1 ? "" : "es");
 }
  
+/* =====================================================
+   RECEITA E MARGEM POR PLANO
+   Valores fechados: preços na Kiwify (taxa de 8,99% + R$ 2,49 por
+   venda), 200 toques por mês e custo estimado de IA por toque.
+   Troque os números aqui quando medir o custo real no Google.
+===================================================== */
+ 
+const FIN_PLANOS = {
+  pro:    { preco:29.90,  iaPorToque:0.022, modelo:"Gemini 3.1 Flash-Lite" },
+  master: { preco:59.90,  iaPorToque:0.044, modelo:"Gemini 3 Flash" },
+  doctus: { preco:139.00, iaPorToque:0.176, modelo:"Gemini 3.1 Pro" }
+};
+const FIN_TOQUES = 200;
+const FIN_TAXA_PCT = 0.0899;
+const FIN_TAXA_FIXA = 2.49;
+ 
+const FIN_PACOTES = [
+  { nome:"Pacote 3 revisões",  preco:9.90,  revisoes:3 },
+  { nome:"Pacote 5 revisões",  preco:14.90, revisoes:5 },
+  { nome:"Pacote 10 revisões", preco:24.90, revisoes:10 }
+];
+const FIN_IA_REVISAO = 0.37;
+ 
+function brl(valor){
+  return valor.toLocaleString("pt-BR",{ style:"currency", currency:"BRL" });
+}
+ 
+function renderFinanceiro(contagem){
+  const el = document.getElementById("planFinanceiro");
+  if(!el) return;
+ 
+  let sobraTotal = 0;
+  let pagantes = 0;
+ 
+  const linhasPlanos = ["doctus","master","pro"].map(function(plano){
+    const c = FIN_PLANOS[plano];
+    const taxa = c.preco * FIN_TAXA_PCT + FIN_TAXA_FIXA;
+    const ia = c.iaPorToque * FIN_TOQUES;
+    const sobra = c.preco - taxa - ia;
+    const n = contagem[plano] || 0;
+ 
+    sobraTotal += sobra * n;
+    pagantes += n;
+ 
+    const larg = function(v){ return (v / c.preco * 100).toFixed(1); };
+ 
+    return (
+      '<div class="fin-row">' +
+        '<div class="fin-name">' + PLANOS_LABEL[plano] + ' · ' + brl(c.preco) +
+          '<small>' + escapeHTML(c.modelo) + '</small></div>' +
+        '<div class="fin-bar" title="Taxa ' + brl(taxa) + ' · IA ' + brl(ia) + ' · Sobra ' + brl(sobra) + '">' +
+          '<i class="fin-taxa" style="width:' + larg(taxa) + '%"></i>' +
+          '<i class="fin-ia" style="width:' + larg(ia) + '%"></i>' +
+          '<i class="fin-sobra" style="width:' + larg(sobra) + '%"></i>' +
+        '</div>' +
+        '<div class="fin-total">' + n + ' × ' + brl(sobra) + ' = <b>' + brl(sobra * n) + '</b></div>' +
+      '</div>'
+    );
+  }).join("");
+ 
+  const linhasPacotes = FIN_PACOTES.map(function(k){
+    const taxa = k.preco * FIN_TAXA_PCT + FIN_TAXA_FIXA;
+    const ia = k.revisoes * FIN_IA_REVISAO;
+    const sobra = k.preco - taxa - ia;
+    const larg = function(v){ return (v / k.preco * 100).toFixed(1); };
+ 
+    return (
+      '<div class="fin-row">' +
+        '<div class="fin-name">' + escapeHTML(k.nome) + ' · ' + brl(k.preco) +
+          '<small>por venda</small></div>' +
+        '<div class="fin-bar" title="Taxa ' + brl(taxa) + ' · IA ' + brl(ia) + ' · Sobra ' + brl(sobra) + '">' +
+          '<i class="fin-taxa" style="width:' + larg(taxa) + '%"></i>' +
+          '<i class="fin-ia" style="width:' + larg(ia) + '%"></i>' +
+          '<i class="fin-sobra" style="width:' + larg(sobra) + '%"></i>' +
+        '</div>' +
+        '<div class="fin-total">sobra <b>' + brl(sobra) + '</b> por venda</div>' +
+      '</div>'
+    );
+  }).join("");
+ 
+  el.innerHTML =
+    linhasPlanos +
+    '<div class="stats-peak-note">Sobra mensal estimada dos planos: <b>' + brl(sobraTotal) +
+      '</b> com ' + pagantes + ' assinante(s), supondo uso máximo de IA (' + FIN_TOQUES + ' toques por mês).</div>' +
+    '<h3 style="margin:18px 0 6px">Pacotes avulsos de revisão</h3>' +
+    linhasPacotes +
+    '<div class="fin-legend">' +
+      '<span><b class="fin-taxa"></b>Taxa da Kiwify</span>' +
+      '<span><b class="fin-ia"></b>Custo de IA</span>' +
+      '<span><b class="fin-sobra"></b>Sobra</span>' +
+    '</div>';
+}
+ 
 async function carregarEstatisticasPlanos(){
   if(!planRefreshBtn) return;
  
@@ -2005,10 +2156,13 @@ async function carregarEstatisticasPlanos(){
   planRefreshBtn.textContent = "ATUALIZANDO...";
  
   try{
+    /*
+      Lê pela função admin_planos_lista (criada no banco): a tabela
+      "profiles" só deixa cada pessoa ver a própria linha, então a
+      leitura direta mostraria só a conta de quem está logado.
+    */
     const {data,error} =
-      await supabaseClient
-        .from("profiles")
-        .select("plano,criado_em");
+      await supabaseClient.rpc("admin_planos_lista");
  
     if(error) throw error;
  
@@ -2035,6 +2189,8 @@ async function carregarEstatisticasPlanos(){
     planTaxaConversao.textContent = linhas.length
       ? Math.round((pagantes / linhas.length) * 100) + "%"
       : "—";
+ 
+    renderFinanceiro(contagem);
  
     const maior = Math.max(1, ...PLANOS_ORDEM.map(function(p){ return contagem[p] || 0; }));
  
@@ -2262,11 +2418,5 @@ document.addEventListener("visibilitychange",function(){
 </body>
 </html>
  
-
-
-
-
-
-
 
 
