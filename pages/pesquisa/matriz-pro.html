@@ -1045,10 +1045,57 @@ main {
  </main>
 
 <script>
+</main>
+
+<section id="revisor-overlay" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;background:rgba(4,10,20,.78);">
+  <div style="width:min(760px,100%);max-height:88vh;overflow:auto;padding:26px;border:1px solid #263754;border-radius:10px;background:#111b30;color:#dbe7f5;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;">
+      <div>
+        <h2 style="margin:0;color:#18bfff;font-size:18px;">REVISOR TEOLÓGICO</h2>
+        <p style="margin:6px 0 0;color:#91a4bd;font-size:11px;line-height:1.5;max-width:520px;">
+          PESQUISAR → ANALISAR → REVISAR → CONSOLIDAR. O Revisor é uma segunda camada de pesquisa: audita metodológica e teologicamente o conteúdo, não é um corretor de texto.
+        </p>
+      </div>
+      <button type="button" onclick="closeRevisor()" style="border:1px solid #35506d;border-radius:5px;padding:7px 10px;background:transparent;color:#dbe7f5;font-weight:900;cursor:pointer;">FECHAR</button>
+    </div>
+
+    <div id="revisor-origin-note" style="margin:14px 0;padding:10px 12px;border-left:3px solid #20d66b;background:#0d172b;color:#b9c7d8;font-size:11px;"></div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+      <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">TEMA / ASSUNTO</label>
+      <input id="revisor-tema" type="text" placeholder="Ex.: A doutrina da justificação em Romanos 3" style="padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;">
+    </div>
+
+    <div id="revisor-subetapa-field" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+      <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">SUBETAPA OU CONTEXTO METODOLÓGICO (opcional)</label>
+      <input id="revisor-subetapa" type="text" placeholder="Ex.: 06.14 — Síntese exegética (deixe vazio se não se aplicar)" style="padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;">
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+      <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">REFERÊNCIA DE COMPARAÇÃO</label>
+      <small style="color:#91a4bd;font-size:9px;">Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere fontes reconhecidas.</small>
+      <textarea id="revisor-referencia" placeholder="Cole uma referência de comparação ou deixe vazio..." style="min-height:110px;resize:vertical;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;"></textarea>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+      <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">CONTEÚDO DO ESCRITOR</label>
+      <small style="color:#91a4bd;font-size:9px;">Cole aqui o texto a ser auditado (produzido por você, por outra IA, artigo, rascunho etc.).</small>
+      <textarea id="revisor-conteudo" placeholder="Cole aqui o conteúdo..." style="min-height:180px;resize:vertical;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;"></textarea>
+    </div>
+
+    <div style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;margin-bottom:6px;">RELATÓRIO DE AUDITORIA</div>
+    <div id="revisor-report" style="min-height:150px;max-height:320px;overflow:auto;padding:14px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font-size:11px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px;">O relatório de auditoria aparecerá aqui depois da revisão.</div>
+
+    <div style="display:flex;justify-content:flex-end;">
+      <button id="revisor-submit" type="button" onclick="submitRevisor()" style="padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;cursor:pointer;">ENVIAR PARA REVISÃO</button>
+    </div>
+  </div>
+</section>
+
+<script>
 /* =====================================================
    SUPABASE
 ===================================================== */
- 
 const SUPABASE_URL =
   "https://qmhdbuxomozdczgvpvcc.supabase.co";
  
