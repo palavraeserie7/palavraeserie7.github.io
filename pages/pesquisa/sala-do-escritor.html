@@ -1,6 +1,3 @@
-
-
-Sala do escritor · HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,7 +5,7 @@ Sala do escritor · HTML
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palavra &amp; Série — Sala do Escritor</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- 
+
 <style>
 :root{
   --p:#20d66b;
@@ -22,7 +19,7 @@ Sala do escritor · HTML
   --muted:#91a4bd;
   --radius:8px;
   --shadow:0 18px 45px rgba(0,0,0,.28);
- 
+
   --paper:#f4eedd;
   --paper-card:#fbf7ec;
   --paper-line:#ddcea4;
@@ -32,12 +29,12 @@ Sala do escritor · HTML
   --brass-deep:#7c5f26;
   --brass-wash:#ede0bd;
 }
- 
+
 *{box-sizing:border-box}
- 
+
 html{min-height:100%;overflow-y:auto;scroll-behavior:auto}
 body{overflow-y:auto}
- 
+
 body{
   margin:0;
   min-height:100vh;
@@ -48,7 +45,7 @@ body{
     linear-gradient(145deg,#0b1428,#0c162b 55%,#091225);
   font-family:"Segoe UI",Arial,Helvetica,sans-serif;
 }
- 
+
 header{
   border-bottom:1px solid var(--b);
   background:rgba(11,20,40,.94);
@@ -57,7 +54,7 @@ header{
   top:0;
   z-index:20;
 }
- 
+
 .header-inner{
   width:min(1180px,92%);
   margin:auto;
@@ -67,11 +64,11 @@ header{
   justify-content:space-between;
   gap:18px;
 }
- 
+
 .brand{display:flex;flex-direction:column;gap:2px}
 .brand-title{font-size:17px;font-weight:700;letter-spacing:1.8px}
 .brand-subtitle{color:var(--muted);font-size:10px;letter-spacing:1.2px}
- 
+
 .session{display:flex;align-items:center;gap:15px}
 .user-email{
   color:var(--p);
@@ -81,7 +78,7 @@ header{
   text-overflow:ellipsis;
   white-space:nowrap;
 }
- 
+
 .btn-logout{
   border:1px solid var(--b);
   background:var(--i);
@@ -95,13 +92,13 @@ header{
 }
 .btn-logout:hover{border-color:var(--p);color:var(--t);background:#12203a}
 .btn-logout:disabled{opacity:.55;cursor:wait}
- 
+
 main{
   width:min(1180px,92%);
   margin:0 auto;
   padding:24px 0 50px;
 }
- 
+
 .hero{margin-bottom:18px}
 .hero-label{color:var(--p);font-size:11px;letter-spacing:2px;margin-bottom:8px}
 .hero h1{margin:0;font-size:27px;font-weight:600;letter-spacing:.3px}
@@ -112,7 +109,7 @@ main{
   line-height:1.55;
   font-size:13px;
 }
- 
+
 .section-title{
   color:var(--t);
   font-size:11px;
@@ -129,13 +126,13 @@ main{
   flex:1;
   background:var(--b);
 }
- 
+
 .workspace{
   display:grid;
   grid-template-columns:1fr;
   gap:18px;
 }
- 
+
 .card{
   position:relative;
   background:linear-gradient(145deg,rgba(23,36,58,.98),rgba(17,27,48,.98));
@@ -148,7 +145,7 @@ main{
   justify-content:space-between;
   box-shadow:var(--shadow);
 }
- 
+
 .card-main{display:flex;gap:16px}
 .icon{
   width:48px;
@@ -165,7 +162,7 @@ main{
 }
 .card h2{margin:1px 0 9px;font-size:19px;font-weight:600;letter-spacing:.4px}
 .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}
- 
+
 .card-footer{
   margin-top:27px;
   display:flex;
@@ -174,7 +171,7 @@ main{
   gap:15px;
 }
 .card-status{color:#7187a3;font-size:10px;letter-spacing:1.2px;text-transform:uppercase}
- 
+
 .btn-open{
   display:inline-block;
   text-decoration:none;
@@ -189,7 +186,7 @@ main{
   transition:.2s;
 }
 .btn-open:hover{background:#14253e;border-color:var(--a);color:#fff}
- 
+
 .stats-card .card-main{width:100%}
 .stats-summary{
   display:flex;
@@ -262,7 +259,7 @@ main{
 .stats-refresh:hover{background:#14253e;border-color:var(--a);color:#fff}
 .stats-refresh:disabled{opacity:.6;cursor:default}
 .stats-msg{color:var(--muted);font-size:12px}
- 
+
 /* ---- painel de visitantes ampliado ---- */
 .stats-grid{
   display:grid;
@@ -362,7 +359,49 @@ main{
 .stats-loc-bar{width:56px;height:5px;border-radius:4px;background:var(--b);overflow:hidden;}
 .stats-loc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--a));}
 .stats-loc-count{width:32px;text-align:right;font-size:12.5px;color:var(--muted);}
- 
+
+/* ---- campos editáveis do quadro de receita ---- */
+.fin-form{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:12px;
+}
+.fin-campo{
+  border:1px solid var(--b);
+  border-radius:6px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.fin-campo > span{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--p);
+}
+.fin-campo label{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:.6px;
+}
+.fin-campo input{
+  height:34px;
+  border:1px solid var(--b);
+  border-radius:4px;
+  background:var(--bg);
+  color:var(--t);
+  padding:0 10px;
+  font:13px "Segoe UI",Arial,sans-serif;
+}
+.fin-campo input:focus{outline:none;border-color:var(--a)}
+@media(max-width:900px){.fin-form{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.fin-form{grid-template-columns:1fr}}
+
 /* ---- botão que abre o painel de gestão ---- */
 .panel-toggle{
   width:100%;
@@ -403,7 +442,7 @@ main{
 @media(max-width:600px){
   .panel-toggle{flex-direction:column;align-items:flex-start}
 }
- 
+
 /* ---- receita e margem por plano ---- */
 .fin-row{
   display:grid;
@@ -454,12 +493,12 @@ main{
   .fin-row{grid-template-columns:1fr}
   .fin-total{text-align:left}
 }
- 
- 
+
+
 /* =====================================================
    BÍBLIA PARALELA — OS TRÊS BLOCOS SÃO O LEITOR
 ===================================================== */
- 
+
 .parallel-wrap{
   border:1px solid var(--paper-line);
   border-radius:var(--radius);
@@ -468,7 +507,7 @@ main{
   overflow:hidden;
   color:var(--ink);
 }
- 
+
 .parallel-toolbar{
   padding:16px 18px;
   border-bottom:1px solid var(--paper-line);
@@ -478,14 +517,14 @@ main{
   gap:16px;
   background:var(--paper-card);
 }
- 
+
 .parallel-title{
   display:flex;
   align-items:center;
   gap:12px;
   min-width:0;
 }
- 
+
 .parallel-title-mark{
   width:36px;
   height:36px;
@@ -499,28 +538,28 @@ main{
   background:var(--paper-card);
   font-size:15px;
 }
- 
+
 .parallel-title h2{
   margin:0;
   font-size:17px;
   font-weight:600;
   color:var(--ink);
 }
- 
+
 .parallel-title p{
   margin:3px 0 0;
   color:var(--ink-soft);
   font-size:10px;
   letter-spacing:.7px;
 }
- 
+
 .parallel-ref{
   color:var(--ink-soft);
   font-size:10px;
   letter-spacing:1.1px;
   white-space:nowrap;
 }
- 
+
 /* Uma única grade: as três colunas permanecem alinhadas até o fim.
    A página inteira é o eixo vertical de rolagem. */
 .parallel-reader{
@@ -529,14 +568,14 @@ main{
   overflow-y:visible;
   overscroll-behavior-x:contain;
 }
- 
+
 .parallel-head,
 .verse-row{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   min-width:900px;
 }
- 
+
 .parallel-head{
   position:sticky;
   top:54px;
@@ -544,27 +583,27 @@ main{
   border-bottom:1px solid var(--paper-line);
   background:var(--paper-card);
 }
- 
+
 .parallel-head .source{
   min-width:0;
   padding:14px 16px 13px;
   border-right:1px solid var(--paper-line);
 }
- 
+
 .parallel-head .source:last-child{border-right:0}
- 
+
 /* A Bíblia escolhida ocupa toda a área de leitura. */
 .parallel-head,
 .verse-row{
   grid-template-columns:1fr;
   min-width:0;
 }
- 
+
 .parallel-head .source[hidden],
 .verse-cell[hidden]{
   display:none !important;
 }
- 
+
 .source-label{
   display:block;
   color:var(--brass-deep);
@@ -573,34 +612,34 @@ main{
   letter-spacing:1.5px;
   margin-bottom:4px;
 }
- 
+
 .source-name{
   display:block;
   color:var(--ink-soft);
   font-size:9px;
   letter-spacing:.8px;
 }
- 
+
 .parallel-head .source:nth-child(1) .source-label{color:var(--brass-deep)}
- 
+
 .parallel-body{
   background:var(--paper);
 }
- 
+
 .verse-row{
   border-bottom:1px solid var(--paper-line);
 }
- 
+
 .verse-row:last-child{border-bottom:0}
- 
+
 .verse-cell{
   min-width:0;
   padding:17px 18px 20px;
   border-right:1px solid var(--paper-line);
 }
- 
+
 .verse-cell:last-child{border-right:0}
- 
+
 .verse-meta{
   display:flex;
   align-items:center;
@@ -610,41 +649,41 @@ main{
   font-size:9px;
   letter-spacing:1px;
 }
- 
+
 .verse-number{
   color:var(--brass-deep);
   font-weight:700;
 }
- 
+
 .verse-text{
   margin:0;
   color:var(--ink);
   font-size:14px;
   line-height:1.9;
 }
- 
+
 .verse-cell.hebrew{
   direction:rtl;
   text-align:right;
 }
- 
+
 .verse-cell.hebrew .verse-meta{
   direction:rtl;
   justify-content:flex-start;
 }
- 
+
 .verse-cell.hebrew .verse-number{color:var(--brass-deep)}
- 
+
 .verse-cell.greek{direction:ltr;text-align:left}
 .verse-cell.portuguese{direction:ltr;text-align:left}
- 
+
 .empty-text{
   color:var(--ink-soft);
   font-size:12px;
   line-height:1.7;
   font-style:italic;
 }
- 
+
 .parallel-note{
   padding:13px 18px;
   border-top:1px solid var(--paper-line);
@@ -654,7 +693,7 @@ main{
   letter-spacing:.5px;
   background:var(--paper);
 }
- 
+
 .info{
   margin-top:20px;
   border:1px solid var(--paper-line);
@@ -662,27 +701,27 @@ main{
   background:linear-gradient(145deg,var(--paper-card),var(--paper));
   padding:18px 21px;
 }
- 
+
 .info-title{
   font-size:10px;
   color:var(--brass-deep);
   letter-spacing:1.7px;
   margin-bottom:8px;
 }
- 
+
 .info p{
   margin:0;
   color:var(--ink-soft);
   font-size:11px;
   line-height:1.7;
 }
- 
+
 footer{
   border-top:1px solid var(--b);
   padding:25px 0 35px;
   background:#091225;
 }
- 
+
 .footer-inner{
   width:min(1180px,92%);
   margin:auto;
@@ -691,7 +730,7 @@ footer{
   align-items:center;
   gap:20px;
 }
- 
+
 .footer-left{color:#6f829b;font-size:10px;letter-spacing:1px}
 .footer-link{
   color:#8ca1ba;
@@ -701,7 +740,7 @@ footer{
   transition:.2s;
 }
 .footer-link:hover{color:var(--a)}
- 
+
 #loading{
   min-height:100vh;
   display:flex;
@@ -712,7 +751,7 @@ footer{
   font-size:12px;
   letter-spacing:1.5px;
 }
- 
+
 #error{
   display:none;
   min-height:100vh;
@@ -722,7 +761,7 @@ footer{
   text-align:center;
   background:#0b1428;
 }
- 
+
 .error-box{
   width:min(500px,100%);
   border:1px solid var(--b);
@@ -731,10 +770,10 @@ footer{
   border-radius:var(--radius);
   box-shadow:var(--shadow);
 }
- 
+
 .error-box h2{margin-top:0;color:var(--t);font-size:18px}
 .error-box p{color:var(--muted);line-height:1.7;font-size:13px}
- 
+
 .btn-login{
   display:inline-block;
   margin-top:15px;
@@ -747,7 +786,7 @@ footer{
   font-size:10px;
   letter-spacing:1.2px;
 }
- 
+
 @media(max-width:760px){
   .header-inner{
     min-height:72px;
@@ -755,32 +794,32 @@ footer{
     padding:12px 0;
     flex-direction:column;
   }
- 
+
   .session{width:100%;justify-content:space-between}
   .user-email{max-width:210px}
   main{padding-top:28px}
   .hero h1{font-size:27px}
- 
+
   .card-main{gap:15px}
   .card-footer{align-items:flex-start;flex-direction:column}
- 
+
   .parallel-toolbar{
     align-items:flex-start;
     flex-direction:column;
   }
- 
+
   .parallel-ref{white-space:normal}
- 
+
   .parallel-head{
     position:relative;
   }
- 
+
   .footer-inner{
     flex-direction:column;
     align-items:flex-start;
   }
 }
- 
+
 @media(max-width:480px){
   main{width:calc(100% - 30px)}
   .header-inner,.footer-inner{width:calc(100% - 30px)}
@@ -788,7 +827,7 @@ footer{
   .hero h1{font-size:25px}
   .icon{width:42px;height:42px;flex-basis:42px;font-size:18px}
 }
- 
+
 /* Controles funcionais da Bíblia paralela */
 .bible-controls{
   display:flex;
@@ -799,21 +838,21 @@ footer{
   border-bottom:1px solid var(--paper-line);
   background:var(--paper);
 }
- 
+
 .bible-controls label{
   display:flex;
   flex-direction:column;
   gap:5px;
   min-width:190px;
 }
- 
+
 .bible-controls label span{
   color:var(--ink-soft);
   font-size:8px;
   font-weight:700;
   letter-spacing:1.4px;
 }
- 
+
 .bible-controls select{
   height:34px;
   border:1px solid var(--paper-line);
@@ -824,13 +863,13 @@ footer{
   outline:none;
   font:11px "Segoe UI",Arial,sans-serif;
 }
- 
+
 .bible-controls select:focus{
   border-color:var(--brass);
 }
- 
+
 .chapter-control{min-width:105px!important;width:105px}
- 
+
 .reader-btn{
   height:34px;
   min-width:38px;
@@ -844,29 +883,29 @@ footer{
   letter-spacing:.8px;
   transition:.2s;
 }
- 
+
 .reader-btn:hover{
   border-color:var(--brass);
   background:var(--brass-wash);
 }
- 
+
 .reader-btn.primary{
   padding:0 14px;
   color:#fffdf6;
   border-color:var(--brass);
   background:var(--brass);
 }
- 
+
 .reader-btn.primary:hover{
   border-color:var(--brass-deep);
   background:var(--brass-deep);
 }
- 
+
 .reader-btn:disabled{
   opacity:.45;
   cursor:wait;
 }
- 
+
 .reader-status{
   align-self:center;
   margin-left:auto;
@@ -874,7 +913,7 @@ footer{
   font-size:8px;
   letter-spacing:1px;
 }
- 
+
 .reader-loading,
 .reader-error{
   min-height:180px;
@@ -887,14 +926,14 @@ footer{
   letter-spacing:1px;
   text-align:center;
 }
- 
+
 .reader-error{color:#a14747}
- 
+
 .verse-cell .verse-text{
   white-space:pre-wrap;
   word-break:normal;
 }
- 
+
 @media(max-width:760px){
   .bible-controls label{
     min-width:calc(100% - 10px);
@@ -911,17 +950,17 @@ footer{
 /* =====================================================
    AJUSTE DE LEITURA E APROVEITAMENTO DA LARGURA
 ===================================================== */
- 
+
 .header-inner,
 main,
 .footer-inner{
   width:min(1500px,calc(100% - 48px));
 }
- 
+
 main{
   padding:34px 0 68px;
 }
- 
+
 .hero{margin-bottom:26px}
 .hero-label{font-size:14px;margin-bottom:12px}
 .hero h1{font-size:40px;letter-spacing:.2px}
@@ -931,20 +970,20 @@ main{
   font-size:18px;
   line-height:1.7;
 }
- 
+
 .section-title{
   font-size:15px;
   margin:30px 0 15px;
   letter-spacing:2.2px;
 }
- 
+
 .workspace{gap:24px}
- 
+
 .card{
   padding:32px;
   min-height:205px;
 }
- 
+
 .card-main{gap:20px}
 .icon{
   width:58px;
@@ -957,14 +996,14 @@ main{
 .card-footer{margin-top:32px;gap:20px}
 .card-status{font-size:12px}
 .btn-open{padding:13px 20px;font-size:13px}
- 
+
 .parallel-toolbar{padding:22px 24px;gap:20px}
 .parallel-title{gap:15px}
 .parallel-title-mark{width:44px;height:44px;flex-basis:44px;font-size:18px}
 .parallel-title h2{font-size:25px}
 .parallel-title p{font-size:13px}
 .parallel-ref{font-size:13px}
- 
+
 .parallel-head .source{padding:18px 22px 17px}
 .source-label{font-size:13px}
 .source-name{font-size:12px}
@@ -973,7 +1012,7 @@ main{
 .verse-text{font-size:20px;line-height:2}
 .empty-text{font-size:16px}
 .parallel-note{padding:17px 24px;font-size:12px;line-height:1.7}
- 
+
 .bible-controls{padding:17px 22px;gap:12px}
 .bible-controls label{min-width:215px;gap:6px}
 .bible-controls label span{font-size:10px}
@@ -986,20 +1025,20 @@ main{
 .reader-btn{height:40px;min-width:44px;font-size:12px}
 .reader-btn.primary{padding:0 17px}
 .reader-status{font-size:11px}
- 
+
 .info{margin-top:28px;padding:22px 25px}
 .info-title{font-size:13px;margin-bottom:11px}
 .info p{font-size:15px;line-height:1.8}
- 
+
 .footer-left,.footer-link{font-size:12px}
- 
+
 @media(max-width:760px){
   .header-inner,
   main,
   .footer-inner{
     width:calc(100% - 32px);
   }
- 
+
   main{padding-top:30px}
   .hero h1{font-size:32px}
   .hero p{font-size:16px}
@@ -1016,11 +1055,11 @@ main{
 }
 </style>
 </head>
- 
+
 <body>
- 
+
 <div id="loading">ABRINDO SALA DO ESCRITOR...</div>
- 
+
 <div id="error">
   <div class="error-box">
     <h2>ACESSO RESTRITO</h2>
@@ -1028,25 +1067,25 @@ main{
     <a class="btn-login" href="entrada.html">IR PARA ENTRADA</a>
   </div>
 </div>
- 
+
 <div id="app" style="display:none;">
- 
+
 <header>
   <div class="header-inner">
     <div class="brand">
       <div class="brand-title">PALAVRA &amp; SÉRIE</div>
       <div class="brand-subtitle">SALA DO ESCRITOR</div>
     </div>
- 
+
     <div class="session">
       <div id="userEmail" class="user-email">—</div>
       <button id="logoutBtn" class="btn-logout" type="button">SAIR</button>
     </div>
   </div>
 </header>
- 
+
 <main>
- 
+
 <section class="hero">
   <div class="hero-label">ÁREA PRIVADA DE CRIAÇÃO</div>
   <h1>Sala do Escritor</h1>
@@ -1056,7 +1095,7 @@ main{
     Palavra &amp; Série.
   </p>
 </section>
- 
+
 <button id="painelToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="painelGestao">
   <span>
     <span class="panel-toggle-title">Painel de gestão</span>
@@ -1064,16 +1103,16 @@ main{
   </span>
   <span id="painelToggleAcao" class="panel-toggle-action">ABRIR</span>
 </button>
- 
+
 <div id="painelGestao" hidden>
- 
+
 <div class="section-title">VISITANTES E SETORES MAIS CONSULTADOS</div>
- 
+
 <section class="workspace">
   <article class="card stats-card">
     <div class="card-main">
       <div style="width:100%">
- 
+
         <div class="stats-summary">
           <div class="stat-box">
             <div class="stat-num" id="statTotalVisitas">—</div>
@@ -1092,49 +1131,49 @@ main{
             <div class="stat-label">Setor mais consultado</div>
           </div>
         </div>
- 
+
         <div class="stats-grid">
- 
+
           <div class="stats-block">
             <h3>Setores mais consultados</h3>
             <div class="stats-rank" id="statsRank">
               <span class="stats-msg">Carregando estatísticas…</span>
             </div>
           </div>
- 
+
           <div class="stats-block">
             <h3>Localização dos visitantes</h3>
             <div id="statsLocations">
               <span class="stats-msg">Carregando localização…</span>
             </div>
           </div>
- 
+
         </div>
- 
+
         <div class="stats-block" style="margin-top:18px;">
           <h3>Atividade por horário (horário local do navegador)</h3>
           <div id="statsHoursWrap">
             <span class="stats-msg">Carregando atividade por horário…</span>
           </div>
         </div>
- 
+
       </div>
     </div>
- 
+
     <div class="card-footer">
       <span class="card-status" id="statsUpdatedAt">—</span>
       <button class="stats-refresh" id="statsRefreshBtn" type="button">ATUALIZAR</button>
     </div>
   </article>
 </section>
- 
+
 <div class="section-title">ASSINANTES E PLANOS</div>
- 
+
 <section class="workspace">
   <article class="card stats-card">
     <div class="card-main">
       <div style="width:100%">
- 
+
         <div class="stats-summary">
           <div class="stat-box">
             <div class="stat-num" id="planTotalAssinantes">—</div>
@@ -1149,32 +1188,32 @@ main{
             <div class="stat-label">Taxa de conversão</div>
           </div>
         </div>
- 
+
         <div class="stats-grid">
- 
+
           <div class="stats-block">
             <h3>Distribuição por plano</h3>
             <div class="stats-rank" id="planRank">
               <span class="stats-msg">Carregando planos…</span>
             </div>
           </div>
- 
+
           <div class="stats-block">
             <h3>Tempo médio de conta por plano</h3>
             <div id="planTempo">
               <span class="stats-msg">Carregando…</span>
             </div>
           </div>
- 
+
         </div>
- 
+
         <div class="stats-block" style="margin-top:18px;">
-          <h3>Receita e margem por plano (200 toques por mês)</h3>
+          <h3>Receita e margem por plano</h3>
           <div id="planFinanceiro">
             <span class="stats-msg">Carregando…</span>
           </div>
         </div>
- 
+
         <div class="stats-block" style="margin-top:18px;">
           <h3>Desistência / cancelamentos</h3>
           <div id="planDesistencia">
@@ -1186,23 +1225,23 @@ main{
             </span>
           </div>
         </div>
- 
+
       </div>
     </div>
- 
+
     <div class="card-footer">
       <span class="card-status" id="planUpdatedAt">—</span>
       <button class="stats-refresh" id="planRefreshBtn" type="button">ATUALIZAR</button>
     </div>
   </article>
 </section>
- 
+
 </div>
- 
+
 <div id="biblia-paralela" class="section-title">BÍBLIA PARALELA</div>
- 
+
 <section class="parallel-wrap">
- 
+
   <div class="parallel-toolbar">
     <div class="parallel-title">
       <div class="parallel-title-mark">א</div>
@@ -1211,10 +1250,10 @@ main{
         <p>HEBRAICO · GREGO · PORTUGUÊS</p>
       </div>
     </div>
- 
+
     <div class="parallel-ref" id="parallelRef">CARREGANDO...</div>
   </div>
- 
+
   <div class="bible-controls">
     <label class="bible-version-control">
       <span>BÍBLIA</span>
@@ -1224,32 +1263,32 @@ main{
         <option value="greek">Grego — Nestle 1904 / Textus Receptus</option>
       </select>
     </label>
- 
+
     <label>
       <span>LIVRO</span>
       <select id="bookSelect" aria-label="Livro"></select>
     </label>
- 
+
     <label class="chapter-control">
       <span>CAPÍTULO</span>
       <select id="chapterSelect" aria-label="Capítulo"></select>
     </label>
- 
+
     <button id="prevChapter" class="reader-btn" type="button" aria-label="Capítulo anterior">←</button>
     <button id="openChapter" class="reader-btn primary" type="button">ABRIR</button>
     <button id="nextChapter" class="reader-btn" type="button" aria-label="Próximo capítulo">→</button>
- 
+
     <span id="readerStatus" class="reader-status">PRONTO</span>
   </div>
- 
+
   <div class="parallel-reader">
- 
+
     <div class="parallel-head">
       <div class="source" data-bible-source="hebrew">
         <span class="source-label">HEBRAICO</span>
         <span class="source-name">WLC · OSHB</span>
       </div>
- 
+
       <div class="source" data-bible-source="greek">
         <span class="source-label">GREGO</span>
         <div class="source-name-line">
@@ -1260,19 +1299,19 @@ main{
           </select>
         </div>
       </div>
- 
+
       <div class="source" data-bible-source="portuguese">
         <span class="source-label">PORTUGUÊS</span>
         <span class="source-name">ALMEIDA 1911 · TEXTO HISTÓRICO</span>
       </div>
     </div>
- 
+
     <div id="parallelBody" class="parallel-body">
       <div class="reader-loading">CARREGANDO TEXTO...</div>
     </div>
- 
+
   </div>
- 
+
   <div class="parallel-note">
     AT: WLC · OSHB + ALMEIDA 1911 &nbsp;|&nbsp;
     NT: NESTLE 1904 ou TEXTUS RECEPTUS · SCRIVENER 1894 + ALMEIDA 1911.
@@ -1280,9 +1319,9 @@ main{
     Grafia histórica preservada na Almeida 1911: formas como “abysmo”, “fórma” e “vasia” pertencem à edição original.
     Textus Receptus: texto grego de Scrivener 1894, integrado por dados do STEPBible TAGNT; o texto grego é domínio público.
   </div>
- 
+
 </section>
- 
+
 <section class="info">
   <div class="info-title">SOBRE ESTA ÁREA</div>
   <p>
@@ -1292,38 +1331,38 @@ main{
     A coluna grega permite alternar entre Nestle 1904 e Textus Receptus · Scrivener 1894.
   </p>
 </section>
- 
+
 </main>
- 
+
 <footer>
   <div class="footer-inner">
     <div class="footer-left">PALAVRA &amp; SÉRIE — SALA DO ESCRITOR</div>
     <a class="footer-link" href="javascript:history.back()">← VOLTAR</a>
   </div>
 </footer>
- 
+
 </div>
- 
- 
+
+
 <script>
 const SUPABASE_URL =
   "https://qmhdbuxomozdczgvpvcc.supabase.co";
- 
+
 const SUPABASE_ANON_KEY =
   "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
- 
+
 const supabaseClient =
   window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
- 
+
 const loading = document.getElementById("loading");
 const app = document.getElementById("app");
 const errorBox = document.getElementById("error");
 const userEmail = document.getElementById("userEmail");
 const logoutBtn = document.getElementById("logoutBtn");
- 
+
 const bibleSelect = document.getElementById("bibleSelect");
 const bookSelect = document.getElementById("bookSelect");
 const chapterSelect = document.getElementById("chapterSelect");
@@ -1335,7 +1374,7 @@ const parallelRef = document.getElementById("parallelRef");
 const readerStatus = document.getElementById("readerStatus");
 const greekSourceSelect = document.getElementById("greekSourceSelect");
 const greekSourceName = document.getElementById("greekSourceName");
- 
+
 /*
   Fontes:
   - WLC: textos normalizados do Biblia Libera, provenientes do Open Scriptures Hebrew Bible.
@@ -1343,21 +1382,21 @@ const greekSourceName = document.getElementById("greekSourceName");
   - Textus Receptus · Scrivener 1894: texto grego do pacote baseado no STEPBible TAGNT, carregado por capítulo.
   - Almeida 1911: JSON público do projeto Smart Bible Versions.
 */
- 
+
 const DATA = {
   portuguese:
     "https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/ALM1911%20-%20Almeida%201911.json",
- 
+
   wlc:
     "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/wlc/",
- 
+
   greek:
     "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/n4/",
- 
+
   tr:
     "https://raw.githubusercontent.com/metaxiamultimedia/scriptures-js-source-stepbible-tagnt-tr/main/data/stepbible-tagnt-tr/"
 };
- 
+
 const BOOKS = [
   ["Gen","Gênesis","OT","Gênesis"],
   ["Exod","Êxodo","OT","Êxodo"],
@@ -1426,14 +1465,14 @@ const BOOKS = [
   ["Jude","Judas","NT","Judas"],
   ["Rev","Apocalipse","NT","Apocalipse"]
 ];
- 
+
 let portugueseBible = null;
 const sourceCache = new Map();
 let currentBookIndex = 0;
 let currentChapter = 1;
 let currentBible = "portuguese";
 let currentGreekSource = "nestle";
- 
+
 function escapeHTML(value){
   return String(value ?? "")
     .replaceAll("&","&amp;")
@@ -1442,170 +1481,170 @@ function escapeHTML(value){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
- 
+
 function setStatus(text){
   readerStatus.textContent = text;
 }
- 
+
 function populateBooks(){
   bookSelect.innerHTML = BOOKS.map((book,index) =>
     `<option value="${index}">${escapeHTML(book[1])}</option>`
   ).join("");
- 
+
   bookSelect.value = "0";
 }
- 
+
 function populateChapters(){
   const book = portugueseBible?.[currentBookIndex];
   const count = book?.chapters?.length || 1;
- 
+
   chapterSelect.innerHTML = Array.from(
     {length:count},
     (_,i) => `<option value="${i+1}">${i+1}</option>`
   ).join("");
- 
+
   if(currentChapter > count) currentChapter = count;
   chapterSelect.value = String(currentChapter);
 }
- 
+
 async function loadPortuguese(){
   if(portugueseBible) return portugueseBible;
- 
+
   setStatus("CARREGANDO ALMEIDA 1911...");
   const response = await fetch(DATA.portuguese, {
     cache:"force-cache"
   });
- 
+
   if(!response.ok){
     throw new Error("Não foi possível carregar Almeida 1911.");
   }
- 
+
   portugueseBible = await response.json();
- 
+
   if(!Array.isArray(portugueseBible)){
     throw new Error("Formato inesperado da Almeida 1911.");
   }
- 
+
   return portugueseBible;
 }
- 
+
 async function loadOriginal(bookCode, testament){
   if(testament === "OT"){
     const url = `${DATA.wlc}${bookCode}.txt`;
- 
+
     if(sourceCache.has(url)){
       return sourceCache.get(url);
     }
- 
+
     const response = await fetch(url, {
       cache:"force-cache"
     });
- 
+
     if(!response.ok){
       sourceCache.set(url, null);
       return null;
     }
- 
+
     const text = await response.text();
     const verses = new Map();
- 
+
     for(const line of text.split(/\r?\n/)){
       if(!line.trim()) continue;
- 
+
       const tab = line.indexOf("\t");
       if(tab < 0) continue;
- 
+
       const id = line.slice(0,tab).trim();
       const value = line.slice(tab+1).trim();
- 
+
       const parts = id.split(".");
       const chapter = Number(parts[1]);
       const verse = Number(parts[2]);
- 
+
       if(Number.isInteger(chapter) && Number.isInteger(verse)){
         verses.set(`${chapter}:${verse}`, value);
       }
     }
- 
+
     sourceCache.set(url, verses);
     return verses;
   }
- 
+
   if(currentGreekSource === "tr"){
     const trBook = getTRBookCode(bookCode);
     const cacheKey = `tr:${trBook}:${currentChapter}`;
- 
+
     if(sourceCache.has(cacheKey)){
       return sourceCache.get(cacheKey);
     }
- 
+
     const verseCount = portugueseBible?.[currentBookIndex]?.chapters?.[currentChapter-1]?.length || 0;
     const urls = Array.from(
       {length:verseCount},
       (_,index) => `${DATA.tr}${trBook}/${currentChapter}/${index+1}.json`
     );
- 
+
     const responses = await Promise.all(
       urls.map(url => fetch(url,{cache:"force-cache"}))
     );
- 
+
     const verses = new Map();
- 
+
     for(let index=0; index<responses.length; index++){
       const response = responses[index];
       if(!response.ok) continue;
- 
+
       const data = await response.json();
       const text = typeof data?.text === "string" ? data.text.trim() : "";
       if(text){
         verses.set(`${currentChapter}:${index+1}`, text);
       }
     }
- 
+
     sourceCache.set(cacheKey, verses);
     return verses;
   }
- 
+
   const url = `${DATA.greek}${bookCode}.txt`;
- 
+
   if(sourceCache.has(url)){
     return sourceCache.get(url);
   }
- 
+
   const response = await fetch(url, {
     cache:"force-cache"
   });
- 
+
   if(!response.ok){
     sourceCache.set(url, null);
     return null;
   }
- 
+
   const text = await response.text();
   const verses = new Map();
- 
+
   for(const line of text.split(/\r?\n/)){
     if(!line.trim()) continue;
- 
+
     const tab = line.indexOf("\t");
     if(tab < 0) continue;
- 
+
     const id = line.slice(0,tab).trim();
     const value = line.slice(tab+1).trim();
- 
+
     const parts = id.split(".");
     const chapter = Number(parts[1]);
     const verse = Number(parts[2]);
- 
+
     if(Number.isInteger(chapter) && Number.isInteger(verse)){
       verses.set(`${chapter}:${verse}`, value);
     }
   }
- 
+
   sourceCache.set(url, verses);
   return verses;
 }
- 
+
 function getTRBookCode(bookCode){
   const map = {
     Matt:"Matt", Mark:"Mark", Luke:"Luke", John:"John", Acts:"Acts",
@@ -1617,22 +1656,22 @@ function getTRBookCode(bookCode){
   };
   return map[bookCode] || bookCode;
 }
- 
+
 function getPortugueseChapter(){
   const book = portugueseBible?.[currentBookIndex];
   const chapter = book?.chapters?.[currentChapter-1];
- 
+
   if(!Array.isArray(chapter)) return [];
- 
+
   return chapter.map((text,index) => ({
     verse:index+1,
     text
   }));
 }
- 
+
 function getOriginalChapter(map){
   if(!map) return [];
- 
+
   const result = [];
   for(const [key,text] of map.entries()){
     const [chapter,verse] = key.split(":").map(Number);
@@ -1640,11 +1679,11 @@ function getOriginalChapter(map){
       result.push({verse,text});
     }
   }
- 
+
   result.sort((a,b) => a.verse-b.verse);
   return result;
 }
- 
+
 function buildVerseMap(items){
   const map = new Map();
   for(const item of items || []){
@@ -1652,17 +1691,17 @@ function buildVerseMap(items){
   }
   return map;
 }
- 
+
 function applyBibleLayout(){
   document.querySelectorAll("[data-bible-source]").forEach(source => {
     source.hidden = source.dataset.bibleSource !== currentBible;
   });
- 
+
   if(bibleSelect){
     bibleSelect.value = currentBible;
   }
 }
- 
+
 function renderRows(bookCode, testament, hebrewMap, greekMap){
   const ptMap = buildVerseMap(getPortugueseChapter());
   const hebrew = testament === "OT"
@@ -1671,24 +1710,24 @@ function renderRows(bookCode, testament, hebrewMap, greekMap){
   const greek = testament === "NT"
     ? buildVerseMap(getOriginalChapter(greekMap))
     : new Map();
- 
+
   const selectedMap = currentBible === "hebrew"
     ? hebrew
     : currentBible === "greek"
       ? greek
       : ptMap;
- 
+
   const ordered = [...selectedMap.keys()].sort((a,b) => a-b);
- 
+
   if(!ordered.length){
     parallelBody.innerHTML =
       `<div class="reader-error">NENHUM VERSÍCULO ENCONTRADO PARA ESTA REFERÊNCIA.</div>`;
     return;
   }
- 
+
   parallelBody.innerHTML = ordered.map(verse => {
     const text = selectedMap.get(verse);
- 
+
     return `
       <div class="verse-row">
         <div class="verse-cell ${currentBible}" data-bible-source="${currentBible}">
@@ -1702,34 +1741,34 @@ function renderRows(bookCode, testament, hebrewMap, greekMap){
     `;
   }).join("");
 }
- 
+
 async function openBibleChapter(){
   const savedScrollX = window.scrollX;
   const savedScrollY = window.scrollY;
   const book = BOOKS[currentBookIndex];
   const [bookCode,bookName,testament] = book;
- 
+
   if(testament === "OT" && currentBible === "greek") currentBible = "portuguese";
   if(testament === "NT" && currentBible === "hebrew") currentBible = "portuguese";
   applyBibleLayout();
- 
+
   openChapter.disabled = true;
   prevChapter.disabled = true;
   nextChapter.disabled = true;
- 
+
   setStatus("CARREGANDO...");
   parallelRef.textContent =
     `${bookName.toUpperCase()} ${currentChapter} · LEITURA ALINHADA`;
- 
+
   parallelBody.innerHTML =
     `<div class="reader-loading">CARREGANDO ${escapeHTML(bookName.toUpperCase())} ${currentChapter}...</div>`;
- 
+
   try{
     await loadPortuguese();
- 
+
     let hebrewMap = null;
     let greekMap = null;
- 
+
     if(testament === "OT"){
       setStatus("CARREGANDO WLC...");
       hebrewMap = await loadOriginal(bookCode,"OT");
@@ -1740,28 +1779,28 @@ async function openBibleChapter(){
       setStatus(`CARREGANDO ${greekLabel}...`);
       greekMap = await loadOriginal(bookCode,"NT");
     }
- 
+
     greekSourceName.textContent = currentGreekSource === "tr"
       ? "TEXTUS RECEPTUS · SCRIVENER 1894"
       : "NESTLE 1904";
     greekSourceSelect.value = currentGreekSource;
     greekSourceSelect.disabled = testament === "OT";
- 
+
     renderRows(bookCode,testament,hebrewMap,greekMap);
- 
+
     setStatus("LEITURA PRONTA");
     parallelRef.textContent =
       `${bookName.toUpperCase()} ${currentChapter} · LEITURA ALINHADA POR VERSÍCULO`;
- 
+
   }catch(error){
     console.error(error);
- 
+
     parallelBody.innerHTML =
       `<div class="reader-error">
         NÃO FOI POSSÍVEL CARREGAR ESTA PASSAGEM.<br>
         VERIFIQUE A CONEXÃO E TENTE NOVAMENTE.
       </div>`;
- 
+
     setStatus("ERRO AO CARREGAR");
   }finally{
     openChapter.disabled = false;
@@ -1771,31 +1810,31 @@ async function openBibleChapter(){
     });
   }
 }
- 
+
 function updateNavigation(){
   const maxChapters =
     portugueseBible?.[currentBookIndex]?.chapters?.length || 1;
- 
+
   prevChapter.disabled =
     currentBookIndex === 0 && currentChapter === 1;
- 
+
   nextChapter.disabled =
     currentBookIndex === BOOKS.length-1 &&
     currentChapter >= maxChapters;
 }
- 
+
 bibleSelect.addEventListener("change",()=>{
   currentBible = bibleSelect.value;
   const y = window.scrollY;
   openBibleChapter().finally(()=>requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"})));
 });
- 
+
 greekSourceSelect.addEventListener("change",()=>{
   currentGreekSource = greekSourceSelect.value;
   const y = window.scrollY;
   openBibleChapter().finally(()=>requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"})));
 });
- 
+
 bookSelect.addEventListener("change",()=>{
   currentBookIndex = Number(bookSelect.value);
   currentChapter = 1;
@@ -1803,20 +1842,20 @@ bookSelect.addEventListener("change",()=>{
   const y = window.scrollY;
   openBibleChapter().finally(()=>requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"})));
 });
- 
+
 chapterSelect.addEventListener("change",()=>{
   currentChapter = Number(chapterSelect.value);
   const y = window.scrollY;
   openBibleChapter().finally(()=>requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"})));
 });
- 
+
 openChapter.addEventListener("click",(event)=>{
   const y = window.scrollY;
   openBibleChapter().finally(()=>{
     requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"}));
   });
 });
- 
+
 prevChapter.addEventListener("click",()=>{
   if(currentChapter > 1){
     currentChapter--;
@@ -1827,16 +1866,16 @@ prevChapter.addEventListener("click",()=>{
       portugueseBible?.[currentBookIndex]?.chapters?.length || 1;
     currentChapter = count;
   }
- 
+
   populateChapters();
   const y = window.scrollY;
   openBibleChapter().finally(()=>requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"})));
 });
- 
+
 nextChapter.addEventListener("click",()=>{
   const count =
     portugueseBible?.[currentBookIndex]?.chapters?.length || 1;
- 
+
   if(currentChapter < count){
     currentChapter++;
   }else if(currentBookIndex < BOOKS.length-1){
@@ -1844,17 +1883,17 @@ nextChapter.addEventListener("click",()=>{
     bookSelect.value = String(currentBookIndex);
     currentChapter = 1;
   }
- 
+
   populateChapters();
   const y = window.scrollY;
   openBibleChapter().finally(()=>requestAnimationFrame(()=>window.scrollTo({top:y,left:window.scrollX,behavior:"auto"})));
 });
- 
+
 async function iniciarBibliaParalela(){
   bibleSelect.value = currentBible;
   applyBibleLayout();
   populateBooks();
- 
+
   try{
     await loadPortuguese();
     populateChapters();
@@ -1868,14 +1907,14 @@ async function iniciarBibliaParalela(){
     setStatus("ERRO");
   }
 }
- 
+
 let verificacaoEmAndamento = false;
 let leitorInicializado = false;
- 
+
 /* =====================================================
    VISITANTES E SETORES MAIS CONSULTADOS
 ===================================================== */
- 
+
 const statTotalVisitas = document.getElementById("statTotalVisitas");
 const statVisitantesUnicos = document.getElementById("statVisitantesUnicos");
 const statMediaPorVisitante = document.getElementById("statMediaPorVisitante");
@@ -1885,7 +1924,7 @@ const statsLocations = document.getElementById("statsLocations");
 const statsHoursWrap = document.getElementById("statsHoursWrap");
 const statsUpdatedAt = document.getElementById("statsUpdatedAt");
 const statsRefreshBtn = document.getElementById("statsRefreshBtn");
- 
+
 /*
   Nomes possíveis de cada coluna, caso já existam na tabela "visitas"
   com nomes diferentes dos usados aqui. Ajuste esta lista se sua
@@ -1894,7 +1933,7 @@ const statsRefreshBtn = document.getElementById("statsRefreshBtn");
 const COLUNAS_DATA = ["created_at","criado_em","inserted_at","data_criacao","timestamp"];
 const COLUNAS_PAIS = ["pais","country","country_name"];
 const COLUNAS_CIDADE = ["cidade","city"];
- 
+
 function primeiraColunaPresente(linha, candidatos){
   for(const nome of candidatos){
     if(linha && Object.prototype.hasOwnProperty.call(linha, nome)){
@@ -1903,13 +1942,13 @@ function primeiraColunaPresente(linha, candidatos){
   }
   return null;
 }
- 
+
 async function carregarEstatisticasVisitas(){
   if(!statsRefreshBtn) return;
- 
+
   statsRefreshBtn.disabled = true;
   statsRefreshBtn.textContent = "ATUALIZANDO...";
- 
+
   try{
     // select("*") em vez de listar colunas: assim funciona mesmo que
     // "visitas" ainda não tenha as colunas de data/país/cidade.
@@ -1917,47 +1956,47 @@ async function carregarEstatisticasVisitas(){
       await supabaseClient
         .from("visitas")
         .select("*");
- 
+
     if(error) throw error;
- 
+
     const linhas = data || [];
     const primeira = linhas[0] || {};
     const colData = primeiraColunaPresente(primeira, COLUNAS_DATA);
     const colPais = primeiraColunaPresente(primeira, COLUNAS_PAIS);
     const colCidade = primeiraColunaPresente(primeira, COLUNAS_CIDADE);
- 
+
     // ---- total de visitas ----
     statTotalVisitas.textContent = linhas.length;
- 
+
     // ---- visitantes únicos (aproximado por visitante_id salvo no navegador) ----
     const idsUnicos = new Set(
       linhas.map(function(l){ return l.visitante_id; }).filter(Boolean)
     );
     statVisitantesUnicos.textContent = idsUnicos.size;
- 
+
     statMediaPorVisitante.textContent = idsUnicos.size
       ? (linhas.length / idsUnicos.size).toFixed(1)
       : "—";
- 
+
     // ---- ranking por setor/página ----
     const contagem = {};
     linhas.forEach(function(l){
       const nome = l.pagina || "Desconhecido";
       contagem[nome] = (contagem[nome] || 0) + 1;
     });
- 
+
     const ranking = Object.keys(contagem)
       .map(function(nome){ return {nome:nome, total:contagem[nome]}; })
       .sort(function(a,b){ return b.total - a.total; });
- 
+
     statSetorTopo.textContent = ranking.length ? ranking[0].nome : "—";
- 
+
     if(ranking.length === 0){
       statsRank.innerHTML =
         '<span class="stats-msg">Ainda não há visitas registradas.</span>';
     }else{
       const maior = ranking[0].total;
- 
+
       statsRank.innerHTML = ranking.map(function(item){
         const pct = Math.max(6, Math.round((item.total / maior) * 100));
         return (
@@ -1969,7 +2008,7 @@ async function carregarEstatisticasVisitas(){
         );
       }).join("");
     }
- 
+
     // ---- localização ----
     if(!colPais){
       statsLocations.innerHTML =
@@ -1987,24 +2026,24 @@ async function carregarEstatisticasVisitas(){
           porPais[pais].cidades[cidade] = (porPais[pais].cidades[cidade] || 0) + 1;
         }
       });
- 
+
       const listaPaises = Object.keys(porPais)
         .map(function(nome){ return {nome:nome, total:porPais[nome].total, cidades:porPais[nome].cidades}; })
         .sort(function(a,b){ return b.total - a.total; });
- 
+
       if(!listaPaises.length){
         statsLocations.innerHTML =
           '<span class="stats-msg">Ainda não há visitas com localização registrada.</span>';
       }else{
         const maiorPais = listaPaises[0].total;
- 
+
         statsLocations.innerHTML = listaPaises.slice(0,6).map(function(item){
           const pct = Math.max(6, Math.round((item.total / maiorPais) * 100));
           const cidadesOrdenadas = Object.keys(item.cidades)
             .sort(function(a,b){ return item.cidades[b]-item.cidades[a]; })
             .slice(0,3)
             .join(" · ");
- 
+
           return (
             '<div class="stats-loc-row">' +
               '<div class="stats-loc-name">' + escapeHTML(item.nome) +
@@ -2017,7 +2056,7 @@ async function carregarEstatisticasVisitas(){
         }).join("");
       }
     }
- 
+
     // ---- atividade por horário ----
     if(!colData){
       statsHoursWrap.innerHTML =
@@ -2033,10 +2072,10 @@ async function carregarEstatisticasVisitas(){
         if(Number.isNaN(data.getTime())) return;
         porHora[data.getHours()]++;
       });
- 
+
       const maiorHora = Math.max(1, ...porHora);
       const horaPico = porHora.indexOf(maiorHora);
- 
+
       const barrasHtml = porHora.map(function(qtd, hora){
         const alturaPct = Math.max(3, Math.round((qtd / maiorHora) * 100));
         const ehPico = qtd === maiorHora && qtd > 0;
@@ -2046,11 +2085,11 @@ async function carregarEstatisticasVisitas(){
           '</div>'
         );
       }).join("");
- 
+
       const labelsHtml = [0,4,8,12,16,20].map(function(h){ return '<span>' + h + 'h</span>'; }).join("");
- 
+
       const totalComData = porHora.reduce(function(a,b){ return a+b; }, 0);
- 
+
       statsHoursWrap.innerHTML =
         '<div class="stats-hours">' + barrasHtml + '</div>' +
         '<div class="stats-hour-labels">' + labelsHtml + '</div>' +
@@ -2058,11 +2097,11 @@ async function carregarEstatisticasVisitas(){
           ? '<div class="stats-peak-note">Pico de acessos por volta das <b>' + horaPico + 'h</b>.</div>'
           : '<div class="stats-peak-note">Ainda não há visitas com horário registrado.</div>');
     }
- 
+
     const agora = new Date();
     statsUpdatedAt.textContent =
       "ATUALIZADO ÀS " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
- 
+
   }catch(error){
     console.error("Erro ao carregar estatísticas:",error);
     statsRank.innerHTML =
@@ -2072,20 +2111,20 @@ async function carregarEstatisticasVisitas(){
     statsRefreshBtn.textContent = "ATUALIZAR";
   }
 }
- 
+
 if(statsRefreshBtn){
   statsRefreshBtn.addEventListener("click",function(){
     carregarEstatisticasVisitas();
   });
 }
- 
+
 /* =====================================================
    ASSINANTES E PLANOS
 ===================================================== */
- 
+
 const PLANOS_ORDEM = ["doctus","master","pro","free"];
 const PLANOS_LABEL = { doctus:"Doctus", master:"Master", pro:"Pro", free:"Free" };
- 
+
 const planTotalAssinantes = document.getElementById("planTotalAssinantes");
 const planPagantes = document.getElementById("planPagantes");
 const planTaxaConversao = document.getElementById("planTaxaConversao");
@@ -2093,14 +2132,14 @@ const planRank = document.getElementById("planRank");
 const planTempo = document.getElementById("planTempo");
 const planUpdatedAt = document.getElementById("planUpdatedAt");
 const planRefreshBtn = document.getElementById("planRefreshBtn");
- 
+
 function diasDesde(dataIso){
   const data = new Date(dataIso);
   if(Number.isNaN(data.getTime())) return null;
   const diffMs = Date.now() - data.getTime();
   return Math.max(0, Math.floor(diffMs / 86400000));
 }
- 
+
 function formatarDias(dias){
   if(dias === null) return "—";
   if(dias < 1) return "hoje";
@@ -2108,57 +2147,184 @@ function formatarDias(dias){
   const meses = Math.round(dias / 30);
   return meses + " mês" + (meses === 1 ? "" : "es");
 }
- 
+
 /* =====================================================
    RECEITA E MARGEM POR PLANO
    Valores fechados: preços na Kiwify (taxa de 8,99% + R$ 2,49 por
    venda), 200 toques por mês e custo estimado de IA por toque.
-   Troque os números aqui quando medir o custo real no Google.
+   Os campos do painel permitem simular outros valores; o botão
+   "Restaurar" volta para os valores fechados abaixo.
 ===================================================== */
- 
-const FIN_PLANOS = {
-  pro:    { preco:29.90,  iaPorToque:0.022, modelo:"Gemini 3.1 Flash-Lite" },
-  master: { preco:59.90,  iaPorToque:0.044, modelo:"Gemini 3 Flash" },
-  doctus: { preco:139.00, iaPorToque:0.176, modelo:"Gemini 3.1 Pro" }
-};
-const FIN_TOQUES = 200;
+
 const FIN_TAXA_PCT = 0.0899;
 const FIN_TAXA_FIXA = 2.49;
- 
+const FIN_CHAVE = "ps_fin_config";
+
+const FIN_MODELOS = {
+  pro:    "Gemini 3.1 Flash-Lite",
+  master: "Gemini 3 Flash",
+  doctus: "Gemini 3.1 Pro"
+};
+
+/* Valores fechados. O botão "Restaurar" do painel volta para estes. */
+const FIN_PADRAO = {
+  toques: 200,
+  planos: {
+    pro:    { preco:29.90,  iaPorToque:0.022 },
+    master: { preco:59.90,  iaPorToque:0.044 },
+    doctus: { preco:139.00, iaPorToque:0.176 }
+  }
+};
+
 const FIN_PACOTES = [
   { nome:"Pacote 3 revisões",  preco:9.90,  revisoes:3 },
   { nome:"Pacote 5 revisões",  preco:14.90, revisoes:5 },
   { nome:"Pacote 10 revisões", preco:24.90, revisoes:10 }
 ];
 const FIN_IA_REVISAO = 0.37;
- 
+
+function finPadrao(){
+  return JSON.parse(JSON.stringify(FIN_PADRAO));
+}
+
+function finNumero(valor, minimo){
+  if(valor === null || valor === undefined) return null;
+  const texto = String(valor).trim().replace(",", ".");
+  if(texto === "") return null;
+  const n = Number(texto);
+  return (Number.isFinite(n) && n >= minimo) ? n : null;
+}
+
+function finCarregar(){
+  const cfg = finPadrao();
+  try{
+    const bruto = localStorage.getItem(FIN_CHAVE);
+    if(!bruto) return cfg;
+    const salvo = JSON.parse(bruto);
+
+    const t = finNumero(salvo && salvo.toques, 1);
+    if(t !== null) cfg.toques = Math.round(t);
+
+    ["pro","master","doctus"].forEach(function(p){
+      const s = salvo && salvo.planos && salvo.planos[p];
+      if(!s) return;
+      const preco = finNumero(s.preco, 0.01);
+      const ia = finNumero(s.iaPorToque, 0);
+      if(preco !== null) cfg.planos[p].preco = preco;
+      if(ia !== null) cfg.planos[p].iaPorToque = ia;
+    });
+  }catch(e){ /* armazenamento indisponível: usa os valores fechados */ }
+  return cfg;
+}
+
+function finSalvar(){
+  try{ localStorage.setItem(FIN_CHAVE, JSON.stringify(finConfig)); }
+  catch(e){ /* sem armazenamento: vale só até recarregar */ }
+}
+
+let finConfig = finCarregar();
+let finContagem = {};
+
 function brl(valor){
   return valor.toLocaleString("pt-BR",{ style:"currency", currency:"BRL" });
 }
- 
-function renderFinanceiro(contagem){
+
+function finTexto(n){
+  return String(n).replace(".", ",");
+}
+
+function finPreencherCampos(){
+  ["pro","master","doctus"].forEach(function(p){
+    const preco = document.getElementById("fin-preco-" + p);
+    const ia = document.getElementById("fin-ia-" + p);
+    if(preco) preco.value = finTexto(finConfig.planos[p].preco.toFixed(2));
+    if(ia) ia.value = finTexto(finConfig.planos[p].iaPorToque);
+  });
+  const toques = document.getElementById("fin-toques");
+  if(toques) toques.value = String(finConfig.toques);
+}
+
+function finAoEditar(evento){
+  if(!evento.target || !evento.target.id || evento.target.id.indexOf("fin-") !== 0) return;
+
+  const novo = finPadrao();
+  const t = finNumero(document.getElementById("fin-toques").value, 1);
+  novo.toques = t !== null ? Math.round(t) : finConfig.toques;
+
+  ["pro","master","doctus"].forEach(function(p){
+    const preco = finNumero(document.getElementById("fin-preco-" + p).value, 0.01);
+    const ia = finNumero(document.getElementById("fin-ia-" + p).value, 0);
+    novo.planos[p].preco = preco !== null ? preco : finConfig.planos[p].preco;
+    novo.planos[p].iaPorToque = ia !== null ? ia : finConfig.planos[p].iaPorToque;
+  });
+
+  finConfig = novo;
+  finSalvar();
+  finPreencherCampos();
+  finDesenhar();
+}
+
+function finMontarFormulario(){
   const el = document.getElementById("planFinanceiro");
+  if(!el || document.getElementById("finForm")) return;
+
+  const campos = ["pro","master","doctus"].map(function(p){
+    return (
+      '<div class="fin-campo"><span>' + PLANOS_LABEL[p] + '</span>' +
+        '<label>Preço por mês (R$)<input id="fin-preco-' + p + '" type="text" inputmode="decimal"></label>' +
+        '<label>IA por toque (R$)<input id="fin-ia-' + p + '" type="text" inputmode="decimal"></label>' +
+      '</div>'
+    );
+  }).join("");
+
+  el.innerHTML =
+    '<div id="finForm" class="fin-form">' + campos +
+      '<div class="fin-campo"><span>Uso</span>' +
+        '<label>Toques por mês<input id="fin-toques" type="text" inputmode="numeric"></label>' +
+        '<button id="finRestaurar" class="stats-refresh" type="button">RESTAURAR VALORES FECHADOS</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="stats-msg" style="margin-bottom:6px">' +
+      'Simulação: mudar os números aqui recalcula o quadro e fica guardado neste navegador, ' +
+      'mas não altera o preço cobrado na Kiwify.' +
+    '</div>' +
+    '<div id="finResultados"></div>';
+
+  finPreencherCampos();
+  el.addEventListener("change", finAoEditar);
+  document.getElementById("finRestaurar").addEventListener("click", function(){
+    finConfig = finPadrao();
+    finSalvar();
+    finPreencherCampos();
+    finDesenhar();
+  });
+}
+
+function finDesenhar(){
+  const el = document.getElementById("finResultados");
   if(!el) return;
- 
+
   let sobraTotal = 0;
   let pagantes = 0;
- 
+
   const linhasPlanos = ["doctus","master","pro"].map(function(plano){
-    const c = FIN_PLANOS[plano];
+    const c = finConfig.planos[plano];
     const taxa = c.preco * FIN_TAXA_PCT + FIN_TAXA_FIXA;
-    const ia = c.iaPorToque * FIN_TOQUES;
+    const ia = c.iaPorToque * finConfig.toques;
     const sobra = c.preco - taxa - ia;
-    const n = contagem[plano] || 0;
- 
+    const n = finContagem[plano] || 0;
+
     sobraTotal += sobra * n;
     pagantes += n;
- 
-    const larg = function(v){ return (v / c.preco * 100).toFixed(1); };
- 
+
+    const larg = function(v){
+      return Math.max(0, Math.min(100, v / c.preco * 100)).toFixed(1);
+    };
+
     return (
       '<div class="fin-row">' +
         '<div class="fin-name">' + PLANOS_LABEL[plano] + ' · ' + brl(c.preco) +
-          '<small>' + escapeHTML(c.modelo) + '</small></div>' +
+          '<small>' + escapeHTML(FIN_MODELOS[plano]) + '</small></div>' +
         '<div class="fin-bar" title="Taxa ' + brl(taxa) + ' · IA ' + brl(ia) + ' · Sobra ' + brl(sobra) + '">' +
           '<i class="fin-taxa" style="width:' + larg(taxa) + '%"></i>' +
           '<i class="fin-ia" style="width:' + larg(ia) + '%"></i>' +
@@ -2168,13 +2334,13 @@ function renderFinanceiro(contagem){
       '</div>'
     );
   }).join("");
- 
+
   const linhasPacotes = FIN_PACOTES.map(function(k){
     const taxa = k.preco * FIN_TAXA_PCT + FIN_TAXA_FIXA;
     const ia = k.revisoes * FIN_IA_REVISAO;
     const sobra = k.preco - taxa - ia;
     const larg = function(v){ return (v / k.preco * 100).toFixed(1); };
- 
+
     return (
       '<div class="fin-row">' +
         '<div class="fin-name">' + escapeHTML(k.nome) + ' · ' + brl(k.preco) +
@@ -2188,11 +2354,11 @@ function renderFinanceiro(contagem){
       '</div>'
     );
   }).join("");
- 
+
   el.innerHTML =
     linhasPlanos +
     '<div class="stats-peak-note">Sobra mensal estimada dos planos: <b>' + brl(sobraTotal) +
-      '</b> com ' + pagantes + ' assinante(s), supondo uso máximo de IA (' + FIN_TOQUES + ' toques por mês).</div>' +
+      '</b> com ' + pagantes + ' assinante(s), supondo uso máximo de IA (' + finConfig.toques + ' toques por mês).</div>' +
     '<h3 style="margin:18px 0 6px">Pacotes avulsos de revisão</h3>' +
     linhasPacotes +
     '<div class="fin-legend">' +
@@ -2201,13 +2367,19 @@ function renderFinanceiro(contagem){
       '<span><b class="fin-sobra"></b>Sobra</span>' +
     '</div>';
 }
- 
+
+function renderFinanceiro(contagem){
+  finContagem = contagem || {};
+  finMontarFormulario();
+  finDesenhar();
+}
+
 async function carregarEstatisticasPlanos(){
   if(!planRefreshBtn) return;
- 
+
   planRefreshBtn.disabled = true;
   planRefreshBtn.textContent = "ATUALIZANDO...";
- 
+
   try{
     /*
       Lê pela função admin_planos_lista (criada no banco): a tabela
@@ -2216,37 +2388,37 @@ async function carregarEstatisticasPlanos(){
     */
     const {data,error} =
       await supabaseClient.rpc("admin_planos_lista");
- 
+
     if(error) throw error;
- 
+
     const linhas = data || [];
- 
+
     planTotalAssinantes.textContent = linhas.length;
- 
+
     const contagem = {};
     const diasPorPlano = {};
- 
+
     linhas.forEach(function(l){
       const plano = (l.plano || "free").toLowerCase();
       contagem[plano] = (contagem[plano] || 0) + 1;
- 
+
       const dias = diasDesde(l.criado_em);
       if(dias !== null){
         if(!diasPorPlano[plano]) diasPorPlano[plano] = [];
         diasPorPlano[plano].push(dias);
       }
     });
- 
+
     const pagantes = (contagem.pro||0) + (contagem.master||0) + (contagem.doctus||0);
     planPagantes.textContent = pagantes;
     planTaxaConversao.textContent = linhas.length
       ? Math.round((pagantes / linhas.length) * 100) + "%"
       : "—";
- 
+
     renderFinanceiro(contagem);
- 
+
     const maior = Math.max(1, ...PLANOS_ORDEM.map(function(p){ return contagem[p] || 0; }));
- 
+
     planRank.innerHTML = PLANOS_ORDEM.map(function(plano){
       const total = contagem[plano] || 0;
       const pct = Math.max(4, Math.round((total / maior) * 100));
@@ -2258,7 +2430,7 @@ async function carregarEstatisticasPlanos(){
         '</div>'
       );
     }).join("");
- 
+
     planTempo.innerHTML = PLANOS_ORDEM.map(function(plano){
       const lista = diasPorPlano[plano] || [];
       if(!lista.length){
@@ -2279,11 +2451,11 @@ async function carregarEstatisticasPlanos(){
         '</div>'
       );
     }).join("");
- 
+
     const agora = new Date();
     planUpdatedAt.textContent =
       "ATUALIZADO ÀS " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
- 
+
   }catch(error){
     console.error("Erro ao carregar planos:",error);
     const motivo = error && error.message
@@ -2300,61 +2472,61 @@ async function carregarEstatisticasPlanos(){
     planRefreshBtn.textContent = "ATUALIZAR";
   }
 }
- 
+
 if(planRefreshBtn){
   planRefreshBtn.addEventListener("click",function(){
     carregarEstatisticasPlanos();
   });
 }
- 
+
 /* =====================================================
    BOTÃO DO PAINEL DE GESTÃO
    O painel fica fechado ao entrar e só carrega os dados
    quando é aberto.
 ===================================================== */
- 
+
 const painelGestao = document.getElementById("painelGestao");
 const painelToggle = document.getElementById("painelToggle");
 const painelToggleAcao = document.getElementById("painelToggleAcao");
- 
+
 if(painelToggle){
   painelToggle.addEventListener("click",function(){
     const abrir = painelGestao.hidden;
- 
+
     painelGestao.hidden = !abrir;
     painelToggle.setAttribute("aria-expanded", String(abrir));
     painelToggleAcao.textContent = abrir ? "FECHAR" : "ABRIR";
- 
+
     if(abrir){
       carregarEstatisticasVisitas();
       carregarEstatisticasPlanos();
     }
   });
 }
- 
+
 function prepararNovaVerificacao(){
   app.style.display = "none";
   errorBox.style.display = "none";
   loading.style.display = "flex";
 }
- 
+
 async function verificarSessao(opcoes = {}){
   if(verificacaoEmAndamento) return;
- 
+
   verificacaoEmAndamento = true;
- 
+
   if(opcoes.revalidar){
     prepararNovaVerificacao();
   }
- 
+
   try{
     const {data,error} =
       await supabaseClient.auth.getSession();
- 
+
     if(error) throw error;
- 
+
     const session = data.session;
- 
+
     if(!session){
       userEmail.textContent = "—";
       loading.style.display = "none";
@@ -2362,27 +2534,27 @@ async function verificarSessao(opcoes = {}){
       errorBox.style.display = "flex";
       return;
     }
- 
+
     userEmail.textContent =
       session.user?.email || "AUTOR";
- 
+
     loading.style.display = "none";
     errorBox.style.display = "none";
     app.style.display = "block";
- 
+
     if(!leitorInicializado){
       leitorInicializado = true;
       iniciarBibliaParalela();
     }
- 
+
     if(!painelGestao.hidden){
       carregarEstatisticasVisitas();
       carregarEstatisticasPlanos();
     }
- 
+
   }catch(error){
     console.error("Erro ao verificar sessão:",error);
- 
+
     loading.style.display = "none";
     app.style.display = "none";
     errorBox.style.display = "flex";
@@ -2390,7 +2562,7 @@ async function verificarSessao(opcoes = {}){
     verificacaoEmAndamento = false;
   }
 }
- 
+
 logoutBtn.addEventListener("click",function(){
   /*
     "SAIR" agora só sai da Sala do Escritor e volta para o site
@@ -2400,9 +2572,9 @@ logoutBtn.addEventListener("click",function(){
   */
   window.location.href = "index.html";
 });
- 
+
 let sessaoInicialResolvida = false;
- 
+
 supabaseClient.auth.onAuthStateChange(function(event){
   if(event === "INITIAL_SESSION"){
     sessaoInicialResolvida = true;
@@ -2413,7 +2585,7 @@ supabaseClient.auth.onAuthStateChange(function(event){
     window.location.replace("entrada.html");
   }
 });
- 
+
 /*
   Rede de segurança: em casos raros o evento INITIAL_SESSION pode
   demorar. Se depois de 3s ele ainda não tiver disparado, verifica
@@ -2422,7 +2594,7 @@ supabaseClient.auth.onAuthStateChange(function(event){
 setTimeout(function(){
   if(!sessaoInicialResolvida) verificarSessao();
 },3000);
- 
+
 /*
   A navegação pelo histórico pode restaurar esta página a partir da
   Back-Forward Cache sem executar novamente o script. Ocultar o conteúdo
@@ -2432,15 +2604,15 @@ setTimeout(function(){
 window.addEventListener("pagehide",function(){
   prepararNovaVerificacao();
 });
- 
+
 window.addEventListener("pageshow",function(){
   verificarSessao({revalidar:true});
 });
- 
+
 window.addEventListener("popstate",function(){
   verificarSessao({revalidar:true});
 });
- 
+
 document.addEventListener("visibilitychange",function(){
   if(document.visibilityState === "visible"){
     verificarSessao({revalidar:true});
@@ -2452,7 +2624,7 @@ document.addEventListener("visibilitychange",function(){
   var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
   var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
   var PAGINA = "Sala do Escritor";
- 
+
   function registrarVisita(pais, cidade){
     try{
       var vid = localStorage.getItem("ps_visitante_id");
@@ -2462,11 +2634,11 @@ document.addEventListener("visibilitychange",function(){
           : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
         localStorage.setItem("ps_visitante_id", vid);
       }
- 
+
       var payload = { pagina: PAGINA, visitante_id: vid };
       if(pais) payload.pais = pais;
       if(cidade) payload.cidade = cidade;
- 
+
       fetch(SUPABASE_URL + "/rest/v1/visitas", {
         method: "POST",
         headers: {
@@ -2479,7 +2651,7 @@ document.addEventListener("visibilitychange",function(){
       }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
     }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
   }
- 
+
   /*
     Localização aproximada por IP, via serviço gratuito (sem chave).
     Se falhar ou demorar mais de 2.5s, a visita é registrada mesmo
@@ -2491,9 +2663,9 @@ document.addEventListener("visibilitychange",function(){
     jaRegistrou = true;
     registrarVisita(pais, cidade);
   }
- 
+
   setTimeout(function(){ concluir(null, null); }, 2500);
- 
+
   fetch("https://ipapi.co/json/")
     .then(function(r){ return r.json(); })
     .then(function(info){
@@ -2504,6 +2676,3 @@ document.addEventListener("visibilitychange",function(){
 </script>
 </body>
 </html>
- 
-
-
