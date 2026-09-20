@@ -2795,7 +2795,21 @@ async function submitRevisor() {
     report.textContent = "Cole o conteúdo do escritor antes de enviar para revisão.";
     return;
   }
- 
+
+  if (
+    revisorOrigin === "platform_mesa" &&
+    (LEVEL_RANK[currentUserPlan] ?? 0) < LEVEL_RANK.MASTER
+  ) {
+    report.innerHTML =
+      "O Revisor Teológico para conteúdos da Mesa/Pergunta Livre é um recurso do plano MASTER. " +
+      "Faça upgrade para liberar esta revisão.<br><br>" +
+      '<a href="' + getCheckoutLink("MASTER") + '" target="_blank" rel="noopener" ' +
+      'style="display:inline-block;padding:8px 14px;background:#20d66b;color:#07151f;' +
+      'border-radius:6px;text-decoration:none;font-weight:900;font-size:11px;">' +
+      "FAZER UPGRADE PARA MASTER</a>";
+    return;
+  }
+
   const guidance = tema
     ? { name: tema, sources: "Selecionar fontes reconhecidas adequadas ao tema.", rule: "Aplicar a regra normativa do módulo/tema informado, quando identificável." }
     : getCanonicalGuidance();
@@ -3293,7 +3307,6 @@ renderModules();
 </body>
 </html>
  
-
 
 
 
