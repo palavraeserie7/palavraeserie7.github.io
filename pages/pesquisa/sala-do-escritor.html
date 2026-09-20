@@ -402,6 +402,19 @@ main{
 @media(max-width:900px){.fin-form{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.fin-form{grid-template-columns:1fr}}
 
+/* ---- confirmação das alterações do quadro de receita ---- */
+.fin-acoes{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:4px 0 12px;
+}
+.fin-estado{flex:1 1 260px;font-size:11.5px;line-height:1.5;color:var(--muted)}
+.fin-estado.pendente{color:#e0a030}
+.fin-confirmar{border-color:var(--p);color:var(--p)}
+.fin-confirmar:hover:not(:disabled){background:rgba(32,214,107,.12);border-color:var(--p)}
+
 /* ---- botão que abre o painel de gestão ---- */
 .panel-toggle{
   width:100%;
@@ -2222,7 +2235,8 @@ function finSalvar(){
   catch(e){ /* sem armazenamento: vale só até recarregar */ }
 }
 
-let finConfig = finCarregar();
+let finConfig = finCarregar();                                  // valores confirmados
+let finRascunho = JSON.parse(JSON.stringify(finConfig));       // o que está sendo editado
 let finContagem = {};
 
 function brl(valor){
@@ -2233,15 +2247,40 @@ function finTexto(n){
   return String(n).replace(".", ",");
 }
 
+function finPendente(){
+  return JSON.stringify(finRascunho) !== JSON.stringify(finConfig);
+}
+
 function finPreencherCampos(){
   ["pro","master","doctus"].forEach(function(p){
     const preco = document.getElementById("fin-preco-" + p);
     const ia = document.getElementById("fin-ia-" + p);
-    if(preco) preco.value = finTexto(finConfig.planos[p].preco.toFixed(2));
-    if(ia) ia.value = finTexto(finConfig.planos[p].iaPorToque);
+    if(preco) preco.value = finTexto(finRascunho.planos[p].preco.toFixed(2));
+    if(ia) ia.value = finTexto(finRascunho.planos[p].iaPorToque);
   });
   const toques = document.getElementById("fin-toques");
-  if(toques) toques.value = String(finConfig.toques);
+  if(toques) toques.value = String(finRascunho.toques);
+}
+
+function finAtualizarEstado(mensagemConfirmado){
+  const estado = document.getElementById("finEstado");
+  const confirmar = document.getElementById("finConfirmar");
+  const descartar = document.getElementById("finDescartar");
+  if(!estado) return;
+
+  const pendente = finPendente();
+
+  if(pendente){
+    estado.textContent =
+      "Alterações não confirmadas. Se você sair desta tela sem confirmar, os valores voltam ao que estava confirmado.";
+    estado.className = "fin-estado pendente";
+  }else{
+    estado.textContent = mensagemConfirmado || "Valores confirmados.";
+    estado.className = "fin-estado";
+  }
+
+  if(confirmar) confirmar.disabled = !pendente;
+  if(descartar) descartar.disabled = !pendente;
 }
 
 function finAoEditar(evento){
@@ -2249,19 +2288,33 @@ function finAoEditar(evento){
 
   const novo = finPadrao();
   const t = finNumero(document.getElementById("fin-toques").value, 1);
-  novo.toques = t !== null ? Math.round(t) : finConfig.toques;
+  novo.toques = t !== null ? Math.round(t) : finRascunho.toques;
 
   ["pro","master","doctus"].forEach(function(p){
     const preco = finNumero(document.getElementById("fin-preco-" + p).value, 0.01);
     const ia = finNumero(document.getElementById("fin-ia-" + p).value, 0);
-    novo.planos[p].preco = preco !== null ? preco : finConfig.planos[p].preco;
-    novo.planos[p].iaPorToque = ia !== null ? ia : finConfig.planos[p].iaPorToque;
+    novo.planos[p].preco = preco !== null ? preco : finRascunho.planos[p].preco;
+    novo.planos[p].iaPorToque = ia !== null ? ia : finRascunho.planos[p].iaPorToque;
   });
 
-  finConfig = novo;
-  finSalvar();
+  finRascunho = novo;
   finPreencherCampos();
   finDesenhar();
+  finAtualizarEstado();
+}
+
+function finConfirmarAlteracoes(){
+  finConfig = JSON.parse(JSON.stringify(finRascunho));
+  finSalvar();
+  const agora = new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  finAtualizarEstado("Confirmado às " + agora + ". Estes valores ficam guardados neste navegador.");
+}
+
+function finDescartarAlteracoes(){
+  finRascunho = JSON.parse(JSON.stringify(finConfig));
+  finPreencherCampos();
+  finDesenhar();
+  finAtualizarEstado("Alterações descartadas. Valores confirmados mantidos.");
 }
 
 function finMontarFormulario(){
@@ -2284,20 +2337,30 @@ function finMontarFormulario(){
         '<button id="finRestaurar" class="stats-refresh" type="button">RESTAURAR VALORES FECHADOS</button>' +
       '</div>' +
     '</div>' +
+    '<div class="fin-acoes">' +
+      '<div id="finEstado" class="fin-estado"></div>' +
+      '<button id="finDescartar" class="stats-refresh" type="button">DESCARTAR</button>' +
+      '<button id="finConfirmar" class="stats-refresh fin-confirmar" type="button">CONFIRMAR ALTERAÇÕES</button>' +
+    '</div>' +
     '<div class="stats-msg" style="margin-bottom:6px">' +
-      'Simulação: mudar os números aqui recalcula o quadro e fica guardado neste navegador, ' +
-      'mas não altera o preço cobrado na Kiwify.' +
+      'Calculadora: os números recalculam na hora, mas só valem depois de confirmar. ' +
+      'Isto não altera o preço cobrado na Kiwify.' +
     '</div>' +
     '<div id="finResultados"></div>';
 
   finPreencherCampos();
   el.addEventListener("change", finAoEditar);
+
   document.getElementById("finRestaurar").addEventListener("click", function(){
-    finConfig = finPadrao();
-    finSalvar();
+    finRascunho = finPadrao();
     finPreencherCampos();
     finDesenhar();
+    finAtualizarEstado();
   });
+  document.getElementById("finConfirmar").addEventListener("click", finConfirmarAlteracoes);
+  document.getElementById("finDescartar").addEventListener("click", finDescartarAlteracoes);
+
+  finAtualizarEstado();
 }
 
 function finDesenhar(){
@@ -2308,9 +2371,9 @@ function finDesenhar(){
   let pagantes = 0;
 
   const linhasPlanos = ["doctus","master","pro"].map(function(plano){
-    const c = finConfig.planos[plano];
+    const c = finRascunho.planos[plano];
     const taxa = c.preco * FIN_TAXA_PCT + FIN_TAXA_FIXA;
-    const ia = c.iaPorToque * finConfig.toques;
+    const ia = c.iaPorToque * finRascunho.toques;
     const sobra = c.preco - taxa - ia;
     const n = finContagem[plano] || 0;
 
@@ -2358,7 +2421,7 @@ function finDesenhar(){
   el.innerHTML =
     linhasPlanos +
     '<div class="stats-peak-note">Sobra mensal estimada dos planos: <b>' + brl(sobraTotal) +
-      '</b> com ' + pagantes + ' assinante(s), supondo uso máximo de IA (' + finConfig.toques + ' toques por mês).</div>' +
+      '</b> com ' + pagantes + ' assinante(s), supondo uso máximo de IA (' + finRascunho.toques + ' toques por mês).</div>' +
     '<h3 style="margin:18px 0 6px">Pacotes avulsos de revisão</h3>' +
     linhasPacotes +
     '<div class="fin-legend">' +
@@ -2373,6 +2436,14 @@ function renderFinanceiro(contagem){
   finMontarFormulario();
   finDesenhar();
 }
+
+/* Sair da página com alterações não confirmadas: o navegador avisa. */
+window.addEventListener("beforeunload",function(evento){
+  if(finPendente()){
+    evento.preventDefault();
+    evento.returnValue = "";
+  }
+});
 
 async function carregarEstatisticasPlanos(){
   if(!planRefreshBtn) return;
@@ -2492,6 +2563,14 @@ const painelToggleAcao = document.getElementById("painelToggleAcao");
 if(painelToggle){
   painelToggle.addEventListener("click",function(){
     const abrir = painelGestao.hidden;
+
+    if(!abrir && finPendente()){
+      const descartar = window.confirm(
+        "Há alterações não confirmadas no quadro de receita. Fechar o painel e descartá-las?"
+      );
+      if(!descartar) return;
+      finDescartarAlteracoes();
+    }
 
     painelGestao.hidden = !abrir;
     painelToggle.setAttribute("aria-expanded", String(abrir));
