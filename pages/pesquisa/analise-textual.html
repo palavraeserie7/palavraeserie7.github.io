@@ -1,4 +1,4 @@
-BLOQUEI HTML
+
 
 Analise textual · HTML
 <!doctype html>
@@ -59,9 +59,9 @@ Analise textual · HTML
 </script>
 <!-- ==================================================================== -->
  
-
-
-
+ 
+ 
+ 
  
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -90,6 +90,8 @@ Analise textual · HTML
 .query-chip.empty{color:#8a7a55;background:#f4eedd;border-color:#ddcea4;font-weight:600}
 .query-run{padding:10px 18px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
 .query-run:disabled{opacity:.5;cursor:not-allowed}
+.query-scan{padding:10px 18px;border:1px solid #18bfff;border-radius:6px;background:#fff;color:#0a6f96;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
+.query-scan:disabled{opacity:.5;cursor:not-allowed}
 .query-meta{margin-top:8px;font-size:11.5px;color:#8a7a55}
  
 /* ===== Histórico de análises ===== */
@@ -200,16 +202,17 @@ Analise textual · HTML
 <section class="card">
 <h1>ANÁLISE TEXTUAL</h1>
 <p>Selecione um recurso de FIGURAS DE LINGUAGEM no índice lateral para iniciar a análise textual.</p>
-<div class="notice"><strong>Como usar:</strong> informe a passagem ou tema de estudo, depois abra uma categoria e selecione um recurso. A pergunta de pesquisa será montada automaticamente para essa referência.</div>
+<div class="notice"><strong>Como usar:</strong> informe a passagem ou tema de estudo, abra uma categoria no índice lateral e clique em <strong>"Escanear grupo"</strong> para ver quais figuras aparecem na passagem. Depois, selecione um item sinalizado e clique em "Analisar" para abrir a análise técnica completa.</div>
  
 <!-- Barra de consulta unificada: passagem + figura + executar, como no SQL Editor -->
 <div class="query-bar" id="queryBar">
   <div class="query-bar-row">
     <input type="text" id="refInput" placeholder="Ex.: João 3:16, ou Salmo 23, ou o tema do êxodo">
+    <button type="button" class="query-scan" id="groupScanButton" disabled>🔍 Escanear grupo</button>
     <span class="query-chip empty" id="queryChip">nenhuma figura selecionada</span>
     <button type="button" class="query-run" id="scanButton" disabled>▶ Analisar</button>
   </div>
-  <div class="query-meta" id="scanStatus">Informe uma passagem/tema, abra uma categoria no índice e escolha uma figura.</div>
+  <div class="query-meta" id="scanStatus">Informe uma passagem/tema, abra uma categoria no índice e escaneie o grupo.</div>
  
   <details class="history-box" id="historyBox">
     <summary>Histórico de análises (<span id="historyCount">0</span>)</summary>
@@ -217,6 +220,15 @@ Analise textual · HTML
       <div class="history-empty">Nenhuma análise executada ainda nesta sessão.</div>
     </div>
   </details>
+</div>
+ 
+<!-- Resultado da varredura de grupo (textual_group_scan) -->
+<div class="scan-box" id="groupScanBox" style="display:none;">
+  <div class="scan-head">
+    <h2 id="groupScanTitle">Varredura do grupo</h2>
+  </div>
+  <div class="scan-status" id="groupScanStatus"></div>
+  <div class="scan-list" id="groupScanList"></div>
 </div>
  
 <div class="account-box" id="accountBox">
@@ -255,11 +267,11 @@ const CHECKOUT_LINKS = Object.freeze({
 });
 const NEXT_TIER = Object.freeze({ FREE: "PRO", PRO: "MASTER", MASTER: "DOCTUS" });
 function getCheckoutLink(level){ return CHECKOUT_LINKS[level] || "#"; }
-
+ 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentSession = null;
 let currentUserPlan = 'FREE';
-
+ 
 async function getUserPlanFromSession(session){
   if(!session?.user?.id) return 'FREE';
   try{
@@ -274,7 +286,7 @@ async function getUserPlanFromSession(session){
     return 'FREE';
   }
 }
-
+ 
 async function refreshSession(){
   const { data } = await supabaseClient.auth.getSession();
   currentSession = data?.session || null;
@@ -286,16 +298,23 @@ async function refreshSession(){
 const CACHE_KEY = 'pes_analise_cache_v1';   // resultados já obtidos: referência+figura -> análise
 const HIST_KEY  = 'pes_analise_historico_v1'; // lista de consultas já executadas, mais recente primeiro
 const HIST_MAX = 30;
+const GROUP_SCAN_CACHE_KEY = 'pes_analise_scan_cache_v1'; // varreduras de grupo já obtidas: referência+grupo -> resultados
 const refInput = document.getElementById('refInput');
 const queryChip = document.getElementById('queryChip');
 const scanButton = document.getElementById('scanButton');
 const scanStatus = document.getElementById('scanStatus');
+const groupScanButton = document.getElementById('groupScanButton');
+const groupScanBox = document.getElementById('groupScanBox');
+const groupScanTitle = document.getElementById('groupScanTitle');
+const groupScanStatus = document.getElementById('groupScanStatus');
+const groupScanList = document.getElementById('groupScanList');
 const historyList = document.getElementById('historyList');
 const historyCount = document.getElementById('historyCount');
 const questionArea = document.getElementById('questionArea');
 const accountStatus = document.getElementById('accountStatus');
 let selectedResourceCode=null;
 let activeCategory=null;
+let lastScanResults={}; // code -> {status, reason}
 function esc(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getReferencia(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; } }
 function setReferencia(v){ try { localStorage.setItem(REF_KEY, v); } catch(e) {} }
@@ -303,12 +322,12 @@ function currentPlan(){ return currentUserPlan; }
 function updateUpgradeButton(){
   const button = document.getElementById('upgradeButton');
   if(!button) return;
-
+ 
   if(currentUserPlan === 'DOCTUS'){
     button.style.display = 'none';
     return;
   }
-
+ 
   if(selectedResourceCode){
     const required = String(TEXTUAL_ACCESS_LEVELS[selectedResourceCode] || 'DOCTUS').toUpperCase();
     const userRank = TEXTUAL_TIER_RANK[currentUserPlan] ?? 0;
@@ -320,7 +339,7 @@ function updateUpgradeButton(){
       return;
     }
   }
-
+ 
   const nextLevel = NEXT_TIER[currentUserPlan] || 'PRO';
   button.style.display = 'inline-flex';
   button.textContent = 'FAZER UPGRADE';
@@ -336,18 +355,26 @@ function readCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY)||'{
 function writeCacheEntry(ref,code,analysis){ const cache=readCache(); cache[cacheKeyFor(ref,code)]={analysis,ts:Date.now()}; try{ localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }catch(e){} }
 function readCacheEntry(ref,code){ return readCache()[cacheKeyFor(ref,code)]||null; }
  
+// ---- Cache da varredura de grupo (chave = referência + código do grupo) ----
+function groupScanCacheKeyFor(ref,groupCode){ return (ref||'').trim().toLowerCase()+'::'+groupCode; }
+function readGroupScanCache(){ try{ return JSON.parse(localStorage.getItem(GROUP_SCAN_CACHE_KEY)||'{}'); }catch(e){ return {}; } }
+function writeGroupScanCacheEntry(ref,groupCode,results){ const cache=readGroupScanCache(); cache[groupScanCacheKeyFor(ref,groupCode)]={results,ts:Date.now()}; try{ localStorage.setItem(GROUP_SCAN_CACHE_KEY, JSON.stringify(cache)); }catch(e){} }
+function readGroupScanCacheEntry(ref,groupCode){ return readGroupScanCache()[groupScanCacheKeyFor(ref,groupCode)]||null; }
+ 
 // ---- Histórico (lista de consultas já rodadas, para reabrir sem gastar nova chamada) ----
 function readHistory(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); }catch(e){ return []; } }
 function writeHistory(list){ try{ localStorage.setItem(HIST_KEY, JSON.stringify(list.slice(0,HIST_MAX))); }catch(e){} }
 function pushHistory(entry){ const list=readHistory().filter(h=>!(h.ref===entry.ref && h.code===entry.code)); list.unshift(entry); writeHistory(list); renderHistory(); }
 function renderHistory(){ const list=readHistory(); historyCount.textContent=String(list.length); if(!list.length){ historyList.innerHTML='<div class="history-empty">Nenhuma análise executada ainda nesta sessão.</div>'; return; } historyList.innerHTML=list.map((h,i)=>'<div class="history-item" data-hist-index="'+i+'"><span><b>'+esc(h.code)+'</b> — '+esc(h.name)+' · '+esc(h.ref)+'</span><span class="hist-time">'+esc(new Date(h.ts).toLocaleString('pt-BR'))+'</span></div>').join(''); [...historyList.querySelectorAll('.history-item')].forEach(item=>item.addEventListener('click',()=>{ const entry=list[Number(item.dataset.histIndex)]; if(entry) reopenFromHistory(entry); })); }
-function reopenFromHistory(entry){ refInput.value=entry.ref; setReferencia(entry.ref); activeCategory=findCategoryForCode(entry.code)||activeCategory; selectedResourceCode=entry.code; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(entry.code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=entry.code+' — '+entry.name; queryChip.classList.remove('empty'); scanButton.disabled=false; const cached=readCacheEntry(entry.ref,entry.code); if(cached){ scanStatus.textContent='Reaberto do histórico (nenhuma nova chamada à IA foi feita).'; renderResult(entry.code,entry.name,cached.analysis,true); } else { scanStatus.textContent='Pronto para analisar novamente.'; questionArea.innerHTML=''; } }
+function reopenFromHistory(entry){ refInput.value=entry.ref; setReferencia(entry.ref); activeCategory=findCategoryForCode(entry.code)||activeCategory; selectedResourceCode=entry.code; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(entry.code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=entry.code+' — '+entry.name; queryChip.classList.remove('empty'); scanButton.disabled=false; const cached=readCacheEntry(entry.ref,entry.code); if(cached){ scanStatus.textContent='Reaberto do histórico (nenhuma nova chamada à IA foi feita).'; renderResult(entry.code,entry.name,cached.analysis,true); } else { scanStatus.textContent='Pronto para analisar novamente.'; questionArea.innerHTML=''; } updateGroupScanButtonState(); }
  
 function renderReferencia(){ /* mantido por compatibilidade; a barra de consulta já mostra o valor no próprio input */ }
 function renderAccount(){ accountStatus.textContent=currentSession?'Sessão reconhecida: plano '+currentPlan()+'. As análises individuais liberadas aparecem conforme o nível de cada etapa.':'Para analisar uma figura, entre pelo acesso principal do site.'; }
 function clearSelection(){ document.querySelectorAll('.resource').forEach(button=>button.classList.remove('selected-resource')); }
+function clearScanMarks(){ document.querySelectorAll('.resource').forEach(button=>{ button.classList.remove('scan-found','scan-uncertain','scan-absent'); const mark=button.querySelector('.scan-mark'); if(mark) mark.remove(); }); }
  
 function updateRunState(){ scanButton.disabled = !(getReferencia() && selectedResourceCode); }
+function updateGroupScanButtonState(){ groupScanButton.disabled = !(getReferencia() && activeCategory); }
  
 function selectResource(code){ if(!activeCategory)return; const resource=activeCategory.resources.find(r=>r.code===code); if(!resource)return; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=resource.code+' — '+resource.name; queryChip.classList.remove('empty'); updateUpgradeButton(); updateRunState(); const ref=getReferencia(); const cached=ref?readCacheEntry(ref,code):null; if(cached){ scanStatus.textContent='Já existe uma análise salva para esta combinação — exibindo do histórico.'; renderResult(resource.code,resource.name,cached.analysis,true); } else { scanStatus.textContent=ref?'Clique em “Analisar” para consultar esta figura na passagem informada.':'Informe uma passagem ou tema antes de analisar.'; questionArea.innerHTML=''; } }
  
@@ -356,17 +383,114 @@ function parseSections(markdown){ const lines=String(markdown||'').replace(/\r\n
 function mdInlineToHtml(text){ return esc(text).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^-\s+(.*)$/,'• $1'); }
 function renderResult(code,name,analysisText,fromCache){ const sections=parseSections(analysisText); const html=sections.map((s,i)=>'<details class="result-section"'+(i<2?' open':'')+'><summary>'+esc(s.title)+'</summary><div class="result-body">'+s.body.map(l=>mdInlineToHtml(l)).join('<br>')+'</div></details>').join(''); questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(code)+'</span>'+(fromCache?'<span class="cached-badge">DO HISTÓRICO</span>':'')+'<div class="qtext"><strong>'+esc(name)+'</strong></div><div class="result-sections">'+html+'</div></div>'; }
  
-async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=currentSession; scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; try{ const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(resource.tier!=='FREE'&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},scanResult:{code:resource.code,status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise concluída.'; writeCacheEntry(ref,resource.code,analysis); pushHistory({ref,code:resource.code,name:resource.name,ts:Date.now()}); renderResult(resource.code,resource.name,analysis,false); }catch(error){ scanStatus.textContent='Não foi possível concluir a análise.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
+// ---- Varredura de grupo (textual_group_scan) ----
+const SCAN_BADGE_LABEL = { found:'ENCONTRADO', uncertain:'INCERTO', absent:'NÃO ENCONTRADO' };
+const SCAN_BADGE_CLASS = { found:'badge-found', uncertain:'badge-uncertain', absent:'badge-absent' };
+ 
+function applyScanMarksToSidebar(results){
+  clearScanMarks();
+  results.forEach(r=>{
+    const btn=document.querySelector('.resource[data-code="'+CSS.escape(r.code)+'"]');
+    if(!btn) return;
+    const cls = r.status==='found' ? 'scan-found' : (r.status==='uncertain' ? 'scan-uncertain' : 'scan-absent');
+    btn.classList.add(cls);
+    const mark=document.createElement('span');
+    mark.className='scan-mark';
+    mark.textContent = r.status==='found' ? '●' : (r.status==='uncertain' ? '?' : '○');
+    btn.appendChild(mark);
+  });
+}
+ 
+function renderGroupScanResults(results){
+  lastScanResults = {};
+  results.forEach(r=>{ lastScanResults[r.code]=r; });
+  applyScanMarksToSidebar(results);
+  groupScanList.innerHTML = results.map(r=>{
+    const resource = activeCategory?.resources.find(res=>res.code===r.code);
+    const name = resource?resource.name:r.code;
+    const tier = resource?resource.tier:'DOCTUS';
+    const badgeClass = SCAN_BADGE_CLASS[r.status] || 'badge-absent';
+    const badgeLabel = SCAN_BADGE_LABEL[r.status] || 'NÃO ENCONTRADO';
+    const locked = !textualCanOpen(tier);
+    return '<div class="scan-item" data-code="'+esc(r.code)+'">'
+      + '<div>'
+        + '<h3>'+esc(r.code)+' — '+esc(name)+'</h3>'
+        + '<p>'+esc(r.reason||'')+'</p>'
+        + '<button type="button" class="detail-btn'+(locked?' locked':'')+'" data-open-code="'+esc(r.code)+'">'
+          + (locked?'🔒 Requer '+esc(tier):'Selecionar para análise completa')
+        + '</button>'
+      + '</div>'
+      + '<span class="scan-badge '+badgeClass+'">'+badgeLabel+'</span>'
+    + '</div>';
+  }).join('');
+  [...groupScanList.querySelectorAll('[data-open-code]')].forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const code=btn.dataset.openCode;
+      selectedResourceCode=code;
+      selectResource(code);
+      document.getElementById('queryBar')?.scrollIntoView({behavior:'smooth',block:'center'});
+    });
+  });
+}
+ 
+async function scanGroup(){
+  if(!activeCategory) return;
+  const ref=getReferencia();
+  if(!ref){ scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.'; refInput.focus(); return; }
+ 
+  const cached=readGroupScanCacheEntry(ref,activeCategory.code);
+  if(cached){
+    groupScanBox.style.display='block';
+    groupScanTitle.textContent='Varredura — '+activeCategory.code+' '+activeCategory.name;
+    groupScanStatus.textContent='Exibindo varredura já feita para esta passagem (nenhuma nova chamada à IA foi feita).';
+    renderGroupScanResults(cached.results);
+    return;
+  }
+ 
+  groupScanButton.disabled=true;
+  groupScanBox.style.display='block';
+  groupScanTitle.textContent='Varredura — '+activeCategory.code+' '+activeCategory.name;
+  groupScanStatus.textContent='Escaneando os '+activeCategory.resources.length+' itens do grupo nesta passagem…';
+  groupScanList.innerHTML='';
+ 
+  try{
+    const response=await fetch(PESQUISA_API_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        analysisType:'textual_group_scan',
+        referenceText:ref,
+        group:{code:activeCategory.code,name:activeCategory.name},
+        resources:activeCategory.resources.map(r=>({code:r.code,name:r.name}))
+      })
+    });
+    const payload=await response.json();
+    if(!response.ok || !payload.ok) throw new Error(payload.error||'O Worker não concluiu a varredura do grupo.');
+    const results=Array.isArray(payload.results)?payload.results:[];
+    if(!results.length) throw new Error('O Worker respondeu sem resultados de varredura.');
+    writeGroupScanCacheEntry(ref,activeCategory.code,results);
+    groupScanStatus.textContent='Varredura concluída — clique num item sinalizado para abrir a análise completa.';
+    renderGroupScanResults(results);
+  }catch(error){
+    groupScanStatus.textContent='Não foi possível concluir a varredura: '+(error.message||'erro desconhecido.');
+  }finally{
+    groupScanButton.disabled=false;
+    updateGroupScanButtonState();
+  }
+}
+ 
+async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=currentSession; scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; const scanResult = lastScanResults[resource.code] || {status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}; try{ const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(resource.tier!=='FREE'&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},scanResult})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise concluída.'; writeCacheEntry(ref,resource.code,analysis); pushHistory({ref,code:resource.code,name:resource.name,ts:Date.now()}); renderResult(resource.code,resource.name,analysis,false); }catch(error){ scanStatus.textContent='Não foi possível concluir a análise.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
  
 let refSaveTimer=null;
-refInput.addEventListener('input',()=>{ clearTimeout(refSaveTimer); refSaveTimer=setTimeout(()=>{ setReferencia(refInput.value.trim()); updateRunState(); if(selectedResourceCode){ const ref=getReferencia(); const cached=ref?readCacheEntry(ref,selectedResourceCode):null; scanStatus.textContent = ref ? (cached?'Já existe uma análise salva para esta combinação.':'Clique em “Analisar” para consultar.') : 'Informe uma passagem ou tema antes de analisar.'; if(cached){ const resource=activeCategory?.resources.find(r=>r.code===selectedResourceCode); if(resource) renderResult(resource.code,resource.name,cached.analysis,true); } } },350); });
-refInput.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); clearTimeout(refSaveTimer); setReferencia(refInput.value.trim()); updateRunState(); if(!scanButton.disabled) analyzeSelected(); } });
+refInput.addEventListener('input',()=>{ clearTimeout(refSaveTimer); refSaveTimer=setTimeout(()=>{ setReferencia(refInput.value.trim()); updateRunState(); updateGroupScanButtonState(); groupScanBox.style.display='none'; clearScanMarks(); lastScanResults={}; if(selectedResourceCode){ const ref=getReferencia(); const cached=ref?readCacheEntry(ref,selectedResourceCode):null; scanStatus.textContent = ref ? (cached?'Já existe uma análise salva para esta combinação.':'Clique em “Analisar” para consultar.') : 'Informe uma passagem ou tema antes de analisar.'; if(cached){ const resource=activeCategory?.resources.find(r=>r.code===selectedResourceCode); if(resource) renderResult(resource.code,resource.name,cached.analysis,true); } } },350); });
+refInput.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); clearTimeout(refSaveTimer); setReferencia(refInput.value.trim()); updateRunState(); updateGroupScanButtonState(); if(!scanButton.disabled) analyzeSelected(); } });
 scanButton.onclick=analyzeSelected;
-document.querySelectorAll('.category-toggle').forEach(button=>button.addEventListener('click',()=>{const resources=button.nextElementSibling,open=resources.classList.toggle('open');button.classList.toggle('active',open);button.setAttribute('aria-expanded',String(open));if(open){activeCategory=categoriesFor(button);}}));
+groupScanButton.onclick=scanGroup;
+document.querySelectorAll('.category-toggle').forEach(button=>button.addEventListener('click',()=>{const resources=button.nextElementSibling,open=resources.classList.toggle('open');button.classList.toggle('active',open);button.setAttribute('aria-expanded',String(open));if(open){activeCategory=categoriesFor(button);updateGroupScanButtonState();groupScanBox.style.display='none';}}));
 document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(!activeCategory){ activeCategory=categoriesFor(button.closest('.category').querySelector('.category-toggle')); } selectedResourceCode=button.dataset.code;selectResource(selectedResourceCode);}));
 // Abre a categoria, mas não executa nenhuma consulta automaticamente.
 document.querySelector('.category-toggle')?.click();
-const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();updateUpgradeButton();updateRunState();refreshSession();
+const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();updateUpgradeButton();updateRunState();updateGroupScanButtonState();refreshSession();
 </script>
 <script>
 (function(){
@@ -399,4 +523,13 @@ const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();update
 </body>
 </html>
  
+
+
+
+
+
+
+
+
+
 
