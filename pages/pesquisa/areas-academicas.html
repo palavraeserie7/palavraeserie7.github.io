@@ -684,32 +684,41 @@ Bloqueio paginas manutencao · HTML
       'Pergunta: ' + question;
 
     try {
-      const response = await fetch(
-        ACADEMIC_CHAT_PROXY.replace(/\/$/, '') + '/api/pesquisa',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            mode: 'free',
-            accessLevel: 'free',
-            question: routedQuestion,
-            topic: academicChatTopic,
-            discipline: academicChatPath.slice(-2, -1)[0] || '',
-            academicPath: academicChatPath,
-            module: 'CONSULTA ACADÊMICA INDEPENDENTE'
-          })
-        }
-      );
+        const sessionResult = await academicSupabaseClient.auth.getSession();
+    const token = sessionResult.data?.session?.access_token;
+    if (!token) {
+      throw new Error('Sessão expirada. Atualize a página e entre novamente.');
+    }
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || 'Não foi possível concluir a pesquisa.'
-        );
+    const response = await fetch(
+      ACADEMIC_CHAT_PROXY.replace(/\/$/, '') + '/api/pesquisa',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          mode: 'academic',
+          analysisType: 'academic_area_detail',
+          question: question,
+          areaPath: academicChatPath,
+          module: 'ÁREAS ACADÊMICAS'
+        })
       }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (data.code === 'MONTHLY_LIMIT_REACHED') {
+        throw new Error(data.error);
+      }
+      if (response.status === 403 && data.requiredLevel) {
+        throw new Error(data.error + ' Assine o plano ' + data.requiredLevel + ' para acessar este tema.');
+      }
+      throw new Error(data.error || 'Não foi possível concluir a pesquisa.');
+    } 
 
       academicChatAddMessage(
         'assistant',
