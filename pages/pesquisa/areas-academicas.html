@@ -699,17 +699,40 @@ Bloqueio paginas manutencao · HTML
         }
       );
 
-      const data = await response.json();
+     const data = await response.json();
 
-      if (!response.ok) {
-        if (data.code === 'MONTHLY_LIMIT_REACHED') {
-          throw new Error(data.error);
-        }
-        if (response.status === 403 && data.requiredLevel) {
-          throw new Error(data.error + ' Assine o plano ' + data.requiredLevel + ' para acessar este tema.');
-        }
-        throw new Error(data.error || 'Não foi possível concluir a pesquisa.');
-      }
+if (!response.ok) {
+  const backendError = data.error || '';
+
+  if (
+    response.status === 429 ||
+    data.code === 'RESOURCE_EXHAUSTED' ||
+    data.code === 'QUOTA_EXCEEDED' ||
+    /quota|exceeded|rate limit/i.test(backendError)
+  ) {
+    throw new Error(
+      'O serviço acadêmico atingiu o limite de consultas. Tente novamente mais tarde.'
+    );
+  }
+
+  if (data.code === 'MONTHLY_LIMIT_REACHED') {
+    throw new Error(backendError);
+  }
+
+  if (response.status === 403 && data.requiredLevel) {
+    throw new Error(
+      backendError +
+      ' Assine o plano ' +
+      data.requiredLevel +
+      ' para acessar este tema.'
+    );
+  }
+
+  throw new Error(
+    backendError || 'Não foi possível concluir a pesquisa.'
+  );
+}
+
 
       academicChatAddMessage(
         'assistant',
