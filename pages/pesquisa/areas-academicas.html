@@ -589,12 +589,13 @@ Bloqueio paginas manutencao · HTML
 
   <div id="academic-chat-status" class="academic-chat-status" aria-live="polite"></div>
   </div>
-</section><script>
+</section>
+  <script>
   const ACADEMIC_CHAT_PROXY =
     'https://yellow-lab-f4b2.palavraeserie.workers.dev';
 
   let academicChatTopic = '';
-     const academicSupabaseClient = window.supabase.createClient("https://qmhdbuxomozdczgvpvcc.supabase.co", "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8");
+  const academicSupabaseClient = window.supabase.createClient("https://qmhdbuxomozdczgvpvcc.supabase.co", "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8");
   let academicChatPath = [];
 
   const academicChatForm =
@@ -673,49 +674,42 @@ Bloqueio paginas manutencao · HTML
     academicChatStatus.textContent = 'Pesquisando...';
     academicChatStatus.className = 'academic-chat-status';
 
-    const routedQuestion =
-      'MODO DE CONSULTA ACADÊMICA INDEPENDENTE. ' +
-      'Não abrir nem mencionar a Matriz Técnica PRO. ' +
-      'Responda com clareza, indique limites e diferencie fatos, ' +
-      'inferências, interpretações e hipóteses.\\n\\n' +
-     
-
     try {
-        const sessionResult = await academicSupabaseClient.auth.getSession();
-    const token = sessionResult.data?.session?.access_token;
-    if (!token) {
-      throw new Error('Sessão expirada. Atualize a página e entre novamente.');
-    }
-
-    const response = await fetch(
-      ACADEMIC_CHAT_PROXY.replace(/\/$/, '') + '/api/pesquisa',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({
-          mode: 'academic',
-          analysisType: 'academic_area_detail',
-          question: question,
-          areaPath: academicChatPath,
-          module: 'ÁREAS ACADÊMICAS'
-        })
+      const sessionResult = await academicSupabaseClient.auth.getSession();
+      const token = sessionResult.data?.session?.access_token;
+      if (!token) {
+        throw new Error('Sessão expirada. Atualize a página e entre novamente.');
       }
-    );
 
-    const data = await response.json();
+      const response = await fetch(
+        ACADEMIC_CHAT_PROXY.replace(/\/$/, '') + '/api/pesquisa',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            mode: 'academic',
+            analysisType: 'academic_area_detail',
+            question: question,
+            areaPath: academicChatPath,
+            module: 'ÁREAS ACADÊMICAS'
+          })
+        }
+      );
 
-    if (!response.ok) {
-      if (data.code === 'MONTHLY_LIMIT_REACHED') {
-        throw new Error(data.error);
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.code === 'MONTHLY_LIMIT_REACHED') {
+          throw new Error(data.error);
+        }
+        if (response.status === 403 && data.requiredLevel) {
+          throw new Error(data.error + ' Assine o plano ' + data.requiredLevel + ' para acessar este tema.');
+        }
+        throw new Error(data.error || 'Não foi possível concluir a pesquisa.');
       }
-      if (response.status === 403 && data.requiredLevel) {
-        throw new Error(data.error + ' Assine o plano ' + data.requiredLevel + ' para acessar este tema.');
-      }
-      throw new Error(data.error || 'Não foi possível concluir a pesquisa.');
-    } 
 
       academicChatAddMessage(
         'assistant',
@@ -740,13 +734,7 @@ Bloqueio paginas manutencao · HTML
       academicChatQuestion.focus();
     }
   });
-
-  /*
-   * Conecta o chat ao clique dos temas da árvore.
-   * O arquivo novo já usa o atributo data-path nos botões.
-   */
-
-
+</script>   
 <script>
 (function(){
   var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
