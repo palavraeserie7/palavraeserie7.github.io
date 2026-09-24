@@ -2377,17 +2377,15 @@ function loadMessages() {
 }
  
  
-function persistQuestionDraft() {
- 
-  if (!activeStep) {
-    return;
-  }
- 
+
+ function persistQuestionDraft() {
+  if (!activeStep) return;
   localStorage.setItem(
     questionDraftKey(),
-    questionInput.value
+    JSON.stringify({ ref: getSavedReference(), text: questionInput.value })
   );
 }
+ 
  
  
 /* =====================================================
