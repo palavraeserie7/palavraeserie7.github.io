@@ -2478,11 +2478,12 @@ function prepareQuestionForStep(skipIntroMessage) {
     return;
   }
  
-  const savedDraft =
-    localStorage.getItem(
-      questionDraftKey()
-    );
- 
+let savedDraft = "";
+  try {
+    const d = JSON.parse(localStorage.getItem(questionDraftKey()) || "null");
+    if (d && d.ref === getSavedReference()) savedDraft = d.text;
+  } catch {}
+
   if (savedDraft) {
     questionInput.value = savedDraft;
     return;
