@@ -3247,23 +3247,26 @@ async function sendQuestion(event) {
        8. RESPOSTA DO WORKER
     --------------------------------------------- */
  
-    answerMessage.textContent =
-      data?.text ||
-      data?.answer ||
-      data?.response ||
-      data?.result ||
-      "A consulta não devolveu conteúdo.";
- 
-    lastMesaAnswer = answerMessage.textContent;
-    lastMesaModule = activeModule || "";
-    lastMesaStep = activeStep || "";
- 
-    const sendToRevisorBtn = document.createElement("button");
-    sendToRevisorBtn.type = "button";
-    sendToRevisorBtn.textContent = "ENVIAR PARA REVISÃO TEOLÓGICA";
-    sendToRevisorBtn.style.cssText = "display:block;margin-top:10px;padding:8px 12px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;font-size:10px;cursor:pointer;";
-    sendToRevisorBtn.onclick = function(){ openRevisor('platform_mesa'); };
-    answerMessage.appendChild(sendToRevisorBtn);
+   const resposta =
+  data?.text || data?.answer || data?.response || data?.result || "";
+
+answerMessage.textContent = "";
+renderAnswer(answerMessage, resposta || "A consulta não devolveu conteúdo.");
+
+lastMesaAnswer = resposta;
+lastMesaModule = activeModule || "";
+lastMesaStep = activeStep || "";
+
+if (resposta) {
+  salvarConsulta({
+    module: activeModule || "",
+    step: activeStep || "",
+    stepCode: stepCode || "",
+    passagem: getSavedReference(),
+    pergunta: questionForApi,
+    resposta
+  });
+}
  
  
   } catch (error) {
