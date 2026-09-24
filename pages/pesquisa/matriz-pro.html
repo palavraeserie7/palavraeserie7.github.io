@@ -2910,7 +2910,94 @@ async function submitRevisor() {
   }
 }
  
- 
+ /* ===== HISTÓRICO DE CONSULTAS ===== */
+const HIST_KEY = "palavraSerieMatrizProHistorico_v1";
+const HIST_MAX = 100;
+
+function lerHist(){
+  try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; }
+  catch { return []; }
+}
+function gravarHist(h){
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(h.slice(0, HIST_MAX))); }
+  catch(e){ console.warn("Histórico não salvo:", e); }
+}
+
+function salvarConsulta(c){
+  const h = lerHist();
+  h.unshift({ id: Date.now(), ...c, data: new Date().toISOString() });
+  gravarHist(h);
+  renderHistorico();
+}
+
+function renderHistorico(){
+  const h = lerHist();
+  document.getElementById("hist-count").textContent = h.length;
+  const box = document.getElementById("hist-lista");
+  box.innerHTML = "";
+  if (!h.length){
+    box.innerHTML = '<div class="hist-vazio">Nenhuma consulta ainda.</div>';
+    return;
+  }
+  h.forEach(c => {
+    const el = document.createElement("div");
+    el.className = "hist-item";
+    const t = document.createElement("span");
+    t.textContent = (c.step || "Consulta livre") + " · " + (c.passagem || "—");
+    const d = document.createElement("span");
+    d.className = "data";
+    d.textContent = new Date(c.data).toLocaleString("pt-BR");
+    el.append(t, d);
+    el.onclick = () => abrirConsulta(c.id);
+    box.appendChild(el);
+  });
+}
+
+function renderAnswer(el, text){
+  if (window.marked && window.DOMPurify){
+    el.classList.add("md");
+    el.innerHTML = DOMPurify.sanitize(marked.parse(text));
+  } else {
+    el.textContent = text;
+  }
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "ENVIAR PARA REVISÃO TEOLÓGICA";
+  btn.style.cssText = "display:block;margin-top:10px;padding:8px 12px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;font-size:10px;cursor:pointer;";
+  btn.onclick = () => openRevisor("platform_mesa");
+  el.appendChild(btn);
+}
+
+function abrirConsulta(id){
+  const c = lerHist().find(x => x.id === id);
+  if (!c) return;
+
+  messages.innerHTML = "";
+
+  const et = document.createElement("div");
+  et.className = "message system";
+  et.textContent = "Consulta anterior · " + (c.step || "livre") +
+    " · " + (c.passagem || "—") + " · " +
+    new Date(c.data).toLocaleString("pt-BR");
+  messages.appendChild(et);
+
+  const u = document.createElement("div");
+  u.className = "message user";
+  u.textContent = c.pergunta;
+  messages.appendChild(u);
+
+  const a = document.createElement("div");
+  a.className = "message system";
+  renderAnswer(a, c.resposta);
+  messages.appendChild(a);
+
+  lastMesaAnswer = c.resposta;
+  lastMesaModule = c.module || "";
+  lastMesaStep = c.step || "";
+
+  document.getElementById("historico").open = false;
+  messages.scrollTop = 0;
+}
 /* =====================================================
    CONSULTA AO WORKER
 ===================================================== */
