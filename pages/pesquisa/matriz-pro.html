@@ -65,8 +65,6 @@ Matriz pro · HTML
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palavra & Série — Método Técnico de Pesquisa</title>
- <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  
@@ -857,19 +855,6 @@ main {
     order:2;
   }
 }
-.historico{border-bottom:1px solid var(--b);padding:0 15px}
-.historico summary{cursor:pointer;padding:11px 0;color:var(--a);font-size:10px;font-weight:900;letter-spacing:.7px}
-#hist-lista{max-height:200px;overflow:auto;padding-bottom:10px}
-.hist-item{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;margin-top:5px;border:1px solid var(--b);border-radius:6px;font-size:10px;cursor:pointer}
-.hist-item:hover{border-color:var(--a);background:rgba(24,191,255,.08)}
-.hist-item .data{color:var(--muted);white-space:nowrap}
-.hist-vazio{color:var(--muted);font-size:10px;padding:4px 0 10px}
-.message.md{white-space:normal}
-.message.md h1,.message.md h2,.message.md h3,.message.md h4{font-size:12px;color:var(--p);margin:12px 0 4px}
-.message.md p,.message.md ul,.message.md ol{margin:6px 0}
-.message.md blockquote{margin:6px 0;padding-left:10px;border-left:2px solid var(--a);color:#b9c7d8}
-.message.md hr{border:0;border-top:1px solid var(--b);margin:10px 0}
- 
 </style>
 </head>
  
@@ -1025,10 +1010,7 @@ main {
             Trocar objeto de pesquisa
           </button>
         </div>
- <details id="historico" class="historico">
-  <summary>HISTÓRICO DE CONSULTAS ( <span id="hist-count">0</span> )</summary>
-  <div id="hist-lista"></div>
-</details>
+ 
         <div id="messages" class="messages"></div>
  
         <form
@@ -2353,23 +2335,54 @@ function questionDraftKey() {
   );
 }
  
- function persistMessages() { return; }
-
-function loadMessages() {
-  messages.innerHTML = "";
-  return false;
-}
-
-
-
- function persistQuestionDraft() {
-  if (!activeStep) return;
+ 
+function persistMessages() {
+ 
+  if (!activeStep) {
+    return;
+  }
+ 
   localStorage.setItem(
-    questionDraftKey(),
-    JSON.stringify({ ref: getSavedReference(), text: questionInput.value })
+    messagesKey(),
+    messages.innerHTML
   );
 }
  
+ 
+function loadMessages() {
+ 
+  if (!activeStep) {
+    messages.innerHTML = "";
+    return false;
+  }
+ 
+ 
+  const saved =
+    localStorage.getItem(
+      messagesKey()
+    );
+ 
+  if (saved) {
+    messages.innerHTML = saved;
+    return true;
+  }
+ 
+  messages.innerHTML = "";
+  return false;
+}
+ 
+ 
+function persistQuestionDraft() {
+ 
+  if (!activeStep) {
+    return;
+  }
+ 
+  localStorage.setItem(
+    questionDraftKey(),
+    questionInput.value
+  );
+}
  
  
 /* =====================================================
@@ -2462,12 +2475,11 @@ function prepareQuestionForStep(skipIntroMessage) {
     return;
   }
  
-let savedDraft = "";
-  try {
-    const d = JSON.parse(localStorage.getItem(questionDraftKey()) || "null");
-    if (d && d.ref === getSavedReference()) savedDraft = d.text;
-  } catch {}
-
+  const savedDraft =
+    localStorage.getItem(
+      questionDraftKey()
+    );
+ 
   if (savedDraft) {
     questionInput.value = savedDraft;
     return;
@@ -2880,94 +2892,7 @@ async function submitRevisor() {
   }
 }
  
- /* ===== HISTÓRICO DE CONSULTAS ===== */
-const HIST_KEY = "palavraSerieMatrizProHistorico_v1";
-const HIST_MAX = 100;
-
-function lerHist(){
-  try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; }
-  catch { return []; }
-}
-function gravarHist(h){
-  try { localStorage.setItem(HIST_KEY, JSON.stringify(h.slice(0, HIST_MAX))); }
-  catch(e){ console.warn("Histórico não salvo:", e); }
-}
-
-function salvarConsulta(c){
-  const h = lerHist();
-  h.unshift({ id: Date.now(), ...c, data: new Date().toISOString() });
-  gravarHist(h);
-  renderHistorico();
-}
-
-function renderHistorico(){
-  const h = lerHist();
-  document.getElementById("hist-count").textContent = h.length;
-  const box = document.getElementById("hist-lista");
-  box.innerHTML = "";
-  if (!h.length){
-    box.innerHTML = '<div class="hist-vazio">Nenhuma consulta ainda.</div>';
-    return;
-  }
-  h.forEach(c => {
-    const el = document.createElement("div");
-    el.className = "hist-item";
-    const t = document.createElement("span");
-    t.textContent = (c.step || "Consulta livre") + " · " + (c.passagem || "—");
-    const d = document.createElement("span");
-    d.className = "data";
-    d.textContent = new Date(c.data).toLocaleString("pt-BR");
-    el.append(t, d);
-    el.onclick = () => abrirConsulta(c.id);
-    box.appendChild(el);
-  });
-}
-
-function renderAnswer(el, text){
-  if (window.marked && window.DOMPurify){
-    el.classList.add("md");
-    el.innerHTML = DOMPurify.sanitize(marked.parse(text));
-  } else {
-    el.textContent = text;
-  }
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.textContent = "ENVIAR PARA REVISÃO TEOLÓGICA";
-  btn.style.cssText = "display:block;margin-top:10px;padding:8px 12px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;font-size:10px;cursor:pointer;";
-  btn.onclick = () => openRevisor("platform_mesa");
-  el.appendChild(btn);
-}
-
-function abrirConsulta(id){
-  const c = lerHist().find(x => x.id === id);
-  if (!c) return;
-
-  messages.innerHTML = "";
-
-  const et = document.createElement("div");
-  et.className = "message system";
-  et.textContent = "Consulta anterior · " + (c.step || "livre") +
-    " · " + (c.passagem || "—") + " · " +
-    new Date(c.data).toLocaleString("pt-BR");
-  messages.appendChild(et);
-
-  const u = document.createElement("div");
-  u.className = "message user";
-  u.textContent = c.pergunta;
-  messages.appendChild(u);
-
-  const a = document.createElement("div");
-  a.className = "message system";
-  renderAnswer(a, c.resposta);
-  messages.appendChild(a);
-
-  lastMesaAnswer = c.resposta;
-  lastMesaModule = c.module || "";
-  lastMesaStep = c.step || "";
-
-  document.getElementById("historico").open = false;
-  messages.scrollTop = 0;
-}
+ 
 /* =====================================================
    CONSULTA AO WORKER
 ===================================================== */
@@ -3230,26 +3155,23 @@ async function sendQuestion(event) {
        8. RESPOSTA DO WORKER
     --------------------------------------------- */
  
-   const resposta =
-  data?.text || data?.answer || data?.response || data?.result || "";
-
-answerMessage.textContent = "";
-renderAnswer(answerMessage, resposta || "A consulta não devolveu conteúdo.");
-
-lastMesaAnswer = resposta;
-lastMesaModule = activeModule || "";
-lastMesaStep = activeStep || "";
-
-if (resposta) {
-  salvarConsulta({
-    module: activeModule || "",
-    step: activeStep || "",
-    stepCode: stepCode || "",
-    passagem: getSavedReference(),
-    pergunta: questionForApi,
-    resposta
-  });
-}
+    answerMessage.textContent =
+      data?.text ||
+      data?.answer ||
+      data?.response ||
+      data?.result ||
+      "A consulta não devolveu conteúdo.";
+ 
+    lastMesaAnswer = answerMessage.textContent;
+    lastMesaModule = activeModule || "";
+    lastMesaStep = activeStep || "";
+ 
+    const sendToRevisorBtn = document.createElement("button");
+    sendToRevisorBtn.type = "button";
+    sendToRevisorBtn.textContent = "ENVIAR PARA REVISÃO TEOLÓGICA";
+    sendToRevisorBtn.style.cssText = "display:block;margin-top:10px;padding:8px 12px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;font-size:10px;cursor:pointer;";
+    sendToRevisorBtn.onclick = function(){ openRevisor('platform_mesa'); };
+    answerMessage.appendChild(sendToRevisorBtn);
  
  
   } catch (error) {
@@ -3338,7 +3260,6 @@ document.addEventListener("keydown", (event) => {
 updatePlanBadge();
 updateUpgradeButton();
 renderModules();
- renderHistorico();
 </script>
  
 <script>
@@ -3387,5 +3308,6 @@ renderModules();
 </body>
 </html>
  
+
 
 
