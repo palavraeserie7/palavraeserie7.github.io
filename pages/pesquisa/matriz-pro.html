@@ -383,6 +383,27 @@ main {
   min-width:0;
 }
  
+
+/* MODO FOCO DA ANÁLISE — somente apresentação; não altera o fluxo de dados. */
+body.comparison-focus main {
+  grid-template-columns:minmax(0, 1fr);
+}
+body.comparison-focus main > .modules {
+  display:none;
+}
+body.comparison-focus .content {
+  grid-template-columns:minmax(0, 1fr);
+}
+/* O cabeçalho REVISOR TEOLÓGICO permanece visível; somente os demais
+   painéis são ocultados para isolar a Análise de comparação e consolidação. */
+body.comparison-focus .content > .chat {
+  display:none;
+}
+body.comparison-focus .content > .sheet {
+  order:1;
+  grid-column:1 / -1;
+}
+
 /* =====================================================
    FOLHA DE TRABALHO
 ===================================================== */
@@ -2907,6 +2928,9 @@ async function sendQuestion(event) {
   if (!text) {
     return false;
   }
+
+  // Apenas altera a apresentação após o clique; o fluxo de envio permanece intacto.
+  document.body.classList.add("comparison-focus");
  
   const stepCode =
     extractStepCode(activeStep);
@@ -3308,7 +3332,6 @@ renderModules();
 </body>
 </html>
  
-
 
 
 
