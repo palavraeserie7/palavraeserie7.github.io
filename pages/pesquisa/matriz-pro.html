@@ -545,85 +545,7 @@ main {
   opacity:.55;
   cursor:wait;
 }
-
- /* ---- Redesign limpo do painel de comparação ---- */
-
-.sheet {
-  padding:22px;
-}
-
-.sheet h3 {
-  margin:0 0 6px;
-  color:var(--p);
-  font-size:12px;
-  font-weight:900;
-  letter-spacing:1px;
-  text-transform:uppercase;
-}
-
-.sheet .meta {
-  margin:0 0 16px;
-  padding-bottom:14px;
-  border-bottom:1px solid var(--b);
-  color:var(--muted);
-  font-size:10px;
-  line-height:1.5;
-}
-
-.comparison-inputs {
-  margin-bottom:16px;
-  border:1px solid var(--b);
-  border-radius:6px;
-}
-
-.comparison-inputs > summary {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 12px;
-  color:var(--muted);
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:.7px;
-  cursor:pointer;
-  list-style:none;
-}
-
-.comparison-inputs > summary::-webkit-details-marker { display:none; }
-
-.comparison-inputs > summary::after {
-  content:"+";
-  color:var(--a);
-  font-size:15px;
-  line-height:1;
-}
-
-.comparison-inputs[open] > summary {
-  color:var(--a);
-  border-bottom:1px solid var(--b);
-}
-
-.comparison-inputs[open] > summary::after { content:"–"; }
-
-.comparison-inputs > summary:hover { color:#fff; }
-
-.comparison-inputs-body {
-  padding:14px 12px 2px;
-}
-
-.comparison-field textarea {
-  min-height:120px;
-  border-color:var(--b);
-}
-
-.comparison-report-label {
-  margin-bottom:6px;
-}
-
-.comparison-report {
-  margin-top:0;
-  border-color:var(--b);
-}
+ 
 /* =====================================================
    CHAT
 ===================================================== */
@@ -1029,48 +951,40 @@ main {
  
     <div class="content">
  
-          <section class="sheet">
-
+      <section class="sheet">
+ 
         <h3 id="sheet-title">
           Análise de comparação e consolidação
         </h3>
-
+ 
         <div id="sheet-meta" class="meta">
           Compare o conteúdo do escritor com uma referência de comparação e gere um relatório de auditoria.
         </div>
-
-        <details id="comparison-inputs" class="comparison-inputs">
-          <summary>ENTRADAS — REFERÊNCIA E CONTEÚDO DO ESCRITOR</summary>
-
-          <div class="comparison-inputs-body">
-
-            <div class="comparison-field">
-              <label for="research-ready">REFERÊNCIA DE COMPARAÇÃO</label>
-              <small>Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere e prioriza fontes da matriz canônica conforme a subetapa.</small>
-              <div id="comparison-guidance" class="comparison-guidance" role="note"></div>
-              <textarea
-                id="research-ready"
-                placeholder="Cole uma referência de comparação ou deixe vazio para a sugestão do Worker..."
-                oninput="persistResearchReady()"
-              ></textarea>
-            </div>
-
-            <div class="comparison-field">
-              <label for="writer-content">CONTEÚDO DO ESCRITOR</label>
-              <small>Cole aqui o conteúdo produzido pelo escritor que será auditado.</small>
-              <textarea
-                id="writer-content"
-                placeholder="Cole aqui o conteúdo do escritor..."
-                oninput="persistWriterContent()"
-              ></textarea>
-            </div>
-
-          </div>
-        </details>
-
+ 
+        <div class="comparison-field">
+          <label for="research-ready">REFERÊNCIA DE COMPARAÇÃO</label>
+          <small>Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere e prioriza fontes da matriz canônica conforme a subetapa.</small>
+          <div id="comparison-guidance" class="comparison-guidance" role="note"></div>
+          <textarea
+            id="research-ready"
+            placeholder="Cole uma referência de comparação ou deixe vazio para a sugestão do Worker..."
+            oninput="persistResearchReady()"
+          ></textarea>
+        </div>
+ 
+        <div class="comparison-field">
+          <label for="writer-content">CONTEÚDO DO ESCRITOR</label>
+          <small>Cole aqui o conteúdo produzido pelo escritor que será auditado.</small>
+          <textarea
+            id="writer-content"
+            placeholder="Cole aqui o conteúdo do escritor..."
+            oninput="persistWriterContent()"
+          ></textarea>
+        </div>
+ 
         <div class="comparison-report-label">RELATÓRIO DE AUDITORIA</div>
         <div id="comparison-report" class="comparison-report" role="status" aria-live="polite">O relatório de auditoria aparecerá aqui depois da comparação.</div>
-
+ 
         <div class="comparison-actions">
           <button
             id="compare-button"
@@ -1081,7 +995,7 @@ main {
             COMPARAR E CONSOLIDAR
           </button>
         </div>
-
+ 
       </section>
  
       <aside class="chat">
@@ -2747,12 +2661,9 @@ async function runComparisonConsolidation() {
  
   const referenceText = researchReadyInput.value.trim();
   const writerContent = writerContentInput.value.trim();
-   const mesaOrigin = (localStorage.getItem(comparisonKey("origem-mesa")) || "").trim();
-  const comparisonOrigin = (mesaOrigin && mesaOrigin === writerContent) ? "platform_mesa" : "external_unit";
   const guidance = getCanonicalGuidance();
  
   if (!writerContent) {
-       document.getElementById("comparison-inputs").open = true;
     comparisonReport.textContent = "Cole o conteúdo do escritor. A referência de comparação pode ser preenchida ou deixada vazia para a sugestão automática do Worker.";
     comparisonReport.classList.remove("pending");
     persistComparisonReport();
@@ -2790,7 +2701,6 @@ async function runComparisonConsolidation() {
           analysisType: "comparison_consolidation",
           stepCode,
           requiredLevel: getStepLevel(stepCode),
-                 origin: comparisonOrigin,
           referenceText,
           writerContent,
           canonicalGuidance: {
