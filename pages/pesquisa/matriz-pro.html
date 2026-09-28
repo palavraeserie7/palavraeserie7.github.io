@@ -2730,6 +2730,8 @@ async function runComparisonConsolidation() {
         },
         body: JSON.stringify({
           mode: "writing_private",
+origin: "platform_mesa",
+         
           accessLevel: "private",
           analysisType: "comparison_consolidation",
           stepCode,
@@ -2787,26 +2789,17 @@ async function runComparisonConsolidation() {
    REVISOR TEOLÓGICO
 ===================================================== */
  
-function openRevisor(origin) {
-  revisorOrigin = origin || "external_unit";
+function openRevisor() {
+  revisorOrigin = "external_unit";
   const overlay = document.getElementById("revisor-overlay");
   const note = document.getElementById("revisor-origin-note");
   if (!overlay) return;
- 
-  if (revisorOrigin === "platform_mesa") {
-    note.textContent = "Origem: conteúdo produzido na Mesa de Análise PRO. Incluído no seu plano MASTER — não consome unidade.";
-    document.getElementById("revisor-tema").value = lastMesaModule || "";
-    document.getElementById("revisor-subetapa").value = lastMesaStep || "";
-    document.getElementById("revisor-conteudo").value = lastMesaAnswer || "";
-    document.getElementById("revisor-referencia").value = "";
-  } else {
-    note.textContent = "Origem: conteúdo externo colado por você. Não exige plano MASTER — consome 1 unidade de revisão.";
-    document.getElementById("revisor-tema").value = "";
-    document.getElementById("revisor-subetapa").value = "";
-    document.getElementById("revisor-conteudo").value = "";
-    document.getElementById("revisor-referencia").value = "";
-  }
- 
+
+  note.textContent = "Revisão avulsa: use para conteúdo criado fora desta página (outra IA, artigo, rascunho etc.). Consome 1 unidade de revisão.";
+  document.getElementById("revisor-tema").value = "";
+  document.getElementById("revisor-subetapa").value = "";
+  document.getElementById("revisor-conteudo").value = "";
+  document.getElementById("revisor-referencia").value = "";
   document.getElementById("revisor-report").textContent = "O relatório de auditoria aparecerá aqui depois da revisão.";
   overlay.style.display = "flex";
 }
