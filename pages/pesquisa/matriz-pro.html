@@ -2747,6 +2747,8 @@ async function runComparisonConsolidation() {
  
   const referenceText = researchReadyInput.value.trim();
   const writerContent = writerContentInput.value.trim();
+   const mesaOrigin = (localStorage.getItem(comparisonKey("origem-mesa")) || "").trim();
+  const comparisonOrigin = (mesaOrigin && mesaOrigin === writerContent) ? "platform_mesa" : "external_unit";
   const guidance = getCanonicalGuidance();
  
   if (!writerContent) {
@@ -2788,6 +2790,7 @@ async function runComparisonConsolidation() {
           analysisType: "comparison_consolidation",
           stepCode,
           requiredLevel: getStepLevel(stepCode),
+                 origin: comparisonOrigin,
           referenceText,
           writerContent,
           canonicalGuidance: {
