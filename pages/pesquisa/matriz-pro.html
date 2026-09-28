@@ -2685,11 +2685,11 @@ async function runComparisonConsolidation() {
   }
  
   const referenceText = researchReadyInput.value.trim();
-  const writerContent = writerContentInput.value.trim();
+ const writerContent = writerContentInput.value.trim() || String(lastMesaAnswer || "").trim();
   const guidance = getCanonicalGuidance();
  
   if (!writerContent) {
-    comparisonReport.textContent = "Cole o conteúdo do escritor. A referência de comparação pode ser preenchida ou deixada vazia para a sugestão automática do Worker.";
+    comparisonReport.textContent = "Faça uma pergunta na Mesa de Análise primeiro. O botão compara a última resposta da Mesa."
     comparisonReport.classList.remove("pending");
     persistComparisonReport();
     return;
