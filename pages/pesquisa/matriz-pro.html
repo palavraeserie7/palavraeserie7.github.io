@@ -2758,9 +2758,17 @@ async function submitRevisor() {
     return;
   }
 
-  const guidance = tema
-    ? { name: tema, sources: "Selecionar fontes reconhecidas adequadas ao tema.", rule: "Aplicar a regra normativa do módulo/tema informado, quando identificável." }
-    : getCanonicalGuidance();
+   const codigoModulo = (
+    subetapaInput.match(/^\s*(\d{2})/) ||
+    tema.match(/^\s*(\d{2})/) ||
+    []
+  )[1] || "";
+
+  const guidance = CANONICAL_REFERENCE_MATRIX[codigoModulo]
+    ? CANONICAL_REFERENCE_MATRIX[codigoModulo]
+    : (tema
+        ? { name: tema, sources: "Selecionar fontes reconhecidas adequadas ao tema.", rule: "Aplicar a regra normativa do módulo/tema informado, quando identificável." }
+        : getCanonicalGuidance());
  
   report.textContent = "REVISÃO EM ANDAMENTO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
   submitBtn.disabled = true;
