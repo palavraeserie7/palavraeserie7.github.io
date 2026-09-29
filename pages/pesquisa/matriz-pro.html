@@ -3152,7 +3152,17 @@ async function sendQuestion(event) {
  
   return false;
 }
- 
+ messages.addEventListener("click", function (e) {
+  const btn = e.target.closest(".send-to-revisor");
+  if (!btn) return;
+  const msg = btn.closest(".message");
+  const copia = msg.cloneNode(true);
+  copia.querySelectorAll(".send-to-revisor").forEach(b => b.remove());
+  lastMesaAnswer = copia.textContent.trim();
+  lastMesaModule = activeModule || "";
+  lastMesaStep = activeStep || "";
+  openRevisor("platform_mesa");
+});
  
 /* =====================================================
    ALTERAÇÕES DE AUTENTICAÇÃO
