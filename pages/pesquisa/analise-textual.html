@@ -1,129 +1,19 @@
-
-
-Analise textual · HTML
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-<head><style>
- html{visibility:hidden}
- #gateManutencao{
-   display:none;
-   position:fixed; inset:0; z-index:99999;
-   background:#f5f1e8; color:#2b2925;
-   font-family:Georgia,"Times New Roman",serif;
-   align-items:center; justify-content:center; text-align:center;
-   padding:24px;
- }
- #gateManutencao.visivel{display:flex}
- #gateManutencao .caixa{max-width:420px}
- #gateManutencao h1{font-size:22px;margin:0 0 10px}
- #gateManutencao p{color:#777067;margin:0 0 20px;font-size:15px;line-height:1.5}
- #gateManutencao a{
-   display:inline-block;border:1px solid #7b5b35;background:#7b5b35;color:#fff;
-   padding:10px 18px;border-radius:9px;text-decoration:none;font-size:14px;
- }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function(){
- var GATE_SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
- var GATE_SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
- var gateClient = window.supabase.createClient(GATE_SUPABASE_URL, GATE_SUPABASE_ANON_KEY);
- 
- function mostrarManutencao(){
-   document.documentElement.style.visibility = "visible";
-   document.addEventListener("DOMContentLoaded", function(){
-     var overlay = document.createElement("div");
-     overlay.id = "gateManutencao";
-     overlay.className = "visivel";
-     overlay.innerHTML =
-       '<div class="caixa">' +
-         '<h1>Página em manutenção</h1>' +
-         '<p>Esta página ainda está sendo preparada e não está disponível no momento.</p>' +
-         '<a href="entrada.html">Fazer login</a>' +
-       '</div>';
-     document.body.appendChild(overlay);
-     document.body.style.overflow = "hidden";
-   });
- }
- 
- gateClient.auth.getSession().then(function(res){
-   if (res.data && res.data.session) {
-     document.documentElement.style.visibility = "visible";
-   } else {
-     mostrarManutencao();
-   }
- }).catch(function(){
-   mostrarManutencao();
- });
-})();
-</script>
-<!-- ==================================================================== -->
- 
- 
- 
- 
- 
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Análise Textual</title>
 <style>
 :root{--bg:#0b1428;--panel:#111b30;--line:#263754;--text:#dbe7f5;--muted:#91a4bd;--blue:#18bfff;--green:#20d66b;--paper:#f4eedd;--ink:#2c2418}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,sans-serif}.shell{display:flex;min-height:100vh}.sidebar{width:230px;flex:0 0 230px;padding:18px 12px;background:var(--panel);border-right:1px solid var(--line)}.brand{display:block;padding:0 6px 16px;border-bottom:1px solid var(--line);color:var(--green);font-size:13px;font-weight:900;letter-spacing:1px;text-decoration:none}.brand small{display:block;margin-top:4px;color:#7c8fac;font-size:9px;letter-spacing:.5px}.back{display:block;margin:16px 4px;padding:9px 8px;border:1px solid #536780;border-radius:6px;color:var(--text);font-size:10px;font-weight:800;text-decoration:none}.back:hover{background:#16233c}.menu-title{padding:8px 6px;color:var(--blue);font-size:9px;font-weight:900;letter-spacing:.08em}.index{border-left:1px solid var(--line);background:#0e172b;padding:6px;max-height:calc(100vh - 150px);overflow:auto}.category{border-bottom:1px solid var(--line)}.category-toggle{display:flex;align-items:center;gap:7px;width:100%;min-height:34px;padding:6px 4px;border:0;background:transparent;color:var(--text);text-align:left;font:700 9px/1.25 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.category-toggle:hover,.category-toggle.active{background:#16233c}.category-code{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:16px;border:1px solid var(--blue);border-radius:3px;color:#8edfff;font-size:8px}.category-toggle strong{flex:1}.arrow{color:var(--blue);font-size:14px;transition:transform .18s}.category-toggle.active .arrow{transform:rotate(90deg)}.resources{display:none;padding:2px 3px 7px 28px}.resources.open{display:block}.resource{display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:6px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--muted);text-align:left;font:7.5px/1.35 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.resource:last-child{border-bottom:0}.resource:hover{color:#fff}.tier{font-size:6px;letter-spacing:.03em}.tier-free{color:var(--green)}.tier-pro{color:#d7b76a}.tier-master{color:#ff9f68}.tier-doctus{color:#c79cff}.main{flex:1;min-width:0;padding:40px;background:var(--paper);color:var(--ink)}.card{max-width:1000px;margin:0 auto;padding:36px;border:1px solid #ddcea4;border-radius:10px;background:#fbf7ec;box-shadow:0 8px 24px #0002}.card h1{margin:0 0 12px;font-family:Georgia,serif;font-size:32px}.card p{color:#6c5c42;line-height:1.6}.notice{margin-top:24px;padding:16px;border-left:3px solid #18bfff;background:#e8f5fa;color:#385466}.selected{margin-top:20px;padding:16px;border:1px solid #ddcea4;background:#f4eedd;color:#6c5c42}.selected strong{color:var(--ink)}
-.ref-box{margin-top:20px;padding:16px;border:1px solid #ddcea4;border-radius:8px;background:#fff}
-.ref-box label{display:block;margin-bottom:8px;font-weight:700;color:var(--ink);font-size:13px}
-.ref-row{display:flex;gap:8px;flex-wrap:wrap}
-.ref-row input{flex:1;min-width:200px;padding:10px 12px;border:1px solid #ccb98a;border-radius:6px;font-size:14px;background:#fffef9}
-.ref-row button{padding:10px 16px;border:0;border-radius:6px;background:var(--blue);color:#04202f;font-weight:800;font-size:12px;cursor:pointer}
-.ref-row button.secondary{background:transparent;border:1px solid #ccb98a;color:#6c5c42}
-.ref-current{margin-top:10px;font-size:12px;color:#6c5c42}
-.question-box{margin-top:20px;padding:18px;border:1px solid #b9d8e6;border-radius:8px;background:#eef8fb}
-.question-box .qcode{display:inline-block;margin-bottom:8px;padding:2px 8px;border-radius:4px;background:#18bfff;color:#04202f;font-weight:900;font-size:11px}
-.question-box .qtext{font-size:15px;line-height:1.6;color:#183042}
-.question-box .qcopy{margin-top:12px;padding:8px 14px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;font-size:12px;cursor:pointer}
-.pending-hint{margin-top:8px;font-size:12px;color:#a15b1f}
-.scan-box{margin-top:20px;padding:18px;border:1px solid #b9d8e6;border-radius:8px;background:#eef8fb}.scan-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.scan-head h2{margin:0;color:#183042;font-size:18px}.scan-btn{padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#04202f;font-weight:800;cursor:pointer}.scan-btn:disabled{opacity:.55;cursor:wait}.scan-status{margin-top:12px;color:#385466;font-size:13px}.scan-list{display:grid;gap:8px;margin-top:14px}.scan-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #d7e5ea;border-radius:6px;background:#fff}.scan-item h3{margin:0;color:#183042;font-size:13px}.scan-item p{margin:4px 0 0;color:#587080;font-size:12px;line-height:1.45}.scan-badge{flex:0 0 auto;padding:4px 7px;border-radius:4px;font-size:10px;font-weight:900}.badge-found{background:#d9f7e4;color:#087332}.badge-uncertain{background:#fff1ce;color:#8a5a00}.badge-absent{background:#edf1f4;color:#607080}.detail-btn{margin-top:8px;padding:5px 9px;border:1px solid #b5cbd5;border-radius:5px;background:#fff;color:#183042;font-size:11px;font-weight:700;cursor:pointer}.detail-btn.locked{color:#8a5a00;border-color:#e0c47b}.account-box{margin-top:20px;padding:14px;border:1px solid #ddcea4;border-radius:8px;background:#fff}.account-row{display:flex;gap:8px;flex-wrap:wrap}.account-row input{flex:1;min-width:180px;padding:9px;border:1px solid #ccb98a;border-radius:6px}.account-row button{padding:9px 13px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;cursor:pointer}.account-status{margin-top:8px;color:#6c5c42;font-size:12px}.resource.selected-resource{background:#1d3556;color:#fff}.resource.scan-found{background:#123b2b;color:#d9f7e4}.resource.scan-uncertain{background:#3b3015;color:#fff1ce}.resource.scan-absent{opacity:.7}.scan-mark{margin-left:4px;font-size:9px;font-weight:900}.scan-found .scan-mark{color:#20d66b}.scan-uncertain .scan-mark{color:#e8b94f}.scan-absent .scan-mark{color:#91a4bd}
-/* ===== Barra de consulta (modelo "SQL editor") ===== */
-.query-bar{margin-top:22px;padding:14px;border:1px solid #ccb98a;border-radius:10px;background:#fffef9;box-shadow:0 2px 6px #0001}
-.query-bar-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.query-bar input{flex:1;min-width:180px;padding:10px 12px;border:1px solid #ccb98a;border-radius:6px;font-size:14px;background:#fff}
-.query-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:6px;background:#eef8fb;border:1px solid #b9d8e6;color:#183042;font-size:13px;font-weight:700;white-space:nowrap}
-.query-chip.empty{color:#8a7a55;background:#f4eedd;border-color:#ddcea4;font-weight:600}
-.query-run{padding:10px 18px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
-.query-run:disabled{opacity:.5;cursor:not-allowed}
-.query-scan{padding:10px 18px;border:1px solid #18bfff;border-radius:6px;background:#fff;color:#0a6f96;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
-.query-scan:disabled{opacity:.5;cursor:not-allowed}
-.query-meta{margin-top:8px;font-size:11.5px;color:#8a7a55}
- 
-/* ===== Histórico de análises ===== */
-.history-box{margin-top:14px}
-.history-box summary{cursor:pointer;font-size:12.5px;font-weight:800;color:#385466;list-style:none;display:flex;align-items:center;gap:6px}
-.history-box summary::-webkit-details-marker{display:none}
-.history-box summary::before{content:'›';display:inline-block;transition:transform .15s}
-.history-box[open] summary::before{transform:rotate(90deg)}
-.history-list{display:grid;gap:6px;margin-top:8px}
-.history-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid #d7e5ea;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;color:#385466}
-.history-item:hover{background:#eef8fb}
-.history-item b{color:#183042}
-.history-item .hist-time{color:#91a4bd;font-size:10.5px;white-space:nowrap}
-.history-empty{padding:8px 2px;font-size:12px;color:#a0947a}
- 
-/* ===== Resultado estruturado (seções colapsáveis) ===== */
-.result-sections{display:grid;gap:8px;margin-top:10px}
-.result-section{border:1px solid #d7e5ea;border-radius:8px;background:#fff;overflow:hidden}
-.result-section summary{cursor:pointer;padding:10px 14px;font-weight:800;font-size:13px;color:#183042;list-style:none;display:flex;align-items:center;gap:8px;background:#f6fbfd}
-.result-section summary::-webkit-details-marker{display:none}
-.result-section summary::before{content:'›';transition:transform .15s;color:#18bfff;font-size:15px}
-.result-section[open] summary::before{transform:rotate(90deg)}
-.result-section .result-body{padding:12px 14px;font-size:13.5px;line-height:1.6;color:#2c2418}
-.cached-badge{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:4px;background:#fff1ce;color:#8a5a00;font-size:10px;font-weight:900;vertical-align:middle}
- 
-@media(max-width:800px){.shell{display:block}.sidebar{width:100%;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.index{max-height:48vh}.main{padding:18px 10px}.card{padding:22px}.card h1{font-size:26px}.query-bar-row{flex-direction:column;align-items:stretch}}
+@media(max-width:800px){.shell{display:block}.sidebar{width:100%;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.index{max-height:48vh}.main{padding:18px 10px}.card{padding:22px}.card h1{font-size:26px}}
 </style>
 </head>
 <body>
 <div class="shell">
 <aside class="sidebar">
-<a class="brand" href="index.html">PALAVRA &amp; SÉRIE<small>Análise Textual</small></a>
+<a class="brand" href="index.html">PALAVRA &amp; SÉRIE<small>Leitura bíblica</small></a>
 <a class="back" href="oraculo.html">← VOLTAR AO ORÁCULO</a>
 <div class="menu-title">ÍNDICE DE ANÁLISE TEXTUAL</div>
 <nav class="index" aria-label="Índice de Análise Textual">
@@ -134,401 +24,638 @@ Analise textual · HTML
             <span class="arrow">›</span>
           </button>
           <div class="resources">
-          <button class="resource" type="button" data-code="A.1" data-resource="Metáfora">
+          <button class="resource" type="button" data-resource="Metáfora">
             <span>A.1 — Metáfora</span>
             <b class="tier tier-free">FREE</b>
           </button>
-          <button class="resource" type="button" data-code="A.2" data-resource="Símile">
+          <button class="resource" type="button" data-resource="Símile">
             <span>A.2 — Símile</span>
             <b class="tier tier-free">FREE</b>
           </button>
-          <button class="resource" type="button" data-code="A.3" data-resource="Hipérbole">
+          <button class="resource" type="button" data-resource="Hipérbole">
             <span>A.3 — Hipérbole</span>
             <b class="tier tier-free">FREE</b>
           </button>
-          <button class="resource" type="button" data-code="A.4" data-resource="Ironia">
+          <button class="resource" type="button" data-resource="Ironia">
             <span>A.4 — Ironia</span>
             <b class="tier tier-pro">PRO</b>
           </button>
-          <button class="resource" type="button" data-code="A.5" data-resource="Eufemismo">
+          <button class="resource" type="button" data-resource="Eufemismo">
             <span>A.5 — Eufemismo</span>
             <b class="tier tier-pro">PRO</b>
           </button>
-          <button class="resource" type="button" data-code="A.6" data-resource="Personificação">
+          <button class="resource" type="button" data-resource="Personificação">
             <span>A.6 — Personificação</span>
             <b class="tier tier-free">FREE</b>
           </button>
-          <button class="resource" type="button" data-code="A.7" data-resource="Antropomorfismo">
+          <button class="resource" type="button" data-resource="Antropomorfismo">
             <span>A.7 — Antropomorfismo</span>
             <b class="tier tier-pro">PRO</b>
           </button>
-          <button class="resource" type="button" data-code="A.8" data-resource="Metonímia">
+          <button class="resource" type="button" data-resource="Metonímia">
             <span>A.8 — Metonímia</span>
             <b class="tier tier-pro">PRO</b>
           </button>
-          <button class="resource" type="button" data-code="A.9" data-resource="Sinédoque">
+          <button class="resource" type="button" data-resource="Sinédoque">
             <span>A.9 — Sinédoque</span>
             <b class="tier tier-master">MASTER</b>
           </button>
-          <button class="resource" type="button" data-code="A.10" data-resource="Apóstrofe">
+          <button class="resource" type="button" data-resource="Apóstrofe">
             <span>A.10 — Apóstrofe</span>
             <b class="tier tier-master">MASTER</b>
           </button>
-          <button class="resource" type="button" data-code="A.11" data-resource="Paradoxo">
+          <button class="resource" type="button" data-resource="Paradoxo">
             <span>A.11 — Paradoxo</span>
             <b class="tier tier-pro">PRO</b>
           </button>
-          <button class="resource" type="button" data-code="A.12" data-resource="Pergunta retórica">
+          <button class="resource" type="button" data-resource="Pergunta retórica">
             <span>A.12 — Pergunta retórica</span>
             <b class="tier tier-free">FREE</b>
           </button>
-          <button class="resource" type="button" data-code="A.13" data-resource="Elipse">
+          <button class="resource" type="button" data-resource="Elipse">
             <span>A.13 — Elipse</span>
             <b class="tier tier-master">MASTER</b>
           </button>
-          <button class="resource" type="button" data-code="A.14" data-resource="Zeugma">
+          <button class="resource" type="button" data-resource="Zeugma">
             <span>A.14 — Zeugma</span>
             <b class="tier tier-doctus">DOCTUS</b>
           </button>
-          <button class="resource" type="button" data-code="A.15" data-resource="Graduação / Clímax">
+          <button class="resource" type="button" data-resource="Graduação / Clímax">
             <span>A.15 — Graduação / Clímax</span>
             <b class="tier tier-pro">PRO</b>
           </button>
           </div>
         </section>
-        </nav>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">B</span>
+            <strong>ESTRUTURAS LITERÁRIAS E RETÓRICAS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Paralelismo">
+            <span>B.1 — Paralelismo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Antítese">
+            <span>B.2 — Antítese</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Repetição">
+            <span>B.3 — Repetição</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Quiasmo">
+            <span>B.4 — Quiasmo</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Inclusio">
+            <span>B.5 — Inclusio</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Merismo">
+            <span>B.6 — Merismo</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Estrutura concêntrica">
+            <span>B.7 — Estrutura concêntrica</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contraste narrativo">
+            <span>B.8 — Contraste narrativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Refrão">
+            <span>B.9 — Refrão</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Inclusão temática">
+            <span>B.10 — Inclusão temática</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">C</span>
+            <strong>RECURSOS SONOROS E POÉTICOS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Aliteração">
+            <span>C.1 — Aliteração</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Assonância">
+            <span>C.2 — Assonância</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Paronomásia / jogo de palavras">
+            <span>C.3 — Paronomásia / jogo de palavras</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Trocadilho / jogo fonético-semântico">
+            <span>C.4 — Trocadilho / jogo fonético-semântico</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ritmo poético">
+            <span>C.5 — Ritmo poético</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Repetição sonora">
+            <span>C.6 — Repetição sonora</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">D</span>
+            <strong>FORMAS LITERÁRIAS E DISCURSIVAS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Parábola">
+            <span>D.1 — Parábola</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Provérbio">
+            <span>D.2 — Provérbio</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Enigma / Adivinha">
+            <span>D.3 — Enigma / Adivinha</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Discurso argumentativo">
+            <span>D.4 — Discurso argumentativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Diatribe">
+            <span>D.5 — Diatribe</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Discurso de despedida">
+            <span>D.6 — Discurso de despedida</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Hino / Cântico">
+            <span>D.7 — Hino / Cântico</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Oração">
+            <span>D.8 — Oração</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Lamento">
+            <span>D.9 — Lamento</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Bênção">
+            <span>D.10 — Bênção</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Maldição / Oráculo de juízo">
+            <span>D.11 — Maldição / Oráculo de juízo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Genealogia">
+            <span>D.12 — Genealogia</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Narrativa de vocação">
+            <span>D.13 — Narrativa de vocação</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Relato de aliança">
+            <span>D.14 — Relato de aliança</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">E</span>
+            <strong>GÊNEROS LITERÁRIOS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Narrativa histórica / bíblica">
+            <span>E.1 — Narrativa histórica / bíblica</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Poesia hebraica">
+            <span>E.2 — Poesia hebraica</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Literatura sapiencial">
+            <span>E.3 — Literatura sapiencial</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Lei / Torá">
+            <span>E.4 — Lei / Torá</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Literatura profética">
+            <span>E.5 — Literatura profética</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Literatura apocalíptica">
+            <span>E.6 — Literatura apocalíptica</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Evangelho">
+            <span>E.7 — Evangelho</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Epístola / Carta">
+            <span>E.8 — Epístola / Carta</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Literatura narrativa-teológica">
+            <span>E.9 — Literatura narrativa-teológica</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">F</span>
+            <strong>LINGUAGEM PROFÉTICA E VISIONÁRIA</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Linguagem profética">
+            <span>F.1 — Linguagem profética</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Linguagem visionária">
+            <span>F.2 — Linguagem visionária</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Simbolismo apocalíptico">
+            <span>F.3 — Simbolismo apocalíptico</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Imagem profética">
+            <span>F.4 — Imagem profética</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ato simbólico profético">
+            <span>F.5 — Ato simbólico profético</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Oráculo profético">
+            <span>F.6 — Oráculo profético</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">G</span>
+            <strong>RELAÇÕES INTERTEXTUAIS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Citação explícita">
+            <span>G.1 — Citação explícita</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Alusão">
+            <span>G.2 — Alusão</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Eco intertextual">
+            <span>G.3 — Eco intertextual</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Intertextualidade">
+            <span>G.4 — Intertextualidade</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Uso do AT no NT">
+            <span>G.5 — Uso do AT no NT</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Releitura de tradição anterior">
+            <span>G.6 — Releitura de tradição anterior</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Eco temático">
+            <span>G.7 — Eco temático</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">H</span>
+            <strong>CATEGORIAS INTERPRETATIVAS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Tipologia">
+            <span>H.1 — Tipologia</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Alegoria">
+            <span>H.2 — Alegoria</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Simbolismo">
+            <span>H.3 — Simbolismo</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Representação simbólica">
+            <span>H.4 — Representação simbólica</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Leitura figurada">
+            <span>H.5 — Leitura figurada</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Linguagem literal">
+            <span>H.6 — Linguagem literal</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Linguagem figurada">
+            <span>H.7 — Linguagem figurada</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">I</span>
+            <strong>RECURSOS DE ARGUMENTAÇÃO E RETÓRICA</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Tese">
+            <span>I.1 — Tese</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Argumento">
+            <span>I.2 — Argumento</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contraste argumentativo">
+            <span>I.3 — Contraste argumentativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Pergunta-objeção">
+            <span>I.4 — Pergunta-objeção</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Resposta à objeção">
+            <span>I.5 — Resposta à objeção</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Conclusão / inferência">
+            <span>I.6 — Conclusão / inferência</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Exortação">
+            <span>I.7 — Exortação</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Advertência">
+            <span>I.8 — Advertência</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Consolação">
+            <span>I.9 — Consolação</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Acusação">
+            <span>I.10 — Acusação</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Apelo à memória">
+            <span>I.11 — Apelo à memória</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">J</span>
+            <strong>RECURSOS SEMÂNTICOS E CONTEXTUAIS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Campo semântico">
+            <span>J.1 — Campo semântico</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Polissemia">
+            <span>J.2 — Polissemia</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ambiguidade lexical">
+            <span>J.3 — Ambiguidade lexical</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ambiguidade sintática">
+            <span>J.4 — Ambiguidade sintática</span>
+            <b class="tier tier-doctus">DOCTUS</b>
+          </button>
+          <button class="resource" type="button" data-resource="Idiomatismo">
+            <span>J.5 — Idiomatismo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Expressão convencional">
+            <span>J.6 — Expressão convencional</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Fórmula literária">
+            <span>J.7 — Fórmula literária</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Termo-chave">
+            <span>J.8 — Termo-chave</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Mudança de sentido contextual">
+            <span>J.9 — Mudança de sentido contextual</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ambiguidade intencional">
+            <span>J.10 — Ambiguidade intencional</span>
+            <b class="tier tier-doctus">DOCTUS</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">K</span>
+            <strong>RECURSOS NARRATIVOS</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Caracterização">
+            <span>K.1 — Caracterização</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Caracterização direta">
+            <span>K.2 — Caracterização direta</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Caracterização indireta">
+            <span>K.3 — Caracterização indireta</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ironia narrativa">
+            <span>K.4 — Ironia narrativa</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ironia dramática">
+            <span>K.5 — Ironia dramática</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Repetição narrativa">
+            <span>K.6 — Repetição narrativa</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Padrão narrativo">
+            <span>K.7 — Padrão narrativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Inclusão narrativa">
+            <span>K.8 — Inclusão narrativa</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Suspense narrativo">
+            <span>K.9 — Suspense narrativo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Ponto de vista narrativo">
+            <span>K.10 — Ponto de vista narrativo</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Cena e sumário">
+            <span>K.11 — Cena e sumário</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          </div>
+        </section>
+        <section class="category">
+          <button class="category-toggle" type="button" aria-expanded="false">
+            <span class="category-code">L</span>
+            <strong>PRINCÍPIOS DE CONTROLE INTERPRETATIVO</strong>
+            <span class="arrow">›</span>
+          </button>
+          <div class="resources">
+          <button class="resource" type="button" data-resource="Contexto imediato">
+            <span>L.1 — Contexto imediato</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto literário">
+            <span>L.2 — Contexto literário</span>
+            <b class="tier tier-free">FREE</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto histórico-cultural">
+            <span>L.3 — Contexto histórico-cultural</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto canônico">
+            <span>L.4 — Contexto canônico</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto autoral">
+            <span>L.5 — Contexto autoral</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Contexto do destinatário">
+            <span>L.6 — Contexto do destinatário</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Unidade literária">
+            <span>L.7 — Unidade literária</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Estrutura argumentativa">
+            <span>L.8 — Estrutura argumentativa</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Estrutura temática">
+            <span>L.9 — Estrutura temática</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Significado × aplicação">
+            <span>L.10 — Significado × aplicação</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Interpretação × inferência teológica">
+            <span>L.11 — Interpretação × inferência teológica</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de anacronismo">
+            <span>L.12 — Controle de anacronismo</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de eisegese">
+            <span>L.13 — Controle de eisegese</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de alegorização arbitrária">
+            <span>L.14 — Controle de alegorização arbitrária</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de falácia lexical">
+            <span>L.15 — Controle de falácia lexical</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de prova-texto">
+            <span>L.16 — Controle de prova-texto</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de generalização indevida">
+            <span>L.17 — Controle de generalização indevida</span>
+            <b class="tier tier-pro">PRO</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de transferência indevida">
+            <span>L.18 — Controle de transferência indevida</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de contradição contextual">
+            <span>L.19 — Controle de contradição contextual</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          <button class="resource" type="button" data-resource="Controle de sobreinterpretação">
+            <span>L.20 — Controle de sobreinterpretação</span>
+            <b class="tier tier-master">MASTER</b>
+          </button>
+          </div>
+        </section>
+</nav>
 </aside>
 <main class="main">
 <section class="card">
 <h1>ANÁLISE TEXTUAL</h1>
-<p>Selecione um recurso de FIGURAS DE LINGUAGEM no índice lateral para iniciar a análise textual.</p>
-<div class="notice"><strong>Como usar:</strong> informe a passagem ou tema de estudo, abra uma categoria no índice lateral e clique em <strong>"Escanear grupo"</strong> para ver quais figuras aparecem na passagem. Depois, selecione um item sinalizado e clique em "Analisar" para abrir a análise técnica completa.</div>
- 
-<!-- Barra de consulta unificada: passagem + figura + executar, como no SQL Editor -->
-<div class="query-bar" id="queryBar">
-  <div class="query-bar-row">
-    <input type="text" id="refInput" placeholder="Ex.: João 3:16, ou Salmo 23, ou o tema do êxodo">
-    <button type="button" class="query-scan" id="groupScanButton" disabled>🔍 Escanear grupo</button>
-    <span class="query-chip empty" id="queryChip">nenhuma figura selecionada</span>
-    <button type="button" class="query-run" id="scanButton" disabled>▶ Analisar</button>
-  </div>
-  <div class="query-meta" id="scanStatus">Informe uma passagem/tema, abra uma categoria no índice e escaneie o grupo.</div>
- 
-  <details class="history-box" id="historyBox">
-    <summary>Histórico de análises (<span id="historyCount">0</span>)</summary>
-    <div class="history-list" id="historyList">
-      <div class="history-empty">Nenhuma análise executada ainda nesta sessão.</div>
-    </div>
-  </details>
-</div>
- 
-<!-- Resultado da varredura de grupo (textual_group_scan) -->
-<div class="scan-box" id="groupScanBox" style="display:none;">
-  <div class="scan-head">
-    <h2 id="groupScanTitle">Varredura do grupo</h2>
-  </div>
-  <div class="scan-status" id="groupScanStatus"></div>
-  <div class="scan-list" id="groupScanList"></div>
-</div>
- 
-<div class="account-box" id="accountBox">
-  <strong>Acesso à análise completa</strong>
-  <div class="account-status" id="accountStatus">A análise está configurada exclusivamente para o Grupo A — FIGURAS DE LINGUAGEM, usando as regras de evidência e os prompts fornecidos. A explicação completa de cada etapa exige o plano correspondente e usa a sessão já existente do site.</div>
-  <a
-    id="upgradeButton"
-    href="#"
-    target="_blank"
-    rel="noopener noreferrer"
-    style="display:none;align-items:center;justify-content:center;margin-top:12px;padding:10px 16px;border:1px solid #20d66b;border-radius:6px;background:rgba(32,214,107,.1);color:#087332;font-size:12px;font-weight:900;letter-spacing:.3px;text-decoration:none;"
-  ></a>
-</div>
- 
-<div id="questionArea"></div>
- 
+<p>Selecione uma categoria no índice lateral para visualizar seus recursos de análise textual.</p>
+<div class="notice"><strong>Como usar:</strong> abra uma categoria e selecione um recurso. A seleção ficará registrada abaixo para orientar a próxima análise.</div>
+<div class="selected" id="selected"><strong>Recurso selecionado:</strong> nenhum recurso selecionado.</div>
 </section>
 </main>
 </div>
 <script>
-// Análise Textual: a IA trabalha por grupo. O frontend nunca presume uma detecção.
-const PESQUISA_API_URL = window.PESQUISA_API_URL || 'https://yellow-lab-f4b2.palavraeserie.workers.dev/api/pesquisa';
-const SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
-const REF_KEY = 'pes_analise_textual_referencia';
-const TEXTUAL_ACCESS_LEVELS = Object.freeze({
-  'A.1':'FREE','A.2':'FREE','A.3':'FREE','A.4':'PRO','A.5':'PRO',
-  'A.6':'FREE','A.7':'PRO','A.8':'PRO','A.9':'MASTER','A.10':'MASTER',
-  'A.11':'PRO','A.12':'FREE','A.13':'MASTER','A.14':'DOCTUS','A.15':'PRO'
-});
-const TEXTUAL_TIER_RANK = Object.freeze({ FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 });
-const CHECKOUT_LINKS = Object.freeze({
-  PRO: "https://pay.kiwify.com.br/4m4qdH7",
-  MASTER: "https://pay.kiwify.com.br/9aANGEG",
-  DOCTUS: "https://pay.kiwify.com.br/tqJboGn"
-});
-const NEXT_TIER = Object.freeze({ FREE: "PRO", PRO: "MASTER", MASTER: "DOCTUS" });
-function getCheckoutLink(level){ return CHECKOUT_LINKS[level] || "#"; }
- 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let currentSession = null;
-let currentUserPlan = 'FREE';
- 
-async function getUserPlanFromSession(session){
-  if(!session?.user?.id) return 'FREE';
-  try{
-    const { data, error } = await supabaseClient
-      .from('profiles')
-      .select('plano')
-      .eq('id', session.user.id)
-      .single();
-    if(error || !data) return 'FREE';
-    return String(data.plano || 'FREE').trim().toUpperCase();
-  }catch(e){
-    return 'FREE';
-  }
-}
- 
-async function refreshSession(){
-  const { data } = await supabaseClient.auth.getSession();
-  currentSession = data?.session || null;
-  currentUserPlan = await getUserPlanFromSession(currentSession);
-  renderAccount();
-  updateUpgradeButton();
-  updateRunState();
-}
-const CACHE_KEY = 'pes_analise_cache_v1';   // resultados já obtidos: referência+figura -> análise
-const HIST_KEY  = 'pes_analise_historico_v1'; // lista de consultas já executadas, mais recente primeiro
-const HIST_MAX = 30;
-const GROUP_SCAN_CACHE_KEY = 'pes_analise_scan_cache_v1'; // varreduras de grupo já obtidas: referência+grupo -> resultados
-const refInput = document.getElementById('refInput');
-const queryChip = document.getElementById('queryChip');
-const scanButton = document.getElementById('scanButton');
-const scanStatus = document.getElementById('scanStatus');
-const groupScanButton = document.getElementById('groupScanButton');
-const groupScanBox = document.getElementById('groupScanBox');
-const groupScanTitle = document.getElementById('groupScanTitle');
-const groupScanStatus = document.getElementById('groupScanStatus');
-const groupScanList = document.getElementById('groupScanList');
-const historyList = document.getElementById('historyList');
-const historyCount = document.getElementById('historyCount');
-const questionArea = document.getElementById('questionArea');
-const accountStatus = document.getElementById('accountStatus');
-let selectedResourceCode=null;
-let activeCategory=null;
-let lastScanResults={}; // code -> {status, reason}
-function esc(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function getReferencia(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; } }
-function setReferencia(v){ try { localStorage.setItem(REF_KEY, v); } catch(e) {} }
-function currentPlan(){ return currentUserPlan; }
-function updateUpgradeButton(){
-  const button = document.getElementById('upgradeButton');
-  if(!button) return;
- 
-  if(currentUserPlan === 'DOCTUS'){
-    button.style.display = 'none';
-    return;
-  }
- 
-  if(selectedResourceCode){
-    const required = String(TEXTUAL_ACCESS_LEVELS[selectedResourceCode] || 'DOCTUS').toUpperCase();
-    const userRank = TEXTUAL_TIER_RANK[currentUserPlan] ?? 0;
-    const requiredRank = TEXTUAL_TIER_RANK[required] ?? 3;
-    if(userRank < requiredRank){
-      button.style.display = 'inline-flex';
-      button.textContent = 'ASSINAR ' + required;
-      button.href = getCheckoutLink(required);
-      return;
-    }
-  }
- 
-  const nextLevel = NEXT_TIER[currentUserPlan] || 'PRO';
-  button.style.display = 'inline-flex';
-  button.textContent = 'FAZER UPGRADE';
-  button.href = getCheckoutLink(nextLevel);
-}
-function textualCanOpen(required){ const requiredPlan=String(required||'FREE').toUpperCase(); if(requiredPlan==='FREE') return true; if(!currentSession?.access_token) return false; return (TEXTUAL_TIER_RANK[currentUserPlan] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99); }
-function categoriesFor(button){ const section=button.closest('.category'); return {code:button.querySelector('.category-code')?.textContent.trim()||'',name:button.querySelector('strong')?.textContent.trim()||'',resources:[...section.querySelectorAll('.resource')].map(r=>({code:r.dataset.code,name:r.dataset.resource,tier:TEXTUAL_ACCESS_LEVELS[r.dataset.code]||'DOCTUS'}))}; }
-function findCategoryForCode(code){ const btn=document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]'); if(!btn)return null; const toggle=btn.closest('.category')?.querySelector('.category-toggle'); return toggle?categoriesFor(toggle):null; }
- 
-// ---- Cache (chave = referência + código da figura) ----
-function cacheKeyFor(ref,code){ return (ref||'').trim().toLowerCase()+'::'+code; }
-function readCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); }catch(e){ return {}; } }
-function writeCacheEntry(ref,code,analysis){ const cache=readCache(); cache[cacheKeyFor(ref,code)]={analysis,ts:Date.now()}; try{ localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }catch(e){} }
-function readCacheEntry(ref,code){ return readCache()[cacheKeyFor(ref,code)]||null; }
- 
-// ---- Cache da varredura de grupo (chave = referência + código do grupo) ----
-function groupScanCacheKeyFor(ref,groupCode){ return (ref||'').trim().toLowerCase()+'::'+groupCode; }
-function readGroupScanCache(){ try{ return JSON.parse(localStorage.getItem(GROUP_SCAN_CACHE_KEY)||'{}'); }catch(e){ return {}; } }
-function writeGroupScanCacheEntry(ref,groupCode,results){ const cache=readGroupScanCache(); cache[groupScanCacheKeyFor(ref,groupCode)]={results,ts:Date.now()}; try{ localStorage.setItem(GROUP_SCAN_CACHE_KEY, JSON.stringify(cache)); }catch(e){} }
-function readGroupScanCacheEntry(ref,groupCode){ return readGroupScanCache()[groupScanCacheKeyFor(ref,groupCode)]||null; }
- 
-// ---- Histórico (lista de consultas já rodadas, para reabrir sem gastar nova chamada) ----
-function readHistory(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); }catch(e){ return []; } }
-function writeHistory(list){ try{ localStorage.setItem(HIST_KEY, JSON.stringify(list.slice(0,HIST_MAX))); }catch(e){} }
-function pushHistory(entry){ const list=readHistory().filter(h=>!(h.ref===entry.ref && h.code===entry.code)); list.unshift(entry); writeHistory(list); renderHistory(); }
-function renderHistory(){ const list=readHistory(); historyCount.textContent=String(list.length); if(!list.length){ historyList.innerHTML='<div class="history-empty">Nenhuma análise executada ainda nesta sessão.</div>'; return; } historyList.innerHTML=list.map((h,i)=>'<div class="history-item" data-hist-index="'+i+'"><span><b>'+esc(h.code)+'</b> — '+esc(h.name)+' · '+esc(h.ref)+'</span><span class="hist-time">'+esc(new Date(h.ts).toLocaleString('pt-BR'))+'</span></div>').join(''); [...historyList.querySelectorAll('.history-item')].forEach(item=>item.addEventListener('click',()=>{ const entry=list[Number(item.dataset.histIndex)]; if(entry) reopenFromHistory(entry); })); }
-function reopenFromHistory(entry){ refInput.value=entry.ref; setReferencia(entry.ref); activeCategory=findCategoryForCode(entry.code)||activeCategory; selectedResourceCode=entry.code; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(entry.code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=entry.code+' — '+entry.name; queryChip.classList.remove('empty'); scanButton.disabled=false; const cached=readCacheEntry(entry.ref,entry.code); if(cached){ scanStatus.textContent='Reaberto do histórico (nenhuma nova chamada à IA foi feita).'; renderResult(entry.code,entry.name,cached.analysis,true); } else { scanStatus.textContent='Pronto para analisar novamente.'; questionArea.innerHTML=''; } updateGroupScanButtonState(); }
- 
-function renderReferencia(){ /* mantido por compatibilidade; a barra de consulta já mostra o valor no próprio input */ }
-function renderAccount(){ accountStatus.textContent=currentSession?'Sessão reconhecida: plano '+currentPlan()+'. As análises individuais liberadas aparecem conforme o nível de cada etapa.':'Para analisar uma figura, entre pelo acesso principal do site.'; }
-function clearSelection(){ document.querySelectorAll('.resource').forEach(button=>button.classList.remove('selected-resource')); }
-function clearScanMarks(){ document.querySelectorAll('.resource').forEach(button=>{ button.classList.remove('scan-found','scan-uncertain','scan-absent'); const mark=button.querySelector('.scan-mark'); if(mark) mark.remove(); }); }
- 
-function updateRunState(){ scanButton.disabled = !(getReferencia() && selectedResourceCode); }
-function updateGroupScanButtonState(){ groupScanButton.disabled = !(getReferencia() && activeCategory); }
- 
-function selectResource(code){ if(!activeCategory)return; const resource=activeCategory.resources.find(r=>r.code===code); if(!resource)return; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=resource.code+' — '+resource.name; queryChip.classList.remove('empty'); updateUpgradeButton(); updateRunState(); const ref=getReferencia(); const cached=ref?readCacheEntry(ref,code):null; if(cached){ scanStatus.textContent='Já existe uma análise salva para esta combinação — exibindo do histórico.'; renderResult(resource.code,resource.name,cached.analysis,true); } else { scanStatus.textContent=ref?'Clique em “Analisar” para consultar esta figura na passagem informada.':'Informe uma passagem ou tema antes de analisar.'; questionArea.innerHTML=''; } }
- 
-// ---- Parser leve de markdown -> seções colapsáveis (## Título) ----
-function parseSections(markdown){ const lines=String(markdown||'').replace(/\r\n/g,'\n').split('\n'); const sections=[]; let current={title:'Análise',body:[]}; for(const line of lines){ const m=line.match(/^#{1,3}\s+(.*)/); if(m){ if(current.body.length||sections.length===0) sections.push(current); current={title:m[1].trim(),body:[]}; } else { current.body.push(line); } } sections.push(current); return sections.filter(s=>s.body.join('').trim().length||s.title); }
-function mdInlineToHtml(text){ return esc(text).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^-\s+(.*)$/,'• $1'); }
-function renderResult(code,name,analysisText,fromCache){ const sections=parseSections(analysisText); const html=sections.map((s,i)=>'<details class="result-section"'+(i<2?' open':'')+'><summary>'+esc(s.title)+'</summary><div class="result-body">'+s.body.map(l=>mdInlineToHtml(l)).join('<br>')+'</div></details>').join(''); questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(code)+'</span>'+(fromCache?'<span class="cached-badge">DO HISTÓRICO</span>':'')+'<div class="qtext"><strong>'+esc(name)+'</strong></div><div class="result-sections">'+html+'</div></div>'; }
- 
-// ---- Varredura de grupo (textual_group_scan) ----
-const SCAN_BADGE_LABEL = { found:'ENCONTRADO', uncertain:'INCERTO', absent:'NÃO ENCONTRADO' };
-const SCAN_BADGE_CLASS = { found:'badge-found', uncertain:'badge-uncertain', absent:'badge-absent' };
- 
-function applyScanMarksToSidebar(results){
-  clearScanMarks();
-  results.forEach(r=>{
-    const btn=document.querySelector('.resource[data-code="'+CSS.escape(r.code)+'"]');
-    if(!btn) return;
-    const cls = r.status==='found' ? 'scan-found' : (r.status==='uncertain' ? 'scan-uncertain' : 'scan-absent');
-    btn.classList.add(cls);
-    const mark=document.createElement('span');
-    mark.className='scan-mark';
-    mark.textContent = r.status==='found' ? '●' : (r.status==='uncertain' ? '?' : '○');
-    btn.appendChild(mark);
+const selected = document.getElementById('selected');
+document.querySelectorAll('.category-toggle').forEach(button => {
+  button.addEventListener('click', () => {
+    const resources = button.nextElementSibling;
+    const open = resources.classList.toggle('open');
+    button.classList.toggle('active', open);
+    button.setAttribute('aria-expanded', String(open));
   });
-}
- 
-function renderGroupScanResults(results){
-  lastScanResults = {};
-  results.forEach(r=>{ lastScanResults[r.code]=r; });
-  applyScanMarksToSidebar(results);
-  groupScanList.innerHTML = results.map(r=>{
-    const resource = activeCategory?.resources.find(res=>res.code===r.code);
-    const name = resource?resource.name:r.code;
-    const tier = resource?resource.tier:'DOCTUS';
-    const badgeClass = SCAN_BADGE_CLASS[r.status] || 'badge-absent';
-    const badgeLabel = SCAN_BADGE_LABEL[r.status] || 'NÃO ENCONTRADO';
-    const locked = !textualCanOpen(tier);
-    return '<div class="scan-item" data-code="'+esc(r.code)+'">'
-      + '<div>'
-        + '<h3>'+esc(r.code)+' — '+esc(name)+'</h3>'
-        + '<p>'+esc(r.reason||'')+'</p>'
-        + '<button type="button" class="detail-btn'+(locked?' locked':'')+'" data-open-code="'+esc(r.code)+'">'
-          + (locked?'🔒 Requer '+esc(tier):'Selecionar para análise completa')
-        + '</button>'
-      + '</div>'
-      + '<span class="scan-badge '+badgeClass+'">'+badgeLabel+'</span>'
-    + '</div>';
-  }).join('');
-  [...groupScanList.querySelectorAll('[data-open-code]')].forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const code=btn.dataset.openCode;
-      selectedResourceCode=code;
-      selectResource(code);
-      document.getElementById('queryBar')?.scrollIntoView({behavior:'smooth',block:'center'});
-    });
+});
+document.querySelectorAll('.resource').forEach(button => {
+  button.addEventListener('click', () => {
+    selected.innerHTML = '<strong>Recurso selecionado:</strong> ' + button.dataset.resource;
   });
-}
- 
-async function scanGroup(){
-  if(!activeCategory) return;
-  const ref=getReferencia();
-  if(!ref){ scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.'; refInput.focus(); return; }
- 
-  const cached=readGroupScanCacheEntry(ref,activeCategory.code);
-  if(cached){
-    groupScanBox.style.display='block';
-    groupScanTitle.textContent='Varredura — '+activeCategory.code+' '+activeCategory.name;
-    groupScanStatus.textContent='Exibindo varredura já feita para esta passagem (nenhuma nova chamada à IA foi feita).';
-    renderGroupScanResults(cached.results);
-    return;
-  }
- 
-  groupScanButton.disabled=true;
-  groupScanBox.style.display='block';
-  groupScanTitle.textContent='Varredura — '+activeCategory.code+' '+activeCategory.name;
-  groupScanStatus.textContent='Escaneando os '+activeCategory.resources.length+' itens do grupo nesta passagem…';
-  groupScanList.innerHTML='';
- 
-  try{
-    const response=await fetch(PESQUISA_API_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        analysisType:'textual_group_scan',
-        referenceText:ref,
-        group:{code:activeCategory.code,name:activeCategory.name},
-        resources:activeCategory.resources.map(r=>({code:r.code,name:r.name}))
-      })
-    });
-    const payload=await response.json();
-    if(!response.ok || !payload.ok) throw new Error(payload.error||'O Worker não concluiu a varredura do grupo.');
-    const results=Array.isArray(payload.results)?payload.results:[];
-    if(!results.length) throw new Error('O Worker respondeu sem resultados de varredura.');
-    writeGroupScanCacheEntry(ref,activeCategory.code,results);
-    groupScanStatus.textContent='Varredura concluída — clique num item sinalizado para abrir a análise completa.';
-    renderGroupScanResults(results);
-  }catch(error){
-    groupScanStatus.textContent='Não foi possível concluir a varredura: '+(error.message||'erro desconhecido.');
-  }finally{
-    groupScanButton.disabled=false;
-    updateGroupScanButtonState();
-  }
-}
- 
-async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=currentSession; scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; const scanResult = lastScanResults[resource.code] || {status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}; try{ const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(resource.tier!=='FREE'&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},scanResult})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise concluída.'; writeCacheEntry(ref,resource.code,analysis); pushHistory({ref,code:resource.code,name:resource.name,ts:Date.now()}); renderResult(resource.code,resource.name,analysis,false); }catch(error){ scanStatus.textContent='Não foi possível concluir a análise.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
- 
-let refSaveTimer=null;
-refInput.addEventListener('input',()=>{ clearTimeout(refSaveTimer); refSaveTimer=setTimeout(()=>{ setReferencia(refInput.value.trim()); updateRunState(); updateGroupScanButtonState(); groupScanBox.style.display='none'; clearScanMarks(); lastScanResults={}; if(selectedResourceCode){ const ref=getReferencia(); const cached=ref?readCacheEntry(ref,selectedResourceCode):null; scanStatus.textContent = ref ? (cached?'Já existe uma análise salva para esta combinação.':'Clique em “Analisar” para consultar.') : 'Informe uma passagem ou tema antes de analisar.'; if(cached){ const resource=activeCategory?.resources.find(r=>r.code===selectedResourceCode); if(resource) renderResult(resource.code,resource.name,cached.analysis,true); } } },350); });
-refInput.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); clearTimeout(refSaveTimer); setReferencia(refInput.value.trim()); updateRunState(); updateGroupScanButtonState(); if(!scanButton.disabled) analyzeSelected(); } });
-scanButton.onclick=analyzeSelected;
-groupScanButton.onclick=scanGroup;
-document.querySelectorAll('.category-toggle').forEach(button=>button.addEventListener('click',()=>{const resources=button.nextElementSibling,open=resources.classList.toggle('open');button.classList.toggle('active',open);button.setAttribute('aria-expanded',String(open));if(open){activeCategory=categoriesFor(button);updateGroupScanButtonState();groupScanBox.style.display='none';}}));
-document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(!activeCategory){ activeCategory=categoriesFor(button.closest('.category').querySelector('.category-toggle')); } selectedResourceCode=button.dataset.code;selectResource(selectedResourceCode);}));
-// Abre a categoria, mas não executa nenhuma consulta automaticamente.
-document.querySelector('.category-toggle')?.click();
-const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();updateUpgradeButton();updateRunState();updateGroupScanButtonState();refreshSession();
-</script>
-<script>
-(function(){
-  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
-  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
-  var PAGINA = "Análise Textual";
- 
-  try{
-    var vid = localStorage.getItem("ps_visitante_id");
-    if(!vid){
-      vid = (window.crypto && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-      localStorage.setItem("ps_visitante_id", vid);
-    }
- 
-    fetch(SUPABASE_URL + "/rest/v1/visitas", {
-      method: "POST",
-      headers: {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
-    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
-  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
-})();
+});
 </script>
 </body>
 </html>
- 
-
-
-
-
-
-
-
-
 
