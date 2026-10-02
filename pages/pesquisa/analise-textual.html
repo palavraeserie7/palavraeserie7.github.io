@@ -299,7 +299,7 @@ async function scanGroup(g,session){
   const h={'Content-Type':'application/json'};
   if(session)h.Authorization='Bearer '+session.access_token;
   const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers:h,body:JSON.stringify({
-    analysisType:'textual_group_scan',referenceText:scanText,group:{code:g.c,name:g.title},
+   analysisType:'textual_group_scan',referenceText:scanText,pergunta:scanText,group:{code:g.c,name:g.title},
     resources:g.list.map(r=>({code:r.code,name:r.name,category:r.cat,level:T[r.tier][0]}))})});
   const d=await res.json().catch(()=>({}));
  if(!res.ok||d.ok===false||!Array.isArray(d.results)){console.warn('VARREDURA falhou',g.c,res.status,d);throw new Error('scan');}
