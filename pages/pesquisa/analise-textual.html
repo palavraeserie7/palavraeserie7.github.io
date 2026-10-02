@@ -12,6 +12,7 @@ Analise textual · HTML
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,sans-serif}.shell{display:flex;min-height:100vh}.sidebar{width:230px;flex:0 0 230px;padding:18px 12px;background:var(--panel);border-right:1px solid var(--line)}.brand{display:block;padding:0 6px 16px;border-bottom:1px solid var(--line);color:var(--green);font-size:13px;font-weight:900;letter-spacing:1px;text-decoration:none}.brand small{display:block;margin-top:4px;color:#7c8fac;font-size:9px;letter-spacing:.5px}.back{display:block;margin:16px 4px;padding:9px 8px;border:1px solid #536780;border-radius:6px;color:var(--text);font-size:10px;font-weight:800;text-decoration:none}.back:hover{background:#16233c}.menu-title{padding:8px 6px;color:var(--blue);font-size:9px;font-weight:900;letter-spacing:.08em}.index{border-left:1px solid var(--line);background:#0e172b;padding:6px;max-height:calc(100vh - 150px);overflow:auto}.category{border-bottom:1px solid var(--line)}.category-toggle{display:flex;align-items:center;gap:7px;width:100%;min-height:34px;padding:6px 4px;border:0;background:transparent;color:var(--text);text-align:left;font:700 9px/1.25 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.category-toggle:hover,.category-toggle.active{background:#16233c}.category-code{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:16px;border:1px solid var(--blue);border-radius:3px;color:#8edfff;font-size:8px}.category-toggle strong{flex:1}.arrow{color:var(--blue);font-size:14px;transition:transform .18s}.category-toggle.active .arrow{transform:rotate(90deg)}.resources{display:none;padding:2px 3px 7px 28px}.resources.open{display:block}.resource{display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:6px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--muted);text-align:left;font:7.5px/1.35 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.resource:last-child{border-bottom:0}.resource:hover,.resource.sel{color:#fff}.tier{font-size:6px;letter-spacing:.03em}.tier-free{color:var(--green)}.tier-pro{color:#d7b76a}.tier-master{color:#ff9f68}.tier-doctus{color:#c79cff}.main{flex:1;min-width:0;padding:40px;background:var(--paper);color:var(--ink)}.card{max-width:1000px;margin:0 auto;padding:36px;border:1px solid #ddcea4;border-radius:10px;background:#fbf7ec;box-shadow:0 8px 24px #0002}.card h1{margin:0 0 12px;font-family:Georgia,serif;font-size:32px}.card p{color:#6c5c42;line-height:1.6}.notice{margin-top:24px;padding:16px;border-left:3px solid #18bfff;background:#e8f5fa;color:#385466}
 .work{margin-top:20px;padding:18px;border:1px solid #ddcea4;background:#f4eedd}.work h2{margin:0 0 4px;font-family:Georgia,serif;font-size:22px}.work .meta{font-size:12px;color:#6c5c42;margin-bottom:12px}.work textarea{width:100%;min-height:110px;padding:10px;border:1px solid #ddcea4;border-radius:6px;background:#fffdf6;color:var(--ink);font:15px/1.5 Georgia,serif}.work button#go{margin-top:10px;padding:10px 22px;border:0;border-radius:6px;background:#0b6fa4;color:#fff;font-weight:800;cursor:pointer}.work button#go:disabled{opacity:.5;cursor:not-allowed}.lock{margin-top:10px;padding:10px;border-left:3px solid #c0762b;background:#fbeedd;color:#6b4318;font-size:13px}.out{margin-top:16px;line-height:1.7;color:var(--ink);white-space:normal}.out p{color:var(--ink);margin:0 0 10px}
 .def{margin:0 0 14px;padding:14px 16px;border-left:3px solid #18bfff;background:#e8f5fa;color:#385466;line-height:1.65;white-space:pre-line}.def b{display:block;margin-bottom:6px;font-size:11px;letter-spacing:.08em;color:#0b6fa4}.def.empty{border-left-color:#c0762b;background:#fbeedd;color:#6b4318}
+.out h2,.out h3,.out h4,.out h5{font-family:Georgia,serif;margin:18px 0 8px;color:var(--ink)}.out table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}.out th,.out td{border:1px solid #ddcea4;padding:6px 8px;text-align:left;vertical-align:top}.out th{background:#f4eedd}.out ul{margin:0 0 10px 20px}.out li{margin-bottom:4px}
 @media(max-width:800px){.shell{display:block}.sidebar{width:100%;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.index{max-height:48vh}.main{padding:18px 10px}.card{padding:22px}.card h1{font-size:26px}}
 </style>
 </head>
@@ -43,7 +44,7 @@ Analise textual · HTML
 <script>
 const WORKER='https://yellow-lab-f4b2.palavraeserie.workers.dev';
 const SUPABASE_URL='https://qmhdbuxomozdczgvpvcc.supabase.co';
-const SUPABASE_ANON_KEY='COLE_AQUI_A_ANON_KEY'; // a mesma já usada em matriz-pro.html (chave anon é pública)
+const SUPABASE_ANON_KEY='sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8'; // a mesma já usada em matriz-pro.html (chave anon é pública)
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const T={f:['FREE','free'],p:['PRO','pro'],m:['MASTER','master'],d:['DOCTUS','doctus']};
 const RANK={free:0,pro:1,master:2,doctus:3};
@@ -201,7 +202,21 @@ DATA.forEach(([c,title,items])=>{
 let cur=null,userRank=-1;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-const fmt=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').split(/\n{2,}/).map(p=>'<p>'+p.replace(/\n/g,'<br>')+'</p>').join('');
+function md(s){
+  const L=esc(s).split('\n');let o='',ul=false,tb=[];
+  const inl=t=>t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+  const fu=()=>{if(ul){o+='</ul>';ul=false}};
+  const ft=()=>{if(tb.length){const rows=tb.filter(r=>!/^\s*\|?\s*:?-{2,}/.test(r));o+='<table>'+rows.map((r,i)=>'<tr>'+r.trim().replace(/^\||\|$/g,'').split('|').map(c=>(i?'<td>':'<th>')+inl(c.trim())+(i?'</td>':'</th>')).join('')+'</tr>').join('')+'</table>';tb=[]}};
+  for(const l of L){
+    if(/^\s*\|/.test(l)){fu();tb.push(l);continue}
+    ft();let m;
+    if(m=l.match(/^(#{1,4})\s+(.*)/)){fu();const n=Math.min(m[1].length+1,5);o+='<h'+n+'>'+inl(m[2])+'</h'+n+'>'}
+    else if(m=l.match(/^\s*[-*]\s+(.*)/)){if(!ul){o+='<ul>';ul=true}o+='<li>'+inl(m[1])+'</li>'}
+    else if(!l.trim()){fu()}
+    else{fu();o+='<p>'+inl(l)+'</p>'}
+  }
+  fu();ft();return o;
+}
 idx.addEventListener('click',e=>{
   const tg=e.target.closest('.category-toggle');
   if(tg){const o=tg.nextElementSibling.classList.toggle('open');tg.classList.toggle('active',o);tg.setAttribute('aria-expanded',String(o));return;}
@@ -242,10 +257,10 @@ $('go').addEventListener('click',async()=>{
   $('go').disabled=true;$('out').innerHTML='<p>Analisando…</p>';
   try{
     const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},
-      body:JSON.stringify({analysisType:'textual_resource_detail',resourceCode:cur.code,resourceName:cur.name,category:cur.cat,passage})});
+      body:JSON.stringify({analysisType:'textual_step_detail',stepCode:cur.code,referenceText:passage,resource:{code:cur.code,name:cur.name,group:cur.cat}})});
     const d=await res.json().catch(()=>({}));
-    if(!res.ok){$('out').innerHTML='<p>'+esc(d.error||d.message||('Erro '+res.status))+'</p>';}
-    else{$('out').innerHTML=fmt(d.answer||d.text||d.result||d.content||JSON.stringify(d));}
+    if(!res.ok||d.ok===false){$('out').innerHTML='<p>'+esc(d.error||d.message||('Erro '+res.status))+'</p>';}
+    else{$('out').innerHTML=md(d.analysis||d.text||d.answer||'');}
   }catch(e){$('out').innerHTML='<p>Falha de conexão com o servidor.</p>';}
   finally{refreshLock();}
 });
@@ -254,6 +269,10 @@ loadPlan();
 </body>
 </html>
  
+
+
+
+
 
 
 
