@@ -302,7 +302,7 @@ async function scanGroup(g,session){
     analysisType:'textual_group_scan',referenceText:scanText,group:{code:g.c,name:g.title},
     resources:g.list.map(r=>({code:r.code,name:r.name,category:r.cat,level:T[r.tier][0]}))})});
   const d=await res.json().catch(()=>({}));
-  if(!res.ok||d.ok===false||!Array.isArray(d.results))throw new Error('scan');
+ if(!res.ok||d.ok===false||!Array.isArray(d.results)){console.warn('VARREDURA falhou',g.c,res.status,d);throw new Error('scan');}
   d.results.forEach(x=>{
     const r=RES[String(x&&x.code)];                       // code validado contra o catálogo local
     if(!r||!r.code.startsWith(g.c+'.')||!STATUS[x.status])return; // descarta code inexistente ou status inválido
