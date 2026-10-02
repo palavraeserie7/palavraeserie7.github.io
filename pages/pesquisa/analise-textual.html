@@ -1,327 +1,263 @@
-<!doctype html>
+
+
+Analise textual · HTML
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-
- 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Análise Textual</title>
 <style>
 :root{--bg:#0b1428;--panel:#111b30;--line:#263754;--text:#dbe7f5;--muted:#91a4bd;--blue:#18bfff;--green:#20d66b;--paper:#f4eedd;--ink:#2c2418}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,sans-serif}.shell{display:flex;min-height:100vh}.sidebar{width:230px;flex:0 0 230px;padding:18px 12px;background:var(--panel);border-right:1px solid var(--line)}.brand{display:block;padding:0 6px 16px;border-bottom:1px solid var(--line);color:var(--green);font-size:13px;font-weight:900;letter-spacing:1px;text-decoration:none}.brand small{display:block;margin-top:4px;color:#7c8fac;font-size:9px;letter-spacing:.5px}.back{display:block;margin:16px 4px;padding:9px 8px;border:1px solid #536780;border-radius:6px;color:var(--text);font-size:10px;font-weight:800;text-decoration:none}.back:hover{background:#16233c}.menu-title{padding:8px 6px;color:var(--blue);font-size:9px;font-weight:900;letter-spacing:.08em}.index{border-left:1px solid var(--line);background:#0e172b;padding:6px;max-height:calc(100vh - 150px);overflow:auto}.category{border-bottom:1px solid var(--line)}.category-toggle{display:flex;align-items:center;gap:7px;width:100%;min-height:34px;padding:6px 4px;border:0;background:transparent;color:var(--text);text-align:left;font:700 9px/1.25 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.category-toggle:hover,.category-toggle.active{background:#16233c}.category-code{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:16px;border:1px solid var(--blue);border-radius:3px;color:#8edfff;font-size:8px}.category-toggle strong{flex:1}.arrow{color:var(--blue);font-size:14px;transition:transform .18s}.category-toggle.active .arrow{transform:rotate(90deg)}.resources{display:none;padding:2px 3px 7px 28px}.resources.open{display:block}.resource{display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:6px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--muted);text-align:left;font:7.5px/1.35 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.resource:last-child{border-bottom:0}.resource:hover{color:#fff}.tier{font-size:6px;letter-spacing:.03em}.tier-free{color:var(--green)}.tier-pro{color:#d7b76a}.tier-master{color:#ff9f68}.tier-doctus{color:#c79cff}.main{flex:1;min-width:0;padding:40px;background:var(--paper);color:var(--ink)}.card{max-width:1000px;margin:0 auto;padding:36px;border:1px solid #ddcea4;border-radius:10px;background:#fbf7ec;box-shadow:0 8px 24px #0002}.card h1{margin:0 0 12px;font-family:Georgia,serif;font-size:32px}.card p{color:#6c5c42;line-height:1.6}.notice{margin-top:24px;padding:16px;border-left:3px solid #18bfff;background:#e8f5fa;color:#385466}.selected{margin-top:20px;padding:16px;border:1px solid #ddcea4;background:#f4eedd;color:#6c5c42}.selected strong{color:var(--ink)}
-.ref-box{margin-top:20px;padding:16px;border:1px solid #ddcea4;border-radius:8px;background:#fff}
-.ref-box label{display:block;margin-bottom:8px;font-weight:700;color:var(--ink);font-size:13px}
-.ref-row{display:flex;gap:8px;flex-wrap:wrap}
-.ref-row input{flex:1;min-width:200px;padding:10px 12px;border:1px solid #ccb98a;border-radius:6px;font-size:14px;background:#fffef9}
-.ref-row button{padding:10px 16px;border:0;border-radius:6px;background:var(--blue);color:#04202f;font-weight:800;font-size:12px;cursor:pointer}
-.ref-row button.secondary{background:transparent;border:1px solid #ccb98a;color:#6c5c42}
-.ref-current{margin-top:10px;font-size:12px;color:#6c5c42}
-.question-box{margin-top:20px;padding:18px;border:1px solid #b9d8e6;border-radius:8px;background:#eef8fb}
-.question-box .qcode{display:inline-block;margin-bottom:8px;padding:2px 8px;border-radius:4px;background:#18bfff;color:#04202f;font-weight:900;font-size:11px}
-.question-box .qtext{font-size:15px;line-height:1.6;color:#183042}
-.question-box .qcopy{margin-top:12px;padding:8px 14px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;font-size:12px;cursor:pointer}
-.pending-hint{margin-top:8px;font-size:12px;color:#a15b1f}
-.scan-box{margin-top:20px;padding:18px;border:1px solid #b9d8e6;border-radius:8px;background:#eef8fb}.scan-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.scan-head h2{margin:0;color:#183042;font-size:18px}.scan-btn{padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#04202f;font-weight:800;cursor:pointer}.scan-btn:disabled{opacity:.55;cursor:wait}.scan-status{margin-top:12px;color:#385466;font-size:13px}.scan-list{display:grid;gap:8px;margin-top:14px}.scan-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #d7e5ea;border-radius:6px;background:#fff}.scan-item h3{margin:0;color:#183042;font-size:13px}.scan-item p{margin:4px 0 0;color:#587080;font-size:12px;line-height:1.45}.scan-badge{flex:0 0 auto;padding:4px 7px;border-radius:4px;font-size:10px;font-weight:900}.badge-found{background:#d9f7e4;color:#087332}.badge-uncertain{background:#fff1ce;color:#8a5a00}.badge-absent{background:#edf1f4;color:#607080}.detail-btn{margin-top:8px;padding:5px 9px;border:1px solid #b5cbd5;border-radius:5px;background:#fff;color:#183042;font-size:11px;font-weight:700;cursor:pointer}.detail-btn.locked{color:#8a5a00;border-color:#e0c47b}.account-box{margin-top:20px;padding:14px;border:1px solid #ddcea4;border-radius:8px;background:#fff}.account-row{display:flex;gap:8px;flex-wrap:wrap}.account-row input{flex:1;min-width:180px;padding:9px;border:1px solid #ccb98a;border-radius:6px}.account-row button{padding:9px 13px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;cursor:pointer}.account-status{margin-top:8px;color:#6c5c42;font-size:12px}.resource.selected-resource{background:#1d3556;color:#fff}.resource.scan-found{background:#123b2b;color:#d9f7e4}.resource.scan-uncertain{background:#3b3015;color:#fff1ce}.resource.scan-absent{opacity:.7}.scan-mark{margin-left:4px;font-size:9px;font-weight:900}.scan-found .scan-mark{color:#20d66b}.scan-uncertain .scan-mark{color:#e8b94f}.scan-absent .scan-mark{color:#91a4bd}
-/* ===== Barra de consulta (modelo "SQL editor") ===== */
-.query-bar{margin-top:22px;padding:14px;border:1px solid #ccb98a;border-radius:10px;background:#fffef9;box-shadow:0 2px 6px #0001}
-.query-bar-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.query-bar input{flex:1;min-width:180px;padding:10px 12px;border:1px solid #ccb98a;border-radius:6px;font-size:14px;background:#fff}
-.query-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:6px;background:#eef8fb;border:1px solid #b9d8e6;color:#183042;font-size:13px;font-weight:700;white-space:nowrap}
-.query-chip.empty{color:#8a7a55;background:#f4eedd;border-color:#ddcea4;font-weight:600}
-.query-run{padding:10px 18px;border:0;border-radius:6px;background:#20d66b;color:#04220f;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
-.query-run:disabled{opacity:.5;cursor:not-allowed}
-.query-meta{margin-top:8px;font-size:11.5px;color:#8a7a55}
- 
-/* ===== Histórico de análises ===== */
-.history-box{margin-top:14px}
-.history-box summary{cursor:pointer;font-size:12.5px;font-weight:800;color:#385466;list-style:none;display:flex;align-items:center;gap:6px}
-.history-box summary::-webkit-details-marker{display:none}
-.history-box summary::before{content:'›';display:inline-block;transition:transform .15s}
-.history-box[open] summary::before{transform:rotate(90deg)}
-.history-list{display:grid;gap:6px;margin-top:8px}
-.history-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid #d7e5ea;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;color:#385466}
-.history-item:hover{background:#eef8fb}
-.history-item b{color:#183042}
-.history-item .hist-time{color:#91a4bd;font-size:10.5px;white-space:nowrap}
-.history-empty{padding:8px 2px;font-size:12px;color:#a0947a}
- 
-/* ===== Resultado estruturado (seções colapsáveis) ===== */
-.result-sections{display:grid;gap:8px;margin-top:10px}
-.result-section{border:1px solid #d7e5ea;border-radius:8px;background:#fff;overflow:hidden}
-.result-section summary{cursor:pointer;padding:10px 14px;font-weight:800;font-size:13px;color:#183042;list-style:none;display:flex;align-items:center;gap:8px;background:#f6fbfd}
-.result-section summary::-webkit-details-marker{display:none}
-.result-section summary::before{content:'›';transition:transform .15s;color:#18bfff;font-size:15px}
-.result-section[open] summary::before{transform:rotate(90deg)}
-.result-section .result-body{padding:12px 14px;font-size:13.5px;line-height:1.6;color:#2c2418}
-.cached-badge{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:4px;background:#fff1ce;color:#8a5a00;font-size:10px;font-weight:900;vertical-align:middle}
- 
-@media(max-width:800px){.shell{display:block}.sidebar{width:100%;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.index{max-height:48vh}.main{padding:18px 10px}.card{padding:22px}.card h1{font-size:26px}.query-bar-row{flex-direction:column;align-items:stretch}}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,sans-serif}.shell{display:flex;min-height:100vh}.sidebar{width:230px;flex:0 0 230px;padding:18px 12px;background:var(--panel);border-right:1px solid var(--line)}.brand{display:block;padding:0 6px 16px;border-bottom:1px solid var(--line);color:var(--green);font-size:13px;font-weight:900;letter-spacing:1px;text-decoration:none}.brand small{display:block;margin-top:4px;color:#7c8fac;font-size:9px;letter-spacing:.5px}.back{display:block;margin:16px 4px;padding:9px 8px;border:1px solid #536780;border-radius:6px;color:var(--text);font-size:10px;font-weight:800;text-decoration:none}.back:hover{background:#16233c}.menu-title{padding:8px 6px;color:var(--blue);font-size:9px;font-weight:900;letter-spacing:.08em}.index{border-left:1px solid var(--line);background:#0e172b;padding:6px;max-height:calc(100vh - 150px);overflow:auto}.category{border-bottom:1px solid var(--line)}.category-toggle{display:flex;align-items:center;gap:7px;width:100%;min-height:34px;padding:6px 4px;border:0;background:transparent;color:var(--text);text-align:left;font:700 9px/1.25 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.category-toggle:hover,.category-toggle.active{background:#16233c}.category-code{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:16px;border:1px solid var(--blue);border-radius:3px;color:#8edfff;font-size:8px}.category-toggle strong{flex:1}.arrow{color:var(--blue);font-size:14px;transition:transform .18s}.category-toggle.active .arrow{transform:rotate(90deg)}.resources{display:none;padding:2px 3px 7px 28px}.resources.open{display:block}.resource{display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:6px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--muted);text-align:left;font:7.5px/1.35 "Segoe UI",Tahoma,sans-serif;cursor:pointer}.resource:last-child{border-bottom:0}.resource:hover,.resource.sel{color:#fff}.tier{font-size:6px;letter-spacing:.03em}.tier-free{color:var(--green)}.tier-pro{color:#d7b76a}.tier-master{color:#ff9f68}.tier-doctus{color:#c79cff}.main{flex:1;min-width:0;padding:40px;background:var(--paper);color:var(--ink)}.card{max-width:1000px;margin:0 auto;padding:36px;border:1px solid #ddcea4;border-radius:10px;background:#fbf7ec;box-shadow:0 8px 24px #0002}.card h1{margin:0 0 12px;font-family:Georgia,serif;font-size:32px}.card p{color:#6c5c42;line-height:1.6}.notice{margin-top:24px;padding:16px;border-left:3px solid #18bfff;background:#e8f5fa;color:#385466}
+.work{margin-top:20px;padding:18px;border:1px solid #ddcea4;background:#f4eedd}.work h2{margin:0 0 4px;font-family:Georgia,serif;font-size:22px}.work .meta{font-size:12px;color:#6c5c42;margin-bottom:12px}.work textarea{width:100%;min-height:110px;padding:10px;border:1px solid #ddcea4;border-radius:6px;background:#fffdf6;color:var(--ink);font:15px/1.5 Georgia,serif}.work button#go{margin-top:10px;padding:10px 22px;border:0;border-radius:6px;background:#0b6fa4;color:#fff;font-weight:800;cursor:pointer}.work button#go:disabled{opacity:.5;cursor:not-allowed}.lock{margin-top:10px;padding:10px;border-left:3px solid #c0762b;background:#fbeedd;color:#6b4318;font-size:13px}.out{margin-top:16px;line-height:1.7;color:var(--ink);white-space:normal}.out p{color:var(--ink);margin:0 0 10px}
+.def{margin:0 0 14px;padding:14px 16px;border-left:3px solid #18bfff;background:#e8f5fa;color:#385466;line-height:1.65;white-space:pre-line}.def b{display:block;margin-bottom:6px;font-size:11px;letter-spacing:.08em;color:#0b6fa4}.def.empty{border-left-color:#c0762b;background:#fbeedd;color:#6b4318}
+@media(max-width:800px){.shell{display:block}.sidebar{width:100%;max-height:none;border-right:0;border-bottom:1px solid var(--line)}.index{max-height:48vh}.main{padding:18px 10px}.card{padding:22px}.card h1{font-size:26px}}
 </style>
 </head>
 <body>
 <div class="shell">
 <aside class="sidebar">
-<a class="brand" href="index.html">PALAVRA &amp; SÉRIE<small>Análise Textual</small></a>
+<a class="brand" href="index.html">PALAVRA &amp; SÉRIE<small>Leitura bíblica</small></a>
 <a class="back" href="oraculo.html">← VOLTAR AO ORÁCULO</a>
 <div class="menu-title">ÍNDICE DE ANÁLISE TEXTUAL</div>
-<nav class="index" aria-label="Índice de Análise Textual">
-        <section class="category">
-          <button class="category-toggle" type="button" aria-expanded="false">
-            <span class="category-code">A</span>
-            <strong>FIGURAS DE LINGUAGEM</strong>
-            <span class="arrow">›</span>
-          </button>
-          <div class="resources">
-          <button class="resource" type="button" data-code="A.1" data-resource="Metáfora">
-            <span>A.1 — Metáfora</span>
-            <b class="tier tier-free">FREE</b>
-          </button>
-          <button class="resource" type="button" data-code="A.2" data-resource="Símile">
-            <span>A.2 — Símile</span>
-            <b class="tier tier-free">FREE</b>
-          </button>
-          <button class="resource" type="button" data-code="A.3" data-resource="Hipérbole">
-            <span>A.3 — Hipérbole</span>
-            <b class="tier tier-free">FREE</b>
-          </button>
-          <button class="resource" type="button" data-code="A.4" data-resource="Ironia">
-            <span>A.4 — Ironia</span>
-            <b class="tier tier-pro">PRO</b>
-          </button>
-          <button class="resource" type="button" data-code="A.5" data-resource="Eufemismo">
-            <span>A.5 — Eufemismo</span>
-            <b class="tier tier-pro">PRO</b>
-          </button>
-          <button class="resource" type="button" data-code="A.6" data-resource="Personificação">
-            <span>A.6 — Personificação</span>
-            <b class="tier tier-free">FREE</b>
-          </button>
-          <button class="resource" type="button" data-code="A.7" data-resource="Antropomorfismo">
-            <span>A.7 — Antropomorfismo</span>
-            <b class="tier tier-pro">PRO</b>
-          </button>
-          <button class="resource" type="button" data-code="A.8" data-resource="Metonímia">
-            <span>A.8 — Metonímia</span>
-            <b class="tier tier-pro">PRO</b>
-          </button>
-          <button class="resource" type="button" data-code="A.9" data-resource="Sinédoque">
-            <span>A.9 — Sinédoque</span>
-            <b class="tier tier-master">MASTER</b>
-          </button>
-          <button class="resource" type="button" data-code="A.10" data-resource="Apóstrofe">
-            <span>A.10 — Apóstrofe</span>
-            <b class="tier tier-master">MASTER</b>
-          </button>
-          <button class="resource" type="button" data-code="A.11" data-resource="Paradoxo">
-            <span>A.11 — Paradoxo</span>
-            <b class="tier tier-pro">PRO</b>
-          </button>
-          <button class="resource" type="button" data-code="A.12" data-resource="Pergunta retórica">
-            <span>A.12 — Pergunta retórica</span>
-            <b class="tier tier-free">FREE</b>
-          </button>
-          <button class="resource" type="button" data-code="A.13" data-resource="Elipse">
-            <span>A.13 — Elipse</span>
-            <b class="tier tier-master">MASTER</b>
-          </button>
-          <button class="resource" type="button" data-code="A.14" data-resource="Zeugma">
-            <span>A.14 — Zeugma</span>
-            <b class="tier tier-doctus">DOCTUS</b>
-          </button>
-          <button class="resource" type="button" data-code="A.15" data-resource="Graduação / Clímax">
-            <span>A.15 — Graduação / Clímax</span>
-            <b class="tier tier-pro">PRO</b>
-          </button>
-          </div>
-        </section>
-        </nav>
+<nav class="index" id="index" aria-label="Índice de Análise Textual"></nav>
 </aside>
 <main class="main">
 <section class="card">
 <h1>ANÁLISE TEXTUAL</h1>
-<p>Selecione um recurso de FIGURAS DE LINGUAGEM no índice lateral para iniciar a análise textual.</p>
-<div class="notice"><strong>Como usar:</strong> informe a passagem ou tema de estudo, depois abra uma categoria e selecione um recurso. A pergunta de pesquisa será montada automaticamente para essa referência.</div>
- 
-<!-- Barra de consulta unificada: passagem + figura + executar, como no SQL Editor -->
-<div class="query-bar" id="queryBar">
-  <div class="query-bar-row">
-    <input type="text" id="refInput" placeholder="Ex.: João 3:16, ou Salmo 23, ou o tema do êxodo">
-    <span class="query-chip empty" id="queryChip">nenhuma figura selecionada</span>
-    <button type="button" class="query-run" id="scanButton" disabled>▶ Analisar</button>
-  </div>
-  <div class="query-meta" id="scanStatus">Informe uma passagem/tema, abra uma categoria no índice e escolha uma figura.</div>
- 
-  <details class="history-box" id="historyBox">
-    <summary>Histórico de análises (<span id="historyCount">0</span>)</summary>
-    <div class="history-list" id="historyList">
-      <div class="history-empty">Nenhuma análise executada ainda nesta sessão.</div>
-    </div>
-  </details>
+<p>Selecione uma categoria no índice lateral e escolha um recurso de análise.</p>
+<div class="notice"><strong>Como usar:</strong> abra uma categoria, selecione um recurso, cole a passagem ou o texto e clique em Analisar. O nível de cada recurso (FREE, PRO, MASTER, DOCTUS) depende do seu plano.</div>
+<div class="work" id="work" hidden>
+<h2 id="wTitle"></h2><div class="meta" id="wMeta"></div>
+<div class="def" id="wDef"></div>
+<textarea id="wInput" placeholder="Ex.: João 3.16-21 (ou cole o texto a analisar)"></textarea>
+<div class="lock" id="wLock" hidden></div>
+<button id="go" type="button">Analisar</button>
+<div class="out" id="out" aria-live="polite"></div>
 </div>
- 
-<div class="account-box" id="accountBox">
-  <strong>Acesso à análise completa</strong>
-  <div class="account-status" id="accountStatus">A análise está configurada exclusivamente para o Grupo A — FIGURAS DE LINGUAGEM, usando as regras de evidência e os prompts fornecidos. A explicação completa de cada etapa exige o plano correspondente e usa a sessão já existente do site.</div>
-</div>
- 
-<div id="questionArea"></div>
- 
 </section>
 </main>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Análise Textual: a IA trabalha por grupo. O frontend nunca presume uma detecção.
-const PESQUISA_API_URL = window.PESQUISA_API_URL || 'https://yellow-lab-f4b2.palavraeserie.workers.dev/api/pesquisa';
-const SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
-const REF_KEY = 'pes_analise_textual_referencia';
-const TEXTUAL_ACCESS_LEVELS = Object.freeze({
-  'A.1':'FREE','A.2':'FREE','A.3':'FREE','A.4':'PRO','A.5':'PRO',
-  'A.6':'FREE','A.7':'PRO','A.8':'PRO','A.9':'MASTER','A.10':'MASTER',
-  'A.11':'PRO','A.12':'FREE','A.13':'MASTER','A.14':'DOCTUS','A.15':'PRO'
+const WORKER='https://yellow-lab-f4b2.palavraeserie.workers.dev';
+const SUPABASE_URL='https://qmhdbuxomozdczgvpvcc.supabase.co';
+const SUPABASE_ANON_KEY='COLE_AQUI_A_ANON_KEY'; // a mesma já usada em matriz-pro.html (chave anon é pública)
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const T={f:['FREE','free'],p:['PRO','pro'],m:['MASTER','master'],d:['DOCTUS','doctus']};
+const RANK={free:0,pro:1,master:2,doctus:3};
+const DATA=[
+["A","FIGURAS DE LINGUAGEM","Metáfora:f|Símile:f|Hipérbole:f|Ironia:p|Eufemismo:p|Personificação:f|Antropomorfismo:p|Metonímia:p|Sinédoque:m|Apóstrofe:m|Paradoxo:p|Pergunta retórica:f|Elipse:m|Zeugma:d|Graduação / Clímax:p"],
+["B","ESTRUTURAS LITERÁRIAS E RETÓRICAS","Paralelismo:p|Antítese:p|Repetição:f|Quiasmo:m|Inclusio:p|Merismo:m|Estrutura concêntrica:m|Contraste narrativo:p|Refrão:f|Inclusão temática:p"],
+["C","RECURSOS SONOROS E POÉTICOS","Aliteração:m|Assonância:m|Paronomásia / jogo de palavras:m|Trocadilho / jogo fonético-semântico:m|Ritmo poético:m|Repetição sonora:p"],
+["D","FORMAS LITERÁRIAS E DISCURSIVAS","Parábola:f|Provérbio:f|Enigma / Adivinha:f|Discurso argumentativo:p|Diatribe:m|Discurso de despedida:p|Hino / Cântico:p|Oração:f|Lamento:f|Bênção:f|Maldição / Oráculo de juízo:p|Genealogia:f|Narrativa de vocação:p|Relato de aliança:p"],
+["E","GÊNEROS LITERÁRIOS","Narrativa histórica / bíblica:f|Poesia hebraica:f|Literatura sapiencial:f|Lei / Torá:f|Literatura profética:p|Literatura apocalíptica:p|Evangelho:f|Epístola / Carta:f|Literatura narrativa-teológica:p"],
+["F","LINGUAGEM PROFÉTICA E VISIONÁRIA","Linguagem profética:p|Linguagem visionária:p|Simbolismo apocalíptico:m|Imagem profética:p|Ato simbólico profético:m|Oráculo profético:p"],
+["G","RELAÇÕES INTERTEXTUAIS","Citação explícita:p|Alusão:p|Eco intertextual:m|Intertextualidade:m|Uso do AT no NT:m|Releitura de tradição anterior:m|Eco temático:p"],
+["H","CATEGORIAS INTERPRETATIVAS","Tipologia:m|Alegoria:p|Simbolismo:m|Representação simbólica:m|Leitura figurada:p|Linguagem literal:f|Linguagem figurada:f"],
+["I","RECURSOS DE ARGUMENTAÇÃO E RETÓRICA","Tese:p|Argumento:p|Contraste argumentativo:p|Pergunta-objeção:p|Resposta à objeção:m|Conclusão / inferência:m|Exortação:f|Advertência:f|Consolação:f|Acusação:p|Apelo à memória:p"],
+["J","RECURSOS SEMÂNTICOS E CONTEXTUAIS","Campo semântico:m|Polissemia:m|Ambiguidade lexical:m|Ambiguidade sintática:d|Idiomatismo:p|Expressão convencional:p|Fórmula literária:p|Termo-chave:p|Mudança de sentido contextual:m|Ambiguidade intencional:d"],
+["K","RECURSOS NARRATIVOS","Caracterização:f|Caracterização direta:f|Caracterização indireta:p|Ironia narrativa:m|Ironia dramática:m|Repetição narrativa:p|Padrão narrativo:p|Inclusão narrativa:p|Suspense narrativo:p|Ponto de vista narrativo:m|Cena e sumário:p"],
+["L","PRINCÍPIOS DE CONTROLE INTERPRETATIVO","Contexto imediato:f|Contexto literário:f|Contexto histórico-cultural:p|Contexto canônico:m|Contexto autoral:m|Contexto do destinatário:m|Unidade literária:p|Estrutura argumentativa:p|Estrutura temática:p|Significado × aplicação:p|Interpretação × inferência teológica:m|Controle de anacronismo:p|Controle de eisegese:p|Controle de alegorização arbitrária:m|Controle de falácia lexical:p|Controle de prova-texto:p|Controle de generalização indevida:p|Controle de transferência indevida:m|Controle de contradição contextual:m|Controle de sobreinterpretação:m"]
+];
+// Definição de cada etapa, pelo código do menu. Exemplo: 'A.1': 'Texto que explica a Metáfora...',
+const DEFS={
+"A.1": "Uso de uma imagem ou realidade para comunicar outra.\nEx.: \"Eu sou o pão da vida.\" — Jo 6:35",
+"A.2": "Comparação explícita entre duas realidades, geralmente mediante \"como\", \"assim como\" ou equivalente.\nEx.: \"Como o cervo brama pelas correntes das águas...\" — Sl 42:1",
+"A.3": "Exagero intencional utilizado para produzir ênfase.\nEx.: \"É mais fácil passar um camelo pelo fundo de uma agulha...\" — Mt 19:24",
+"A.4": "Afirmação cujo sentido pretendido depende do contraste entre as palavras utilizadas e a realidade ou intenção comunicada.\nEx.: \"Já estais fartos! Já estais ricos!\" — 1Co 4:8",
+"A.5": "Expressão indireta ou suavizada para tratar de uma realidade difícil, delicada ou desagradável.\nEx.: \"Lázaro dorme.\" — Jo 11:11",
+"A.6": "Atribuição de características ou ações humanas a coisas, conceitos ou realidades não humanas.\nEx.: \"A misericórdia e a verdade se encontraram...\" — Sl 85:10",
+"A.7": "Descrição de Deus mediante características, ações ou linguagem associadas à experiência humana.\nEx.: \"Os olhos do SENHOR estão em todo lugar...\" — Pv 15:3",
+"A.8": "Referência a uma realidade por meio de outra que mantém relação próxima com ela.\nEx.: linguagem envolvendo \"cálice\" em Lc 22:20, cuja interpretação deve ser determinada pelo contexto.",
+"A.9": "Uso de uma parte para representar o todo, ou do todo para representar uma parte.\nEx.: \"Toda carne verá a salvação de Deus.\" — Lc 3:6",
+"A.10": "Direcionamento direto do discurso a uma pessoa, objeto, realidade abstrata ou conceito, mesmo quando este não está presente.\nEx.: \"Ó morte, onde está o teu aguilhão?\" — 1Co 15:55",
+"A.11": "Afirmação que parece contraditória à primeira vista, mas comunica uma verdade dentro do contexto.\nEx.: \"Quem perder a sua vida por minha causa achá-la-á.\" — Mt 16:25",
+"A.12": "Pergunta formulada principalmente para provocar reflexão, ênfase ou confronto, e não necessariamente para obter uma resposta.\nEx.: \"Que aproveitará ao homem ganhar o mundo inteiro e perder a sua alma?\" — Mc 8:36",
+"A.13": "Omissão de um termo que pode ser identificado ou recuperado pelo contexto.\nEx.: \"Graça e paz da parte de Deus, nosso Pai, e do Senhor Jesus Cristo.\" — Rm 1:7 (o verbo, como \"haja\" ou \"seja\", fica subentendido)",
+"A.14": "Omissão de um termo já expresso anteriormente, que passa a ser compreendido em relação a mais de um elemento da frase.\nEx.: \"Leite vos dei a beber, não alimento sólido.\" — 1Co 3:2 (o verbo \"dei a beber\" serve a \"leite\" e também a \"alimento sólido\", embora só combine bem com \"leite\")",
+"A.15": "Organização progressiva de ideias, expressões ou ações para produzir aumento de intensidade ou culminância.\nEx.: \"Tribulação produz perseverança; a perseverança, experiência; e a experiência, esperança.\" — Rm 5:3-4",
+"B.1": "Correspondência entre linhas ou unidades de pensamento, especialmente característica da poesia hebraica.\nEx.: “O filho sábio alegra a seu pai, mas o filho insensato...” — Pv 10:1",
+"B.2": "Colocação de ideias, personagens ou realidades em contraste deliberado.\nEx.: contraste entre sábio e insensato em Provérbios.",
+"B.3": "Reiteração intencional de palavras, expressões, ideias ou estruturas para produzir ênfase.\nEx.: “Santo, santo, santo...” — Is 6:3",
+"B.4": "Estrutura cruzada, frequentemente representada por A-B-B'-A' ou estruturas semelhantes.\nPode contribuir para identificar relações e possíveis pontos de ênfase, mas não deve ser presumido sem evidência estrutural.",
+"B.5": "Repetição ou correspondência de palavras, expressões ou temas no início e no final de uma unidade literária.\nPode ajudar a identificar limites e coesão da passagem.",
+"B.6": "Utilização de dois extremos ou partes para comunicar uma totalidade.\nEx.: “céus e terra” — Gn 1:1; “dia e noite” — Gn 1:5",
+"B.7": "Organização de uma unidade em torno de um centro estrutural ou temático.\nDeve ser demonstrada pela evidência textual e estrutural, não apenas presumida.",
+"B.8": "Colocação de personagens, ações, situações ou respostas em oposição para destacar diferenças teológicas ou narrativas.",
+"B.9": "Repetição regular de uma frase ou fórmula que organiza ou enfatiza uma composição.\nÉ especialmente relevante em poesia e cânticos.",
+"B.10": "Abertura e encerramento de uma unidade mediante temas correspondentes, mesmo quando não há repetição verbal exata.",
+"C.1": "Repetição de sons consonantais.\nObservação: recursos sonoros do hebraico, aramaico e grego podem ser parcialmente obscurecidos ou modificados pela tradução.",
+"C.2": "Repetição ou aproximação de sons vocálicos.\nObservação: recursos sonoros do hebraico, aramaico e grego podem ser parcialmente obscurecidos ou modificados pela tradução.",
+"C.3": "Exploração de palavras semelhantes em som ou forma, mas diferentes em significado, para produzir efeito retórico ou semântico.\nObservação: recursos sonoros do hebraico, aramaico e grego podem ser parcialmente obscurecidos ou modificados pela tradução.",
+"C.4": "Uso deliberado de semelhanças sonoras ou linguísticas para estabelecer relações de sentido.\nObservação: recursos sonoros do hebraico, aramaico e grego podem ser parcialmente obscurecidos ou modificados pela tradução.",
+"C.5": "Organização sonora e estrutural que contribui para a forma e a ênfase da composição.\nObservação: recursos sonoros do hebraico, aramaico e grego podem ser parcialmente obscurecidos ou modificados pela tradução.",
+"C.6": "Uso deliberado de padrões fonéticos para produzir efeito retórico, poético ou mnemônico.\nObservação: recursos sonoros do hebraico, aramaico e grego podem ser parcialmente obscurecidos ou modificados pela tradução.",
+"D.1": "Narrativa ou comparação elaborada para comunicar uma verdade por meio de uma situação, personagem ou história.\nEx.: Parábola do Bom Samaritano — Lc 10:30-37",
+"D.2": "Formulação breve e memorável que expressa uma observação ou princípio de sabedoria.\nEx.: “A resposta branda desvia o furor.” — Pv 15:1",
+"D.3": "Formulação que apresenta uma questão ou imagem enigmática destinada a provocar reflexão ou revelar conhecimento.\nEx.: enigma de Sansão — Jz 14:12-18",
+"D.4": "Desenvolvimento estruturado de uma tese mediante argumentos, perguntas, contrastes, evidências ou conclusões.",
+"D.5": "Forma argumentativa que utiliza perguntas, objeções imaginárias e respostas para desenvolver ou defender uma posição.",
+"D.6": "Discurso final ou próximo da despedida de uma personagem, normalmente contendo instruções, advertências e perspectivas futuras.\nEx.: discursos de Jesus em Jo 13–17.",
+"D.7": "Composição poética destinada à exaltação, adoração ou proclamação das ações e atributos de Deus.",
+"D.8": "Comunicação dirigida a Deus, podendo assumir formas de petição, louvor, confissão, ação de graças, lamento ou intercessão.",
+"D.9": "Expressão de dor, sofrimento, perplexidade ou súplica diante de uma situação de aflição.",
+"D.10": "Fórmula ou declaração de favor, benefício ou proteção.",
+"D.11": "Declaração de julgamento, consequência ou condenação.",
+"D.12": "Lista estruturada de descendentes ou antepassados com função histórica, literária, social ou teológica.",
+"D.13": "Relato do chamado, comissão ou envio de uma personagem para determinada missão.",
+"D.14": "Material que apresenta, desenvolve ou relembra relações de aliança, compromissos, obrigações e promessas.",
+"E.1": "Relato organizado de acontecimentos, personagens, ações e conflitos.",
+"E.2": "Literatura caracterizada por recursos como paralelismo, imagens, ritmo e estruturas poéticas.",
+"E.3": "Textos voltados à sabedoria, temor de Deus, comportamento, experiência humana e ordem moral.",
+"E.4": "Material relacionado a mandamentos, legislação, instruções e ordenanças dentro do contexto da aliança.",
+"E.5": "Discurso profético que comunica acusação, advertência, julgamento, promessa, esperança ou interpretação teológica da história.",
+"E.6": "Literatura caracterizada frequentemente por revelação, visões, símbolos, seres celestiais, conflitos cósmicos e perspectiva escatológica.",
+"E.7": "Forma literária dos quatro Evangelhos, combinando narrativa, ensino, discursos, sinais, conflitos e apresentação da identidade e missão de Jesus.",
+"E.8": "Comunicação dirigida a indivíduos ou comunidades, frequentemente contendo saudação, argumentação, instrução, exortação e conclusão.",
+"E.9": "Narrativa na qual acontecimentos e personagens também desempenham função significativa na comunicação teológica.",
+"F.1": "Linguagem utilizada no discurso profético, frequentemente envolvendo imagens, metáforas, símbolos, oráculos de juízo e promessas.\nEx.: “O sol se converterá em trevas...” — Jl 2:31",
+"F.2": "Linguagem utilizada para descrever experiências de visão ou revelação.\nEx.: os quatro animais — Dn 7.",
+"F.3": "Uso de imagens, números, animais, objetos ou eventos com função simbólica dentro de uma visão apocalíptica.\nEx.: o dragão — Ap 12.",
+"F.4": "Imagem concreta utilizada para comunicar uma realidade histórica, espiritual, moral ou escatológica.",
+"F.5": "Ação realizada por um profeta que funciona como sinal ou mensagem profética.",
+"F.6": "Unidade discursiva de proclamação profética, podendo envolver acusação, julgamento, promessa, restauração ou anúncio.",
+"G.1": "Reprodução identificável de palavras ou expressões de outro texto bíblico.",
+"G.2": "Referência indireta a outro texto, acontecimento, personagem ou tradição sem citação explícita.",
+"G.3": "Correspondência temática, lexical ou conceitual que pode indicar relação literária ou teológica com outro texto.",
+"G.4": "Relação entre um texto e outros textos ou tradições relevantes para sua interpretação.",
+"G.5": "Utilização, interpretação, aplicação ou releitura de textos, temas e acontecimentos do Antigo Testamento no Novo Testamento.",
+"G.6": "Desenvolvimento ou reapresentação de uma tradição, narrativa ou tema anterior dentro de novo contexto literário.",
+"G.7": "Reaparecimento de um tema ou padrão narrativo em diferentes partes do cânon.",
+"H.1": "Relação histórico-teológica entre pessoas, acontecimentos, instituições ou padrões do AT e seu desenvolvimento ou cumprimento posterior, especialmente no NT.\nEx.: serpente de bronze — Nm 21:8-9; Jo 3:14-15.",
+"H.2": "Interpretação ou construção de correspondências entre elementos de uma narrativa e realidades representadas.\nEx.: interpretação alegórica de Agar e Sara em Gl 4:21-31.",
+"H.3": "Uso ou interpretação de uma imagem, objeto, pessoa, ação ou realidade como representação de significado adicional dentro de determinado contexto.",
+"H.4": "Relação em que uma realidade concreta funciona como sinal ou representação de outra realidade.",
+"H.5": "Interpretação segundo a qual uma expressão não deve ser compreendida de maneira estritamente literal devido ao contexto linguístico, literário ou discursivo.",
+"H.6": "Uso de uma expressão em seu sentido ordinário dentro do contexto, sem pressupor figuração.",
+"H.7": "Uso de uma expressão cujo significado depende de uma relação figurativa, retórica, metafórica ou simbólica.",
+"I.1": "Proposição central que o autor procura estabelecer, defender ou desenvolver.",
+"I.2": "Conjunto de razões ou evidências utilizado para sustentar uma conclusão.",
+"I.3": "Apresentação de posições, comportamentos ou conclusões opostas para fortalecer a argumentação.",
+"I.4": "Formulação de uma pergunta que representa uma possível objeção à argumentação.",
+"I.5": "Desenvolvimento de uma resposta a uma questão ou objeção levantada no próprio discurso.",
+"I.6": "Resultado lógico ou retórico derivado de premissas, argumentos ou observações anteriores.",
+"I.7": "Apelo destinado a conduzir o destinatário a determinado comportamento, decisão ou resposta.",
+"I.8": "Declaração destinada a alertar sobre perigo, consequência ou julgamento.",
+"I.9": "Comunicação destinada a encorajar, fortalecer ou confortar.",
+"I.10": "Apresentação de culpa, transgressão ou infidelidade.",
+"I.11": "Recurso que convoca acontecimentos, ensinamentos ou experiências anteriores para sustentar a argumentação.",
+"J.1": "Conjunto de significados e relações associadas a determinado termo ou conceito dentro de um contexto.",
+"J.2": "Capacidade de uma mesma palavra possuir diferentes sentidos relacionados.",
+"J.3": "Situação em que uma expressão pode apresentar mais de uma interpretação lexical plausível.",
+"J.4": "Situação em que a estrutura gramatical permite mais de uma análise possível.",
+"J.5": "Expressão cujo significado não deve ser obtido simplesmente pela soma dos significados literais de suas palavras.\nEx.: “endurecer a cerviz” — Êx 32:9.",
+"J.6": "Fórmula ou construção recorrente cujo significado e função dependem de seu uso cultural e literário.",
+"J.7": "Expressão ou estrutura recorrente que desempenha função reconhecível dentro de determinado gênero.",
+"J.8": "Palavra ou expressão cuja função semântica ou temática é particularmente relevante para a passagem.",
+"J.9": "Alteração do sentido funcional de uma palavra conforme o contexto em que aparece.",
+"J.10": "Possibilidade de o autor explorar deliberadamente mais de um sentido ou nível de compreensão.",
+"K.1": "Técnicas utilizadas para apresentar personalidade, motivações, qualidades e defeitos de personagens.",
+"K.2": "O narrador ou personagem informa explicitamente uma característica.",
+"K.3": "Características são reveladas por ações, palavras, decisões, relações ou reações.",
+"K.4": "Diferença entre o que uma personagem sabe ou entende e o que o leitor é levado a perceber.",
+"K.5": "O leitor conhece uma informação relevante que determinada personagem ainda desconhece.",
+"K.6": "Repetição de acontecimentos, palavras, situações ou padrões para produzir comparação ou ênfase.",
+"K.7": "Estrutura recorrente de acontecimentos, comportamentos ou respostas dentro de uma narrativa.",
+"K.8": "Correspondência entre o início e o final de uma narrativa ou unidade.",
+"K.9": "Retenção ou distribuição de informações para criar expectativa sobre acontecimentos futuros.",
+"K.10": "Perspectiva a partir da qual os acontecimentos são apresentados ao leitor.",
+"K.11": "Alternância entre representação detalhada de acontecimentos e relato condensado de períodos ou eventos.",
+"L.1": "Relação do versículo com os versículos e unidades literárias imediatamente próximas.",
+"L.2": "Relação da passagem com sua estrutura, gênero, discurso e composição.",
+"L.3": "Relação da passagem com o ambiente histórico, social, político, religioso e cultural relevante.",
+"L.4": "Relação da passagem com o restante das Escrituras e com o desenvolvimento do cânon.",
+"L.5": "Consideração da intenção comunicativa e da estratégia literária do autor conforme evidências disponíveis.",
+"L.6": "Consideração da situação, necessidades, conflitos ou características dos destinatários originais quando recuperáveis.",
+"L.7": "Identificação da extensão adequada da passagem antes de determinar seu significado.",
+"L.8": "Identificação da sequência de afirmações, razões, objeções e conclusões.",
+"L.9": "Identificação dos temas dominantes e de suas relações dentro da passagem.",
+"L.10": "Separação entre aquilo que o texto comunica em seu contexto original e as aplicações possíveis para contextos posteriores.",
+"L.11": "Separação entre o que o texto afirma diretamente e conclusões teológicas derivadas de sua relação com outros textos e doutrinas.",
+"L.12": "Verificação de interpretações que projetam categorias, conceitos ou circunstâncias posteriores sobre o texto original.",
+"L.13": "Verificação de inserção de ideias externas no texto sem sustentação textual suficiente.",
+"L.14": "Verificação de correspondências simbólicas ou alegóricas que não possuem fundamento contextual ou textual suficiente.",
+"L.15": "Verificação de conclusões baseadas indevidamente em possíveis significados de uma palavra que não são sustentados pelo contexto.",
+"L.16": "Verificação do uso de um versículo isolado para sustentar uma conclusão sem considerar seu contexto.",
+"L.17": "Verificação de conclusões universais construídas a partir de afirmações limitadas ou específicas.",
+"L.18": "Verificação de transferência automática de mandamentos, promessas, condições ou circunstâncias de um contexto para outro.",
+"L.19": "Verificação de interpretações que entram em conflito com afirmações explícitas da própria passagem ou de seu contexto.",
+"L.20": "Verificação de conclusões que ultrapassam aquilo que as evidências textuais permitem afirmar."
+};
+const RES={};
+const idx=document.getElementById('index');
+DATA.forEach(([c,title,items])=>{
+  const list=items.split('|').map((it,i)=>{const [n,t]=it.split(':');const r={code:c+'.'+(i+1),name:n,tier:t,cat:title};RES[r.code]=r;return r;});
+  const sec=document.createElement('section');sec.className='category';
+  sec.innerHTML='<button class="category-toggle" type="button" aria-expanded="false"><span class="category-code">'+c+'</span><strong>'+title+'</strong><span class="arrow">›</span></button><div class="resources">'+list.map(r=>'<button class="resource" type="button" data-code="'+r.code+'"><span>'+r.code+' — '+r.name+'</span><b class="tier tier-'+T[r.tier][1]+'">'+T[r.tier][0]+'</b></button>').join('')+'</div>';
+  idx.appendChild(sec);
 });
-const TEXTUAL_TIER_RANK = Object.freeze({ FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 });
-
-const TEXTUAL_RISK_PAIRS = {  'A.1':['A.2'], 'A.2':['A.1'],  'A.6':['A.7','A.10'], 'A.7':['A.6'], 'A.10':['A.6'],  'A.8':['A.9'], 'A.9':['A.8'],  'A.3':['A.11'], 'A.11':['A.3'],  'A.4':['A.12'], 'A.12':['A.4'],  'A.13':['A.14'], 'A.14':['A.13']};
-
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let currentSession = null;
-let currentUserPlan = 'FREE';
-
-async function getUserPlanFromSession(session){
-  if(!session?.user?.id) return 'FREE';
+let cur=null,userRank=-1;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const fmt=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').split(/\n{2,}/).map(p=>'<p>'+p.replace(/\n/g,'<br>')+'</p>').join('');
+idx.addEventListener('click',e=>{
+  const tg=e.target.closest('.category-toggle');
+  if(tg){const o=tg.nextElementSibling.classList.toggle('open');tg.classList.toggle('active',o);tg.setAttribute('aria-expanded',String(o));return;}
+  const rb=e.target.closest('.resource');
+  if(rb){pick(rb.dataset.code);}
+});
+function pick(code){
+  cur=RES[code];
+  document.querySelectorAll('.resource').forEach(b=>b.classList.toggle('sel',b.dataset.code===code));
+  $('work').hidden=false;$('out').innerHTML='';
+  $('wTitle').textContent=cur.code+' — '+cur.name;
+  $('wMeta').textContent=cur.cat+' · nível '+T[cur.tier][0];
+  const d=DEFS[cur.code],box=$('wDef');
+  box.classList.toggle('empty',!d);
+  box.innerHTML='<b>O QUE É ESTA ETAPA</b>'+(d?esc(d):'Definição desta etapa ainda não cadastrada.');
+  refreshLock();
+}
+function refreshLock(){
+  const need=RANK[T[cur.tier][1]],lock=$('wLock');
+  if(userRank>=0&&userRank<need){lock.hidden=false;lock.textContent='Este recurso exige o plano '+T[cur.tier][0]+' ou superior.';$('go').disabled=true;}
+  else{lock.hidden=true;$('go').disabled=false;}
+}
+async function loadPlan(){
   try{
-    const { data, error } = await supabaseClient
-      .from('profiles')
-      .select('plano')
-      .eq('id', session.user.id)
-      .single();
-    if(error || !data) return 'FREE';
-    return String(data.plano || 'FREE').trim().toUpperCase();
-  }catch(e){
-    return 'FREE';
-  }
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session)return;
+    const {data}=await sb.from('profiles').select('plano').eq('id',session.user.id).single();
+    userRank=RANK[String((data&&data.plano)||'free').toLowerCase()]??0;
+    if(cur)refreshLock();
+  }catch(e){}
 }
-
-async function refreshSession(){
-  const { data } = await supabaseClient.auth.getSession();
-  currentSession = data?.session || null;
-  currentUserPlan = await getUserPlanFromSession(currentSession);
-  renderAccount();
-  updateRunState();
-}
-const CACHE_KEY = 'pes_analise_cache_v1';   // resultados já obtidos: referência+figura -> análise
-const HIST_KEY  = 'pes_analise_historico_v1'; // lista de consultas já executadas, mais recente primeiro
-const HIST_MAX = 30;
-const refInput = document.getElementById('refInput');
-const queryChip = document.getElementById('queryChip');
-const scanButton = document.getElementById('scanButton');
-const scanStatus = document.getElementById('scanStatus');
-const historyList = document.getElementById('historyList');
-const historyCount = document.getElementById('historyCount');
-const questionArea = document.getElementById('questionArea');
-const accountStatus = document.getElementById('accountStatus');
-let selectedResourceCode=null;
-let activeCategory=null;
-function esc(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function getReferencia(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; } }
-function setReferencia(v){ try { localStorage.setItem(REF_KEY, v); } catch(e) {} }
-function currentPlan(){ return currentUserPlan; }
-function textualCanOpen(required){ const requiredPlan=String(required||'FREE').toUpperCase(); if(requiredPlan==='FREE') return true; if(!currentSession?.access_token) return false; return (TEXTUAL_TIER_RANK[currentUserPlan] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99); }
-function categoriesFor(button){ const section=button.closest('.category'); return {code:button.querySelector('.category-code')?.textContent.trim()||'',name:button.querySelector('strong')?.textContent.trim()||'',resources:[...section.querySelectorAll('.resource')].map(r=>({code:r.dataset.code,name:r.dataset.resource,tier:TEXTUAL_ACCESS_LEVELS[r.dataset.code]||'DOCTUS'}))}; }
-function findCategoryForCode(code){ const btn=document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]'); if(!btn)return null; const toggle=btn.closest('.category')?.querySelector('.category-toggle'); return toggle?categoriesFor(toggle):null; }
- 
-// ---- Cache (chave = referência + código da figura) ----
-function cacheKeyFor(ref,code){ return (ref||'').trim().toLowerCase()+'::'+code; }
-function readCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); }catch(e){ return {}; } }
-function writeCacheEntry(ref,code,analysis){ const cache=readCache(); cache[cacheKeyFor(ref,code)]={analysis,ts:Date.now()}; try{ localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); }catch(e){} }
-function readCacheEntry(ref,code){ return readCache()[cacheKeyFor(ref,code)]||null; }
- 
-// ---- Histórico (lista de consultas já rodadas, para reabrir sem gastar nova chamada) ----
-function readHistory(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); }catch(e){ return []; } }
-function writeHistory(list){ try{ localStorage.setItem(HIST_KEY, JSON.stringify(list.slice(0,HIST_MAX))); }catch(e){} }
-function pushHistory(entry){ const list=readHistory().filter(h=>!(h.ref===entry.ref && h.code===entry.code)); list.unshift(entry); writeHistory(list); renderHistory(); }
-function renderHistory(){ const list=readHistory(); historyCount.textContent=String(list.length); if(!list.length){ historyList.innerHTML='<div class="history-empty">Nenhuma análise executada ainda nesta sessão.</div>'; return; } historyList.innerHTML=list.map((h,i)=>'<div class="history-item" data-hist-index="'+i+'"><span><b>'+esc(h.code)+'</b> — '+esc(h.name)+' · '+esc(h.ref)+'</span><span class="hist-time">'+esc(new Date(h.ts).toLocaleString('pt-BR'))+'</span></div>').join(''); [...historyList.querySelectorAll('.history-item')].forEach(item=>item.addEventListener('click',()=>{ const entry=list[Number(item.dataset.histIndex)]; if(entry) reopenFromHistory(entry); })); }
-function reopenFromHistory(entry){ refInput.value=entry.ref; setReferencia(entry.ref); activeCategory=findCategoryForCode(entry.code)||activeCategory; selectedResourceCode=entry.code; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(entry.code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=entry.code+' — '+entry.name; queryChip.classList.remove('empty'); scanButton.disabled=false; const cached=readCacheEntry(entry.ref,entry.code); if(cached){ scanStatus.textContent='Reaberto do histórico (nenhuma nova chamada à IA foi feita).'; renderResult(entry.code,entry.name,cached.analysis,true); } else { scanStatus.textContent='Pronto para analisar novamente.'; questionArea.innerHTML=''; } }
- 
-function renderReferencia(){ /* mantido por compatibilidade; a barra de consulta já mostra o valor no próprio input */ }
-function renderAccount(){ accountStatus.textContent=currentSession?'Sessão reconhecida: plano '+currentPlan()+'. As análises individuais liberadas aparecem conforme o nível de cada etapa.':'Para analisar uma figura, entre pelo acesso principal do site.'; }
-function clearSelection(){ document.querySelectorAll('.resource').forEach(button=>button.classList.remove('selected-resource')); }
- 
-function updateRunState(){ scanButton.disabled = !(getReferencia() && selectedResourceCode); }
- 
-function selectResource(code){ if(!activeCategory)return; const resource=activeCategory.resources.find(r=>r.code===code); if(!resource)return; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=resource.code+' — '+resource.name; queryChip.classList.remove('empty'); updateRunState(); const ref=getReferencia(); const cached=ref?readCacheEntry(ref,code):null; if(cached){ scanStatus.textContent='Já existe uma análise salva para esta combinação — exibindo do histórico.'; renderResult(resource.code,resource.name,cached.analysis,true); } else { scanStatus.textContent=ref?'Clique em “Analisar” para consultar esta figura na passagem informada.':'Informe uma passagem ou tema antes de analisar.'; questionArea.innerHTML=''; } }
- 
-// ---- Parser leve de markdown -> seções colapsáveis (## Título) ----
-function parseSections(markdown){ const lines=String(markdown||'').replace(/\r\n/g,'\n').split('\n'); const sections=[]; let current={title:'Análise',body:[]}; for(const line of lines){ const m=line.match(/^#{1,3}\s+(.*)/); if(m){ if(current.body.length||sections.length===0) sections.push(current); current={title:m[1].trim(),body:[]}; } else { current.body.push(line); } } sections.push(current); return sections.filter(s=>s.body.join('').trim().length||s.title); }
-function mdInlineToHtml(text){ return esc(text).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^-\s+(.*)$/,'• $1'); }
-function renderResult(code,name,analysisText,fromCache){ const sections=parseSections(analysisText); const html=sections.map((s,i)=>'<details class="result-section"'+(i<2?' open':'')+'><summary>'+esc(s.title)+'</summary><div class="result-body">'+s.body.map(l=>mdInlineToHtml(l)).join('<br>')+'</div></details>').join(''); questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(code)+'</span>'+(fromCache?'<span class="cached-badge">DO HISTÓRICO</span>':'')+'<div class="qtext"><strong>'+esc(name)+'</strong></div><div class="result-sections">'+html+'</div></div>'; }
- 
-async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=currentSession; scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; try{ 
-const rivals = (TEXTUAL_RISK_PAIRS[resource.code] || [])  .map(c => findCategoryForCode(c)?.resources.find(r => r.code === c))  .filter(Boolean)  .map(r => ({code: r.code, name: r.name}));
-
-const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(resource.tier!=='FREE'&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},riskPairs: rivals,scanResult:{code:resource.code,status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise concluída.'; writeCacheEntry(ref,resource.code,analysis); pushHistory({ref,code:resource.code,name:resource.name,ts:Date.now()}); renderResult(resource.code,resource.name,analysis,false); }catch(error){ scanStatus.textContent='Não foi possível concluir a análise.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
- 
-let refSaveTimer=null;
-refInput.addEventListener('input',()=>{ clearTimeout(refSaveTimer); refSaveTimer=setTimeout(()=>{ setReferencia(refInput.value.trim()); updateRunState(); if(selectedResourceCode){ const ref=getReferencia(); const cached=ref?readCacheEntry(ref,selectedResourceCode):null; scanStatus.textContent = ref ? (cached?'Já existe uma análise salva para esta combinação.':'Clique em “Analisar” para consultar.') : 'Informe uma passagem ou tema antes de analisar.'; if(cached){ const resource=activeCategory?.resources.find(r=>r.code===selectedResourceCode); if(resource) renderResult(resource.code,resource.name,cached.analysis,true); } } },350); });
-refInput.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); clearTimeout(refSaveTimer); setReferencia(refInput.value.trim()); updateRunState(); if(!scanButton.disabled) analyzeSelected(); } });
-scanButton.onclick=analyzeSelected;
-document.querySelectorAll('.category-toggle').forEach(button=>button.addEventListener('click',()=>{const resources=button.nextElementSibling,open=resources.classList.toggle('open');button.classList.toggle('active',open);button.setAttribute('aria-expanded',String(open));if(open){activeCategory=categoriesFor(button);}}));
-document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(!activeCategory){ activeCategory=categoriesFor(button.closest('.category').querySelector('.category-toggle')); } selectedResourceCode=button.dataset.code;selectResource(selectedResourceCode);}));
-// Abre a categoria, mas não executa nenhuma consulta automaticamente.
-document.querySelector('.category-toggle')?.click();
-const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();updateRunState();refreshSession();
-</script>
-<script>
-(function(){
-  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
-  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
-  var PAGINA = "Análise Textual";
-
-  function registrarVisita(pais, cidade){
-    try{
-      var vid = localStorage.getItem("ps_visitante_id");
-      if(!vid){
-        vid = (window.crypto && crypto.randomUUID)
-          ? crypto.randomUUID()
-          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-        localStorage.setItem("ps_visitante_id", vid);
-      }
-
-      var payload = { pagina: PAGINA, visitante_id: vid };
-      if(pais) payload.pais = pais;
-      if(cidade) payload.cidade = cidade;
-
-      fetch(SUPABASE_URL + "/rest/v1/visitas", {
-        method: "POST",
-        headers: {
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-          "Content-Type": "application/json",
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify(payload)
-      }).catch(function(){});
-    }catch(e){}
-  }
-
-  var jaRegistrou = false;
-  function concluir(pais, cidade){
-    if(jaRegistrou) return;
-    jaRegistrou = true;
-    registrarVisita(pais, cidade);
-  }
-
-  setTimeout(function(){ concluir(null, null); }, 2500);
-
-  fetch("https://ipapi.co/json/")
-    .then(function(r){ return r.json(); })
-    .then(function(info){
-      concluir(info && info.country_name, info && info.city);
-    })
-    .catch(function(){ concluir(null, null); });
-})();
+$('go').addEventListener('click',async()=>{
+  const passage=$('wInput').value.trim();
+  if(!cur)return;
+  if(!passage){$('out').innerHTML='<p>Informe a passagem ou cole o texto a analisar.</p>';return;}
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){$('out').innerHTML='<p>Entre na sua conta para usar a análise. <a href="index.html">Entrar</a></p>';return;}
+  $('go').disabled=true;$('out').innerHTML='<p>Analisando…</p>';
+  try{
+    const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},
+      body:JSON.stringify({analysisType:'textual_resource_detail',resourceCode:cur.code,resourceName:cur.name,category:cur.cat,passage})});
+    const d=await res.json().catch(()=>({}));
+    if(!res.ok){$('out').innerHTML='<p>'+esc(d.error||d.message||('Erro '+res.status))+'</p>';}
+    else{$('out').innerHTML=fmt(d.answer||d.text||d.result||d.content||JSON.stringify(d));}
+  }catch(e){$('out').innerHTML='<p>Falha de conexão com o servidor.</p>';}
+  finally{refreshLock();}
+});
+loadPlan();
 </script>
 </body>
 </html>
+ 
+
+
+
+
+
+
+
