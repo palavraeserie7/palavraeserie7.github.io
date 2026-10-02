@@ -286,6 +286,76 @@ $('go').addEventListener('click',async()=>{
   }catch(e){$('out').innerHTML='<p>Falha de conexão com o servidor.</p>';}
   finally{refreshLock();}
 });
+// ===== VARREDURA TEXTUAL (porta de entrada; usa RES, T, pick e o Worker existentes) =====
+const GROUPS=DATA.map(([c,title])=>({c,title,list:Object.values(RES).filter(r=>r.code.startsWith(c+'.'))}));
+const STATUS={found:'ENCONTRADO',uncertain:'INCERTO',absent:'NÃO ENCONTRADO'};
+let scanText='',scanRes={},scanFail=[];
+function setMode(m){$('scanPane').hidden=m!=='scan';$('manualPane').hidden=m!=='manual';$('tabScan').classList.toggle('on',m==='scan');$('tabManual').classList.toggle('on',m==='manual');}
+$('tabScan').onclick=()=>setMode('scan');$('tabManual').onclick=()=>setMode('manual');
+idx.addEventListener('click',e=>{if(e.target.closest('.resource'))setMode('manual');});
+$('sCount').textContent=DATA.length+' categorias • '+Object.keys(RES).length+' recursos de análise';
+
+async function scanGroup(g,session){
+  const h={'Content-Type':'application/json'};
+  if(session)h.Authorization='Bearer '+session.access_token;
+  const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers:h,body:JSON.stringify({
+    analysisType:'textual_group_scan',referenceText:scanText,group:{code:g.c,name:g.title},
+    resources:g.list.map(r=>({code:r.code,name:r.name,category:r.cat,level:T[r.tier][0]}))})});
+  const d=await res.json().catch(()=>({}));
+  if(!res.ok||d.ok===false||!Array.isArray(d.results))throw new Error('scan');
+  d.results.forEach(x=>{
+    const r=RES[String(x&&x.code)];                       // code validado contra o catálogo local
+    if(!r||!r.code.startsWith(g.c+'.')||!STATUS[x.status])return; // descarta code inexistente ou status inválido
+    scanRes[r.code]={status:x.status,reason:String(x.reason||''),evidence:Array.isArray(x.evidence)?x.evidence.map(String):[]};
+  });
+}
+async function runScan(groups){
+  const {data:{session}}=await sb.auth.getSession();
+  let i=0,done=0;const failed=[];
+  const w=async()=>{while(i<groups.length){const g=groups[i++];try{await scanGroup(g,session);}catch(e){failed.push(g);}done++;$('sStatus').textContent='Analisando o trecho… '+done+' de '+groups.length;}};
+  await Promise.all([w(),w(),w()]);
+  return failed;
+}
+function renderScan(){
+  const all=Object.values(RES).filter(r=>scanRes[r.code]);
+  const by=s=>all.filter(r=>scanRes[r.code].status===s);
+  const f=by('found'),u=by('uncertain'),a=by('absent');
+  const card=(r,open)=>{const s=scanRes[r.code];return '<details class="rc '+s.status+'"'+(open?' open':'')+'><summary><span class="badge">'+STATUS[s.status]+'</span>'+esc(r.code+' — '+r.name)+'</summary><div class="meta">'+esc(r.cat)+' · '+T[r.tier][0]+'</div>'+(s.reason?'<p><b>Motivo:</b> '+esc(s.reason)+'</p>':'')+(s.evidence.length?'<p><b>Evidência:</b> '+s.evidence.map(e=>'“'+esc(e)+'”').join(' ')+'</p>':'')+'<button type="button" class="open" data-open="'+r.code+'">Abrir recurso</button></details>';};
+  let h='';
+  if(!all.length){h='<div class="warn">Não foi possível concluir a varredura agora. Tente novamente em instantes. <button type="button" class="open" data-retry>Tentar novamente</button></div>';$('sStatus').textContent='';}
+  else{
+    $('sStatus').textContent='';
+    h='<div class="sum">Varredura concluída</div><div class="sub">'+f.length+' recursos encontrados • '+u.length+' incertos</div>';
+    if(scanFail.length)h+='<div class="warn">Algumas categorias não puderam ser analisadas ('+scanFail.map(g=>g.c).join(', ')+'). <button type="button" class="open" data-retry>Tentar novamente</button></div>';
+    h+=f.map(r=>card(r,true)).join('')+u.map(r=>card(r,false)).join('');
+    if(a.length)h+='<details class="absent-box"><summary>Não encontrados ('+a.length+')</summary><p>'+a.map(r=>esc(r.code+' — '+r.name)).join(' · ')+'</p></details>';
+  }
+  $('sResults').innerHTML=h;
+}
+$('sGo').onclick=async()=>{
+  const t=$('sText').value.trim();
+  if(!t){$('sStatus').textContent='Cole um trecho para fazer a varredura.';return;}
+  if(t.length>30000){$('sStatus').textContent='O trecho passa de 30.000 caracteres. Reduza o texto.';return;}
+  scanText=t;scanRes={};scanFail=[];$('sResults').innerHTML='';$('sGo').disabled=true;
+  try{scanFail=await runScan(GROUPS);renderScan();}
+  catch(e){$('sStatus').textContent='Falha de conexão com o servidor. Tente novamente.';}
+  finally{$('sGo').disabled=false;}
+};
+$('sResults').addEventListener('click',async e=>{
+  const o=e.target.closest('[data-open]');
+  if(o){
+    const code=o.dataset.open;
+    setMode('manual');$('wInput').value=scanText;pick(code);   // fluxo existente: pick -> textual_step_detail
+    const b=document.querySelector('.resource[data-code="'+code+'"]');
+    if(b){const box=b.parentElement,tg=box.previousElementSibling;box.classList.add('open');tg.classList.add('active');tg.setAttribute('aria-expanded','true');}
+    $('work').scrollIntoView({behavior:'smooth'});return;
+  }
+  if(e.target.closest('[data-retry]')){
+    const g=scanFail.length?scanFail:GROUPS;$('sGo').disabled=true;
+    try{scanFail=await runScan(g);renderScan();}catch(x){$('sStatus').textContent='Falha de conexão com o servidor.';}
+    finally{$('sGo').disabled=false;}
+  }
+});  
 loadPlan();
 </script>
 </body>
