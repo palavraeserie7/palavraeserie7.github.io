@@ -1,6 +1,3 @@
-BLOQUEI HTML
-
-Analise textual · HTML
 <!doctype html>
 <html lang="pt-BR">
 <head><style>
@@ -240,8 +237,36 @@ const TEXTUAL_ACCESS_LEVELS = Object.freeze({
   'A.6':'FREE','A.7':'PRO','A.8':'PRO','A.9':'MASTER','A.10':'MASTER',
   'A.11':'PRO','A.12':'FREE','A.13':'MASTER','A.14':'DOCTUS','A.15':'PRO'
 });
-const SESSION_KEY = 'pes_supabase_session';
 const TEXTUAL_TIER_RANK = Object.freeze({ FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 });
+
+const TEXTUAL_RISK_PAIRS = {  'A.1':['A.2'], 'A.2':['A.1'],  'A.6':['A.7','A.10'], 'A.7':['A.6'], 'A.10':['A.6'],  'A.8':['A.9'], 'A.9':['A.8'],  'A.3':['A.11'], 'A.11':['A.3'],  'A.4':['A.12'], 'A.12':['A.4'],  'A.13':['A.14'], 'A.14':['A.13']};
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentSession = null;
+let currentUserPlan = 'FREE';
+
+async function getUserPlanFromSession(session){
+  if(!session?.user?.id) return 'FREE';
+  try{
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('plano')
+      .eq('id', session.user.id)
+      .single();
+    if(error || !data) return 'FREE';
+    return String(data.plano || 'FREE').trim().toUpperCase();
+  }catch(e){
+    return 'FREE';
+  }
+}
+
+async function refreshSession(){
+  const { data } = await supabaseClient.auth.getSession();
+  currentSession = data?.session || null;
+  currentUserPlan = await getUserPlanFromSession(currentSession);
+  renderAccount();
+  updateRunState();
+}
 const CACHE_KEY = 'pes_analise_cache_v1';   // resultados já obtidos: referência+figura -> análise
 const HIST_KEY  = 'pes_analise_historico_v1'; // lista de consultas já executadas, mais recente primeiro
 const HIST_MAX = 30;
@@ -258,9 +283,8 @@ let activeCategory=null;
 function esc(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getReferencia(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(e) { return ''; } }
 function setReferencia(v){ try { localStorage.setItem(REF_KEY, v); } catch(e) {} }
-function getSession(){ try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch(e) { return null; } }
-function currentPlan(){ const session=getSession()||{}; const user=session.user||{}; return String(session.profile?.plano||session.plano||user.user_metadata?.plano||user.app_metadata?.plano||'FREE').trim().toUpperCase(); }
-function textualCanOpen(required){ const requiredPlan=String(required||'FREE').toUpperCase(); const session=getSession(); if(requiredPlan==='FREE') return true; if(!session?.access_token) return false; return (TEXTUAL_TIER_RANK[currentPlan()] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99); }
+function currentPlan(){ return currentUserPlan; }
+function textualCanOpen(required){ const requiredPlan=String(required||'FREE').toUpperCase(); if(requiredPlan==='FREE') return true; if(!currentSession?.access_token) return false; return (TEXTUAL_TIER_RANK[currentUserPlan] ?? 0) >= (TEXTUAL_TIER_RANK[requiredPlan] ?? 99); }
 function categoriesFor(button){ const section=button.closest('.category'); return {code:button.querySelector('.category-code')?.textContent.trim()||'',name:button.querySelector('strong')?.textContent.trim()||'',resources:[...section.querySelectorAll('.resource')].map(r=>({code:r.dataset.code,name:r.dataset.resource,tier:TEXTUAL_ACCESS_LEVELS[r.dataset.code]||'DOCTUS'}))}; }
 function findCategoryForCode(code){ const btn=document.querySelector('.resource[data-code="'+CSS.escape(code)+'"]'); if(!btn)return null; const toggle=btn.closest('.category')?.querySelector('.category-toggle'); return toggle?categoriesFor(toggle):null; }
  
@@ -278,7 +302,7 @@ function renderHistory(){ const list=readHistory(); historyCount.textContent=Str
 function reopenFromHistory(entry){ refInput.value=entry.ref; setReferencia(entry.ref); activeCategory=findCategoryForCode(entry.code)||activeCategory; selectedResourceCode=entry.code; clearSelection(); document.querySelector('.resource[data-code="'+CSS.escape(entry.code)+'"]')?.classList.add('selected-resource'); queryChip.textContent=entry.code+' — '+entry.name; queryChip.classList.remove('empty'); scanButton.disabled=false; const cached=readCacheEntry(entry.ref,entry.code); if(cached){ scanStatus.textContent='Reaberto do histórico (nenhuma nova chamada à IA foi feita).'; renderResult(entry.code,entry.name,cached.analysis,true); } else { scanStatus.textContent='Pronto para analisar novamente.'; questionArea.innerHTML=''; } }
  
 function renderReferencia(){ /* mantido por compatibilidade; a barra de consulta já mostra o valor no próprio input */ }
-function renderAccount(){ const session=getSession(); accountStatus.textContent=session?'Sessão reconhecida: plano '+currentPlan()+'. As análises individuais liberadas aparecem conforme o nível de cada etapa.':'Para analisar uma figura, entre pelo acesso principal do site.'; }
+function renderAccount(){ accountStatus.textContent=currentSession?'Sessão reconhecida: plano '+currentPlan()+'. As análises individuais liberadas aparecem conforme o nível de cada etapa.':'Para analisar uma figura, entre pelo acesso principal do site.'; }
 function clearSelection(){ document.querySelectorAll('.resource').forEach(button=>button.classList.remove('selected-resource')); }
  
 function updateRunState(){ scanButton.disabled = !(getReferencia() && selectedResourceCode); }
@@ -290,7 +314,10 @@ function parseSections(markdown){ const lines=String(markdown||'').replace(/\r\n
 function mdInlineToHtml(text){ return esc(text).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^-\s+(.*)$/,'• $1'); }
 function renderResult(code,name,analysisText,fromCache){ const sections=parseSections(analysisText); const html=sections.map((s,i)=>'<details class="result-section"'+(i<2?' open':'')+'><summary>'+esc(s.title)+'</summary><div class="result-body">'+s.body.map(l=>mdInlineToHtml(l)).join('<br>')+'</div></details>').join(''); questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(code)+'</span>'+(fromCache?'<span class="cached-badge">DO HISTÓRICO</span>':'')+'<div class="qtext"><strong>'+esc(name)+'</strong></div><div class="result-sections">'+html+'</div></div>'; }
  
-async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=getSession(); scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; try{ const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(resource.tier!=='FREE'&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},scanResult:{code:resource.code,status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise concluída.'; writeCacheEntry(ref,resource.code,analysis); pushHistory({ref,code:resource.code,name:resource.name,ts:Date.now()}); renderResult(resource.code,resource.name,analysis,false); }catch(error){ scanStatus.textContent='Não foi possível concluir a análise.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
+async function analyzeSelected(){ if(!activeCategory||!selectedResourceCode)return; const ref=getReferencia(); if(!ref){scanStatus.textContent='Informe primeiro uma passagem ou tema de estudo.';refInput.focus();return;} const resource=activeCategory.resources.find(r=>r.code===selectedResourceCode); if(!resource)return; if(!textualCanOpen(resource.tier)){questionArea.innerHTML='<div class="pending-hint">Para abrir a análise completa de <strong>'+esc(resource.code+' — '+resource.name)+'</strong>, entre na conta com uma assinatura '+esc(resource.tier)+' ou superior.</div>';return;} const session=currentSession; scanButton.disabled=true; scanStatus.textContent='Consultando somente '+resource.code+' para a passagem selecionada…'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext">Carregando a análise técnica completa...</div></div>'; try{ 
+const rivals = (TEXTUAL_RISK_PAIRS[resource.code] || [])  .map(c => findCategoryForCode(c)?.resources.find(r => r.code === c))  .filter(Boolean)  .map(r => ({code: r.code, name: r.name}));
+
+const response=await fetch(PESQUISA_API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(resource.tier!=='FREE'&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{})},body:JSON.stringify({question:'Produza a análise textual acadêmica completa exclusivamente para a figura solicitada.',referenceText:ref,analysisType:'textual_step_detail',mode:'free',stepCode:resource.code,group:activeCategory,resource:{code:resource.code,name:resource.name,tier:resource.tier},riskPairs: rivals,scanResult:{code:resource.code,status:'not_run',reason:'A análise foi solicitada individualmente; nenhuma varredura de grupo foi executada.',evidence:[]}})}); const payload=await response.json(); if(!response.ok)throw new Error(payload.error||'O Worker não autorizou ou não concluiu a análise detalhada.'); const analysis=payload.analysis||payload.text||payload.answer||payload.response||''; if(!analysis)throw new Error('O Worker respondeu sem conteúdo de análise detalhada.'); scanStatus.textContent='Análise concluída.'; writeCacheEntry(ref,resource.code,analysis); pushHistory({ref,code:resource.code,name:resource.name,ts:Date.now()}); renderResult(resource.code,resource.name,analysis,false); }catch(error){ scanStatus.textContent='Não foi possível concluir a análise.'; questionArea.innerHTML='<div class="question-box"><span class="qcode">'+esc(resource.code)+'</span><div class="qtext"><strong>'+esc(resource.name)+'</strong><br><span class="pending-hint">'+esc(error.message||'Não foi possível carregar a análise detalhada.')+'</span></div></div>'; }finally{scanButton.disabled=false;} }
  
 let refSaveTimer=null;
 refInput.addEventListener('input',()=>{ clearTimeout(refSaveTimer); refSaveTimer=setTimeout(()=>{ setReferencia(refInput.value.trim()); updateRunState(); if(selectedResourceCode){ const ref=getReferencia(); const cached=ref?readCacheEntry(ref,selectedResourceCode):null; scanStatus.textContent = ref ? (cached?'Já existe uma análise salva para esta combinação.':'Clique em “Analisar” para consultar.') : 'Informe uma passagem ou tema antes de analisar.'; if(cached){ const resource=activeCategory?.resources.find(r=>r.code===selectedResourceCode); if(resource) renderResult(resource.code,resource.name,cached.analysis,true); } } },350); });
@@ -300,37 +327,57 @@ document.querySelectorAll('.category-toggle').forEach(button=>button.addEventLis
 document.querySelectorAll('.resource').forEach(button=>button.addEventListener('click',()=>{if(!activeCategory){ activeCategory=categoriesFor(button.closest('.category').querySelector('.category-toggle')); } selectedResourceCode=button.dataset.code;selectResource(selectedResourceCode);}));
 // Abre a categoria, mas não executa nenhuma consulta automaticamente.
 document.querySelector('.category-toggle')?.click();
-const saved=getReferencia();if(saved)refInput.value=saved;renderAccount();renderHistory();updateRunState();
+const saved=getReferencia();if(saved)refInput.value=saved;renderHistory();updateRunState();refreshSession();
 </script>
 <script>
 (function(){
   var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
   var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
   var PAGINA = "Análise Textual";
- 
-  try{
-    var vid = localStorage.getItem("ps_visitante_id");
-    if(!vid){
-      vid = (window.crypto && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-      localStorage.setItem("ps_visitante_id", vid);
-    }
- 
-    fetch(SUPABASE_URL + "/rest/v1/visitas", {
-      method: "POST",
-      headers: {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
-    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
-  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
+
+  function registrarVisita(pais, cidade){
+    try{
+      var vid = localStorage.getItem("ps_visitante_id");
+      if(!vid){
+        vid = (window.crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+        localStorage.setItem("ps_visitante_id", vid);
+      }
+
+      var payload = { pagina: PAGINA, visitante_id: vid };
+      if(pais) payload.pais = pais;
+      if(cidade) payload.cidade = cidade;
+
+      fetch(SUPABASE_URL + "/rest/v1/visitas", {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(payload)
+      }).catch(function(){});
+    }catch(e){}
+  }
+
+  var jaRegistrou = false;
+  function concluir(pais, cidade){
+    if(jaRegistrou) return;
+    jaRegistrou = true;
+    registrarVisita(pais, cidade);
+  }
+
+  setTimeout(function(){ concluir(null, null); }, 2500);
+
+  fetch("https://ipapi.co/json/")
+    .then(function(r){ return r.json(); })
+    .then(function(info){
+      concluir(info && info.country_name, info && info.city);
+    })
+    .catch(function(){ concluir(null, null); });
 })();
 </script>
 </body>
 </html>
- 
-
