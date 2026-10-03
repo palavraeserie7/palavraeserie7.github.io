@@ -326,7 +326,7 @@ $('go').addEventListener('click',async()=>{
   $('go').disabled=true;$('out').innerHTML='<p>Analisando…</p>';
   try{
     const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},
-      body:JSON.stringify({analysisType:'textual_step_detail',stepCode:cur.code,referenceText:passage,resource:{code:cur.code,name:cur.name,group:cur.cat}})});
+      body:JSON.stringify({analysisType:'textual_step_detail',stepCode:cur.code,referenceText:passage,resource:{code:cur.code,name:cur.name,group:cur.cat,definition:(DEFS[cur.code]||'')}})});
     const d=await res.json().catch(()=>({}));
     if(!res.ok||d.ok===false){$('out').innerHTML='<p>'+esc(d.error||d.message||('Erro '+res.status))+'</p>';}
     else{$('out').innerHTML=md(d.analysis||d.text||d.answer||'');}
