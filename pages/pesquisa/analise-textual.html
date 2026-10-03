@@ -360,7 +360,147 @@ $('go').addEventListener('click',async()=>{
   }catch(e){$('out').innerHTML='<p>Falha de conexão com o servidor.</p>';}
   finally{refreshLock();}
 });
-loadPlan();
+/* ===== CONSULTA BÍBLICA ===== */
+(function(){
+  const g=id=>document.getElementById(id);
+  const NAMES=["Gênesis","Êxodo","Levítico","Números","Deuteronômio","Josué","Juízes","Rute","1 Samuel","2 Samuel","1 Reis","2 Reis","1 Crônicas","2 Crônicas","Esdras","Neemias","Ester","Jó","Salmos","Provérbios","Eclesiastes","Cânticos","Isaías","Jeremias","Lamentações","Ezequiel","Daniel","Oséias","Joel","Amós","Obadias","Jonas","Miquéias","Naum","Habacuque","Sofonias","Ageu","Zacarias","Malaquias","Mateus","Marcos","Lucas","João","Atos","Romanos","1 Coríntios","2 Coríntios","Gálatas","Efésios","Filipenses","Colossenses","1 Tessalonicenses","2 Tessalonicenses","1 Timóteo","2 Timóteo","Tito","Filemom","Hebreus","Tiago","1 Pedro","2 Pedro","1 João","2 João","3 João","Judas","Apocalipse"];
+  const BASE="https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/";
+  const VERS=[
+    {name:"Almeida 1911",url:BASE+"ALM1911%20-%20Almeida%201911.json"},
+    {name:"Bíblia Livre",url:BASE+"BLIVRE%20-%20B%C3%ADblia%20Livre.json"},
+    {name:"Tradução Brasileira",url:BASE+"TB%20-%20Tradu%C3%A7%C3%A3o%20Brasileira.json"}
+  ];
+  const cache=new Map();
+  const sel=new Set();
+  let cur=null,last=null;
+
+  const bs=g('bbBook');
+  bs.innerHTML='<option value="">Escolha o livro…</option>';
+  [["Antigo Testamento",0,38],["Novo Testamento",39,65]].forEach(([l,a,z])=>{
+    const og=document.createElement('optgroup');og.label=l;
+    for(let i=a;i<=z;i++){const o=document.createElement('option');o.value=String(i);o.textContent=NAMES[i];og.appendChild(o)}
+    bs.appendChild(og);
+  });
+  VERS.forEach((v,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=v.name;g('bbVer').appendChild(o)});
+
+  function load(vi){
+    if(cache.has(vi))return cache.get(vi);
+    const p=fetch(VERS[vi].url,{cache:'force-cache'})
+      .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+      .catch(e=>{cache.delete(vi);throw e});
+    cache.set(vi,p);return p;
+  }
+
+  async function openChap(){
+    const st=g('bbStatus');
+    if(g('bbBook').value===''){st.textContent='Escolha um livro para abrir.';return}
+    const b=Number(g('bbBook').value),vi=Number(g('bbVer').value);
+    let c=parseInt(g('bbChap').value,10);if(!(c>=1))c=1;
+    st.textContent='Carregando '+VERS[vi].name+'…';
+    let bible;
+    try{bible=await load(vi)}catch(e){st.textContent='Não foi possível carregar o texto agora. Atualize a página e tente novamente.';return}
+    const book=bible[b];
+    if(!book||!Array.isArray(book.chapters)){st.textContent='Livro não encontrado nesta versão.';return}
+    const max=book.chapters.length;
+    if(c>max)c=max;
+    const verses=book.chapters[c-1];
+    if(!Array.isArray(verses)){st.textContent='Capítulo não encontrado nesta versão.';return}
+    cur={book:b,chap:c,max,verses,ver:vi};
+    g('bbChap').value=String(c);g('bbChap').max=String(max);
+    sel.clear();last=null;render();
+    st.textContent=VERS[vi].name+' · '+NAMES[b]+' '+c+' de '+max;
+  }
+
+  function render(){
+    const box=g('bbVerses');box.textContent='';
+    cur.verses.forEach((t,i)=>{
+      const row=document.createElement('div');
+      row.className='bb-v';row.tabIndex=0;row.dataset.n=String(i+1);
+      const b=document.createElement('b');b.textContent=String(i+1);
+      const s=document.createElement('span');s.textContent=String(t).trim();
+      row.append(b,s);box.appendChild(row);
+    });
+    g('bbTitle').textContent=NAMES[cur.book]+' '+cur.chap;
+    g('bbReader').hidden=false;
+    upd();
+  }
+
+  function upd(){
+    g('bbVerses').querySelectorAll('.bb-v').forEach(r=>r.classList.toggle('sel',sel.has(Number(r.dataset.n))));
+    const n=sel.size;
+    g('bbCopy').disabled=g('bbUse').disabled=n===0;
+    g('bbCount').textContent=n?n+(n===1?' versículo selecionado':' versículos selecionados'):'Nenhum versículo selecionado';
+  }
+
+  function pick(row,shift){
+    const n=Number(row.dataset.n);
+    if(shift&&last){
+      const a=Math.min(last,n),z=Math.max(last,n);
+      for(let i=a;i<=z;i++)sel.add(i);
+    }else{
+      if(sel.has(n))sel.delete(n);else sel.add(n);
+    }
+    last=n;upd();
+  }
+
+  g('bbVerses').addEventListener('click',e=>{const r=e.target.closest('.bb-v');if(r)pick(r,e.shiftKey)});
+  g('bbVerses').addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){const r=e.target.closest('.bb-v');if(r){e.preventDefault();pick(r,e.shiftKey)}}
+  });
+
+  function refStr(){
+    const a=[...sel].sort((x,y)=>x-y),parts=[];
+    let s=a[0],p=a[0];
+    for(let i=1;i<=a.length;i++){
+      if(a[i]===p+1){p=a[i];continue}
+      parts.push(s===p?String(s):s+'-'+p);s=a[i];p=a[i];
+    }
+    return NAMES[cur.book]+' '+cur.chap+':'+parts.join(',');
+  }
+  function selText(){
+    const nums=g('bbNums').checked;
+    return [...sel].sort((x,y)=>x-y)
+      .map(n=>(nums?n+' ':'')+String(cur.verses[n-1]).trim().replace(/\s*\n\s*/g,' '))
+      .join(nums?'\n':' ');
+  }
+  async function copyTxt(t){
+    try{await navigator.clipboard.writeText(t);return true}catch(e){
+      const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+      let ok=false;try{ok=document.execCommand('copy')}catch(x){}
+      ta.remove();return ok;
+    }
+  }
+
+  g('bbCopy').addEventListener('click',async()=>{
+    const ok=await copyTxt(selText()+'\n— '+refStr()+' ('+VERS[cur.ver].name+')');
+    g('bbStatus').textContent=ok?'Copiado: '+refStr()+'.':'Não foi possível copiar. Use Ctrl+C.';
+  });
+  g('bbUse').addEventListener('click',()=>{
+    const t=selText();
+    g('investigateInput').value=t;g('wInput').value=t;
+    g('bbStatus').textContent='Texto de '+refStr()+' enviado para os campos de análise.';
+    g('investigate').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  g('bbAll').addEventListener('click',()=>{cur.verses.forEach((_,i)=>sel.add(i+1));upd()});
+  g('bbClear').addEventListener('click',()=>{sel.clear();last=null;upd()});
+
+  async function step(d){
+    if(!cur)return;
+    let bible;try{bible=await load(cur.ver)}catch(e){return}
+    let b=cur.book,c=cur.chap+d;
+    if(c<1){if(b===0)return;b--;c=bible[b].chapters.length}
+    else if(c>cur.max){if(b===NAMES.length-1)return;b++;c=1}
+    g('bbBook').value=String(b);g('bbChap').value=String(c);openChap();
+  }
+  g('bbPrev').addEventListener('click',()=>step(-1));
+  g('bbNext').addEventListener('click',()=>step(1));
+
+  g('bbBook').addEventListener('change',()=>{g('bbChap').value='1';openChap()});
+  g('bbOpen').addEventListener('click',openChap);
+  g('bbChap').addEventListener('keydown',e=>{if(e.key==='Enter')openChap()});
+  g('bbVer').addEventListener('change',()=>{if(cur)openChap()});
+})();
+  loadPlan();
 </script>
 </body>
 </html>
