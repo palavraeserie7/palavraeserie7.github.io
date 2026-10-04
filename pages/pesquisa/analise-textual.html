@@ -314,20 +314,23 @@ function renderScanResults(items){
 }
 $('scanResults').addEventListener('click',e=>{const b=e.target.closest('[data-open-resource]');if(b){$('wInput').value=$('investigateInput').value;pick(b.dataset.openResource)}});
 $('investigateGo').addEventListener('click',async()=>{
-  const passage=$('investigateInput').value;
-  if(!passage.trim()){$('scanStatus').textContent='Cole um trecho antes de iniciar a investigação.';return;}
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session){$('scanStatus').innerHTML='<p>Entre na sua conta para investigar. <a href="/index.html">Entrar</a></p>';return;}
-  const btn=$('investigateGo');btn.disabled=true;$('scanBlocks').innerHTML='';$('scanResults').innerHTML='';$('scanStatus').textContent='Varredura dos 12 blocos em andamento…';
+  const passage=$('investigateInput').value.trim();
+  if(!passage){$('scanStatus').textContent='Digite uma referência bíblica, um tema ou cole um trecho.';return;}
+  const btn=$('investigateGo');
+  btn.disabled=true;$('scanBlocks').innerHTML='';$('scanResults').innerHTML='';
+  $('scanStatus').textContent='Analisando… isso pode levar até 1 minuto.';
   try{
-    const blockData=await scanRequest('textual_block_scan',{referenceText:passage,categories:DATA.map(([code,name])=>({code,name}))},session);
-    const blockCodes=renderBlocks(scanArray(blockData,['blocks','categories','relevantBlocks']));
-    if(!blockCodes.length){$('scanStatus').textContent='A investigação foi concluída.';return;}
-    $('scanStatus').textContent='Blocos pertinentes identificados. Varredura dos recursos em andamento…';
-    const resourceData=await scanRequest('textual_step_scan',{referenceText:passage,blocks:blockCodes.map(code=>({code,name:DATA.find(c=>c[0]===code)[1]})),resources:resourceCatalogFor(Object.values(RES).filter(r=>blockCodes.includes(r.code.split('.')[0])).map(r=>r.code))},session);
-    renderScanResults(scanArray(resourceData,['resources','steps','matches','possibleResources']));$('scanStatus').textContent='Investigação concluída. O trecho original foi preservado.';
-  }catch(e){$('scanStatus').innerHTML='<div class="scan-note">Não foi possível concluir a varredura: '+esc(e.message||'falha de conexão')+'. O Worker precisa aceitar textual_block_scan e textual_step_scan; a análise detalhada existente continua disponível.</div>'}
-  finally{btn.disabled=false}
+    const {data:{session}}=await sb.auth.getSession();
+    const headers={'Content-Type':'application/json'};
+    if(session)headers.Authorization='Bearer '+session.access_token;
+    const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers,body:JSON.stringify({analysisType:'analise_textual',referenceText:passage})});
+    const d=await res.json().catch(()=>({}));
+    if(!res.ok||d.ok===false)throw new Error(d.error||d.message||('Erro '+res.status));
+    $('scanStatus').textContent='Análise concluída. Plano aplicado: '+(d.plan||'FREE')+(session?'':' (sem login)');
+    $('scanResults').innerHTML='<div class="out">'+md(d.text||d.answer||'')+'</div>';
+  }catch(e){
+    $('scanStatus').innerHTML='<div class="scan-note">Não foi possível concluir a análise: '+esc(e.message||'falha de conexão')+'</div>';
+  }finally{btn.disabled=false}
 });
 
 idx.addEventListener('click',e=>{
