@@ -339,7 +339,12 @@ $('investigateGo').addEventListener('click',async()=>{
       const d=await call({analysisType:'analise_textual_etapa',stepCode:m.code,resumo});
       const sec=document.createElement('div');
       sec.className='out';
-      sec.innerHTML='<h3>'+esc(m.code+' — '+m.name)+'</h3>'+md(d.text||'');
+     const limpo=String(d.text||'')
+  .replace(/^\s*Como analista[^\n]*\n+/i,'')
+  .replace(/^\s*(?:-{3,}|\*{3,})\s*\n+/,'')
+  .replace(/^\s*#{0,4}\s*\**\s*M[ÉE]TODO\s+\d\d\.\d+[^\n]*\n+/i,'')
+  .replace(/^\s*(?:-{3,}|\*{3,})\s*\n+/,'');
+sec.innerHTML='<h3>'+esc(m.code+' — '+m.name)+'</h3>'+md(limpo);
       box.appendChild(sec);
       resumo=(resumo+'\n'+m.code+': '+String(d.text||'').replace(/\s+/g,' ').slice(0,350)).slice(-2800);
     }
