@@ -318,16 +318,32 @@ $('investigateGo').addEventListener('click',async()=>{
   if(!passage){$('scanStatus').textContent='Digite uma referência bíblica, um tema ou cole um trecho.';return;}
   const btn=$('investigateGo');
   btn.disabled=true;$('scanBlocks').innerHTML='';$('scanResults').innerHTML='';
-  $('scanStatus').textContent='Analisando… isso pode levar até 1 minuto.';
+  const box=$('scanResults');
   try{
     const {data:{session}}=await sb.auth.getSession();
     const headers={'Content-Type':'application/json'};
     if(session)headers.Authorization='Bearer '+session.access_token;
-    const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers,body:JSON.stringify({analysisType:'analise_textual',referenceText:passage})});
-    const d=await res.json().catch(()=>({}));
-    if(!res.ok||d.ok===false)throw new Error(d.error||d.message||('Erro '+res.status));
-    $('scanStatus').textContent='Análise concluída. Plano aplicado: '+(d.plan||'FREE')+(session?'':' (sem login)');
-    $('scanResults').innerHTML='<div class="out">'+md(d.text||d.answer||'')+'</div>';
+    const call=async payload=>{
+      const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers,body:JSON.stringify(Object.assign({referenceText:passage},payload))});
+      const d=await res.json().catch(()=>({}));
+      if(!res.ok||d.ok===false)throw new Error(d.error||d.message||('Erro '+res.status));
+      return d;
+    };
+    $('scanStatus').textContent='Preparando a análise…';
+    const plano=await call({analysisType:'analise_textual_plano'});
+    const lista=plano.metodos;
+    let resumo='';
+    for(let i=0;i<lista.length;i++){
+      const m=lista[i];
+      $('scanStatus').textContent='Plano '+plano.plan+' · método '+m.code+' ('+(i+1)+' de '+lista.length+')…';
+      const d=await call({analysisType:'analise_textual_etapa',stepCode:m.code,resumo});
+      const sec=document.createElement('div');
+      sec.className='out';
+      sec.innerHTML='<h3>'+esc(m.code+' — '+m.name)+'</h3>'+md(d.text||'');
+      box.appendChild(sec);
+      resumo=(resumo+'\n'+m.code+': '+String(d.text||'').replace(/\s+/g,' ').slice(0,350)).slice(-2800);
+    }
+    $('scanStatus').textContent='Análise concluída. Plano aplicado: '+plano.plan+'. Confira as citações em obra original antes de usar este estudo.';
   }catch(e){
     $('scanStatus').innerHTML='<div class="scan-note">Não foi possível concluir a análise: '+esc(e.message||'falha de conexão')+'</div>';
   }finally{btn.disabled=false}
