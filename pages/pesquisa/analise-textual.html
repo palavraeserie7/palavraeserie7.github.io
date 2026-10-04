@@ -354,54 +354,7 @@ sec.innerHTML='<h3>'+esc(m.code+' — '+m.name)+'</h3>'+md(limpo);
   }finally{btn.disabled=false}
 });
 
-idx.addEventListener('click',e=>{
-  const tg=e.target.closest('.category-toggle');
-  if(tg){const o=tg.nextElementSibling.classList.toggle('open');tg.classList.toggle('active',o);tg.setAttribute('aria-expanded',String(o));return;}
-  const rb=e.target.closest('.resource');
-  if(rb){pick(rb.dataset.code);}
-});
-function pick(code){
-  cur=RES[code];
-  document.querySelectorAll('.resource').forEach(b=>b.classList.toggle('sel',b.dataset.code===code));
-  $('work').hidden=false;$('out').innerHTML='';
-  $('wTitle').textContent=cur.code+' — '+cur.name;
-  $('wMeta').textContent=cur.cat+' · nível '+T[cur.tier][0];
-  const d=DEFS[cur.code],box=$('wDef');
-  box.classList.toggle('empty',!d);
-  box.innerHTML='<b>O QUE É ESTA ETAPA</b>'+(d?esc(d):'Definição desta etapa ainda não cadastrada.');
-  refreshLock();
-  $('work').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function refreshLock(){
-  const need=RANK[T[cur.tier][1]],lock=$('wLock');
-  if(userRank>=0&&userRank<need){lock.hidden=false;lock.textContent='Este recurso exige o plano '+T[cur.tier][0]+' ou superior.';$('go').disabled=true;}
-  else{lock.hidden=true;$('go').disabled=false;}
-}
-async function loadPlan(){
-  try{
-    const {data:{session}}=await sb.auth.getSession();
-    if(!session)return;
-    const {data}=await sb.from('profiles').select('plano').eq('id',session.user.id).single();
-    userRank=RANK[String((data&&data.plano)||'free').toLowerCase()]??0;
-    if(cur)refreshLock();
-  }catch(e){}
-}
-$('go').addEventListener('click',async()=>{
-  const passage=$('wInput').value.trim();
-  if(!cur)return;
-  if(!passage){$('out').innerHTML='<p>Informe a passagem ou cole o texto a analisar.</p>';return;}
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session){$('out').innerHTML='<p>Entre na sua conta para usar a análise. <a href="/index.html">Entrar</a></p>';return;}
-  $('go').disabled=true;$('out').innerHTML='<p>Analisando…</p>';
-  try{
-    const res=await fetch(WORKER+'/api/pesquisa',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},
-      body:JSON.stringify({analysisType:'textual_step_detail',stepCode:cur.code,referenceText:passage,resource:{code:cur.code,name:cur.name,group:cur.cat,definition:(DEFS[cur.code]||'')}})});
-    const d=await res.json().catch(()=>({}));
-    if(!res.ok||d.ok===false){$('out').innerHTML='<p>'+esc(d.error||d.message||('Erro '+res.status))+'</p>';}
-    else{$('out').innerHTML=md(d.analysis||d.text||d.answer||'');}
-  }catch(e){$('out').innerHTML='<p>Falha de conexão com o servidor.</p>';}
-  finally{refreshLock();}
-});
+
 /* ===== CONSULTA BÍBLICA ===== */
 (function(){
   const g=id=>document.getElementById(id);
@@ -522,12 +475,7 @@ $('go').addEventListener('click',async()=>{
     g('bbStatus').textContent='Texto de '+refStr()+' enviado para "Investigar um trecho".';
     g('investigate').scrollIntoView({behavior:'smooth',block:'start'});
   });
-  g('bbUseStep').addEventListener('click',()=>{
-    if(g('work').hidden){g('bbStatus').textContent='Escolha antes uma etapa no índice lateral (ex.: A.1 — Metáfora).';return}
-    g('wInput').value=selText();
-    g('bbStatus').textContent='Texto de '+refStr()+' enviado para a etapa '+g('wTitle').textContent+'.';
-    g('work').scrollIntoView({behavior:'smooth',block:'start'});
-  });
+  
   g('bbAll').addEventListener('click',()=>{cur.verses.forEach((_,i)=>sel.add(i+1));upd()});
   g('bbClear').addEventListener('click',()=>{sel.clear();last=null;upd()});
 
