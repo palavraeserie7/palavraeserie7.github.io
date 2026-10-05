@@ -503,24 +503,27 @@ Bloqueio paginas manutencao · HTML
       return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
     }
     function levelFor(path) { return LEVEL_MAP_BY_DISCIPLINE[path.join(' > ')] || ''; }
-    function badge(level) { return level ? `<span class="badge level">{LEVEL_LABELS[level] || level.toUpperCase()}</span>` : ''; }
-    function renderItems(items, path) {
-      if (!items.length) return '';
-      return `<ul class="items">${items.map(item => {
-        const itemPath = [...path, item.title];
-        const level = levelFor(itemPath);
-        return `<li data-level="escapeHtml(level)"><buttontype="button"class="topic"data-path="{escapeHtml(JSON.stringify(itemPath))}">escapeHtml(item.title)</button>{badge(level)}</li>`;
-      }).join('')}</ul>`;
-    }
+   function badge(level) {
+  return level ? `<span class="badge level">${LEVEL_LABELS[level] || level.toUpperCase()}</span>` : '';
+}
+
+function renderItems(items, path) {
+  if (!items.length) return '';
+  return `<ul class="items">${items.map(item => {
+    const itemPath = [...path, item.title];
+    const level = levelFor(itemPath);
+    return `<li data-level="${escapeHtml(level)}"><button type="button" class="topic" data-path="${escapeHtml(JSON.stringify(itemPath))}">${escapeHtml(item.title)}</button>${badge(level)}</li>`;
+  }).join('')}</ul>`;
+}
     function renderNode(node, path = [], root = false) {
       const currentPath = [...path, node.title];
       const children = node.children || [];
       const nested = children.filter(child => child.kind !== 'item');
       const items = children.filter(child => child.kind === 'item');
       const className = root ? 'node' : 'node category';
-      const inner = `nested.map(child=>renderNode(child,currentPath,false)).join(''){renderItems(items, currentPath)}${node.note ? `<p class="intro"><strong>Nota:</strong> ${escapeHtml(node.note)}</p>` : ''}`;
-      return `<details class="className"><summary>{escapeHtml(node.title)}</summary><div class="node-children">${inner}</div></details>`;
-    }
+      const inner = `${nested.map(child => renderNode(child, currentPath, false)).join('')}${renderItems(items, currentPath)}${node.note ? `<p class="intro"><strong>Nota:</strong> ${escapeHtml(node.note)}</p>` : ''}`;
+return `<details class="${className}"><summary>${escapeHtml(node.title)}</summary><div class="node-children">${inner}</div></details>`;   
+      }
     function renderTree() { treeEl.innerHTML = ACADEMIC_TREE.map(area => renderNode(area, [], true)).join(''); }
     function applyFilter() {
       let visible = 0;
