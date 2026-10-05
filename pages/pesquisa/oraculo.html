@@ -2,32 +2,6 @@ Oraculo · HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
- <!-- ==================================================================== -->
- <style>
- a.side-item[href="areas-academicas.html"],
- a.side-item[href="estante.html"],
- a.side-item[href="sermoes.html"],
- a.side-item[href="ponte-infantil.html"]{display:none}
- html.logado a.side-item[href="areas-academicas.html"],
- html.logado a.side-item[href="estante.html"],
- html.logado a.side-item[href="sermoes.html"],
- html.logado a.side-item[href="ponte-infantil.html"]{display:flex}
-</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function(){
- var menuClient = window.supabase.createClient(
-   "https://qmhdbuxomozdczgvpvcc.supabase.co",
-   "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8"
- );
- menuClient.auth.getSession().then(function(res){
-   if (res.data && res.data.session) {
-     document.documentElement.classList.add("logado");
-   }
- }).catch(function(){});
-})();
-</script>
- <!-- ==================================================================== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oráculo — Consulta Geral</title>
@@ -651,6 +625,7 @@ Oraculo · HTML
        RASTREAMENTO DE FONTES — ORDEM METODOLÓGICA
        ========================================================= */
     .oracle-tracking-trigger{
+      display:none;
       position:fixed;right:0;top:50%;z-index:1000;transform:translateY(-50%);
       padding:13px 10px;border:1px solid var(--navy-soft);border-right:0;
       border-radius:8px 0 0 8px;background:var(--navy);color:#dbe7f5;
@@ -919,6 +894,10 @@ Oraculo · HTML
       }
     }
 
+.oracle-source-class{display:inline-block;margin:4px 0 6px;padding:2px 6px;border:1px solid var(--paper-line);border-radius:3px;color:var(--brass-deep);background:#fffdf6;font-size:9px;font-weight:800;letter-spacing:.04em}
+.oracle-bible-invitation{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;padding:16px;border:1px solid var(--paper-line);border-left:3px solid var(--brass);background:var(--brass-wash)}
+.oracle-bible-invitation strong{display:block;margin-bottom:4px;color:var(--ink);font-family:var(--font-display);font-size:16px}.oracle-bible-invitation span{display:block;color:var(--ink-soft);font-size:11.5px;line-height:1.5}.oracle-bible-button{padding:10px 14px;border:0;border-radius:5px;background:var(--navy);color:#fff;font-size:10.5px;font-weight:800;cursor:pointer}
+@media(max-width:600px){.oracle-bible-invitation{flex-direction:column;align-items:stretch}}
 </style>
 </head>
 
@@ -931,7 +910,7 @@ Oraculo · HTML
       </div>
 
       <nav class="side-menu">
-        <a class="side-item" href="index.html"><span class="side-icon">⌂</span>INÍCIO</a>
+        <a class="side-item" href="index.html"><span class="side-icon">⌂</span>PESQUISA</a>
         <a class="side-item" href="areas-academicas.html"><span class="side-icon">▤</span>ÁREAS ACADÊMICAS</a>
         <a class="side-item" href="biblia.html"><span class="side-icon">▤</span>BÍBLIA</a>
         <a class="side-item" href="estante.html"><span class="side-icon">▤</span>ESTANTE</a>
@@ -985,19 +964,15 @@ Oraculo · HTML
               <section class="oracle-chat-panel" aria-label="Consulta geral do Oráculo">
 
         <header class="ai-chat-header">
-          <h1>ORÁCULO — CONSULTA GERAL</h1>
+          <h1>ORÁCULO — FATOS, FONTES E BÍBLIA</h1>
           <p>
-            Faça qualquer pergunta. O Oráculo pesquisa internamente em fontes e publicações
-            adequadas ao assunto, sem exigir que o pesquisador escolha previamente onde procurar.
+            Faça uma pergunta sobre um acontecimento, declaração, pessoa, proposta, instituição ou assunto relevante para a vida pública e para os valores que a Igreja defende. O Oráculo investiga o que aconteceu, rastreia as fontes e depois coloca a questão diante das Escrituras.
           </p>
         </header>
 
         <p class="oracle-trust-note">
-          <strong>Como funciona:</strong>
-          a pergunta é analisada automaticamente e o serviço seleciona as fontes adequadas
-          para a pesquisa. O resultado apresenta as publicações e fontes encontradas,
-          suas datas quando disponíveis, possíveis divergências e limitações.
-          Uma publicação é uma evidência verificável, não uma garantia absoluta de verdade.
+          <strong>PRINCÍPIO DO ORÁCULO:</strong> primeiro, descubra o que foi dito. Depois, descubra o que aconteceu. Por fim, consulte o que as Escrituras dizem sobre o assunto.
+          <br><br><strong>O Oráculo não dá parecer próprio.</strong> Ele separa fonte original, fonte oficial, cobertura jornalística e análise. Na etapa bíblica, a Bíblia é apresentada em seu contexto e pode afirmar, corrigir, confrontar, advertir ou condenar sem que o Oráculo suavize sua afirmação.
         </p>
 
         <div class="ai-chat-messages" id="oracle-chat-messages">
@@ -1052,34 +1027,34 @@ Oraculo · HTML
         </aside>
       </div>
           <div class="ai-chat-welcome">
-            <strong>ORÁCULO</strong><br>
-            Escreva qualquer pergunta e clique em “Investigar”.
-            Você não precisa escolher uma área ou informar onde a resposta deve ser procurada.
-            O sistema fará essa seleção internamente e apresentará as fontes/publicações
-            utilizadas quando estiverem disponíveis.
+            <strong>COMO O ORÁCULO INVESTIGA</strong>
+            <br><b>1. O QUE ACONTECEU?</b> — identifica o fato, declaração ou proposta.
+            <br><b>2. QUAL É A FONTE?</b> — procura a origem e separa-a da cobertura jornalística.
+            <br><b>3. QUEM ESTÁ ENVOLVIDO?</b> — organiza autoria, organização, decisão, execução, participação e repercussão conforme a evidência.
+            <br><b>4. O QUE A BÍBLIA DIZ?</b> — coloca a questão diante das Escrituras, sem substituir o texto bíblico pela opinião do Oráculo.
           </div>
 
           <div class="oracle-sources">
-            <h2>CONSULTA AUTOMÁTICA DE FONTES</h2>
+            <h2>RASTREIO E PROVENIÊNCIA</h2>
 
             <div class="oracle-source-grid">
               <div class="oracle-source-card">
-                <strong>Pesquisa geral</strong>
+                <strong>FONTE ORIGINAL</strong>
                 O assunto é identificado automaticamente a partir da pergunta.
               </div>
 
               <div class="oracle-source-card">
-                <strong>Fontes adequadas ao assunto</strong>
+                <strong>FONTE OFICIAL</strong>
                 O sistema seleciona internamente as fontes pertinentes à consulta.
               </div>
 
               <div class="oracle-source-card">
-                <strong>Publicações e dados</strong>
+                <strong>COBERTURA JORNALÍSTICA</strong>
                 Quando disponíveis, são apresentados título, veículo, data e publicação original.
               </div>
 
               <div class="oracle-source-card">
-                <strong>Verificação</strong>
+                <strong>RASTREABILIDADE</strong>
                 Divergências, ausência de evidência e limitações devem ser informadas.
               </div>
             </div>
@@ -1093,7 +1068,7 @@ Oraculo · HTML
             <input
               id="oracle-question"
               type="text"
-              placeholder="Ex.: Qual foi o principal acontecimento econômico desta semana?"
+              placeholder="Ex.: O que foi dito sobre a Bíblia e o que as Escrituras dizem sobre isso?"
               aria-label="Pergunta para o Oráculo"
               autocomplete="off"
               required
@@ -1106,9 +1081,8 @@ Oraculo · HTML
           </div>
 
           <div class="oracle-disclaimer">
-            O Oráculo não declara que uma publicação seja uma verdade absoluta.
-            A resposta deve distinguir informação encontrada, interpretação, divergência
-            e ausência de evidência quando aplicável.
+            O Oráculo não emite parecer próprio sobre o acontecimento.
+            A investigação deve distinguir fonte original, fonte oficial, jornalismo, análise, divergência e ausência de evidência. A etapa “O QUE A BÍBLIA DIZ?” apresenta as Escrituras em seu contexto, sem substituir sua afirmação por uma opinião editorial.
           </div>
 
         </div>
@@ -1398,7 +1372,7 @@ Oraculo · HTML
     });
 
     renderOracleIndex();
-    setOracleIndexOpen(false);
+
     function renderOracleResult(data) {
       const text = cleanServiceText(
         data.text ||
@@ -1435,6 +1409,8 @@ Oraculo · HTML
         escapeHtml(text).replace(/\n/g, '<br>') +
         '</div>';
 
+      html += '<div class="oracle-bible-invitation"><div><strong>O QUE A BÍBLIA DIZ?</strong><span>O Oráculo não dará um parecer próprio. Esta etapa coloca a questão diante das Escrituras.</span></div><button type="button" class="oracle-bible-button" data-question=""'+escapeHtml(window.__oraculoLastQuestion||'')+'">CONSULTAR AS ESCRITURAS</button></div>';
+
       if (sources.length) {
         html +=
           '<div class="oracle-sources">' +
@@ -1443,6 +1419,7 @@ Oraculo · HTML
             const publisher = source.publisher || source.source || source.domain || 'Fonte não identificada';
              const sourceTier = source.sourceTier || source.tier || source.sourceLevel || '';
             const type = source.type || (source.domain ? 'resultado de busca' : 'conteúdo');
+            const sourceClass = String(source.sourceClass || source.sourceTier || '').toLowerCase().includes('original') ? 'FONTE ORIGINAL' : (String(source.sourceClass || source.sourceTier || '').toLowerCase().includes('official') || String(source.sourceClass || '').toLowerCase().includes('oficial') ? 'FONTE OFICIAL' : (type.toLowerCase().includes('news') || type.toLowerCase().includes('jornal') || type.toLowerCase().includes('imprensa') ? 'FONTE JORNALÍSTICA' : 'FONTE / PUBLICAÇÃO'));
             const title = source.title || 'Sem título';
             const date = source.publishedAt
               ? ' · ' + escapeHtml(source.publishedAt)
@@ -1483,7 +1460,7 @@ Oraculo · HTML
             return (
               '<div class="oracle-result-source' + (isVideo ? ' is-video' : '') + '">' +
               badge +
-              '<strong>' + escapeHtml(publisher) + '</strong> — ' +
+              '<span class="oracle-source-class">' + escapeHtml(sourceClass) + '</span><br><strong>' + escapeHtml(publisher) + '</strong> — '+
               escapeHtml(type) + (sourceTier ? ' · <span class="tracking-badge">ETAPA '+escapeHtml(sourceTier)+'</span>' : '') +
               '<br>' +
               escapeHtml(title) +
@@ -1524,10 +1501,32 @@ Oraculo · HTML
       return html;
     }
 
+    messages.addEventListener('click', async event => {
+      const b = event.target.closest('.oracle-bible-button');
+      if (!b) return;
+      const question = b.dataset.question || window.__oraculoLastQuestion || '';
+      if (!question) return;
+      b.disabled = true; b.textContent = 'CONSULTANDO...';
+      const ans = document.createElement('div'); ans.className='ai-chat-answer';
+      ans.innerHTML='<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div><div>Consultando as Escrituras e organizando o contexto bíblico...</div>';
+      messages.appendChild(ans); messages.scrollTop=messages.scrollHeight;
+      const prompt = `ETAPA BÍBLICA DO ORÁCULO.\n\nQuestão investigada:\n${question}\n\nO Oráculo não dá parecer próprio. Nesta etapa, apresente livremente o que a Bíblia diz, sem suavizar sua afirmação para agradar à cultura, política, opinião pública ou ao pesquisador. Use somente afirmações bíblicas sustentáveis. Não invente versículos. Apresente: O QUE A BÍBLIA DIZ; TEXTOS BÍBLICOS; CONTEXTO; O QUE O TEXTO AFIRMA; INTERPRETAÇÕES RELEVANTES quando houver; SÍNTESE À LUZ DAS ESCRITURAS. Diferencie texto bíblico de interpretação humana.`;
+      try{
+        const r=await fetch(`${AI_PROXY_URL.replace(/\/$/,'')}/api/pesquisa`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'free',accessLevel:'free',question:prompt,topic:'ORÁCULO — O QUE A BÍBLIA DIZ?',module:'ORÁCULO — ETAPA BÍBLICA',discipline:'Bíblia',studyContext:{trackingContext}})});
+        const ct=r.headers.get('content-type')||''; let d=ct.includes('application/json')?await r.json():{error:await r.text()};
+        if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`);
+        if(typeof d.text==='string'&&d.text.trim().startsWith('{')){try{d=JSON.parse(d.text)}catch(_){} }
+        const text=d.text||d.answer||d.response||'A consulta bíblica não devolveu uma resposta.';
+        ans.innerHTML='<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div><div class="oracle-result-text">'+escapeHtml(cleanServiceText(text)).replace(/\n/g,'<br>')+'</div>';
+      }catch(e){ ans.textContent='Não foi possível concluir a consulta bíblica: '+(e.message||'erro desconhecido'); }
+      finally{b.disabled=false;b.textContent='CONSULTAR AS ESCRITURAS';messages.scrollTop=messages.scrollHeight;}
+    });
+
     form.addEventListener('submit', async event => {
       event.preventDefault();
 
       const question = input.value.trim();
+      window.__oraculoLastQuestion = question;
       if (!question) {
         input.focus();
         return;
@@ -1674,5 +1673,4 @@ REGRAS:
 </script>
 </body>
 </html>
-
 
