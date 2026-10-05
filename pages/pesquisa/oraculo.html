@@ -1,7 +1,30 @@
 Oraculo · HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
+<head><style>
+ a.side-item[href="areas-academicas.html"],
+ a.side-item[href="estante.html"],
+ a.side-item[href="sermoes.html"],
+ a.side-item[href="ponte-infantil.html"]{display:none}
+ html.logado a.side-item[href="areas-academicas.html"],
+ html.logado a.side-item[href="estante.html"],
+ html.logado a.side-item[href="sermoes.html"],
+ html.logado a.side-item[href="ponte-infantil.html"]{display:flex}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+ var menuClient = window.supabase.createClient(
+   "https://qmhdbuxomozdczgvpvcc.supabase.co",
+   "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8"
+ );
+ menuClient.auth.getSession().then(function(res){
+   if (res.data && res.data.session) {
+     document.documentElement.classList.add("logado");
+   }
+ }).catch(function(){});
+})();
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oráculo — Consulta Geral</title>
