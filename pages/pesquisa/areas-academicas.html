@@ -791,57 +791,6 @@ if (!response.ok) {
     .catch(function(){ concluir(null, null); });
 })();
 </script>
-<script>
-(function () {
-  var side = document.querySelector('.side-nav');
-  var footer = side.querySelector('.side-footer-note');
-  var tree = document.getElementById('academic-tree');
 
-  var st = document.createElement('style');
-  st.textContent =
-    '@media(min-width:901px){:root{--side-w:270px}}' +
-    '.paper details{scroll-margin-top:84px}' +
-    '.side-tree summary{cursor:pointer;list-style:none;padding:8px 7px;border-radius:6px;color:var(--text);font-size:9.5px;font-weight:800;line-height:1.3}' +
-    '.side-tree summary::-webkit-details-marker{display:none}' +
-    '.side-tree summary::before{content:"▶";display:inline-block;width:12px;font-size:8px;color:#7c8fac}' +
-    '.side-tree details[open]>summary::before{content:"▼"}' +
-    '.side-tree details[open]>summary{color:var(--green)}' +
-    '.side-tree summary:hover{background:#16233c}' +
-    '.st-subs{margin:2px 0 6px 10px;padding-left:8px;border-left:1px solid #263754}' +
-    '.st-subs a{display:block;padding:5px 7px;border-radius:5px;color:#a9b9d0;font-size:9.5px;font-weight:600;line-height:1.3;text-decoration:none}' +
-    '.st-subs a:hover{background:#16233c;color:#fff}' +
-    '@media(max-width:900px){.side-tree{display:none}}';
-  document.head.appendChild(st);
-
-  function titulo(d) { return d.querySelector(':scope > summary').textContent.trim(); }
-  function ir(d) {
-    var p = d;
-    while (p && p !== tree) { if (p.tagName === 'DETAILS') p.open = true; p = p.parentElement; }
-    d.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  var nav = document.createElement('nav');
-  nav.className = 'side-tree';
-  tree.querySelectorAll(':scope > details.node').forEach(function (area) {
-    var box = document.createElement('details');
-    var sum = document.createElement('summary');
-    sum.textContent = titulo(area);
-    sum.addEventListener('click', function () { ir(area); });
-    box.appendChild(sum);
-    var subs = document.createElement('div');
-    subs.className = 'st-subs';
-    area.querySelectorAll(':scope > .node-children > details').forEach(function (sub) {
-      var a = document.createElement('a');
-      a.href = '#';
-      a.textContent = titulo(sub);
-      a.addEventListener('click', function (e) { e.preventDefault(); ir(sub); });
-      subs.appendChild(a);
-    });
-    box.appendChild(subs);
-    nav.appendChild(box);
-  });
-  side.insertBefore(nav, footer);
-})();
-</script>
 </body>
 </html>
