@@ -205,10 +205,10 @@ $('investigateGo').addEventListener('click',async()=>{
           out.textContent='Gerando a análise completa…';
           try{
             const d=await call({analysisType:'textual_step_detail',stepCode:x.code,resource:{name:fig?fig.name:''},scanResult:x});
-            out.innerHTML=md(d.text||d.analysis||'');
+           out.innerHTML=md(d.text||d.analysis||'');bt.textContent='ANÁLISE GERADA';
           }catch(e){
             out.innerHTML='<div class="scan-note">'+esc(e.message||'falha de conexão')+'</div>';
-          }finally{bt.disabled=false}
+          bt.disabled=false;}
         });
         box.appendChild(card);
       });
