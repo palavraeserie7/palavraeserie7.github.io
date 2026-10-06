@@ -117,12 +117,33 @@ function md(s){
 
 
 
+const GRUPOS=[
+ {code:'A',name:'Figuras de linguagem'},
+ {code:'B',name:'Estruturas literárias e retóricas'},
+ {code:'C',name:'Recursos sonoros e poéticos'},
+ {code:'D',name:'Formas literárias e discursivas'},
+ {code:'E',name:'Gêneros literários'},
+ {code:'F',name:'Linguagem profética e visionária'},
+ {code:'G',name:'Relações intertextuais'},
+ {code:'H',name:'Categorias interpretativas'},
+ {code:'I',name:'Recursos de argumentação e retórica'},
+ {code:'J',name:'Recursos semânticos e contextuais'},
+ {code:'K',name:'Recursos narrativos'},
+ {code:'L',name:'Princípios de controle interpretativo'}
+];
+const FIGURAS_A=[
+ {code:'A.1',name:'Metáfora'},{code:'A.2',name:'Símile / Comparação'},{code:'A.3',name:'Hipérbole'},
+ {code:'A.4',name:'Ironia'},{code:'A.5',name:'Eufemismo'},{code:'A.6',name:'Personificação'},
+ {code:'A.7',name:'Antropomorfismo'},{code:'A.8',name:'Metonímia'},{code:'A.9',name:'Sinédoque'},
+ {code:'A.10',name:'Apóstrofe'},{code:'A.11',name:'Paradoxo'},{code:'A.12',name:'Pergunta retórica'},
+ {code:'A.13',name:'Elipse'},{code:'A.14',name:'Zeugma'},{code:'A.15',name:'Graduação / Clímax'}
+];
+
 $('investigateGo').addEventListener('click',async()=>{
   const passage=$('investigateInput').value.trim();
   if(!passage){$('scanStatus').textContent='Digite uma referência bíblica, um tema ou cole um trecho.';return;}
   const btn=$('investigateGo');
   btn.disabled=true;$('scanBlocks').innerHTML='';$('scanResults').innerHTML='';
-  const box=$('scanResults');
   try{
     const {data:{session}}=await sb.auth.getSession();
     const headers={'Content-Type':'application/json'};
@@ -133,26 +154,66 @@ $('investigateGo').addEventListener('click',async()=>{
       if(!res.ok||d.ok===false)throw new Error(d.error||d.message||('Erro '+res.status));
       return d;
     };
-    $('scanStatus').textContent='Preparando a análise…';
-    const plano=await call({analysisType:'analise_textual_plano'});
-    const lista=plano.metodos;
-    let resumo='';
-    for(let i=0;i<lista.length;i++){
-      const m=lista[i];
-      $('scanStatus').textContent='Plano '+plano.plan+' · método '+m.code+' ('+(i+1)+' de '+lista.length+')…';
-      const d=await call({analysisType:'analise_textual_etapa',stepCode:m.code,resumo});
-      const sec=document.createElement('div');
-      sec.className='out';
-     const limpo=String(d.text||'')
-  .replace(/^\s*Como analista[^\n]*\n+/i,'')
-  .replace(/^\s*(?:-{3,}|\*{3,})\s*\n+/,'')
-  .replace(/^\s*#{0,4}\s*\**\s*M[ÉE]TODO\s+\d\d\.\d+[^\n]*\n+/i,'')
-  .replace(/^\s*(?:-{3,}|\*{3,})\s*\n+/,'');
-sec.innerHTML='<h3>'+esc(m.code+' — '+m.name)+'</h3>'+md(limpo);
-      box.appendChild(sec);
-      resumo=(resumo+'\n'+m.code+': '+String(d.text||'').replace(/\s+/g,' ').slice(0,350)).slice(-2800);
+
+    $('scanStatus').textContent='Verificando quais grupos aparecem no texto…';
+    const b=await call({analysisType:'textual_block_scan',categories:GRUPOS});
+    const blocos=b.blocks||[];
+    if(!blocos.length){$('scanStatus').textContent='Nenhum grupo com indício claro neste trecho.';return;}
+    blocos.forEach(x=>{
+      const g=GRUPOS.find(k=>k.code===x.code);
+      const el=document.createElement('div');
+      el.className='scan-block';
+      el.innerHTML='<b>'+esc(x.code+' — '+(g?g.name:''))+'</b><small>'+esc((x.relevance||'')+' · '+(x.reason||''))+'</small>';
+      $('scanBlocks').appendChild(el);
+    });
+    if(blocos.some(x=>x.code!=='A')){
+      const nota=document.createElement('div');
+      nota.className='scan-note';
+      nota.textContent='Os grupos B a L foram apontados, mas a lista de figuras desses grupos ainda será cadastrada no Worker.';
+      $('scanBlocks').appendChild(nota);
     }
-    $('scanStatus').textContent='Análise concluída. Plano aplicado: '+plano.plan+'. Confira as citações em obra original antes de usar este estudo.';
+
+    if(blocos.some(x=>x.code==='A')){
+      $('scanStatus').textContent='Verificando as figuras de linguagem (Grupo A)…';
+      const r=await call({analysisType:'textual_step_scan',resources:FIGURAS_A});
+      const achados=r.resources||[];
+      const box=$('scanResults');
+      const titulo=document.createElement('h3');
+      titulo.textContent='Figuras de linguagem encontradas';
+      box.appendChild(titulo);
+      if(!achados.length){
+        const n=document.createElement('div');
+        n.className='scan-note';
+        n.textContent='Nenhuma figura de linguagem confirmada neste trecho.';
+        box.appendChild(n);
+      }
+      achados.forEach(x=>{
+        const fig=FIGURAS_A.find(k=>k.code===x.code);
+        const card=document.createElement('div');
+        card.className='scan-card';
+        card.innerHTML='<span class="relevance">'+esc(x.relevance||'')+'</span>'
+          +'<h4>'+esc(x.code+' — '+(fig?fig.name:''))+'</h4>'
+          +'<p>'+esc(x.reason||'')+'</p>'
+          +(x.evidence?'<p class="evidence">'+esc(x.evidence)+'</p>':'')
+          +'<button type="button">ANÁLISE COMPLETA</button>';
+        const out=document.createElement('div');
+        out.className='out';
+        card.appendChild(out);
+        const bt=card.querySelector('button');
+        bt.addEventListener('click',async()=>{
+          bt.disabled=true;
+          out.textContent='Gerando a análise completa…';
+          try{
+            const d=await call({analysisType:'textual_step_detail',stepCode:x.code,resource:{name:fig?fig.name:''},scanResult:x});
+            out.innerHTML=md(d.text||d.analysis||'');
+          }catch(e){
+            out.innerHTML='<div class="scan-note">'+esc(e.message||'falha de conexão')+'</div>';
+          }finally{bt.disabled=false}
+        });
+        box.appendChild(card);
+      });
+    }
+    $('scanStatus').textContent='Varredura concluída. Confira as citações em obra original antes de usar este estudo.';
   }catch(e){
     $('scanStatus').innerHTML='<div class="scan-note">Não foi possível concluir a análise: '+esc(e.message||'falha de conexão')+'</div>';
   }finally{btn.disabled=false}
