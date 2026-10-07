@@ -1315,16 +1315,11 @@ main{
       <div class="at-row">
         <select id="atLivro" class="at-sel at-grow" aria-label="Livro"></select>
         <select id="atCap" class="at-sel" style="width:76px" aria-label="Capítulo"></select>
-       <select id="atModo" class="at-sel" aria-label="Texto">
-  <option value="pt">Português</option>
-  <option value="or">Original</option>
-  <option value="tr">Grego TR</option>
-</select>
+        <select id="atModo" class="at-sel" aria-label="Texto">
+          <option value="pt">Português</option>
+          <option value="or">Original</option>
+        </select>
       </div>
-     <div class="at-row">
-  <button id="atAnt" class="at-btn at-grow" type="button">← ANTERIOR</button>
-  <button id="atProx" class="at-btn at-grow" type="button">PRÓXIMO →</button>
-</div>
      <div class="at-row">
   <input id="atBusca" class="at-in at-grow" type="search" placeholder="Buscar palavra" aria-label="Buscar versículos">
   <select id="atEscopo" class="at-sel" aria-label="Onde buscar">
@@ -1635,7 +1630,7 @@ function setStatus(text){
  
 function populateBooks(){
   bookSelect.innerHTML = BOOKS.map((book,index) =>
-    `<option value="${index}">${escapeHTML(book[1])}</option>`
+    `<option value="index">{escapeHTML(book[1])}</option>`
   ).join("");
  
   bookSelect.value = "0";
@@ -1647,7 +1642,7 @@ function populateChapters(){
  
   chapterSelect.innerHTML = Array.from(
     {length:count},
-    (_,i) => `<option value="${i+1}">${i+1}</option>`
+    (_,i) => `<option value="i+1">{i+1}</option>`
   ).join("");
  
   if(currentChapter > count) currentChapter = count;
@@ -1677,7 +1672,7 @@ async function loadPortuguese(){
  
 async function loadOriginal(bookCode, testament){
   if(testament === "OT"){
-    const url = `${DATA.wlc}${bookCode}.txt`;
+    const url = `DATA.wlc{bookCode}.txt`;
  
     if(sourceCache.has(url)){
       return sourceCache.get(url);
@@ -1709,7 +1704,7 @@ async function loadOriginal(bookCode, testament){
       const verse = Number(parts[2]);
  
       if(Number.isInteger(chapter) && Number.isInteger(verse)){
-        verses.set(`${chapter}:${verse}`, value);
+        verses.set(`chapter:{verse}`, value);
       }
     }
  
@@ -1719,7 +1714,7 @@ async function loadOriginal(bookCode, testament){
  
   if(currentGreekSource === "tr"){
     const trBook = getTRBookCode(bookCode);
-    const cacheKey = `tr:${trBook}:${currentChapter}`;
+    const cacheKey = `tr:trBook:{currentChapter}`;
  
     if(sourceCache.has(cacheKey)){
       return sourceCache.get(cacheKey);
@@ -1728,7 +1723,7 @@ async function loadOriginal(bookCode, testament){
     const verseCount = portugueseBible?.[currentBookIndex]?.chapters?.[currentChapter-1]?.length || 0;
     const urls = Array.from(
       {length:verseCount},
-      (_,index) => `${DATA.tr}${trBook}/${currentChapter}/${index+1}.json`
+      (_,index) => `DATA.tr{trBook}/currentChapter/{index+1}.json`
     );
  
     const responses = await Promise.all(
@@ -1744,7 +1739,7 @@ async function loadOriginal(bookCode, testament){
       const data = await response.json();
       const text = typeof data?.text === "string" ? data.text.trim() : "";
       if(text){
-        verses.set(`${currentChapter}:${index+1}`, text);
+        verses.set(`currentChapter:{index+1}`, text);
       }
     }
  
@@ -1752,7 +1747,7 @@ async function loadOriginal(bookCode, testament){
     return verses;
   }
  
-  const url = `${DATA.greek}${bookCode}.txt`;
+  const url = `DATA.greek{bookCode}.txt`;
  
   if(sourceCache.has(url)){
     return sourceCache.get(url);
@@ -1784,7 +1779,7 @@ async function loadOriginal(bookCode, testament){
     const verse = Number(parts[2]);
  
     if(Number.isInteger(chapter) && Number.isInteger(verse)){
-      verses.set(`${chapter}:${verse}`, value);
+      verses.set(`chapter:{verse}`, value);
     }
   }
  
@@ -1877,10 +1872,10 @@ function renderRows(bookCode, testament, hebrewMap, greekMap){
  
     return `
       <div class="verse-row">
-        <div class="verse-cell ${currentBible}" data-bible-source="${currentBible}">
+        <div class="verse-cell currentBible"data-bible-source="{currentBible}">
           <div class="verse-meta">
             <span class="verse-number">${verse}</span>
-            <span>${escapeHTML(bookCode)} ${currentChapter}:${verse}</span>
+            <span>${escapeHTML(bookCode)} currentChapter:{verse}</span>
           </div>
           <p class="verse-text">${text ? escapeHTML(text) : `<span class="empty-text">—</span>`}</p>
         </div>
@@ -2751,7 +2746,7 @@ if(painelToggle){
     }
   });
 }
- /* =====================================================
+/* =====================================================
    BÍBLIA RECOLHÍVEL + ATELIÊ DE CRIAÇÃO
 ===================================================== */
 (function(){
@@ -2825,57 +2820,27 @@ if(painelToggle){
       if(o) o.textContent = d.titulo || "Sem título";
     }, 500);
   }
- /* ---- fonte bíblica ---- */
+
+  /* ---- fonte bíblica ---- */
   function rotuloVersao(){
     const t = BOOKS[cur.livro][2];
     if(cur.modo === "pt") return "Almeida 1911";
-    if(cur.modo === "tr") return "Textus Receptus, Scrivener 1894";
     return t === "OT" ? "WLC" : "Nestle 1904";
   }
 
-  async function mapaOriginal(code, ehAT){
-    const url = (ehAT ? DATA.wlc : DATA.greek) + code + ".txt";
-    if(sourceCache.has(url)) return sourceCache.get(url);
-
+  async function mapaOriginal(code, ot){
+    const url = (ot ? DATA.wlc : DATA.greek) + code + ".txt";
+    if(sourceCache.get(url)) return sourceCache.get(url);
     const r = await fetch(url, {cache:"force-cache"});
-    if(!r.ok){ sourceCache.set(url, null); return null; }
-
-    const texto = await r.text();
+    if(!r.ok) return null;
     const m = new Map();
-    for(const linha of texto.split(/\r?\n/)){
-      if(!linha.trim()) continue;
-      const tab = linha.indexOf("\t");
-      if(tab < 0) continue;
-      const id = linha.slice(0, tab).trim();
-      const v = linha.slice(tab + 1).trim();
-      const p = id.split(".");
-      const c = Number(p[1]), n = Number(p[2]);
-      if(Number.isInteger(c) && Number.isInteger(n)) m.set(c + ":" + n, v);
+    for(const l of (await r.text()).split(/\r?\n/)){
+      const t = l.indexOf("\t");
+      if(t < 0) continue;
+      const p = l.slice(0,t).split(".");
+      m.set(p[1] + ":" + p[2], l.slice(t+1).trim());
     }
     sourceCache.set(url, m);
-    return m;
-  }
-
-  async function mapaTR(code){
-    const livro = getTRBookCode(code);
-    const chave = "tr:" + livro + ":" + cur.cap;
-    if(sourceCache.has(chave)) return sourceCache.get(chave);
-
-    const qtd = (portugueseBible[cur.livro].chapters[cur.cap - 1] || []).length;
-    const respostas = await Promise.all(
-      Array.from({length:qtd}, function(_, i){
-        return fetch(DATA.tr + livro + "/" + cur.cap + "/" + (i + 1) + ".json", {cache:"force-cache"})
-          .then(function(r){ return r.ok ? r.json() : null; })
-          .catch(function(){ return null; });
-      })
-    );
-
-    const m = new Map();
-    respostas.forEach(function(d, i){
-      const t = d && typeof d.text === "string" ? d.text.trim() : "";
-      if(t) m.set(cur.cap + ":" + (i + 1), t);
-    });
-    sourceCache.set(chave, m);
     return m;
   }
 
@@ -2886,25 +2851,17 @@ if(painelToggle){
     try{
       await loadPortuguese();
       const [code,,test] = BOOKS[cur.livro];
-
-      if(cur.modo === "tr" && test === "OT"){
-        versos = [];
-        alvo.innerHTML = '<span class="at-msg">O Textus Receptus existe só para o Novo Testamento. No Antigo, escolha "Original" para ver o hebraico.</span>';
-        return;
-      }
-
       if(cur.modo === "pt"){
-        versos = (portugueseBible[cur.livro].chapters[cur.cap - 1] || []).map((t, i) => ({n:i + 1, t}));
+        versos = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).map((t,i) => ({n:i+1, t}));
       }else{
-        const m = cur.modo === "tr" ? await mapaTR(code) : await mapaOriginal(code, test === "OT");
+        const m = await mapaOriginal(code, test === "OT");
         versos = [];
-        if(m) for(const [k, t] of m){
-          const [c, v] = k.split(":").map(Number);
+        if(m) for(const [k,t] of m){
+          const [c,v] = k.split(":").map(Number);
           if(c === cur.cap) versos.push({n:v, t});
         }
-        versos.sort((a, b) => a.n - b.n);
+        versos.sort((a,b) => a.n - b.n);
       }
-
       const rtl = cur.modo === "or" && test === "OT";
       alvo.innerHTML = versos.length ? versos.map(v =>
         '<button type="button" class="at-v" data-n="' + v.n + '"' + (rtl ? ' dir="rtl"' : '') + '><b>' + v.n + '</b><span>' + escapeHTML(v.t) + '</span></button>'
@@ -2915,6 +2872,7 @@ if(painelToggle){
       alvo.innerHTML = '<span class="at-msg">Não foi possível carregar. Verifique a conexão e tente de novo.</span>';
     }
   }
+
  const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 let emBusca = false;
 
@@ -3044,28 +3002,6 @@ async function irPara(l, c, n){
   $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
   $("atModo").addEventListener("change", function(){ cur.modo = this.value; lerVersos(); });
   $("atBusca").addEventListener("input", filtrar);
- function mudarCapitulo(direcao){
-  const total = portugueseBible[cur.livro].chapters.length;
-
-  if(direcao > 0){
-    if(cur.cap < total) cur.cap++;
-    else if(cur.livro < BOOKS.length - 1){ cur.livro++; cur.cap = 1; }
-    else return;
-  }else{
-    if(cur.cap > 1) cur.cap--;
-    else if(cur.livro > 0){ cur.livro--; cur.cap = portugueseBible[cur.livro].chapters.length; }
-    else return;
-  }
-
-  $("atLivro").value = String(cur.livro);
-  preencherCapitulos();
-  if($("atEscopo")) $("atEscopo").value = "cap";
-  $("atBusca").value = "";
-  if(typeof emBusca !== "undefined") emBusca = false;
-  lerVersos();
-}
-$("atAnt").addEventListener("click", function(){ mudarCapitulo(-1); });
-$("atProx").addEventListener("click", function(){ mudarCapitulo(1); });
 $("atEscopo").addEventListener("change", filtrar);
 $("atVersos").addEventListener("click", function(ev){
   const r = ev.target.closest(".at-r");
@@ -3305,5 +3241,6 @@ document.addEventListener("visibilitychange",function(){
 </body>
 </html>
  
+
 
 
