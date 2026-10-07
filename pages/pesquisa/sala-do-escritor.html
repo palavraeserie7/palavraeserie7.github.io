@@ -3057,6 +3057,28 @@ async function irPara(l, c, n){
   $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
   $("atModo").addEventListener("change", function(){ cur.modo = this.value; lerVersos(); });
   $("atBusca").addEventListener("input", filtrar);
+ function mudarCapitulo(direcao){
+  const total = portugueseBible[cur.livro].chapters.length;
+
+  if(direcao > 0){
+    if(cur.cap < total) cur.cap++;
+    else if(cur.livro < BOOKS.length - 1){ cur.livro++; cur.cap = 1; }
+    else return;
+  }else{
+    if(cur.cap > 1) cur.cap--;
+    else if(cur.livro > 0){ cur.livro--; cur.cap = portugueseBible[cur.livro].chapters.length; }
+    else return;
+  }
+
+  $("atLivro").value = String(cur.livro);
+  preencherCapitulos();
+  if($("atEscopo")) $("atEscopo").value = "cap";
+  $("atBusca").value = "";
+  if(typeof emBusca !== "undefined") emBusca = false;
+  lerVersos();
+}
+$("atAnt").addEventListener("click", function(){ mudarCapitulo(-1); });
+$("atProx").addEventListener("click", function(){ mudarCapitulo(1); });
 $("atEscopo").addEventListener("change", filtrar);
 $("atVersos").addEventListener("click", function(ev){
   const r = ev.target.closest(".at-r");
