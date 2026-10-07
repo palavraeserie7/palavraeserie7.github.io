@@ -1512,7 +1512,22 @@ const BOOKS = [
  
 let portugueseBible = null;
 const sourceCache = new Map();
+async function loadPortuguese(){
+  if(portugueseBible) return portugueseBible;
+  const response = await fetch(DATA.portuguese, {cache:"force-cache"});
+  if(!response.ok){
+    throw new Error("Não foi possível carregar Almeida 1911.");
+  }
+  portugueseBible = await response.json();
+  if(!Array.isArray(portugueseBible)){
+    throw new Error("Formato inesperado da Almeida 1911.");
+  }
+  return portugueseBible;
+}
 
+function getTRBookCode(bookCode){
+  return bookCode;
+}
  
 function escapeHTML(value){
   return String(value ?? "")
@@ -2238,7 +2253,7 @@ if(painelToggle){
       if(abrir && aoAbrir) aoAbrir();
     });
   }
-  ligarToggle("bibliaToggle","bibliaToggleAcao","bibliaPainel");
+
   ligarToggle("ateliToggle","ateliToggleAcao","ateliPainel",iniciarAtelie);
 
   /* ---- estado ---- */
@@ -2635,10 +2650,7 @@ async function verificarSessao(opcoes = {}){
     errorBox.style.display = "none";
     app.style.display = "block";
  
-    if(!leitorInicializado){
-      leitorInicializado = true;
-      iniciarBibliaParalela();
-    }
+  
  
     if(!painelGestao.hidden){
       carregarEstatisticasVisitas();
