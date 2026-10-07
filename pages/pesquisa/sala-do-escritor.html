@@ -3040,6 +3040,26 @@ async function irPara(l, c, n){
   $("atLivro").addEventListener("change", function(){ cur.livro = Number(this.value); cur.cap = 1; preencherCapitulos(); lerVersos(); });
   $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
   $("atModo").addEventListener("change", function(){ cur.modo = this.value; lerVersos(); });
+ async function mudarCapitulo(delta){
+  await loadPortuguese();
+  let l = cur.livro, c = cur.cap + delta;
+  if(c < 1){
+    if(l === 0) return;
+    l--; c = portugueseBible[l].chapters.length;
+  }else if(c > portugueseBible[l].chapters.length){
+    if(l === BOOKS.length - 1) return;
+    l++; c = 1;
+  }
+  cur.livro = l; cur.cap = c;
+  $("atLivro").value = String(l);
+  preencherCapitulos();
+  $("atEscopo").value = "cap";
+  $("atBusca").value = "";
+  emBusca = false;
+  lerVersos();
+}
+$("atAnt").addEventListener("click", function(){ mudarCapitulo(-1); });
+$("atProx").addEventListener("click", function(){ mudarCapitulo(1); });
   $("atBusca").addEventListener("input", filtrar);
 $("atEscopo").addEventListener("change", filtrar);
 $("atVersos").addEventListener("click", function(ev){
