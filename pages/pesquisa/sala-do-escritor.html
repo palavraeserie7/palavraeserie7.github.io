@@ -2751,7 +2751,81 @@ if(painelToggle){
     }
   });
 }
-  /* ---- fonte bíblica ---- */
+ /* =====================================================
+   BÍBLIA RECOLHÍVEL + ATELIÊ DE CRIAÇÃO
+===================================================== */
+(function(){
+  const $ = id => document.getElementById(id);
+
+  /* ---- alternância genérica dos painéis ---- */
+  function ligarToggle(btnId, acaoId, painelId, aoAbrir){
+    const btn = $(btnId), acao = $(acaoId), painel = $(painelId);
+    btn.addEventListener("click", function(){
+      const abrir = painel.hidden;
+      painel.hidden = !abrir;
+      btn.setAttribute("aria-expanded", String(abrir));
+      acao.textContent = abrir ? "FECHAR" : "ABRIR";
+      if(abrir && aoAbrir) aoAbrir();
+    });
+  }
+  ligarToggle("bibliaToggle","bibliaToggleAcao","bibliaPainel");
+  ligarToggle("ateliToggle","ateliToggleAcao","ateliPainel",iniciarAtelie);
+
+  /* ---- estado ---- */
+  const CHAVE = "ps_atelie";
+  let st = {r:[], a:null};
+  let cur = {livro:0, cap:1, modo:"pt"};
+  let sel = new Set(), versos = [], iniciado = false, timer = null;
+
+  function carregarSalvo(){
+    try{
+      const s = JSON.parse(localStorage.getItem(CHAVE) || "null");
+      if(s && Array.isArray(s.r)) st = s;
+    }catch(e){}
+    if(!st.r.length) criarRascunho(true);
+    if(!st.r.some(x => x.id === st.a)) st.a = st.r[0].id;
+  }
+  function gravar(){
+    try{ localStorage.setItem(CHAVE, JSON.stringify(st)); }catch(e){}
+    $("atSalvo").textContent = "Salvo às " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  }
+  const ativo = () => st.r.find(x => x.id === st.a);
+
+  function criarRascunho(silencioso){
+    const d = {id:String(Date.now()), titulo:"", texto:""};
+    st.r.unshift(d); st.a = d.id;
+    if(!silencioso){ gravar(); desenharRascunhos(); mostrarRascunho(); }
+  }
+  function desenharRascunhos(){
+    $("atRasc").innerHTML = st.r.map(r =>
+      '<option value="' + r.id + '">' + escapeHTML(r.titulo || "Sem título") + '</option>').join("");
+    $("atRasc").value = st.a;
+  }
+  function mostrarRascunho(){
+    const d = ativo();
+    $("atTitulo").value = d.titulo;
+    $("atTexto").value = d.texto;
+    contar();
+  }
+  function contar(){
+    const t = $("atTexto").value.trim();
+    const p = t ? t.split(/\s+/).length : 0;
+    const min = Math.max(1, Math.round(p / 130));
+    $("atContagem").textContent = p + " palavras" + (p ? " · cerca de " + min + " min de fala" : "");
+  }
+  function agendarGravacao(){
+    const d = ativo();
+    d.titulo = $("atTitulo").value;
+    d.texto = $("atTexto").value;
+    contar();
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      gravar();
+      const o = $("atRasc").querySelector('option[value="' + d.id + '"]');
+      if(o) o.textContent = d.titulo || "Sem título";
+    }, 500);
+  }
+ /* ---- fonte bíblica ---- */
   function rotuloVersao(){
     const t = BOOKS[cur.livro][2];
     if(cur.modo === "pt") return "Almeida 1911";
