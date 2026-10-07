@@ -1110,6 +1110,9 @@ main{
 .at-foco .at-box{box-shadow:none;border:0;background:transparent;max-width:860px;margin:auto}
 .at-grid.foco-grid{display:block;margin:0}
 .at-grid.foco-grid .at-fontes{display:none}
+.at-r{display:block;text-align:left;width:100%;border:1px solid var(--b);border-radius:6px;background:var(--i);color:var(--t);padding:10px 12px;cursor:pointer;font:14px/1.6 Georgia,"Times New Roman",serif;transition:.15s}
+.at-r:hover{border-color:var(--a)}
+.at-r small{display:block;color:var(--a);font:700 11px "Segoe UI",Arial,sans-serif;margin-bottom:3px}
 </style>
 </head>
  
@@ -1316,7 +1319,16 @@ main{
           <option value="or">Original</option>
         </select>
       </div>
-      <input id="atBusca" class="at-in" type="search" placeholder="Filtrar palavra neste capítulo" aria-label="Filtrar versículos">
+     <div class="at-row">
+  <input id="atBusca" class="at-in at-grow" type="search" placeholder="Buscar palavra" aria-label="Buscar versículos">
+  <select id="atEscopo" class="at-sel" aria-label="Onde buscar">
+    <option value="cap">Neste capítulo</option>
+    <option value="livro">Neste livro</option>
+    <option value="ot">Antigo Testamento</option>
+    <option value="nt">Novo Testamento</option>
+    <option value="all">Bíblia toda</option>
+  </select>
+</div>
       <div id="atVersos" class="at-versos"><span class="at-msg">Abra o ateliê para carregar o texto.</span></div>
       <div class="at-bandeja">
         <span id="atRef">Toque nos versículos para selecioná-los</span>
@@ -2860,12 +2872,79 @@ if(painelToggle){
     }
   }
 
-  function filtrar(){
-    const q = $("atBusca").value.trim().toLowerCase();
+ const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+let emBusca = false;
+
+function filtrar(){
+  const q = norm($("atBusca").value.trim());
+  const escopo = $("atEscopo").value;
+
+  if(escopo === "cap"){
+    if(emBusca){ emBusca = false; lerVersos(); return; }
     document.querySelectorAll("#atVersos .at-v").forEach(b => {
-      b.hidden = q && !b.textContent.toLowerCase().includes(q);
+      b.hidden = q && !norm(b.textContent).includes(q);
+    });
+    return;
+  }
+  buscarGlobal(q, escopo);
+}
+
+async function buscarGlobal(q, escopo){
+  const alvo = $("atVersos");
+  emBusca = true;
+
+  if(q.length < 3){
+    alvo.innerHTML = '<span class="at-msg">Digite ao menos 3 letras para buscar.</span>';
+    return;
+  }
+
+  await loadPortuguese();
+  const achados = [];
+  let total = 0;
+
+  for(let l = 0; l < BOOKS.length; l++){
+    const t = BOOKS[l][2];
+    if(escopo === "ot" && t !== "OT") continue;
+    if(escopo === "nt" && t !== "NT") continue;
+    if(escopo === "livro" && l !== cur.livro) continue;
+
+    portugueseBible[l].chapters.forEach(function(cap, ci){
+      cap.forEach(function(txt, vi){
+        if(norm(txt).includes(q)){
+          total++;
+          if(achados.length < 100) achados.push({l:l, c:ci+1, n:vi+1, txt:txt});
+        }
+      });
     });
   }
+
+  if(!total){
+    alvo.innerHTML = '<span class="at-msg">Nenhum versículo encontrado com essa palavra.</span>';
+    return;
+  }
+
+  alvo.innerHTML =
+    '<span class="at-msg">' + total + ' resultado' + (total === 1 ? '' : 's') +
+    (total > 100 ? ' · mostrando os 100 primeiros. Restrinja o alcance para refinar.' : '') +
+    ' · busca na Almeida 1911</span>' +
+    achados.map(function(a){
+      return '<button type="button" class="at-r" data-l="' + a.l + '" data-c="' + a.c + '" data-n="' + a.n + '">' +
+        '<small>' + escapeHTML(BOOKS[a.l][1]) + ' ' + a.c + ':' + a.n + '</small>' +
+        escapeHTML(a.txt) + '</button>';
+    }).join("");
+}
+
+async function irPara(l, c, n){
+  cur.livro = l; cur.cap = c;
+  $("atLivro").value = String(l);
+  preencherCapitulos();
+  $("atEscopo").value = "cap";
+  $("atBusca").value = "";
+  emBusca = false;
+  await lerVersos();
+  const b = document.querySelector('#atVersos .at-v[data-n="' + n + '"]');
+  if(b){ b.click(); b.scrollIntoView({block:"center"}); }
+}
 
   function intervalos(ns){
     const out = []; let ini = ns[0], ant = ns[0];
@@ -2922,7 +3001,11 @@ if(painelToggle){
   $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
   $("atModo").addEventListener("change", function(){ cur.modo = this.value; lerVersos(); });
   $("atBusca").addEventListener("input", filtrar);
-
+$("atEscopo").addEventListener("change", filtrar);
+$("atVersos").addEventListener("click", function(ev){
+  const r = ev.target.closest(".at-r");
+  if(r) irPara(Number(r.dataset.l), Number(r.dataset.c), Number(r.dataset.n));
+});
   $("atVersos").addEventListener("click", function(ev){
     const b = ev.target.closest(".at-v");
     if(!b) return;
