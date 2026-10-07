@@ -1069,6 +1069,47 @@ main{
   .bible-controls{padding:16px}
   .parallel-note{padding-left:18px;padding-right:18px}
 }
+ /* ===== ATELIÊ DE CRIAÇÃO ===== */
+.at-grid{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:18px;margin:14px 0 6px}
+@media(max-width:900px){.at-grid{grid-template-columns:1fr}}
+.at-box{border:1px solid var(--b);border-radius:var(--radius);background:linear-gradient(145deg,rgba(23,36,58,.98),rgba(17,27,48,.98));box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.at-box h3{margin:0;font-size:13px;font-weight:700;letter-spacing:1.4px;color:var(--muted)}
+.at-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.at-row>*{min-width:0}
+.at-sel,.at-in{height:38px;border:1px solid var(--b);border-radius:5px;background:var(--bg);color:var(--t);padding:0 10px;font:13px "Segoe UI",Arial,sans-serif}
+.at-sel:focus,.at-in:focus{outline:none;border-color:var(--a)}
+.at-grow{flex:1 1 130px}
+.at-btn{height:38px;padding:0 14px;border:1px solid #315071;border-radius:5px;background:var(--i);color:var(--t);font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:.2s}
+.at-btn:hover:not(:disabled){border-color:var(--a);background:#14253e}
+.at-btn:disabled{opacity:.45;cursor:default}
+.at-btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.at-btn.gold:hover:not(:disabled){background:var(--brass-deep);border-color:var(--brass-deep)}
+.at-versos{max-height:430px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
+.at-v{display:flex;gap:10px;text-align:left;width:100%;border:1px solid var(--b);border-radius:6px;background:var(--i);color:var(--t);padding:10px 12px;cursor:pointer;font:14px/1.6 Georgia,"Times New Roman",serif;transition:.15s}
+.at-v:hover{border-color:#4a6a90}
+.at-v b{flex:0 0 auto;color:var(--a);font:700 11px "Segoe UI",Arial,sans-serif;padding-top:4px}
+.at-v.on{background:var(--paper-card);color:var(--ink);border-color:var(--brass);box-shadow:inset 4px 0 0 var(--brass)}
+.at-v.on b{color:var(--brass-deep)}
+.at-v[dir=rtl]{text-align:right;flex-direction:row-reverse;font-size:17px}
+.at-bandeja{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px dashed var(--brass);border-radius:6px;color:var(--paper-line);font-size:12px}
+.at-bandeja strong{color:#fffdf6;font-family:Georgia,serif;font-size:15px}
+.at-msg{color:var(--muted);font-size:12px;line-height:1.6}
+.at-editor{background:var(--paper-card);border-color:var(--paper-line);color:var(--ink)}
+.at-editor h3{color:var(--ink-soft)}
+.at-titulo{width:100%;height:auto;border:0;border-bottom:1px solid var(--paper-line);border-radius:0;background:transparent;color:var(--ink);padding:6px 2px 12px;font:600 28px/1.25 Georgia,"Times New Roman",serif}
+.at-titulo:focus{outline:none;border-color:var(--brass)}
+.at-titulo::placeholder{color:#b3a583}
+.at-texto{width:100%;min-height:440px;resize:vertical;border:0;background:transparent;color:var(--ink);padding:4px 2px;font:18px/1.95 Georgia,"Times New Roman",serif}
+.at-texto:focus{outline:none}
+.at-editor .at-sel{background:#fffdf6;border-color:var(--paper-line);color:var(--ink)}
+.at-editor .at-btn{background:#fffdf6;border-color:var(--paper-line);color:var(--ink)}
+.at-editor .at-btn:hover:not(:disabled){background:var(--brass-wash);border-color:var(--brass)}
+.at-editor .at-btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.at-rodape{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--paper-line);padding-top:12px;color:var(--ink-soft);font-size:12px}
+.at-foco{position:fixed;inset:0;z-index:60;background:var(--paper-card);overflow:auto;padding:28px min(8vw,120px)}
+.at-foco .at-box{box-shadow:none;border:0;background:transparent;max-width:860px;margin:auto}
+.at-grid.foco-grid{display:block;margin:0}
+.at-grid.foco-grid .at-fontes{display:none}
 </style>
 </head>
  
@@ -1254,6 +1295,78 @@ main{
  
 </div>
  
+<button id="ateliToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="ateliPainel">
+  <span>
+    <span class="panel-toggle-title">Ateliê de criação</span>
+    <span class="panel-toggle-sub">Escreva sermões, devocionais e roteiros com os versículos a um clique.</span>
+  </span>
+  <span id="ateliToggleAcao" class="panel-toggle-action">ABRIR</span>
+</button>
+
+<div id="ateliPainel" hidden>
+  <div class="at-grid" id="atGrid">
+
+    <div class="at-box at-fontes">
+      <h3>FONTE BÍBLICA</h3>
+      <div class="at-row">
+        <select id="atLivro" class="at-sel at-grow" aria-label="Livro"></select>
+        <select id="atCap" class="at-sel" style="width:76px" aria-label="Capítulo"></select>
+        <select id="atModo" class="at-sel" aria-label="Texto">
+          <option value="pt">Português</option>
+          <option value="or">Original</option>
+        </select>
+      </div>
+      <input id="atBusca" class="at-in" type="search" placeholder="Filtrar palavra neste capítulo" aria-label="Filtrar versículos">
+      <div id="atVersos" class="at-versos"><span class="at-msg">Abra o ateliê para carregar o texto.</span></div>
+      <div class="at-bandeja">
+        <span id="atRef">Toque nos versículos para selecioná-los</span>
+        <span style="margin-left:auto" class="at-row">
+          <button id="atLimpar" class="at-btn" type="button">LIMPAR</button>
+          <button id="atInserir" class="at-btn gold" type="button" disabled>INSERIR NO TEXTO</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="at-box at-editor" id="atEditor">
+      <div class="at-row">
+        <select id="atRasc" class="at-sel at-grow" aria-label="Rascunhos"></select>
+        <button id="atNovo" class="at-btn" type="button">NOVO</button>
+        <button id="atExcluir" class="at-btn" type="button">EXCLUIR</button>
+      </div>
+      <input id="atTitulo" class="at-titulo at-in" type="text" placeholder="Título da mensagem" aria-label="Título">
+      <div class="at-row">
+        <select id="atModelo" class="at-sel at-grow" aria-label="Modelo de estrutura">
+          <option value="sermao">Sermão em 3 pontos</option>
+          <option value="devocional">Devocional diário</option>
+          <option value="post">Post para redes</option>
+          <option value="serie">Episódio de série</option>
+        </select>
+        <button id="atAplicar" class="at-btn" type="button">APLICAR ESTRUTURA</button>
+      </div>
+      <textarea id="atTexto" class="at-texto" placeholder="Comece a escrever. Selecione versículos ao lado e insira-os onde o cursor estiver." aria-label="Texto"></textarea>
+      <div class="at-rodape">
+        <span id="atContagem">0 palavras</span>
+        <span id="atSalvo">—</span>
+        <span class="at-row">
+          <button id="atCopiar" class="at-btn" type="button">COPIAR</button>
+          <button id="atBaixar" class="at-btn" type="button">BAIXAR .MD</button>
+          <button id="atFoco" class="at-btn gold" type="button">MODO FOCO</button>
+        </span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<button id="bibliaToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="bibliaPainel">
+  <span>
+    <span class="panel-toggle-title">Bíblia paralela</span>
+    <span class="panel-toggle-sub">Leitura de consulta: Hebraico, Grego e Português por versículo.</span>
+  </span>
+  <span id="bibliaToggleAcao" class="panel-toggle-action">ABRIR</span>
+</button>
+
+<div id="bibliaPainel" hidden>
 <div id="biblia-paralela" class="section-title">BÍBLIA PARALELA</div>
  
 <section class="parallel-wrap">
@@ -1337,7 +1450,7 @@ main{
   </div>
  
 </section>
- 
+ </div>
 <section class="info">
   <div class="info-title">SOBRE ESTA ÁREA</div>
   <p>
@@ -2620,7 +2733,257 @@ if(painelToggle){
     }
   });
 }
- 
+/* =====================================================
+   BÍBLIA RECOLHÍVEL + ATELIÊ DE CRIAÇÃO
+===================================================== */
+(function(){
+  const $ = id => document.getElementById(id);
+
+  /* ---- alternância genérica dos painéis ---- */
+  function ligarToggle(btnId, acaoId, painelId, aoAbrir){
+    const btn = $(btnId), acao = $(acaoId), painel = $(painelId);
+    btn.addEventListener("click", function(){
+      const abrir = painel.hidden;
+      painel.hidden = !abrir;
+      btn.setAttribute("aria-expanded", String(abrir));
+      acao.textContent = abrir ? "FECHAR" : "ABRIR";
+      if(abrir && aoAbrir) aoAbrir();
+    });
+  }
+  ligarToggle("bibliaToggle","bibliaToggleAcao","bibliaPainel");
+  ligarToggle("ateliToggle","ateliToggleAcao","ateliPainel",iniciarAtelie);
+
+  /* ---- estado ---- */
+  const CHAVE = "ps_atelie";
+  let st = {r:[], a:null};
+  let cur = {livro:0, cap:1, modo:"pt"};
+  let sel = new Set(), versos = [], iniciado = false, timer = null;
+
+  function carregarSalvo(){
+    try{
+      const s = JSON.parse(localStorage.getItem(CHAVE) || "null");
+      if(s && Array.isArray(s.r)) st = s;
+    }catch(e){}
+    if(!st.r.length) criarRascunho(true);
+    if(!st.r.some(x => x.id === st.a)) st.a = st.r[0].id;
+  }
+  function gravar(){
+    try{ localStorage.setItem(CHAVE, JSON.stringify(st)); }catch(e){}
+    $("atSalvo").textContent = "Salvo às " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  }
+  const ativo = () => st.r.find(x => x.id === st.a);
+
+  function criarRascunho(silencioso){
+    const d = {id:String(Date.now()), titulo:"", texto:""};
+    st.r.unshift(d); st.a = d.id;
+    if(!silencioso){ gravar(); desenharRascunhos(); mostrarRascunho(); }
+  }
+  function desenharRascunhos(){
+    $("atRasc").innerHTML = st.r.map(r =>
+      '<option value="' + r.id + '">' + escapeHTML(r.titulo || "Sem título") + '</option>').join("");
+    $("atRasc").value = st.a;
+  }
+  function mostrarRascunho(){
+    const d = ativo();
+    $("atTitulo").value = d.titulo;
+    $("atTexto").value = d.texto;
+    contar();
+  }
+  function contar(){
+    const t = $("atTexto").value.trim();
+    const p = t ? t.split(/\s+/).length : 0;
+    const min = Math.max(1, Math.round(p / 130));
+    $("atContagem").textContent = p + " palavras" + (p ? " · cerca de " + min + " min de fala" : "");
+  }
+  function agendarGravacao(){
+    const d = ativo();
+    d.titulo = $("atTitulo").value;
+    d.texto = $("atTexto").value;
+    contar();
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      gravar();
+      const o = $("atRasc").querySelector('option[value="' + d.id + '"]');
+      if(o) o.textContent = d.titulo || "Sem título";
+    }, 500);
+  }
+
+  /* ---- fonte bíblica ---- */
+  function rotuloVersao(){
+    const t = BOOKS[cur.livro][2];
+    if(cur.modo === "pt") return "Almeida 1911";
+    return t === "OT" ? "WLC" : "Nestle 1904";
+  }
+
+  async function mapaOriginal(code, ot){
+    const url = (ot ? DATA.wlc : DATA.greek) + code + ".txt";
+    if(sourceCache.get(url)) return sourceCache.get(url);
+    const r = await fetch(url, {cache:"force-cache"});
+    if(!r.ok) return null;
+    const m = new Map();
+    for(const l of (await r.text()).split(/\r?\n/)){
+      const t = l.indexOf("\t");
+      if(t < 0) continue;
+      const p = l.slice(0,t).split(".");
+      m.set(p[1] + ":" + p[2], l.slice(t+1).trim());
+    }
+    sourceCache.set(url, m);
+    return m;
+  }
+
+  async function lerVersos(){
+    const alvo = $("atVersos");
+    alvo.innerHTML = '<span class="at-msg">Carregando…</span>';
+    sel.clear(); atualizarBandeja();
+    try{
+      await loadPortuguese();
+      const [code,,test] = BOOKS[cur.livro];
+      if(cur.modo === "pt"){
+        versos = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).map((t,i) => ({n:i+1, t}));
+      }else{
+        const m = await mapaOriginal(code, test === "OT");
+        versos = [];
+        if(m) for(const [k,t] of m){
+          const [c,v] = k.split(":").map(Number);
+          if(c === cur.cap) versos.push({n:v, t});
+        }
+        versos.sort((a,b) => a.n - b.n);
+      }
+      const rtl = cur.modo === "or" && test === "OT";
+      alvo.innerHTML = versos.length ? versos.map(v =>
+        '<button type="button" class="at-v" data-n="' + v.n + '"' + (rtl ? ' dir="rtl"' : '') + '><b>' + v.n + '</b><span>' + escapeHTML(v.t) + '</span></button>'
+      ).join("") : '<span class="at-msg">Nenhum texto encontrado nesta passagem.</span>';
+      filtrar();
+    }catch(e){
+      console.error(e);
+      alvo.innerHTML = '<span class="at-msg">Não foi possível carregar. Verifique a conexão e tente de novo.</span>';
+    }
+  }
+
+  function filtrar(){
+    const q = $("atBusca").value.trim().toLowerCase();
+    document.querySelectorAll("#atVersos .at-v").forEach(b => {
+      b.hidden = q && !b.textContent.toLowerCase().includes(q);
+    });
+  }
+
+  function intervalos(ns){
+    const out = []; let ini = ns[0], ant = ns[0];
+    for(let i = 1; i <= ns.length; i++){
+      if(ns[i] === ant + 1){ ant = ns[i]; continue; }
+      out.push(ini === ant ? String(ini) : ini + "–" + ant);
+      ini = ant = ns[i];
+    }
+    return out.join(", ");
+  }
+  const referencia = () => BOOKS[cur.livro][1] + " " + cur.cap + ":" + intervalos([...sel].sort((a,b) => a-b));
+
+  function atualizarBandeja(){
+    $("atInserir").disabled = !sel.size;
+    $("atRef").innerHTML = sel.size ? '<strong>' + escapeHTML(referencia()) + '</strong>' : "Toque nos versículos para selecioná-los";
+  }
+
+  function inserirNoCursor(texto){
+    const ta = $("atTexto");
+    const ini = ta.selectionStart, fim = ta.selectionEnd;
+    const antes = ta.value.slice(0, ini), depois = ta.value.slice(fim);
+    const pre = antes && !antes.endsWith("\n\n") ? (antes.endsWith("\n") ? "\n" : "\n\n") : "";
+    const pos = depois && !depois.startsWith("\n") ? "\n\n" : "";
+    ta.value = antes + pre + texto + pos + depois;
+    const novoPos = (antes + pre + texto + pos).length;
+    ta.focus(); ta.setSelectionRange(novoPos, novoPos);
+    agendarGravacao();
+  }
+
+  const MODELOS = {
+    sermao: "## Texto base\n\n\n## Introdução\n\n\n## Ponto 1\n\n\n## Ponto 2\n\n\n## Ponto 3\n\n\n## Aplicação\n\n\n## Chamado final\n",
+    devocional: "## Versículo do dia\n\n\n## O que o texto diz\n\n\n## O que ele significa para hoje\n\n\n## Oração\n",
+    post: "**Gancho (uma frase que prende)**\n\n\n**Versículo**\n\n\n**Reflexão em 3 linhas**\n\n\n**Convite para comentar**\n",
+    serie: "## Abertura\n\n\n## Contexto do texto\n\n\n## Cena central\n\n\n## Virada\n\n\n## Mensagem final\n"
+  };
+
+  function iniciarAtelie(){
+    if(iniciado) return;
+    iniciado = true;
+    carregarSalvo();
+    $("atLivro").innerHTML = BOOKS.map((b,i) => '<option value="' + i + '">' + escapeHTML(b[1]) + '</option>').join("");
+    desenharRascunhos(); mostrarRascunho();
+    loadPortuguese().then(function(){ preencherCapitulos(); lerVersos(); });
+  }
+  function preencherCapitulos(){
+    const n = portugueseBible[cur.livro].chapters.length;
+    $("atCap").innerHTML = Array.from({length:n}, (_,i) => '<option value="' + (i+1) + '">' + (i+1) + '</option>').join("");
+    if(cur.cap > n) cur.cap = n;
+    $("atCap").value = String(cur.cap);
+  }
+
+  /* ---- eventos ---- */
+  $("atLivro").addEventListener("change", function(){ cur.livro = Number(this.value); cur.cap = 1; preencherCapitulos(); lerVersos(); });
+  $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
+  $("atModo").addEventListener("change", function(){ cur.modo = this.value; lerVersos(); });
+  $("atBusca").addEventListener("input", filtrar);
+
+  $("atVersos").addEventListener("click", function(ev){
+    const b = ev.target.closest(".at-v");
+    if(!b) return;
+    const n = Number(b.dataset.n);
+    if(sel.has(n)){ sel.delete(n); b.classList.remove("on"); } else { sel.add(n); b.classList.add("on"); }
+    atualizarBandeja();
+  });
+  $("atLimpar").addEventListener("click", function(){
+    sel.clear();
+    document.querySelectorAll("#atVersos .at-v.on").forEach(b => b.classList.remove("on"));
+    atualizarBandeja();
+  });
+  $("atInserir").addEventListener("click", function(){
+    const ordem = [...sel].sort((a,b) => a - b);
+    const texto = ordem.map(n => versos.find(v => v.n === n).t).join(" ");
+    inserirNoCursor("> *“" + texto + "”*\n> — **" + referencia() + "** (" + rotuloVersao() + ")");
+    $("atLimpar").click();
+  });
+
+  $("atTitulo").addEventListener("input", agendarGravacao);
+  $("atTexto").addEventListener("input", agendarGravacao);
+  $("atRasc").addEventListener("change", function(){ st.a = this.value; gravar(); mostrarRascunho(); });
+  $("atNovo").addEventListener("click", function(){ criarRascunho(false); $("atTitulo").focus(); });
+  $("atExcluir").addEventListener("click", function(){
+    if(!window.confirm("Excluir este rascunho? Não dá para desfazer.")) return;
+    st.r = st.r.filter(x => x.id !== st.a);
+    if(!st.r.length) criarRascunho(true);
+    st.a = st.r[0].id; gravar(); desenharRascunhos(); mostrarRascunho();
+  });
+  $("atAplicar").addEventListener("click", function(){ inserirNoCursor(MODELOS[$("atModelo").value]); });
+
+  $("atCopiar").addEventListener("click", function(){
+    const d = ativo();
+    const t = (d.titulo ? "# " + d.titulo + "\n\n" : "") + d.texto;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(
+      function(){ $("atSalvo").textContent = "Copiado."; },
+      function(){ $("atTexto").select(); $("atSalvo").textContent = "Selecionado: use Ctrl+C."; }
+    );
+  });
+  $("atBaixar").addEventListener("click", function(){
+    const d = ativo();
+    const blob = new Blob([(d.titulo ? "# " + d.titulo + "\n\n" : "") + d.texto], {type:"text/markdown;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = ((d.titulo || "rascunho").toLowerCase().replace(/[^a-z0-9à-ú]+/gi, "-").replace(/^-|-$/g, "") || "rascunho") + ".md";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  function alternarFoco(){
+    const on = !$("ateliPainel").classList.contains("at-foco");
+    $("ateliPainel").classList.toggle("at-foco", on);
+    $("atGrid").classList.toggle("foco-grid", on);
+    $("atFoco").textContent = on ? "SAIR DO FOCO" : "MODO FOCO";
+    if(on) $("atTexto").focus();
+  }
+  $("atFoco").addEventListener("click", alternarFoco);
+  document.addEventListener("keydown", function(ev){
+    if(ev.key === "Escape" && $("ateliPainel").classList.contains("at-foco")) alternarFoco();
+  });
+})(); 
 function prepararNovaVerificacao(){
   app.style.display = "none";
   errorBox.style.display = "none";
