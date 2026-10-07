@@ -2827,11 +2827,6 @@ if(painelToggle){
   }
 
   /* ---- fonte bíblica ---- */
-  function rotuloVersao(){
-    const t = BOOKS[cur.livro][2];
-    if(cur.modo === "pt") return "Almeida 1911";
-    return t === "OT" ? "WLC" : "Nestle 1904";
-  }
 
   async function mapaOriginal(code, ot){
     const url = (ot ? DATA.wlc : DATA.greek) + code + ".txt";
@@ -2849,39 +2844,78 @@ if(painelToggle){
     return m;
   }
 
-  async function lerVersos(){
-    const alvo = $("atVersos");
-    alvo.innerHTML = '<span class="at-msg">Carregando…</span>';
-    sel.clear(); atualizarBandeja();
-    try{
-      await loadPortuguese();
-      const [code,,test] = BOOKS[cur.livro];
-      if(cur.modo === "pt"){
-        versos = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).map((t,i) => ({n:i+1, t}));
-      }else{
-        const m = await mapaOriginal(code, test === "OT");
-        versos = [];
-        if(m) for(const [k,t] of m){
-          const [c,v] = k.split(":").map(Number);
-          if(c === cur.cap) versos.push({n:v, t});
-        }
-        versos.sort((a,b) => a.n - b.n);
-      }
-      const rtl = cur.modo === "or" && test === "OT";
-      alvo.innerHTML = versos.length ? versos.map(v =>
-        '<button type="button" class="at-v" data-n="' + v.n + '"' + (rtl ? ' dir="rtl"' : '') + '><b>' + v.n + '</b><span>' + escapeHTML(v.t) + '</span></button>'
-      ).join("") : '<span class="at-msg">Nenhum texto encontrado nesta passagem.</span>';
-      filtrar();
-    }catch(e){
-      console.error(e);
-      alvo.innerHTML = '<span class="at-msg">Não foi possível carregar. Verifique a conexão e tente de novo.</span>';
-    }
-  }
+ function rotuloVersao(){
+  const t = BOOKS[cur.livro][2];
+  if(cur.modo === "pt") return "Almeida 1911";
+  if(cur.modo === "tr") return "Textus Receptus, Scrivener 1894";
+  return t === "OT" ? "WLC" : "Nestle 1904";
+}
 
- const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+async function mapaTR(code){
+  const livro = getTRBookCode(code);
+  const chave = "tr:" + livro + ":" + cur.cap;
+  if(sourceCache.has(chave)) return sourceCache.get(chave);
+
+  const qtd = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).length;
+  const respostas = await Promise.all(
+    Array.from({length:qtd}, function(_, i){
+      return fetch(DATA.tr + livro + "/" + cur.cap + "/" + (i+1) + ".json", {cache:"force-cache"})
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .catch(function(){ return null; });
+    })
+  );
+
+  const m = new Map();
+  respostas.forEach(function(d, i){
+    const t = d && typeof d.text === "string" ? d.text.trim() : "";
+    if(t) m.set(cur.cap + ":" + (i+1), t);
+  });
+  sourceCache.set(chave, m);
+  return m;
+}
+
+async function lerVersos(){
+  const alvo = $("atVersos");
+  alvo.innerHTML = '<span class="at-msg">Carregando…</span>';
+  sel.clear(); atualizarBandeja();
+  try{
+    await loadPortuguese();
+    const [code,,test] = BOOKS[cur.livro];
+
+    if(cur.modo === "tr" && test === "OT"){
+      versos = [];
+      alvo.innerHTML = '<span class="at-msg">O Textus Receptus existe só para o Novo Testamento. No Antigo, escolha "Original" para ver o hebraico.</span>';
+      return;
+    }
+
+    if(cur.modo === "pt"){
+      versos = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).map((t,i) => ({n:i+1, t}));
+    }else{
+      const m = cur.modo === "tr" ? await mapaTR(code) : await mapaOriginal(code, test === "OT");
+      versos = [];
+      if(m) for(const [k,t] of m){
+        const [c,v] = k.split(":").map(Number);
+        if(c === cur.cap) versos.push({n:v, t});
+      }
+      versos.sort((a,b) => a.n - b.n);
+    }
+
+    const rtl = cur.modo === "or" && test === "OT";
+    alvo.innerHTML = versos.length ? versos.map(v =>
+      '<button type="button" class="at-v" data-n="' + v.n + '"' + (rtl ? ' dir="rtl"' : '') + '><b>' + v.n + '</b><span>' + escapeHTML(v.t) + '</span></button>'
+    ).join("") : '<span class="at-msg">Nenhum texto encontrado nesta passagem.</span>';
+    filtrar();
+  }catch(e){
+    console.error(e);
+    alvo.innerHTML = '<span class="at-msg">Não foi possível carregar. Verifique a conexão e tente de novo.</span>';
+  }
+}
+
+const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 let emBusca = false;
 
 function filtrar(){
+     
   const q = norm($("atBusca").value.trim());
   const escopo = $("atEscopo").value;
 
