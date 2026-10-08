@@ -1,9 +1,6 @@
 
 
-Sala final · HTML
- 
- 
-Sala do escritor · HTML
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1166,6 +1163,27 @@ main{
 .at-a-barra{display:flex;gap:8px;flex-wrap:wrap}
 .at-a-barra button{height:38px;padding:0 14px;border:1px solid var(--paper-line);border-radius:5px;background:#fffdf6;color:var(--ink);font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer}
 .at-a-barra .at-a-novo{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+/* ----- Ateliê v2 ----- */
+.at-a-acoes{flex-wrap:wrap;justify-content:flex-end;max-width:340px}
+.at-a-acoes button[data-act^="del"]{margin-left:12px;color:#a14747}
+.at-a-acoes button[data-act="addV"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.at-ativo{box-shadow:0 0 0 2px var(--brass)}
+.at-destino{font-size:12px;color:var(--paper-line);padding:0 2px}
+.at-destino strong{color:#fffdf6;font-family:Georgia,serif;font-size:14px}
+
+.at-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:95;display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:8px;background:#2c2418;color:#fffdf6;font-size:13px;box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.at-toast[hidden]{display:none}
+.at-toast button{border:1px solid var(--brass);border-radius:4px;background:transparent;color:#f1d58a;font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 10px;cursor:pointer}
+
+#atPulpito{position:fixed;inset:0;z-index:90;background:#0b1428;color:#f4eedd;overflow:auto;padding:76px min(10vw,160px) 90px}
+#atPulpito[hidden]{display:none}
+.pul-barra{position:fixed;top:14px;right:18px;display:flex;gap:8px}
+.pul-barra button{height:38px;padding:0 14px;border:1px solid #315071;border-radius:5px;background:#0d172b;color:#dbe7f5;font-weight:700;cursor:pointer}
+#atPulpitoTexto{max-width:980px;margin:auto;font-family:Georgia,"Times New Roman",serif;line-height:1.7}
+#atPulpitoTexto h1{font-size:1.5em;color:#fff;margin:0 0 .7em}
+#atPulpitoTexto h2{font-size:1.1em;color:#e0b95a;margin:1.6em 0 .4em;letter-spacing:.5px}
+#atPulpitoTexto p{margin:.3em 0;white-space:pre-wrap}
+#atPulpitoTexto blockquote{margin:.9em 0;padding:.2em 0 .2em 1em;border-left:4px solid #9c7a32;color:#fff;font-style:italic}
 </style>
 </head>
  
@@ -2555,17 +2573,25 @@ async function irPara(l, c, n){
     $("atRef").innerHTML = sel.size ? '<strong>' + escapeHTML(referencia()) + '</strong>' : "Toque nos versículos para selecioná-los";
   }
  
-  function inserirNoCursor(texto){
-    const ta = $("atTexto");
-    const ini = ta.selectionStart, fim = ta.selectionEnd;
-    const antes = ta.value.slice(0, ini), depois = ta.value.slice(fim);
-    const pre = antes && !antes.endsWith("\n\n") ? (antes.endsWith("\n") ? "\n" : "\n\n") : "";
-    const pos = depois && !depois.startsWith("\n") ? "\n\n" : "";
+function inserirNoCursor(texto){
+  const ta = $("atTexto");
+  const ini = ta.selectionStart, fim = ta.selectionEnd;
+  const antes = ta.value.slice(0, ini), depois = ta.value.slice(fim);
+  const pre = antes && !antes.endsWith("\n\n") ? (antes.endsWith("\n") ? "\n" : "\n\n") : "";
+  const pos = depois && !depois.startsWith("\n") ? "\n\n" : "";
+
+  ta.focus();
+  ta.setSelectionRange(ini, fim);
+  let ok = false;
+  try{ ok = document.execCommand("insertText", false, pre + texto + pos); }catch(e){}
+
+  if(!ok){
     ta.value = antes + pre + texto + pos + depois;
-    const novoPos = (antes + pre + texto + pos).length;
-    ta.focus(); ta.setSelectionRange(novoPos, novoPos);
-    agendarGravacao();
+    const p = (antes + pre + texto + pos).length;
+    ta.setSelectionRange(p, p);
   }
+  agendarGravacao();
+}
  
   const MODELOS = {
     sermao: "## Texto base\n\n\n## Introdução\n\n\n## Ponto 1\n\n\n## Ponto 2\n\n\n## Ponto 3\n\n\n## Aplicação\n\n\n## Chamado final\n",
@@ -2731,11 +2757,11 @@ async function irPara(l, c, n){
         return '<div class="at-a-ponto">' +
           '<div class="at-a-linha"><span class="at-a-num">' + romano(i+1) + '.</span>' +
             campo("p", b.titulo, b.id, "", "", "Ponto principal") +
-            '<span class="at-a-acoes">' + bt("sobe","↑",b.id) + bt("desce","↓",b.id) + bt("delB","EXCLUIR",b.id) + bt("addS","+ SUBTÓPICO",b.id) + '</span></div>' +
+          '<span class="at-a-acoes">' + bt("addV","+ VERSÍCULO",b.id) + bt("addS","+ SUBTÓPICO",b.id) + bt("sobe","↑",b.id) + bt("desce","↓",b.id) + bt("delB","EXCLUIR",b.id) + '</span></div>' +
           b.subs.map(function(s,j){
             return '<div class="at-a-sub"><div class="at-a-linha"><span class="at-a-num">' + (j+1) + '.</span>' +
               campo("s", s.titulo, b.id, s.id, "", "Subtópico") +
-              '<span class="at-a-acoes">' + bt("delS","EXCLUIR",b.id,s.id) + bt("addD","+ DETALHE",b.id,s.id) + '</span></div>' +
+              '<span class="at-a-acoes">' + bt("addV","+ VERSÍCULO",b.id,s.id) + bt("addD","+ DETALHE",b.id,s.id) + bt("delS","EXCLUIR",b.id,s.id) + '</span></div>' +
               s.dets.map(function(x,k){
                 return '<div class="at-a-linha at-a-det"><span class="at-a-num">' + String.fromCharCode(97+k) + ')</span>' +
                   campo("d", x.titulo, b.id, s.id, x.id, "Detalhe ou versículo") +
@@ -2821,7 +2847,7 @@ async function irPara(l, c, n){
         if(j < 0 || j >= a.blocos.length) return;
         const troca = a.blocos[i]; a.blocos[i] = a.blocos[j]; a.blocos[j] = troca;
       }else if(acao === "delB"){
-        if(!window.confirm("Excluir este ponto e tudo que está dentro dele?")) return;
+       
         a.blocos = a.blocos.filter(x => x !== b);
       }else if(acao === "addS"){
         b.subs.push({id:uid(), titulo:"", dets:[]});
@@ -2871,6 +2897,165 @@ async function irPara(l, c, n){
   });
  
   window.addEventListener("resize", function(){ if(modoArvore()) ajustarCampos(); });
+ /* ===== v2: destino do versículo, aviso, desfazer e púlpito ===== */
+
+/* aviso curto na tela, com ação opcional */
+let tTimer = null;
+const tEl = document.createElement("div");
+tEl.className = "at-toast"; tEl.hidden = true; tEl.setAttribute("role","status");
+document.body.appendChild(tEl);
+
+function toast(msg, rotulo, fn){
+  tEl.innerHTML = "";
+  const s = document.createElement("span"); s.textContent = msg; tEl.appendChild(s);
+  if(rotulo){
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = rotulo;
+    b.onclick = function(){ tEl.hidden = true; fn(); };
+    tEl.appendChild(b);
+  }
+  tEl.hidden = false;
+  clearTimeout(tTimer);
+  tTimer = setTimeout(function(){ tEl.hidden = true; }, 8000);
+}
+
+/* faixa "Receberá em..." acima da bandeja + destaque do campo ativo */
+const bandejaEl = document.querySelector(".at-bandeja");
+const destEl = document.createElement("div");
+destEl.className = "at-destino";
+bandejaEl.parentNode.insertBefore(destEl, bandejaEl);
+
+function marcarDestino(){
+  document.querySelectorAll(".at-ativo").forEach(e => e.classList.remove("at-ativo"));
+  if(!modoArvore()){
+    destEl.innerHTML = 'Receberá <strong>no cursor do texto</strong>';
+    return;
+  }
+  const a = arvoreDe(ativo());
+  let nome = "", alvo = null;
+
+  if(noSel && noSel.campo){
+    nome = noSel.campo === "intro" ? "Introdução" : "Conclusão";
+    const t = $("atArvore").querySelector('textarea[data-k="' + noSel.campo + '"]');
+    alvo = t && t.closest(".at-a-livre");
+  }else if(noSel){
+    const i = a.blocos.findIndex(x => x.id === noSel.b);
+    if(i >= 0){
+      nome = "Ponto " + romano(i+1);
+      alvo = $("atArvore").querySelectorAll(".at-a-ponto")[i];
+      if(noSel.s){
+        const j = a.blocos[i].subs.findIndex(x => x.id === noSel.s);
+        if(j >= 0){
+          nome += " › Subtópico " + (j+1);
+          alvo = alvo.querySelectorAll(".at-a-sub")[j];
+        }
+      }
+    }
+  }
+  if(alvo) alvo.classList.add("at-ativo");
+  destEl.innerHTML = nome
+    ? 'Receberá em <strong>' + escapeHTML(nome) + '</strong>'
+    : 'Clique num ponto, ou use <strong>+ VERSÍCULO</strong>';
+}
+new MutationObserver(marcarDestino).observe($("atArvore"), {childList:true});
+$("atArvore").addEventListener("focusin", marcarDestino);
+["atModoTexto","atModoArvore","atNovo","atExcluir"].forEach(function(id){
+  $(id).addEventListener("click", function(){ setTimeout(marcarDestino, 0); });
+});
+$("atRasc").addEventListener("change", function(){ setTimeout(marcarDestino, 0); });
+marcarDestino();
+
+/* + VERSÍCULO e DESFAZER de exclusões (fase de captura: roda antes do tratador antigo) */
+$("atArvore").addEventListener("click", function(ev){
+  const el = ev.target.closest("[data-act]");
+  if(!el) return;
+  const act = el.dataset.act;
+
+  if(act === "addV"){
+    ev.stopPropagation();
+    if(!sel.size){ toast("Selecione primeiro os versículos na lista à esquerda."); return; }
+    noSel = {b:el.dataset.b, s:el.dataset.s || null};
+    $("atInserir").click();
+    return;
+  }
+
+  if(act === "delB" || act === "delS" || act === "delD"){
+    const d = ativo(), snap = JSON.stringify(d.arv);
+    toast("Item excluído.", "DESFAZER", function(){
+      d.arv = JSON.parse(snap); gravar(); desenharArvore(); contar();
+    });
+  }
+}, true);
+
+/* aviso de inserção com DESFAZER */
+$("atInserir").addEventListener("click", function(){
+  if(!sel.size) return;
+  const ref = referencia();
+  const snap = modoArvore() ? JSON.stringify(ativo().arv) : null;
+  setTimeout(function(){
+    if(sel.size) return;                       // nada foi inserido
+    toast("Inserido: " + ref, "DESFAZER", function(){
+      if(snap){
+        ativo().arv = JSON.parse(snap); gravar(); desenharArvore(); contar();
+      }else{
+        $("atTexto").focus(); document.execCommand("undo");
+      }
+    });
+  }, 0);
+}, true);
+
+/* ===== modo púlpito: texto formatado, letra grande, só leitura ===== */
+let zoom = 26;
+const pul = document.createElement("div");
+pul.id = "atPulpito"; pul.hidden = true;
+pul.innerHTML =
+  '<div class="pul-barra">' +
+    '<button type="button" data-z="-2">A−</button>' +
+    '<button type="button" data-z="2">A+</button>' +
+    '<button type="button" data-z="0">FECHAR</button>' +
+  '</div><article id="atPulpitoTexto"></article>';
+document.body.appendChild(pul);
+const pulTxt = pul.querySelector("#atPulpitoTexto");
+
+function md(t){
+  const out = []; let cit = [];
+  const inl = s => escapeHTML(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>");
+  const fecha = () => { if(cit.length){ out.push("<blockquote>" + cit.join("<br>") + "</blockquote>"); cit = []; } };
+  t.split("\n").forEach(function(l){
+    if(/^>\s?/.test(l)){ cit.push(inl(l.replace(/^>\s?/,""))); return; }
+    fecha();
+    if(/^##\s/.test(l)) out.push("<h2>" + inl(l.slice(3)) + "</h2>");
+    else if(l.trim()) out.push("<p>" + inl(l) + "</p>");
+  });
+  fecha();
+  return out.join("");
+}
+
+function abrirPulpito(){
+  const d = ativo();
+  if(!d) return;
+  pulTxt.innerHTML = (d.titulo ? "<h1>" + escapeHTML(d.titulo) + "</h1>" : "") + md(textoAtual());
+  pulTxt.style.fontSize = zoom + "px";
+  pul.hidden = false;
+  pul.scrollTop = 0;
+}
+
+pul.addEventListener("click", function(ev){
+  const b = ev.target.closest("[data-z]");
+  if(!b) return;
+  const z = Number(b.dataset.z);
+  if(z === 0){ pul.hidden = true; return; }
+  zoom = Math.min(56, Math.max(16, zoom + z));
+  pulTxt.style.fontSize = zoom + "px";
+});
+
+$("atFoco").insertAdjacentHTML("beforebegin",
+  '<button id="atPulpitoBtn" class="at-btn" type="button" title="Ver formatado, em letra grande">PÚLPITO</button>');
+$("atPulpitoBtn").addEventListener("click", abrirPulpito);
+
+document.addEventListener("keydown", function(ev){
+  if(ev.key === "Escape" && !pul.hidden){ pul.hidden = true; ev.stopImmediatePropagation(); }
+}, true);
   /* ---- eventos ---- */
   $("atLivro").addEventListener("change", function(){ cur.livro = Number(this.value); cur.cap = 1; preencherCapitulos(); lerVersos(); });
   $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
@@ -3142,4 +3327,4 @@ document.addEventListener("visibilitychange",function(){
  
  
  
-Claude terminou a resposta
+
