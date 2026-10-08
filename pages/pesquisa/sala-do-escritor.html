@@ -2642,10 +2642,14 @@ function inserirNoCursor(texto){
     $("atMTexto").value = m ? m.texto : "";
   }
  
-  $("atAplicar").addEventListener("click", function(){
-    const m = todosModelos().find(x => x.id === $("atModelo").value);
-    if(m) inserirNoCursor(m.texto);
-  });
+ $("atAplicar").addEventListener("click", function(){
+  const m = todosModelos().find(x => x.id === $("atModelo").value);
+  if(!m) return;
+  const primeira = m.texto.trim().split("\n")[0];
+  if($("atTexto").value.includes(primeira) &&
+     !window.confirm("Este texto já tem essa estrutura. Adicionar outra mesmo assim?")) return;
+  inserirNoCursor(m.texto);
+});
   $("atModelos").addEventListener("click", function(){
     const p = $("atModelosPainel");
     p.hidden = !p.hidden;
