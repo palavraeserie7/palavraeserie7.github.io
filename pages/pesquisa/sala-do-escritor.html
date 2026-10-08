@@ -1142,6 +1142,27 @@ main{
 .at-modelos[hidden]{display:none}
 .at-modelos .at-in{background:#fffdf6;border:1px solid var(--paper-line);color:var(--ink)}
 .at-modelos textarea.at-in{height:170px;padding:10px;font:14px/1.6 Georgia,"Times New Roman",serif;resize:vertical}
+.at-modo{display:flex;gap:8px}
+.at-modo .at-btn.on{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.at-arvore{display:flex;flex-direction:column;gap:12px;overflow:auto;max-height:70vh;padding-right:4px}
+.at-arvore[hidden]{display:none}
+.at-foco .at-arvore{max-height:none;flex:1}
+@media(min-width:901px){.at-arvore{flex:1;min-height:0;max-height:none}}
+.at-a-livre{display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-soft)}
+.at-a-livre textarea{min-height:70px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);padding:10px;font:16px/1.7 Georgia,"Times New Roman",serif;resize:vertical}
+.at-a-ponto{border:1px solid var(--paper-line);border-left:4px solid var(--brass);border-radius:6px;background:#fffdf6;padding:12px;display:flex;flex-direction:column;gap:10px}
+.at-a-linha{display:flex;align-items:flex-start;gap:8px}
+.at-a-sub{margin-left:22px;padding-left:12px;border-left:2px solid var(--paper-line);display:flex;flex-direction:column;gap:8px}
+.at-a-det{margin-left:30px}
+.at-a-num{flex:0 0 30px;color:var(--brass-deep);font:700 16px Georgia,serif;padding-top:8px}
+.at-a-in{flex:1;min-width:0;resize:none;overflow:hidden;border:1px solid var(--paper-line);border-radius:5px;background:#fff;color:var(--ink);padding:8px 10px;font:16px/1.6 Georgia,"Times New Roman",serif}
+.at-a-in:focus{outline:none;border-color:var(--brass)}
+.at-a-acoes{display:flex;gap:4px;flex:0 0 auto}
+.at-a-acoes button{height:30px;padding:0 9px;border:1px solid var(--paper-line);border-radius:4px;background:var(--brass-wash);color:var(--brass-deep);font-size:10px;font-weight:700;letter-spacing:.6px;cursor:pointer}
+.at-a-acoes button:hover{border-color:var(--brass)}
+.at-a-barra{display:flex;gap:8px;flex-wrap:wrap}
+.at-a-barra button{height:38px;padding:0 14px;border:1px solid var(--paper-line);border-radius:5px;background:#fffdf6;color:var(--ink);font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer}
+.at-a-barra .at-a-novo{background:var(--brass);border-color:var(--brass);color:#fffdf6}
 </style>
 </head>
  
@@ -1380,7 +1401,11 @@ main{
         <button id="atExcluir" class="at-btn" type="button">EXCLUIR</button>
       </div>
       <input id="atTitulo" class="at-titulo at-in" type="text" placeholder="Título da mensagem" aria-label="Título">
-           <div class="at-row">
+           <div class="at-modo">
+        <button id="atModoTexto" class="at-btn on" type="button">TEXTO LIVRE</button>
+        <button id="atModoArvore" class="at-btn" type="button">ESTRUTURA DINÂMICA</button>
+      </div>
+        <div class="at-row">
         <select id="atModelo" class="at-sel at-grow" aria-label="Modelo de estrutura"></select>
         <button id="atAplicar" class="at-btn" type="button">APLICAR ESTRUTURA</button>
         <button id="atModelos" class="at-btn" type="button">MEUS MODELOS</button>
@@ -1401,7 +1426,8 @@ main{
         </div>
       </div>
       <textarea id="atTexto" class="at-texto" placeholder="Comece a escrever. Selecione versículos ao lado e insira-os onde o cursor estiver." aria-label="Texto"></textarea>
-      <div class="at-rodape">
+      <div id="atArvore" class="at-arvore" hidden></div>
+     <div class="at-rodape">
         <span id="atContagem">0 palavras</span>
         <span id="atSalvo">—</span>
         <span class="at-row">
@@ -2639,7 +2665,209 @@ async function irPara(l, c, n){
     if(cur.cap > n) cur.cap = n;
     $("atCap").value = String(cur.cap);
   }
+  /* ===== ESTRUTURA HOMILÉTICA DINÂMICA ===== */
+  let noSel = null, timerA = null;
+  const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36);
+  const ROMANOS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
+  const romano = n => ROMANOS[n-1] || String(n);
+  const novoBloco = () => ({id:uid(), titulo:"", subs:[{id:uid(), titulo:"", dets:[]}]});
+  const modoArvore = () => { const d = ativo(); return !!d && d.modo === "arvore"; };
 
+  function arvoreDe(d){
+    if(!d.arv) d.arv = {intro:"", blocos:[novoBloco()], conc:""};
+    return d.arv;
+  }
+
+  function arvoreParaTexto(d){
+    const a = d.arv;
+    if(!a) return "";
+    const L = [];
+    if(a.intro.trim()) L.push("## Introdução\n\n" + a.intro.trim());
+    let n = 0;
+    a.blocos.forEach(function(b){
+      const subs = b.subs.map(function(s){
+        return {t:s.titulo.trim(), dets:s.dets.map(x => x.titulo.trim()).filter(Boolean)};
+      }).filter(s => s.t || s.dets.length);
+      if(!b.titulo.trim() && !subs.length) return;
+      n++;
+      const l = ["## " + romano(n) + ". " + (b.titulo.trim() || "(sem título)")];
+      subs.forEach(function(s,j){
+        l.push((j+1) + ". " + (s.t || "(sem título)"));
+        s.dets.forEach(function(x,k){ l.push("   " + String.fromCharCode(97+k) + ") " + x); });
+      });
+      L.push(l.join("\n"));
+    });
+    if(a.conc.trim()) L.push("## Conclusão\n\n" + a.conc.trim());
+    return L.join("\n\n");
+  }
+
+  function textoAtual(){
+    const d = ativo();
+    return d && d.modo === "arvore" ? arvoreParaTexto(d) : $("atTexto").value;
+  }
+
+  function ajustar(el){ el.style.height = "auto"; el.style.height = (el.scrollHeight + 2) + "px"; }
+  function ajustarCampos(){ $("atArvore").querySelectorAll(".at-a-in").forEach(ajustar); }
+
+  function bt(acao, rotulo, b, s, d){
+    return '<button type="button" data-act="' + acao + '" data-b="' + b + '"' +
+      (s ? ' data-s="' + s + '"' : '') + (d ? ' data-d="' + d + '"' : '') + '>' + rotulo + '</button>';
+  }
+  function campo(k, valor, b, s, d, ph){
+    return '<textarea class="at-a-in" rows="1" data-k="' + k + '" data-b="' + b + '"' +
+      (s ? ' data-s="' + s + '"' : '') + (d ? ' data-d="' + d + '"' : '') +
+      ' placeholder="' + ph + '">' + escapeHTML(valor) + '</textarea>';
+  }
+
+  function desenharArvore(){
+    const a = arvoreDe(ativo());
+    const topo = $("atArvore").scrollTop;
+    $("atArvore").innerHTML =
+      '<label class="at-a-livre">INTRODUÇÃO (LIVRE)<textarea data-k="intro" rows="3">' + escapeHTML(a.intro) + '</textarea></label>' +
+      a.blocos.map(function(b,i){
+        return '<div class="at-a-ponto">' +
+          '<div class="at-a-linha"><span class="at-a-num">' + romano(i+1) + '.</span>' +
+            campo("p", b.titulo, b.id, "", "", "Ponto principal") +
+            '<span class="at-a-acoes">' + bt("sobe","↑",b.id) + bt("desce","↓",b.id) + bt("delB","EXCLUIR",b.id) + bt("addS","+ SUBTÓPICO",b.id) + '</span></div>' +
+          b.subs.map(function(s,j){
+            return '<div class="at-a-sub"><div class="at-a-linha"><span class="at-a-num">' + (j+1) + '.</span>' +
+              campo("s", s.titulo, b.id, s.id, "", "Subtópico") +
+              '<span class="at-a-acoes">' + bt("delS","EXCLUIR",b.id,s.id) + bt("addD","+ DETALHE",b.id,s.id) + '</span></div>' +
+              s.dets.map(function(x,k){
+                return '<div class="at-a-linha at-a-det"><span class="at-a-num">' + String.fromCharCode(97+k) + ')</span>' +
+                  campo("d", x.titulo, b.id, s.id, x.id, "Detalhe ou versículo") +
+                  '<span class="at-a-acoes">' + bt("delD","EXCLUIR",b.id,s.id,x.id) + '</span></div>';
+              }).join("") + '</div>';
+          }).join("") + '</div>';
+      }).join("") +
+      '<div class="at-a-barra">' +
+        '<button type="button" class="at-a-novo" data-act="novoB">+ ADICIONAR NOVO PONTO PRINCIPAL</button>' +
+        '<button type="button" data-act="paraTexto">PASSAR PARA O TEXTO</button>' +
+      '</div>' +
+      '<label class="at-a-livre">CONCLUSÃO (LIVRE)<textarea data-k="conc" rows="3">' + escapeHTML(a.conc) + '</textarea></label>';
+    $("atArvore").scrollTop = topo;
+    ajustarCampos();
+  }
+
+  function aplicarModo(){
+    const d = ativo();
+    if(!d) return;
+    const arv = d.modo === "arvore";
+    noSel = null;
+    $("atTexto").style.display = arv ? "none" : "";
+    $("atArvore").hidden = !arv;
+    $("atModoTexto").classList.toggle("on", !arv);
+    $("atModoArvore").classList.toggle("on", arv);
+    const linha = $("atModelo").closest(".at-row");
+    if(linha) linha.style.display = arv ? "none" : "";
+    const pm = $("atModelosPainel");
+    if(pm && arv) pm.hidden = true;
+    if(arv){ arvoreDe(d); desenharArvore(); }
+    contar();
+  }
+
+  function inserirNaArvore(txt){
+    const a = arvoreDe(ativo());
+    const f = noSel;
+    if(!f){
+      $("atSalvo").textContent = "Clique num ponto ou subtópico para receber o versículo.";
+      return false;
+    }
+    if(f.campo){
+      a[f.campo] = (a[f.campo].trim() ? a[f.campo].replace(/\s+$/,"") + "\n\n" : "") + "> " + txt;
+    }else{
+      const b = a.blocos.find(x => x.id === f.b);
+      if(!b){ $("atSalvo").textContent = "Clique num ponto ou subtópico para receber o versículo."; return false; }
+      const s = f.s ? b.subs.find(x => x.id === f.s) : null;
+      if(s) s.dets.push({id:uid(), titulo:txt});
+      else b.subs.push({id:uid(), titulo:txt, dets:[]});
+    }
+    gravar(); desenharArvore(); contar();
+    return true;
+  }
+
+  function passarParaTexto(){
+    const d = ativo();
+    const t = arvoreParaTexto(d);
+    d.modo = "texto";
+    if(t.trim()){
+      const atual = $("atTexto").value.replace(/\s+$/,"");
+      $("atTexto").value = (atual ? atual + "\n\n" : "") + t + "\n";
+      d.texto = $("atTexto").value;
+    }
+    gravar(); aplicarModo();
+  }
+
+  $("atModoTexto").addEventListener("click", function(){ ativo().modo = "texto"; gravar(); aplicarModo(); });
+  $("atModoArvore").addEventListener("click", function(){ ativo().modo = "arvore"; gravar(); aplicarModo(); });
+
+  $("atArvore").addEventListener("click", function(ev){
+    const el = ev.target.closest("[data-act]");
+    if(!el) return;
+    const acao = el.dataset.act;
+    if(acao === "paraTexto"){ passarParaTexto(); return; }
+    const a = arvoreDe(ativo());
+    if(acao === "novoB"){
+      a.blocos.push(novoBloco());
+    }else{
+      const b = a.blocos.find(x => x.id === el.dataset.b);
+      if(!b) return;
+      const s = el.dataset.s ? b.subs.find(x => x.id === el.dataset.s) : null;
+      if(acao === "sobe" || acao === "desce"){
+        const i = a.blocos.indexOf(b), j = i + (acao === "sobe" ? -1 : 1);
+        if(j < 0 || j >= a.blocos.length) return;
+        const troca = a.blocos[i]; a.blocos[i] = a.blocos[j]; a.blocos[j] = troca;
+      }else if(acao === "delB"){
+        if(!window.confirm("Excluir este ponto e tudo que está dentro dele?")) return;
+        a.blocos = a.blocos.filter(x => x !== b);
+      }else if(acao === "addS"){
+        b.subs.push({id:uid(), titulo:"", dets:[]});
+      }else if(acao === "delS" && s){
+        b.subs = b.subs.filter(x => x !== s);
+      }else if(acao === "addD" && s){
+        s.dets.push({id:uid(), titulo:""});
+      }else if(acao === "delD" && s){
+        s.dets = s.dets.filter(x => x.id !== el.dataset.d);
+      }
+    }
+    gravar(); desenharArvore(); contar();
+  });
+
+  $("atArvore").addEventListener("input", function(ev){
+    const el = ev.target, k = el.dataset.k;
+    if(!k) return;
+    const a = arvoreDe(ativo());
+    if(k === "intro" || k === "conc"){
+      a[k] = el.value;
+    }else{
+      const b = a.blocos.find(x => x.id === el.dataset.b);
+      if(!b) return;
+      if(k === "p"){
+        b.titulo = el.value;
+      }else{
+        const s = b.subs.find(x => x.id === el.dataset.s);
+        if(!s) return;
+        if(k === "s") s.titulo = el.value;
+        else{ const x = s.dets.find(y => y.id === el.dataset.d); if(x) x.titulo = el.value; }
+      }
+    }
+    if(el.classList.contains("at-a-in")) ajustar(el);
+    clearTimeout(timerA);
+    timerA = setTimeout(function(){ gravar(); contar(); }, 500);
+  });
+
+  $("atArvore").addEventListener("focusin", function(ev){
+    const el = ev.target, k = el.dataset && el.dataset.k;
+    if(!k) return;
+    if(k === "intro" || k === "conc") noSel = {campo:k};
+    else noSel = {b:el.dataset.b, s:el.dataset.s || null};
+  });
+
+  $("atArvore").addEventListener("keydown", function(ev){
+    if(ev.key === "Enter" && ev.target.classList && ev.target.classList.contains("at-a-in")) ev.preventDefault();
+  });
+
+  window.addEventListener("resize", function(){ if(modoArvore()) ajustarCampos(); });
   /* ---- eventos ---- */
   $("atLivro").addEventListener("change", function(){ cur.livro = Number(this.value); cur.cap = 1; preencherCapitulos(); lerVersos(); });
   $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
