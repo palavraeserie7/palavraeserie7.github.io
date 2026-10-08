@@ -1138,6 +1138,10 @@ main{
   .at-texto{flex:1;min-height:0}
   .at-grid.foco-grid{height:auto}
 }
+ .at-modelos{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px dashed var(--brass);border-radius:6px;background:#fffdf6}
+.at-modelos[hidden]{display:none}
+.at-modelos .at-in{background:#fffdf6;border:1px solid var(--paper-line);color:var(--ink)}
+.at-modelos textarea.at-in{height:170px;padding:10px;font:14px/1.6 Georgia,"Times New Roman",serif;resize:vertical}
 </style>
 </head>
  
@@ -2540,11 +2544,91 @@ async function irPara(l, c, n){
     post: "**Gancho (uma frase que prende)**\n\n\n**Versículo**\n\n\n**Reflexão em 3 linhas**\n\n\n**Convite para comentar**\n",
     serie: "## Abertura\n\n\n## Contexto do texto\n\n\n## Cena central\n\n\n## Virada\n\n\n## Mensagem final\n"
   };
+  /* ===== MODELOS DE ESTRUTURA POR GÊNERO ===== */
+  MODELOS.homiletico = ["I","II","III","IV","V"].map(function(n){
+    return "## " + n + ". Ponto principal\n\n1. Subtópico\n   a) Detalhe\n";
+  }).join("\n") + "\n## Conclusão\n";
 
+  const BASE_MODELOS = [
+    {id:"sermao", nome:"Sermão em 3 pontos", genero:"Sermão"},
+    {id:"homiletico", nome:"Estrutura homilética (I, 1, a)", genero:"Sermão"},
+    {id:"devocional", nome:"Devocional diário", genero:"Devocional"},
+    {id:"post", nome:"Post para redes", genero:"Redes sociais"},
+    {id:"serie", nome:"Episódio de série", genero:"Série"}
+  ];
+  const CHAVE_M = "ps_modelos";
+  let meus = [], editando = null;
+
+  function carregarModelos(){
+    try{ const m = JSON.parse(localStorage.getItem(CHAVE_M) || "[]"); if(Array.isArray(m)) meus = m; }catch(e){}
+  }
+  function gravarModelos(){
+    try{ localStorage.setItem(CHAVE_M, JSON.stringify(meus)); }catch(e){}
+  }
+  function todosModelos(){
+    return BASE_MODELOS.map(function(b){ return {id:b.id, nome:b.nome, genero:b.genero, texto:MODELOS[b.id]}; })
+      .concat(meus);
+  }
+  function desenharModelos(sel){
+    const lista = todosModelos();
+    const generos = lista.map(m => m.genero).filter((g,i,a) => a.indexOf(g) === i);
+    $("atModelo").innerHTML = generos.map(function(g){
+      return '<optgroup label="' + escapeHTML(g) + '">' +
+        lista.filter(m => m.genero === g).map(m => '<option value="' + escapeHTML(m.id) + '">' + escapeHTML(m.nome) + '</option>').join("") +
+        '</optgroup>';
+    }).join("");
+    if(sel) $("atModelo").value = sel;
+  }
+  function preencherPainel(){
+    const m = meus.find(x => x.id === $("atModelo").value);
+    editando = m ? m.id : null;
+    $("atMNome").value = m ? m.nome : "";
+    $("atMGenero").value = m ? m.genero : "";
+    $("atMTexto").value = m ? m.texto : "";
+  }
+
+  $("atAplicar").addEventListener("click", function(){
+    const m = todosModelos().find(x => x.id === $("atModelo").value);
+    if(m) inserirNoCursor(m.texto);
+  });
+  $("atModelos").addEventListener("click", function(){
+    const p = $("atModelosPainel");
+    p.hidden = !p.hidden;
+    if(!p.hidden) preencherPainel();
+  });
+  $("atModelo").addEventListener("change", function(){
+    if(!$("atModelosPainel").hidden) preencherPainel();
+  });
+  $("atMNovo").addEventListener("click", function(){
+    editando = null;
+    $("atMNome").value = ""; $("atMGenero").value = ""; $("atMTexto").value = "";
+    $("atMNome").focus();
+  });
+  $("atMUsarTexto").addEventListener("click", function(){
+    $("atMTexto").value = $("atTexto").value;
+  });
+  $("atMSalvar").addEventListener("click", function(){
+    const nome = $("atMNome").value.trim();
+    const texto = $("atMTexto").value;
+    const genero = $("atMGenero").value.trim() || "Outros";
+    if(!nome || !texto.trim()){ window.alert("Dê um nome ao modelo e escreva a estrutura."); return; }
+    let id = editando;
+    const m = id ? meus.find(x => x.id === id) : null;
+    if(m){ m.nome = nome; m.genero = genero; m.texto = texto; }
+    else { id = "m" + Date.now(); meus.push({id:id, nome:nome, genero:genero, texto:texto}); editando = id; }
+    gravarModelos(); desenharModelos(id);
+  });
+  $("atMExcluir").addEventListener("click", function(){
+    if(!editando){ window.alert("Selecione um dos seus modelos na lista para excluir."); return; }
+    if(!window.confirm("Excluir este modelo? Não dá para desfazer.")) return;
+    meus = meus.filter(x => x.id !== editando);
+    editando = null; gravarModelos(); desenharModelos(); preencherPainel();
+  });
   function iniciarAtelie(){
     if(iniciado) return;
     iniciado = true;
     carregarSalvo();
+      carregarModelos(); desenharModelos();
     $("atLivro").innerHTML = BOOKS.map((b,i) => '<option value="' + i + '">' + escapeHTML(b[1]) + '</option>').join("");
     desenharRascunhos(); mostrarRascunho();
     loadPortuguese().then(function(){ preencherCapitulos(); lerVersos(); });
@@ -2615,7 +2699,6 @@ $("atVersos").addEventListener("click", function(ev){
     if(!st.r.length) criarRascunho(true);
     st.a = st.r[0].id; gravar(); desenharRascunhos(); mostrarRascunho();
   });
-  $("atAplicar").addEventListener("click", function(){ inserirNoCursor(MODELOS[$("atModelo").value]); });
 
   $("atCopiar").addEventListener("click", function(){
     const d = ativo();
