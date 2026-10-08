@@ -1,5 +1,8 @@
 
 
+Sala final · HTML
+ 
+ 
 Sala do escritor · HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -1355,10 +1358,10 @@ main{
   </span>
   <span id="ateliToggleAcao" class="panel-toggle-action">ABRIR</span>
 </button>
-
+ 
 <div id="ateliPainel" hidden>
   <div class="at-grid" id="atGrid">
-
+ 
     <div class="at-box at-fontes">
       <h3>FONTE BÍBLICA</h3>
       <div class="at-row">
@@ -1393,7 +1396,7 @@ main{
         </span>
       </div>
     </div>
-
+ 
     <div class="at-box at-editor" id="atEditor">
       <div class="at-row">
         <select id="atRasc" class="at-sel at-grow" aria-label="Rascunhos"></select>
@@ -1437,13 +1440,13 @@ main{
         </span>
       </div>
     </div>
-
+ 
   </div>
 </div>
-
-
-
-
+ 
+ 
+ 
+ 
 <section class="info">
   <div class="info-title">SOBRE ESTA ÁREA</div>
   <p>
@@ -1482,7 +1485,7 @@ const errorBox = document.getElementById("error");
 const userEmail = document.getElementById("userEmail");
 const logoutBtn = document.getElementById("logoutBtn");
  
-
+ 
  
 /*
   Fontes:
@@ -1589,7 +1592,7 @@ async function loadPortuguese(){
   }
   return portugueseBible;
 }
-
+ 
 function getTRBookCode(bookCode){
   return bookCode;
 }
@@ -1603,10 +1606,10 @@ function escapeHTML(value){
     .replaceAll("'","&#039;");
 }
  
-
+ 
  
 let verificacaoEmAndamento = false;
-
+ 
  
 /* =====================================================
    VISITANTES E SETORES MAIS CONSULTADOS
@@ -2306,7 +2309,7 @@ if(painelToggle){
 ===================================================== */
 (function(){
   const $ = id => document.getElementById(id);
-
+ 
   /* ---- alternância genérica dos painéis ---- */
   function ligarToggle(btnId, acaoId, painelId, aoAbrir){
     const btn = $(btnId), acao = $(acaoId), painel = $(painelId);
@@ -2318,15 +2321,15 @@ if(painelToggle){
       if(abrir && aoAbrir) aoAbrir();
     });
   }
-
+ 
   ligarToggle("ateliToggle","ateliToggleAcao","ateliPainel",iniciarAtelie);
-
+ 
   /* ---- estado ---- */
   const CHAVE = "ps_atelie";
   let st = {r:[], a:null};
   let cur = {livro:0, cap:1, modo:"pt"};
   let sel = new Set(), versos = [], iniciado = false, timer = null;
-
+ 
   function carregarSalvo(){
     try{
       const s = JSON.parse(localStorage.getItem(CHAVE) || "null");
@@ -2340,7 +2343,7 @@ if(painelToggle){
     $("atSalvo").textContent = "Salvo às " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   }
   const ativo = () => st.r.find(x => x.id === st.a);
-
+ 
   function criarRascunho(silencioso){
     const d = {id:String(Date.now()), titulo:"", texto:""};
     st.r.unshift(d); st.a = d.id;
@@ -2375,9 +2378,9 @@ if(painelToggle){
       if(o) o.textContent = d.titulo || "Sem título";
     }, 500);
   }
-
+ 
   /* ---- fonte bíblica ---- */
-
+ 
   async function mapaOriginal(code, ot){
     const url = (ot ? DATA.wlc : DATA.greek) + code + ".txt";
     if(sourceCache.get(url)) return sourceCache.get(url);
@@ -2393,19 +2396,19 @@ if(painelToggle){
     sourceCache.set(url, m);
     return m;
   }
-
+ 
  function rotuloVersao(){
   const t = BOOKS[cur.livro][2];
   if(cur.modo === "pt") return "Almeida 1911";
   if(cur.modo === "tr") return "Textus Receptus, Scrivener 1894";
   return t === "OT" ? "WLC" : "Nestle 1904";
 }
-
+ 
 async function mapaTR(code){
   const livro = getTRBookCode(code);
   const chave = "tr:" + livro + ":" + cur.cap;
   if(sourceCache.has(chave)) return sourceCache.get(chave);
-
+ 
   const qtd = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).length;
   const respostas = await Promise.all(
     Array.from({length:qtd}, function(_, i){
@@ -2414,7 +2417,7 @@ async function mapaTR(code){
         .catch(function(){ return null; });
     })
   );
-
+ 
   const m = new Map();
   respostas.forEach(function(d, i){
     const t = d && typeof d.text === "string" ? d.text.trim() : "";
@@ -2423,7 +2426,7 @@ async function mapaTR(code){
   sourceCache.set(chave, m);
   return m;
 }
-
+ 
 async function lerVersos(){
   const alvo = $("atVersos");
   alvo.innerHTML = '<span class="at-msg">Carregando…</span>';
@@ -2431,13 +2434,13 @@ async function lerVersos(){
   try{
     await loadPortuguese();
     const [code,,test] = BOOKS[cur.livro];
-
+ 
     if(cur.modo === "tr" && test === "OT"){
       versos = [];
       alvo.innerHTML = '<span class="at-msg">O Textus Receptus existe só para o Novo Testamento. No Antigo, escolha "Original" para ver o hebraico.</span>';
       return;
     }
-
+ 
     if(cur.modo === "pt"){
       versos = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).map((t,i) => ({n:i+1, t}));
     }else{
@@ -2449,7 +2452,7 @@ async function lerVersos(){
       }
       versos.sort((a,b) => a.n - b.n);
     }
-
+ 
     const rtl = cur.modo === "or" && test === "OT";
     alvo.innerHTML = versos.length ? versos.map(v =>
       '<button type="button" class="at-v" data-n="' + v.n + '"' + (rtl ? ' dir="rtl"' : '') + '><b>' + v.n + '</b><span>' + escapeHTML(v.t) + '</span></button>'
@@ -2460,15 +2463,15 @@ async function lerVersos(){
     alvo.innerHTML = '<span class="at-msg">Não foi possível carregar. Verifique a conexão e tente de novo.</span>';
   }
 }
-
+ 
 const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 let emBusca = false;
-
+ 
 function filtrar(){
      
   const q = norm($("atBusca").value.trim());
   const escopo = $("atEscopo").value;
-
+ 
   if(escopo === "cap"){
     if(emBusca){ emBusca = false; lerVersos(); return; }
     document.querySelectorAll("#atVersos .at-v").forEach(b => {
@@ -2478,26 +2481,26 @@ function filtrar(){
   }
   buscarGlobal(q, escopo);
 }
-
+ 
 async function buscarGlobal(q, escopo){
   const alvo = $("atVersos");
   emBusca = true;
-
+ 
   if(q.length < 3){
     alvo.innerHTML = '<span class="at-msg">Digite ao menos 3 letras para buscar.</span>';
     return;
   }
-
+ 
   await loadPortuguese();
   const achados = [];
   let total = 0;
-
+ 
   for(let l = 0; l < BOOKS.length; l++){
     const t = BOOKS[l][2];
     if(escopo === "ot" && t !== "OT") continue;
     if(escopo === "nt" && t !== "NT") continue;
     if(escopo === "livro" && l !== cur.livro) continue;
-
+ 
     portugueseBible[l].chapters.forEach(function(cap, ci){
       cap.forEach(function(txt, vi){
         if(norm(txt).includes(q)){
@@ -2507,12 +2510,12 @@ async function buscarGlobal(q, escopo){
       });
     });
   }
-
+ 
   if(!total){
     alvo.innerHTML = '<span class="at-msg">Nenhum versículo encontrado com essa palavra.</span>';
     return;
   }
-
+ 
   alvo.innerHTML =
     '<span class="at-msg">' + total + ' resultado' + (total === 1 ? '' : 's') +
     (total > 100 ? ' · mostrando os 100 primeiros. Restrinja o alcance para refinar.' : '') +
@@ -2523,7 +2526,7 @@ async function buscarGlobal(q, escopo){
         escapeHTML(a.txt) + '</button>';
     }).join("");
 }
-
+ 
 async function irPara(l, c, n){
   cur.livro = l; cur.cap = c;
   $("atLivro").value = String(l);
@@ -2535,7 +2538,7 @@ async function irPara(l, c, n){
   const b = document.querySelector('#atVersos .at-v[data-n="' + n + '"]');
   if(b){ b.click(); b.scrollIntoView({block:"center"}); }
 }
-
+ 
   function intervalos(ns){
     const out = []; let ini = ns[0], ant = ns[0];
     for(let i = 1; i <= ns.length; i++){
@@ -2546,12 +2549,12 @@ async function irPara(l, c, n){
     return out.join(", ");
   }
   const referencia = () => BOOKS[cur.livro][1] + " " + cur.cap + ":" + intervalos([...sel].sort((a,b) => a-b));
-
+ 
   function atualizarBandeja(){
     $("atInserir").disabled = !sel.size;
     $("atRef").innerHTML = sel.size ? '<strong>' + escapeHTML(referencia()) + '</strong>' : "Toque nos versículos para selecioná-los";
   }
-
+ 
   function inserirNoCursor(texto){
     const ta = $("atTexto");
     const ini = ta.selectionStart, fim = ta.selectionEnd;
@@ -2563,7 +2566,7 @@ async function irPara(l, c, n){
     ta.focus(); ta.setSelectionRange(novoPos, novoPos);
     agendarGravacao();
   }
-
+ 
   const MODELOS = {
     sermao: "## Texto base\n\n\n## Introdução\n\n\n## Ponto 1\n\n\n## Ponto 2\n\n\n## Ponto 3\n\n\n## Aplicação\n\n\n## Chamado final\n",
     devocional: "## Versículo do dia\n\n\n## O que o texto diz\n\n\n## O que ele significa para hoje\n\n\n## Oração\n",
@@ -2574,7 +2577,7 @@ async function irPara(l, c, n){
   MODELOS.homiletico = ["I","II","III","IV","V"].map(function(n){
     return "## " + n + ". Ponto principal\n\n1. Subtópico\n   a) Detalhe\n";
   }).join("\n") + "\n## Conclusão\n";
-
+ 
   const BASE_MODELOS = [
     {id:"sermao", nome:"Sermão em 3 pontos", genero:"Sermão"},
     {id:"homiletico", nome:"Estrutura homilética (I, 1, a)", genero:"Sermão"},
@@ -2584,7 +2587,7 @@ async function irPara(l, c, n){
   ];
   const CHAVE_M = "ps_modelos";
   let meus = [], editando = null;
-
+ 
   function carregarModelos(){
     try{ const m = JSON.parse(localStorage.getItem(CHAVE_M) || "[]"); if(Array.isArray(m)) meus = m; }catch(e){}
   }
@@ -2612,7 +2615,7 @@ async function irPara(l, c, n){
     $("atMGenero").value = m ? m.genero : "";
     $("atMTexto").value = m ? m.texto : "";
   }
-
+ 
   $("atAplicar").addEventListener("click", function(){
     const m = todosModelos().find(x => x.id === $("atModelo").value);
     if(m) inserirNoCursor(m.texto);
@@ -2672,12 +2675,12 @@ async function irPara(l, c, n){
   const romano = n => ROMANOS[n-1] || String(n);
   const novoBloco = () => ({id:uid(), titulo:"", subs:[{id:uid(), titulo:"", dets:[]}]});
   const modoArvore = () => { const d = ativo(); return !!d && d.modo === "arvore"; };
-
+ 
   function arvoreDe(d){
     if(!d.arv) d.arv = {intro:"", blocos:[novoBloco()], conc:""};
     return d.arv;
   }
-
+ 
   function arvoreParaTexto(d){
     const a = d.arv;
     if(!a) return "";
@@ -2700,15 +2703,15 @@ async function irPara(l, c, n){
     if(a.conc.trim()) L.push("## Conclusão\n\n" + a.conc.trim());
     return L.join("\n\n");
   }
-
+ 
   function textoAtual(){
     const d = ativo();
     return d && d.modo === "arvore" ? arvoreParaTexto(d) : $("atTexto").value;
   }
-
+ 
   function ajustar(el){ el.style.height = "auto"; el.style.height = (el.scrollHeight + 2) + "px"; }
   function ajustarCampos(){ $("atArvore").querySelectorAll(".at-a-in").forEach(ajustar); }
-
+ 
   function bt(acao, rotulo, b, s, d){
     return '<button type="button" data-act="' + acao + '" data-b="' + b + '"' +
       (s ? ' data-s="' + s + '"' : '') + (d ? ' data-d="' + d + '"' : '') + '>' + rotulo + '</button>';
@@ -2718,7 +2721,7 @@ async function irPara(l, c, n){
       (s ? ' data-s="' + s + '"' : '') + (d ? ' data-d="' + d + '"' : '') +
       ' placeholder="' + ph + '">' + escapeHTML(valor) + '</textarea>';
   }
-
+ 
   function desenharArvore(){
     const a = arvoreDe(ativo());
     const topo = $("atArvore").scrollTop;
@@ -2748,7 +2751,7 @@ async function irPara(l, c, n){
     $("atArvore").scrollTop = topo;
     ajustarCampos();
   }
-
+ 
   function aplicarModo(){
     const d = ativo();
     if(!d) return;
@@ -2765,7 +2768,7 @@ async function irPara(l, c, n){
     if(arv){ arvoreDe(d); desenharArvore(); }
     contar();
   }
-
+ 
   function inserirNaArvore(txt){
     const a = arvoreDe(ativo());
     const f = noSel;
@@ -2785,7 +2788,7 @@ async function irPara(l, c, n){
     gravar(); desenharArvore(); contar();
     return true;
   }
-
+ 
   function passarParaTexto(){
     const d = ativo();
     const t = arvoreParaTexto(d);
@@ -2797,10 +2800,10 @@ async function irPara(l, c, n){
     }
     gravar(); aplicarModo();
   }
-
+ 
   $("atModoTexto").addEventListener("click", function(){ ativo().modo = "texto"; gravar(); aplicarModo(); });
   $("atModoArvore").addEventListener("click", function(){ ativo().modo = "arvore"; gravar(); aplicarModo(); });
-
+ 
   $("atArvore").addEventListener("click", function(ev){
     const el = ev.target.closest("[data-act]");
     if(!el) return;
@@ -2832,7 +2835,7 @@ async function irPara(l, c, n){
     }
     gravar(); desenharArvore(); contar();
   });
-
+ 
   $("atArvore").addEventListener("input", function(ev){
     const el = ev.target, k = el.dataset.k;
     if(!k) return;
@@ -2855,18 +2858,18 @@ async function irPara(l, c, n){
     clearTimeout(timerA);
     timerA = setTimeout(function(){ gravar(); contar(); }, 500);
   });
-
+ 
   $("atArvore").addEventListener("focusin", function(ev){
     const el = ev.target, k = el.dataset && el.dataset.k;
     if(!k) return;
     if(k === "intro" || k === "conc") noSel = {campo:k};
     else noSel = {b:el.dataset.b, s:el.dataset.s || null};
   });
-
+ 
   $("atArvore").addEventListener("keydown", function(ev){
     if(ev.key === "Enter" && ev.target.classList && ev.target.classList.contains("at-a-in")) ev.preventDefault();
   });
-
+ 
   window.addEventListener("resize", function(){ if(modoArvore()) ajustarCampos(); });
   /* ---- eventos ---- */
   $("atLivro").addEventListener("change", function(){ cur.livro = Number(this.value); cur.cap = 1; preencherCapitulos(); lerVersos(); });
@@ -2920,7 +2923,7 @@ $("atVersos").addEventListener("click", function(ev){
     }
     $("atLimpar").click();
   });
-
+ 
   $("atTitulo").addEventListener("input", agendarGravacao);
   $("atTexto").addEventListener("input", agendarGravacao);
   $("atRasc").addEventListener("change", function(){ st.a = this.value; gravar(); mostrarRascunho(); });
@@ -2931,10 +2934,10 @@ $("atVersos").addEventListener("click", function(ev){
     if(!st.r.length) criarRascunho(true);
     st.a = st.r[0].id; gravar(); desenharRascunhos(); mostrarRascunho();
   });
-
+ 
   $("atCopiar").addEventListener("click", function(){
     const d = ativo();
-    const t = (d.titulo ? "# " + d.titulo + "\n\n" : "") + d.texto;
+    const t = (d.titulo ? "# " + d.titulo + "\n\n" : "") + textoAtual();
     (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(
       function(){ $("atSalvo").textContent = "Copiado."; },
       function(){ $("atTexto").select(); $("atSalvo").textContent = "Selecionado: use Ctrl+C."; }
@@ -2942,14 +2945,14 @@ $("atVersos").addEventListener("click", function(ev){
   });
   $("atBaixar").addEventListener("click", function(){
     const d = ativo();
-    const blob = new Blob([(d.titulo ? "# " + d.titulo + "\n\n" : "") + d.texto], {type:"text/markdown;charset=utf-8"});
+    const blob = new Blob([(d.titulo ? "# " + d.titulo + "\n\n" : "") + textoAtual()], {type:"text/markdown;charset=utf-8"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = ((d.titulo || "rascunho").toLowerCase().replace(/[^a-z0-9à-ú]+/gi, "-").replace(/^-|-$/g, "") || "rascunho") + ".md";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
-
+ 
   function alternarFoco(){
     const on = !$("ateliPainel").classList.contains("at-foco");
     $("ateliPainel").classList.toggle("at-foco", on);
@@ -3135,6 +3138,8 @@ document.addEventListener("visibilitychange",function(){
 </body>
 </html>
  
-
-
-
+ 
+ 
+ 
+ 
+Claude terminou a resposta
