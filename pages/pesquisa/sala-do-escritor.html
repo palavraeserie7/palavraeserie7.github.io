@@ -2355,10 +2355,10 @@ if(painelToggle){
     const d = ativo();
     $("atTitulo").value = d.titulo;
     $("atTexto").value = d.texto;
-    contar();
+   aplicarModo();
   }
   function contar(){
-    const t = $("atTexto").value.trim();
+   const t = textoAtual().trim();
     const p = t ? t.split(/\s+/).length : 0;
     const min = Math.max(1, Math.round(p / 130));
     $("atContagem").textContent = p + " palavras" + (p ? " · cerca de " + min + " min de fala" : "");
@@ -2913,7 +2913,11 @@ $("atVersos").addEventListener("click", function(ev){
   $("atInserir").addEventListener("click", function(){
     const ordem = [...sel].sort((a,b) => a - b);
     const texto = ordem.map(n => versos.find(v => v.n === n).t).join(" ");
-    inserirNoCursor("> *“" + texto + "”*\n> — **" + referencia() + "** (" + rotuloVersao() + ")");
+    if(modoArvore()){
+      if(!inserirNaArvore("“" + texto + "” — " + referencia() + " (" + rotuloVersao() + ")")) return;
+    }else{
+      inserirNoCursor("> *“" + texto + "”*\n> — **" + referencia() + "** (" + rotuloVersao() + ")");
+    }
     $("atLimpar").click();
   });
 
