@@ -2606,7 +2606,8 @@ function inserirNoCursor(texto){
   }).join("\n") + "\n## Conclusão\n";
  
   const BASE_MODELOS = [
-    {id:"sermao", nome:"Sermão em 3 pontos", genero:"Sermão"},
+    {id:"sermao", nome:"Estudo de um livro (5 perguntas)", genero:"Estudo bíblico"},
+    {id:"capitulo", nome:"Estudo de um capítulo", genero:"Estudo bíblico"},
     {id:"homiletico", nome:"Estrutura homilética (I, 1, a)", genero:"Sermão"},
     {id:"devocional", nome:"Devocional diário", genero:"Devocional"},
     {id:"post", nome:"Post para redes", genero:"Redes sociais"},
@@ -2643,10 +2644,19 @@ function inserirNoCursor(texto){
     $("atMTexto").value = m ? m.texto : "";
   }
  
-  $("atAplicar").addEventListener("click", function(){
-    const m = todosModelos().find(x => x.id === $("atModelo").value);
-    if(m) inserirNoCursor(m.texto);
-  });
+ $("atAplicar").addEventListener("click", function(){
+  const m = todosModelos().find(x => x.id === $("atModelo").value);
+  if(!m) return;
+  const num = String(cur.livro + 1).padStart(2, "0") + "." + cur.cap;
+  const texto = m.texto
+    .replace(/\{num\}/g, num)
+    .replace(/\{livro\}/g, BOOKS[cur.livro][1])
+    .replace(/\{cap\}/g, String(cur.cap));
+  const primeira = texto.trim().split("\n")[0];
+  if($("atTexto").value.includes(primeira) &&
+     !window.confirm("Este texto já tem essa estrutura. Adicionar outra mesmo assim?")) return;
+  inserirNoCursor(texto);
+});
   $("atModelos").addEventListener("click", function(){
     const p = $("atModelosPainel");
     p.hidden = !p.hidden;
