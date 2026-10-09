@@ -3340,7 +3340,68 @@ $("mzLista").addEventListener("input", function(ev){
   if(mzAbertos.has(g)) mzAbertos.delete(g); else mzAbertos.add(g);
   mzRender();
 });
-function mzAtualizarBotoes(){
+function mzEscopoDaEtapa(it){
+  const nucleo = {"01.1":"Livro","01.2":"Capítulo","01.3":"Perícope","01.4":"Versículo","01.5":"Palavra"};
+  return nucleo[it.cod] || mzEsc;
+}
+
+function mzPassagem(escopo){
+  const livro = BOOKS[cur.livro][1];
+  const cap = portugueseBible[cur.livro].chapters[cur.cap-1] || [];
+  const nums = [...sel].sort((a,b) => a-b);
+  if(escopo === "Livro") return {ok:true, p:{book:livro, reference:livro, text:""}};
+  if(escopo === "Capítulo"){
+    return {ok:true, p:{book:livro, reference:livro + " " + cur.cap, text:cap.map((t,i) => (i+1) + " " + t).join("\n")}};
+  }
+  if(!nums.length) return {ok:false, erro:"Selecione, à esquerda, os versículos desta etapa."};
+  const ref = livro + " " + cur.cap + ":" + intervalos(nums);
+  const texto = nums.map(n => n + " " + (cap[n-1] || "")).join("\n");
+  if(escopo === "Palavra"){
+    const w = (window.prompt("Qual palavra deste texto você quer estudar?") || "").trim();
+    if(!w) return {ok:false, erro:"Informe a palavra para pesquisar."};
+    return {ok:true, p:{book:livro, reference:ref, text:texto, word:w}};
+  }
+  return {ok:true, p:{book:livro, reference:ref, text:texto}};
+}
+
+async function mzPesquisar(cod, btn){
+  const it = ((TAB && TAB[mzEsc]) || []).find(x => x.cod === cod);
+  if(!it) return;
+  const escopo = mzEscopoDaEtapa(it);
+  const r = mzPassagem(escopo);
+  if(!r.ok){ toast(r.erro); return; }
+  const m = mzDados();
+  const atual = (m[cod] && m[cod].t) || "";
+  if(atual.trim() && !window.confirm("Esta etapa já tem texto. Substituir pela pesquisa?")) return;
+  btn.disabled = true; btn.textContent = "PESQUISANDO…";
+  try{
+    const sess = (await supabaseClient.auth.getSession()).data.session;
+    if(!sess) throw new Error("Sessão encerrada. Entre de novo.");
+    const resp = await fetch("https://yellow-lab-f4b2.palavraeserie.workers.dev/api/pesquisa", {
+      method:"POST",
+      headers:{"Content-Type":"application/json", "Authorization":"Bearer " + sess.access_token},
+      body: JSON.stringify({
+        analysisType:"study_step",
+        scope:escopo,
+        stepCode:it.cod,
+        stepName:it.nome,
+        instruction:it.descricao,
+        question:it.nome,
+        passage:r.p
+      })
+    });
+    const dados = await resp.json().catch(() => ({}));
+    if(!resp.ok || !dados.ok) throw new Error(dados.error || "Não foi possível pesquisar agora.");
+    m[cod] = m[cod] || {};
+    m[cod].t = dados.text || dados.answer || "";
+    gravar(); mzRender();
+  }catch(e){
+    console.error(e);
+    toast(e.message || "Não foi possível pesquisar agora.");
+    btn.disabled = false; btn.textContent = "PESQUISAR ESTA ETAPA";
+  }
+}
+ function mzAtualizarBotoes(){
   mz.querySelectorAll(".mz-addv").forEach(b => { b.disabled = !sel.size; });
 }
 $("atVersos").addEventListener("click", mzAtualizarBotoes);
