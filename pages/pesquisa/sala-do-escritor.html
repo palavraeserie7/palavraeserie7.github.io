@@ -3171,29 +3171,50 @@ const mzRes = (m, i) => (m[i.cod] && m[i.cod].s) || 0;
 
 
 
-function mzRender(){
+function mzGrupo(i){
+  return (String(i.bloco) === "01" && /^01\.[1-5]$/.test(i.cod)) ? "N" : String(i.bloco);
+}
+const mzFeita = (m, i) => mzRes(m, i) > 0 || !!(m[i.cod] && m[i.cod].t && m[i.cod].t.trim());
+
+function mzContagem(){
   const lista = (TAB && TAB[mzEsc]) || [];
   const m = mzDados();
-  const feitas = lista.filter(i => mzRes(m,i) > 0).length;
+  const feitas = lista.filter(i => mzFeita(m,i)).length;
   const escritas = lista.filter(i => m[i.cod] && m[i.cod].t && m[i.cod].t.trim()).length;
   $("mzProg").textContent = feitas + " de " + lista.length + " etapas resolvidas · " + Math.round(100 * feitas / Math.max(1, lista.length)) + "%";
   $("mzCont").textContent = escritas + " com resposta escrita";
+}
 
-  const vis = lista;
+function mzRender(){
+  const lista = (TAB && TAB[mzEsc]) || [];
+  const m = mzDados();
+  mzContagem();
 
   let html = "", atual = "";
-  vis.forEach(function(i){
-    if(i.bloco !== atual){
-      atual = i.bloco;
-      html += '<h4 class="mz-bl" id="mzb' + atual + '">' + atual + " · " + escapeHTML(i.bloco_nome) + "</h4>";
+  lista.forEach(function(i){
+    const g = mzGrupo(i);
+    const aberto = g === "N" || mzAbertos.has(g);
+    if(g !== atual){
+      atual = g;
+      const doGrupo = lista.filter(x => mzGrupo(x) === g);
+      const f = doGrupo.filter(x => mzFeita(m,x)).length;
+      if(g === "N"){
+        html += '<h4 class="mz-bl">Núcleo do estudo · a Bíblia · ' + f + "/" + doGrupo.length + "</h4>";
+      }else{
+        html += '<h4 class="mz-bl mz-bl-b" data-g="' + g + '">' + (aberto ? "▾ " : "▸ ") + g + " · " +
+          escapeHTML(i.bloco_nome) + " · " + f + "/" + doGrupo.length + "</h4>";
+      }
     }
+    if(!aberto) return;
+
     const e = m[i.cod] || {}, s = e.s || 0, ab = mzAberta === i.cod;
-    html += '<div class="mz-et' + (s === 1 ? " feita" : s === 2 ? " na" : "") + (ab ? " ab" : "") + '" data-c="' + i.cod + '">' +
+    const tem = !!(e.t && e.t.trim());
+    html += '<div class="mz-et' + (s === 1 || (s === 0 && tem) ? " feita" : s === 2 ? " na" : "") + (ab ? " ab" : "") + '" data-c="' + i.cod + '">' +
       '<div class="mz-cab">' +
         '<button type="button" class="mz-st" title="Pendente, resolvida ou não se aplica">' + ["○","●","⊘"][s] + "</button>" +
-                '<span class="mz-cod">' + i.cod + '</span>' +
-        '<span class="mz-nome">' + escapeHTML(i.nome) + "</span>" + 
-        (e.t && e.t.trim() ? '<span class="mz-tem" title="Tem resposta">✎</span>' : "") +
+        '<span class="mz-cod">' + i.cod + '</span>' +
+        '<span class="mz-nome">' + escapeHTML(i.nome) + "</span>" +
+        (tem ? '<span class="mz-tem" title="Tem resposta">✎</span>' : "") +
       "</div>" +
       (ab ? '<div class="mz-corpo"><p class="mz-desc">' + escapeHTML(i.descricao) + "</p>" +
         '<textarea class="mz-t" placeholder="Sua resposta para esta etapa…">' + escapeHTML(e.t || "") + "</textarea>" +
@@ -3203,7 +3224,7 @@ function mzRender(){
   });
 
   const topo = $("mzLista").scrollTop;
-  $("mzLista").innerHTML = html || '<span class="at-msg">Nenhuma etapa neste filtro.</span>';
+  $("mzLista").innerHTML = html || '<span class="at-msg">Nenhuma etapa nesta base.</span>';
   $("mzLista").scrollTop = topo;
 }
 
