@@ -2639,14 +2639,16 @@ function inserirNoCursor(texto){
 function desenharModelos(sel){
   const lista = todosModelos();
   const generos = lista.map(m => m.genero).filter((g,i,a) => a.indexOf(g) === i);
-  $("atModelo").innerHTML = '<optgroup label="Estudo bíblico (tabela de rastreio)">' +
-    '<option value="tabela:Livro">01.1 Livro</option>' +
-    '<option value="tabela:Capítulo">01.2 Capítulo</option>' +
-    '<option value="tabela:Perícope">01.3 Contexto (perícope)</option>' +
-    '<option value="tabela:Versículo">01.4 Versículo</option>' +
-    '</optgroup>' + generos.map(function(g){
-      return '<optgroup label="' + escapeHTML(g) + '">' +
-        lista.filter(m => m.genero === g).map(m => '<option value="' + escapeHTML(m.id) + '">' + escapeHTML(m.nome) + '</option>').join("") +
+ 
+$("atModelo").innerHTML = '<optgroup label="Estudo bíblico (tabela de rastreio)">' +
+  '<option value="tabela:Livro">01.1 Livro</option>' +
+  '<option value="tabela:Capítulo">01.2 Capítulo</option>' +
+  '<option value="tabela:Perícope">01.3 Contexto (perícope)</option>' +
+  '<option value="tabela:Versículo">01.4 Versículo</option>' +
+  '<option value="tabela:Palavras">01.5 Palavras</option>' +
+  '</optgroup>' + generos.map(function(g){
+    return '<optgroup label="' + escapeHTML(g) + '">' +
+      lista.filter(m => m.genero === g).map(m => '<option value="' + escapeHTML(m.id) + '">' + escapeHTML(m.nome) + '</option>').join("") +
  '</optgroup>';
     }).join("");
     if(sel) $("atModelo").value = sel;
