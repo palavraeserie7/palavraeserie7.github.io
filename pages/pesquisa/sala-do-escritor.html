@@ -2766,45 +2766,7 @@ function desenharModelos(sel){
     };
   }
 
-  $("atAplicar").addEventListener("click", function(){
-    const v = $("atModelo").value;
-    if(v.indexOf("tabela:") === 0){ abrirTabela(v.slice(7)); return; }
-    const m = todosModelos().find(x => x.id === v);
-    if(m) inserirNoCursor(m.texto);
-  });
-  $("atModelos").addEventListener("click", function(){
-    const p = $("atModelosPainel");
-    p.hidden = !p.hidden;
-    if(!p.hidden) preencherPainel();
-  });
-  $("atModelo").addEventListener("change", function(){
-    if(!$("atModelosPainel").hidden) preencherPainel();
-  });
-  $("atMNovo").addEventListener("click", function(){
-    editando = null;
-    $("atMNome").value = ""; $("atMGenero").value = ""; $("atMTexto").value = "";
-    $("atMNome").focus();
-  });
-  $("atMUsarTexto").addEventListener("click", function(){
-    $("atMTexto").value = $("atTexto").value;
-  });
-  $("atMSalvar").addEventListener("click", function(){
-    const nome = $("atMNome").value.trim();
-    const texto = $("atMTexto").value;
-    const genero = $("atMGenero").value.trim() || "Outros";
-    if(!nome || !texto.trim()){ window.alert("Dê um nome ao modelo e escreva a estrutura."); return; }
-    let id = editando;
-    const m = id ? meus.find(x => x.id === id) : null;
-    if(m){ m.nome = nome; m.genero = genero; m.texto = texto; }
-    else { id = "m" + Date.now(); meus.push({id:id, nome:nome, genero:genero, texto:texto}); editando = id; }
-    gravarModelos(); desenharModelos(id);
-  });
-  $("atMExcluir").addEventListener("click", function(){
-    if(!editando){ window.alert("Selecione um dos seus modelos na lista para excluir."); return; }
-    if(!window.confirm("Excluir este modelo? Não dá para desfazer.")) return;
-    meus = meus.filter(x => x.id !== editando);
-    editando = null; gravarModelos(); desenharModelos(); preencherPainel();
-  });
+ 
   function iniciarAtelie(){
     if(iniciado) return;
     iniciado = true;
