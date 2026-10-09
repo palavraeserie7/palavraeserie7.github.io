@@ -3263,23 +3263,7 @@ function mzRender(){
   $("mzProg").textContent = feitas + " de " + lista.length + " etapas resolvidas · " + Math.round(100 * feitas / Math.max(1, lista.length)) + "%";
   $("mzCont").textContent = escritas + " com resposta escrita";
 
-  const blocos = lista.map(i => i.bloco).filter((b,k,a) => a.indexOf(b) === k);
-  $("mzMapa").innerHTML = blocos.map(function(b){
-    const g = lista.filter(i => i.bloco === b);
-    const f = g.filter(i => mzRes(m,i) > 0).length;
-    return '<button type="button" class="mz-seg" data-b="' + b + '" title="' + escapeHTML(g[0].bloco_nome) + ": " + f + "/" + g.length + '">' +
-      '<i style="height:' + Math.round(100 * f / g.length) + '%"></i><span>' + b + '</span></button>';
-  }).join("");
-
-  mz.querySelectorAll("[data-f]").forEach(b => b.classList.toggle("on", b.dataset.f === mzFiltro));
-
-  const vis = lista.filter(function(i){
-    const r = mzRes(m,i);
-    if(mzFiltro === "pend") return r === 0;
-    if(mzFiltro === "feitas") return r > 0;
-    if(mzFiltro === "comp") return i.simbolo === "✅" && !i.cond;
-    return true;
-  });
+  const vis = lista;
 
   let html = "", atual = "";
   vis.forEach(function(i){
@@ -3360,13 +3344,7 @@ $("atRasc").addEventListener("change", function(){ if(mz.style.display !== "none
 
 $("mzEsc").addEventListener("change", function(){ mzEsc = this.value; mzAberta = null; mzRender(); });
 
-$("mzMapa").addEventListener("click", function(ev){
-  const b = ev.target.closest(".mz-seg");
-  if(!b) return;
-  let alvo = document.getElementById("mzb" + b.dataset.b);
-  if(!alvo){ mzFiltro = "todas"; mzRender(); alvo = document.getElementById("mzb" + b.dataset.b); }
-  if(alvo) alvo.scrollIntoView({behavior:"smooth", block:"start"});
-});
+
 
 mz.querySelector(".mz-chips").addEventListener("click", function(ev){
   const b = ev.target.closest("[data-f]");
