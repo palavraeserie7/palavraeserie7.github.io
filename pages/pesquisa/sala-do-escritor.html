@@ -3330,6 +3330,13 @@ $("mzLista").addEventListener("input", function(ev){
   mzContagem();
 });
 
+ $("mzLista").addEventListener("click", function(ev){
+  const h = ev.target.closest(".mz-bl-b");
+  if(!h) return;
+  const g = h.dataset.g;
+  if(mzAbertos.has(g)) mzAbertos.delete(g); else mzAbertos.add(g);
+  mzRender();
+});
 function mzAtualizarBotoes(){
   mz.querySelectorAll(".mz-addv").forEach(b => { b.disabled = !sel.size; });
 }
