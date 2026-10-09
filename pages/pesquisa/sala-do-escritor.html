@@ -3196,6 +3196,225 @@ $("atPulpitoBtn").addEventListener("click", abrirPulpito);
 document.addEventListener("keydown", function(ev){
   if(ev.key === "Escape" && !pul.hidden){ pul.hidden = true; ev.stopImmediatePropagation(); }
 }, true);
+ /* ===== MESA DE ESTUDO: a tabela de rastreio como roteiro de trabalho ===== */
+let TAB = null, mzEsc = "Livro", mzFiltro = "todas", mzAberta = null;
+
+const mz = document.createElement("div");
+mz.id = "atMesa"; mz.className = "at-box at-editor"; mz.style.display = "none";
+mz.innerHTML =
+  '<div class="at-row">' +
+    '<select id="mzEsc" class="at-sel" aria-label="Escopo do estudo"></select>' +
+    '<strong id="mzProg" style="flex:1;font-size:13px"></strong>' +
+    '<button id="mzProx" class="at-btn gold" type="button">PRÓXIMA PENDENTE →</button>' +
+    '<button id="mzVoltar" class="at-btn" type="button">← EDITOR</button>' +
+  '</div>' +
+  '<div id="mzMapa" class="mz-mapa"></div>' +
+  '<div class="mz-chips">' +
+    '<button type="button" class="at-btn" data-f="todas">TODAS</button>' +
+    '<button type="button" class="at-btn" data-f="pend">PENDENTES</button>' +
+    '<button type="button" class="at-btn" data-f="feitas">RESOLVIDAS</button>' +
+    '<button type="button" class="at-btn" data-f="comp">SÓ ✅ COMPLETAS</button>' +
+  '</div>' +
+  '<div id="mzLista" class="mz-lista"></div>' +
+  '<div class="at-rodape">' +
+    '<label><input id="mzDesc" type="checkbox"> incluir a descrição de cada etapa</label>' +
+    '<span id="mzCont"></span>' +
+    '<button id="mzMontar" class="at-btn gold" type="button">MONTAR NO EDITOR</button>' +
+  '</div>';
+$("atEditor").insertAdjacentElement("afterend", mz);
+
+document.querySelector(".at-modo").insertAdjacentHTML("beforeend",
+  '<button id="atModoMesa" class="at-btn" type="button">MESA DE ESTUDO</button>');
+
+function mzDados(){
+  const d = ativo();
+  d.mesa = d.mesa || {};
+  d.mesa[mzEsc] = d.mesa[mzEsc] || {};
+  return d.mesa[mzEsc];
+}
+const mzRes = (m, i) => (m[i.cod] && m[i.cod].s) || 0;
+
+function mzSelos(i){
+  let s = "";
+  if(String(i.simbolo).indexOf("\u26A0") >= 0) s += "<em>resumida</em>";
+  if(i.cond) s += "<em>condicional</em>";
+  if(mzEsc === "Palavra" && ["03.9","03.10","03.11"].indexOf(i.cod) >= 0) s += "<em>só se for verbo</em>";
+  return s ? '<span class="mz-selos">' + s + '</span>' : "";
+}
+
+function mzRender(){
+  const lista = (TAB && TAB[mzEsc]) || [];
+  const m = mzDados();
+  const feitas = lista.filter(i => mzRes(m,i) > 0).length;
+  const escritas = lista.filter(i => m[i.cod] && m[i.cod].t && m[i.cod].t.trim()).length;
+  $("mzProg").textContent = feitas + " de " + lista.length + " etapas resolvidas · " + Math.round(100 * feitas / Math.max(1, lista.length)) + "%";
+  $("mzCont").textContent = escritas + " com resposta escrita";
+
+  const blocos = lista.map(i => i.bloco).filter((b,k,a) => a.indexOf(b) === k);
+  $("mzMapa").innerHTML = blocos.map(function(b){
+    const g = lista.filter(i => i.bloco === b);
+    const f = g.filter(i => mzRes(m,i) > 0).length;
+    return '<button type="button" class="mz-seg" data-b="' + b + '" title="' + escapeHTML(g[0].bloco_nome) + ": " + f + "/" + g.length + '">' +
+      '<i style="height:' + Math.round(100 * f / g.length) + '%"></i><span>' + b + '</span></button>';
+  }).join("");
+
+  mz.querySelectorAll("[data-f]").forEach(b => b.classList.toggle("on", b.dataset.f === mzFiltro));
+
+  const vis = lista.filter(function(i){
+    const r = mzRes(m,i);
+    if(mzFiltro === "pend") return r === 0;
+    if(mzFiltro === "feitas") return r > 0;
+    if(mzFiltro === "comp") return i.simbolo === "✅" && !i.cond;
+    return true;
+  });
+
+  let html = "", atual = "";
+  vis.forEach(function(i){
+    if(i.bloco !== atual){
+      atual = i.bloco;
+      html += '<h4 class="mz-bl" id="mzb' + atual + '">' + atual + " · " + escapeHTML(i.bloco_nome) + "</h4>";
+    }
+    const e = m[i.cod] || {}, s = e.s || 0, ab = mzAberta === i.cod;
+    html += '<div class="mz-et' + (s === 1 ? " feita" : s === 2 ? " na" : "") + (ab ? " ab" : "") + '" data-c="' + i.cod + '">' +
+      '<div class="mz-cab">' +
+        '<button type="button" class="mz-st" title="Pendente, resolvida ou não se aplica">' + ["○","●","⊘"][s] + "</button>" +
+        '<span>' + i.icone + '</span><span class="mz-cod">' + i.cod + '</span>' +
+        '<span class="mz-nome">' + escapeHTML(i.nome) + "</span>" + mzSelos(i) +
+        (e.t && e.t.trim() ? '<span class="mz-tem" title="Tem resposta">✎</span>' : "") +
+      "</div>" +
+      (ab ? '<div class="mz-corpo"><p class="mz-desc">' + escapeHTML(i.descricao) + "</p>" +
+        '<textarea class="mz-t" placeholder="Sua resposta para esta etapa…">' + escapeHTML(e.t || "") + "</textarea>" +
+        '<div class="at-row"><button type="button" class="at-btn mz-addv"' + (sel.size ? "" : " disabled") +
+        ">+ VERSÍCULOS SELECIONADOS</button></div></div>" : "") +
+      "</div>";
+  });
+
+  const topo = $("mzLista").scrollTop;
+  $("mzLista").innerHTML = html || '<span class="at-msg">Nenhuma etapa neste filtro.</span>';
+  $("mzLista").scrollTop = topo;
+}
+
+async function mzAbrir(){
+  if(!ativo()) return;
+  mz.style.display = "";
+  $("atEditor").style.display = "none";
+  document.querySelectorAll(".at-modo .at-btn").forEach(b => b.classList.remove("on"));
+  $("atModoMesa").classList.add("on");
+  $("mzLista").innerHTML = '<span class="at-msg">Carregando a tabela…</span>';
+  try{
+    if(!TAB) TAB = await carregarTabela();
+    if(!TAB[mzEsc]) mzEsc = Object.keys(TAB)[0];
+    $("mzEsc").innerHTML = Object.keys(TAB).map(k => '<option value="' + escapeHTML(k) + '">' + escapeHTML(k) + "</option>").join("");
+    $("mzEsc").value = mzEsc;
+    mzRender();
+  }catch(e){
+    console.error(e);
+    $("mzLista").innerHTML = '<span class="at-msg">Não foi possível ler o tabela.json. Confira se ele está na mesma pasta desta página.</span>';
+  }
+}
+
+function mzFechar(){
+  mz.style.display = "none";
+  $("atEditor").style.display = "";
+  $("atModoMesa").classList.remove("on");
+  aplicarModo();
+}
+
+function mzColar(ta, texto){
+  ta.focus();
+  const pre = ta.value ? (ta.value.endsWith("\n") ? "\n" : "\n\n") : "";
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+  let ok = false;
+  try{ ok = document.execCommand("insertText", false, pre + texto); }catch(e){}
+  if(!ok){ ta.value += pre + texto; ta.dispatchEvent(new Event("input", {bubbles:true})); }
+}
+
+function mzAbrirEtapa(cod){
+  mzAberta = mzAberta === cod ? null : cod;
+  mzRender();
+  if(mzAberta){
+    const el = mz.querySelector('.mz-et[data-c="' + cod + '"]');
+    if(el){ el.scrollIntoView({block:"nearest"}); const t = el.querySelector(".mz-t"); if(t) t.focus(); }
+  }
+}
+
+let mzTimer = null;
+$("atModoMesa").addEventListener("click", mzAbrir);
+$("mzVoltar").addEventListener("click", mzFechar);
+$("atModoTexto").addEventListener("click", function(){ if(mz.style.display !== "none") mzFechar(); });
+$("atModoArvore").addEventListener("click", function(){ if(mz.style.display !== "none") mzFechar(); });
+$("atRasc").addEventListener("change", function(){ if(mz.style.display !== "none") mzRender(); });
+
+$("mzEsc").addEventListener("change", function(){ mzEsc = this.value; mzAberta = null; mzRender(); });
+
+$("mzMapa").addEventListener("click", function(ev){
+  const b = ev.target.closest(".mz-seg");
+  const alvo = b && document.getElementById("mzb" + b.dataset.b);
+  if(alvo) alvo.scrollIntoView({behavior:"smooth", block:"start"});
+});
+
+mz.querySelector(".mz-chips").addEventListener("click", function(ev){
+  const b = ev.target.closest("[data-f]");
+  if(b){ mzFiltro = b.dataset.f; mzRender(); }
+});
+
+$("mzProx").addEventListener("click", function(){
+  const m = mzDados();
+  const prox = ((TAB && TAB[mzEsc]) || []).find(i => mzRes(m,i) === 0);
+  if(!prox){ $("mzCont").textContent = "Todas as etapas foram resolvidas."; return; }
+  mzFiltro = "todas"; mzAberta = null;
+  mzAbrirEtapa(prox.cod);
+});
+
+$("mzLista").addEventListener("click", function(ev){
+  const et = ev.target.closest(".mz-et");
+  if(!et) return;
+  const cod = et.dataset.c, m = mzDados();
+
+  if(ev.target.closest(".mz-st")){
+    m[cod] = m[cod] || {};
+    m[cod].s = ((m[cod].s || 0) + 1) % 3;
+    gravar(); mzRender();
+    return;
+  }
+  if(ev.target.closest(".mz-addv")){
+    if(!sel.size) return;
+    const ta = et.querySelector(".mz-t");
+    const ordem = [...sel].sort((a,b) => a - b);
+    const txt = ordem.map(n => versos.find(v => v.n === n).t).join(" ");
+    mzColar(ta, "> “" + txt + "” — " + referencia() + " (" + rotuloVersao() + ")");
+    $("atLimpar").click();
+    return;
+  }
+  if(ev.target.closest(".mz-cab")) mzAbrirEtapa(cod);
+});
+
+$("mzLista").addEventListener("input", function(ev){
+  if(!ev.target.classList.contains("mz-t")) return;
+  const cod = ev.target.closest(".mz-et").dataset.c, m = mzDados();
+  m[cod] = m[cod] || {};
+  m[cod].t = ev.target.value;
+  clearTimeout(mzTimer);
+  mzTimer = setTimeout(gravar, 400);
+});
+
+function mzAtualizarBotoes(){
+  mz.querySelectorAll(".mz-addv").forEach(b => { b.disabled = !sel.size; });
+}
+$("atVersos").addEventListener("click", mzAtualizarBotoes);
+$("atLimpar").addEventListener("click", mzAtualizarBotoes);
+
+$("mzMontar").addEventListener("click", function(){
+  const m = mzDados(), comDesc = $("mzDesc").checked;
+  const partes = ((TAB && TAB[mzEsc]) || [])
+    .filter(i => m[i.cod] && m[i.cod].t && m[i.cod].t.trim())
+    .map(i => "## " + i.cod + " " + i.nome + "\n" + (comDesc ? "[" + i.descricao + "]\n" : "") + "\n" + m[i.cod].t.trim());
+  if(!partes.length){ $("mzCont").textContent = "Escreva ao menos uma resposta antes de montar."; return; }
+  const d = ativo();
+  d.modo = "texto"; gravar();
+  mzFechar();
+  inserirNoCursor(partes.join("\n\n") + "\n");
+});
   /* ---- eventos ---- */
   $("atLivro").addEventListener("change", function(){ cur.livro = Number(this.value); cur.cap = 1; preencherCapitulos(); lerVersos(); });
   $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
