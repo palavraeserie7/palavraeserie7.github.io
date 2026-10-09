@@ -3241,13 +3241,7 @@ function mzDados(){
 }
 const mzRes = (m, i) => (m[i.cod] && m[i.cod].s) || 0;
 
-function mzSelos(i){
-  let s = "";
-  if(String(i.simbolo).indexOf("\u26A0") >= 0) s += "<em>resumida</em>";
-  if(i.cond) s += "<em>condicional</em>";
-  if(mzEsc === "Palavra" && ["03.9","03.10","03.11"].indexOf(i.cod) >= 0) s += "<em>só se for verbo</em>";
-  return s ? '<span class="mz-selos">' + s + '</span>' : "";
-}
+
 
 function mzRender(){
   const lista = (TAB && TAB[mzEsc]) || [];
@@ -3269,8 +3263,8 @@ function mzRender(){
     html += '<div class="mz-et' + (s === 1 ? " feita" : s === 2 ? " na" : "") + (ab ? " ab" : "") + '" data-c="' + i.cod + '">' +
       '<div class="mz-cab">' +
         '<button type="button" class="mz-st" title="Pendente, resolvida ou não se aplica">' + ["○","●","⊘"][s] + "</button>" +
-        '<span>' + i.icone + '</span><span class="mz-cod">' + i.cod + '</span>' +
-        '<span class="mz-nome">' + escapeHTML(i.nome) + "</span>" + mzSelos(i) +
+                '<span class="mz-cod">' + i.cod + '</span>' +
+        '<span class="mz-nome">' + escapeHTML(i.nome) + "</span>" + 
         (e.t && e.t.trim() ? '<span class="mz-tem" title="Tem resposta">✎</span>' : "") +
       "</div>" +
       (ab ? '<div class="mz-corpo"><p class="mz-desc">' + escapeHTML(i.descricao) + "</p>" +
