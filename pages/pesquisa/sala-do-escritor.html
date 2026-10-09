@@ -3389,23 +3389,7 @@ $("atVersos").addEventListener("click", function(ev){
     st.a = st.r[0].id; gravar(); desenharRascunhos(); mostrarRascunho();
   });
  
-  $("atCopiar").addEventListener("click", function(){
-    const d = ativo();
-    const t = (d.titulo ? "# " + d.titulo + "\n\n" : "") + textoAtual();
-    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(
-      function(){ $("atSalvo").textContent = "Copiado."; },
-      function(){ $("atTexto").select(); $("atSalvo").textContent = "Selecionado: use Ctrl+C."; }
-    );
-  });
-  $("atBaixar").addEventListener("click", function(){
-    const d = ativo();
-    const blob = new Blob([(d.titulo ? "# " + d.titulo + "\n\n" : "") + textoAtual()], {type:"text/markdown;charset=utf-8"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = ((d.titulo || "rascunho").toLowerCase().replace(/[^a-z0-9à-ú]+/gi, "-").replace(/^-|-$/g, "") || "rascunho") + ".md";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  });
+
  
   function alternarFoco(){
     const on = !$("ateliPainel").classList.contains("at-foco");
