@@ -3349,7 +3349,9 @@ $("mzEsc").addEventListener("change", function(){ mzEsc = this.value; mzAberta =
 
 $("mzMapa").addEventListener("click", function(ev){
   const b = ev.target.closest(".mz-seg");
-  const alvo = b && document.getElementById("mzb" + b.dataset.b);
+  if(!b) return;
+  let alvo = document.getElementById("mzb" + b.dataset.b);
+  if(!alvo){ mzFiltro = "todas"; mzRender(); alvo = document.getElementById("mzb" + b.dataset.b); }
   if(alvo) alvo.scrollIntoView({behavior:"smooth", block:"start"});
 });
 
