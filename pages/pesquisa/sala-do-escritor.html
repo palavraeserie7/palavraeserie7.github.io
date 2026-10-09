@@ -3264,7 +3264,11 @@ function mzColar(ta, texto){
 }
 
 function mzAbrirEtapa(cod){
-  mzAberta = mzAberta === cod ? null : cod;
+   mzAberta = mzAberta === cod ? null : cod;
+  if(mzAberta){
+    const it = ((TAB && TAB[mzEsc]) || []).find(x => x.cod === cod);
+    if(it) mzAbertos.add(mzGrupo(it));
+  }
   mzRender();
   if(mzAberta){
     const el = mz.querySelector('.mz-et[data-c="' + cod + '"]');
