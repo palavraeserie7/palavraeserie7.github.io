@@ -2728,7 +2728,9 @@ function desenharModelos(sel){
     try{
       const dados = await carregarTabela();
       lista = dados[escopo];
-      if(!Array.isArray(lista) || !lista.length) throw new Error("lista vazia");
+      if(!Array.isArray(lista) || !lista.length) throw new Error("lista vazia");lista = lista.filter(function(e){
+  return ["01.1","01.2","01.3","01.4","01.5"].indexOf(e.cod) < 0;
+});
     }catch(e){
       console.error(e);
       tabelaFundo.innerHTML =
