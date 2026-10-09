@@ -1184,23 +1184,6 @@ main{
 #atPulpitoTexto h2{font-size:1.1em;color:#e0b95a;margin:1.6em 0 .4em;letter-spacing:.5px}
 #atPulpitoTexto p{margin:.3em 0;white-space:pre-wrap}
 #atPulpitoTexto blockquote{margin:.9em 0;padding:.2em 0 .2em 1em;border-left:4px solid #9c7a32;color:#fff;font-style:italic}
-/* ----- Janela "Aplicar estrutura" (tabela de rastreio) ----- */
-.at-tab-fundo{position:fixed;inset:0;z-index:80;background:rgba(11,20,40,.72);display:flex;align-items:center;justify-content:center;padding:18px}
-.at-tab-fundo[hidden]{display:none}
-.at-tab-janela{width:min(760px,100%);max-height:calc(100vh - 36px);display:flex;flex-direction:column;background:var(--paper-card);color:var(--ink);border:1px solid var(--paper-line);border-radius:8px;box-shadow:0 18px 45px rgba(0,0,0,.4)}
-.at-tab-topo{padding:16px 20px;border-bottom:1px solid var(--paper-line);font:16px Georgia,serif}
-.at-tab-leg{margin-top:6px;font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-.at-tab-corpo{flex:1;overflow:auto;padding:6px 20px 14px}
-.at-tab-bloco{margin:16px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--paper-line);font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:1px;color:var(--brass-deep);text-transform:uppercase}
-.at-tab-item{display:flex;gap:10px;align-items:flex-start;padding:6px 2px;cursor:pointer;font:15px/1.5 Georgia,"Times New Roman",serif}
-.at-tab-item:hover{background:var(--brass-wash)}
-.at-tab-item input{margin-top:6px}
-.at-tab-ic{width:24px;text-align:center;flex:0 0 24px}
-.at-tab-cod{flex:0 0 46px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--brass-deep);padding-top:4px}
-.at-tab-tag{font:italic 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-.at-tab-rodape{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 20px;border-top:1px solid var(--paper-line)}
-.at-tab-aviso{margin-right:auto;font-size:12px;color:#a14747}
-.at-tab-msg{padding:30px 20px;font:14px/1.6 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
 </style>
 </head>
  
@@ -2621,7 +2604,13 @@ function inserirNoCursor(texto){
     return "## " + n + ". Ponto principal\n\n1. Subtópico\n   a) Detalhe\n";
   }).join("\n") + "\n## Conclusão\n";
  
-  const BASE_MODELOS = [];
+  const BASE_MODELOS = [
+    {id:"sermao", nome:"Sermão em 3 pontos", genero:"Sermão"},
+    {id:"homiletico", nome:"Estrutura homilética (I, 1, a)", genero:"Sermão"},
+    {id:"devocional", nome:"Devocional diário", genero:"Devocional"},
+    {id:"post", nome:"Post para redes", genero:"Redes sociais"},
+    {id:"serie", nome:"Episódio de série", genero:"Série"}
+  ];
   const CHAVE_M = "ps_modelos";
   let meus = [], editando = null;
  
@@ -2638,7 +2627,7 @@ function inserirNoCursor(texto){
   function desenharModelos(sel){
     const lista = todosModelos();
     const generos = lista.map(m => m.genero).filter((g,i,a) => a.indexOf(g) === i);
-    $("atModelo").innerHTML = '<optgroup label="Estudo bíblico (tabela de rastreio)"><option value="tabela:Livro">01.1 Livro</option></optgroup>' + generos.map(function(g){
+    $("atModelo").innerHTML = generos.map(function(g){
       return '<optgroup label="' + escapeHTML(g) + '">' +
         lista.filter(m => m.genero === g).map(m => '<option value="' + escapeHTML(m.id) + '">' + escapeHTML(m.nome) + '</option>').join("") +
         '</optgroup>';
@@ -2653,103 +2642,8 @@ function inserirNoCursor(texto){
     $("atMTexto").value = m ? m.texto : "";
   }
  
-  /* ===== APLICAR ESTRUTURA: etapas vindas do tabela.json ===== */
-  let tabelaDados = null;
-  let tabelaFundo = null;
-  const ROTULOS_ESCOPO = {Livro:"01.1 Livro"};
-
-  async function carregarTabela(){
-    if(tabelaDados) return tabelaDados;
-    const r = await fetch("tabela.json", {cache:"no-cache"});
-    if(!r.ok) throw new Error("tabela.json não encontrado");
-    tabelaDados = await r.json();
-    return tabelaDados;
-  }
-
-  function fecharTabela(){ if(tabelaFundo) tabelaFundo.hidden = true; }
-
-  async function abrirTabela(escopo){
-    if(!tabelaFundo){
-      tabelaFundo = document.createElement("div");
-      tabelaFundo.className = "at-tab-fundo";
-      tabelaFundo.hidden = true;
-      document.body.appendChild(tabelaFundo);
-      tabelaFundo.addEventListener("click", function(ev){
-        if(ev.target === tabelaFundo) fecharTabela();
-      });
-      document.addEventListener("keydown", function(ev){
-        if(ev.key === "Escape" && !tabelaFundo.hidden){
-          fecharTabela();
-          ev.stopImmediatePropagation();
-        }
-      }, true);
-    }
-
-    tabelaFundo.innerHTML = '<div class="at-tab-janela"><div class="at-tab-msg">Carregando etapas…</div></div>';
-    tabelaFundo.hidden = false;
-
-    let lista;
-    try{
-      const dados = await carregarTabela();
-      lista = dados[escopo];
-      if(!Array.isArray(lista) || !lista.length) throw new Error("lista vazia");
-    }catch(e){
-      console.error(e);
-      tabelaFundo.innerHTML =
-        '<div class="at-tab-janela"><div class="at-tab-msg">Não foi possível carregar as etapas. ' +
-        'Verifique a conexão e se o arquivo tabela.json está na mesma pasta desta página.</div>' +
-        '<div class="at-tab-rodape"><button type="button" class="at-btn" data-tab="fechar">FECHAR</button></div></div>';
-      tabelaFundo.querySelector('[data-tab="fechar"]').onclick = fecharTabela;
-      return;
-    }
-
-    let blocoAtual = null, html = "";
-    lista.forEach(function(e, i){
-      if(e.bloco !== blocoAtual){
-        blocoAtual = e.bloco;
-        html += '<div class="at-tab-bloco">Bloco ' + escapeHTML(e.bloco) + ' — ' + escapeHTML(e.bloco_nome) + '</div>';
-      }
-      let tags = "";
-      if(String(e.simbolo).indexOf("\u26A0") >= 0) tags += ' <span class="at-tab-tag">(resumida)</span>';
-      if(e.cond) tags += ' <span class="at-tab-tag">[condicional]</span>';
-      html += '<label class="at-tab-item"><input type="checkbox" data-i="' + i + '">' +
-        '<span class="at-tab-ic">' + escapeHTML(e.icone || "") + '</span>' +
-        '<span class="at-tab-cod">' + escapeHTML(e.cod) + '</span>' +
-        '<span>' + escapeHTML(e.nome) + tags + '</span></label>';
-    });
-
-    tabelaFundo.innerHTML =
-      '<div class="at-tab-janela" role="dialog" aria-modal="true">' +
-        '<div class="at-tab-topo"><strong>' + escapeHTML(ROTULOS_ESCOPO[escopo] || escopo) + '</strong> — escolha as etapas' +
-          '<div class="at-tab-leg">✅ entra · ⚠️ entra adaptada ou resumida · * condicional</div></div>' +
-        '<div class="at-tab-corpo">' + html + '</div>' +
-        '<div class="at-tab-rodape"><span class="at-tab-aviso"></span>' +
-          '<button type="button" class="at-btn" data-tab="fechar">CANCELAR</button>' +
-          '<button type="button" class="at-btn gold" data-tab="aplicar">APLICAR ESTRUTURA</button></div>' +
-      '</div>';
-
-    tabelaFundo.querySelector('[data-tab="fechar"]').onclick = fecharTabela;
-    tabelaFundo.querySelector('[data-tab="aplicar"]').onclick = function(){
-      const marcadas = Array.from(tabelaFundo.querySelectorAll('input[type="checkbox"]:checked'))
-        .map(function(c){ return Number(c.dataset.i); })
-        .sort(function(a, b){ return a - b; });
-      if(!marcadas.length){
-        tabelaFundo.querySelector(".at-tab-aviso").textContent = "Marque pelo menos uma etapa.";
-        return;
-      }
-      const texto = marcadas.map(function(i){
-        const e = lista[i];
-        return "## " + e.cod + " " + e.nome + "\n[" + e.descricao + "]";
-      }).join("\n\n");
-      fecharTabela();
-      inserirNoCursor(texto);
-    };
-  }
-
   $("atAplicar").addEventListener("click", function(){
-    const v = $("atModelo").value;
-    if(v.indexOf("tabela:") === 0){ abrirTabela(v.slice(7)); return; }
-    const m = todosModelos().find(x => x.id === v);
+    const m = todosModelos().find(x => x.id === $("atModelo").value);
     if(m) inserirNoCursor(m.texto);
   });
   $("atModelos").addEventListener("click", function(){
