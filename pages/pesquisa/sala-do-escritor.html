@@ -3338,6 +3338,13 @@ function arqAbrir(){
       if(!b) return;
       const acao = b.dataset.arq;
       if(acao === "fechar"){ arqFechar(); return; }
+           if(acao === "limpar"){
+        if(!(st.arq || []).length){ toast("O arquivo já está vazio."); return; }
+        if(!window.confirm("Apagar TODAS as pesquisas do arquivo? Não dá para desfazer.")) return;
+        st.arq = [];
+        gravar(); arqDesenhar();
+        return;
+      }
       const item = (st.arq || []).find(x => x.id === b.dataset.id);
       if(!item) return;
       if(acao === "copiar"){
