@@ -827,22 +827,18 @@
   function renderResults() {
     const list = OCORRENCIAS.filter(matches).sort((a, b) => b.quando.localeCompare(a.quando));
     const box = $('results');
- 
-    $('list-count').textContent =
-      list.length === 1 ? '1 registro encontrado' : `${list.length} registros encontrados`;
- 
+    const listBar = document.querySelector('.list-bar');
+
     if (!list.length) {
-      const q = $('search-input').value.trim();
-      box.innerHTML = `
-        <div class="empty">
-          <strong>Nenhum registro encontrado nesta demonstração</strong>
-          ${q
-            ? `Não há registro local correspondente a “${esc(q)}”. Isso não significa que o fato não exista. O botão abaixo apenas abre uma ficha provisória nesta sessão; ainda não realiza uma busca externa nem encontra fontes automaticamente.`
-            : 'Nenhum registro corresponde aos filtros escolhidos. Tente ampliar a busca.'}
-          ${q ? '<br><button type="button" class="btn" id="start-investigation">ABRIR FICHA PROVISÓRIA</button>' : ''}
-        </div>`;
+      // Mantém esta área totalmente limpa enquanto não houver registros.
+      listBar.style.display = 'none';
+      box.innerHTML = '';
       return;
     }
+
+    listBar.style.display = '';
+    $('list-count').textContent =
+      list.length === 1 ? '1 registro encontrado' : `${list.length} registros encontrados`;
  
     if (mode === 'timeline') {
       let html = '';
