@@ -3471,6 +3471,13 @@ async function mzPesquisar(cod, btn){
   const escopo = mzEscopoDaEtapa(it);
   const r = mzPassagem(escopo);
   if(!r.ok){ toast(r.erro); return; }
+   const o = await mzOriginal(it, escopo);
+  if(!o.ok){ toast(o.erro); return; }
+  if(o.original){
+    r.p.original = o.original;
+    r.p.originalLang = o.lang;
+    if(o.lingua) r.p.text = "";
+  }
   const m = mzDados();
   const atual = (m[cod] && m[cod].t) || "";
   if(atual.trim() && !window.confirm("Esta etapa já tem texto. Substituir pela pesquisa?")) return;
