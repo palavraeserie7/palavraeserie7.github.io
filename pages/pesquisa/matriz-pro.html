@@ -1938,6 +1938,34 @@ function getModulesForScope() {
   });
   return modules;
 } 
+ const SCOPES = ["Livro", "Capítulo", "Perícope", "Versículo", "Palavra"];
+
+function renderScopeBar() {
+  const bar = document.getElementById("scope-bar");
+  if (!bar) return;
+  bar.innerHTML = "";
+  SCOPES.forEach(scope => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "scope-button" + (scope === activeScope ? " active" : "");
+    b.textContent = scope;
+    b.onclick = () => selectScope(scope);
+    bar.appendChild(b);
+  });
+}
+
+function selectScope(scope) {
+  activeScope = scope;
+  activeModule = "";
+  activeStep = "";
+  awaitingReference = false;
+  renderScopeBar();
+  renderModules();
+  document.getElementById("workspace-context").textContent =
+    "Escopo: " + scope + " • selecione um módulo e uma subetapa";
+  messages.innerHTML = "";
+  questionInput.value = "";
+}
 function renderModules() {
  
   const root =
