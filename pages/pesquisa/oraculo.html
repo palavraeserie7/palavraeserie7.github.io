@@ -1,6 +1,3 @@
-
-
-Oraculo ocorrencias · HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -460,6 +457,8 @@ Oraculo ocorrencias · HTML
     .src .src-meta { color:var(--ink-soft); font-size:11.5px; margin:2px 0 6px; }
     .src .src-note { color:var(--ink-soft); }
     .src .link-pending { display:inline-block; margin-top:6px; color:var(--grey); font-size:11px; font-style:italic; }
+    .src .source-link { display:inline-block; margin-top:7px; color:var(--brass-deep); font-size:12px; font-weight:700; text-decoration:underline; }
+    .src .source-link:hover { color:var(--ink); }
  
     .vbadge {
       display:inline-block;
@@ -572,7 +571,7 @@ Oraculo ocorrencias · HTML
  
           <header class="oracle-head">
             <h1>ORÁCULO — FATOS, FONTES E BÍBLIA</h1>
-            <p>Pesquise o que uma pessoa influente ou uma autoridade disse ou fez. O Oráculo confirma se o fato existe, mostra quando, onde e por quais fontes foi documentado, registra o impacto social, religioso e familiar e, por fim, coloca a questão diante das Escrituras.</p>
+            <p>Investigue declarações e acontecimentos relevantes para a vida pública e a fé cristã. O Oráculo organiza o que foi alegado, quem está envolvido, quando e onde ocorreu, quais fontes sustentam cada informação e como a questão pode ser examinada à luz das Escrituras.</p>
           </header>
  
           <p class="principle">
@@ -580,7 +579,8 @@ Oraculo ocorrencias · HTML
           </p>
  
           <p class="demo-note">
-            <strong>Versão de demonstração.</strong> Os registros abaixo são fictícios e servem para testar o layout e o fluxo. Nomes, veículos e falas foram inventados e não se referem a pessoas reais. As fontes reais serão ligadas depois.
+            <strong>Modo de demonstração — não é uma pesquisa na internet.</strong>
+            Os registros exibidos são fictícios e servem somente para testar a interface. A busca atual consulta apenas estes dados locais; ela não confirma acontecimentos reais, não consulta notícias em tempo real e não deve ser usada como fonte factual. A pesquisa real dependerá da integração com serviços de busca e de fontes verificáveis.
           </p>
  
           <!-- ================= BUSCA ================= -->
@@ -595,7 +595,7 @@ Oraculo ocorrencias · HTML
               >
               <button class="btn" type="submit">BUSCAR</button>
             </form>
-            <p class="search-hint">Busque pelo nome, por palavras da declaração, pelo veículo ou pelo tema. A busca ignora acentos e maiúsculas.</p>
+            <p class="search-hint">Nesta versão, a busca consulta somente os registros de demonstração abaixo. Ela ignora acentos e maiúsculas, mas ainda não pesquisa na internet.</p>
  
             <div class="filters">
               <div>
@@ -659,7 +659,7 @@ Oraculo ocorrencias · HTML
             </div>
  
             <div class="foot-note">
-              <strong>Como o Oráculo registra:</strong> separa citação literal de resumo, informa a fonte de cada afirmação e mostra quando não encontrou evidência. Quem for citado pode pedir correção ou direito de resposta (canal a definir).
+              <strong>Como o Oráculo deve registrar:</strong> separar citação literal de resumo, ligar cada afirmação à sua fonte e mostrar o que ainda não foi verificado. Nesta demonstração, os dados são fictícios e não há apuração automática nem canal de correção conectado.
             </div>
           </section>
  
@@ -914,6 +914,15 @@ Oraculo ocorrencias · HTML
   function statusInfo(id) { return STATUS.find(s => s.id === id) || STATUS[3]; }
   function areaName(id) { const a = AREAS.find(x => x[0] === id); return a ? a[1] : id; }
   function slug(v) { return norm(v).replace(/[^a-z0-9]+/g, '-'); }
+
+  function safeSourceUrl(value) {
+    try {
+      const u = new URL(String(value || ''));
+      return (u.protocol === 'https:' || u.protocol === 'http:') ? u.href : '';
+    } catch (_) {
+      return '';
+    }
+  }
  
   /* =========================================================
      BUSCA
@@ -1013,11 +1022,11 @@ Oraculo ocorrencias · HTML
       const q = $('search-input').value.trim();
       box.innerHTML = `
         <div class="empty">
-          <strong>Nenhum registro ainda</strong>
+          <strong>Nenhum registro encontrado nesta demonstração</strong>
           ${q
-            ? `Não há ocorrência registrada para “${esc(q)}”. Você pode abrir uma investigação: o Oráculo cria o registro com a situação <em>Em apuração</em> e procura as fontes.`
+            ? `Não há registro local correspondente a “${esc(q)}”. Isso não significa que o fato não exista. O botão abaixo apenas abre uma ficha provisória nesta sessão; ainda não realiza uma busca externa nem encontra fontes automaticamente.`
             : 'Nenhum registro corresponde aos filtros escolhidos. Tente ampliar a busca.'}
-          ${q ? '<br><button type="button" class="btn" id="start-investigation">INVESTIGAR ESTE ASSUNTO</button>' : ''}
+          ${q ? '<br><button type="button" class="btn" id="start-investigation">ABRIR FICHA PROVISÓRIA</button>' : ''}
         </div>`;
       return;
     }
@@ -1077,7 +1086,7 @@ Oraculo ocorrencias · HTML
       quando:new Date().toISOString().slice(0, 10),
       onde:{tipo:'A apurar', nome:'A apurar', local:''},
       status:'em-apuracao',
-      contexto:'Registro criado nesta sessão. Quando o serviço de apuração estiver ligado, ele procurará a fonte original, as fontes oficiais e a cobertura jornalística, na ordem do rastreio.',
+      contexto:'Ficha provisória criada apenas nesta sessão. Nenhuma pesquisa externa foi executada e nenhuma fonte foi localizada automaticamente.',
       temas:[],
       keywords:[],
       rastro:null,
@@ -1096,7 +1105,7 @@ Oraculo ocorrencias · HTML
   /* =========================================================
      FICHA
      ========================================================= */
-  const STAGES = ['O que aconteceu', 'Rastreio e proveniência', 'Impacto', 'O que a Bíblia diz'];
+  const STAGES = ['Acontecimento', 'Responsáveis', 'Fontes e verificação', 'Impacto', 'O que a Bíblia diz'];
   let currentOcc = null;
   let currentStage = 0;
  
@@ -1151,6 +1160,30 @@ Oraculo ocorrencias · HTML
       <div class="context-box"><strong>Contexto:</strong> ${esc(o.contexto)}</div>`;
   }
  
+  function stageResponsible(o) {
+    const people = Array.isArray(o.responsaveis) ? o.responsaveis : [];
+    const items = people.length
+      ? `<div class="facts">${people.map(p => `
+          <div class="fact">
+            <h4>${esc(p.funcao || 'Participação')}</h4>
+            <p>${esc(p.nome || 'Não identificado')}</p>
+            <small>${esc(p.vinculo || 'Vínculo não informado')}</small>
+            ${p.fonte ? `<small>Fonte: ${esc(p.fonte)}</small>` : ''}
+          </div>`).join('')}</div>`
+      : `<div class="empty"><strong>Responsáveis adicionais ainda não identificados</strong>
+          O registro identifica a pessoa ou entidade principal acima. Organizadores, financiadores, participantes e responsáveis institucionais só devem ser acrescentados quando houver fonte que sustente o vínculo. Não se deve presumir responsabilidade por associação.</div>`;
+
+    return `
+      <h3>Responsáveis e participantes</h3>
+      <p class="lead">Esta etapa separa quem fez a declaração, quem organizou ou realizou o acontecimento e outras pessoas ou entidades envolvidas. Cada vínculo precisa ter fundamento verificável.</p>
+      <div class="facts">
+        <div class="fact"><h4>Pessoa ou entidade principal</h4><p>${esc(o.quem.nome)}</p><small>${esc(o.quem.papel)}</small></div>
+        <div class="fact"><h4>Local ou organização associada</h4><p>${esc(o.onde.nome || 'Não identificado')}</p><small>${esc(o.onde.tipo || 'Tipo não informado')}${o.onde.local ? ' — ' + esc(o.onde.local) : ''}</small></div>
+      </div>
+      <div style="margin-top:14px">${items}</div>
+      <div class="context-box"><strong>Regra de atribuição:</strong> aparecer em uma notícia, participar de um evento ou compartilhar uma publicação não prova, por si só, que alguém organizou, financiou ou endossou tudo o que ocorreu.</div>`;
+  }
+
   function stageTrail(o) {
     const rastro = o.rastro ? `
       <div class="src-group">
@@ -1177,7 +1210,9 @@ Oraculo ocorrencias · HTML
               <span class="vbadge ${slug(f.verificacao)}">${esc(f.verificacao.replace('-', ' '))}</span>
               <div class="src-meta">${esc(f.veiculo)} · ${fmtDate(f.data)}</div>
               <div class="src-note">${esc(f.nota)}</div>
-              <span class="link-pending">Link da publicação original: a conectar</span>
+              ${safeSourceUrl(f.url)
+                ? `<a class="source-link" href="${esc(safeSourceUrl(f.url))}" target="_blank" rel="noopener noreferrer">Abrir fonte ↗</a>`
+                : '<span class="link-pending">Link verificável ainda não informado</span>'}
             </div>`).join('')}
         </div>`;
     }).join('');
@@ -1187,8 +1222,8 @@ Oraculo ocorrencias · HTML
       : '';
  
     return `
-      <h3>Rastreio e proveniência</h3>
-      <p class="lead">De onde vem a informação. As fontes ficam separadas por tipo: original, oficial, jornalística e análise. Cada uma tem o seu nível de verificação.</p>
+      <h3>Fontes e verificação</h3>
+      <p class="lead">De onde vem cada informação. As fontes são separadas por tipo: original, oficial, jornalística e análise. Uma fonte secundária não substitui o registro original quando este existe.</p>
       ${rastro}${groups}${none}`;
   }
  
@@ -1245,7 +1280,7 @@ Oraculo ocorrencias · HTML
  
     renderStepper();
  
-    const html = [stageWhat, stageTrail, stageImpact, stageBible][currentStage](o);
+    const html = [stageWhat, stageResponsible, stageTrail, stageImpact, stageBible][currentStage](o);
     $('ficha-body').innerHTML = html;
  
     $('prev-stage').disabled = currentStage === 0;
@@ -1319,9 +1354,3 @@ Oraculo ocorrencias · HTML
   </script>
 </body>
 </html>
- 
-
-
-
-
-Claude terminou a resposta
