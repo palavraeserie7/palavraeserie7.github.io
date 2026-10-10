@@ -1,12 +1,12 @@
 
 
-Oraculo · HTML
+Oraculo ocorrencias · HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oráculo — Consulta Geral</title>
+  <title>Oráculo — Fatos, Fontes e Bíblia</title>
  
   <style>
     a.side-item[href="areas-academicas.html"],
@@ -21,15 +21,15 @@ Oraculo · HTML
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
   (function(){
-    var menuClient = window.supabase.createClient(
-      "https://qmhdbuxomozdczgvpvcc.supabase.co",
-      "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8"
-    );
-    menuClient.auth.getSession().then(function(res){
-      if (res.data && res.data.session) {
-        document.documentElement.classList.add("logado");
-      }
-    }).catch(function(){});
+    try {
+      var menuClient = window.supabase.createClient(
+        "https://qmhdbuxomozdczgvpvcc.supabase.co",
+        "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8"
+      );
+      menuClient.auth.getSession().then(function(res){
+        if (res.data && res.data.session) document.documentElement.classList.add("logado");
+      }).catch(function(){});
+    } catch(e) {}
   })();
   </script>
  
@@ -39,12 +39,6 @@ Oraculo · HTML
  
   <style>
     :root {
-      --bg:#0b1428;
-      --panel:#111b30;
-      --border:#263754;
-      --text:#dbe7f5;
-      --muted:#91a4bd;
- 
       --paper:#f4eedd;
       --paper-card:#fbf7ec;
       --paper-line:#ddcea4;
@@ -55,37 +49,33 @@ Oraculo · HTML
       --brass-wash:#ede0bd;
       --navy:#0e1526;
       --navy-soft:#1b2740;
-      --verified:#4b6b4e;
+      --green:#4b6b4e;
+      --amber:#b07a1d;
+      --rust:#9a4a35;
+      --grey:#7d7566;
  
       --font-display:'Fraunces',Georgia,serif;
       --font-body:'Inter','Segoe UI',Tahoma,sans-serif;
- 
-      --accent:var(--brass);
-      --paper-border:var(--paper-line);
       --side-w:168px;
     }
  
     * { box-sizing:border-box; }
- 
     html, body { margin:0; width:100%; min-height:100%; }
- 
     body {
       min-height:100vh;
       background:#0b1428;
-      color:var(--text);
+      color:#dbe7f5;
       font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
       -webkit-font-smoothing:antialiased;
     }
- 
+    button, input, select { font-family:inherit; }
     :focus-visible { outline:2px solid var(--brass); outline-offset:2px; }
  
     @media (prefers-reduced-motion:reduce) {
       * { transition-duration:.01ms !important; animation-duration:.01ms !important; }
     }
  
-    /* =========================================================
-       SHELL PADRÃO DA PLATAFORMA
-       ========================================================= */
+    /* ---------- shell da plataforma ---------- */
     .app-shell{ display:flex; align-items:stretch; min-height:100vh; }
     .side-nav{ flex:0 0 var(--side-w); width:var(--side-w); display:flex; flex-direction:column; gap:16px; padding:16px 10px; background:#111b30; border-right:1px solid #263754; position:sticky; top:0; height:100vh; overflow-y:auto; }
     .side-brand{ padding:2px 4px 12px; border-bottom:1px solid #263754; }
@@ -101,8 +91,8 @@ Oraculo · HTML
     .site-header{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-bottom:1px solid #263754; background:#111b30; position:sticky; top:0; z-index:20; }
     .header-link{ padding:8px 11px; border:1px solid #536780; border-radius:7px; background:transparent; color:#dbe7f5; font-size:10px; font-weight:900; text-decoration:none; white-space:nowrap; }
     .header-link:hover,.header-link:focus-visible{ border-color:#18bfff; background:#163451; outline:none; }
-    .content-area > main{ width:100%; max-width:none; flex:1; margin:0; padding:40px; background:#f4eedd; }
-    .content-area > main > .paper{ width:100%; max-width:none; margin:0; padding:24px; border:1px solid #ddcea4; border-radius:8px; background:#f4eedd; color:#2c2418; box-shadow:0 6px 18px rgba(55,45,30,.12); }
+    .content-area > main{ width:100%; flex:1; padding:40px; background:var(--paper); }
+    .paper{ width:100%; padding:24px; border:1px solid var(--paper-line); border-radius:8px; background:var(--paper); color:var(--ink); box-shadow:0 6px 18px rgba(55,45,30,.12); font-family:var(--font-body); }
  
     @media(max-width:900px){
       :root{ --side-w:100%; }
@@ -117,85 +107,234 @@ Oraculo · HTML
       .content-area > main{ padding:12px 9px 28px; }
       .site-header{ align-items:flex-start; flex-wrap:wrap; }
       .header-link{ flex:1; text-align:center; }
-      .content-area > main > .paper{ padding:14px; }
+      .paper{ padding:12px; }
     }
  
-    /* =========================================================
-       PAINEL DO ORÁCULO
-       ========================================================= */
-    .oracle-chat-panel {
-      width:100%;
-      overflow:hidden;
+    /* ---------- cabeçalho do Oráculo ---------- */
+    .oracle-head {
+      padding:26px 28px 20px;
       border:1px solid var(--paper-line);
-      border-radius:8px;
-      background:var(--paper);
-      color:var(--ink);
-    }
- 
-    .ai-chat-header {
-      padding:28px 32px 20px;
-      border-bottom:1px solid var(--paper-line);
+      border-radius:8px 8px 0 0;
       background:var(--paper-card);
     }
- 
-    .ai-chat-header h1 {
-      margin:0 0 12px;
-      color:var(--ink);
+    .oracle-head h1 {
+      margin:0 0 10px;
       font-family:var(--font-display);
       font-weight:650;
       font-size:clamp(24px,3.6vw,34px);
-      letter-spacing:.2px;
+      color:var(--ink);
     }
+    .oracle-head p { margin:0; max-width:680px; color:var(--ink-soft); font-size:14.5px; line-height:1.65; }
  
-    .ai-chat-header p {
-      max-width:640px;
+    .principle {
       margin:0;
-      color:var(--ink-soft);
-      font-family:var(--font-body);
-      font-size:14.5px;
-      line-height:1.65;
-    }
- 
-    .oracle-trust-note {
-      margin:16px 32px 4px;
-      padding:12px 14px;
-      border-left:2px solid var(--brass);
+      padding:12px 18px;
+      border:1px solid var(--paper-line);
+      border-top:0;
+      border-left:3px solid var(--brass);
       background:var(--brass-wash);
       color:var(--ink-soft);
-      font-family:var(--font-body);
       font-size:12px;
       line-height:1.6;
     }
+    .principle strong { color:var(--ink); }
  
-    .oracle-trust-note strong { color:var(--ink); }
- 
-    /* =========================================================
-       PASSO A PASSO
-       ========================================================= */
-    .wiz-stepper {
-      display:flex;
-      gap:0;
-      margin:16px 32px 0;
-      border-bottom:1px solid var(--paper-line);
-      overflow-x:auto;
+    .demo-note {
+      margin:12px 0 0;
+      padding:9px 12px;
+      border:1px dashed var(--brass);
+      border-radius:5px;
+      color:var(--brass-deep);
+      font-size:11.5px;
+      line-height:1.5;
     }
  
-    .wiz-step {
+    .view { display:none; margin-top:18px; }
+    body[data-view="search"] #view-search,
+    body[data-view="ficha"] #view-ficha { display:block; }
+ 
+    /* ---------- busca ---------- */
+    .search-box {
+      display:flex;
+      gap:10px;
+    }
+    .search-box input {
       flex:1;
-      min-width:130px;
+      min-width:0;
+      padding:15px 16px;
+      border:1px solid var(--paper-line);
+      border-radius:6px;
+      background:#fffdf6;
+      color:var(--ink);
+      font-size:15px;
+    }
+    .search-box input:focus { border-color:var(--brass); }
+    .btn {
+      min-height:44px;
+      padding:0 20px;
+      border:0;
+      border-radius:6px;
+      background:var(--brass);
+      color:#fffdf6;
+      font-weight:700;
+      font-size:13px;
+      cursor:pointer;
+    }
+    .btn:hover { background:var(--brass-deep); }
+    .btn.dark { background:var(--navy); }
+    .btn.dark:hover { background:var(--navy-soft); }
+    .btn.ghost { background:transparent; border:1px solid var(--paper-line); color:var(--ink-soft); }
+    .btn.ghost:hover { background:var(--brass-wash); color:var(--ink); }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+ 
+    .search-hint { margin:8px 2px 0; color:var(--ink-soft); font-size:12px; line-height:1.5; }
+ 
+    .filters {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:10px;
+      margin-top:14px;
+    }
+    .filters label { display:block; margin-bottom:4px; color:var(--ink-soft); font-size:11px; font-weight:600; }
+    .filters select {
+      width:100%;
+      padding:9px 10px;
+      border:1px solid var(--paper-line);
+      border-radius:5px;
+      background:#fffdf6;
+      color:var(--ink);
+      font-size:12.5px;
+    }
+ 
+    .list-bar {
       display:flex;
       align-items:center;
-      gap:9px;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:22px 0 12px;
+      padding-top:16px;
+      border-top:1px solid var(--paper-line);
+    }
+    .list-count { color:var(--ink-soft); font-size:13px; }
+    .toggle { display:inline-flex; border:1px solid var(--paper-line); border-radius:6px; overflow:hidden; }
+    .toggle button {
+      padding:7px 13px;
+      border:0;
+      background:transparent;
+      color:var(--ink-soft);
+      font-size:12px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .toggle button.on { background:var(--navy); color:#fff; }
+ 
+    .month-label {
+      margin:20px 0 8px;
+      color:var(--brass-deep);
+      font-family:var(--font-display);
+      font-size:16px;
+      font-weight:600;
+      text-transform:capitalize;
+    }
+ 
+    .occ-list { display:flex; flex-direction:column; gap:10px; }
+    .occ-list.timeline { border-left:2px solid var(--paper-line); padding-left:16px; margin-left:4px; }
+    .occ-list.timeline .occ-card { position:relative; }
+    .occ-list.timeline .occ-card::before {
+      content:"";
+      position:absolute;
+      left:-23px;
+      top:20px;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--brass);
+      border:2px solid var(--paper);
+    }
+ 
+    .occ-card {
+      display:block;
+      width:100%;
+      padding:16px 18px;
+      border:1px solid var(--paper-line);
+      border-radius:7px;
+      background:var(--paper-card);
+      color:var(--ink);
+      text-align:left;
+      cursor:pointer;
+      transition:border-color .12s ease, background .12s ease;
+    }
+    .occ-card:hover { border-color:var(--brass); background:#fffaf0; }
+    .occ-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+    .occ-who { font-weight:700; font-size:14.5px; }
+    .occ-role { color:var(--ink-soft); font-size:12px; }
+    .occ-what { margin:0 0 10px; font-family:var(--font-display); font-size:16.5px; line-height:1.4; font-weight:500; }
+    .occ-meta { display:flex; flex-wrap:wrap; gap:6px 14px; color:var(--ink-soft); font-size:11.5px; }
+    .occ-meta span::before { content:""; }
+ 
+    .badge {
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:4px;
+      color:#fff;
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .badge.confirmada { background:var(--green); }
+    .badge.parcial { background:var(--amber); }
+    .badge.contestada { background:var(--rust); }
+    .badge.nao-localizada { background:var(--grey); }
+    .badge.em-apuracao { background:var(--navy-soft); }
+    .badge.tipo { background:transparent; color:var(--brass-deep); border:1px solid var(--brass); }
+ 
+    .mini-impact { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+    .chip {
+      padding:2px 8px;
+      border:1px solid var(--paper-line);
+      border-radius:999px;
+      background:#fffdf6;
+      color:var(--ink-soft);
+      font-size:11px;
+    }
+    .chip b { color:var(--ink); font-weight:600; }
+ 
+    .empty {
+      padding:26px 20px;
+      border:1px dashed var(--paper-line);
+      border-radius:8px;
+      background:var(--paper-card);
+      text-align:center;
+      color:var(--ink-soft);
+      font-size:13.5px;
+      line-height:1.6;
+    }
+    .empty strong { color:var(--ink); display:block; font-family:var(--font-display); font-size:17px; margin-bottom:4px; }
+    .empty .btn { margin-top:14px; }
+ 
+    /* ---------- ficha ---------- */
+    .ficha-top { display:flex; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
+    .ficha-title h2 { margin:0; font-family:var(--font-display); font-size:22px; font-weight:600; line-height:1.3; }
+    .ficha-title p { margin:6px 0 0; color:var(--ink-soft); font-size:12.5px; }
+ 
+    .wiz-stepper { display:flex; border-bottom:1px solid var(--paper-line); overflow-x:auto; margin-bottom:6px; }
+    .wiz-step {
+      flex:1;
+      min-width:120px;
+      display:flex;
+      align-items:center;
+      gap:8px;
       padding:11px 8px;
       border:0;
       border-bottom:3px solid transparent;
       background:transparent;
       color:#a79a7e;
-      font-family:var(--font-body);
       text-align:left;
-      cursor:default;
+      cursor:pointer;
     }
- 
     .wiz-num {
       flex:none;
       width:22px;
@@ -208,497 +347,198 @@ Oraculo · HTML
       font-size:11px;
       font-weight:700;
     }
- 
-    .wiz-text { display:flex; flex-direction:column; min-width:0; }
     .wiz-title { font-size:12.5px; font-weight:600; }
-    .wiz-value {
-      margin-top:1px;
-      font-size:11px;
-      color:var(--ink-soft);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:190px;
-    }
- 
-    .wiz-step.done { color:var(--ink); cursor:pointer; }
+    .wiz-step:hover { background:var(--brass-wash); }
+    .wiz-step.done { color:var(--ink); }
     .wiz-step.done .wiz-num { background:var(--brass); border-color:var(--brass); color:#fffdf6; }
-    .wiz-step.done:hover { background:var(--brass-wash); }
     .wiz-step.current { color:var(--ink); border-bottom-color:var(--brass); }
     .wiz-step.current .wiz-num { border-color:var(--brass); color:var(--brass-deep); }
  
-    .wiz-stage { display:none; padding:24px 32px 30px; }
-    #oracle-wizard[data-stage="1"] #wiz-stage-1,
-    #oracle-wizard[data-stage="2"] #wiz-stage-2,
-    #oracle-wizard[data-stage="3"] #wiz-stage-3,
-    #oracle-wizard[data-stage="4"] #wiz-stage-4 { display:block; }
- 
-    .wiz-top {
-      display:flex;
-      align-items:flex-start;
-      gap:14px;
-      margin-bottom:18px;
-    }
- 
-    .wiz-back {
-      flex:none;
-      min-height:34px;
-      padding:0 14px;
-      border:1px solid var(--navy-soft);
-      border-radius:6px;
-      background:var(--navy);
-      color:#dbe7f5;
-      font-family:var(--font-body);
-      font-weight:600;
-      font-size:12.5px;
-      cursor:pointer;
-    }
- 
-    .wiz-back:hover { background:var(--navy-soft); color:#fff; }
- 
-    .wiz-back.quiet {
-      background:transparent;
-      border-color:var(--paper-line);
-      color:var(--ink-soft);
-    }
- 
-    .wiz-back.quiet:hover { background:var(--brass-wash); color:var(--ink); }
- 
-    .wiz-heading h2 {
-      margin:0;
-      color:var(--ink);
+    .stage-body { padding:18px 2px 8px; }
+    .stage-body h3 {
+      margin:0 0 4px;
       font-family:var(--font-display);
+      font-size:19px;
       font-weight:600;
-      font-size:21px;
     }
+    .stage-body .lead { margin:0 0 16px; color:var(--ink-soft); font-size:13px; line-height:1.55; max-width:660px; }
  
-    .wiz-heading p {
-      margin:5px 0 0;
-      color:var(--ink-soft);
-      font-family:var(--font-body);
-      font-size:13px;
-      line-height:1.55;
-      max-width:620px;
-    }
- 
-    .choice-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-      gap:10px;
-    }
- 
-    .choice-card {
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-height:56px;
-      padding:11px 14px;
+    .facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:10px; }
+    .fact {
+      padding:13px 15px;
       border:1px solid var(--paper-line);
-      border-radius:6px;
+      border-top:3px solid var(--brass);
+      border-radius:5px;
       background:var(--paper-card);
-      color:var(--ink);
-      font-family:var(--font-body);
-      font-size:13.5px;
-      font-weight:500;
-      line-height:1.3;
-      text-align:left;
-      cursor:pointer;
-      transition:border-color .12s ease, background .12s ease;
     }
+    .fact:nth-child(2) { border-top-color:var(--navy-soft); }
+    .fact:nth-child(3) { border-top-color:var(--green); }
+    .fact:nth-child(4) { border-top-color:var(--brass-deep); }
+    .fact h4 { margin:0 0 5px; color:var(--ink-soft); font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+    .fact p { margin:0; font-size:13.5px; line-height:1.5; }
+    .fact small { display:block; margin-top:4px; color:var(--ink-soft); font-size:12px; }
  
-    .choice-card:hover { border-color:var(--brass); background:var(--brass-wash); }
- 
-    .choice-number {
-      flex:0 0 auto;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:28px;
-      height:20px;
-      padding:0 5px;
-      border:1px solid var(--brass);
-      border-radius:4px;
-      color:var(--brass-deep);
-      font-size:10.5px;
-      font-weight:700;
-    }
- 
-    .choice-name { flex:1; }
- 
-    .skip-row {
-      display:flex;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:18px;
-      padding-top:16px;
-      border-top:1px solid var(--paper-line);
-      color:var(--ink-soft);
-      font-family:var(--font-body);
-      font-size:12.5px;
-    }
- 
-    .skip-button {
-      padding:9px 14px;
-      border:1px solid var(--brass);
-      border-radius:6px;
-      background:transparent;
-      color:var(--brass-deep);
-      font-family:var(--font-body);
-      font-weight:700;
-      font-size:12px;
-      cursor:pointer;
-    }
- 
-    .skip-button:hover { background:var(--brass-wash); }
- 
-    .sub-list { display:flex; flex-direction:column; }
- 
-    .sub-row {
-      display:flex;
-      align-items:center;
-      gap:12px;
-      width:100%;
-      padding:12px 8px;
-      border:0;
-      border-bottom:1px solid var(--paper-line);
-      background:transparent;
-      color:var(--ink);
-      font-family:var(--font-body);
-      font-size:13.5px;
-      text-align:left;
-      cursor:pointer;
-    }
- 
-    .sub-row:first-child { border-top:1px solid var(--paper-line); }
-    .sub-row:hover { background:var(--brass-wash); }
-    .sub-row .sub-code { flex:0 0 auto; min-width:42px; color:var(--brass-deep); font-size:11.5px; font-weight:700; }
-    .sub-row .sub-name { flex:1; }
-    .sub-row.whole { font-weight:600; }
- 
-    .context-chip {
-      display:inline-block;
-      margin:0 0 14px;
-      padding:6px 10px;
-      border:1px solid var(--paper-line);
-      border-radius:4px;
+    .quote {
+      margin:14px 0 0;
+      padding:12px 16px;
+      border-left:3px solid var(--brass);
       background:var(--paper-card);
-      color:var(--ink-soft);
-      font-family:var(--font-body);
-      font-size:12px;
-      line-height:1.4;
-    }
- 
-    .context-chip strong { color:var(--ink); }
- 
-    .question-row { display:flex; gap:10px; }
- 
-    .question-row input {
-      flex:1;
-      min-width:0;
-      padding:13px 14px;
-      border:1px solid var(--paper-line);
-      border-radius:6px;
-      background:#fffdf6;
-      color:var(--ink);
-      font:inherit;
-      font-family:var(--font-body);
-      font-size:14px;
-    }
- 
-    .question-row input:focus { border-color:var(--brass); }
- 
-    .question-row button {
-      min-height:44px;
-      padding:0 22px;
-      border:0;
-      border-radius:6px;
-      background:var(--brass);
-      color:#fffdf6;
-      font-family:var(--font-body);
-      font-weight:700;
-      font-size:13px;
-      letter-spacing:.03em;
-      cursor:pointer;
-    }
- 
-    .question-row button:hover { background:var(--brass-deep); }
- 
-    .oracle-disclaimer {
-      margin-top:14px;
-      color:var(--ink-soft);
-      font-family:var(--font-body);
-      font-size:11px;
+      font-family:var(--font-display);
+      font-size:15.5px;
       line-height:1.5;
     }
+    .quote small { display:block; margin-top:6px; font-family:var(--font-body); font-size:11.5px; color:var(--ink-soft); }
  
-    .ai-chat-welcome {
-      position:relative;
-      margin-top:22px;
-      padding:18px 20px 18px 52px;
-      background:var(--paper-card);
-      border:1px solid var(--paper-line);
-      border-radius:8px;
+    .context-box {
+      margin-top:14px;
+      padding:12px 15px;
+      border-radius:6px;
+      background:var(--brass-wash);
       color:var(--ink-soft);
-      font-family:var(--font-body);
-      font-size:13.5px;
+      font-size:12.5px;
       line-height:1.6;
     }
+    .context-box strong { color:var(--ink); }
  
-    .ai-chat-welcome::before {
-      content:'◈';
-      position:absolute;
-      left:18px;
-      top:18px;
-      color:var(--brass);
-      font-size:20px;
-    }
- 
-    .ai-chat-welcome strong.title {
-      display:block;
-      margin-bottom:4px;
-      color:var(--ink);
-      font-family:var(--font-display);
-      font-size:16px;
-      font-weight:600;
-    }
- 
-    .oracle-sources { margin-top:18px; padding-top:18px; border-top:1px solid var(--paper-line); }
- 
-    .oracle-sources h2,
-    .oracle-sources h3 {
-      margin:0 0 10px;
+    .status-box {
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:14px;
+      padding:12px 15px;
+      border:1px solid var(--paper-line);
+      border-radius:6px;
+      background:var(--paper-card);
+      font-size:12.5px;
+      line-height:1.55;
       color:var(--ink-soft);
-      font-family:var(--font-body);
+    }
+    .status-box strong { color:var(--ink); }
+ 
+    /* rastreio */
+    .rastro { display:grid; gap:6px; margin-bottom:18px; }
+    .rastro-step {
+      display:grid;
+      grid-template-columns:26px 1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:8px 11px;
+      border:1px solid var(--paper-line);
+      border-radius:4px;
+      background:#fffdf6;
+      font-size:12px;
+    }
+    .rastro-step .n { color:var(--brass-deep); font-weight:800; }
+    .rastro-res { font-size:10.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+    .rastro-res.encontrado { color:var(--green); }
+    .rastro-res.sem-resultado { color:var(--grey); }
+    .rastro-res.nao-aplicavel { color:#b0a78f; }
+ 
+    .src-group { margin-bottom:18px; }
+    .src-group h4 {
+      margin:0 0 8px;
+      color:var(--ink-soft);
       font-size:11px;
       font-weight:700;
       letter-spacing:.06em;
       text-transform:uppercase;
     }
- 
-    .oracle-source-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-      gap:10px;
-    }
- 
-    .oracle-source-card {
-      display:block;
-      padding:13px 14px;
-      border:1px solid var(--paper-line);
-      border-top:3px solid var(--brass);
-      border-radius:5px;
-      background:var(--paper-card);
-      color:var(--ink-soft);
-      font-family:var(--font-body);
-      font-size:12px;
-      line-height:1.45;
-    }
- 
-    .oracle-source-card:nth-child(2) { border-top-color:var(--navy-soft); }
-    .oracle-source-card:nth-child(3) { border-top-color:var(--verified); }
-    .oracle-source-card:nth-child(4) { border-top-color:var(--brass-deep); }
- 
-    .oracle-source-card strong { display:block; margin-bottom:3px; color:var(--ink); font-size:12.5px; font-weight:600; }
- 
-    /* ---------- resultados ---------- */
-    .ai-chat-messages { margin-top:4px; }
- 
-    .ai-chat-message {
-      margin:10px 0;
-      padding:11px 15px;
-      border-radius:8px;
-      line-height:1.5;
-      white-space:pre-wrap;
-    }
- 
-    .ai-chat-message.user {
-      margin-left:auto;
-      max-width:85%;
-      background:var(--navy);
-      color:#eef2f8;
-      font-family:var(--font-body);
-      font-size:13.5px;
-    }
- 
-    .ai-chat-answer {
-      margin:10px 0;
-      padding:16px 18px;
-      border-left:2px solid var(--brass);
-      background:var(--paper-card);
-      color:var(--ink);
-      font-family:var(--font-body);
-      font-size:13.5px;
-      line-height:1.65;
-    }
- 
-    .oracle-result-meta {
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:6px;
-      background:var(--brass-wash);
-      color:var(--brass-deep);
-      font-size:11.5px;
-      line-height:1.5;
-    }
- 
-    .oracle-result-meta:first-child { margin-top:0; margin-bottom:10px; }
- 
-    .oracle-result-source {
-      display:block;
-      margin-top:8px;
-      padding:10px 12px;
-      border-left:2px solid var(--verified);
-      background:var(--paper-card);
-      color:var(--ink-soft);
-      font-size:11.5px;
-      line-height:1.45;
-    }
- 
-    .oracle-result-source a { color:var(--brass-deep); font-weight:700; }
- 
-    .oracle-media-badge {
-      display:inline-block;
-      margin-bottom:4px;
-      padding:2px 7px;
-      border-radius:4px;
-      background:var(--navy);
-      color:#eef2f8;
-      font-size:9.5px;
-      font-weight:700;
-      letter-spacing:.05em;
-    }
- 
-    .oracle-result-source.is-video { border-left-color:var(--navy-soft); }
- 
-    .oracle-video-embed {
-      position:relative;
-      width:100%;
-      max-width:420px;
-      margin-top:9px;
-      padding-top:56.25%;
-      border-radius:6px;
-      overflow:hidden;
-      background:var(--navy);
-    }
- 
-    .oracle-video-embed iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
- 
-    .oracle-source-class {
-      display:inline-block;
-      margin:4px 0 6px;
-      padding:2px 6px;
-      border:1px solid var(--paper-line);
-      border-radius:3px;
-      color:var(--brass-deep);
-      background:#fffdf6;
-      font-size:9px;
-      font-weight:800;
-      letter-spacing:.04em;
-    }
- 
-    .oracle-bible-invitation {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      margin-top:18px;
-      padding:16px;
+    .src {
+      margin-bottom:8px;
+      padding:12px 14px;
       border:1px solid var(--paper-line);
       border-left:3px solid var(--brass);
-      background:var(--brass-wash);
+      border-radius:4px;
+      background:var(--paper-card);
+      font-size:12.5px;
+      line-height:1.5;
     }
+    .src.oficial { border-left-color:var(--navy-soft); }
+    .src.jornalistica { border-left-color:var(--green); }
+    .src.analise { border-left-color:var(--brass-deep); }
+    .src strong { font-size:13px; }
+    .src .src-meta { color:var(--ink-soft); font-size:11.5px; margin:2px 0 6px; }
+    .src .src-note { color:var(--ink-soft); }
+    .src .link-pending { display:inline-block; margin-top:6px; color:var(--grey); font-size:11px; font-style:italic; }
  
-    .oracle-bible-invitation strong { display:block; margin-bottom:4px; color:var(--ink); font-family:var(--font-display); font-size:16px; }
-    .oracle-bible-invitation span { display:block; color:var(--ink-soft); font-size:11.5px; line-height:1.5; }
- 
-    .oracle-bible-button {
-      flex:none;
-      padding:10px 14px;
-      border:0;
-      border-radius:5px;
-      background:var(--navy);
+    .vbadge {
+      display:inline-block;
+      margin-left:6px;
+      padding:1px 7px;
+      border-radius:3px;
+      font-size:9.5px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
       color:#fff;
-      font-size:10.5px;
-      font-weight:800;
-      cursor:pointer;
+      vertical-align:middle;
     }
+    .vbadge.confirmado { background:var(--green); }
+    .vbadge.parcial { background:var(--amber); }
+    .vbadge.nao-verificado { background:var(--grey); }
+    .vbadge.contestado { background:var(--rust); }
  
-    .oracle-bible-button:disabled { opacity:.6; cursor:wait; }
+    /* impacto */
+    .impact-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; }
+    .impact-card {
+      padding:15px 16px;
+      border:1px solid var(--paper-line);
+      border-radius:6px;
+      background:var(--paper-card);
+    }
+    .impact-card h4 { margin:0 0 8px; font-family:var(--font-display); font-size:16px; font-weight:600; }
+    .meter { display:flex; gap:4px; margin-bottom:6px; }
+    .meter i { flex:1; height:7px; border-radius:2px; background:#e6dcc0; }
+    .meter.g1 i:nth-child(-n+1),
+    .meter.g2 i:nth-child(-n+2),
+    .meter.g3 i:nth-child(-n+3) { background:var(--brass); }
+    .meter.g3 i { background:var(--rust); }
+    .grade { font-size:12px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:.04em; }
+    .impact-card ul { margin:10px 0 0; padding-left:17px; color:var(--ink-soft); font-size:12.5px; line-height:1.55; }
+    .impact-card .none { margin:10px 0 0; color:var(--grey); font-size:12px; font-style:italic; }
  
-    .result-bar {
+    /* bíblia */
+    .verse-list { display:grid; gap:10px; }
+    .verse {
+      padding:14px 16px;
+      border:1px solid var(--paper-line);
+      border-left:3px solid var(--brass);
+      border-radius:4px;
+      background:var(--paper-card);
+    }
+    .verse .ref { font-family:var(--font-display); font-size:16px; font-weight:600; }
+    .verse .tema { margin:2px 0 6px; color:var(--brass-deep); font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+    .verse p { margin:0; color:var(--ink-soft); font-size:12.5px; line-height:1.55; }
+ 
+    .nav-row {
       display:flex;
-      align-items:center;
       justify-content:space-between;
       gap:10px;
-      flex-wrap:wrap;
-      margin-top:18px;
+      margin-top:22px;
       padding-top:16px;
       border-top:1px solid var(--paper-line);
     }
  
-    .ai-chat-loading {
-      display:none;
-      color:var(--brass-deep);
-      font-family:var(--font-body);
-      font-size:12px;
-      font-style:italic;
+    .foot-note {
+      margin-top:22px;
+      padding:12px 15px;
+      border-left:2px solid var(--brass);
+      background:var(--brass-wash);
+      color:var(--ink-soft);
+      font-size:11.5px;
+      line-height:1.6;
     }
+    .foot-note strong { color:var(--ink); }
  
     @media (max-width:600px) {
-      .oracle-chat-panel { border-radius:0; }
-      .ai-chat-header { padding:20px 15px 16px; }
-      .oracle-trust-note { margin-left:15px; margin-right:15px; }
-      .wiz-stepper { margin-left:15px; margin-right:15px; }
-      .wiz-stage { padding:18px 15px 24px; }
-      .question-row { flex-direction:column; }
-      .question-row button { width:100%; }
-      .oracle-bible-invitation { flex-direction:column; align-items:stretch; }
-      .wiz-top { flex-direction:column; gap:10px; }
+      .search-box { flex-direction:column; }
+      .nav-row { flex-direction:column-reverse; }
+      .nav-row .btn { width:100%; }
     }
- 
-    /* =========================================================
-       RASTREAMENTO DE FONTES
-       ========================================================= */
-    .oracle-tracking-trigger{
-      display:none;
-      position:fixed;right:0;top:50%;z-index:1000;transform:translateY(-50%);
-      padding:13px 10px;border:1px solid var(--navy-soft);border-right:0;
-      border-radius:8px 0 0 8px;background:var(--navy);color:#dbe7f5;
-      font-size:11px;font-weight:700;letter-spacing:.05em;writing-mode:vertical-rl;
-      cursor:pointer;box-shadow:0 6px 16px rgba(14,21,38,.3)
-    }
-    .oracle-tracking-trigger:hover{background:var(--navy-soft);color:#fff}
-    .oracle-tracking-overlay{position:fixed;inset:0;z-index:1100;display:none;background:rgba(14,21,38,.45);backdrop-filter:blur(1px)}
-    .oracle-tracking-overlay.active{display:block}
-    .oracle-tracking-panel{position:absolute;right:0;top:0;bottom:0;width:min(560px,94vw);overflow-y:auto;padding:24px;background:var(--paper-card);color:var(--ink);box-shadow:-16px 0 40px rgba(14,21,38,.28)}
-    .tracking-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
-    .tracking-head h2{margin:0;font-family:var(--font-display);font-size:20px;font-weight:600}
-    .tracking-close{width:30px;height:30px;border:1px solid var(--paper-line);border-radius:50%;background:transparent;color:var(--ink-soft);font-size:16px;cursor:pointer}
-    .tracking-context{margin:14px 0;padding:12px;border-left:2px solid var(--brass);background:var(--brass-wash);font-size:12px;line-height:1.5}
-    .tracking-order{display:grid;gap:7px;margin:12px 0 20px}
-    .tracking-step{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--paper-line);background:#fffdf6;font-size:11.5px}
-    .tracking-step .num{font-weight:800;color:var(--brass-deep)}
-    .tracking-step .state{font-size:10px;color:var(--ink-soft)}
-    .tracking-step.active{border-color:var(--brass);background:var(--brass-wash)}
-    .tracking-form{display:grid;gap:8px;margin-top:12px}
-    .tracking-form label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
-    .tracking-form input,.tracking-form select,.tracking-form textarea{width:100%;padding:10px 11px;border:1px solid var(--paper-line);border-radius:5px;background:#fffdf6;color:var(--ink);font:inherit;font-size:12px}
-    .tracking-form textarea{min-height:72px;resize:vertical}
-    .tracking-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-    .tracking-actions button{padding:9px 13px;border:0;border-radius:5px;background:var(--brass);color:#fff;font-weight:700;font-size:11px;cursor:pointer}
-    .tracking-actions button.secondary{background:var(--navy)}
-    .tracking-publications{margin-top:20px;padding-top:16px;border-top:1px solid var(--paper-line)}
-    .tracking-publication{padding:12px;margin:8px 0;border:1px solid var(--paper-line);background:#fffdf6;font-size:11.5px;line-height:1.5}
-    .tracking-publication strong{color:var(--ink)}
-    .tracking-badge{display:inline-block;padding:2px 6px;margin-bottom:5px;border-radius:3px;background:var(--navy);color:#fff;font-size:9px;font-weight:800}
-    .tracking-publication a{color:var(--brass-deep);font-weight:700}
-    .tracking-classification{margin-top:7px;padding-top:7px;border-top:1px dashed var(--paper-line);color:var(--ink-soft);font-size:10.5px}
-    .tracking-note{margin-top:14px;color:var(--ink-soft);font-size:10.5px;line-height:1.55}
   </style>
 </head>
  
-<body>
+<body data-view="search">
   <div class="app-shell">
     <aside class="side-nav" aria-label="Navegação da plataforma">
       <div class="side-brand">
@@ -718,9 +558,7 @@ Oraculo · HTML
         <a class="side-item" href="analise-textual.html"><span class="side-icon">✎</span>ANÁLISE TEXTUAL</a>
       </nav>
  
-      <p class="side-footer-note">
-        Módulo público: leitura independente da Sala do Escritor.
-      </p>
+      <p class="side-footer-note">Módulo público: leitura independente da Sala do Escritor.</p>
     </aside>
  
     <div class="content-area">
@@ -730,889 +568,727 @@ Oraculo · HTML
       </header>
  
       <main>
-        <section class="paper" aria-label="Oráculo — Consulta Geral">
-          <section class="oracle-chat-panel" aria-label="Consulta geral do Oráculo">
+        <section class="paper" aria-label="Oráculo — Fatos, fontes e Bíblia">
  
-            <header class="ai-chat-header">
-              <h1>ORÁCULO — FATOS, FONTES E BÍBLIA</h1>
-              <p>
-                Faça uma pergunta sobre um acontecimento, declaração, pessoa, proposta, instituição ou assunto relevante para a vida pública e para os valores que a Igreja defende. O Oráculo investiga o que aconteceu, rastreia as fontes e depois coloca a questão diante das Escrituras.
-              </p>
-            </header>
+          <header class="oracle-head">
+            <h1>ORÁCULO — FATOS, FONTES E BÍBLIA</h1>
+            <p>Pesquise o que uma pessoa influente ou uma autoridade disse ou fez. O Oráculo confirma se o fato existe, mostra quando, onde e por quais fontes foi documentado, registra o impacto social, religioso e familiar e, por fim, coloca a questão diante das Escrituras.</p>
+          </header>
  
-            <p class="oracle-trust-note">
-              <strong>PRINCÍPIO DO ORÁCULO:</strong> primeiro, descubra o que foi dito. Depois, descubra o que aconteceu. Por fim, consulte o que as Escrituras dizem sobre o assunto.
-              <br><br><strong>O Oráculo não dá parecer próprio.</strong> Ele separa fonte original, fonte oficial, cobertura jornalística e análise. Na etapa bíblica, a Bíblia é apresentada em seu contexto e pode afirmar, corrigir, confrontar, advertir ou condenar sem que o Oráculo suavize sua afirmação.
-            </p>
+          <p class="principle">
+            <strong>PRINCÍPIO DO ORÁCULO:</strong> primeiro, descubra o que foi dito. Depois, descubra o que aconteceu. Por fim, consulte o que as Escrituras dizem. O Oráculo descreve fatos e fontes; não dá parecer próprio nem rotula pessoas.
+          </p>
  
-            <div id="oracle-wizard" data-stage="1">
+          <p class="demo-note">
+            <strong>Versão de demonstração.</strong> Os registros abaixo são fictícios e servem para testar o layout e o fluxo. Nomes, veículos e falas foram inventados e não se referem a pessoas reais. As fontes reais serão ligadas depois.
+          </p>
  
-              <nav class="wiz-stepper" id="wiz-stepper" aria-label="Passos da consulta"></nav>
+          <!-- ================= BUSCA ================= -->
+          <section class="view" id="view-search" aria-label="Busca de ocorrências">
+            <form class="search-box" id="search-form" role="search">
+              <input
+                id="search-input"
+                type="search"
+                placeholder="Quem disse o quê? Ex.: Bíblia reescrita, projeto de lei, nome da pessoa..."
+                aria-label="Buscar ocorrência"
+                autocomplete="off"
+              >
+              <button class="btn" type="submit">BUSCAR</button>
+            </form>
+            <p class="search-hint">Busque pelo nome, por palavras da declaração, pelo veículo ou pelo tema. A busca ignora acentos e maiúsculas.</p>
  
-              <!-- PASSO 1 — ÁREA -->
-              <section class="wiz-stage" id="wiz-stage-1">
-                <div class="wiz-top">
-                  <div class="wiz-heading">
-                    <h2>Sobre qual área é a sua pergunta?</h2>
-                    <p>A escolha orienta a consulta, mas não impede o Oráculo de considerar outras áreas relevantes.</p>
-                  </div>
-                </div>
-                <div class="choice-grid" id="area-grid"></div>
-                <div class="skip-row">
-                  <span>Não sabe qual área escolher?</span>
-                  <button type="button" class="skip-button" id="skip-area">Fazer uma pergunta livre</button>
-                </div>
-              </section>
+            <div class="filters">
+              <div>
+                <label for="f-tema">Tema</label>
+                <select id="f-tema"></select>
+              </div>
+              <div>
+                <label for="f-periodo">Período</label>
+                <select id="f-periodo">
+                  <option value="">Qualquer data</option>
+                  <option value="30">Últimos 30 dias</option>
+                  <option value="90">Últimos 90 dias</option>
+                  <option value="365">Últimos 12 meses</option>
+                </select>
+              </div>
+              <div>
+                <label for="f-tipo">Tipo</label>
+                <select id="f-tipo"></select>
+              </div>
+              <div>
+                <label for="f-status">Situação do fato</label>
+                <select id="f-status"></select>
+              </div>
+              <div>
+                <label for="f-impacto">Impacto</label>
+                <select id="f-impacto">
+                  <option value="">Qualquer</option>
+                  <option value="alto">Alto em alguma dimensão</option>
+                  <option value="religioso">Religioso: médio ou alto</option>
+                  <option value="social">Social: médio ou alto</option>
+                  <option value="familiar">Familiar: médio ou alto</option>
+                </select>
+              </div>
+            </div>
  
-              <!-- PASSO 2 — SUBÁREA -->
-              <section class="wiz-stage" id="wiz-stage-2">
-                <div class="wiz-top">
-                  <button type="button" class="wiz-back" data-go="1">← Voltar</button>
-                  <div class="wiz-heading">
-                    <h2 id="sub-title">Qual subárea?</h2>
-                    <p>Escolha o recorte do assunto, ou use a área inteira.</p>
-                  </div>
-                </div>
-                <div class="sub-list" id="sub-list"></div>
-              </section>
+            <div class="list-bar">
+              <span class="list-count" id="list-count"></span>
+              <div class="toggle" role="group" aria-label="Modo de exibição">
+                <button type="button" id="mode-list" class="on">Lista</button>
+                <button type="button" id="mode-timeline">Linha do tempo</button>
+              </div>
+            </div>
  
-              <!-- PASSO 3 — PERGUNTA -->
-              <section class="wiz-stage" id="wiz-stage-3">
-                <div class="wiz-top">
-                  <button type="button" class="wiz-back" id="back-from-question">← Voltar</button>
-                  <div class="wiz-heading">
-                    <h2>Qual é a sua pergunta?</h2>
-                    <p>Você pode editar o texto sugerido. Quanto mais específica a pergunta, melhor o rastreio das fontes.</p>
-                  </div>
-                </div>
+            <div id="results"></div>
+          </section>
  
-                <div class="context-chip" id="context-chip"></div>
+          <!-- ================= FICHA ================= -->
+          <section class="view" id="view-ficha" aria-label="Ficha da ocorrência">
+            <div class="ficha-top">
+              <button type="button" class="btn ghost" id="back-to-search">← Voltar à busca</button>
+              <div class="ficha-title" id="ficha-title"></div>
+            </div>
  
-                <form class="question-row" id="oracle-form">
-                  <input
-                    id="oracle-question"
-                    type="text"
-                    placeholder="Ex.: O que foi dito sobre a Bíblia e o que as Escrituras dizem sobre isso?"
-                    aria-label="Pergunta para o Oráculo"
-                    autocomplete="off"
-                    required
-                  >
-                  <button type="submit">INVESTIGAR</button>
-                </form>
+            <nav class="wiz-stepper" id="ficha-stepper" aria-label="Etapas da investigação"></nav>
  
-                <div class="oracle-disclaimer">
-                  O Oráculo não emite parecer próprio sobre o acontecimento.
-                  A investigação deve distinguir fonte original, fonte oficial, jornalismo, análise, divergência e ausência de evidência. A etapa “O QUE A BÍBLIA DIZ?” apresenta as Escrituras em seu contexto, sem substituir sua afirmação por uma opinião editorial.
-                </div>
+            <div class="stage-body" id="ficha-body"></div>
  
-                <div class="ai-chat-welcome">
-                  <strong class="title">COMO O ORÁCULO INVESTIGA</strong>
-                  <b>1. O QUE ACONTECEU?</b> — identifica o fato, declaração ou proposta.
-                  <br><b>2. QUAL É A FONTE?</b> — procura a origem e separa-a da cobertura jornalística.
-                  <br><b>3. QUEM ESTÁ ENVOLVIDO?</b> — organiza autoria, organização, decisão, execução, participação e repercussão conforme a evidência.
-                  <br><b>4. O QUE A BÍBLIA DIZ?</b> — coloca a questão diante das Escrituras, sem substituir o texto bíblico pela opinião do Oráculo.
-                </div>
+            <div class="nav-row">
+              <button type="button" class="btn ghost" id="prev-stage">← Etapa anterior</button>
+              <button type="button" class="btn dark" id="next-stage">Próxima etapa →</button>
+            </div>
  
-                <div class="oracle-sources">
-                  <h2>RASTREIO E PROVENIÊNCIA</h2>
-                  <div class="oracle-source-grid">
-                    <div class="oracle-source-card">
-                      <strong>FONTE ORIGINAL</strong>
-                      O assunto é identificado automaticamente a partir da pergunta.
-                    </div>
-                    <div class="oracle-source-card">
-                      <strong>FONTE OFICIAL</strong>
-                      O sistema seleciona internamente as fontes pertinentes à consulta.
-                    </div>
-                    <div class="oracle-source-card">
-                      <strong>COBERTURA JORNALÍSTICA</strong>
-                      Quando disponíveis, são apresentados título, veículo, data e publicação original.
-                    </div>
-                    <div class="oracle-source-card">
-                      <strong>RASTREABILIDADE</strong>
-                      Divergências, ausência de evidência e limitações devem ser informadas.
-                    </div>
-                  </div>
-                </div>
-              </section>
- 
-              <!-- PASSO 4 — RESULTADO -->
-              <section class="wiz-stage" id="wiz-stage-4">
-                <div class="context-chip" id="result-chip"></div>
-                <div class="ai-chat-messages" id="oracle-chat-messages"></div>
-                <div class="ai-chat-loading" id="oracle-chat-loading">Pesquisando e verificando publicações...</div>
-                <div class="result-bar">
-                  <button type="button" class="wiz-back quiet" id="ask-again">← Fazer outra pergunta nesta área</button>
-                  <button type="button" class="skip-button" id="new-search">Nova consulta</button>
-                </div>
-              </section>
- 
+            <div class="foot-note">
+              <strong>Como o Oráculo registra:</strong> separa citação literal de resumo, informa a fonte de cada afirmação e mostra quando não encontrou evidência. Quem for citado pode pedir correção ou direito de resposta (canal a definir).
             </div>
           </section>
+ 
         </section>
       </main>
     </div>
   </div>
  
-  <!-- RASTREAMENTO DE FONTES -->
-  <button type="button" class="oracle-tracking-trigger" id="oracle-tracking-trigger" aria-controls="oracle-tracking-overlay" aria-expanded="false">↗ RASTREAR</button>
-  <div class="oracle-tracking-overlay" id="oracle-tracking-overlay" aria-hidden="true">
-    <aside class="oracle-tracking-panel" role="dialog" aria-modal="true" aria-labelledby="tracking-title">
-      <div class="tracking-head">
-        <h2 id="tracking-title">RASTREAMENTO DE FONTES</h2>
-        <button type="button" class="tracking-close" id="tracking-close" aria-label="Fechar rastreamento">×</button>
-      </div>
-      <div class="tracking-context" id="tracking-context">
-        <strong>Objeto atual:</strong> consulta geral. Selecione uma área/subárea ou informe uma entidade abaixo.
-      </div>
-      <strong style="font-size:11px;letter-spacing:.05em">ORDEM OBRIGATÓRIA DE BUSCA</strong>
-      <div class="tracking-order" id="tracking-order"></div>
- 
-      <form class="tracking-form" id="tracking-form">
-        <label for="tracking-entity">Entidade / item pesquisado</label>
-        <input id="tracking-entity" name="entity" placeholder="Ex.: Senado Federal" required>
-        <label for="tracking-sphere">Esfera</label>
-        <select id="tracking-sphere" name="sphere">
-          <option value="federal">Federal</option><option value="estadual">Estadual</option><option value="municipal">Municipal</option><option value="outro">Outra / não definida</option>
-        </select>
-        <label for="tracking-url">URL da publicação encontrada</label>
-        <input id="tracking-url" name="url" type="url" placeholder="https://...">
-        <label for="tracking-title-input">Título da publicação</label>
-        <input id="tracking-title-input" name="title" placeholder="Título / descrição da publicação">
-        <label for="tracking-source">Fonte / veículo</label>
-        <input id="tracking-source" name="source" placeholder="Órgão, jornal, canal, perfil etc.">
-        <label for="tracking-type">Tipo</label>
-        <select id="tracking-type" name="type">
-          <option>Portal de Transparência</option><option>Acesso à Informação / LAI</option><option>Portal institucional</option><option>Diário Oficial</option><option>Tribunal de Contas</option><option>Controladoria</option><option>Base oficial de dados</option><option>Imprensa</option><option>Vídeo / audiovisual</option><option>Rede social</option><option>Outro</option>
-        </select>
-        <label for="tracking-date">Data da publicação</label>
-        <input id="tracking-date" name="date" type="date">
-        <label for="tracking-notes">Observações</label>
-        <textarea id="tracking-notes" name="notes" placeholder="Informações úteis para a análise posterior..."></textarea>
-        <div class="tracking-actions">
-          <button type="submit">REGISTRAR PUBLICAÇÃO</button>
-          <button type="button" class="secondary" id="tracking-clear">LIMPAR REGISTROS LOCAIS</button>
-        </div>
-      </form>
- 
-      <div class="tracking-publications">
-        <strong style="font-size:11px;letter-spacing:.05em">PUBLICAÇÕES ENCONTRADAS</strong>
-        <div id="tracking-publications-list"></div>
-      </div>
-      <div class="tracking-note"><strong>Regra metodológica:</strong> registrar a existência da publicação antes de classificá-la. A classificação posterior poderá ser <em>Verdadeira, Mentirosa, Neutra</em> ou <em>Sem definição</em>. “Sem definição” não significa falsa; significa evidência insuficiente para concluir.</div>
-    </aside>
-  </div>
- 
   <script>
-    const AI_PROXY_URL = 'https://yellow-lab-f4b2.palavraeserie.workers.dev';
+  /* =========================================================
+     DADOS
+     ========================================================= */
+  const AREAS = [
+    ['01','Estado, Poderes e Cidadão'],['02','Direito e Justiça'],['03','Economia e Finanças'],
+    ['04','Empresas e Mercado'],['05','História e Arqueologia'],['06','Ciência'],
+    ['07','Medicina e Saúde'],['08','Psicologia'],['09','Sociedade e Sociologia'],
+    ['10','Antropologia'],['11','Filosofia'],['12','Ciência Política'],
+    ['13','Geopolítica e Relações Internacionais'],['14','Países e Desenvolvimento'],['15','Educação'],
+    ['16','Tecnologia, Computação e IA'],['17','Patentes, Inovação e Propriedade Intelectual'],
+    ['18','Engenharia e Normas Técnicas'],['19','Agricultura, Alimentos e Pecuária'],
+    ['20','Meio Ambiente e Clima'],['21','Energia'],['22','Minerais e Recursos Naturais'],
+    ['23','Geografia e Geociências'],['24','Linguística e Filologia'],
+    ['25','Religião, Igrejas e Influência'],['26','Cultura, Artes e Mídia'],['27','Esportes'],
+    ['28','Espaço e Astronomia'],['29','Pessoas, Prêmios, Rankings e Reconhecimento'],
+    ['30','Transporte e Mobilidade'],['31','Qualidade de Vida e Desenvolvimento'],
+    ['32','Segurança, Criminalidade e Paz'],['33','Defesa e Poder Militar'],
+    ['34','Rankings Institucionais e Comparados'],['35','Comparações e Perguntas Específicas'],
+    ['36','Atualidades e Apuração']
+  ];
  
-    const form = document.getElementById('oracle-form');
-    const input = document.getElementById('oracle-question');
-    const messages = document.getElementById('oracle-chat-messages');
-    const loading = document.getElementById('oracle-chat-loading');
+  const TIPOS = ['Declaração','Proposta legislativa','Decisão','Publicação','Vídeo'];
  
-    const ORACULO_AREAS = [
-      {id:'01',name:'Estado, Poderes e Cidadão',subareas:['01.1 — Constituição e Organização do Estado','01.2 — Poder Executivo — Presidência e Governo','01.3 — Congresso Nacional e Poder Legislativo','01.4 — Poder Judiciário','01.5 — Ministério Público e Defesa da Sociedade','01.6 — Poder Executivo Federal — Ministérios e Órgãos','01.7 — Tribunais de Contas e Controle dos Recursos Públicos','01.8 — Defensoria Pública e Acesso à Justiça','01.9 — Estados e Distrito Federal','01.10 — Municípios e Governo Local','01.11 — Cidadão e Seus Direitos perante o Estado','01.12 — Fiscalização e Controle pelo Cidadão','01.13 — Participação Popular e Democracia','01.14 — Onde o Cidadão Deve Procurar?','01.15 — Legislação e Fontes Oficiais']},
-      {id:'02',name:'Direito e Justiça',subareas:['Constituição e legislação','Jurisprudência','Direito civil','Direito penal','Direito trabalhista','Direito empresarial','Direito administrativo','Direito internacional','Direitos humanos','Processos e decisões']},
-      {id:'03',name:'Economia e Finanças',subareas:['PIB e crescimento','Inflação','Juros','Câmbio','Comércio exterior','Dívida pública','Mercados financeiros','Bancos e crédito','Emprego e renda','Indicadores econômicos']},
-      {id:'04',name:'Empresas e Mercado',subareas:['Empresas','Receita e faturamento','Valor de mercado','Marcas','Empresas públicas','Empresas privadas','Mercados','Investimentos','Executivos','Rankings empresariais']},
-      {id:'05',name:'História e Arqueologia',subareas:['História antiga','História medieval','História moderna','História contemporânea','História do Brasil','Arqueologia','Museus e patrimônio','Manuscritos e documentos','Fontes primárias','Historiografia']},
-      {id:'06',name:'Ciência',subareas:['Ciências naturais','Ciências exatas','Ciências da Terra','Pesquisa científica','Experimentos','Estudos observacionais','Revisões sistemáticas','Meta-análises','Descobertas científicas','Dados científicos']},
-      {id:'07',name:'Medicina e Saúde',subareas:['Medicina','Epidemiologia','Saúde pública','Doenças','Tratamentos','Medicamentos','Ensaios clínicos','Diretrizes clínicas','Nutrição','Estatísticas de saúde']},
-      {id:'08',name:'Psicologia',subareas:['Psicologia cognitiva','Psicologia social','Psicologia clínica','Desenvolvimento humano','Personalidade','Comportamento','Neuropsicologia','Psicometria','Psicologia organizacional','Pesquisa experimental']},
-      {id:'09',name:'Sociedade e Sociologia',subareas:['Estrutura social','Desigualdade','Família','Trabalho','Religião e sociedade','Educação e sociedade','Comportamento coletivo','Demografia','Movimentos sociais','Transformações sociais']},
-      {id:'10',name:'Antropologia',subareas:['Antropologia cultural','Antropologia social','Antropologia biológica','Etnografia','Povos e culturas','Costumes','Organização social','Antropologia urbana','Antropologia histórica','Pesquisa antropológica']},
-      {id:'11',name:'Filosofia',subareas:['Filosofia antiga','Filosofia medieval','Filosofia moderna','Filosofia contemporânea','Ética','Epistemologia','Metafísica','Filosofia política','Filosofia da ciência','Filosofia da linguagem']},
-      {id:'12',name:'Ciência Política',subareas:['Estado','Democracia','Eleições','Partidos políticos','Instituições','Políticas públicas','Sistemas políticos','Ideologias políticas','Comportamento eleitoral','Governança']},
-      {id:'13',name:'Geopolítica e Relações Internacionais',subareas:['Relações internacionais','Diplomacia','Alianças','Conflitos','Sanções','Organizações internacionais','Comércio internacional','Influência internacional','Segurança internacional','Geopolítica regional']},
-      {id:'14',name:'Países e Desenvolvimento',subareas:['Perfil de países','População','Economia','Desenvolvimento humano','Educação','Saúde','Segurança','Infraestrutura','Energia','Relações com o Brasil']},
-      {id:'15',name:'Educação',subareas:['Educação básica','Ensino superior','Universidades','Pesquisa acadêmica','Pós-graduação','Avaliações educacionais','PISA','Políticas educacionais','Professores','Indicadores educacionais']},
-      {id:'16',name:'Tecnologia, Computação e IA',subareas:['Computação','Inteligência artificial','Software','Internet','Cibersegurança','Dados','Algoritmos','Robótica','Padrões técnicos','Pesquisa em IA']},
-      {id:'17',name:'Patentes, Inovação e Propriedade Intelectual',subareas:['Patentes','Marcas','Propriedade intelectual','Inovação','Tecnologias emergentes','Pesquisa e desenvolvimento','Transferência tecnológica','Startups','Indicadores de inovação','Propriedade industrial']},
-      {id:'18',name:'Engenharia e Normas Técnicas',subareas:['Engenharia civil','Engenharia mecânica','Engenharia elétrica','Engenharia química','Engenharia ambiental','Engenharia de produção','Normas técnicas','Padrões internacionais','Segurança técnica','Regulamentação']},
-      {id:'19',name:'Agricultura, Alimentos e Pecuária',subareas:['Agricultura','Pecuária','Produção de alimentos','Agropecuária','Segurança alimentar','Commodities agrícolas','Produção mundial','Clima e agricultura','Tecnologia agrícola','Dados agropecuários']},
-      {id:'20',name:'Meio Ambiente e Clima',subareas:['Mudanças climáticas','Florestas','Biodiversidade','Conservação','Água','Poluição','Desmatamento','Oceanos','Unidades de conservação','Políticas ambientais']},
-      {id:'21',name:'Energia',subareas:['Petróleo','Gás natural','Carvão','Energia nuclear','Hidrelétrica','Solar','Eólica','Biomassa','Hidrogênio','Armazenamento de energia']},
-      {id:'22',name:'Minerais e Recursos Naturais',subareas:['Minerais críticos','Minerais estratégicos','Petróleo e gás','Metais','Mineração','Reservas','Produção','Exportação','Importação','Cadeias industriais']},
-      {id:'23',name:'Geografia e Geociências',subareas:['Geografia física','Geografia humana','Cartografia','Geologia','Geodésia','Hidrologia','Oceanografia','Sensoriamento remoto','Território','Mapas e dados geográficos']},
-      {id:'24',name:'Linguística e Filologia',subareas:['Linguística','Gramática','Sintaxe','Semântica','Pragmática','Fonética e fonologia','Sociolinguística','Línguas antigas','Filologia','Dicionários e corpora']},
-      {id:'25',name:'Religião, Igrejas e Influência',subareas:['Religiões','História das religiões','Igrejas e instituições religiosas','Líderes religiosos','Discursos e declarações','Religião e política','Religião e relações internacionais','Religião e sociedade','Religião e cultura','Influência religiosa','Vaticano e Santa Sé','Estudos acadêmicos da religião']},
-      {id:'26',name:'Cultura, Artes e Mídia',subareas:['Cinema','Televisão','Música','Literatura','Artes visuais','Arquitetura','Design','Moda','Jornalismo','Mídia e comunicação']},
-      {id:'27',name:'Esportes',subareas:['Futebol','Basquete','Tênis','Fórmula 1','Atletismo','Olimpíadas','Clubes','Atletas','Rankings','Estatísticas esportivas']},
-      {id:'28',name:'Espaço e Astronomia',subareas:['Astronomia','Sistema Solar','Planetas','Estrelas','Galáxias','Cosmologia','Asteroides','Exploração espacial','Satélites','Missões espaciais']},
-      {id:'29',name:'Pessoas, Prêmios, Rankings e Reconhecimento',subareas:['Pessoas influentes','Personalidades públicas','Cientistas','Artistas','Líderes','Prêmios','Nobel','Rankings','Fama e popularidade','Influência e impacto','Produção acadêmica','Reconhecimento profissional']},
-      {id:'30',name:'Transporte e Mobilidade',subareas:['Transporte rodoviário','Transporte ferroviário','Transporte marítimo e fluvial','Aviação e aeroportos','Portos','Transporte urbano','Logística e cadeias de suprimento','Infraestrutura de mobilidade']},
-      {id:'31',name:'Qualidade de Vida e Desenvolvimento',subareas:['Desenvolvimento humano (IDH)','Renda e distribuição','Saúde e expectativa de vida','Educação e alfabetização','Segurança e violência','Desigualdade social','Felicidade e bem-estar subjetivo','Indicadores internacionais comparados']},
-      {id:'32',name:'Segurança, Criminalidade e Paz',subareas:['Criminalidade','Segurança pública','Homicídios e mortalidade violenta','Sistema prisional','Violência urbana e rural','Terrorismo','Conflitos armados internos','Paz e estabilidade','Estado de direito','Corrupção']},
-      {id:'33',name:'Defesa e Poder Militar',subareas:['Forças armadas','Orçamento e gastos militares','Efetivos militares','Armamentos e equipamentos','Indústria de defesa','Poder terrestre','Poder aéreo','Poder naval','Armas nucleares','Alianças militares','Comparações de poder militar']},
-      {id:'34',name:'Rankings Institucionais e Comparados',subareas:['Rankings de países','Rankings de empresas','Rankings de universidades','Rankings de cidades','Prêmios internacionais','Prêmio Nobel','Reconhecimento científico','Reconhecimento cultural']},
-      {id:'35',name:'Comparações e Perguntas Específicas',subareas:['Quem é maior','Quem é mais rico','Quem é mais influente','Qual país é mais poderoso','Qual empresa é maior','Qual cidade é melhor','Qual universidade é melhor','Quem é mais famoso','Quem produz mais','Comparação por indicadores']},
-      {id:'36',name:'Atualidades e Apuração',subareas:['Notícias recentes','Acontecimentos em andamento','Declarações públicas','Decisões governamentais','Conflitos e crises atuais','Economia atual','Ciência e tecnologia atual','Cultura atual','Verificação de alegações']}
-    ];
+  const STATUS = [
+    {id:'confirmada', label:'Confirmada', desc:'Há fonte original que comprova o fato.'},
+    {id:'parcial', label:'Parcial', desc:'Só há relatos de terceiros, sem a fonte original.'},
+    {id:'contestada', label:'Contestada', desc:'Existem versões conflitantes ou desmentido.'},
+    {id:'nao-localizada', label:'Não localizada', desc:'Nenhuma fonte foi encontrada. Isso não prova que seja falso.'},
+    {id:'em-apuracao', label:'Em apuração', desc:'A investigação ainda não foi concluída.'}
+  ];
  
-    function escapeHtml(value) {
-      const div = document.createElement('div');
-      div.textContent = String(value ?? '');
-      return div.innerHTML;
+  const CLASSES = [
+    {id:'original', label:'Fonte original'},
+    {id:'oficial', label:'Fonte oficial'},
+    {id:'jornalistica', label:'Cobertura jornalística'},
+    {id:'analise', label:'Análise'}
+  ];
+ 
+  const GRAUS = {'baixo':1,'médio':2,'alto':3,'não avaliado':0};
+ 
+  /* Registros FICTÍCIOS para demonstração */
+  const OCORRENCIAS = [
+    {
+      id:'oc-0001',
+      quem:{nome:'Helena Duarte', papel:'Apresentadora e influenciadora (fictícia)', alcance:'Cerca de 12 milhões de seguidores (dado fictício)'},
+      aliases:['Helena D.'],
+      oque:{
+        tipo:'Declaração',
+        resumo:'Afirmou em programa de TV que a Bíblia está ultrapassada e deveria ser reescrita.',
+        citacao:'“Esse livro é de outra época, precisa ser reescrito.”'
+      },
+      quando:'2026-09-14',
+      onde:{tipo:'Programa de TV', nome:'Noite Aberta (fictício)', local:'São Paulo, SP'},
+      status:'confirmada',
+      contexto:'A fala ocorreu em uma conversa sobre tradição e modernidade, depois de uma pergunta do apresentador. A mesma entrevista traz, minutos depois, uma ressalva da convidada sobre respeitar quem tem fé.',
+      temas:['25','26','09'],
+      keywords:['biblia','reescrita','ultrapassada','tv','entrevista'],
+      rastro:null,
+      fontes:[
+        {classe:'original', titulo:'Gravação do programa Noite Aberta, bloco 3', veiculo:'Rede Aurora (fictícia)', data:'2026-09-14', verificacao:'confirmado', nota:'Trecho integral da fala, com o que vem antes e depois.'},
+        {classe:'oficial', titulo:'Nota da emissora sobre a entrevista', veiculo:'Rede Aurora (fictícia)', data:'2026-09-15', verificacao:'confirmado', nota:'A emissora confirma a exibição e diz que a opinião é da convidada.'},
+        {classe:'jornalistica', titulo:'Apresentadora diz que a Bíblia deve ser reescrita', veiculo:'Portal Tribuna Digital (fictício)', data:'2026-09-15', verificacao:'confirmado', nota:'Reproduz a fala e ouve duas lideranças religiosas.'},
+        {classe:'analise', titulo:'O que a polêmica diz sobre fé e celebridade', veiculo:'Revista Vértice (fictícia)', data:'2026-09-20', verificacao:'parcial', nota:'Texto de opinião; interpreta a fala, não a documenta.'}
+      ],
+      impacto:{
+        social:{grau:'alto', evid:['Assunto entre os mais comentados nas redes por vários dias.','Cobertura em portais nacionais e regionais.']},
+        religioso:{grau:'alto', evid:['Notas de repúdio de duas entidades de igrejas.','Pastores e padres comentaram o caso em cultos e nas redes.']},
+        familiar:{grau:'médio', evid:['Pais e educadores cristãos relataram dúvidas dos filhos nas redes e em grupos de igreja.']}
+      },
+      escrituras:[
+        {ref:'Mateus 24:35', tema:'Permanência da palavra de Cristo', nota:'Jesus afirma que as suas palavras não passarão. É o texto central quando se discute se a Escritura envelhece.'},
+        {ref:'Isaías 40:8', tema:'A palavra de Deus permanece', nota:'Contrasta o que é passageiro com a palavra de Deus, que permanece.'},
+        {ref:'2 Timóteo 3:16-17', tema:'Origem e finalidade das Escrituras', nota:'Trata da inspiração das Escrituras e da sua utilidade para ensinar, corrigir e formar.'}
+      ]
+    },
+    {
+      id:'oc-0002',
+      quem:{nome:'Ruy Albuquerque', papel:'Deputado (fictício)', alcance:'Mandato estadual (dado fictício)'},
+      aliases:['Dep. Ruy','Albuquerque'],
+      oque:{
+        tipo:'Proposta legislativa',
+        resumo:'Circula a alegação de que ele teria proposto uma lei para “educar a sociedade a aceitar” o casamento entre pais e filhos.',
+        citacao:''
+      },
+      quando:'2026-10-02',
+      onde:{tipo:'Rede social', nome:'Mensagens encaminhadas e perfis diversos', local:'Não identificado'},
+      status:'nao-localizada',
+      contexto:'A alegação aparece em mensagens encaminhadas sem link, sem data e sem a gravação da suposta fala. Não foi localizado projeto de lei, requerimento ou discurso em nome do parlamentar.',
+      temas:['01','12','02','09'],
+      keywords:['lei','casamento','pais','filhos','educar','sociedade','projeto','incesto'],
+      rastro:[
+        {n:1, etapa:'Portal de Transparência próprio do órgão', res:'sem-resultado'},
+        {n:2, etapa:'Portal de Transparência do governo (federal, estadual ou municipal)', res:'nao-aplicavel'},
+        {n:3, etapa:'Portal oficial de Acesso à Informação / LAI', res:'nao-aplicavel'},
+        {n:4, etapa:'Portal institucional da Casa Legislativa (proposições e discursos)', res:'sem-resultado'},
+        {n:5, etapa:'Diário Oficial correspondente', res:'sem-resultado'},
+        {n:6, etapa:'Tribunal de Contas competente', res:'nao-aplicavel'},
+        {n:7, etapa:'Controladoria / órgão de controle competente', res:'nao-aplicavel'},
+        {n:8, etapa:'Base oficial de dados do governo', res:'sem-resultado'},
+        {n:9, etapa:'Fontes secundárias (imprensa, perfis)', res:'encontrado'}
+      ],
+      fontes:[
+        {classe:'jornalistica', titulo:'Checagem: não há projeto que autorize o casamento entre pais e filhos', veiculo:'Agência Verifica (fictícia)', data:'2026-10-05', verificacao:'parcial', nota:'Informa que não achou projeto nem discurso; não prova que a fala nunca existiu.'},
+        {classe:'analise', titulo:'Como boatos sobre projetos de lei se espalham', veiculo:'Observatório Digital (fictício)', data:'2026-10-07', verificacao:'nao-verificado', nota:'Texto geral sobre o fenômeno; não trata deste caso em específico.'}
+      ],
+      impacto:{
+        social:{grau:'médio', evid:['Mensagem encaminhada em muitos grupos, segundo a checagem.']},
+        religioso:{grau:'médio', evid:['Líderes de igrejas pediram esclarecimento nas redes.']},
+        familiar:{grau:'não avaliado', evid:[]}
+      },
+      escrituras:[
+        {ref:'Levítico 18:6-18', tema:'Limites nas relações dentro da família', nota:'Lista as uniões proibidas entre parentes próximos na lei dada a Israel.'},
+        {ref:'1 Coríntios 5:1', tema:'Gravidade dessas uniões no Novo Testamento', nota:'Paulo trata uma união desse tipo na igreja de Corinto como algo grave.'},
+        {ref:'Provérbios 18:13', tema:'Verificar antes de responder', nota:'Aplica-se ao caso: responder antes de ouvir é tolice. A alegação ainda não foi comprovada.'}
+      ]
+    },
+    {
+      id:'oc-0003',
+      quem:{nome:'Pastor Anselmo Reis', papel:'Líder religioso (fictício)', alcance:'Igreja com 8 mil membros (dado fictício)'},
+      aliases:['Anselmo Reis'],
+      oque:{
+        tipo:'Vídeo',
+        resumo:'Teria dito em culto, segundo relato, que quem não contribui financeiramente não será salvo.',
+        citacao:''
+      },
+      quando:'2026-08-23',
+      onde:{tipo:'Culto', nome:'Igreja Caminho Novo (fictícia)', local:'Goiânia, GO'},
+      status:'parcial',
+      contexto:'O vídeo original não foi localizado. Há relatos de duas pessoas que estiveram no culto e um trecho curto sem áudio claro. A igreja ainda não se pronunciou.',
+      temas:['25','09'],
+      keywords:['pastor','salvacao','dizimo','contribuicao','culto','igreja'],
+      rastro:null,
+      fontes:[
+        {classe:'jornalistica', titulo:'Fiéis relatam fala sobre contribuição e salvação', veiculo:'Jornal Centro-Oeste (fictício)', data:'2026-08-27', verificacao:'parcial', nota:'Baseia-se em depoimentos. Não exibe a gravação.'},
+        {classe:'original', titulo:'Trecho de 20 segundos publicado em rede social', veiculo:'Perfil anônimo', data:'2026-08-24', verificacao:'nao-verificado', nota:'Perfil sem identificação; áudio incompleto.'}
+      ],
+      impacto:{
+        social:{grau:'baixo', evid:['Repercussão regional.']},
+        religioso:{grau:'médio', evid:['Debate entre pastores sobre ensino de dízimo e salvação.']},
+        familiar:{grau:'médio', evid:['Relatos de famílias que se sentiram pressionadas a contribuir.']}
+      },
+      escrituras:[
+        {ref:'Efésios 2:8-9', tema:'Salvação pela graça', nota:'Afirma que a salvação é dom de Deus e não vem de obras.'},
+        {ref:'2 Coríntios 9:7', tema:'A oferta voluntária', nota:'Ensina que cada um dê como determinou no coração, sem tristeza nem constrangimento.'}
+      ]
+    },
+    {
+      id:'oc-0004',
+      quem:{nome:'Ministro Tadeu Barros', papel:'Ministro de tribunal (fictício)', alcance:'Decisão com efeito nacional (dado fictício)'},
+      aliases:['Tadeu Barros'],
+      oque:{
+        tipo:'Decisão',
+        resumo:'Decidiu que escolas públicas devem retirar o ensino religioso da grade obrigatória.',
+        citacao:''
+      },
+      quando:'2026-07-30',
+      onde:{tipo:'Tribunal', nome:'Tribunal Superior (fictício)', local:'Brasília, DF'},
+      status:'confirmada',
+      contexto:'A decisão é liminar e ainda pode ser revista pelo plenário. Ela vale para a rede pública e não alcança escolas privadas.',
+      temas:['02','15','25','01'],
+      keywords:['ensino','religioso','escola','decisao','liminar','educacao'],
+      rastro:[
+        {n:1, etapa:'Portal próprio do órgão (consulta processual)', res:'encontrado'},
+        {n:2, etapa:'Portal de Transparência do governo', res:'nao-aplicavel'},
+        {n:3, etapa:'Portal oficial de Acesso à Informação / LAI', res:'nao-aplicavel'},
+        {n:4, etapa:'Portal oficial institucional (decisões e notícias)', res:'encontrado'},
+        {n:5, etapa:'Diário Oficial correspondente', res:'encontrado'},
+        {n:6, etapa:'Tribunal de Contas competente', res:'nao-aplicavel'},
+        {n:7, etapa:'Controladoria / órgão de controle competente', res:'nao-aplicavel'},
+        {n:8, etapa:'Base oficial de dados do governo', res:'sem-resultado'},
+        {n:9, etapa:'Fontes secundárias (imprensa, perfis)', res:'encontrado'}
+      ],
+      fontes:[
+        {classe:'original', titulo:'Íntegra da decisão liminar', veiculo:'Tribunal Superior (fictício)', data:'2026-07-30', verificacao:'confirmado', nota:'Documento oficial com o número do processo.'},
+        {classe:'oficial', titulo:'Publicação no Diário da Justiça', veiculo:'Diário da Justiça (fictício)', data:'2026-08-01', verificacao:'confirmado', nota:'Registra a publicação da decisão.'},
+        {classe:'jornalistica', titulo:'Decisão tira ensino religioso da grade da rede pública', veiculo:'Folha Capital (fictícia)', data:'2026-07-31', verificacao:'confirmado', nota:'Resume o alcance e ouve especialistas.'}
+      ],
+      impacto:{
+        social:{grau:'alto', evid:['Atinge toda a rede pública de ensino.','Debate em câmaras municipais e assembleias.']},
+        religioso:{grau:'alto', evid:['Manifestações de várias confissões religiosas.','Pedido de audiência pública por entidades de igrejas.']},
+        familiar:{grau:'alto', evid:['Mudança direta na formação oferecida aos filhos na escola.','Pais divididos entre apoio e contrariedade.']}
+      },
+      escrituras:[
+        {ref:'Deuteronômio 6:6-7', tema:'Os pais ensinam os filhos', nota:'Coloca a transmissão da fé, antes de tudo, na vida da família.'},
+        {ref:'Provérbios 22:6', tema:'Instruir a criança', nota:'Fala da instrução da criança no caminho em que deve andar.'}
+      ]
+    },
+    {
+      id:'oc-0005',
+      quem:{nome:'Caio Menezes', papel:'Influenciador digital (fictício)', alcance:'Cerca de 3 milhões de seguidores (dado fictício)'},
+      aliases:['Caio M.'],
+      oque:{
+        tipo:'Publicação',
+        resumo:'Teria dito que o casamento é uma ideia ultrapassada. O vídeo completo mostra uma fala mais longa, com outra conclusão.',
+        citacao:'“O casamento como o conhecemos precisa ser repensado.”'
+      },
+      quando:'2026-09-28',
+      onde:{tipo:'Rede social', nome:'Vídeo curto em perfil verificado', local:'Online'},
+      status:'contestada',
+      contexto:'Um trecho de 15 segundos circulou sem o restante. No vídeo completo, ele diz que muitos casais se casam sem preparo e defende mais preparação, não o fim do casamento.',
+      temas:['09','26','25'],
+      keywords:['casamento','ultrapassado','video','influenciador','familia'],
+      rastro:null,
+      fontes:[
+        {classe:'original', titulo:'Vídeo completo de 4 minutos', veiculo:'Perfil verificado de Caio Menezes', data:'2026-09-28', verificacao:'confirmado', nota:'Mostra a fala inteira e o contexto.'},
+        {classe:'original', titulo:'Corte de 15 segundos', veiculo:'Perfil de terceiros', data:'2026-09-29', verificacao:'contestado', nota:'Remove a conclusão e muda o sentido.'},
+        {classe:'jornalistica', titulo:'Corte de vídeo distorce fala de influenciador', veiculo:'Agência Verifica (fictícia)', data:'2026-10-01', verificacao:'confirmado', nota:'Compara o corte com o vídeo completo.'}
+      ],
+      impacto:{
+        social:{grau:'médio', evid:['O corte teve grande alcance antes da correção.']},
+        religioso:{grau:'baixo', evid:['Poucas manifestações de igrejas.']},
+        familiar:{grau:'médio', evid:['Debate sobre casamento entre jovens e casais.']}
+      },
+      escrituras:[
+        {ref:'Gênesis 2:24', tema:'A instituição do casamento', nota:'Apresenta o casamento desde a criação: o homem deixa pai e mãe e se une à mulher.'},
+        {ref:'Mateus 19:4-6', tema:'A palavra de Jesus sobre o casamento', nota:'Jesus retoma a criação para falar da união que Deus fez.'},
+        {ref:'Provérbios 18:17', tema:'Ouvir os dois lados', nota:'Lembra que a primeira versão parece certa até alguém examiná-la.'}
+      ]
+    }
+  ];
+ 
+  /* =========================================================
+     UTILIDADES
+     ========================================================= */
+  const $ = id => document.getElementById(id);
+ 
+  function esc(v) {
+    const d = document.createElement('div');
+    d.textContent = String(v ?? '');
+    return d.innerHTML;
+  }
+ 
+  function norm(v) {
+    return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
+ 
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+ 
+  function statusInfo(id) { return STATUS.find(s => s.id === id) || STATUS[3]; }
+  function areaName(id) { const a = AREAS.find(x => x[0] === id); return a ? a[1] : id; }
+  function slug(v) { return norm(v).replace(/[^a-z0-9]+/g, '-'); }
+ 
+  /* =========================================================
+     BUSCA
+     ========================================================= */
+  let mode = 'list';
+ 
+  function fillFilters() {
+    const tema = $('f-tema');
+    tema.innerHTML = '<option value="">Todos os temas</option>' +
+      AREAS.map(a => `<option value="${a[0]}">${a[0]} — ${esc(a[1])}</option>`).join('');
+ 
+    $('f-tipo').innerHTML = '<option value="">Todos os tipos</option>' +
+      TIPOS.map(t => `<option>${esc(t)}</option>`).join('');
+ 
+    $('f-status').innerHTML = '<option value="">Qualquer situação</option>' +
+      STATUS.map(s => `<option value="${s.id}">${esc(s.label)}</option>`).join('');
+  }
+ 
+  function haystack(o) {
+    return norm([
+      o.quem.nome, (o.aliases || []).join(' '), o.quem.papel,
+      o.oque.resumo, o.oque.citacao, o.oque.tipo,
+      o.onde.nome, o.onde.local, o.onde.tipo,
+      (o.keywords || []).join(' '),
+      o.temas.map(areaName).join(' ')
+    ].join(' '));
+  }
+ 
+  function matches(o) {
+    const q = norm($('search-input').value).trim();
+    if (q) {
+      const hay = haystack(o);
+      const tokens = q.split(/\s+/).filter(Boolean);
+      if (!tokens.every(t => hay.includes(t))) return false;
     }
  
-    function cleanServiceText(value) {
-      return String(value || '').replace(/\bIA\b/gi, 'serviço de análise');
+    const tema = $('f-tema').value;
+    if (tema && !o.temas.includes(tema)) return false;
+ 
+    const tipo = $('f-tipo').value;
+    if (tipo && o.oque.tipo !== tipo) return false;
+ 
+    const st = $('f-status').value;
+    if (st && o.status !== st) return false;
+ 
+    const dias = Number($('f-periodo').value);
+    if (dias) {
+      const limite = Date.now() - dias * 86400000;
+      if (new Date(o.quando + 'T12:00:00').getTime() < limite) return false;
     }
  
-    /* =========================================================
-       VÍDEOS
-       ========================================================= */
-    const VIDEO_HOSTS = [
-      'youtube.com','m.youtube.com','youtu.be','youtube-nocookie.com',
-      'vimeo.com','player.vimeo.com',
-      'tiktok.com','x.com','twitter.com','instagram.com','facebook.com','fb.watch'
-    ];
- 
-    function isVideoSource(source) {
-      const mediaType = String(source.mediaType || '').toLowerCase();
-      const type = String(source.type || '').toLowerCase();
-      if (mediaType.includes('víde') || mediaType.includes('vide') ||
-          type.includes('víde') || type.includes('vide')) {
-        return true;
-      }
-      if (!source.url) return false;
-      try {
-        const host = new URL(source.url).hostname.replace(/^www\./, '');
-        return VIDEO_HOSTS.includes(host);
-      } catch (_) {
-        return false;
-      }
+    const imp = $('f-impacto').value;
+    if (imp) {
+      const g = k => GRAUS[o.impacto[k].grau] || 0;
+      if (imp === 'alto' && !['social','religioso','familiar'].some(k => g(k) === 3)) return false;
+      if (['religioso','social','familiar'].includes(imp) && g(imp) < 2) return false;
     }
  
-    function getEmbedUrl(url) {
-      if (!url) return null;
-      try {
-        const u = new URL(url);
-        const host = u.hostname.replace(/^www\./, '');
+    return true;
+  }
  
-        if (host === 'youtu.be') {
-          const id = u.pathname.slice(1);
-          return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+  function cardHtml(o) {
+    const st = statusInfo(o.status);
+    const imp = ['religioso','social','familiar'].map(k =>
+      `<span class="chip">${k[0].toUpperCase() + k.slice(1)}: <b>${esc(o.impacto[k].grau)}</b></span>`
+    ).join('');
+ 
+    return `
+      <button type="button" class="occ-card" data-id="${o.id}">
+        <div class="occ-top">
+          <span class="badge ${st.id}">${esc(st.label)}</span>
+          <span class="badge tipo">${esc(o.oque.tipo)}</span>
+          <span class="occ-who">${esc(o.quem.nome)}</span>
+          <span class="occ-role">${esc(o.quem.papel)}</span>
+        </div>
+        <p class="occ-what">${esc(o.oque.resumo)}</p>
+        <div class="occ-meta">
+          <span>${fmtDate(o.quando)}</span>
+          <span>${esc(o.onde.nome)}${o.onde.local ? ' — ' + esc(o.onde.local) : ''}</span>
+        </div>
+        <div class="mini-impact">${imp}</div>
+      </button>`;
+  }
+ 
+  function monthLabel(iso) {
+    return new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+  }
+ 
+  function renderResults() {
+    const list = OCORRENCIAS.filter(matches).sort((a, b) => b.quando.localeCompare(a.quando));
+    const box = $('results');
+ 
+    $('list-count').textContent =
+      list.length === 1 ? '1 registro encontrado' : `${list.length} registros encontrados`;
+ 
+    if (!list.length) {
+      const q = $('search-input').value.trim();
+      box.innerHTML = `
+        <div class="empty">
+          <strong>Nenhum registro ainda</strong>
+          ${q
+            ? `Não há ocorrência registrada para “${esc(q)}”. Você pode abrir uma investigação: o Oráculo cria o registro com a situação <em>Em apuração</em> e procura as fontes.`
+            : 'Nenhum registro corresponde aos filtros escolhidos. Tente ampliar a busca.'}
+          ${q ? '<br><button type="button" class="btn" id="start-investigation">INVESTIGAR ESTE ASSUNTO</button>' : ''}
+        </div>`;
+      return;
+    }
+ 
+    if (mode === 'timeline') {
+      let html = '';
+      let current = '';
+      list.forEach(o => {
+        const label = monthLabel(o.quando);
+        if (label !== current) {
+          if (current) html += '</div>';
+          html += `<h3 class="month-label">${esc(label)}</h3><div class="occ-list timeline">`;
+          current = label;
         }
- 
-        if (host === 'youtube.com' || host === 'm.youtube.com') {
-          const id = u.searchParams.get('v');
-          if (id) return `https://www.youtube-nocookie.com/embed/${id}`;
-          const shorts = u.pathname.match(/\/shorts\/([^/]+)/);
-          if (shorts) return `https://www.youtube-nocookie.com/embed/${shorts[1]}`;
-          return null;
-        }
- 
-        if (host === 'vimeo.com') {
-          const id = u.pathname.split('/').filter(Boolean)[0];
-          return id && /^\d+$/.test(id) ? `https://player.vimeo.com/video/${id}` : null;
-        }
-      } catch (_) {
-        return null;
-      }
-      return null;
-    }
- 
-    /* =========================================================
-       RASTREAMENTO DE FONTES
-       ========================================================= */
-    const TRACKING_ORDER = [
-      ['1','Portal de Transparência próprio do órgão','official-own'],
-      ['2','Portal de Transparência do governo (federal, estadual ou municipal)','official-government'],
-      ['3','Portal oficial de Acesso à Informação / LAI','official-lai'],
-      ['4','Portal oficial institucional — Transparência, LAI, Prestação de Contas, Dados Abertos','official-institutional'],
-      ['5','Diário Oficial correspondente','official-gazette'],
-      ['6','Tribunal de Contas competente (TCU/TCE/TCM)','control-audit'],
-      ['7','Controladoria / órgão de controle competente','control'],
-      ['8','Base oficial de dados do governo','official-database'],
-      ['9','Fonte secundária — imprensa, mídia, perfis não oficiais etc.','secondary']
-    ];
-    let trackingContext = {area:'', subarea:'', entity:''};
-    const trackingOverlay = document.getElementById('oracle-tracking-overlay');
-    const trackingTrigger = document.getElementById('oracle-tracking-trigger');
-    const trackingClose = document.getElementById('tracking-close');
-    const trackingOrder = document.getElementById('tracking-order');
-    const trackingForm = document.getElementById('tracking-form');
-    const trackingList = document.getElementById('tracking-publications-list');
-    const trackingContextEl = document.getElementById('tracking-context');
-    const TRACKING_STORAGE_KEY = 'oraculo_tracking_publications_v1';
- 
-    function renderTrackingOrder(){
-      trackingOrder.innerHTML = TRACKING_ORDER.map(item =>
-        `<div class="tracking-step" data-tier="${item[0]}"><span class="num">${item[0]}</span><span>${escapeHtml(item[1])}</span><span class="state">aguardar pesquisa</span></div>`
-      ).join('');
-    }
-    function getTrackingRecords(){
-      try { const v=JSON.parse(localStorage.getItem(TRACKING_STORAGE_KEY)||'[]'); return Array.isArray(v)?v:[]; }
-      catch(_){ return []; }
-    }
-    function renderTrackingRecords(){
-      const records=getTrackingRecords();
-      if(!records.length){ trackingList.innerHTML='<div class="tracking-note">Nenhuma publicação registrada ainda.</div>'; return; }
-      trackingList.innerHTML=records.slice().reverse().map(r=>`
-        <article class="tracking-publication">
-          <span class="tracking-badge">${escapeHtml(r.type||'PUBLICAÇÃO')}</span>
-          <strong>${escapeHtml(r.title||'Sem título')}</strong><br>
-          ${escapeHtml(r.source||'Fonte não identificada')}${r.date?' · '+escapeHtml(r.date):''}<br>
-          ${r.entity?'<strong>Entidade:</strong> '+escapeHtml(r.entity):''}
-          ${r.sphere?' · '+escapeHtml(r.sphere):''}
-          ${r.url?'<br><a href="'+escapeHtml(r.url)+'" target="_blank" rel="noopener noreferrer">Abrir publicação original</a>':''}
-          ${r.notes?'<div class="tracking-classification"><strong>Observações:</strong> '+escapeHtml(r.notes)+'</div>':''}
-          <div class="tracking-classification"><strong>Classificação:</strong> ainda não realizada</div>
-        </article>`).join('');
-    }
-    function updateTrackingContext(){
-      const parts=[trackingContext.entity,trackingContext.area,trackingContext.subarea].filter(Boolean);
-      trackingContextEl.innerHTML='<strong>Objeto atual:</strong> '+escapeHtml(parts.join(' · ')||'consulta geral')+'<br><span>O rastreamento registra publicações; não determina a verdade nesta etapa.</span>';
-      if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
-    }
-    function openTracking(){ trackingOverlay.classList.add('active'); trackingOverlay.setAttribute('aria-hidden','false'); trackingTrigger.setAttribute('aria-expanded','true'); updateTrackingContext(); renderTrackingOrder(); renderTrackingRecords(); }
-    function closeTracking(){ trackingOverlay.classList.remove('active'); trackingOverlay.setAttribute('aria-hidden','true'); trackingTrigger.setAttribute('aria-expanded','false'); }
-    trackingTrigger.addEventListener('click',openTracking);
-    trackingClose.addEventListener('click',closeTracking);
-    trackingOverlay.addEventListener('click',e=>{if(e.target===trackingOverlay)closeTracking();});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTracking();});
-    trackingForm.addEventListener('submit',e=>{
-      e.preventDefault();
-      const fd=new FormData(trackingForm);
-      const record={
-        id:Date.now().toString(36)+Math.random().toString(36).slice(2),
-        entity:fd.get('entity')||'', sphere:fd.get('sphere')||'', url:fd.get('url')||'',
-        title:fd.get('title')||'', source:fd.get('source')||'', type:fd.get('type')||'',
-        date:fd.get('date')||'', notes:fd.get('notes')||'', createdAt:new Date().toISOString()
-      };
-      const records=getTrackingRecords();
-      records.push(record);
-      localStorage.setItem(TRACKING_STORAGE_KEY,JSON.stringify(records));
-      renderTrackingRecords();
-      trackingForm.reset();
-      if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
-    });
-    document.getElementById('tracking-clear').addEventListener('click',()=>{
-      if(confirm('Apagar os registros de publicações salvos neste navegador?')){
-        localStorage.removeItem(TRACKING_STORAGE_KEY);
-        renderTrackingRecords();
-      }
-    });
- 
-    /* =========================================================
-       PASSO A PASSO
-       ========================================================= */
-    const wizard = document.getElementById('oracle-wizard');
-    const stepperEl = document.getElementById('wiz-stepper');
- 
-    const wiz = {
-      stage: 1,
-      area: null,       // objeto de ORACULO_AREAS
-      sub: '',          // texto da subárea ('' = área inteira)
-      free: false,      // pergunta livre, sem área
-      hasResults: false
-    };
- 
-    const WIZ_TITLES = ['Área', 'Subárea', 'Pergunta', 'Resultado'];
- 
-    function subareaLabel(area, subarea, index) {
-      return /^\d{2}\.\d+/.test(subarea) ? subarea : `${area.id}.${index + 1} — ${subarea}`;
-    }
- 
-    function wizReachable(n) {
-      if (n === 1) return true;
-      if (n === 2) return !!wiz.area;
-      if (n === 3) return !!wiz.area || wiz.free;
-      if (n === 4) return wiz.hasResults;
-      return false;
-    }
- 
-    function wizValue(n) {
-      if (n === 1) return wiz.free ? 'Pergunta livre' : (wiz.area ? wiz.area.id + ' ' + wiz.area.name : '');
-      if (n === 2) return wiz.sub || (wiz.area ? 'Área inteira' : '');
-      return '';
-    }
- 
-    function contextText() {
-      if (wiz.free || !wiz.area) return '<strong>Pergunta livre</strong> — sem área definida';
-      return '<strong>' + escapeHtml(wiz.area.id + ' ' + wiz.area.name) + '</strong>' +
-        (wiz.sub ? ' › ' + escapeHtml(wiz.sub) : ' › área inteira');
-    }
- 
-    function updateTrackingFromWizard() {
-      trackingContext.area = wiz.area ? wiz.area.name : '';
-      trackingContext.subarea = wiz.sub || '';
-    }
- 
-    function renderStepper() {
-      stepperEl.innerHTML = '';
- 
-      WIZ_TITLES.forEach((title, index) => {
-        const n = index + 1;
-        const done = n < wiz.stage && wizReachable(n);
-        const current = n === wiz.stage;
- 
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'wiz-step' + (current ? ' current' : '') + (done ? ' done' : '');
-        btn.disabled = !done;
-        if (current) btn.setAttribute('aria-current', 'step');
- 
-        const num = document.createElement('span');
-        num.className = 'wiz-num';
-        num.textContent = done ? '✓' : String(n);
- 
-        const text = document.createElement('span');
-        text.className = 'wiz-text';
- 
-        const t = document.createElement('span');
-        t.className = 'wiz-title';
-        t.textContent = title;
-        text.appendChild(t);
- 
-        const value = wizValue(n);
-        if (value && n < wiz.stage) {
-          const v = document.createElement('span');
-          v.className = 'wiz-value';
-          v.textContent = value;
-          text.appendChild(v);
-        }
- 
-        btn.appendChild(num);
-        btn.appendChild(text);
-        btn.addEventListener('click', () => goStage(n));
-        stepperEl.appendChild(btn);
+        html += cardHtml(o);
       });
+      html += '</div>';
+      box.innerHTML = html;
+    } else {
+      box.innerHTML = `<div class="occ-list">${list.map(cardHtml).join('')}</div>`;
     }
+  }
  
-    function goStage(n) {
-      if (!wizReachable(n)) return;
-      wiz.stage = n;
-      wizard.dataset.stage = String(n);
+  $('search-form').addEventListener('submit', e => { e.preventDefault(); renderResults(); });
+  $('search-input').addEventListener('input', renderResults);
+  ['f-tema','f-periodo','f-tipo','f-status','f-impacto'].forEach(id =>
+    $(id).addEventListener('change', renderResults));
  
-      if (n === 2) renderSubareas();
-      if (n === 3) prepareQuestionStage();
-      if (n === 4) document.getElementById('result-chip').innerHTML = contextText();
+  $('mode-list').addEventListener('click', () => setMode('list'));
+  $('mode-timeline').addEventListener('click', () => setMode('timeline'));
  
-      renderStepper();
-      window.scrollTo({top: 0, behavior: 'smooth'});
+  function setMode(m) {
+    mode = m;
+    $('mode-list').classList.toggle('on', m === 'list');
+    $('mode-timeline').classList.toggle('on', m === 'timeline');
+    renderResults();
+  }
  
-      if (n === 3) input.focus();
-    }
+  $('results').addEventListener('click', e => {
+    const card = e.target.closest('.occ-card');
+    if (card) { openFicha(card.dataset.id); return; }
  
-    /* ---------- Passo 1 ---------- */
-    function renderAreas() {
-      const grid = document.getElementById('area-grid');
-      grid.innerHTML = '';
+    if (e.target.closest('#start-investigation')) startInvestigation();
+  });
  
-      ORACULO_AREAS.forEach(area => {
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'choice-card';
-        card.innerHTML = '<span class="choice-number"></span><span class="choice-name"></span>';
-        card.querySelector('.choice-number').textContent = area.id;
-        card.querySelector('.choice-name').textContent = area.name;
-        card.addEventListener('click', () => selectArea(area));
-        grid.appendChild(card);
-      });
-    }
+  /* Investigação nova: cria um registro "em apuração" (somente nesta sessão) */
+  function startInvestigation() {
+    const q = $('search-input').value.trim();
+    if (!q) return;
  
-    function selectArea(area) {
-      if (!wiz.area || wiz.area.id !== area.id) wiz.sub = '';
-      wiz.area = area;
-      wiz.free = false;
-      updateTrackingFromWizard();
-      goStage(2);
-    }
- 
-    document.getElementById('skip-area').addEventListener('click', () => {
-      wiz.area = null;
-      wiz.sub = '';
-      wiz.free = true;
-      updateTrackingFromWizard();
-      goStage(3);
+    const id = 'oc-novo-' + Date.now().toString(36);
+    OCORRENCIAS.push({
+      id,
+      quem:{nome:q, papel:'A identificar', alcance:'A apurar'},
+      aliases:[],
+      oque:{tipo:'Declaração', resumo:'Assunto aberto para investigação a partir da busca: “' + q + '”.', citacao:''},
+      quando:new Date().toISOString().slice(0, 10),
+      onde:{tipo:'A apurar', nome:'A apurar', local:''},
+      status:'em-apuracao',
+      contexto:'Registro criado nesta sessão. Quando o serviço de apuração estiver ligado, ele procurará a fonte original, as fontes oficiais e a cobertura jornalística, na ordem do rastreio.',
+      temas:[],
+      keywords:[],
+      rastro:null,
+      fontes:[],
+      impacto:{
+        social:{grau:'não avaliado', evid:[]},
+        religioso:{grau:'não avaliado', evid:[]},
+        familiar:{grau:'não avaliado', evid:[]}
+      },
+      escrituras:[]
     });
  
-    /* ---------- Passo 2 ---------- */
-    function renderSubareas() {
-      const list = document.getElementById('sub-list');
-      list.innerHTML = '';
-      if (!wiz.area) return;
+    openFicha(id);
+  }
  
-      document.getElementById('sub-title').textContent =
-        'Qual subárea de ' + wiz.area.name + '?';
+  /* =========================================================
+     FICHA
+     ========================================================= */
+  const STAGES = ['O que aconteceu', 'Rastreio e proveniência', 'Impacto', 'O que a Bíblia diz'];
+  let currentOcc = null;
+  let currentStage = 0;
  
-      const whole = document.createElement('button');
-      whole.type = 'button';
-      whole.className = 'sub-row whole';
-      whole.innerHTML = '<span class="sub-code"></span><span class="sub-name"></span>';
-      whole.querySelector('.sub-code').textContent = wiz.area.id;
-      whole.querySelector('.sub-name').textContent = 'Usar a área inteira';
-      whole.addEventListener('click', () => selectSubarea(''));
-      list.appendChild(whole);
+  function openFicha(id) {
+    currentOcc = OCORRENCIAS.find(o => o.id === id);
+    if (!currentOcc) return;
+    currentStage = 0;
  
-      wiz.area.subareas.forEach((subarea, index) => {
-        const label = subareaLabel(wiz.area, subarea, index);
-        const m = label.match(/^(\d{2}\.\d+)\s*—\s*(.*)$/);
+    const st = statusInfo(currentOcc.status);
+    $('ficha-title').innerHTML = `
+      <h2>${esc(currentOcc.quem.nome)}</h2>
+      <p><span class="badge ${st.id}">${esc(st.label)}</span>
+         <span class="badge tipo">${esc(currentOcc.oque.tipo)}</span>
+         ${fmtDate(currentOcc.quando)}</p>`;
  
-        const row = document.createElement('button');
-        row.type = 'button';
-        row.className = 'sub-row';
-        row.innerHTML = '<span class="sub-code"></span><span class="sub-name"></span>';
-        row.querySelector('.sub-code').textContent = m ? m[1] : '';
-        row.querySelector('.sub-name').textContent = m ? m[2] : label;
-        row.addEventListener('click', () => selectSubarea(label));
-        list.appendChild(row);
-      });
-    }
+    document.body.dataset.view = 'ficha';
+    renderStage();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
  
-    function selectSubarea(label) {
-      wiz.sub = label;
-      updateTrackingFromWizard();
-      goStage(3);
-    }
+  function renderStepper() {
+    $('ficha-stepper').innerHTML = STAGES.map((t, i) => {
+      const cls = i === currentStage ? 'current' : (i < currentStage ? 'done' : '');
+      return `<button type="button" class="wiz-step ${cls}" data-stage="${i}"
+          ${i === currentStage ? 'aria-current="step"' : ''}>
+          <span class="wiz-num">${i < currentStage ? '✓' : i + 1}</span>
+          <span class="wiz-title">${esc(t)}</span>
+        </button>`;
+    }).join('');
+  }
  
-    /* ---------- Passo 3 ---------- */
-    function prepareQuestionStage() {
-      document.getElementById('context-chip').innerHTML = contextText();
+  function stageWhat(o) {
+    const st = statusInfo(o.status);
+    return `
+      <h3>O que aconteceu</h3>
+      <p class="lead">Primeiro, o fato: quem, o quê, quando e onde. A situação mostra se existe fonte que comprove.</p>
  
-      if (wiz.free || !wiz.area) {
-        input.value = '';
-        return;
-      }
+      <div class="status-box">
+        <span class="badge ${st.id}">${esc(st.label)}</span>
+        <div><strong>${esc(st.label)}.</strong> ${esc(st.desc)}</div>
+      </div>
  
-      input.value = wiz.sub
-        ? `Pesquisar sobre ${wiz.area.name}, especificamente em ${wiz.sub}.`
-        : `Pesquisar sobre ${wiz.area.name}.`;
-    }
+      <div class="facts">
+        <div class="fact"><h4>Quem</h4><p>${esc(o.quem.nome)}</p><small>${esc(o.quem.papel)}</small><small>${esc(o.quem.alcance)}</small></div>
+        <div class="fact"><h4>O quê</h4><p>${esc(o.oque.resumo)}</p><small>Tipo: ${esc(o.oque.tipo)}</small></div>
+        <div class="fact"><h4>Quando</h4><p>${fmtDate(o.quando)}</p></div>
+        <div class="fact"><h4>Onde</h4><p>${esc(o.onde.nome)}</p><small>${esc(o.onde.tipo)}${o.onde.local ? ' — ' + esc(o.onde.local) : ''}</small></div>
+      </div>
  
-    document.getElementById('back-from-question').addEventListener('click', () => {
-      goStage(wiz.free || !wiz.area ? 1 : 2);
-    });
+      ${o.oque.citacao ? `<div class="quote">${esc(o.oque.citacao)}<small>Citação literal registrada na fonte original.</small></div>` : ''}
  
-    wizard.addEventListener('click', event => {
-      const back = event.target.closest('[data-go]');
-      if (back) goStage(Number(back.dataset.go));
-    });
+      <div class="context-box"><strong>Contexto:</strong> ${esc(o.contexto)}</div>`;
+  }
  
-    /* ---------- Passo 4 ---------- */
-    document.getElementById('ask-again').addEventListener('click', () => goStage(3));
+  function stageTrail(o) {
+    const rastro = o.rastro ? `
+      <div class="src-group">
+        <h4>Ordem de busca aplicada</h4>
+        <div class="rastro">
+          ${o.rastro.map(r => `
+            <div class="rastro-step">
+              <span class="n">${r.n}</span>
+              <span>${esc(r.etapa)}</span>
+              <span class="rastro-res ${r.res}">${r.res === 'encontrado' ? 'encontrado' : (r.res === 'sem-resultado' ? 'sem resultado' : 'não se aplica')}</span>
+            </div>`).join('')}
+        </div>
+      </div>` : '';
  
-    document.getElementById('new-search').addEventListener('click', () => {
-      wiz.area = null;
-      wiz.sub = '';
-      wiz.free = false;
-      wiz.hasResults = false;
-      messages.innerHTML = '';
-      updateTrackingFromWizard();
-      goStage(1);
-    });
+    const groups = CLASSES.map(c => {
+      const items = o.fontes.filter(f => f.classe === c.id);
+      if (!items.length) return '';
+      return `
+        <div class="src-group">
+          <h4>${esc(c.label)}</h4>
+          ${items.map(f => `
+            <div class="src ${c.id}">
+              <strong>${esc(f.titulo)}</strong>
+              <span class="vbadge ${slug(f.verificacao)}">${esc(f.verificacao.replace('-', ' '))}</span>
+              <div class="src-meta">${esc(f.veiculo)} · ${fmtDate(f.data)}</div>
+              <div class="src-note">${esc(f.nota)}</div>
+              <span class="link-pending">Link da publicação original: a conectar</span>
+            </div>`).join('')}
+        </div>`;
+    }).join('');
  
-    /* =========================================================
-       RESULTADO
-       ========================================================= */
-    function renderOracleResult(data, question) {
-      const text = cleanServiceText(
-        data.text ||
-        data.answer ||
-        data.response ||
-        'A investigação não devolveu uma resposta.'
-      );
+    const none = !o.fontes.length
+      ? '<div class="empty"><strong>Nenhuma fonte registrada</strong>Esta investigação ainda não localizou publicações. Ausência de fonte não prova que o fato seja falso.</div>'
+      : '';
  
-      const sources = Array.isArray(data.sources) ? data.sources : [];
+    return `
+      <h3>Rastreio e proveniência</h3>
+      <p class="lead">De onde vem a informação. As fontes ficam separadas por tipo: original, oficial, jornalística e análise. Cada uma tem o seu nível de verificação.</p>
+      ${rastro}${groups}${none}`;
+  }
  
-      let confidence = data.confidence || data.verificationStatus || '';
-      if (!confidence) {
-        if (data.grounded === true) confidence = 'fontes localizadas (grau não classificado pelo serviço)';
-        else if (data.grounded === false) confidence = 'nenhuma fonte autorizada localizada';
-        else confidence = 'não indicado pelo serviço';
-      }
+  function meter(g) {
+    const n = GRAUS[g] || 0;
+    return `<div class="meter g${n}"><i></i><i></i><i></i></div>`;
+  }
  
-      const checkedAt = data.checkedAt
-        ? new Date(data.checkedAt).toLocaleString('pt-BR')
-        : 'momento da consulta';
+  function stageImpact(o) {
+    const dims = [
+      ['religioso','Religioso'],
+      ['social','Social'],
+      ['familiar','Familiar']
+    ];
+    return `
+      <h3>Impacto</h3>
+      <p class="lead">O grau de cada dimensão só aparece quando há evidência registrada. Sem evidência, o Oráculo informa “não avaliado” e não opina.</p>
+      <div class="impact-grid">
+        ${dims.map(([k, label]) => {
+          const d = o.impacto[k];
+          return `
+            <div class="impact-card">
+              <h4>${label}</h4>
+              ${meter(d.grau)}
+              <div class="grade">${esc(d.grau)}</div>
+              ${d.evid.length
+                ? `<ul>${d.evid.map(e => `<li>${esc(e)}</li>`).join('')}</ul>`
+                : '<p class="none">Sem evidência registrada até agora.</p>'}
+            </div>`;
+        }).join('')}
+      </div>`;
+  }
  
-      let html =
-        '<div class="oracle-result-meta">' +
-        '<strong>Estado da verificação:</strong> ' +
-        escapeHtml(confidence) +
-        '<br><strong>Consultado em:</strong> ' +
-        escapeHtml(checkedAt) +
-        '</div>';
+  function stageBible(o) {
+    const verses = o.escrituras.length
+      ? `<div class="verse-list">${o.escrituras.map(v => `
+          <div class="verse">
+            <div class="ref">${esc(v.ref)}</div>
+            <div class="tema">${esc(v.tema)}</div>
+            <p>${esc(v.nota)}</p>
+          </div>`).join('')}</div>`
+      : '<div class="empty"><strong>Textos ainda não indicados</strong>As referências serão sugeridas quando a investigação identificar o princípio em jogo.</div>';
  
-      html +=
-        '<div class="oracle-result-text">' +
-        escapeHtml(text).replace(/\n/g, '<br>') +
-        '</div>';
+    return `
+      <h3>O que a Bíblia diz</h3>
+      <p class="lead">Esta etapa trata do princípio em jogo e não da pessoa. Vale mesmo quando o fato ainda não foi confirmado: a Escritura fala do assunto, independentemente de quem o disse.</p>
+      ${verses}
+      <div class="context-box"><strong>Texto bíblico:</strong> nesta demonstração aparecem só a referência e o princípio. O texto completo virá de uma tradução com licença, ligada a uma base, e não escrito pelo modelo, para evitar versículo inventado.</div>`;
+  }
  
-      html +=
-        '<div class="oracle-bible-invitation"><div><strong>O QUE A BÍBLIA DIZ?</strong>' +
-        '<span>O Oráculo não dará um parecer próprio. Esta etapa coloca a questão diante das Escrituras.</span></div>' +
-        '<button type="button" class="oracle-bible-button" data-question="' + escapeHtml(question) + '">CONSULTAR AS ESCRITURAS</button></div>';
+  function renderStage() {
+    const o = currentOcc;
+    if (!o) return;
  
-      if (sources.length) {
-        html +=
-          '<div class="oracle-sources">' +
-          '<h3>PUBLICAÇÕES / FONTES ENCONTRADAS</h3>' +
-          sources.map(source => {
-            const publisher = source.publisher || source.source || source.domain || 'Fonte não identificada';
-            const sourceTier = source.sourceTier || source.tier || source.sourceLevel || '';
-            const type = source.type || (source.domain ? 'resultado de busca' : 'conteúdo');
-            const classHint = String(source.sourceClass || source.sourceTier || '').toLowerCase();
-            const sourceClass = classHint.includes('original')
-              ? 'FONTE ORIGINAL'
-              : (classHint.includes('official') || classHint.includes('oficial')
-                ? 'FONTE OFICIAL'
-                : (type.toLowerCase().includes('news') || type.toLowerCase().includes('jornal') || type.toLowerCase().includes('imprensa')
-                  ? 'FONTE JORNALÍSTICA'
-                  : 'FONTE / PUBLICAÇÃO'));
-            const title = source.title || 'Sem título';
-            const date = source.publishedAt ? ' · ' + escapeHtml(source.publishedAt) : '';
-            const author = source.author ? '<br>Autor: ' + escapeHtml(source.author) : '';
-            const isVideo = isVideoSource(source);
-            const embedUrl = isVideo ? getEmbedUrl(source.url) : null;
- 
-            const platformLine = (source.platform || source.channelOrAccount)
-              ? '<br>' +
-                (source.platform ? escapeHtml(source.platform) : '') +
-                (source.platform && source.channelOrAccount ? ' · ' : '') +
-                (source.channelOrAccount ? escapeHtml(source.channelOrAccount) : '')
-              : '';
- 
-            const url = source.url
-              ? '<br><a href="' + escapeHtml(source.url) + '" target="_blank" rel="noopener noreferrer">' +
-                (isVideo ? '▶ Assistir na fonte original' : 'Abrir publicação original') + '</a>'
-              : '';
- 
-            const badge = isVideo ? '<span class="oracle-media-badge">▶ VÍDEO</span> ' : '';
- 
-            const embed = embedUrl
-              ? '<div class="oracle-video-embed"><iframe src="' + escapeHtml(embedUrl) +
-                '" title="' + escapeHtml(title) + '" loading="lazy" ' +
-                'allow="accelerometer; encrypted-media; picture-in-picture" ' +
-                'allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
-              : '';
- 
-            return (
-              '<div class="oracle-result-source' + (isVideo ? ' is-video' : '') + '">' +
-              badge +
-              '<span class="oracle-source-class">' + escapeHtml(sourceClass) + '</span><br><strong>' + escapeHtml(publisher) + '</strong> — ' +
-              escapeHtml(type) +
-              (sourceTier ? ' · <span class="tracking-badge">ETAPA ' + escapeHtml(sourceTier) + '</span>' : '') +
-              '<br>' + escapeHtml(title) + date + platformLine + author + url + embed +
-              '</div>'
-            );
-          }).join('') +
-          '</div>';
-      } else {
-        html +=
-          '<div class="oracle-result-source">' +
-          '<strong>Publicações estruturadas não devolvidas.</strong><br>' +
-          'O serviço não apresentou links verificáveis para esta resposta. ' +
-          'Trate o resultado como orientação preliminar.' +
-          '</div>';
-      }
- 
-      if (Array.isArray(data.searchQueries) && data.searchQueries.length) {
-        html +=
-          '<div class="oracle-result-meta">' +
-          '<strong>Consultas realizadas pelo serviço:</strong> ' +
-          data.searchQueries.map(q => escapeHtml(q)).join(' · ') +
-          '</div>';
-      }
- 
-      if (Array.isArray(data.limitations) && data.limitations.length) {
-        html +=
-          '<div class="oracle-result-meta">' +
-          '<strong>Limitações:</strong> ' +
-          escapeHtml(data.limitations.join(' ')) +
-          '</div>';
-      }
- 
-      return html;
-    }
- 
-    /* =========================================================
-       ETAPA BÍBLICA
-       ========================================================= */
-    messages.addEventListener('click', async event => {
-      const b = event.target.closest('.oracle-bible-button');
-      if (!b) return;
- 
-      const question = b.dataset.question || '';
-      if (!question) return;
- 
-      b.disabled = true;
-      b.textContent = 'CONSULTANDO...';
- 
-      const ans = document.createElement('div');
-      ans.className = 'ai-chat-answer';
-      ans.innerHTML = '<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div><div>Consultando as Escrituras e organizando o contexto bíblico...</div>';
-      messages.appendChild(ans);
-      ans.scrollIntoView({behavior: 'smooth', block: 'nearest'});
- 
-      const prompt = `ETAPA BÍBLICA DO ORÁCULO.\n\nQuestão investigada:\n${question}\n\nO Oráculo não dá parecer próprio. Nesta etapa, apresente livremente o que a Bíblia diz, sem suavizar sua afirmação para agradar à cultura, política, opinião pública ou ao pesquisador. Use somente afirmações bíblicas sustentáveis. Não invente versículos. Apresente: O QUE A BÍBLIA DIZ; TEXTOS BÍBLICOS; CONTEXTO; O QUE O TEXTO AFIRMA; INTERPRETAÇÕES RELEVANTES quando houver; SÍNTESE À LUZ DAS ESCRITURAS. Diferencie texto bíblico de interpretação humana.`;
- 
-      try {
-        const r = await fetch(`${AI_PROXY_URL.replace(/\/$/, '')}/api/pesquisa`, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            mode: 'free',
-            accessLevel: 'free',
-            question: prompt,
-            topic: 'ORÁCULO — O QUE A BÍBLIA DIZ?',
-            module: 'ORÁCULO — ETAPA BÍBLICA',
-            discipline: 'Bíblia',
-            studyContext: {trackingContext}
-          })
-        });
- 
-        const ct = r.headers.get('content-type') || '';
-        let d = ct.includes('application/json') ? await r.json() : {error: await r.text()};
- 
-        if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
- 
-        if (typeof d.text === 'string' && d.text.trim().startsWith('{')) {
-          try { d = JSON.parse(d.text); } catch (_) {}
-        }
- 
-        const text = d.text || d.answer || d.response || 'A consulta bíblica não devolveu uma resposta.';
-        ans.innerHTML =
-          '<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div>' +
-          '<div class="oracle-result-text">' +
-          escapeHtml(cleanServiceText(text)).replace(/\n/g, '<br>') +
-          '</div>';
-      } catch (e) {
-        ans.textContent = 'Não foi possível concluir a consulta bíblica: ' + (e.message || 'erro desconhecido');
-      } finally {
-        b.disabled = false;
-        b.textContent = 'CONSULTAR AS ESCRITURAS';
-      }
-    });
- 
-    /* =========================================================
-       INVESTIGAÇÃO
-       ========================================================= */
-    form.addEventListener('submit', async event => {
-      event.preventDefault();
- 
-      const question = input.value.trim();
-      if (!question) {
-        input.focus();
-        return;
-      }
- 
-      const button = form.querySelector('button');
-      const userMessage = document.createElement('div');
-      const answer = document.createElement('div');
- 
-      userMessage.className = 'ai-chat-message user';
-      userMessage.textContent = question;
-      messages.appendChild(userMessage);
- 
-      answer.className = 'ai-chat-answer';
-      answer.textContent = 'A investigar a pergunta...';
-      messages.appendChild(answer);
- 
-      wiz.hasResults = true;
-      goStage(4);
- 
-      button.disabled = true;
-      loading.style.display = 'block';
-      answer.scrollIntoView({behavior: 'smooth', block: 'nearest'});
- 
-      const researchPrompt = `Atue como um mecanismo de pesquisa geral e editor responsável.
- 
-Pergunta do pesquisador:
-${question}
- 
-OBJETIVO:
-Responder à pergunta por meio de pesquisa interna em fontes e publicações adequadas ao assunto. O pesquisador não precisa indicar previamente a disciplina, área, site ou fonte.
- 
-REGRAS:
-1. Classifique internamente o assunto e escolha os tipos de fonte adequados.
-2. Não restrinja a consulta a notícias.
-3. Priorize publicações, documentos e dados verificáveis.
-4. Para informações atuais, priorize conteúdo recente e informe a data.
-5. Não invente fontes, autores, datas, URLs ou evidências.
-6. Diferencie fatos publicados, interpretações, hipóteses, opiniões e ausência de evidência.
-7. Quando houver divergência relevante entre fontes, apresente-a claramente.
-8. Quando possível, apresente as publicações originais utilizadas.
-9. Para assuntos com provável registo audiovisual, procure também fontes em vídeo.
-10. Para vídeos de redes sociais, confirme a oficialidade do perfil; se não for possível, marque a fonte como não verificada.
-11. Se a evidência for insuficiente, declare essa limitação em vez de completar a lacuna por inferência.
-12. Quando a consulta envolver uma entidade ou órgão, siga esta ordem de busca: 1) Portal de Transparência próprio; 2) Portal de Transparência do governo ao qual pertence; 3) Acesso à Informação/LAI; 4) portal institucional; 5) Diário Oficial; 6) Tribunal de Contas competente; 7) Controladoria competente; 8) base oficial de dados; 9) fontes secundárias.
-13. Não pare necessariamente na primeira fonte encontrada: registre as publicações relevantes das etapas aplicáveis para formar o rastro documental.
-14. Canais oficiais do próprio órgão (site, YouTube, TV, Instagram, Facebook, X, LinkedIn, TikTok etc.) são fontes oficiais institucionais; não devem ser tratados como fonte secundária.
-15. Nesta etapa, registre a existência e os metadados da publicação. Não classifique o conteúdo como verdadeiro ou falso apenas por ter sido localizado.`;
- 
-      try {
-        const response = await fetch(
-          `${AI_PROXY_URL.replace(/\/$/, '')}/api/pesquisa`,
-          {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              mode: 'free',
-              accessLevel: 'free',
-              question: researchPrompt,
-              topic: 'ORÁCULO — CONSULTA GERAL',
-              module: 'ORÁCULO — CONSULTA GERAL',
-              discipline: '',
-              studyContext: {
-                trackingContext,
-                sourceOrder: TRACKING_ORDER.map(x => ({step: x[0], source: x[1]}))
-              }
-            })
-          }
-        );
- 
-        const contentType = response.headers.get('content-type') || '';
-        const data = contentType.includes('application/json')
-          ? await response.json()
-          : {error: await response.text()};
- 
-        if (!response.ok) {
-          const serviceMessage =
-            data && typeof data.error === 'string'
-              ? data.error
-              : `O serviço devolveu HTTP ${response.status}.`;
-          throw new Error(serviceMessage);
-        }
- 
-        let parsed = data || {};
-        if (typeof parsed.text === 'string' && parsed.text.trim().startsWith('{')) {
-          try {
-            parsed = JSON.parse(parsed.text);
-          } catch (_) {
-            parsed = {text: parsed.text};
-          }
-        }
- 
-        answer.innerHTML = renderOracleResult(parsed, question);
-      } catch (error) {
-        console.error('Erro no chat Oráculo:', error);
-        const message = String(error && error.message || '');
- 
-        if (message === 'Failed to fetch') {
-          answer.textContent =
-            'Não foi possível ligar ao serviço de investigação. Verifique a ligação e tente novamente.';
-        } else if (/quota|rate.?limit|billing|plan/i.test(message)) {
-          answer.textContent =
-            'O serviço de investigação atingiu o limite de utilização. Tente novamente mais tarde.';
-        } else {
-          answer.textContent =
-            `Não foi possível concluir a investigação: ${message}`;
-        }
-      } finally {
-        button.disabled = false;
-        loading.style.display = 'none';
-      }
-    });
- 
-    /* =========================================================
-       INICIALIZAÇÃO
-       ========================================================= */
-    renderAreas();
     renderStepper();
+ 
+    const html = [stageWhat, stageTrail, stageImpact, stageBible][currentStage](o);
+    $('ficha-body').innerHTML = html;
+ 
+    $('prev-stage').disabled = currentStage === 0;
+    const last = currentStage === STAGES.length - 1;
+    const next = $('next-stage');
+    next.textContent = last ? 'Concluir e voltar à busca' : 'Próxima etapa →';
+  }
+ 
+  $('ficha-stepper').addEventListener('click', e => {
+    const b = e.target.closest('.wiz-step');
+    if (!b) return;
+    currentStage = Number(b.dataset.stage);
+    renderStage();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+ 
+  $('prev-stage').addEventListener('click', () => {
+    if (currentStage > 0) { currentStage--; renderStage(); window.scrollTo({top:0, behavior:'smooth'}); }
+  });
+ 
+  $('next-stage').addEventListener('click', () => {
+    if (currentStage < STAGES.length - 1) {
+      currentStage++;
+      renderStage();
+      window.scrollTo({top:0, behavior:'smooth'});
+    } else {
+      backToSearch();
+    }
+  });
+ 
+  function backToSearch() {
+    document.body.dataset.view = 'search';
+    renderResults();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+ 
+  $('back-to-search').addEventListener('click', backToSearch);
+ 
+  /* =========================================================
+     INICIALIZAÇÃO
+     ========================================================= */
+  fillFilters();
+  renderResults();
   </script>
  
   <script>
@@ -1620,7 +1296,6 @@ REGRAS:
     var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
     var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
     var PAGINA = "Oráculo";
- 
     try{
       var vid = localStorage.getItem("ps_visitante_id");
       if(!vid){
@@ -1629,7 +1304,6 @@ REGRAS:
           : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
         localStorage.setItem("ps_visitante_id", vid);
       }
- 
       fetch(SUPABASE_URL + "/rest/v1/visitas", {
         method: "POST",
         headers: {
