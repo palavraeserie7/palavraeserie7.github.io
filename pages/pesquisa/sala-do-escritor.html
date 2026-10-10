@@ -3441,7 +3441,30 @@ function mzPassagem(escopo){
   }
   return {ok:true, p:{book:livro, reference:ref, text:texto}};
 }
-
+async function mzOriginal(it, escopo){
+  if(escopo === "Livro") return {ok:true};
+  const cod = it.cod;
+  const code = BOOKS[cur.livro][0], test = BOOKS[cur.livro][2];
+  if(cod === "01.8") return {ok:false, erro:"A Septuaginta não está carregada nesta página. Esta etapa não pode usar texto real."};
+  if(cod === "01.6" && test !== "OT") return {ok:false, erro:"01.6 é texto hebraico: serve só para livros do Antigo Testamento."};
+  if(cod === "01.7" && test !== "NT") return {ok:false, erro:"01.7 é texto grego: serve só para livros do Novo Testamento."};
+  const lingua = /^(01\.[67]|03\.\d+|04\.\d+)$/.test(cod);
+  let nums;
+  if(escopo === "Capítulo"){
+    const total = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).length;
+    nums = Array.from({length:total}, (_,i) => i+1);
+  }else{
+    nums = [...sel].sort((a,b) => a-b);
+  }
+  let m = null;
+  try{ m = await mapaOriginal(code, test === "OT"); }catch(e){}
+  const linhas = m ? nums.map(n => m.get(cur.cap + ":" + n) ? n + " " + m.get(cur.cap + ":" + n) : "").filter(Boolean) : [];
+  if(!linhas.length){
+    if(lingua) return {ok:false, erro:"Não foi possível carregar o texto original desta passagem. Tente de novo."};
+    return {ok:true};
+  }
+  return {ok:true, original:linhas.join("\n"), lang:(test === "OT" ? "hebraico, WLC" : "grego, Nestle 1904"), lingua:lingua};
+}
 async function mzPesquisar(cod, btn){
   const it = ((TAB && TAB[mzEsc]) || []).find(x => x.cod === cod);
   if(!it) return;
