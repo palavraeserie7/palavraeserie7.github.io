@@ -1,42 +1,42 @@
+
+
 Oraculo · HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-   <!-- ==================================================================== -->
- <style>
- a.side-item[href="areas-academicas.html"],
- a.side-item[href="estante.html"],
- a.side-item[href="sermoes.html"],
- a.side-item[href="ponte-infantil.html"]{display:none}
- html.logado a.side-item[href="areas-academicas.html"],
- html.logado a.side-item[href="estante.html"],
- html.logado a.side-item[href="sermoes.html"],
- html.logado a.side-item[href="ponte-infantil.html"]{display:flex}
-</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function(){
- var menuClient = window.supabase.createClient(
-   "https://qmhdbuxomozdczgvpvcc.supabase.co",
-   "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8"
- );
- menuClient.auth.getSession().then(function(res){
-   if (res.data && res.data.session) {
-     document.documentElement.classList.add("logado");
-   }
- }).catch(function(){});
-})();
-</script>
- <!-- ==================================================================== -->
-
-
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oráculo — Consulta Geral</title>
+ 
+  <style>
+    a.side-item[href="areas-academicas.html"],
+    a.side-item[href="estante.html"],
+    a.side-item[href="sermoes.html"],
+    a.side-item[href="ponte-infantil.html"]{display:none}
+    html.logado a.side-item[href="areas-academicas.html"],
+    html.logado a.side-item[href="estante.html"],
+    html.logado a.side-item[href="sermoes.html"],
+    html.logado a.side-item[href="ponte-infantil.html"]{display:flex}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (function(){
+    var menuClient = window.supabase.createClient(
+      "https://qmhdbuxomozdczgvpvcc.supabase.co",
+      "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8"
+    );
+    menuClient.auth.getSession().then(function(res){
+      if (res.data && res.data.session) {
+        document.documentElement.classList.add("logado");
+      }
+    }).catch(function(){});
+  })();
+  </script>
+ 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,560;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+ 
   <style>
     :root {
       --bg:#0b1428;
@@ -44,7 +44,7 @@ Oraculo · HTML
       --border:#263754;
       --text:#dbe7f5;
       --muted:#91a4bd;
-
+ 
       --paper:#f4eedd;
       --paper-card:#fbf7ec;
       --paper-line:#ddcea4;
@@ -56,93 +56,88 @@ Oraculo · HTML
       --navy:#0e1526;
       --navy-soft:#1b2740;
       --verified:#4b6b4e;
-
+ 
       --font-display:'Fraunces',Georgia,serif;
       --font-body:'Inter','Segoe UI',Tahoma,sans-serif;
-
-      /* legacy aliases kept so nothing else on the page breaks */
+ 
       --accent:var(--brass);
       --paper-border:var(--paper-line);
+      --side-w:168px;
     }
-
+ 
     * { box-sizing:border-box; }
-
-    html, body {
-      margin:0;
-      width:100%;
-      min-height:100%;
-    }
-
+ 
+    html, body { margin:0; width:100%; min-height:100%; }
+ 
     body {
       min-height:100vh;
-      background:var(--paper);
+      background:#0b1428;
       color:var(--text);
-      font-family:var(--font-body);
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
       -webkit-font-smoothing:antialiased;
     }
-
-    :focus-visible {
-      outline:2px solid var(--brass);
-      outline-offset:2px;
-    }
-
+ 
+    :focus-visible { outline:2px solid var(--brass); outline-offset:2px; }
+ 
     @media (prefers-reduced-motion:reduce) {
       * { transition-duration:.01ms !important; animation-duration:.01ms !important; }
     }
-
-    .oracle-page {
-      min-height:100vh;
-      width:100%;
-      padding:18px 0 0;
-      background:var(--paper);
+ 
+    /* =========================================================
+       SHELL PADRÃO DA PLATAFORMA
+       ========================================================= */
+    .app-shell{ display:flex; align-items:stretch; min-height:100vh; }
+    .side-nav{ flex:0 0 var(--side-w); width:var(--side-w); display:flex; flex-direction:column; gap:16px; padding:16px 10px; background:#111b30; border-right:1px solid #263754; position:sticky; top:0; height:100vh; overflow-y:auto; }
+    .side-brand{ padding:2px 4px 12px; border-bottom:1px solid #263754; }
+    .side-brand-link{ display:block; color:#20d66b; font-size:12px; font-weight:900; letter-spacing:1.2px; text-decoration:none; line-height:1.3; }
+    .side-brand-sub{ display:block; margin-top:3px; color:#7c8fac; font-size:8px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
+    .side-menu{ display:flex; flex-direction:column; gap:3px; }
+    .side-item{ display:flex; align-items:center; gap:7px; padding:8px 7px; border-radius:6px; border:1px solid transparent; color:#dbe7f5; text-decoration:none; font-size:9.5px; font-weight:800; letter-spacing:.3px; line-height:1.25; }
+    .side-item:hover,.side-item:focus-visible{ background:#16233c; outline:none; }
+    .side-item.active{ background:rgba(32,214,107,.12); border-color:#20d66b; color:#20d66b; }
+    .side-icon{ flex:0 0 auto; width:13px; font-size:12px; text-align:center; line-height:1; }
+    .side-footer-note{ margin-top:auto; padding-top:12px; border-top:1px solid #263754; color:#5f7192; font-size:8px; line-height:1.5; }
+    .content-area{ flex:1; min-width:0; display:flex; flex-direction:column; }
+    .site-header{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-bottom:1px solid #263754; background:#111b30; position:sticky; top:0; z-index:20; }
+    .header-link{ padding:8px 11px; border:1px solid #536780; border-radius:7px; background:transparent; color:#dbe7f5; font-size:10px; font-weight:900; text-decoration:none; white-space:nowrap; }
+    .header-link:hover,.header-link:focus-visible{ border-color:#18bfff; background:#163451; outline:none; }
+    .content-area > main{ width:100%; max-width:none; flex:1; margin:0; padding:40px; background:#f4eedd; }
+    .content-area > main > .paper{ width:100%; max-width:none; margin:0; padding:24px; border:1px solid #ddcea4; border-radius:8px; background:#f4eedd; color:#2c2418; box-shadow:0 6px 18px rgba(55,45,30,.12); }
+ 
+    @media(max-width:900px){
+      :root{ --side-w:100%; }
+      .app-shell{ flex-direction:column; }
+      .side-nav{ position:relative; top:auto; height:auto; width:100%; flex-direction:row; align-items:center; gap:10px; overflow-x:auto; border-right:0; border-bottom:1px solid #263754; }
+      .side-brand{ padding:0 12px 0 0; border-bottom:0; border-right:1px solid #263754; flex:0 0 auto; }
+      .side-menu{ flex-direction:row; gap:6px; }
+      .side-item{ white-space:nowrap; }
+      .side-footer-note{ display:none; }
     }
-
-    .oracle-content {
-      width:100%;
-      margin:0;
+    @media(max-width:700px){
+      .content-area > main{ padding:12px 9px 28px; }
+      .site-header{ align-items:flex-start; flex-wrap:wrap; }
+      .header-link{ flex:1; text-align:center; }
+      .content-area > main > .paper{ padding:14px; }
     }
-
-    .back-arrow {
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      min-height:34px;
-      margin:0 0 16px 3.8%;
-      padding:0 14px;
-      border:1px solid var(--navy-soft);
-      border-radius:6px;
-      background:var(--navy);
-      color:#dbe7f5;
-      font-family:var(--font-body);
-      font-weight:600;
-      font-size:13px;
-      cursor:pointer;
-      text-decoration:none;
-      transition:background .15s ease;
-    }
-
-    .back-arrow:hover {
-      background:var(--navy-soft);
-      color:#fff;
-    }
-
+ 
+    /* =========================================================
+       PAINEL DO ORÁCULO
+       ========================================================= */
     .oracle-chat-panel {
-      width:92.4%;
-      margin:0 auto;
+      width:100%;
       overflow:hidden;
       border:1px solid var(--paper-line);
-      border-radius:10px;
+      border-radius:8px;
       background:var(--paper);
       color:var(--ink);
-      box-shadow:0 18px 40px rgba(14,21,38,.16);
     }
-
+ 
     .ai-chat-header {
       padding:28px 32px 20px;
       border-bottom:1px solid var(--paper-line);
       background:var(--paper-card);
     }
-
+ 
     .ai-chat-header h1 {
       margin:0 0 12px;
       color:var(--ink);
@@ -151,436 +146,253 @@ Oraculo · HTML
       font-size:clamp(24px,3.6vw,34px);
       letter-spacing:.2px;
     }
-
+ 
     .ai-chat-header p {
       max-width:640px;
       margin:0;
       color:var(--ink-soft);
+      font-family:var(--font-body);
       font-size:14.5px;
       line-height:1.65;
     }
-
+ 
     .oracle-trust-note {
-      margin:16px 32px 12px;
+      margin:16px 32px 4px;
       padding:12px 14px;
       border-left:2px solid var(--brass);
       background:var(--brass-wash);
       color:var(--ink-soft);
+      font-family:var(--font-body);
       font-size:12px;
       line-height:1.6;
     }
-
-    .oracle-trust-note strong {
-      color:var(--ink);
-    }
-
-    .ai-chat-messages {
-      min-height:300px;
-      max-height:52vh;
-      overflow-y:auto;
-      padding:0 28px 18px;
-    }
-
-
+ 
+    .oracle-trust-note strong { color:var(--ink); }
+ 
     /* =========================================================
-       ÍNDICE LATERAL DE 29 ÁREAS
+       PASSO A PASSO
        ========================================================= */
-
-    .oracle-index-trigger {
-      position:fixed;
-      left:0;
-      top:50%;
-      z-index:1000;
-      transform:translateY(-50%);
-      padding:13px 10px;
+    .wiz-stepper {
+      display:flex;
+      gap:0;
+      margin:16px 32px 0;
+      border-bottom:1px solid var(--paper-line);
+      overflow-x:auto;
+    }
+ 
+    .wiz-step {
+      flex:1;
+      min-width:130px;
+      display:flex;
+      align-items:center;
+      gap:9px;
+      padding:11px 8px;
+      border:0;
+      border-bottom:3px solid transparent;
+      background:transparent;
+      color:#a79a7e;
+      font-family:var(--font-body);
+      text-align:left;
+      cursor:default;
+    }
+ 
+    .wiz-num {
+      flex:none;
+      width:22px;
+      height:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #a79a7e;
+      border-radius:50%;
+      font-size:11px;
+      font-weight:700;
+    }
+ 
+    .wiz-text { display:flex; flex-direction:column; min-width:0; }
+    .wiz-title { font-size:12.5px; font-weight:600; }
+    .wiz-value {
+      margin-top:1px;
+      font-size:11px;
+      color:var(--ink-soft);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:190px;
+    }
+ 
+    .wiz-step.done { color:var(--ink); cursor:pointer; }
+    .wiz-step.done .wiz-num { background:var(--brass); border-color:var(--brass); color:#fffdf6; }
+    .wiz-step.done:hover { background:var(--brass-wash); }
+    .wiz-step.current { color:var(--ink); border-bottom-color:var(--brass); }
+    .wiz-step.current .wiz-num { border-color:var(--brass); color:var(--brass-deep); }
+ 
+    .wiz-stage { display:none; padding:24px 32px 30px; }
+    #oracle-wizard[data-stage="1"] #wiz-stage-1,
+    #oracle-wizard[data-stage="2"] #wiz-stage-2,
+    #oracle-wizard[data-stage="3"] #wiz-stage-3,
+    #oracle-wizard[data-stage="4"] #wiz-stage-4 { display:block; }
+ 
+    .wiz-top {
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:18px;
+    }
+ 
+    .wiz-back {
+      flex:none;
+      min-height:34px;
+      padding:0 14px;
       border:1px solid var(--navy-soft);
-      border-left:0;
-      border-radius:0 8px 8px 0;
+      border-radius:6px;
       background:var(--navy);
       color:#dbe7f5;
       font-family:var(--font-body);
-      font-size:11px;
       font-weight:600;
-      letter-spacing:.06em;
-      writing-mode:vertical-rl;
+      font-size:12.5px;
       cursor:pointer;
-      box-shadow:0 6px 16px rgba(14,21,38,.3);
-      transition:background .15s ease, padding .15s ease;
     }
-
-    .oracle-index-trigger:hover {
-      background:var(--navy-soft);
-      color:#fff;
-      padding-right:14px;
+ 
+    .wiz-back:hover { background:var(--navy-soft); color:#fff; }
+ 
+    .wiz-back.quiet {
+      background:transparent;
+      border-color:var(--paper-line);
+      color:var(--ink-soft);
     }
-
-    .oracle-index-overlay {
-      position:fixed;
-      inset:0;
-      z-index:1001;
-      display:none;
-      background:rgba(14,21,38,.45);
-      backdrop-filter:blur(1px);
-    }
-
-    .oracle-index-overlay.active {
-      display:block;
-    }
-
-    .oracle-index-panel {
-      position:absolute;
-      left:0;
-      top:0;
-      bottom:0;
-      width:min(420px,88vw);
-      overflow-y:auto;
-      padding:26px 24px 30px;
-      background:var(--paper-card);
-      color:var(--ink);
-      box-shadow:16px 0 40px rgba(14,21,38,.28);
-    }
-
-    .oracle-index-header {
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:6px;
-      padding-bottom:16px;
-      border-bottom:2px solid var(--ink);
-    }
-
-    .oracle-index-header h2 {
+ 
+    .wiz-back.quiet:hover { background:var(--brass-wash); color:var(--ink); }
+ 
+    .wiz-heading h2 {
       margin:0;
       color:var(--ink);
       font-family:var(--font-display);
       font-weight:600;
-      font-size:19px;
-      letter-spacing:.01em;
+      font-size:21px;
     }
-
-    .oracle-index-close {
-      width:30px;
-      height:30px;
-      border:1px solid var(--paper-line);
-      border-radius:50%;
-      background:transparent;
+ 
+    .wiz-heading p {
+      margin:5px 0 0;
       color:var(--ink-soft);
-      font-size:16px;
-      line-height:1;
-      cursor:pointer;
-      transition:background .15s ease, color .15s ease;
+      font-family:var(--font-body);
+      font-size:13px;
+      line-height:1.55;
+      max-width:620px;
     }
-
-    .oracle-index-close:hover {
-      background:var(--brass-wash);
-      color:var(--ink);
+ 
+    .choice-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+      gap:10px;
     }
-
-    .oracle-index-intro {
-      margin:14px 0 18px;
-      color:var(--ink-soft);
-      font-size:12.5px;
-      line-height:1.6;
-    }
-
-    .oracle-index-list {
-      display:flex;
-      flex-direction:column;
-    }
-
-    .oracle-index-item {
-      border-bottom:1px solid var(--paper-line);
-    }
-
-    .oracle-index-item:first-child {
-      border-top:1px solid var(--paper-line);
-    }
-
-    .oracle-index-area {
+ 
+    .choice-card {
       display:flex;
       align-items:center;
       gap:12px;
-      width:100%;
-      min-height:46px;
-      padding:9px 6px;
-      border:0;
-      background:transparent;
+      min-height:56px;
+      padding:11px 14px;
+      border:1px solid var(--paper-line);
+      border-radius:6px;
+      background:var(--paper-card);
       color:var(--ink);
-      text-align:left;
-      font:inherit;
+      font-family:var(--font-body);
       font-size:13.5px;
       font-weight:500;
+      line-height:1.3;
+      text-align:left;
       cursor:pointer;
-      transition:background .12s ease;
+      transition:border-color .12s ease, background .12s ease;
     }
-
-    .oracle-index-area:hover {
-      background:var(--brass-wash);
-    }
-
-    .oracle-index-area.active {
-      background:var(--brass-wash);
-    }
-
-    .oracle-index-number {
+ 
+    .choice-card:hover { border-color:var(--brass); background:var(--brass-wash); }
+ 
+    .choice-number {
       flex:0 0 auto;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:26px;
+      min-width:28px;
       height:20px;
       padding:0 5px;
       border:1px solid var(--brass);
       border-radius:4px;
       color:var(--brass-deep);
-      font-family:var(--font-body);
       font-size:10.5px;
       font-weight:700;
-      letter-spacing:.02em;
     }
-
-    .oracle-index-name {
-      flex:1;
-      line-height:1.3;
+ 
+    .choice-name { flex:1; }
+ 
+    .skip-row {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:18px;
+      padding-top:16px;
+      border-top:1px solid var(--paper-line);
+      color:var(--ink-soft);
+      font-family:var(--font-body);
+      font-size:12.5px;
     }
-
-    .oracle-index-chevron {
-      flex:0 0 14px;
-      color:var(--brass);
-      text-align:right;
-      font-size:14px;
-      transition:transform .18s ease;
+ 
+    .skip-button {
+      padding:9px 14px;
+      border:1px solid var(--brass);
+      border-radius:6px;
+      background:transparent;
+      color:var(--brass-deep);
+      font-family:var(--font-body);
+      font-weight:700;
+      font-size:12px;
+      cursor:pointer;
     }
-
-    .oracle-index-area.active .oracle-index-chevron {
-      transform:rotate(90deg);
-    }
-
-    .oracle-index-subareas {
-      display:none;
-      padding:2px 6px 14px 44px;
-    }
-
-    .oracle-index-subareas.active {
-      display:block;
-    }
-
-    .oracle-index-subarea {
-      display:block;
+ 
+    .skip-button:hover { background:var(--brass-wash); }
+ 
+    .sub-list { display:flex; flex-direction:column; }
+ 
+    .sub-row {
+      display:flex;
+      align-items:center;
+      gap:12px;
       width:100%;
-      margin:0;
-      padding:8px 0;
+      padding:12px 8px;
       border:0;
       border-bottom:1px solid var(--paper-line);
       background:transparent;
-      color:var(--ink-soft);
+      color:var(--ink);
+      font-family:var(--font-body);
+      font-size:13.5px;
       text-align:left;
-      font-family:var(--font-body);
-      font-size:12.5px;
-      line-height:1.4;
       cursor:pointer;
-      transition:color .12s ease;
     }
-
-    .oracle-index-subarea:last-child {
-      border-bottom:0;
-    }
-
-    .oracle-index-subarea:hover {
-      color:var(--brass-deep);
-    }
-
-    .oracle-index-note {
-      margin-top:20px;
-      padding:12px 14px;
-      border-left:2px solid var(--brass);
-      background:var(--brass-wash);
-      color:var(--ink-soft);
-      font-size:11.5px;
-      line-height:1.55;
-    }
-
-    .oracle-index-note strong {
-      color:var(--ink);
-    }
-
-    .ai-chat-welcome {
-      position:relative;
-      padding:18px 20px 18px 52px;
-      background:var(--paper-card);
+ 
+    .sub-row:first-child { border-top:1px solid var(--paper-line); }
+    .sub-row:hover { background:var(--brass-wash); }
+    .sub-row .sub-code { flex:0 0 auto; min-width:42px; color:var(--brass-deep); font-size:11.5px; font-weight:700; }
+    .sub-row .sub-name { flex:1; }
+    .sub-row.whole { font-weight:600; }
+ 
+    .context-chip {
+      display:inline-block;
+      margin:0 0 14px;
+      padding:6px 10px;
       border:1px solid var(--paper-line);
-      border-radius:8px;
-      color:var(--ink-soft);
-      font-size:13.5px;
-      line-height:1.6;
-    }
-
-    .ai-chat-welcome::before {
-      content:'◈';
-      position:absolute;
-      left:18px;
-      top:18px;
-      color:var(--brass);
-      font-size:20px;
-    }
-
-    .ai-chat-welcome strong {
-      display:block;
-      margin-bottom:4px;
-      color:var(--ink);
-      font-family:var(--font-display);
-      font-size:16px;
-      font-weight:600;
-    }
-
-    .ai-chat-message {
-      margin:10px 0;
-      padding:11px 15px;
-      border-radius:8px;
-      line-height:1.5;
-      white-space:pre-wrap;
-    }
-
-    .ai-chat-message.user {
-      margin-left:auto;
-      max-width:85%;
-      background:var(--navy);
-      color:#eef2f8;
-      font-size:13.5px;
-    }
-
-    .ai-chat-answer {
-      margin:10px 0;
-      padding:16px 18px;
-      border-left:2px solid var(--brass);
+      border-radius:4px;
       background:var(--paper-card);
-      color:var(--ink);
-      font-size:13.5px;
-      line-height:1.65;
-    }
-
-    .oracle-sources {
-      margin-top:18px;
-      padding-top:18px;
-      border-top:1px solid var(--paper-line);
-    }
-
-    .oracle-sources h2,
-    .oracle-sources h3,
-    .oracle-sources h4 {
-      margin:0 0 10px;
       color:var(--ink-soft);
       font-family:var(--font-body);
-      font-size:11px;
-      font-weight:700;
-      letter-spacing:.06em;
-      text-transform:uppercase;
-    }
-
-    .oracle-source-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-      gap:10px;
-    }
-
-    .oracle-source-card {
-      display:block;
-      padding:13px 14px;
-      border:1px solid var(--paper-line);
-      border-top:3px solid var(--brass);
-      border-radius:5px;
-      background:var(--paper-card);
-      color:var(--ink-soft);
-      text-decoration:none;
       font-size:12px;
-      line-height:1.45;
+      line-height:1.4;
     }
-
-    .oracle-source-card:nth-child(2) { border-top-color:var(--navy-soft); }
-    .oracle-source-card:nth-child(3) { border-top-color:var(--verified); }
-    .oracle-source-card:nth-child(4) { border-top-color:var(--brass-deep); }
-
-    .oracle-source-card strong {
-      display:block;
-      margin-bottom:3px;
-      color:var(--ink);
-      font-size:12.5px;
-      font-weight:600;
-    }
-
-    .oracle-result-meta {
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:6px;
-      background:var(--brass-wash);
-      color:var(--brass-deep);
-      font-size:11.5px;
-      line-height:1.5;
-    }
-
-    .oracle-result-source {
-      display:block;
-      margin-top:8px;
-      padding:10px 12px;
-      border-left:2px solid var(--verified);
-      background:var(--paper-card);
-      color:var(--ink-soft);
-      font-size:11.5px;
-      line-height:1.45;
-    }
-
-    .oracle-result-source a {
-      color:var(--brass-deep);
-      font-weight:700;
-    }
-
-    .oracle-media-badge {
-      display:inline-block;
-      margin-bottom:4px;
-      padding:2px 7px;
-      border-radius:4px;
-      background:var(--navy);
-      color:#eef2f8;
-      font-size:9.5px;
-      font-weight:700;
-      letter-spacing:.05em;
-    }
-
-    .oracle-result-source.is-video {
-      border-left-color:var(--navy-soft);
-    }
-
-    .oracle-video-embed {
-      position:relative;
-      width:100%;
-      max-width:420px;
-      margin-top:9px;
-      padding-top:56.25%;
-      border-radius:6px;
-      overflow:hidden;
-      background:var(--navy);
-    }
-
-    .oracle-video-embed iframe {
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      border:0;
-    }
-
-    .ai-chat-input {
-      padding:20px 32px 26px;
-      border-top:1px solid var(--paper-line);
-      background:var(--paper-card);
-    }
-
-    .question-row {
-      display:flex;
-      gap:10px;
-    }
-
+ 
+    .context-chip strong { color:var(--ink); }
+ 
+    .question-row { display:flex; gap:10px; }
+ 
     .question-row input {
       flex:1;
       min-width:0;
@@ -590,14 +402,12 @@ Oraculo · HTML
       background:#fffdf6;
       color:var(--ink);
       font:inherit;
+      font-family:var(--font-body);
       font-size:14px;
-      transition:border-color .15s ease;
     }
-
-    .question-row input:focus {
-      border-color:var(--brass);
-    }
-
+ 
+    .question-row input:focus { border-color:var(--brass); }
+ 
     .question-row button {
       min-height:44px;
       padding:0 22px;
@@ -610,48 +420,245 @@ Oraculo · HTML
       font-size:13px;
       letter-spacing:.03em;
       cursor:pointer;
-      transition:background .15s ease;
     }
-
-    .question-row button:hover {
-      background:var(--brass-deep);
-    }
-
-    .question-row button:disabled {
-      opacity:.55;
-      cursor:wait;
-    }
-
-    .ai-chat-loading {
-      display:none;
-      margin-top:10px;
-      color:var(--brass-deep);
-      font-size:12px;
-      font-style:italic;
-    }
-
+ 
+    .question-row button:hover { background:var(--brass-deep); }
+ 
     .oracle-disclaimer {
-      margin-top:12px;
+      margin-top:14px;
       color:var(--ink-soft);
+      font-family:var(--font-body);
       font-size:11px;
       line-height:1.5;
     }
-
+ 
+    .ai-chat-welcome {
+      position:relative;
+      margin-top:22px;
+      padding:18px 20px 18px 52px;
+      background:var(--paper-card);
+      border:1px solid var(--paper-line);
+      border-radius:8px;
+      color:var(--ink-soft);
+      font-family:var(--font-body);
+      font-size:13.5px;
+      line-height:1.6;
+    }
+ 
+    .ai-chat-welcome::before {
+      content:'◈';
+      position:absolute;
+      left:18px;
+      top:18px;
+      color:var(--brass);
+      font-size:20px;
+    }
+ 
+    .ai-chat-welcome strong.title {
+      display:block;
+      margin-bottom:4px;
+      color:var(--ink);
+      font-family:var(--font-display);
+      font-size:16px;
+      font-weight:600;
+    }
+ 
+    .oracle-sources { margin-top:18px; padding-top:18px; border-top:1px solid var(--paper-line); }
+ 
+    .oracle-sources h2,
+    .oracle-sources h3 {
+      margin:0 0 10px;
+      color:var(--ink-soft);
+      font-family:var(--font-body);
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+ 
+    .oracle-source-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+      gap:10px;
+    }
+ 
+    .oracle-source-card {
+      display:block;
+      padding:13px 14px;
+      border:1px solid var(--paper-line);
+      border-top:3px solid var(--brass);
+      border-radius:5px;
+      background:var(--paper-card);
+      color:var(--ink-soft);
+      font-family:var(--font-body);
+      font-size:12px;
+      line-height:1.45;
+    }
+ 
+    .oracle-source-card:nth-child(2) { border-top-color:var(--navy-soft); }
+    .oracle-source-card:nth-child(3) { border-top-color:var(--verified); }
+    .oracle-source-card:nth-child(4) { border-top-color:var(--brass-deep); }
+ 
+    .oracle-source-card strong { display:block; margin-bottom:3px; color:var(--ink); font-size:12.5px; font-weight:600; }
+ 
+    /* ---------- resultados ---------- */
+    .ai-chat-messages { margin-top:4px; }
+ 
+    .ai-chat-message {
+      margin:10px 0;
+      padding:11px 15px;
+      border-radius:8px;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
+ 
+    .ai-chat-message.user {
+      margin-left:auto;
+      max-width:85%;
+      background:var(--navy);
+      color:#eef2f8;
+      font-family:var(--font-body);
+      font-size:13.5px;
+    }
+ 
+    .ai-chat-answer {
+      margin:10px 0;
+      padding:16px 18px;
+      border-left:2px solid var(--brass);
+      background:var(--paper-card);
+      color:var(--ink);
+      font-family:var(--font-body);
+      font-size:13.5px;
+      line-height:1.65;
+    }
+ 
+    .oracle-result-meta {
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:6px;
+      background:var(--brass-wash);
+      color:var(--brass-deep);
+      font-size:11.5px;
+      line-height:1.5;
+    }
+ 
+    .oracle-result-meta:first-child { margin-top:0; margin-bottom:10px; }
+ 
+    .oracle-result-source {
+      display:block;
+      margin-top:8px;
+      padding:10px 12px;
+      border-left:2px solid var(--verified);
+      background:var(--paper-card);
+      color:var(--ink-soft);
+      font-size:11.5px;
+      line-height:1.45;
+    }
+ 
+    .oracle-result-source a { color:var(--brass-deep); font-weight:700; }
+ 
+    .oracle-media-badge {
+      display:inline-block;
+      margin-bottom:4px;
+      padding:2px 7px;
+      border-radius:4px;
+      background:var(--navy);
+      color:#eef2f8;
+      font-size:9.5px;
+      font-weight:700;
+      letter-spacing:.05em;
+    }
+ 
+    .oracle-result-source.is-video { border-left-color:var(--navy-soft); }
+ 
+    .oracle-video-embed {
+      position:relative;
+      width:100%;
+      max-width:420px;
+      margin-top:9px;
+      padding-top:56.25%;
+      border-radius:6px;
+      overflow:hidden;
+      background:var(--navy);
+    }
+ 
+    .oracle-video-embed iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+ 
+    .oracle-source-class {
+      display:inline-block;
+      margin:4px 0 6px;
+      padding:2px 6px;
+      border:1px solid var(--paper-line);
+      border-radius:3px;
+      color:var(--brass-deep);
+      background:#fffdf6;
+      font-size:9px;
+      font-weight:800;
+      letter-spacing:.04em;
+    }
+ 
+    .oracle-bible-invitation {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-top:18px;
+      padding:16px;
+      border:1px solid var(--paper-line);
+      border-left:3px solid var(--brass);
+      background:var(--brass-wash);
+    }
+ 
+    .oracle-bible-invitation strong { display:block; margin-bottom:4px; color:var(--ink); font-family:var(--font-display); font-size:16px; }
+    .oracle-bible-invitation span { display:block; color:var(--ink-soft); font-size:11.5px; line-height:1.5; }
+ 
+    .oracle-bible-button {
+      flex:none;
+      padding:10px 14px;
+      border:0;
+      border-radius:5px;
+      background:var(--navy);
+      color:#fff;
+      font-size:10.5px;
+      font-weight:800;
+      cursor:pointer;
+    }
+ 
+    .oracle-bible-button:disabled { opacity:.6; cursor:wait; }
+ 
+    .result-bar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+      padding-top:16px;
+      border-top:1px solid var(--paper-line);
+    }
+ 
+    .ai-chat-loading {
+      display:none;
+      color:var(--brass-deep);
+      font-family:var(--font-body);
+      font-size:12px;
+      font-style:italic;
+    }
+ 
     @media (max-width:600px) {
-      .oracle-page { padding:10px 0 0; }
-      .oracle-chat-panel { width:100%; border-radius:0; }
-      .back-arrow { margin-left:15px; }
-      .ai-chat-header,
-      .ai-chat-input { padding-left:15px; padding-right:15px; }
+      .oracle-chat-panel { border-radius:0; }
+      .ai-chat-header { padding:20px 15px 16px; }
       .oracle-trust-note { margin-left:15px; margin-right:15px; }
-      .ai-chat-messages { padding-left:15px; padding-right:15px; }
+      .wiz-stepper { margin-left:15px; margin-right:15px; }
+      .wiz-stage { padding:18px 15px 24px; }
       .question-row { flex-direction:column; }
       .question-row button { width:100%; }
+      .oracle-bible-invitation { flex-direction:column; align-items:stretch; }
+      .wiz-top { flex-direction:column; gap:10px; }
     }
-
-
+ 
     /* =========================================================
-       RASTREAMENTO DE FONTES — ORDEM METODOLÓGICA
+       RASTREAMENTO DE FONTES
        ========================================================= */
     .oracle-tracking-trigger{
       display:none;
@@ -688,248 +695,9 @@ Oraculo · HTML
     .tracking-publication a{color:var(--brass-deep);font-weight:700}
     .tracking-classification{margin-top:7px;padding-top:7px;border-top:1px dashed var(--paper-line);color:var(--ink-soft);font-size:10.5px}
     .tracking-note{margin-top:14px;color:var(--ink-soft);font-size:10.5px;line-height:1.55}
-
-
-    /* =========================================================
-       ÍNDICE DO ORÁCULO DENTRO DO BOTÃO LATERAL
-       ========================================================= */
-    .side-oracle-group {
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-    }
-
-    .side-oracle-toggle {
-      width:100%;
-      appearance:none;
-      -webkit-appearance:none;
-      cursor:pointer;
-      font-family:inherit;
-      text-align:left;
-    }
-
-    .side-oracle-label {
-      flex:1;
-    }
-
-    .side-oracle-chevron {
-      margin-left:auto;
-      color:#20d66b;
-      font-size:10px;
-      transition:transform .18s ease;
-    }
-
-    .side-oracle-toggle[aria-expanded="false"] .side-oracle-chevron {
-      transform:rotate(-90deg);
-    }
-
-    .side-oracle-index {
-      display:block;
-      margin:0 0 3px 5px;
-      padding:7px 5px 8px;
-      border-left:1px solid #263754;
-      max-height:52vh;
-      overflow-y:auto;
-      background:#0e172b;
-      border-radius:0 5px 5px 0;
-    }
-
-    .side-oracle-index[aria-hidden="true"] {
-      display:none;
-    }
-
-    .side-oracle-index-title {
-      padding:4px 6px 7px;
-      color:#9c7a32;
-      font-size:7.5px;
-      font-weight:900;
-      letter-spacing:.07em;
-      text-transform:uppercase;
-      border-bottom:1px solid #263754;
-    }
-
-    .side-oracle-index .oracle-index-list {
-      display:flex;
-      flex-direction:column;
-    }
-
-    .side-oracle-index .oracle-index-item {
-      border-bottom:1px solid #263754;
-    }
-
-    .side-oracle-index .oracle-index-item:first-child {
-      border-top:0;
-    }
-
-    .side-oracle-index .oracle-index-area {
-      display:flex;
-      align-items:center;
-      gap:5px;
-      width:100%;
-      min-height:29px;
-      padding:5px 4px;
-      border:0;
-      background:transparent;
-      color:#dbe7f5;
-      text-align:left;
-      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
-      font-size:8px;
-      font-weight:700;
-      line-height:1.25;
-      cursor:pointer;
-    }
-
-    .side-oracle-index .oracle-index-area:hover,
-    .side-oracle-index .oracle-index-area.active {
-      background:#16233c;
-    }
-
-    .side-oracle-index .oracle-index-number {
-      min-width:20px;
-      height:16px;
-      padding:0 3px;
-      border:1px solid #9c7a32;
-      border-radius:3px;
-      color:#d7b76a;
-      font-size:7px;
-      font-weight:800;
-    }
-
-    .side-oracle-index .oracle-index-name {
-      flex:1;
-      line-height:1.2;
-    }
-
-    .side-oracle-index .oracle-index-chevron {
-      flex:0 0 9px;
-      color:#9c7a32;
-      font-size:10px;
-      text-align:right;
-      transition:transform .18s ease;
-    }
-
-    .side-oracle-index .oracle-index-area.active .oracle-index-chevron {
-      transform:rotate(90deg);
-    }
-
-    .side-oracle-index .oracle-index-subareas {
-      display:none;
-      padding:2px 3px 7px 29px;
-    }
-
-    .side-oracle-index .oracle-index-subareas.active {
-      display:block;
-    }
-
-    .side-oracle-index .oracle-index-subarea {
-      display:block;
-      width:100%;
-      padding:5px 0;
-      border:0;
-      border-bottom:1px solid #263754;
-      background:transparent;
-      color:#91a4bd;
-      text-align:left;
-      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
-      font-size:7.5px;
-      line-height:1.35;
-      cursor:pointer;
-    }
-
-    .side-oracle-index .oracle-index-subarea:last-child {
-      border-bottom:0;
-    }
-
-    .side-oracle-index .oracle-index-subarea:hover {
-      color:#d7b76a;
-    }
-
-    .side-oracle-index-note {
-      margin:7px 3px 0;
-      padding:6px;
-      border-left:2px solid #9c7a32;
-      background:#16233c;
-      color:#7c8fac;
-      font-size:7px;
-      line-height:1.4;
-    }
-
-    /* =========================================================
-       SHELL PADRÃO DA PLATAFORMA — MESMAS DIMENSÕES DA BÍBLIA
-       ========================================================= */
-    :root{ --side-w:168px; }
-    body{ background:#0b1428; color:#dbe7f5; font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; }
-    .app-shell{ display:flex; align-items:stretch; min-height:100vh; }
-    .side-nav{ flex:0 0 var(--side-w); width:var(--side-w); display:flex; flex-direction:column; gap:16px; padding:16px 10px; background:#111b30; border-right:1px solid #263754; position:sticky; top:0; height:100vh; overflow-y:auto; }
-    .side-brand{ padding:2px 4px 12px; border-bottom:1px solid #263754; }
-    .side-brand-link{ display:block; color:#20d66b; font-size:12px; font-weight:900; letter-spacing:1.2px; text-decoration:none; line-height:1.3; }
-    .side-brand-sub{ display:block; margin-top:3px; color:#7c8fac; font-size:8px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
-    .side-menu{ display:flex; flex-direction:column; gap:3px; }
-    .side-item{ display:flex; align-items:center; gap:7px; padding:8px 7px; border-radius:6px; border:1px solid transparent; color:#dbe7f5; text-decoration:none; font-size:9.5px; font-weight:800; letter-spacing:.3px; line-height:1.25; }
-    .side-item:hover,.side-item:focus-visible{ background:#16233c; outline:none; }
-    .side-item.active{ background:rgba(32,214,107,.12); border-color:#20d66b; color:#20d66b; }
-    .side-icon{ flex:0 0 auto; width:13px; font-size:12px; text-align:center; line-height:1; }
-    .side-footer-note{ margin-top:auto; padding-top:12px; border-top:1px solid #263754; color:#5f7192; font-size:8px; line-height:1.5; }
-    .content-area{ flex:1; min-width:0; display:flex; flex-direction:column; }
-    .site-header{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-bottom:1px solid #263754; background:#111b30; position:sticky; top:0; z-index:20; }
-    .header-link{ padding:8px 11px; border:1px solid #536780; border-radius:7px; background:transparent; color:#dbe7f5; font-size:10px; font-weight:900; text-decoration:none; white-space:nowrap; }
-    .header-link:hover,.header-link:focus-visible{ border-color:#18bfff; background:#163451; outline:none; }
-    .content-area > main{ width:100%; max-width:none; flex:1; margin:0; padding:40px; background:#f4eedd; }
-    .content-area > main > .paper{ width:100%; max-width:none; margin:0; padding:24px; border:1px solid #ddcea4; border-radius:8px; background:#f4eedd; color:#2c2418; box-shadow:0 6px 18px rgba(55,45,30,.12); }
-    .oracle-page{ min-height:0; width:100%; padding:0; background:transparent; }
-    .oracle-content{ width:100%; margin:0; }
-    .oracle-chat-panel{ width:100%; margin:0; box-shadow:none; border-radius:8px; }
-    .oracle-index-trigger{ position:static; transform:none; writing-mode:horizontal-tb; display:inline-flex; margin:14px 28px 0; padding:8px 11px; border:1px solid #536780; border-radius:7px; background:#0e1526; color:#dbe7f5; box-shadow:none; font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; font-size:10px; font-weight:900; letter-spacing:.06em; }
-    .oracle-index-trigger:hover{ background:#1b2740; color:#fff; padding-right:11px; }
-    @media(max-width:900px){
-      :root{ --side-w:100%; }
-      .app-shell{ flex-direction:column; }
-      .side-nav{ position:relative; top:auto; height:auto; width:100%; flex-direction:row; align-items:center; gap:10px; overflow-x:auto; border-right:0; border-bottom:1px solid #263754; }
-      .side-brand{ padding:0 12px 0 0; border-bottom:0; border-right:1px solid #263754; flex:0 0 auto; }
-      .side-menu{ flex-direction:row; gap:6px; }
-      .side-item{ white-space:nowrap; }
-      .side-footer-note{ display:none; }
-    }
-    @media(max-width:700px){
-      .content-area > main{ padding:12px 9px 28px; }
-      .site-header{ align-items:flex-start; flex-wrap:wrap; }
-      .header-link{ flex:1; text-align:center; }
-      .content-area > main > .paper{ padding:14px; }
-    }
-
-
-/* Ajuste de largura do painel ao shell padrão */
-.oracle-page { padding:0; }
-.oracle-chat-panel { width:100%; margin:0; border-left:0; border-right:0; border-radius:0; box-shadow:none; }
-@media (max-width:900px) { .oracle-page { padding:0; } }
-/* Fim do ajuste de largura do painel ao shell padrão */
-
-    /* Ajustes do índice incorporado ao menu lateral */
-    .side-oracle-group { position:relative; }
-    .side-oracle-toggle { border:1px solid transparent; }
-    .side-oracle-toggle.active { background:rgba(32,214,107,.12); border-color:#20d66b; color:#20d66b; }
-
-    @media(max-width:900px){
-      .side-oracle-group { flex:0 0 auto; }
-      .side-oracle-index {
-        position:absolute;
-        top:calc(100% + 3px);
-        left:0;
-        z-index:50;
-        width:min(330px,88vw);
-        max-height:60vh;
-        margin:0;
-        box-shadow:0 12px 28px rgba(0,0,0,.35);
-      }
-    }
-
-.oracle-source-class{display:inline-block;margin:4px 0 6px;padding:2px 6px;border:1px solid var(--paper-line);border-radius:3px;color:var(--brass-deep);background:#fffdf6;font-size:9px;font-weight:800;letter-spacing:.04em}
-.oracle-bible-invitation{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;padding:16px;border:1px solid var(--paper-line);border-left:3px solid var(--brass);background:var(--brass-wash)}
-.oracle-bible-invitation strong{display:block;margin-bottom:4px;color:var(--ink);font-family:var(--font-display);font-size:16px}.oracle-bible-invitation span{display:block;color:var(--ink-soft);font-size:11.5px;line-height:1.5}.oracle-bible-button{padding:10px 14px;border:0;border-radius:5px;background:var(--navy);color:#fff;font-size:10.5px;font-weight:800;cursor:pointer}
-@media(max-width:600px){.oracle-bible-invitation{flex-direction:column;align-items:stretch}}
-</style>
+  </style>
 </head>
-
+ 
 <body>
   <div class="app-shell">
     <aside class="side-nav" aria-label="Navegação da plataforma">
@@ -937,7 +705,7 @@ Oraculo · HTML
         <a class="side-brand-link" href="index.html">PALAVRA &amp; SÉRIE</a>
         <span class="side-brand-sub">Leitura bíblica</span>
       </div>
-
+ 
       <nav class="side-menu">
         <a class="side-item" href="index.html"><span class="side-icon">⌂</span>PESQUISA</a>
         <a class="side-item" href="areas-academicas.html"><span class="side-icon">▤</span>ÁREAS ACADÊMICAS</a>
@@ -946,190 +714,203 @@ Oraculo · HTML
         <a class="side-item" href="sermoes.html"><span class="side-icon">▤</span>SERMÕES</a>
         <a class="side-item" href="ponte-infantil.html"><span class="side-icon">✦</span>PONTE INFANTIL</a>
         <a class="side-item" href="matriz-pro.html"><span class="side-icon">★</span>MATRIZ PRO</a>
-
-        <div class="side-oracle-group">
-          <button
-            type="button"
-            class="side-item side-oracle-toggle active"
-            id="side-oracle-toggle"
-            aria-expanded="true"
-            aria-controls="side-oracle-index"
-          >
-            <span class="side-icon">◆</span>
-            <span class="side-oracle-label">ORÁCULO</span>
-            <span class="side-oracle-chevron" aria-hidden="true">▾</span>
-          </button>
-
-          <div class="side-oracle-index" id="side-oracle-index">
-            <div class="side-oracle-index-title">ÍNDICE DE PESQUISA</div>
-            <div class="oracle-index-list" id="oracle-index-list"></div>
-            <div class="side-oracle-index-note">
-              Selecione uma área para visualizar as subáreas. A escolha orienta a consulta,
-              mas não impede o Oráculo de considerar outras áreas relevantes.
-            </div>
-          </div>
-        </div>
-
-        <a class="side-item" href="analise-textual.html">
-          <span class="side-icon">✎</span>ANÁLISE TEXTUAL
-        </a>
+        <a class="side-item active" href="oraculo.html" aria-current="page"><span class="side-icon">◆</span>ORÁCULO</a>
+        <a class="side-item" href="analise-textual.html"><span class="side-icon">✎</span>ANÁLISE TEXTUAL</a>
       </nav>
-
+ 
       <p class="side-footer-note">
         Módulo público: leitura independente da Sala do Escritor.
       </p>
     </aside>
-
+ 
     <div class="content-area">
       <header class="site-header">
         <a class="header-link" href="index.html">← VOLTAR À PESQUISA</a>
         <a class="header-link" href="sala-do-escritor.html">SALA DO ESCRITOR</a>
       </header>
-
+ 
       <main>
         <section class="paper" aria-label="Oráculo — Consulta Geral">
-          <div class="oracle-page">
-            <div class="oracle-content">
-              <section class="oracle-chat-panel" aria-label="Consulta geral do Oráculo">
-
-        <header class="ai-chat-header">
-          <h1>ORÁCULO — FATOS, FONTES E BÍBLIA</h1>
-          <p>
-            Faça uma pergunta sobre um acontecimento, declaração, pessoa, proposta, instituição ou assunto relevante para a vida pública e para os valores que a Igreja defende. O Oráculo investiga o que aconteceu, rastreia as fontes e depois coloca a questão diante das Escrituras.
-          </p>
-        </header>
-
-        <p class="oracle-trust-note">
-          <strong>PRINCÍPIO DO ORÁCULO:</strong> primeiro, descubra o que foi dito. Depois, descubra o que aconteceu. Por fim, consulte o que as Escrituras dizem sobre o assunto.
-          <br><br><strong>O Oráculo não dá parecer próprio.</strong> Ele separa fonte original, fonte oficial, cobertura jornalística e análise. Na etapa bíblica, a Bíblia é apresentada em seu contexto e pode afirmar, corrigir, confrontar, advertir ou condenar sem que o Oráculo suavize sua afirmação.
-        </p>
-
-        <div class="ai-chat-messages" id="oracle-chat-messages">
-
-
-
-      <button type="button" class="oracle-tracking-trigger" id="oracle-tracking-trigger" aria-controls="oracle-tracking-overlay" aria-expanded="false">↗ RASTREAR</button>
-      <div class="oracle-tracking-overlay" id="oracle-tracking-overlay" aria-hidden="true">
-        <aside class="oracle-tracking-panel" role="dialog" aria-modal="true" aria-labelledby="tracking-title">
-          <div class="tracking-head">
-            <h2 id="tracking-title">RASTREAMENTO DE FONTES</h2>
-            <button type="button" class="tracking-close" id="tracking-close" aria-label="Fechar rastreamento">×</button>
-          </div>
-          <div class="tracking-context" id="tracking-context">
-            <strong>Objeto atual:</strong> consulta geral. Selecione uma área/subárea no índice ou informe uma entidade abaixo.
-          </div>
-          <strong style="font-size:11px;letter-spacing:.05em">ORDEM OBRIGATÓRIA DE BUSCA</strong>
-          <div class="tracking-order" id="tracking-order"></div>
-
-          <form class="tracking-form" id="tracking-form">
-            <label for="tracking-entity">Entidade / item pesquisado</label>
-            <input id="tracking-entity" name="entity" placeholder="Ex.: Senado Federal" required>
-            <label for="tracking-sphere">Esfera</label>
-            <select id="tracking-sphere" name="sphere">
-              <option value="federal">Federal</option><option value="estadual">Estadual</option><option value="municipal">Municipal</option><option value="outro">Outra / não definida</option>
-            </select>
-            <label for="tracking-url">URL da publicação encontrada</label>
-            <input id="tracking-url" name="url" type="url" placeholder="https://...">
-            <label for="tracking-title-input">Título da publicação</label>
-            <input id="tracking-title-input" name="title" placeholder="Título / descrição da publicação">
-            <label for="tracking-source">Fonte / veículo</label>
-            <input id="tracking-source" name="source" placeholder="Órgão, jornal, canal, perfil etc.">
-            <label for="tracking-type">Tipo</label>
-            <select id="tracking-type" name="type">
-              <option>Portal de Transparência</option><option>Acesso à Informação / LAI</option><option>Portal institucional</option><option>Diário Oficial</option><option>Tribunal de Contas</option><option>Controladoria</option><option>Base oficial de dados</option><option>Imprensa</option><option>Vídeo / audiovisual</option><option>Rede social</option><option>Outro</option>
-            </select>
-            <label for="tracking-date">Data da publicação</label>
-            <input id="tracking-date" name="date" type="date">
-            <label for="tracking-notes">Observações</label>
-            <textarea id="tracking-notes" name="notes" placeholder="Informações úteis para a análise posterior..."></textarea>
-            <div class="tracking-actions">
-              <button type="submit">REGISTRAR PUBLICAÇÃO</button>
-              <button type="button" class="secondary" id="tracking-clear">LIMPAR REGISTROS LOCAIS</button>
-            </div>
-          </form>
-
-          <div class="tracking-publications">
-            <strong style="font-size:11px;letter-spacing:.05em">PUBLICAÇÕES ENCONTRADAS</strong>
-            <div id="tracking-publications-list"></div>
-          </div>
-          <div class="tracking-note"><strong>Regra metodológica:</strong> registrar a existência da publicação antes de classificá-la. A classificação posterior poderá ser <em>Verdadeira, Mentirosa, Neutra</em> ou <em>Sem definição</em>. “Sem definição” não significa falsa; significa evidência insuficiente para concluir.</div>
-        </aside>
-      </div>
-          <div class="ai-chat-welcome">
-            <strong>COMO O ORÁCULO INVESTIGA</strong>
-            <br><b>1. O QUE ACONTECEU?</b> — identifica o fato, declaração ou proposta.
-            <br><b>2. QUAL É A FONTE?</b> — procura a origem e separa-a da cobertura jornalística.
-            <br><b>3. QUEM ESTÁ ENVOLVIDO?</b> — organiza autoria, organização, decisão, execução, participação e repercussão conforme a evidência.
-            <br><b>4. O QUE A BÍBLIA DIZ?</b> — coloca a questão diante das Escrituras, sem substituir o texto bíblico pela opinião do Oráculo.
-          </div>
-
-          <div class="oracle-sources">
-            <h2>RASTREIO E PROVENIÊNCIA</h2>
-
-            <div class="oracle-source-grid">
-              <div class="oracle-source-card">
-                <strong>FONTE ORIGINAL</strong>
-                O assunto é identificado automaticamente a partir da pergunta.
-              </div>
-
-              <div class="oracle-source-card">
-                <strong>FONTE OFICIAL</strong>
-                O sistema seleciona internamente as fontes pertinentes à consulta.
-              </div>
-
-              <div class="oracle-source-card">
-                <strong>COBERTURA JORNALÍSTICA</strong>
-                Quando disponíveis, são apresentados título, veículo, data e publicação original.
-              </div>
-
-              <div class="oracle-source-card">
-                <strong>RASTREABILIDADE</strong>
-                Divergências, ausência de evidência e limitações devem ser informadas.
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="ai-chat-input">
-
-          <form class="question-row" id="oracle-form">
-            <input
-              id="oracle-question"
-              type="text"
-              placeholder="Ex.: O que foi dito sobre a Bíblia e o que as Escrituras dizem sobre isso?"
-              aria-label="Pergunta para o Oráculo"
-              autocomplete="off"
-              required
-            >
-            <button type="submit">INVESTIGAR</button>
-          </form>
-
-          <div class="ai-chat-loading" id="oracle-chat-loading">
-            Pesquisando e verificando publicações...
-          </div>
-
-          <div class="oracle-disclaimer">
-            O Oráculo não emite parecer próprio sobre o acontecimento.
-            A investigação deve distinguir fonte original, fonte oficial, jornalismo, análise, divergência e ausência de evidência. A etapa “O QUE A BÍBLIA DIZ?” apresenta as Escrituras em seu contexto, sem substituir sua afirmação por uma opinião editorial.
-          </div>
-
-        </div>
+          <section class="oracle-chat-panel" aria-label="Consulta geral do Oráculo">
+ 
+            <header class="ai-chat-header">
+              <h1>ORÁCULO — FATOS, FONTES E BÍBLIA</h1>
+              <p>
+                Faça uma pergunta sobre um acontecimento, declaração, pessoa, proposta, instituição ou assunto relevante para a vida pública e para os valores que a Igreja defende. O Oráculo investiga o que aconteceu, rastreia as fontes e depois coloca a questão diante das Escrituras.
+              </p>
+            </header>
+ 
+            <p class="oracle-trust-note">
+              <strong>PRINCÍPIO DO ORÁCULO:</strong> primeiro, descubra o que foi dito. Depois, descubra o que aconteceu. Por fim, consulte o que as Escrituras dizem sobre o assunto.
+              <br><br><strong>O Oráculo não dá parecer próprio.</strong> Ele separa fonte original, fonte oficial, cobertura jornalística e análise. Na etapa bíblica, a Bíblia é apresentada em seu contexto e pode afirmar, corrigir, confrontar, advertir ou condenar sem que o Oráculo suavize sua afirmação.
+            </p>
+ 
+            <div id="oracle-wizard" data-stage="1">
+ 
+              <nav class="wiz-stepper" id="wiz-stepper" aria-label="Passos da consulta"></nav>
+ 
+              <!-- PASSO 1 — ÁREA -->
+              <section class="wiz-stage" id="wiz-stage-1">
+                <div class="wiz-top">
+                  <div class="wiz-heading">
+                    <h2>Sobre qual área é a sua pergunta?</h2>
+                    <p>A escolha orienta a consulta, mas não impede o Oráculo de considerar outras áreas relevantes.</p>
+                  </div>
+                </div>
+                <div class="choice-grid" id="area-grid"></div>
+                <div class="skip-row">
+                  <span>Não sabe qual área escolher?</span>
+                  <button type="button" class="skip-button" id="skip-area">Fazer uma pergunta livre</button>
+                </div>
               </section>
+ 
+              <!-- PASSO 2 — SUBÁREA -->
+              <section class="wiz-stage" id="wiz-stage-2">
+                <div class="wiz-top">
+                  <button type="button" class="wiz-back" data-go="1">← Voltar</button>
+                  <div class="wiz-heading">
+                    <h2 id="sub-title">Qual subárea?</h2>
+                    <p>Escolha o recorte do assunto, ou use a área inteira.</p>
+                  </div>
+                </div>
+                <div class="sub-list" id="sub-list"></div>
+              </section>
+ 
+              <!-- PASSO 3 — PERGUNTA -->
+              <section class="wiz-stage" id="wiz-stage-3">
+                <div class="wiz-top">
+                  <button type="button" class="wiz-back" id="back-from-question">← Voltar</button>
+                  <div class="wiz-heading">
+                    <h2>Qual é a sua pergunta?</h2>
+                    <p>Você pode editar o texto sugerido. Quanto mais específica a pergunta, melhor o rastreio das fontes.</p>
+                  </div>
+                </div>
+ 
+                <div class="context-chip" id="context-chip"></div>
+ 
+                <form class="question-row" id="oracle-form">
+                  <input
+                    id="oracle-question"
+                    type="text"
+                    placeholder="Ex.: O que foi dito sobre a Bíblia e o que as Escrituras dizem sobre isso?"
+                    aria-label="Pergunta para o Oráculo"
+                    autocomplete="off"
+                    required
+                  >
+                  <button type="submit">INVESTIGAR</button>
+                </form>
+ 
+                <div class="oracle-disclaimer">
+                  O Oráculo não emite parecer próprio sobre o acontecimento.
+                  A investigação deve distinguir fonte original, fonte oficial, jornalismo, análise, divergência e ausência de evidência. A etapa “O QUE A BÍBLIA DIZ?” apresenta as Escrituras em seu contexto, sem substituir sua afirmação por uma opinião editorial.
+                </div>
+ 
+                <div class="ai-chat-welcome">
+                  <strong class="title">COMO O ORÁCULO INVESTIGA</strong>
+                  <b>1. O QUE ACONTECEU?</b> — identifica o fato, declaração ou proposta.
+                  <br><b>2. QUAL É A FONTE?</b> — procura a origem e separa-a da cobertura jornalística.
+                  <br><b>3. QUEM ESTÁ ENVOLVIDO?</b> — organiza autoria, organização, decisão, execução, participação e repercussão conforme a evidência.
+                  <br><b>4. O QUE A BÍBLIA DIZ?</b> — coloca a questão diante das Escrituras, sem substituir o texto bíblico pela opinião do Oráculo.
+                </div>
+ 
+                <div class="oracle-sources">
+                  <h2>RASTREIO E PROVENIÊNCIA</h2>
+                  <div class="oracle-source-grid">
+                    <div class="oracle-source-card">
+                      <strong>FONTE ORIGINAL</strong>
+                      O assunto é identificado automaticamente a partir da pergunta.
+                    </div>
+                    <div class="oracle-source-card">
+                      <strong>FONTE OFICIAL</strong>
+                      O sistema seleciona internamente as fontes pertinentes à consulta.
+                    </div>
+                    <div class="oracle-source-card">
+                      <strong>COBERTURA JORNALÍSTICA</strong>
+                      Quando disponíveis, são apresentados título, veículo, data e publicação original.
+                    </div>
+                    <div class="oracle-source-card">
+                      <strong>RASTREABILIDADE</strong>
+                      Divergências, ausência de evidência e limitações devem ser informadas.
+                    </div>
+                  </div>
+                </div>
+              </section>
+ 
+              <!-- PASSO 4 — RESULTADO -->
+              <section class="wiz-stage" id="wiz-stage-4">
+                <div class="context-chip" id="result-chip"></div>
+                <div class="ai-chat-messages" id="oracle-chat-messages"></div>
+                <div class="ai-chat-loading" id="oracle-chat-loading">Pesquisando e verificando publicações...</div>
+                <div class="result-bar">
+                  <button type="button" class="wiz-back quiet" id="ask-again">← Fazer outra pergunta nesta área</button>
+                  <button type="button" class="skip-button" id="new-search">Nova consulta</button>
+                </div>
+              </section>
+ 
             </div>
-          </div>
+          </section>
         </section>
       </main>
     </div>
   </div>
+ 
+  <!-- RASTREAMENTO DE FONTES -->
+  <button type="button" class="oracle-tracking-trigger" id="oracle-tracking-trigger" aria-controls="oracle-tracking-overlay" aria-expanded="false">↗ RASTREAR</button>
+  <div class="oracle-tracking-overlay" id="oracle-tracking-overlay" aria-hidden="true">
+    <aside class="oracle-tracking-panel" role="dialog" aria-modal="true" aria-labelledby="tracking-title">
+      <div class="tracking-head">
+        <h2 id="tracking-title">RASTREAMENTO DE FONTES</h2>
+        <button type="button" class="tracking-close" id="tracking-close" aria-label="Fechar rastreamento">×</button>
+      </div>
+      <div class="tracking-context" id="tracking-context">
+        <strong>Objeto atual:</strong> consulta geral. Selecione uma área/subárea ou informe uma entidade abaixo.
+      </div>
+      <strong style="font-size:11px;letter-spacing:.05em">ORDEM OBRIGATÓRIA DE BUSCA</strong>
+      <div class="tracking-order" id="tracking-order"></div>
+ 
+      <form class="tracking-form" id="tracking-form">
+        <label for="tracking-entity">Entidade / item pesquisado</label>
+        <input id="tracking-entity" name="entity" placeholder="Ex.: Senado Federal" required>
+        <label for="tracking-sphere">Esfera</label>
+        <select id="tracking-sphere" name="sphere">
+          <option value="federal">Federal</option><option value="estadual">Estadual</option><option value="municipal">Municipal</option><option value="outro">Outra / não definida</option>
+        </select>
+        <label for="tracking-url">URL da publicação encontrada</label>
+        <input id="tracking-url" name="url" type="url" placeholder="https://...">
+        <label for="tracking-title-input">Título da publicação</label>
+        <input id="tracking-title-input" name="title" placeholder="Título / descrição da publicação">
+        <label for="tracking-source">Fonte / veículo</label>
+        <input id="tracking-source" name="source" placeholder="Órgão, jornal, canal, perfil etc.">
+        <label for="tracking-type">Tipo</label>
+        <select id="tracking-type" name="type">
+          <option>Portal de Transparência</option><option>Acesso à Informação / LAI</option><option>Portal institucional</option><option>Diário Oficial</option><option>Tribunal de Contas</option><option>Controladoria</option><option>Base oficial de dados</option><option>Imprensa</option><option>Vídeo / audiovisual</option><option>Rede social</option><option>Outro</option>
+        </select>
+        <label for="tracking-date">Data da publicação</label>
+        <input id="tracking-date" name="date" type="date">
+        <label for="tracking-notes">Observações</label>
+        <textarea id="tracking-notes" name="notes" placeholder="Informações úteis para a análise posterior..."></textarea>
+        <div class="tracking-actions">
+          <button type="submit">REGISTRAR PUBLICAÇÃO</button>
+          <button type="button" class="secondary" id="tracking-clear">LIMPAR REGISTROS LOCAIS</button>
+        </div>
+      </form>
+ 
+      <div class="tracking-publications">
+        <strong style="font-size:11px;letter-spacing:.05em">PUBLICAÇÕES ENCONTRADAS</strong>
+        <div id="tracking-publications-list"></div>
+      </div>
+      <div class="tracking-note"><strong>Regra metodológica:</strong> registrar a existência da publicação antes de classificá-la. A classificação posterior poderá ser <em>Verdadeira, Mentirosa, Neutra</em> ou <em>Sem definição</em>. “Sem definição” não significa falsa; significa evidência insuficiente para concluir.</div>
+    </aside>
+  </div>
+ 
   <script>
     const AI_PROXY_URL = 'https://yellow-lab-f4b2.palavraeserie.workers.dev';
-
+ 
     const form = document.getElementById('oracle-form');
     const input = document.getElementById('oracle-question');
     const messages = document.getElementById('oracle-chat-messages');
     const loading = document.getElementById('oracle-chat-loading');
-
+ 
     const ORACULO_AREAS = [
       {id:'01',name:'Estado, Poderes e Cidadão',subareas:['01.1 — Constituição e Organização do Estado','01.2 — Poder Executivo — Presidência e Governo','01.3 — Congresso Nacional e Poder Legislativo','01.4 — Poder Judiciário','01.5 — Ministério Público e Defesa da Sociedade','01.6 — Poder Executivo Federal — Ministérios e Órgãos','01.7 — Tribunais de Contas e Controle dos Recursos Públicos','01.8 — Defensoria Pública e Acesso à Justiça','01.9 — Estados e Distrito Federal','01.10 — Municípios e Governo Local','01.11 — Cidadão e Seus Direitos perante o Estado','01.12 — Fiscalização e Controle pelo Cidadão','01.13 — Participação Popular e Democracia','01.14 — Onde o Cidadão Deve Procurar?','01.15 — Legislação e Fontes Oficiais']},
       {id:'02',name:'Direito e Justiça',subareas:['Constituição e legislação','Jurisprudência','Direito civil','Direito penal','Direito trabalhista','Direito empresarial','Direito administrativo','Direito internacional','Direitos humanos','Processos e decisões']},
@@ -1168,23 +949,26 @@ Oraculo · HTML
       {id:'35',name:'Comparações e Perguntas Específicas',subareas:['Quem é maior','Quem é mais rico','Quem é mais influente','Qual país é mais poderoso','Qual empresa é maior','Qual cidade é melhor','Qual universidade é melhor','Quem é mais famoso','Quem produz mais','Comparação por indicadores']},
       {id:'36',name:'Atualidades e Apuração',subareas:['Notícias recentes','Acontecimentos em andamento','Declarações públicas','Decisões governamentais','Conflitos e crises atuais','Economia atual','Ciência e tecnologia atual','Cultura atual','Verificação de alegações']}
     ];
-
+ 
     function escapeHtml(value) {
       const div = document.createElement('div');
       div.textContent = String(value ?? '');
       return div.innerHTML;
     }
-
+ 
     function cleanServiceText(value) {
       return String(value || '').replace(/\bIA\b/gi, 'serviço de análise');
     }
-
+ 
+    /* =========================================================
+       VÍDEOS
+       ========================================================= */
     const VIDEO_HOSTS = [
       'youtube.com','m.youtube.com','youtu.be','youtube-nocookie.com',
       'vimeo.com','player.vimeo.com',
       'tiktok.com','x.com','twitter.com','instagram.com','facebook.com','fb.watch'
     ];
-
+ 
     function isVideoSource(source) {
       const mediaType = String(source.mediaType || '').toLowerCase();
       const type = String(source.type || '').toLowerCase();
@@ -1192,8 +976,6 @@ Oraculo · HTML
           type.includes('víde') || type.includes('vide')) {
         return true;
       }
-      // O Worker real (grounding do Google Search) não envia mediaType/type,
-      // então também detectamos vídeo pelo domínio da própria URL da fonte.
       if (!source.url) return false;
       try {
         const host = new URL(source.url).hostname.replace(/^www\./, '');
@@ -1202,18 +984,18 @@ Oraculo · HTML
         return false;
       }
     }
-
+ 
     function getEmbedUrl(url) {
       if (!url) return null;
       try {
         const u = new URL(url);
         const host = u.hostname.replace(/^www\./, '');
-
+ 
         if (host === 'youtu.be') {
           const id = u.pathname.slice(1);
           return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
         }
-
+ 
         if (host === 'youtube.com' || host === 'm.youtube.com') {
           const id = u.searchParams.get('v');
           if (id) return `https://www.youtube-nocookie.com/embed/${id}`;
@@ -1221,7 +1003,7 @@ Oraculo · HTML
           if (shorts) return `https://www.youtube-nocookie.com/embed/${shorts[1]}`;
           return null;
         }
-
+ 
         if (host === 'vimeo.com') {
           const id = u.pathname.split('/').filter(Boolean)[0];
           return id && /^\d+$/.test(id) ? `https://player.vimeo.com/video/${id}` : null;
@@ -1231,14 +1013,10 @@ Oraculo · HTML
       }
       return null;
     }
-
-
-    const oracleSideToggle = document.getElementById('side-oracle-toggle');
-    const oracleSideIndex = document.getElementById('side-oracle-index');
-    const indexList = document.getElementById('oracle-index-list');
-
-
-
+ 
+    /* =========================================================
+       RASTREAMENTO DE FONTES
+       ========================================================= */
     const TRACKING_ORDER = [
       ['1','Portal de Transparência próprio do órgão','official-own'],
       ['2','Portal de Transparência do governo (federal, estadual ou municipal)','official-government'],
@@ -1259,7 +1037,7 @@ Oraculo · HTML
     const trackingList = document.getElementById('tracking-publications-list');
     const trackingContextEl = document.getElementById('tracking-context');
     const TRACKING_STORAGE_KEY = 'oraculo_tracking_publications_v1';
-
+ 
     function renderTrackingOrder(){
       trackingOrder.innerHTML = TRACKING_ORDER.map(item =>
         `<div class="tracking-step" data-tier="${item[0]}"><span class="num">${item[0]}</span><span>${escapeHtml(item[1])}</span><span class="state">aguardar pesquisa</span></div>`
@@ -1291,141 +1069,266 @@ Oraculo · HTML
     }
     function openTracking(){ trackingOverlay.classList.add('active'); trackingOverlay.setAttribute('aria-hidden','false'); trackingTrigger.setAttribute('aria-expanded','true'); updateTrackingContext(); renderTrackingOrder(); renderTrackingRecords(); }
     function closeTracking(){ trackingOverlay.classList.remove('active'); trackingOverlay.setAttribute('aria-hidden','true'); trackingTrigger.setAttribute('aria-expanded','false'); }
-    trackingTrigger.addEventListener('click',openTracking); trackingClose.addEventListener('click',closeTracking);
+    trackingTrigger.addEventListener('click',openTracking);
+    trackingClose.addEventListener('click',closeTracking);
     trackingOverlay.addEventListener('click',e=>{if(e.target===trackingOverlay)closeTracking();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTracking();});
     trackingForm.addEventListener('submit',e=>{
-      e.preventDefault(); const fd=new FormData(trackingForm); const record={
-        id:Date.now().toString(36)+Math.random().toString(36).slice(2), entity:fd.get('entity')||'', sphere:fd.get('sphere')||'', url:fd.get('url')||'', title:fd.get('title')||'', source:fd.get('source')||'', type:fd.get('type')||'', date:fd.get('date')||'', notes:fd.get('notes')||'', createdAt:new Date().toISOString()
-      }; const records=getTrackingRecords(); records.push(record); localStorage.setItem(TRACKING_STORAGE_KEY,JSON.stringify(records)); renderTrackingRecords(); trackingForm.reset(); if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
+      e.preventDefault();
+      const fd=new FormData(trackingForm);
+      const record={
+        id:Date.now().toString(36)+Math.random().toString(36).slice(2),
+        entity:fd.get('entity')||'', sphere:fd.get('sphere')||'', url:fd.get('url')||'',
+        title:fd.get('title')||'', source:fd.get('source')||'', type:fd.get('type')||'',
+        date:fd.get('date')||'', notes:fd.get('notes')||'', createdAt:new Date().toISOString()
+      };
+      const records=getTrackingRecords();
+      records.push(record);
+      localStorage.setItem(TRACKING_STORAGE_KEY,JSON.stringify(records));
+      renderTrackingRecords();
+      trackingForm.reset();
+      if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
     });
-    document.getElementById('tracking-clear').addEventListener('click',()=>{ if(confirm('Apagar os registros de publicações salvos neste navegador?')){localStorage.removeItem(TRACKING_STORAGE_KEY);renderTrackingRecords();} });
-
-    function renderOracleIndex() {
-      indexList.innerHTML = ORACULO_AREAS.map(area => `
-        <div class="oracle-index-item">
-          <button
-            type="button"
-            class="oracle-index-area"
-            data-area="${area.id}"
-            aria-expanded="false"
-          >
-            <span class="oracle-index-number">${area.id}</span>
-            <span class="oracle-index-name">${escapeHtml(area.name)}</span>
-            <span class="oracle-index-chevron">›</span>
-          </button>
-
-          <div
-            class="oracle-index-subareas"
-            data-subareas="${area.id}"
-          >
-            ${area.subareas.map((subarea, index) => `
-              <button
-                type="button"
-                class="oracle-index-subarea"
-                data-area="${area.id}"
-                data-subarea="${escapeHtml(subarea)}"
-              >
-                ${area.id}.${index + 1} — ${escapeHtml(subarea)}
-              </button>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function setOracleIndexOpen(open) {
-      oracleSideToggle.setAttribute('aria-expanded', String(open));
-      oracleSideIndex.setAttribute('aria-hidden', String(!open));
-    }
-
-    oracleSideToggle.addEventListener('click', () => {
-      const open = oracleSideToggle.getAttribute('aria-expanded') === 'true';
-      setOracleIndexOpen(!open);
-    });
-
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && oracleSideToggle.getAttribute('aria-expanded') === 'true') {
-        setOracleIndexOpen(false);
-        oracleSideToggle.focus();
+    document.getElementById('tracking-clear').addEventListener('click',()=>{
+      if(confirm('Apagar os registros de publicações salvos neste navegador?')){
+        localStorage.removeItem(TRACKING_STORAGE_KEY);
+        renderTrackingRecords();
       }
     });
-
-    indexList.addEventListener('click', event => {
-      const areaButton = event.target.closest('.oracle-index-area');
-
-      if (areaButton) {
-        const id = areaButton.dataset.area;
-        const subareas = indexList.querySelector(
-          `.oracle-index-subareas[data-subareas="${id}"]`
-        );
-
-        if (!subareas) return;
-
-        const willOpen = !subareas.classList.contains('active');
-
-        indexList.querySelectorAll('.oracle-index-subareas').forEach(box => {
-          box.classList.remove('active');
-        });
-
-        indexList.querySelectorAll('.oracle-index-area').forEach(button => {
-          button.classList.remove('active');
-          button.setAttribute('aria-expanded', 'false');
-        });
-
-        if (willOpen) {
-          subareas.classList.add('active');
-          areaButton.classList.add('active');
-          areaButton.setAttribute('aria-expanded', 'true');
+ 
+    /* =========================================================
+       PASSO A PASSO
+       ========================================================= */
+    const wizard = document.getElementById('oracle-wizard');
+    const stepperEl = document.getElementById('wiz-stepper');
+ 
+    const wiz = {
+      stage: 1,
+      area: null,       // objeto de ORACULO_AREAS
+      sub: '',          // texto da subárea ('' = área inteira)
+      free: false,      // pergunta livre, sem área
+      hasResults: false
+    };
+ 
+    const WIZ_TITLES = ['Área', 'Subárea', 'Pergunta', 'Resultado'];
+ 
+    function subareaLabel(area, subarea, index) {
+      return /^\d{2}\.\d+/.test(subarea) ? subarea : `${area.id}.${index + 1} — ${subarea}`;
+    }
+ 
+    function wizReachable(n) {
+      if (n === 1) return true;
+      if (n === 2) return !!wiz.area;
+      if (n === 3) return !!wiz.area || wiz.free;
+      if (n === 4) return wiz.hasResults;
+      return false;
+    }
+ 
+    function wizValue(n) {
+      if (n === 1) return wiz.free ? 'Pergunta livre' : (wiz.area ? wiz.area.id + ' ' + wiz.area.name : '');
+      if (n === 2) return wiz.sub || (wiz.area ? 'Área inteira' : '');
+      return '';
+    }
+ 
+    function contextText() {
+      if (wiz.free || !wiz.area) return '<strong>Pergunta livre</strong> — sem área definida';
+      return '<strong>' + escapeHtml(wiz.area.id + ' ' + wiz.area.name) + '</strong>' +
+        (wiz.sub ? ' › ' + escapeHtml(wiz.sub) : ' › área inteira');
+    }
+ 
+    function updateTrackingFromWizard() {
+      trackingContext.area = wiz.area ? wiz.area.name : '';
+      trackingContext.subarea = wiz.sub || '';
+    }
+ 
+    function renderStepper() {
+      stepperEl.innerHTML = '';
+ 
+      WIZ_TITLES.forEach((title, index) => {
+        const n = index + 1;
+        const done = n < wiz.stage && wizReachable(n);
+        const current = n === wiz.stage;
+ 
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'wiz-step' + (current ? ' current' : '') + (done ? ' done' : '');
+        btn.disabled = !done;
+        if (current) btn.setAttribute('aria-current', 'step');
+ 
+        const num = document.createElement('span');
+        num.className = 'wiz-num';
+        num.textContent = done ? '✓' : String(n);
+ 
+        const text = document.createElement('span');
+        text.className = 'wiz-text';
+ 
+        const t = document.createElement('span');
+        t.className = 'wiz-title';
+        t.textContent = title;
+        text.appendChild(t);
+ 
+        const value = wizValue(n);
+        if (value && n < wiz.stage) {
+          const v = document.createElement('span');
+          v.className = 'wiz-value';
+          v.textContent = value;
+          text.appendChild(v);
         }
-
+ 
+        btn.appendChild(num);
+        btn.appendChild(text);
+        btn.addEventListener('click', () => goStage(n));
+        stepperEl.appendChild(btn);
+      });
+    }
+ 
+    function goStage(n) {
+      if (!wizReachable(n)) return;
+      wiz.stage = n;
+      wizard.dataset.stage = String(n);
+ 
+      if (n === 2) renderSubareas();
+      if (n === 3) prepareQuestionStage();
+      if (n === 4) document.getElementById('result-chip').innerHTML = contextText();
+ 
+      renderStepper();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+ 
+      if (n === 3) input.focus();
+    }
+ 
+    /* ---------- Passo 1 ---------- */
+    function renderAreas() {
+      const grid = document.getElementById('area-grid');
+      grid.innerHTML = '';
+ 
+      ORACULO_AREAS.forEach(area => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'choice-card';
+        card.innerHTML = '<span class="choice-number"></span><span class="choice-name"></span>';
+        card.querySelector('.choice-number').textContent = area.id;
+        card.querySelector('.choice-name').textContent = area.name;
+        card.addEventListener('click', () => selectArea(area));
+        grid.appendChild(card);
+      });
+    }
+ 
+    function selectArea(area) {
+      if (!wiz.area || wiz.area.id !== area.id) wiz.sub = '';
+      wiz.area = area;
+      wiz.free = false;
+      updateTrackingFromWizard();
+      goStage(2);
+    }
+ 
+    document.getElementById('skip-area').addEventListener('click', () => {
+      wiz.area = null;
+      wiz.sub = '';
+      wiz.free = true;
+      updateTrackingFromWizard();
+      goStage(3);
+    });
+ 
+    /* ---------- Passo 2 ---------- */
+    function renderSubareas() {
+      const list = document.getElementById('sub-list');
+      list.innerHTML = '';
+      if (!wiz.area) return;
+ 
+      document.getElementById('sub-title').textContent =
+        'Qual subárea de ' + wiz.area.name + '?';
+ 
+      const whole = document.createElement('button');
+      whole.type = 'button';
+      whole.className = 'sub-row whole';
+      whole.innerHTML = '<span class="sub-code"></span><span class="sub-name"></span>';
+      whole.querySelector('.sub-code').textContent = wiz.area.id;
+      whole.querySelector('.sub-name').textContent = 'Usar a área inteira';
+      whole.addEventListener('click', () => selectSubarea(''));
+      list.appendChild(whole);
+ 
+      wiz.area.subareas.forEach((subarea, index) => {
+        const label = subareaLabel(wiz.area, subarea, index);
+        const m = label.match(/^(\d{2}\.\d+)\s*—\s*(.*)$/);
+ 
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'sub-row';
+        row.innerHTML = '<span class="sub-code"></span><span class="sub-name"></span>';
+        row.querySelector('.sub-code').textContent = m ? m[1] : '';
+        row.querySelector('.sub-name').textContent = m ? m[2] : label;
+        row.addEventListener('click', () => selectSubarea(label));
+        list.appendChild(row);
+      });
+    }
+ 
+    function selectSubarea(label) {
+      wiz.sub = label;
+      updateTrackingFromWizard();
+      goStage(3);
+    }
+ 
+    /* ---------- Passo 3 ---------- */
+    function prepareQuestionStage() {
+      document.getElementById('context-chip').innerHTML = contextText();
+ 
+      if (wiz.free || !wiz.area) {
+        input.value = '';
         return;
       }
-
-      const subareaButton = event.target.closest('.oracle-index-subarea');
-
-      if (subareaButton) {
-        const area = ORACULO_AREAS.find(
-          item => item.id === subareaButton.dataset.area
-        );
-
-        if (!area) return;
-
-        trackingContext.area = area.name;
-        trackingContext.subarea = subareaButton.dataset.subarea;
-        input.value =
-          `Pesquisar sobre ${area.name}, especificamente em ${subareaButton.dataset.subarea}.`;
-
-        setOracleIndexOpen(false);
-        input.focus();
-      }
+ 
+      input.value = wiz.sub
+        ? `Pesquisar sobre ${wiz.area.name}, especificamente em ${wiz.sub}.`
+        : `Pesquisar sobre ${wiz.area.name}.`;
+    }
+ 
+    document.getElementById('back-from-question').addEventListener('click', () => {
+      goStage(wiz.free || !wiz.area ? 1 : 2);
     });
-
-    renderOracleIndex();
-  setOracleIndexOpen(false);
-
-    function renderOracleResult(data) {
+ 
+    wizard.addEventListener('click', event => {
+      const back = event.target.closest('[data-go]');
+      if (back) goStage(Number(back.dataset.go));
+    });
+ 
+    /* ---------- Passo 4 ---------- */
+    document.getElementById('ask-again').addEventListener('click', () => goStage(3));
+ 
+    document.getElementById('new-search').addEventListener('click', () => {
+      wiz.area = null;
+      wiz.sub = '';
+      wiz.free = false;
+      wiz.hasResults = false;
+      messages.innerHTML = '';
+      updateTrackingFromWizard();
+      goStage(1);
+    });
+ 
+    /* =========================================================
+       RESULTADO
+       ========================================================= */
+    function renderOracleResult(data, question) {
       const text = cleanServiceText(
         data.text ||
         data.answer ||
         data.response ||
         'A investigação não devolveu uma resposta.'
       );
-
+ 
       const sources = Array.isArray(data.sources) ? data.sources : [];
-
+ 
       let confidence = data.confidence || data.verificationStatus || '';
       if (!confidence) {
-        // O Worker real não envia "confidence"; usamos o sinal que ele
-        // efetivamente fornece (grounded = achou fonte autorizada ou não).
         if (data.grounded === true) confidence = 'fontes localizadas (grau não classificado pelo serviço)';
         else if (data.grounded === false) confidence = 'nenhuma fonte autorizada localizada';
         else confidence = 'não indicado pelo serviço';
       }
-
+ 
       const checkedAt = data.checkedAt
         ? new Date(data.checkedAt).toLocaleString('pt-BR')
         : 'momento da consulta';
-
+ 
       let html =
         '<div class="oracle-result-meta">' +
         '<strong>Estado da verificação:</strong> ' +
@@ -1433,72 +1336,67 @@ Oraculo · HTML
         '<br><strong>Consultado em:</strong> ' +
         escapeHtml(checkedAt) +
         '</div>';
-
+ 
       html +=
         '<div class="oracle-result-text">' +
         escapeHtml(text).replace(/\n/g, '<br>') +
         '</div>';
-
-      html += '<div class="oracle-bible-invitation"><div><strong>O QUE A BÍBLIA DIZ?</strong><span>O Oráculo não dará um parecer próprio. Esta etapa coloca a questão diante das Escrituras.</span></div><button type="button" class="oracle-bible-button" data-question=""'+escapeHtml(window.__oraculoLastQuestion||'')+'">CONSULTAR AS ESCRITURAS</button></div>';
-
+ 
+      html +=
+        '<div class="oracle-bible-invitation"><div><strong>O QUE A BÍBLIA DIZ?</strong>' +
+        '<span>O Oráculo não dará um parecer próprio. Esta etapa coloca a questão diante das Escrituras.</span></div>' +
+        '<button type="button" class="oracle-bible-button" data-question="' + escapeHtml(question) + '">CONSULTAR AS ESCRITURAS</button></div>';
+ 
       if (sources.length) {
         html +=
           '<div class="oracle-sources">' +
           '<h3>PUBLICAÇÕES / FONTES ENCONTRADAS</h3>' +
           sources.map(source => {
             const publisher = source.publisher || source.source || source.domain || 'Fonte não identificada';
-             const sourceTier = source.sourceTier || source.tier || source.sourceLevel || '';
+            const sourceTier = source.sourceTier || source.tier || source.sourceLevel || '';
             const type = source.type || (source.domain ? 'resultado de busca' : 'conteúdo');
-            const sourceClass = String(source.sourceClass || source.sourceTier || '').toLowerCase().includes('original') ? 'FONTE ORIGINAL' : (String(source.sourceClass || source.sourceTier || '').toLowerCase().includes('official') || String(source.sourceClass || '').toLowerCase().includes('oficial') ? 'FONTE OFICIAL' : (type.toLowerCase().includes('news') || type.toLowerCase().includes('jornal') || type.toLowerCase().includes('imprensa') ? 'FONTE JORNALÍSTICA' : 'FONTE / PUBLICAÇÃO'));
+            const classHint = String(source.sourceClass || source.sourceTier || '').toLowerCase();
+            const sourceClass = classHint.includes('original')
+              ? 'FONTE ORIGINAL'
+              : (classHint.includes('official') || classHint.includes('oficial')
+                ? 'FONTE OFICIAL'
+                : (type.toLowerCase().includes('news') || type.toLowerCase().includes('jornal') || type.toLowerCase().includes('imprensa')
+                  ? 'FONTE JORNALÍSTICA'
+                  : 'FONTE / PUBLICAÇÃO'));
             const title = source.title || 'Sem título';
-            const date = source.publishedAt
-              ? ' · ' + escapeHtml(source.publishedAt)
-              : '';
-            const author = source.author
-              ? '<br>Autor: ' + escapeHtml(source.author)
-              : '';
+            const date = source.publishedAt ? ' · ' + escapeHtml(source.publishedAt) : '';
+            const author = source.author ? '<br>Autor: ' + escapeHtml(source.author) : '';
             const isVideo = isVideoSource(source);
             const embedUrl = isVideo ? getEmbedUrl(source.url) : null;
-
+ 
             const platformLine = (source.platform || source.channelOrAccount)
               ? '<br>' +
                 (source.platform ? escapeHtml(source.platform) : '') +
                 (source.platform && source.channelOrAccount ? ' · ' : '') +
                 (source.channelOrAccount ? escapeHtml(source.channelOrAccount) : '')
               : '';
-
+ 
             const url = source.url
-              ? '<br><a href="' +
-                escapeHtml(source.url) +
-                '" target="_blank" rel="noopener noreferrer">' +
-                (isVideo ? '▶ Assistir na fonte original' : 'Abrir publicação original') +
-                '</a>'
+              ? '<br><a href="' + escapeHtml(source.url) + '" target="_blank" rel="noopener noreferrer">' +
+                (isVideo ? '▶ Assistir na fonte original' : 'Abrir publicação original') + '</a>'
               : '';
-
-            const badge = isVideo
-              ? '<span class="oracle-media-badge">▶ VÍDEO</span> '
-              : '';
-
+ 
+            const badge = isVideo ? '<span class="oracle-media-badge">▶ VÍDEO</span> ' : '';
+ 
             const embed = embedUrl
-              ? '<div class="oracle-video-embed"><iframe src="' +
-                escapeHtml(embedUrl) +
+              ? '<div class="oracle-video-embed"><iframe src="' + escapeHtml(embedUrl) +
                 '" title="' + escapeHtml(title) + '" loading="lazy" ' +
                 'allow="accelerometer; encrypted-media; picture-in-picture" ' +
                 'allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
               : '';
-
+ 
             return (
               '<div class="oracle-result-source' + (isVideo ? ' is-video' : '') + '">' +
               badge +
-              '<span class="oracle-source-class">' + escapeHtml(sourceClass) + '</span><br><strong>' + escapeHtml(publisher) + '</strong> — '+
-              escapeHtml(type) + (sourceTier ? ' · <span class="tracking-badge">ETAPA '+escapeHtml(sourceTier)+'</span>' : '') +
-              '<br>' +
-              escapeHtml(title) +
-              date +
-              platformLine +
-              author +
-              url +
-              embed +
+              '<span class="oracle-source-class">' + escapeHtml(sourceClass) + '</span><br><strong>' + escapeHtml(publisher) + '</strong> — ' +
+              escapeHtml(type) +
+              (sourceTier ? ' · <span class="tracking-badge">ETAPA ' + escapeHtml(sourceTier) + '</span>' : '') +
+              '<br>' + escapeHtml(title) + date + platformLine + author + url + embed +
               '</div>'
             );
           }).join('') +
@@ -1511,7 +1409,7 @@ Oraculo · HTML
           'Trate o resultado como orientação preliminar.' +
           '</div>';
       }
-
+ 
       if (Array.isArray(data.searchQueries) && data.searchQueries.length) {
         html +=
           '<div class="oracle-result-meta">' +
@@ -1519,7 +1417,7 @@ Oraculo · HTML
           data.searchQueries.map(q => escapeHtml(q)).join(' · ') +
           '</div>';
       }
-
+ 
       if (Array.isArray(data.limitations) && data.limitations.length) {
         html +=
           '<div class="oracle-result-meta">' +
@@ -1527,66 +1425,108 @@ Oraculo · HTML
           escapeHtml(data.limitations.join(' ')) +
           '</div>';
       }
-
+ 
       return html;
     }
-
+ 
+    /* =========================================================
+       ETAPA BÍBLICA
+       ========================================================= */
     messages.addEventListener('click', async event => {
       const b = event.target.closest('.oracle-bible-button');
       if (!b) return;
-      const question = b.dataset.question || window.__oraculoLastQuestion || '';
+ 
+      const question = b.dataset.question || '';
       if (!question) return;
-      b.disabled = true; b.textContent = 'CONSULTANDO...';
-      const ans = document.createElement('div'); ans.className='ai-chat-answer';
-      ans.innerHTML='<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div><div>Consultando as Escrituras e organizando o contexto bíblico...</div>';
-      messages.appendChild(ans); messages.scrollTop=messages.scrollHeight;
+ 
+      b.disabled = true;
+      b.textContent = 'CONSULTANDO...';
+ 
+      const ans = document.createElement('div');
+      ans.className = 'ai-chat-answer';
+      ans.innerHTML = '<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div><div>Consultando as Escrituras e organizando o contexto bíblico...</div>';
+      messages.appendChild(ans);
+      ans.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+ 
       const prompt = `ETAPA BÍBLICA DO ORÁCULO.\n\nQuestão investigada:\n${question}\n\nO Oráculo não dá parecer próprio. Nesta etapa, apresente livremente o que a Bíblia diz, sem suavizar sua afirmação para agradar à cultura, política, opinião pública ou ao pesquisador. Use somente afirmações bíblicas sustentáveis. Não invente versículos. Apresente: O QUE A BÍBLIA DIZ; TEXTOS BÍBLICOS; CONTEXTO; O QUE O TEXTO AFIRMA; INTERPRETAÇÕES RELEVANTES quando houver; SÍNTESE À LUZ DAS ESCRITURAS. Diferencie texto bíblico de interpretação humana.`;
-      try{
-        const r=await fetch(`${AI_PROXY_URL.replace(/\/$/,'')}/api/pesquisa`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'free',accessLevel:'free',question:prompt,topic:'ORÁCULO — O QUE A BÍBLIA DIZ?',module:'ORÁCULO — ETAPA BÍBLICA',discipline:'Bíblia',studyContext:{trackingContext}})});
-        const ct=r.headers.get('content-type')||''; let d=ct.includes('application/json')?await r.json():{error:await r.text()};
-        if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`);
-        if(typeof d.text==='string'&&d.text.trim().startsWith('{')){try{d=JSON.parse(d.text)}catch(_){} }
-        const text=d.text||d.answer||d.response||'A consulta bíblica não devolveu uma resposta.';
-        ans.innerHTML='<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div><div class="oracle-result-text">'+escapeHtml(cleanServiceText(text)).replace(/\n/g,'<br>')+'</div>';
-      }catch(e){ ans.textContent='Não foi possível concluir a consulta bíblica: '+(e.message||'erro desconhecido'); }
-      finally{b.disabled=false;b.textContent='CONSULTAR AS ESCRITURAS';messages.scrollTop=messages.scrollHeight;}
+ 
+      try {
+        const r = await fetch(`${AI_PROXY_URL.replace(/\/$/, '')}/api/pesquisa`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            mode: 'free',
+            accessLevel: 'free',
+            question: prompt,
+            topic: 'ORÁCULO — O QUE A BÍBLIA DIZ?',
+            module: 'ORÁCULO — ETAPA BÍBLICA',
+            discipline: 'Bíblia',
+            studyContext: {trackingContext}
+          })
+        });
+ 
+        const ct = r.headers.get('content-type') || '';
+        let d = ct.includes('application/json') ? await r.json() : {error: await r.text()};
+ 
+        if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+ 
+        if (typeof d.text === 'string' && d.text.trim().startsWith('{')) {
+          try { d = JSON.parse(d.text); } catch (_) {}
+        }
+ 
+        const text = d.text || d.answer || d.response || 'A consulta bíblica não devolveu uma resposta.';
+        ans.innerHTML =
+          '<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div>' +
+          '<div class="oracle-result-text">' +
+          escapeHtml(cleanServiceText(text)).replace(/\n/g, '<br>') +
+          '</div>';
+      } catch (e) {
+        ans.textContent = 'Não foi possível concluir a consulta bíblica: ' + (e.message || 'erro desconhecido');
+      } finally {
+        b.disabled = false;
+        b.textContent = 'CONSULTAR AS ESCRITURAS';
+      }
     });
-
+ 
+    /* =========================================================
+       INVESTIGAÇÃO
+       ========================================================= */
     form.addEventListener('submit', async event => {
       event.preventDefault();
-
+ 
       const question = input.value.trim();
-      window.__oraculoLastQuestion = question;
       if (!question) {
         input.focus();
         return;
       }
-
+ 
       const button = form.querySelector('button');
       const userMessage = document.createElement('div');
       const answer = document.createElement('div');
-
+ 
       userMessage.className = 'ai-chat-message user';
       userMessage.textContent = question;
       messages.appendChild(userMessage);
-
+ 
       answer.className = 'ai-chat-answer';
       answer.textContent = 'A investigar a pergunta...';
       messages.appendChild(answer);
-
-      input.value = '';
+ 
+      wiz.hasResults = true;
+      goStage(4);
+ 
       button.disabled = true;
       loading.style.display = 'block';
-      messages.scrollTop = messages.scrollHeight;
-
+      answer.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+ 
       const researchPrompt = `Atue como um mecanismo de pesquisa geral e editor responsável.
-
+ 
 Pergunta do pesquisador:
 ${question}
-
+ 
 OBJETIVO:
 Responder à pergunta por meio de pesquisa interna em fontes e publicações adequadas ao assunto. O pesquisador não precisa indicar previamente a disciplina, área, site ou fonte.
-
+ 
 REGRAS:
 1. Classifique internamente o assunto e escolha os tipos de fonte adequados.
 2. Não restrinja a consulta a notícias.
@@ -1603,15 +1543,13 @@ REGRAS:
 13. Não pare necessariamente na primeira fonte encontrada: registre as publicações relevantes das etapas aplicáveis para formar o rastro documental.
 14. Canais oficiais do próprio órgão (site, YouTube, TV, Instagram, Facebook, X, LinkedIn, TikTok etc.) são fontes oficiais institucionais; não devem ser tratados como fonte secundária.
 15. Nesta etapa, registre a existência e os metadados da publicação. Não classifique o conteúdo como verdadeiro ou falso apenas por ter sido localizado.`;
-
+ 
       try {
         const response = await fetch(
           `${AI_PROXY_URL.replace(/\/$/, '')}/api/pesquisa`,
           {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
               mode: 'free',
               accessLevel: 'free',
@@ -1621,17 +1559,17 @@ REGRAS:
               discipline: '',
               studyContext: {
                 trackingContext,
-                sourceOrder: TRACKING_ORDER.map(x => ({step:x[0], source:x[1]}))
+                sourceOrder: TRACKING_ORDER.map(x => ({step: x[0], source: x[1]}))
               }
             })
           }
         );
-
+ 
         const contentType = response.headers.get('content-type') || '';
         const data = contentType.includes('application/json')
           ? await response.json()
           : {error: await response.text()};
-
+ 
         if (!response.ok) {
           const serviceMessage =
             data && typeof data.error === 'string'
@@ -1639,7 +1577,7 @@ REGRAS:
               : `O serviço devolveu HTTP ${response.status}.`;
           throw new Error(serviceMessage);
         }
-
+ 
         let parsed = data || {};
         if (typeof parsed.text === 'string' && parsed.text.trim().startsWith('{')) {
           try {
@@ -1648,12 +1586,12 @@ REGRAS:
             parsed = {text: parsed.text};
           }
         }
-
-        answer.innerHTML = renderOracleResult(parsed);
+ 
+        answer.innerHTML = renderOracleResult(parsed, question);
       } catch (error) {
         console.error('Erro no chat Oráculo:', error);
         const message = String(error && error.message || '');
-
+ 
         if (message === 'Failed to fetch') {
           answer.textContent =
             'Não foi possível ligar ao serviço de investigação. Verifique a ligação e tente novamente.';
@@ -1667,40 +1605,49 @@ REGRAS:
       } finally {
         button.disabled = false;
         loading.style.display = 'none';
-        messages.scrollTop = messages.scrollHeight;
       }
     });
-
-    input.focus();
+ 
+    /* =========================================================
+       INICIALIZAÇÃO
+       ========================================================= */
+    renderAreas();
+    renderStepper();
   </script>
-<script>
-(function(){
-  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
-  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
-  var PAGINA = "Oráculo";
-
-  try{
-    var vid = localStorage.getItem("ps_visitante_id");
-    if(!vid){
-      vid = (window.crypto && crypto.randomUUID)
-        ? crypto.randomUUID()
-        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-      localStorage.setItem("ps_visitante_id", vid);
-    }
-
-    fetch(SUPABASE_URL + "/rest/v1/visitas", {
-      method: "POST",
-      headers: {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
-    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
-  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
-})();
-</script>
+ 
+  <script>
+  (function(){
+    var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+    var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+    var PAGINA = "Oráculo";
+ 
+    try{
+      var vid = localStorage.getItem("ps_visitante_id");
+      if(!vid){
+        vid = (window.crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+        localStorage.setItem("ps_visitante_id", vid);
+      }
+ 
+      fetch(SUPABASE_URL + "/rest/v1/visitas", {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
+      }).catch(function(){});
+    }catch(e){}
+  })();
+  </script>
 </body>
 </html>
+ 
 
+
+
+
+Claude terminou a resposta
