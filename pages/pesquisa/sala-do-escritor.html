@@ -3293,6 +3293,69 @@ function mzAbrirEtapa(cod){
 let mzTimer = null;
 $("atModoMesa").addEventListener("click", mzAbrir);
 $("mzVoltar").addEventListener("click", mzFechar);
+ /* ===== ARQUIVO: pesquisas antigas, com data e horário ===== */
+let arqFundo = null;
+function arqFechar(){ if(arqFundo) arqFundo.hidden = true; }
+function arqDataHora(iso){
+  if(!iso) return "Data não registrada";
+  const d = new Date(iso);
+  if(Number.isNaN(d.getTime())) return "Data não registrada";
+  return d.toLocaleDateString("pt-BR") + " às " + d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+}
+function arqDesenhar(){
+  const lista = (st.arq || []).slice().sort(function(a,b){
+    return (b.em ? Date.parse(b.em) : 0) - (a.em ? Date.parse(a.em) : 0);
+  });
+  const corpo = arqFundo.querySelector(".at-tab-corpo");
+  corpo.innerHTML = lista.length ? lista.map(function(a){
+    return '<div class="at-tab-bloco" style="text-transform:none">' + escapeHTML(arqDataHora(a.em)) +
+        (a.cod ? ' — ' + escapeHTML(a.cod) + ' ' + escapeHTML(a.nome || "") : '') +
+        (a.ref ? ' · ' + escapeHTML(a.ref) : '') + '</div>' +
+      '<div style="white-space:pre-wrap;font:15px/1.6 Georgia,serif;padding:6px 2px">' + escapeHTML(a.texto) + '</div>' +
+      '<div class="at-row" style="margin:4px 0 10px">' +
+        '<button type="button" class="at-btn" data-arq="copiar" data-id="' + escapeHTML(a.id) + '">COPIAR</button>' +
+        '<button type="button" class="at-btn" data-arq="excluir" data-id="' + escapeHTML(a.id) + '">EXCLUIR</button>' +
+      '</div>';
+  }).join("") : '<div class="at-tab-msg">Nenhuma pesquisa arquivada ainda.</div>';
+}
+function arqAbrir(){
+  if(!arqFundo){
+    arqFundo = document.createElement("div");
+    arqFundo.className = "at-tab-fundo";
+    arqFundo.hidden = true;
+    arqFundo.innerHTML =
+      '<div class="at-tab-janela" role="dialog" aria-modal="true">' +
+        '<div class="at-tab-topo"><strong>Arquivo de pesquisas</strong>' +
+          '<div class="at-tab-leg">Resultados da Mesa de estudo, com data e horário.</div></div>' +
+        '<div class="at-tab-corpo"></div>' +
+        '<div class="at-tab-rodape"><button type="button" class="at-btn" data-arq="fechar">FECHAR</button></div>' +
+      '</div>';
+    document.body.appendChild(arqFundo);
+    arqFundo.addEventListener("click", function(ev){
+      if(ev.target === arqFundo){ arqFechar(); return; }
+      const b = ev.target.closest("[data-arq]");
+      if(!b) return;
+      const acao = b.dataset.arq;
+      if(acao === "fechar"){ arqFechar(); return; }
+      const item = (st.arq || []).find(x => x.id === b.dataset.id);
+      if(!item) return;
+      if(acao === "copiar"){
+        if(navigator.clipboard) navigator.clipboard.writeText(item.texto);
+        toast("Texto copiado.");
+      }else if(acao === "excluir"){
+        if(!window.confirm("Excluir esta pesquisa do arquivo? Não dá para desfazer.")) return;
+        st.arq = st.arq.filter(x => x.id !== item.id);
+        gravar(); arqDesenhar();
+      }
+    });
+    document.addEventListener("keydown", function(ev){
+      if(ev.key === "Escape" && !arqFundo.hidden){ arqFechar(); ev.stopImmediatePropagation(); }
+    }, true);
+  }
+  arqDesenhar();
+  arqFundo.hidden = false;
+}
+$("mzArq").addEventListener("click", arqAbrir);
 $("atModoTexto").addEventListener("click", function(){ if(mz.style.display !== "none") mzFechar(); });
 $("atModoArvore").addEventListener("click", function(){ if(mz.style.display !== "none") mzFechar(); });
 $("atRasc").addEventListener("change", function(){ if(mz.style.display !== "none") mzRender(); });
