@@ -3383,7 +3383,7 @@ async function mzPesquisar(cod, btn){
     const dados = await resp.json().catch(() => ({}));
     if(!resp.ok || !dados.ok) throw new Error(dados.error || "Não foi possível pesquisar agora.");
     m[cod] = m[cod] || {};
-    m[cod].t = dados.text || dados.answer || "";
+       m[cod].t = String(dados.text || dados.answer || "").replace(/\*/g, "");
     gravar(); mzRender();
   }catch(e){
     console.error(e);
