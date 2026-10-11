@@ -2829,66 +2829,6 @@ function resetReference() {
 }
  
  
-function prepareQuestionForStepOld(skipIntroMessage) {
- 
-  awaitingReference = false;
- 
-  if (!activeStep) {
-    questionInput.value = "";
-    return;
-  }
- 
-  const savedDraft =
-    localStorage.getItem(
-      questionDraftKey()
-    );
- 
-  if (savedDraft) {
-    questionInput.value = savedDraft;
-    return;
-  }
- 
-  const code = extractStepCode(activeStep);
-  const config = M01_INPUT_CONFIG[code];
-  const reference = getSavedReference();
-  const template = objetivosDasSubetapas[code];
- 
-  questionInput.placeholder = config
-    ? config.prompt
-    : "Escreva sua pergunta...";
- 
-  if (config && !reference) {
-    questionInput.value = "";
-    awaitingReference = true;
- 
-    if (!skipIntroMessage) {
-      appendSystemMessage(
-        config.prompt
-      );
-    }
-    return;
-  }
- 
-  if (template && reference) {
-    questionInput.value = template
-      .replace(/\{PASSAGEM\}/g, reference)
-      .replace(/\{OBJETO\}/g, reference)
-      .replace(/\{LIVRO\}/g, reference)
-      .replace(/\{PALAVRA\}/g, reference)
-      .replace(/\{REFERENCIA\}/g, reference);
-    return;
-  }
- 
-  questionInput.value = "";
- 
-  if (!skipIntroMessage) {
-    appendSystemMessage(
-      "A subetapa \"" + activeStep + "\" está pronta. " +
-      "Informe o dado necessário ou escreva sua pergunta."
-    );
-  }
-}
- 
  
 /* =====================================================
    COMPARAÇÃO E CONSOLIDAÇÃO AO WORKER
