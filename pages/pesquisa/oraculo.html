@@ -1086,45 +1086,20 @@ Objetivo: localizar informações institucionais, registros oficiais e posiciona
     const messages = document.getElementById('oracle-chat-messages');
     const loading = document.getElementById('oracle-chat-loading');
 
-    const ORACULO_AREAS = [
-      {id:'01',name:'Estado, Poderes e Cidadão',subareas:['01.1 — Constituição e Organização do Estado','01.2 — Poder Executivo — Presidência e Governo','01.3 — Congresso Nacional e Poder Legislativo','01.4 — Poder Judiciário','01.5 — Ministério Público e Defesa da Sociedade','01.6 — Poder Executivo Federal — Ministérios e Órgãos','01.7 — Tribunais de Contas e Controle dos Recursos Públicos','01.8 — Defensoria Pública e Acesso à Justiça','01.9 — Estados e Distrito Federal','01.10 — Municípios e Governo Local','01.11 — Cidadão e Seus Direitos perante o Estado','01.12 — Fiscalização e Controle pelo Cidadão','01.13 — Participação Popular e Democracia','01.14 — Onde o Cidadão Deve Procurar?','01.15 — Legislação e Fontes Oficiais']},
-      {id:'02',name:'Direito e Justiça',subareas:['Constituição e legislação','Jurisprudência','Direito civil','Direito penal','Direito trabalhista','Direito empresarial','Direito administrativo','Direito internacional','Direitos humanos','Processos e decisões']},
-      {id:'03',name:'Economia e Finanças',subareas:['PIB e crescimento','Inflação','Juros','Câmbio','Comércio exterior','Dívida pública','Mercados financeiros','Bancos e crédito','Emprego e renda','Indicadores econômicos']},
-      {id:'04',name:'Empresas e Mercado',subareas:['Empresas','Receita e faturamento','Valor de mercado','Marcas','Empresas públicas','Empresas privadas','Mercados','Investimentos','Executivos','Rankings empresariais']},
-      {id:'05',name:'História e Arqueologia',subareas:['História antiga','História medieval','História moderna','História contemporânea','História do Brasil','Arqueologia','Museus e patrimônio','Manuscritos e documentos','Fontes primárias','Historiografia']},
-      {id:'06',name:'Ciência',subareas:['Ciências naturais','Ciências exatas','Ciências da Terra','Pesquisa científica','Experimentos','Estudos observacionais','Revisões sistemáticas','Meta-análises','Descobertas científicas','Dados científicos']},
-      {id:'07',name:'Medicina e Saúde',subareas:['Medicina','Epidemiologia','Saúde pública','Doenças','Tratamentos','Medicamentos','Ensaios clínicos','Diretrizes clínicas','Nutrição','Estatísticas de saúde']},
-      {id:'08',name:'Psicologia',subareas:['Psicologia cognitiva','Psicologia social','Psicologia clínica','Desenvolvimento humano','Personalidade','Comportamento','Neuropsicologia','Psicometria','Psicologia organizacional','Pesquisa experimental']},
-      {id:'09',name:'Sociedade e Sociologia',subareas:['Estrutura social','Desigualdade','Família','Trabalho','Religião e sociedade','Educação e sociedade','Comportamento coletivo','Demografia','Movimentos sociais','Transformações sociais']},
-      {id:'10',name:'Antropologia',subareas:['Antropologia cultural','Antropologia social','Antropologia biológica','Etnografia','Povos e culturas','Costumes','Organização social','Antropologia urbana','Antropologia histórica','Pesquisa antropológica']},
-      {id:'11',name:'Filosofia',subareas:['Filosofia antiga','Filosofia medieval','Filosofia moderna','Filosofia contemporânea','Ética','Epistemologia','Metafísica','Filosofia política','Filosofia da ciência','Filosofia da linguagem']},
-      {id:'12',name:'Ciência Política',subareas:['Estado','Democracia','Eleições','Partidos políticos','Instituições','Políticas públicas','Sistemas políticos','Ideologias políticas','Comportamento eleitoral','Governança']},
-      {id:'13',name:'Geopolítica e Relações Internacionais',subareas:['Relações internacionais','Diplomacia','Alianças','Conflitos','Sanções','Organizações internacionais','Comércio internacional','Influência internacional','Segurança internacional','Geopolítica regional']},
-      {id:'14',name:'Países e Desenvolvimento',subareas:['Perfil de países','População','Economia','Desenvolvimento humano','Educação','Saúde','Segurança','Infraestrutura','Energia','Relações com o Brasil']},
-      {id:'15',name:'Educação',subareas:['Educação básica','Ensino superior','Universidades','Pesquisa acadêmica','Pós-graduação','Avaliações educacionais','PISA','Políticas educacionais','Professores','Indicadores educacionais']},
-      {id:'16',name:'Tecnologia, Computação e IA',subareas:['Computação','Inteligência artificial','Software','Internet','Cibersegurança','Dados','Algoritmos','Robótica','Padrões técnicos','Pesquisa em IA']},
-      {id:'17',name:'Patentes, Inovação e Propriedade Intelectual',subareas:['Patentes','Marcas','Propriedade intelectual','Inovação','Tecnologias emergentes','Pesquisa e desenvolvimento','Transferência tecnológica','Startups','Indicadores de inovação','Propriedade industrial']},
-      {id:'18',name:'Engenharia e Normas Técnicas',subareas:['Engenharia civil','Engenharia mecânica','Engenharia elétrica','Engenharia química','Engenharia ambiental','Engenharia de produção','Normas técnicas','Padrões internacionais','Segurança técnica','Regulamentação']},
-      {id:'19',name:'Agricultura, Alimentos e Pecuária',subareas:['Agricultura','Pecuária','Produção de alimentos','Agropecuária','Segurança alimentar','Commodities agrícolas','Produção mundial','Clima e agricultura','Tecnologia agrícola','Dados agropecuários']},
-      {id:'20',name:'Meio Ambiente e Clima',subareas:['Mudanças climáticas','Florestas','Biodiversidade','Conservação','Água','Poluição','Desmatamento','Oceanos','Unidades de conservação','Políticas ambientais']},
-      {id:'21',name:'Energia',subareas:['Petróleo','Gás natural','Carvão','Energia nuclear','Hidrelétrica','Solar','Eólica','Biomassa','Hidrogênio','Armazenamento de energia']},
-      {id:'22',name:'Minerais e Recursos Naturais',subareas:['Minerais críticos','Minerais estratégicos','Petróleo e gás','Metais','Mineração','Reservas','Produção','Exportação','Importação','Cadeias industriais']},
-      {id:'23',name:'Geografia e Geociências',subareas:['Geografia física','Geografia humana','Cartografia','Geologia','Geodésia','Hidrologia','Oceanografia','Sensoriamento remoto','Território','Mapas e dados geográficos']},
-      {id:'24',name:'Linguística e Filologia',subareas:['Linguística','Gramática','Sintaxe','Semântica','Pragmática','Fonética e fonologia','Sociolinguística','Línguas antigas','Filologia','Dicionários e corpora']},
-      {id:'25',name:'Religião, Igrejas e Influência',subareas:['Religiões','História das religiões','Igrejas e instituições religiosas','Líderes religiosos','Discursos e declarações','Religião e política','Religião e relações internacionais','Religião e sociedade','Religião e cultura','Influência religiosa','Vaticano e Santa Sé','Estudos acadêmicos da religião']},
-      {id:'26',name:'Cultura, Artes e Mídia',subareas:['Cinema','Televisão','Música','Literatura','Artes visuais','Arquitetura','Design','Moda','Jornalismo','Mídia e comunicação']},
-      {id:'27',name:'Esportes',subareas:['Futebol','Basquete','Tênis','Fórmula 1','Atletismo','Olimpíadas','Clubes','Atletas','Rankings','Estatísticas esportivas']},
-      {id:'28',name:'Espaço e Astronomia',subareas:['Astronomia','Sistema Solar','Planetas','Estrelas','Galáxias','Cosmologia','Asteroides','Exploração espacial','Satélites','Missões espaciais']},
-      {id:'29',name:'Pessoas, Prêmios, Rankings e Reconhecimento',subareas:['Pessoas influentes','Personalidades públicas','Cientistas','Artistas','Líderes','Prêmios','Nobel','Rankings','Fama e popularidade','Influência e impacto','Produção acadêmica','Reconhecimento profissional']},
-      {id:'30',name:'Transporte e Mobilidade',subareas:['Transporte rodoviário','Transporte ferroviário','Transporte marítimo e fluvial','Aviação e aeroportos','Portos','Transporte urbano','Logística e cadeias de suprimento','Infraestrutura de mobilidade']},
-      {id:'31',name:'Qualidade de Vida e Desenvolvimento',subareas:['Desenvolvimento humano (IDH)','Renda e distribuição','Saúde e expectativa de vida','Educação e alfabetização','Segurança e violência','Desigualdade social','Felicidade e bem-estar subjetivo','Indicadores internacionais comparados']},
-      {id:'32',name:'Segurança, Criminalidade e Paz',subareas:['Criminalidade','Segurança pública','Homicídios e mortalidade violenta','Sistema prisional','Violência urbana e rural','Terrorismo','Conflitos armados internos','Paz e estabilidade','Estado de direito','Corrupção']},
-      {id:'33',name:'Defesa e Poder Militar',subareas:['Forças armadas','Orçamento e gastos militares','Efetivos militares','Armamentos e equipamentos','Indústria de defesa','Poder terrestre','Poder aéreo','Poder naval','Armas nucleares','Alianças militares','Comparações de poder militar']},
-      {id:'34',name:'Rankings Institucionais e Comparados',subareas:['Rankings de países','Rankings de empresas','Rankings de universidades','Rankings de cidades','Prêmios internacionais','Prêmio Nobel','Reconhecimento científico','Reconhecimento cultural']},
-      {id:'35',name:'Comparações e Perguntas Específicas',subareas:['Quem é maior','Quem é mais rico','Quem é mais influente','Qual país é mais poderoso','Qual empresa é maior','Qual cidade é melhor','Qual universidade é melhor','Quem é mais famoso','Quem produz mais','Comparação por indicadores']},
-      {id:'36',name:'Atualidades e Apuração',subareas:['Notícias recentes','Acontecimentos em andamento','Declarações públicas','Decisões governamentais','Conflitos e crises atuais','Economia atual','Ciência e tecnologia atual','Cultura atual','Verificação de alegações']}
-    ];
-
+   const ORACULO_AREAS = [
+  {id:'01',name:'Fontes Oficiais',tracks:'Rastreiam atos, decisões e posicionamentos institucionais.',subareas:['Leis','Decretos','Portarias','Resoluções','Notas oficiais','Comunicados governamentais']},
+  {id:'02',name:'Fontes Jornalísticas',tracks:'Rastreiam acontecimentos, declarações e investigações.',subareas:['Reportagens','Entrevistas','Notícias','Coberturas ao vivo','Jornalismo investigativo']},
+  {id:'03',name:'Fontes Legislativas',tracks:'Rastreiam a criação e a tramitação de decisões políticas.',subareas:['Projetos de lei','Votações','Discursos parlamentares','Atas','Registros de comissões']},
+  {id:'04',name:'Fontes Judiciais',tracks:'Rastreiam decisões judiciais e seus fundamentos.',subareas:['Sentenças','Acórdãos','Decisões liminares','Processos públicos','Votos de magistrados']},
+  {id:'05',name:'Fontes Declaratórias',tracks:'Rastreiam o que pessoas e instituições efetivamente disseram.',subareas:['Discursos integrais','Entrevistas gravadas','Pronunciamentos','Transcrições','Coletivas de imprensa']},
+  {id:'06',name:'Fontes Administrativas',tracks:'Rastreiam decisões e ações da administração pública.',subareas:['Atas de reuniões','Contratos','Licitações','Relatórios de gestão','Auditorias','Processos administrativos acessíveis']},
+  {id:'07',name:'Fontes Estatísticas e Econômicas',tracks:'Rastreiam mudanças e impactos sociais mensuráveis.',subareas:['Indicadores de emprego','Inflação','Renda','Educação','Saúde','Criminalidade','Desigualdade']},
+  {id:'08',name:'Fontes de Mobilização Social',tracks:'Rastreiam manifestações, reivindicações e movimentos coletivos.',subareas:['Comunicados de movimentos sociais','Sindicatos','Associações','Organizações civis','Registros de protestos']},
+  {id:'09',name:'Fontes Digitais e de Redes Sociais',tracks:'Rastreiam publicações, declarações e repercussões públicas.',subareas:['Publicações originais','Perfis verificados','Comunicados digitais','Registros arquivados de páginas']},
+  {id:'10',name:'Fontes Históricas e Arquivísticas',tracks:'Rastreiam a origem, a sequência e a evolução dos acontecimentos.',subareas:['Arquivos públicos','Jornais antigos','Documentos históricos','Registros audiovisuais','Versões anteriores de documentos']},
+  {id:'11',name:'Fontes Corporativas e Empresariais',tracks:'Rastreiam decisões privadas com repercussão econômica ou social.',subareas:['Comunicados empresariais','Relatórios financeiros','Atas públicas','Anúncios de políticas corporativas','Documentos regulatórios']},
+  {id:'12',name:'Fontes Científicas e Técnicas',tracks:'Rastreiam descobertas, alertas e evidências que podem orientar decisões sociais.',subareas:['Estudos científicos','Pareceres técnicos','Notas de agências reguladoras','Relatórios epidemiológicos','Avaliações de impacto']}
+];
     function escapeHtml(value) {
       const div = document.createElement('div');
       div.textContent = String(value ?? '');
@@ -1256,38 +1231,36 @@ Objetivo: localizar informações institucionais, registros oficiais e posiciona
     });
     document.getElementById('tracking-clear').addEventListener('click',()=>{ if(confirm('Apagar os registros de publicações salvos neste navegador?')){localStorage.removeItem(TRACKING_STORAGE_KEY);renderTrackingRecords();} });
 
-    function renderOracleIndex() {
-      indexList.innerHTML = ORACULO_AREAS.map(area => `
-        <div class="oracle-index-item">
+   function renderOracleIndex() {
+  indexList.innerHTML = ORACULO_AREAS.map(area => `
+    <div class="oracle-index-item">
+      <button
+        type="button"
+        class="oracle-index-area"
+        data-area="${area.id}"
+        aria-expanded="false"
+      >
+        <span class="oracle-index-number">${area.id}</span>
+        <span class="oracle-index-name">${escapeHtml(area.name)}</span>
+        <span class="oracle-index-chevron">›</span>
+      </button>
+
+      <div class="oracle-index-subareas" data-subareas="${area.id}">
+        <div class="oracle-index-desc">${escapeHtml(area.tracks)}</div>
+        ${area.subareas.map(subarea => `
           <button
             type="button"
-            class="oracle-index-area"
+            class="oracle-index-subarea"
             data-area="${area.id}"
-            aria-expanded="false"
+            data-subarea="${escapeHtml(subarea)}"
           >
-            <span class="oracle-index-number">${area.id}</span>
-            <span class="oracle-index-name">${escapeHtml(area.name)}</span>
-            <span class="oracle-index-chevron">›</span>
+            ${escapeHtml(subarea)}
           </button>
-
-          <div
-            class="oracle-index-subareas"
-            data-subareas="${area.id}"
-          >
-            ${area.subareas.map((subarea, index) => `
-              <button
-                type="button"
-                class="oracle-index-subarea"
-                data-area="${area.id}"
-                data-subarea="${escapeHtml(subarea)}"
-              >
-                area.id.{index + 1} — ${escapeHtml(subarea)}
-              </button>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
-    }
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
 
     function setOracleIndexOpen(open) {
       oracleSideToggle.setAttribute('aria-expanded', String(open));
@@ -1348,9 +1321,8 @@ Objetivo: localizar informações institucionais, registros oficiais e posiciona
 
         trackingContext.area = area.name;
         trackingContext.subarea = subareaButton.dataset.subarea;
-        input.value =
-          `Pesquisar sobre ${area.name}, especificamente em ${subareaButton.dataset.subarea}.`;
-
+       input.value =
+  `Pesquisar em fontes da categoria "${area.name}" (${area.tracks}), com foco em: ${subareaButton.dataset.subarea}.`;
         setOracleIndexOpen(false);
         input.focus();
       }
