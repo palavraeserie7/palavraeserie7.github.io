@@ -208,14 +208,20 @@
     .consult-panel{grid-column:1/-1;margin-top:4px;padding:16px;border:1px solid var(--paper-line);border-radius:7px;background:#fffaf0}
     .consult-heading label{display:block;margin:0 0 5px;color:var(--ink);font-size:14px;font-weight:800}
     .consult-heading p,.consult-note{margin:0;color:var(--ink-soft);font-size:11.5px;line-height:1.55}
-    .consult-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px}
-    .consult-group{min-width:0;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:var(--paper-card)}
-    .consult-group h3{margin:0 0 9px;color:var(--brass-deep);font-size:11px;line-height:1.4;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+    .consult-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin-top:14px;align-items:start}
+    .consult-group{min-width:0;border:1px solid var(--paper-line);border-radius:6px;background:var(--paper-card);overflow:hidden}
+    .consult-group summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:12px 14px;color:var(--brass-deep);font-size:12px;line-height:1.4;font-weight:800;letter-spacing:.025em;cursor:pointer;list-style:none}
+    .consult-group summary::-webkit-details-marker{display:none}
+    .consult-group summary::after{content:'+';flex:none;font-size:20px;font-weight:500;line-height:1;color:var(--brass)}
+    .consult-group[open] summary{border-bottom:1px solid var(--paper-line);background:#fffaf0}
+    .consult-group[open] summary::after{content:'−'}
+    .consult-group summary:hover,.consult-group summary:focus-visible{background:var(--brass-wash);outline-offset:-3px}
+    .consult-group .consult-buttons{padding:12px}
     .consult-buttons{display:flex;flex-wrap:wrap;gap:7px}
     .consult-btn{min-height:34px;padding:7px 10px;border:1px solid #c8b783;border-radius:5px;background:#fffdf6;color:var(--ink);font-size:11.5px;font-weight:700;text-align:left;cursor:pointer;transition:background .12s,border-color .12s,color .12s}
     .consult-btn:hover,.consult-btn:focus-visible{border-color:var(--brass);background:var(--brass-wash);color:var(--ink)}
     .consult-note{margin-top:12px;padding-top:10px;border-top:1px solid var(--paper-line)}
-    @media(max-width:600px){.consult-panel{padding:10px}.consult-groups{grid-template-columns:1fr}.consult-btn{flex:1 1 auto}}
+    @media(max-width:600px){.consult-panel{padding:10px}.consult-groups{grid-template-columns:1fr}.consult-btn{flex:1 1 auto}.consult-group summary{min-height:46px}}
 
     .list-bar {
       display:flex;
@@ -629,17 +635,17 @@
                   <p>Digite um assunto acima e escolha o botão correspondente ao tipo de registro que deseja localizar. Cada botão abre uma pesquisa externa direcionada.</p>
                 </div>
                 <div class="consult-groups">
-                  <section class="consult-group">
-                    <h3>Transparência e administração pública</h3>
+                  <details class="consult-group">
+                    <summary>Transparência e administração pública</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="transparencia">Portal da Transparência</button>
                       <button type="button" class="consult-btn" data-search="dados-abertos">Dados Abertos</button>
                       <button type="button" class="consult-btn" data-search="acesso-informacao">Acesso à Informação (LAI)</button>
                       <button type="button" class="consult-btn" data-search="licitacoes">Licitações e Contratos</button>
                     </div>
-                  </section>
-                  <section class="consult-group">
-                    <h3>Registros oficiais e jurídicos</h3>
+                  </details>
+                  <details class="consult-group">
+                    <summary>Registros oficiais e jurídicos</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="legislacao">Legislação Oficial</button>
                       <button type="button" class="consult-btn" data-search="diarios-oficiais">Diários Oficiais</button>
@@ -647,27 +653,27 @@
                       <button type="button" class="consult-btn" data-search="controle">Tribunais de Contas e Controle</button>
                       <button type="button" class="consult-btn" data-search="eleitoral">Registros Eleitorais</button>
                     </div>
-                  </section>
-                  <section class="consult-group">
-                    <h3>Dados, estudos e documentos</h3>
+                  </details>
+                  <details class="consult-group">
+                    <summary>Dados, estudos e documentos</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="estatisticas">Estatísticas Oficiais</button>
                       <button type="button" class="consult-btn" data-search="pesquisa-cientifica">Pesquisa Científica</button>
                       <button type="button" class="consult-btn" data-search="documentos">Relatórios e Documentos</button>
                       <button type="button" class="consult-btn" data-search="arquivos-historicos">Arquivos Históricos</button>
                     </div>
-                  </section>
-                  <section class="consult-group">
-                    <h3>Checagem e verificação digital</h3>
+                  </details>
+                  <details class="consult-group">
+                    <summary>Checagem e verificação digital</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="checagem">Agências de Checagem</button>
                       <button type="button" class="consult-btn" data-search="imagens">Busca Reversa de Imagens</button>
                       <button type="button" class="consult-btn" data-search="videos">Verificação de Vídeos</button>
                       <button type="button" class="consult-btn" data-search="arquivamento-web">Histórico de Páginas (Web Archive)</button>
                     </div>
-                  </section>
-                  <section class="consult-group">
-                    <h3>Fontes especializadas e internacionais</h3>
+                  </details>
+                  <details class="consult-group">
+                    <summary>Fontes especializadas e internacionais</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="saude">Saúde e Vigilância Sanitária</button>
                       <button type="button" class="consult-btn" data-search="meio-ambiente">Meio Ambiente e Clima</button>
@@ -675,13 +681,13 @@
                       <button type="button" class="consult-btn" data-search="organismos-internacionais">Organismos Internacionais</button>
                       <button type="button" class="consult-btn" data-search="imprensa-internacional">Imprensa Internacional</button>
                     </div>
-                  </section>
-                  <section class="consult-group">
-                    <h3>Publicações locais</h3>
+                  </details>
+                  <details class="consult-group">
+                    <summary>Publicações locais</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="estaduais-municipais">Portais Estaduais e Municipais</button>
                     </div>
-                  </section>
+                  </details>
                 </div>
                 <p class="consult-note">As consultas abrem resultados de pesquisa na web; não representam integração direta com os sistemas consultados. Confirme o domínio, a data e o documento original antes de considerar uma informação verificada.</p>
               </div>
