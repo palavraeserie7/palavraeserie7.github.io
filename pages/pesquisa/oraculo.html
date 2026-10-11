@@ -603,12 +603,19 @@
                 <select id="f-tema"></select>
               </div>
               <div>
-                <label for="f-periodo">Período</label>
-                <select id="f-periodo">
-                  <option value="">Qualquer data</option>
-                  <option value="30">Últimos 30 dias</option>
-                  <option value="90">Últimos 90 dias</option>
-                  <option value="365">Últimos 12 meses</option>
+                <label for="f-imprensa">Imprensa Nacional</label>
+                <select id="f-imprensa">
+                  <option value="">Todos os jornais e portais</option>
+                  <option value="g1.globo.com">G1</option>
+                  <option value="folha.uol.com.br">Folha de S.Paulo</option>
+                  <option value="estadao.com.br">Estadão</option>
+                  <option value="oglobo.globo.com">O Globo</option>
+                  <option value="agenciabrasil.ebc.com.br">Agência Brasil</option>
+                  <option value="cnnbrasil.com.br">CNN Brasil</option>
+                  <option value="poder360.com.br">Poder360</option>
+                  <option value="metropoles.com">Metrópoles</option>
+                  <option value="bbc.com/portuguese">BBC News Brasil</option>
+                  <option value="apublica.org">Agência Pública</option>
                 </select>
               </div>
               <div>
@@ -990,10 +997,14 @@
     const st = $('f-status').value;
     if (st && o.status !== st) return false;
  
-    const dias = Number($('f-periodo').value);
-    if (dias) {
-      const limite = Date.now() - dias * 86400000;
-      if (new Date(o.quando + 'T12:00:00').getTime() < limite) return false;
+    const imprensa = $('f-imprensa').value;
+    if (imprensa) {
+      const fontes = Array.isArray(o.fontes) ? o.fontes : [];
+      const encontrouVeiculo = fontes.some(f => {
+        const textoFonte = norm([f.veiculo, f.titulo, f.url].filter(Boolean).join(' '));
+        return textoFonte.includes(norm(imprensa));
+      });
+      if (!encontrouVeiculo) return false;
     }
  
     const imp = $('f-impacto').value;
@@ -1074,7 +1085,7 @@
  
   $('search-form').addEventListener('submit', e => { e.preventDefault(); renderResults(); });
   $('search-input').addEventListener('input', renderResults);
-  ['f-tema','f-periodo','f-tipo','f-status','f-impacto'].forEach(id =>
+  ['f-tema','f-imprensa','f-tipo','f-status','f-impacto'].forEach(id =>
     $(id).addEventListener('change', renderResults));
  
   $('mode-list').addEventListener('click', () => setMode('list'));
