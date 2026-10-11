@@ -208,8 +208,20 @@
     .consult-panel{grid-column:1/-1;margin-top:4px;padding:16px;border:1px solid var(--paper-line);border-radius:7px;background:#fffaf0}
     .consult-heading label{display:block;margin:0 0 5px;color:var(--ink);font-size:14px;font-weight:800}
     .consult-heading p,.consult-note{margin:0;color:var(--ink-soft);font-size:11.5px;line-height:1.55}
+    .index-menu{margin-top:16px;padding:14px;border:1px solid var(--paper-line);border-radius:7px;background:#f7f0df}
+    .index-menu-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .index-menu-head strong{color:var(--ink);font-size:13px;font-weight:800}
+    .index-menu-head span{color:var(--ink-soft);font-size:10.5px}
+    .index-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+    .index-link{display:flex;align-items:flex-start;gap:9px;min-width:0;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf7;color:var(--ink);text-align:left;cursor:pointer;transition:background .12s,border-color .12s}
+    .index-link:hover,.index-link:focus-visible{border-color:var(--brass);background:var(--brass-wash)}
+    .index-number{flex:none;color:var(--brass-deep);font-size:11px;font-weight:800;line-height:1.5}
+    .index-copy{display:block;min-width:0}
+    .index-copy strong{display:block;font-size:11px;line-height:1.35}
+    .index-copy small{display:block;margin-top:3px;color:var(--ink-soft);font-size:9.5px;line-height:1.4}
     .consult-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin-top:14px;align-items:start}
-    .consult-group{min-width:0;border:1px solid var(--paper-line);border-radius:6px;background:var(--paper-card);overflow:hidden}
+    .consult-group{min-width:0;border:1px solid var(--paper-line);border-radius:6px;background:var(--paper-card);overflow:hidden;scroll-margin-top:90px}
+    .consult-group.index-highlight{border-color:var(--brass);box-shadow:0 0 0 2px rgba(156,122,50,.13)}
     .consult-group summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:12px 14px;color:var(--brass-deep);font-size:12px;line-height:1.4;font-weight:800;letter-spacing:.025em;cursor:pointer;list-style:none}
     .consult-group summary::-webkit-details-marker{display:none}
     .consult-group summary::after{content:'+';flex:none;font-size:20px;font-weight:500;line-height:1;color:var(--brass)}
@@ -222,7 +234,8 @@
     .consult-btn:hover,.consult-btn:focus-visible{border-color:var(--brass);background:var(--brass-wash);color:var(--ink)}
     .consult-btn.consult-local-btn{background:#f4efe2;border-style:dashed;font-weight:650}
     .consult-note{margin-top:12px;padding-top:10px;border-top:1px solid var(--paper-line)}
-    @media(max-width:600px){.consult-panel{padding:10px}.consult-groups{grid-template-columns:1fr}.consult-btn{flex:1 1 auto}.consult-group summary{min-height:46px}}
+    @media(max-width:900px){.index-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){.consult-panel{padding:10px}.consult-groups{grid-template-columns:1fr}.consult-btn{flex:1 1 auto}.consult-group summary{min-height:46px}.index-menu{padding:10px}.index-grid{grid-template-columns:1fr}.index-menu-head{align-items:flex-start;flex-direction:column;gap:4px}}
 
     .list-bar {
       display:flex;
@@ -623,8 +636,40 @@
                   <label id="consult-title">Consultar por tipo de recurso</label>
                   <p>Digite um assunto acima e escolha o botão correspondente ao tipo de registro que deseja localizar. Cada botão abre uma pesquisa externa direcionada.</p>
                 </div>
+                <nav class="index-menu" aria-label="Índice de investigação">
+                  <div class="index-menu-head">
+                    <strong>ÍNDICE DE INVESTIGAÇÃO</strong>
+                    <span>Escolha uma área para abrir as fontes correspondentes.</span>
+                  </div>
+                  <div class="index-grid">
+                    <button class="index-link" type="button" data-index-target="group-noticias"><span class="index-number">01</span><span class="index-copy"><strong>Acontecimentos e notícias</strong><small>Fatos, reportagens e cobertura local</small></span></button>
+                    <button class="index-link" type="button" data-index-target="group-declaracoes"><span class="index-number">02</span><span class="index-copy"><strong>Pessoas e declarações</strong><small>Falas, entrevistas e pronunciamentos</small></span></button>
+                    <button class="index-link" type="button" data-index-target="group-transparencia"><span class="index-number">03</span><span class="index-copy"><strong>Política e governo</strong><small>Gestão pública, gastos e decisões</small></span></button>
+                    <button class="index-link" type="button" data-index-target="group-juridico"><span class="index-number">04</span><span class="index-copy"><strong>Justiça e investigações</strong><small>Processos, auditorias e apurações</small></span></button>
+                    <button class="index-link" type="button" data-index-target="group-documentos"><span class="index-number">05</span><span class="index-copy"><strong>Documentos e registros oficiais</strong><small>Leis, diários, relatórios e arquivos</small></span></button>
+                    <button class="index-link" type="button" data-index-target="group-documentos"><span class="index-number">06</span><span class="index-copy"><strong>Dados e pesquisa científica</strong><small>Estatísticas, estudos e indicadores</small></span></button>
+                    <button class="index-link" type="button" data-index-target="group-digital"><span class="index-number">07</span><span class="index-copy"><strong>Imagens, vídeos e verificação</strong><small>Origem, contexto e histórico digital</small></span></button>
+                    <button class="index-link" type="button" data-index-target="group-internacional"><span class="index-number">08</span><span class="index-copy"><strong>História e fontes internacionais</strong><small>Acervos, imprensa e organismos externos</small></span></button>
+                  </div>
+                </nav>
                 <div class="consult-groups">
-                  <details class="consult-group">
+                  <details class="consult-group" id="group-noticias">
+                    <summary>Acontecimentos e notícias</summary>
+                    <div class="consult-buttons">
+                      <button type="button" class="consult-btn" data-search="noticias-nacionais">Notícias Nacionais</button>
+                      <button type="button" class="consult-btn" data-search="noticias-locais">Imprensa Local e Regional</button>
+                      <button type="button" class="consult-btn" data-search="agencias-noticias">Agências de Notícias</button>
+                    </div>
+                  </details>
+                  <details class="consult-group" id="group-declaracoes">
+                    <summary>Pessoas e declarações públicas</summary>
+                    <div class="consult-buttons">
+                      <button type="button" class="consult-btn" data-search="declaracoes">Discursos e Pronunciamentos</button>
+                      <button type="button" class="consult-btn" data-search="entrevistas">Entrevistas e Transcrições</button>
+                      <button type="button" class="consult-btn" data-search="registros-parlamentares">Registros Parlamentares</button>
+                    </div>
+                  </details>
+                  <details class="consult-group" id="group-transparencia">
                     <summary>Transparência e administração pública</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="transparencia">Portal da Transparência</button>
@@ -633,18 +678,19 @@
                       <button type="button" class="consult-btn" data-search="licitacoes">Licitações e Contratos</button>
                     </div>
                   </details>
-                  <details class="consult-group">
+                  <details class="consult-group" id="group-juridico">
                     <summary>Registros oficiais e jurídicos</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="legislacao">Legislação Oficial</button>
                       <button type="button" class="consult-btn" data-search="diarios-oficiais">Diários Oficiais</button>
                       <button type="button" class="consult-btn" data-search="justica">Processos e Decisões Judiciais</button>
                       <button type="button" class="consult-btn" data-search="controle">Tribunais de Contas e Controle</button>
+                      <button type="button" class="consult-btn" data-search="investigacoes-oficiais">Investigações e Auditorias</button>
                       <button type="button" class="consult-btn" data-search="eleitoral">Registros Eleitorais</button>
                     </div>
                   </details>
-                  <details class="consult-group">
-                    <summary>Dados, estudos e documentos</summary>
+                  <details class="consult-group" id="group-documentos">
+                    <summary>Documentos, dados e estudos</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="estatisticas">Estatísticas Oficiais</button>
                       <button type="button" class="consult-btn" data-search="pesquisa-cientifica">Pesquisa Científica</button>
@@ -652,7 +698,7 @@
                       <button type="button" class="consult-btn" data-search="arquivos-historicos">Arquivos Históricos</button>
                     </div>
                   </details>
-                  <details class="consult-group">
+                  <details class="consult-group" id="group-digital">
                     <summary>Checagem e verificação digital</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="checagem">Agências de Checagem</button>
@@ -661,8 +707,8 @@
                       <button type="button" class="consult-btn" data-search="arquivamento-web">Histórico de Páginas (Web Archive)</button>
                     </div>
                   </details>
-                  <details class="consult-group">
-                    <summary>Fontes especializadas e internacionais</summary>
+                  <details class="consult-group" id="group-internacional">
+                    <summary>História, fontes especializadas e internacionais</summary>
                     <div class="consult-buttons">
                       <button type="button" class="consult-btn" data-search="saude">Saúde e Vigilância Sanitária</button>
                       <button type="button" class="consult-btn" data-search="meio-ambiente">Meio Ambiente e Clima</button>
@@ -1116,6 +1162,12 @@
   }
  
   const CONSULTAS_RECURSOS = {
+    'noticias-nacionais': {label:'Notícias Nacionais', query:'site:agenciabrasil.ebc.com.br OR site:g1.globo.com OR site:bbc.com/portuguese OR site:cnn.com.br'},
+    'noticias-locais': {label:'Imprensa Local e Regional', query:'jornal regional notícia prefeitura cidade estado'},
+    'agencias-noticias': {label:'Agências de Notícias', query:'site:reuters.com OR site:apnews.com OR site:afp.com OR site:agenciabrasil.ebc.com.br'},
+    'declaracoes': {label:'Discursos e Pronunciamentos', query:'discurso pronunciamento declaração transcrição fala pública'},
+    'entrevistas': {label:'Entrevistas e Transcrições', query:'entrevista transcrição íntegra declaração'},
+    'registros-parlamentares': {label:'Registros Parlamentares', query:'site:camara.leg.br OR site:senado.leg.br discurso pronunciamento notas taquigráficas'},
     'transparencia': {label:'Portal da Transparência', query:'site:portaldatransparencia.gov.br OR site:transparencia.gov.br'},
     'dados-abertos': {label:'Dados Abertos', query:'site:dados.gov.br OR site:gov.br dados abertos'},
     'acesso-informacao': {label:'Acesso à Informação (LAI)', query:'site:gov.br acesso à informação LAI pedido de informação'},
@@ -1124,6 +1176,7 @@
     'diarios-oficiais': {label:'Diários Oficiais', query:'site:in.gov.br OR site:diariooficial.* diário oficial'},
     'justica': {label:'Processos e Decisões Judiciais', query:'site:stf.jus.br OR site:stj.jus.br OR site:cnj.jus.br consulta processo decisão'},
     'controle': {label:'Tribunais de Contas e Controle', query:'site:tcu.gov.br OR site:gov.br/cgu OR site:mpf.mp.br auditoria relatório'},
+    'investigacoes-oficiais': {label:'Investigações e Auditorias', query:'site:gov.br/pf OR site:mpf.mp.br OR site:gov.br/cgu OR site:tcu.gov.br investigação auditoria relatório'},
     'eleitoral': {label:'Registros Eleitorais', query:'site:tse.jus.br consulta eleitoral candidaturas prestação de contas'},
     'estatisticas': {label:'Estatísticas Oficiais', query:'site:ibge.gov.br OR site:ipea.gov.br OR site:datasus.saude.gov.br estatísticas'},
     'pesquisa-cientifica': {label:'Pesquisa Científica', query:'site:scielo.br OR site:pubmed.ncbi.nlm.nih.gov OR site:periodicos.capes.gov.br estudo pesquisa'},
@@ -1140,6 +1193,19 @@
     'imprensa-internacional': {label:'Imprensa Internacional', query:'site:reuters.com OR site:apnews.com OR site:dw.com OR site:france24.com'},
     'estaduais-municipais': {label:'Portais Estaduais e Municipais', query:'site:gov.br OR site:*.gov.br prefeitura OR assembleia legislativa diário oficial portal transparência'}
   };
+
+  document.querySelectorAll('[data-index-target]').forEach(button => {
+    button.addEventListener('click', () => {
+      const target = $(button.dataset.indexTarget);
+      if (!target) return;
+      document.querySelectorAll('.consult-group.index-highlight').forEach(group => group.classList.remove('index-highlight'));
+      target.open = true;
+      target.classList.add('index-highlight');
+      target.scrollIntoView({behavior:'smooth', block:'center'});
+      const summary = target.querySelector('summary');
+      if (summary) summary.focus({preventScroll:true});
+    });
+  });
 
   document.querySelectorAll('[data-search]').forEach(button => {
     button.addEventListener('click', () => {
