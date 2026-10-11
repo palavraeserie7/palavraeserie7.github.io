@@ -683,24 +683,6 @@
                   </optgroup>
                 </select>
               </div>
-              <div>
-                <label for="f-tipo">Tipo</label>
-                <select id="f-tipo"></select>
-              </div>
-              <div>
-                <label for="f-status">Situação do fato</label>
-                <select id="f-status"></select>
-              </div>
-              <div>
-                <label for="f-impacto">Impacto</label>
-                <select id="f-impacto">
-                  <option value="">Qualquer</option>
-                  <option value="alto">Alto em alguma dimensão</option>
-                  <option value="religioso">Religioso: médio ou alto</option>
-                  <option value="social">Social: médio ou alto</option>
-                  <option value="familiar">Familiar: médio ou alto</option>
-                </select>
-              </div>
             </div>
  
             <div class="list-bar">
@@ -1021,11 +1003,6 @@
     tema.innerHTML = '<option value="">Todas as redes sociais</option>' +
       REDES_SOCIAIS.map(rede => `<option value="${esc(rede)}">${esc(rede)}</option>`).join('');
  
-    $('f-tipo').innerHTML = '<option value="">Todos os tipos</option>' +
-      TIPOS.map(t => `<option>${esc(t)}</option>`).join('');
- 
-    $('f-status').innerHTML = '<option value="">Qualquer situação</option>' +
-      STATUS.map(s => `<option value="${s.id}">${esc(s.label)}</option>`).join('');
   }
  
   function haystack(o) {
@@ -1069,11 +1046,6 @@
       if (!encontrouFonte) return false;
     }
 
-    const tipo = $('f-tipo').value;
-    if (tipo && o.oque.tipo !== tipo) return false;
- 
-    const st = $('f-status').value;
-    if (st && o.status !== st) return false;
  
     const imprensa = $('f-imprensa').value;
     if (imprensa) {
@@ -1085,12 +1057,6 @@
       if (!encontrouVeiculo) return false;
     }
  
-    const imp = $('f-impacto').value;
-    if (imp) {
-      const g = k => GRAUS[o.impacto[k].grau] || 0;
-      if (imp === 'alto' && !['social','religioso','familiar'].some(k => g(k) === 3)) return false;
-      if (['religioso','social','familiar'].includes(imp) && g(imp) < 2) return false;
-    }
  
     return true;
   }
@@ -1163,7 +1129,7 @@
  
   $('search-form').addEventListener('submit', e => { e.preventDefault(); renderResults(); });
   $('search-input').addEventListener('input', renderResults);
-  ['f-tema','f-imprensa','f-outras-fontes','f-tipo','f-status','f-impacto'].forEach(id =>
+  ['f-tema','f-imprensa','f-outras-fontes'].forEach(id =>
     $(id).addEventListener('change', renderResults));
  
   $('mode-list').addEventListener('click', () => setMode('list'));
