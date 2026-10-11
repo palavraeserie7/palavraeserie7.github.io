@@ -203,6 +203,20 @@
       font-size:12.5px;
     }
  
+
+    /* ---------- botões de consulta por recurso ---------- */
+    .consult-panel{grid-column:1/-1;margin-top:4px;padding:16px;border:1px solid var(--paper-line);border-radius:7px;background:#fffaf0}
+    .consult-heading label{display:block;margin:0 0 5px;color:var(--ink);font-size:14px;font-weight:800}
+    .consult-heading p,.consult-note{margin:0;color:var(--ink-soft);font-size:11.5px;line-height:1.55}
+    .consult-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px}
+    .consult-group{min-width:0;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:var(--paper-card)}
+    .consult-group h3{margin:0 0 9px;color:var(--brass-deep);font-size:11px;line-height:1.4;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+    .consult-buttons{display:flex;flex-wrap:wrap;gap:7px}
+    .consult-btn{min-height:34px;padding:7px 10px;border:1px solid #c8b783;border-radius:5px;background:#fffdf6;color:var(--ink);font-size:11.5px;font-weight:700;text-align:left;cursor:pointer;transition:background .12s,border-color .12s,color .12s}
+    .consult-btn:hover,.consult-btn:focus-visible{border-color:var(--brass);background:var(--brass-wash);color:var(--ink)}
+    .consult-note{margin-top:12px;padding-top:10px;border-top:1px solid var(--paper-line)}
+    @media(max-width:600px){.consult-panel{padding:10px}.consult-groups{grid-template-columns:1fr}.consult-btn{flex:1 1 auto}}
+
     .list-bar {
       display:flex;
       align-items:center;
@@ -609,70 +623,67 @@
                   <option value="apublica.org">Agência Pública</option>
                 </select>
               </div>
-              <div>
-                <label for="f-outras-fontes">Outras fontes de investigação</label>
-                <select id="f-outras-fontes">
-                  <option value="">Todas as categorias</option>
-                  <optgroup label="1. Fontes oficiais e legislativas">
-                    <option value="camara.leg.br">Câmara dos Deputados</option>
-                    <option value="senado.leg.br">Senado Federal</option>
-                    <option value="planalto.gov.br/legislacao">Portal da Legislação</option>
-                    <option value="in.gov.br">Diário Oficial da União</option>
-                    <option value="portaldatransparencia.gov.br">Portal da Transparência</option>
-                  </optgroup>
-                  <optgroup label="2. Justiça e controle">
-                    <option value="stf.jus.br">Supremo Tribunal Federal</option>
-                    <option value="stj.jus.br">Superior Tribunal de Justiça</option>
-                    <option value="cnj.jus.br">Conselho Nacional de Justiça</option>
-                    <option value="tcu.gov.br">Tribunal de Contas da União</option>
-                    <option value="mpf.mp.br">Ministério Público Federal</option>
-                    <option value="tse.jus.br">Tribunal Superior Eleitoral</option>
-                  </optgroup>
-                  <optgroup label="3. Dados, ciência e pesquisa">
-                    <option value="ibge.gov.br">IBGE</option>
-                    <option value="ipea.gov.br">IPEA</option>
-                    <option value="bcb.gov.br">Banco Central</option>
-                    <option value="datasus.saude.gov.br">DataSUS</option>
-                    <option value="scielo.br">SciELO</option>
-                    <option value="periodicos.capes.gov.br">Periódicos CAPES</option>
-                    <option value="scholar.google.com.br">Google Scholar</option>
-                    <option value="crossref.org">Crossref</option>
-                  </optgroup>
-                  <optgroup label="4. Agências de checagem">
-                    <option value="lupa.uol.com.br">Agência Lupa</option>
-                    <option value="aosfatos.org">Aos Fatos</option>
-                    <option value="projetocomprova.com.br">Projeto Comprova</option>
-                    <option value="g1.globo.com/fato-ou-fake">Fato ou Fake</option>
-                  </optgroup>
-                  <optgroup label="5. Arquivos e rastreabilidade">
-                    <option value="web.archive.org">Wayback Machine</option>
-                    <option value="gov.br/arquivonacional">Arquivo Nacional</option>
-                  </optgroup>
-                  <optgroup label="6. Imprensa internacional">
-                    <option value="reuters.com">Reuters</option>
-                    <option value="apnews.com">Associated Press</option>
-                    <option value="france24.com">France 24</option>
-                    <option value="dw.com">Deutsche Welle</option>
-                    <option value="aljazeera.com">Al Jazeera</option>
-                  </optgroup>
-                  <optgroup label="7. Fontes especializadas">
-                    <option value="who.int">Organização Mundial da Saúde</option>
-                    <option value="gov.br/anvisa">Anvisa</option>
-                    <option value="inpe.gov.br">INPE</option>
-                    <option value="gov.br/ibama">IBAMA</option>
-                    <option value="gov.br/cvm">CVM</option>
-                    <option value="gov.br/inpi">INPI</option>
-                    <option value="un.org">Organização das Nações Unidas</option>
-                  </optgroup>
-                  <optgroup label="8. Verificação de imagens e vídeos">
-                    <option value="invid-project.eu">InVID-WeVerify</option>
-                    <option value="lens.google.com">Google Lens</option>
-                    <option value="tineye.com">TinEye</option>
-                  </optgroup>
-                  <optgroup label="9. Órgãos estaduais e municipais">
-                    <option value="fonte-local">Órgãos e diários oficiais locais</option>
-                  </optgroup>
-                </select>
+              <div class="consult-panel" aria-labelledby="consult-title">
+                <div class="consult-heading">
+                  <label id="consult-title">Consultar por tipo de recurso</label>
+                  <p>Digite um assunto acima e escolha o botão correspondente ao tipo de registro que deseja localizar. Cada botão abre uma pesquisa externa direcionada.</p>
+                </div>
+                <div class="consult-groups">
+                  <section class="consult-group">
+                    <h3>Transparência e administração pública</h3>
+                    <div class="consult-buttons">
+                      <button type="button" class="consult-btn" data-search="transparencia">Portal da Transparência</button>
+                      <button type="button" class="consult-btn" data-search="dados-abertos">Dados Abertos</button>
+                      <button type="button" class="consult-btn" data-search="acesso-informacao">Acesso à Informação (LAI)</button>
+                      <button type="button" class="consult-btn" data-search="licitacoes">Licitações e Contratos</button>
+                    </div>
+                  </section>
+                  <section class="consult-group">
+                    <h3>Registros oficiais e jurídicos</h3>
+                    <div class="consult-buttons">
+                      <button type="button" class="consult-btn" data-search="legislacao">Legislação Oficial</button>
+                      <button type="button" class="consult-btn" data-search="diarios-oficiais">Diários Oficiais</button>
+                      <button type="button" class="consult-btn" data-search="justica">Processos e Decisões Judiciais</button>
+                      <button type="button" class="consult-btn" data-search="controle">Tribunais de Contas e Controle</button>
+                      <button type="button" class="consult-btn" data-search="eleitoral">Registros Eleitorais</button>
+                    </div>
+                  </section>
+                  <section class="consult-group">
+                    <h3>Dados, estudos e documentos</h3>
+                    <div class="consult-buttons">
+                      <button type="button" class="consult-btn" data-search="estatisticas">Estatísticas Oficiais</button>
+                      <button type="button" class="consult-btn" data-search="pesquisa-cientifica">Pesquisa Científica</button>
+                      <button type="button" class="consult-btn" data-search="documentos">Relatórios e Documentos</button>
+                      <button type="button" class="consult-btn" data-search="arquivos-historicos">Arquivos Históricos</button>
+                    </div>
+                  </section>
+                  <section class="consult-group">
+                    <h3>Checagem e verificação digital</h3>
+                    <div class="consult-buttons">
+                      <button type="button" class="consult-btn" data-search="checagem">Agências de Checagem</button>
+                      <button type="button" class="consult-btn" data-search="imagens">Busca Reversa de Imagens</button>
+                      <button type="button" class="consult-btn" data-search="videos">Verificação de Vídeos</button>
+                      <button type="button" class="consult-btn" data-search="arquivamento-web">Histórico de Páginas (Web Archive)</button>
+                    </div>
+                  </section>
+                  <section class="consult-group">
+                    <h3>Fontes especializadas e internacionais</h3>
+                    <div class="consult-buttons">
+                      <button type="button" class="consult-btn" data-search="saude">Saúde e Vigilância Sanitária</button>
+                      <button type="button" class="consult-btn" data-search="meio-ambiente">Meio Ambiente e Clima</button>
+                      <button type="button" class="consult-btn" data-search="economia">Economia e Mercado</button>
+                      <button type="button" class="consult-btn" data-search="organismos-internacionais">Organismos Internacionais</button>
+                      <button type="button" class="consult-btn" data-search="imprensa-internacional">Imprensa Internacional</button>
+                    </div>
+                  </section>
+                  <section class="consult-group">
+                    <h3>Publicações locais</h3>
+                    <div class="consult-buttons">
+                      <button type="button" class="consult-btn" data-search="estaduais-municipais">Portais Estaduais e Municipais</button>
+                    </div>
+                  </section>
+                </div>
+                <p class="consult-note">As consultas abrem resultados de pesquisa na web; não representam integração direta com os sistemas consultados. Confirme o domínio, a data e o documento original antes de considerar uma informação verificada.</p>
               </div>
             </div>
  
@@ -1015,19 +1026,6 @@
       if (!aliasesRede.some(alias => plataformas.includes(alias))) return false;
     }
  
-    const outraFonte = $('f-outras-fontes').value;
-    if (outraFonte) {
-      const fontes = Array.isArray(o.fontes) ? o.fontes : [];
-      const encontrouFonte = fontes.some(f => {
-        const textoFonte = norm([f.veiculo, f.titulo, f.url, f.dominio, f.categoria].filter(Boolean).join(' '));
-        if (outraFonte === 'fonte-local') {
-          return /estadual|municipal|prefeitura|assembleia legislativa|câmara municipal|diário oficial local|tribunal de justiça estadual/.test(textoFonte);
-        }
-        return textoFonte.includes(norm(outraFonte));
-      });
-      if (!encontrouFonte) return false;
-    }
-
  
     const imprensa = $('f-imprensa').value;
     if (imprensa) {
@@ -1109,6 +1107,50 @@
     }
   }
  
+  const CONSULTAS_RECURSOS = {
+    'transparencia': {label:'Portal da Transparência', query:'site:portaldatransparencia.gov.br OR site:transparencia.gov.br'},
+    'dados-abertos': {label:'Dados Abertos', query:'site:dados.gov.br OR site:gov.br dados abertos'},
+    'acesso-informacao': {label:'Acesso à Informação (LAI)', query:'site:gov.br acesso à informação LAI pedido de informação'},
+    'licitacoes': {label:'Licitações e Contratos', query:'site:gov.br licitações contratos OR site:pncp.gov.br'},
+    'legislacao': {label:'Legislação Oficial', query:'site:planalto.gov.br legislação OR site:camara.leg.br OR site:senado.leg.br'},
+    'diarios-oficiais': {label:'Diários Oficiais', query:'site:in.gov.br OR site:diariooficial.* diário oficial'},
+    'justica': {label:'Processos e Decisões Judiciais', query:'site:stf.jus.br OR site:stj.jus.br OR site:cnj.jus.br consulta processo decisão'},
+    'controle': {label:'Tribunais de Contas e Controle', query:'site:tcu.gov.br OR site:gov.br/cgu OR site:mpf.mp.br auditoria relatório'},
+    'eleitoral': {label:'Registros Eleitorais', query:'site:tse.jus.br consulta eleitoral candidaturas prestação de contas'},
+    'estatisticas': {label:'Estatísticas Oficiais', query:'site:ibge.gov.br OR site:ipea.gov.br OR site:datasus.saude.gov.br estatísticas'},
+    'pesquisa-cientifica': {label:'Pesquisa Científica', query:'site:scielo.br OR site:pubmed.ncbi.nlm.nih.gov OR site:periodicos.capes.gov.br estudo pesquisa'},
+    'documentos': {label:'Relatórios e Documentos', query:'site:gov.br relatório filetype:pdf OR site:gov.br publicação documento'},
+    'arquivos-historicos': {label:'Arquivos Históricos', query:'site:gov.br/arquivonacional OR site:bn.gov.br acervo arquivo histórico'},
+    'checagem': {label:'Agências de Checagem', query:'site:aosfatos.org OR site:apublica.org OR site:lupa.uol.com.br OR site:projetocomprova.com.br checagem'},
+    'imagens': {label:'Busca Reversa de Imagens', query:'Google Lens TinEye busca reversa imagem'},
+    'videos': {label:'Verificação de Vídeos', query:'InVID WeVerify verificação de vídeo tutorial ferramenta'},
+    'arquivamento-web': {label:'Histórico de Páginas (Web Archive)', query:'site:web.archive.org'},
+    'saude': {label:'Saúde e Vigilância Sanitária', query:'site:gov.br/anvisa OR site:gov.br/saude OR site:who.int'},
+    'meio-ambiente': {label:'Meio Ambiente e Clima', query:'site:gov.br/ibama OR site:inpe.gov.br OR site:gov.br/mma'},
+    'economia': {label:'Economia e Mercado', query:'site:bcb.gov.br OR site:gov.br/cvm OR site:ibge.gov.br economia'},
+    'organismos-internacionais': {label:'Organismos Internacionais', query:'site:un.org OR site:who.int OR site:worldbank.org OR site:oecd.org'},
+    'imprensa-internacional': {label:'Imprensa Internacional', query:'site:reuters.com OR site:apnews.com OR site:dw.com OR site:france24.com'},
+    'estaduais-municipais': {label:'Portais Estaduais e Municipais', query:'site:gov.br OR site:*.gov.br prefeitura OR assembleia legislativa diário oficial portal transparência'}
+  };
+
+  document.querySelectorAll('[data-search]').forEach(button => {
+    button.addEventListener('click', () => {
+      const termo = $('search-input').value.trim();
+      if (!termo) {
+        $('search-input').focus();
+        $('search-input').setCustomValidity('Digite um assunto antes de escolher uma consulta.');
+        $('search-input').reportValidity();
+        return;
+      }
+      $('search-input').setCustomValidity('');
+      const config = CONSULTAS_RECURSOS[button.dataset.search];
+      if (!config) return;
+      const query = `${termo} (${config.query})`;
+      const url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+  });
+
   $('search-form').addEventListener('submit', e => {
     e.preventDefault();
     startInvestigation();
