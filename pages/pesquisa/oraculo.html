@@ -619,6 +619,71 @@
                 </select>
               </div>
               <div>
+                <label for="f-outras-fontes">Outras fontes de investigação</label>
+                <select id="f-outras-fontes">
+                  <option value="">Todas as categorias</option>
+                  <optgroup label="1. Fontes oficiais e legislativas">
+                    <option value="camara.leg.br">Câmara dos Deputados</option>
+                    <option value="senado.leg.br">Senado Federal</option>
+                    <option value="planalto.gov.br/legislacao">Portal da Legislação</option>
+                    <option value="in.gov.br">Diário Oficial da União</option>
+                    <option value="portaldatransparencia.gov.br">Portal da Transparência</option>
+                  </optgroup>
+                  <optgroup label="2. Justiça e controle">
+                    <option value="stf.jus.br">Supremo Tribunal Federal</option>
+                    <option value="stj.jus.br">Superior Tribunal de Justiça</option>
+                    <option value="cnj.jus.br">Conselho Nacional de Justiça</option>
+                    <option value="tcu.gov.br">Tribunal de Contas da União</option>
+                    <option value="mpf.mp.br">Ministério Público Federal</option>
+                    <option value="tse.jus.br">Tribunal Superior Eleitoral</option>
+                  </optgroup>
+                  <optgroup label="3. Dados, ciência e pesquisa">
+                    <option value="ibge.gov.br">IBGE</option>
+                    <option value="ipea.gov.br">IPEA</option>
+                    <option value="bcb.gov.br">Banco Central</option>
+                    <option value="datasus.saude.gov.br">DataSUS</option>
+                    <option value="scielo.br">SciELO</option>
+                    <option value="periodicos.capes.gov.br">Periódicos CAPES</option>
+                    <option value="scholar.google.com.br">Google Scholar</option>
+                    <option value="crossref.org">Crossref</option>
+                  </optgroup>
+                  <optgroup label="4. Agências de checagem">
+                    <option value="lupa.uol.com.br">Agência Lupa</option>
+                    <option value="aosfatos.org">Aos Fatos</option>
+                    <option value="projetocomprova.com.br">Projeto Comprova</option>
+                    <option value="g1.globo.com/fato-ou-fake">Fato ou Fake</option>
+                  </optgroup>
+                  <optgroup label="5. Arquivos e rastreabilidade">
+                    <option value="web.archive.org">Wayback Machine</option>
+                    <option value="gov.br/arquivonacional">Arquivo Nacional</option>
+                  </optgroup>
+                  <optgroup label="6. Imprensa internacional">
+                    <option value="reuters.com">Reuters</option>
+                    <option value="apnews.com">Associated Press</option>
+                    <option value="france24.com">France 24</option>
+                    <option value="dw.com">Deutsche Welle</option>
+                    <option value="aljazeera.com">Al Jazeera</option>
+                  </optgroup>
+                  <optgroup label="7. Fontes especializadas">
+                    <option value="who.int">Organização Mundial da Saúde</option>
+                    <option value="gov.br/anvisa">Anvisa</option>
+                    <option value="inpe.gov.br">INPE</option>
+                    <option value="gov.br/ibama">IBAMA</option>
+                    <option value="gov.br/cvm">CVM</option>
+                    <option value="gov.br/inpi">INPI</option>
+                    <option value="un.org">Organização das Nações Unidas</option>
+                  </optgroup>
+                  <optgroup label="8. Verificação de imagens e vídeos">
+                    <option value="invid-project.eu">InVID-WeVerify</option>
+                    <option value="lens.google.com">Google Lens</option>
+                    <option value="tineye.com">TinEye</option>
+                  </optgroup>
+                  <optgroup label="9. Órgãos estaduais e municipais">
+                    <option value="fonte-local">Órgãos e diários oficiais locais</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div>
                 <label for="f-tipo">Tipo</label>
                 <select id="f-tipo"></select>
               </div>
@@ -991,6 +1056,19 @@
       if (!aliasesRede.some(alias => plataformas.includes(alias))) return false;
     }
  
+    const outraFonte = $('f-outras-fontes').value;
+    if (outraFonte) {
+      const fontes = Array.isArray(o.fontes) ? o.fontes : [];
+      const encontrouFonte = fontes.some(f => {
+        const textoFonte = norm([f.veiculo, f.titulo, f.url, f.dominio, f.categoria].filter(Boolean).join(' '));
+        if (outraFonte === 'fonte-local') {
+          return /estadual|municipal|prefeitura|assembleia legislativa|câmara municipal|diário oficial local|tribunal de justiça estadual/.test(textoFonte);
+        }
+        return textoFonte.includes(norm(outraFonte));
+      });
+      if (!encontrouFonte) return false;
+    }
+
     const tipo = $('f-tipo').value;
     if (tipo && o.oque.tipo !== tipo) return false;
  
@@ -1085,7 +1163,7 @@
  
   $('search-form').addEventListener('submit', e => { e.preventDefault(); renderResults(); });
   $('search-input').addEventListener('input', renderResults);
-  ['f-tema','f-imprensa','f-tipo','f-status','f-impacto'].forEach(id =>
+  ['f-tema','f-imprensa','f-outras-fontes','f-tipo','f-status','f-impacto'].forEach(id =>
     $(id).addEventListener('change', renderResults));
  
   $('mode-list').addEventListener('click', () => setMode('list'));
