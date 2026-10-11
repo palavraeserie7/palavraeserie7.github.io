@@ -1712,6 +1712,131 @@ REGRAS:
 
     input.focus();
   </script>
+  <script>
+/* ===== EVIDÊNCIA AUDIOVISUAL (NÍVEL D) ===== */
+(function(){
+  var KEY = 'oraculo_evidencia_audiovisual_v1';
+  var overlay = document.getElementById('av-overlay');
+  var openBtn = document.getElementById('av-open');
+  var closeBtn = document.getElementById('av-close');
+  var form = document.getElementById('av-form');
+  var statusEl = document.getElementById('av-status');
+  var listEl = document.getElementById('av-saved-list');
+  var lastFocus = null;
+ 
+  function esc(v){
+    var d = document.createElement('div');
+    d.textContent = String(v == null ? '' : v);
+    return d.innerHTML;
+  }
+  function getRecords(){
+    try { var v = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(v) ? v : []; }
+    catch(_){ return []; }
+  }
+  function setRecords(r){
+    try { localStorage.setItem(KEY, JSON.stringify(r)); return true; }
+    catch(_){ return false; }
+  }
+  function fmtDate(iso){
+    if(!iso) return '';
+    var p = iso.split('-');
+    return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : iso;
+  }
+  function say(msg){
+    statusEl.textContent = msg;
+    if(msg) setTimeout(function(){ if(statusEl.textContent === msg) statusEl.textContent = ''; }, 3500);
+  }
+  function safeUrl(u){
+    try { var x = new URL(u); return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : ''; }
+    catch(_){ return ''; }
+  }
+  function readForm(){
+    var fd = new FormData(form);
+    return {
+      tipo: fd.get('tipo') || '',
+      url: (fd.get('url') || '').trim(),
+      data: fd.get('data') || '',
+      tempo: (fd.get('tempo') || '').trim(),
+      origem: (fd.get('origem') || '').trim(),
+      autenticidade: fd.get('autenticidade') || '',
+      obs: (fd.get('obs') || '').trim()
+    };
+  }
+  function renderSaved(){
+    var recs = getRecords();
+    if(!recs.length){ listEl.innerHTML = '<div class="av-saved-empty">Nenhum registro salvo ainda.</div>'; return; }
+    listEl.innerHTML = recs.slice().reverse().map(function(r){
+      var link = safeUrl(r.url);
+      return '<article class="av-saved-item">' +
+        '<span class="av-badge">' + esc(r.autenticidade || 'SEM SITUAÇÃO').toUpperCase() + '</span><br>' +
+        '<strong>' + esc(r.tipo) + '</strong>' +
+        (r.origem ? ' · ' + esc(r.origem) : '') +
+        (r.data ? ' · ' + esc(fmtDate(r.data)) : '') +
+        (r.tempo ? '<br>Trecho: ' + esc(r.tempo) : '') +
+        (link ? '<br><a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Abrir vídeo</a>' : '') +
+        (r.obs ? '<br>' + esc(r.obs) : '') +
+        '</article>';
+    }).join('');
+  }
+ 
+  function openModal(){
+    lastFocus = document.activeElement;
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+    renderSaved();
+    var first = document.getElementById('av-tipo');
+    if(first) first.focus();
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+ 
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('mousedown', function(e){ if(e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+  });
+ 
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var rec = readForm();
+    if(rec.url && !safeUrl(rec.url)){ say('O link precisa começar com http:// ou https://'); document.getElementById('av-url').focus(); return; }
+    if(!rec.url && !rec.obs && !rec.origem){ say('Preencha ao menos o link, a origem ou as observações.'); return; }
+    rec.id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    rec.createdAt = new Date().toISOString();
+    var recs = getRecords(); recs.push(rec);
+    if(setRecords(recs)){ renderSaved(); say('Registro salvo.'); }
+    else say('Não foi possível salvar neste navegador.');
+  });
+ 
+  document.getElementById('av-usar').addEventListener('click', function(){
+    var r = readForm();
+    var partes = ['Verificar evidência audiovisual (' + r.tipo + ')'];
+    if(r.url) partes.push('link: ' + r.url);
+    if(r.data) partes.push('data: ' + fmtDate(r.data));
+    if(r.tempo) partes.push('trecho: ' + r.tempo);
+    if(r.origem) partes.push('origem: ' + r.origem);
+    partes.push('autenticidade: ' + r.autenticidade);
+    if(r.obs) partes.push('finalidade: ' + r.obs);
+    input.value = partes.join('; ') + '.';
+    closeModal();
+    input.focus();
+  });
+ 
+  document.getElementById('av-limpar').addEventListener('click', function(){
+    form.reset();
+    say('Campos limpos.');
+  });
+ 
+  renderSaved();
+})();
+</script>
+ 
 <script>
 (function(){
   var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
