@@ -595,7 +595,7 @@
               >
               <button class="btn" type="submit">BUSCAR</button>
             </form>
-            <p class="search-hint">Nesta versão, a busca consulta somente os registros de demonstração abaixo. Ela ignora acentos e maiúsculas, mas ainda não pesquisa na internet.</p>
+            <p class="search-hint">A busca externa depende da integração com serviços de pesquisa. Você pode iniciar uma ficha provisória para organizar a investigação.</p>
  
             <div class="filters">
               <div>
@@ -685,15 +685,6 @@
               </div>
             </div>
  
-            <div class="list-bar">
-              <span class="list-count" id="list-count"></span>
-              <div class="toggle" role="group" aria-label="Modo de exibição">
-                <button type="button" id="mode-list" class="on">Lista</button>
-                <button type="button" id="mode-timeline">Linha do tempo</button>
-              </div>
-            </div>
- 
-            <div id="results"></div>
           </section>
  
           <!-- ================= FICHA ================= -->
@@ -1127,26 +1118,9 @@
     }
   }
  
-  $('search-form').addEventListener('submit', e => { e.preventDefault(); renderResults(); });
-  $('search-input').addEventListener('input', renderResults);
-  ['f-tema','f-imprensa','f-outras-fontes'].forEach(id =>
-    $(id).addEventListener('change', renderResults));
- 
-  $('mode-list').addEventListener('click', () => setMode('list'));
-  $('mode-timeline').addEventListener('click', () => setMode('timeline'));
- 
-  function setMode(m) {
-    mode = m;
-    $('mode-list').classList.toggle('on', m === 'list');
-    $('mode-timeline').classList.toggle('on', m === 'timeline');
-    renderResults();
-  }
- 
-  $('results').addEventListener('click', e => {
-    const card = e.target.closest('.occ-card');
-    if (card) { openFicha(card.dataset.id); return; }
- 
-    if (e.target.closest('#start-investigation')) startInvestigation();
+  $('search-form').addEventListener('submit', e => {
+    e.preventDefault();
+    startInvestigation();
   });
  
   /* Investigação nova: cria um registro "em apuração" (somente nesta sessão) */
