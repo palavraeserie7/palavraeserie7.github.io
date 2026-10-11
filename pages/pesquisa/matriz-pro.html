@@ -2124,6 +2124,163 @@ async function bbMontarPassagem(escopo, codigoEtapa, textoReferencia){
 
   return {ok:true, passage:passage};
 }
+ /* =====================================================
+   PESQUISA POR ETAPA — mesma lógica da Mesa de estudo
+===================================================== */
+
+const SCOPE_QUESTIONS = {
+  "Livro": "Qual livro bíblico será objeto da pesquisa? Exemplo: João",
+  "Capítulo": "Qual capítulo será objeto da pesquisa? Exemplo: João 3",
+  "Perícope": "Qual perícope será objeto da pesquisa? Exemplo: João 3.16-18",
+  "Versículo": "Qual versículo será objeto da pesquisa? Exemplo: João 3.16",
+  "Palavra": "Em qual versículo está a palavra? Exemplo: João 3.16"
+};
+
+function prepareQuestionForStep(skipIntroMessage) {
+  awaitingReference = false;
+
+  if (!activeStep) {
+    questionInput.value = "";
+    return;
+  }
+
+  const savedDraft = localStorage.getItem(questionDraftKey());
+  if (savedDraft) {
+    questionInput.value = savedDraft;
+    return;
+  }
+
+  const pergunta = SCOPE_QUESTIONS[activeScope] || "Informe a passagem. Exemplo: João 3.16";
+  const reference = getSavedReference();
+
+  questionInput.placeholder = pergunta;
+  questionInput.value = reference || "";
+
+  if (!skipIntroMessage) {
+    appendSystemMessage(
+      reference
+        ? 'A subetapa "' + activeStep + '" está pronta. Confira a passagem e clique em ENVIAR.'
+        : pergunta
+    );
+  }
+}
+
+async function sendStudyStep(event) {
+  event.preventDefault();
+
+  /* Sem etapa escolhida: continua a pergunta livre de antes. */
+  if (!activeStep) {
+    return sendQuestion(event);
+  }
+
+  const text = questionInput.value.trim();
+  if (!text) {
+    return false;
+  }
+
+  const stepCode = extractStepCode(activeStep);
+
+  if (!stepIsAllowed(stepCode, currentUserPlan)) {
+    appendLockedMessage(
+      'A subetapa "' + activeStep + '" requer o plano ' +
+      levelName(getStepLevel(stepCode)) +
+      ". Faça upgrade para continuar.",
+      getStepLevel(stepCode)
+    );
+    return false;
+  }
+
+  const userMessage = document.createElement("div");
+  userMessage.className = "message user";
+  userMessage.textContent = text;
+  messages.appendChild(userMessage);
+
+  const answerMessage = document.createElement("div");
+  answerMessage.className = "message system";
+  answerMessage.textContent = "Buscando o texto da passagem...";
+  messages.appendChild(answerMessage);
+  persistMessages();
+
+  sendButton.disabled = true;
+  sendButton.textContent = "PROCESSANDO...";
+
+  try {
+    const stepName = String(activeStep).replace(/^\d{2}\.\d+\s*—\s*/, "");
+
+    const montagem = await bbMontarPassagem(activeScope, stepCode, text);
+    if (!montagem.ok) {
+      answerMessage.textContent = montagem.erro;
+      return false;
+    }
+    saveReference(text);
+
+    const session = await getAuthenticatedSession();
+    if (!session.access_token) {
+      throw new Error("O Supabase não forneceu um token de acesso.");
+    }
+
+    answerMessage.textContent = "Consultando a Mesa de Análise...";
+
+    const response = await fetch(AI_PROXY_URL + "/api/pesquisa", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + session.access_token
+      },
+      body: JSON.stringify({
+        analysisType: "matriz_study_step",
+        scope: activeScope,
+        stepCode: stepCode,
+        stepName: stepName,
+        question: stepName,
+        passage: montagem.passage
+      })
+    });
+
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+
+    if (response.status === 401) {
+      await supabaseClient.auth.signOut();
+      throw new Error("Sua sessão expirou. Entre novamente na Sala do Escritor.");
+    }
+
+    if (!response.ok || data?.ok === false) {
+      throw new Error(data?.error || "O Worker não conseguiu concluir a consulta.");
+    }
+
+    answerMessage.textContent = String(
+      data?.text || data?.answer || "A consulta não devolveu conteúdo."
+    ).replace(/\*/g, "");
+
+    lastMesaAnswer = answerMessage.textContent;
+    lastMesaModule = activeModule || "";
+    lastMesaStep = activeStep || "";
+
+    const sendToRevisorBtn = document.createElement("button");
+    sendToRevisorBtn.type = "button";
+    sendToRevisorBtn.textContent = "ENVIAR PARA REVISÃO TEOLÓGICA";
+    sendToRevisorBtn.style.cssText = "display:block;margin-top:10px;padding:8px 12px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;font-size:10px;cursor:pointer;";
+    sendToRevisorBtn.className = "send-to-revisor";
+    answerMessage.appendChild(sendToRevisorBtn);
+
+  } catch (error) {
+    console.error("Erro na pesquisa da etapa:", error);
+    answerMessage.textContent = error?.message || "Não foi possível realizar a consulta.";
+  } finally {
+    sendButton.disabled = false;
+    sendButton.textContent = "ENVIAR";
+    messages.scrollTop = messages.scrollHeight;
+    persistMessages();
+    questionInput.focus();
+  }
+
+  return false;
+}
  const SCOPES = ["Livro", "Capítulo", "Perícope", "Versículo", "Palavra"];
 
 function renderScopeBar() {
