@@ -1958,6 +1958,172 @@ function getModulesForScope() {
   });
   return modules;
 } 
+ /* =====================================================
+   TEXTO BÍBLICO REAL — mesma fonte da Mesa de estudo
+   (Almeida 1911, hebraico WLC e grego Nestle 1904)
+===================================================== */
+
+const BB_DADOS = {
+  pt: "https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/ALM1911%20-%20Almeida%201911.json",
+  hebraico: "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/wlc/",
+  grego: "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/n4/"
+};
+
+const BB_LIVROS = [
+  ["Gen","Gênesis","OT"],["Exod","Êxodo","OT"],["Lev","Levítico","OT"],["Num","Números","OT"],
+  ["Deut","Deuteronômio","OT"],["Josh","Josué","OT"],["Judg","Juízes","OT"],["Ruth","Rute","OT"],
+  ["1Sam","1 Samuel","OT"],["2Sam","2 Samuel","OT"],["1Kgs","1 Reis","OT"],["2Kgs","2 Reis","OT"],
+  ["1Chr","1 Crônicas","OT"],["2Chr","2 Crônicas","OT"],["Ezra","Esdras","OT"],["Neh","Neemias","OT"],
+  ["Esth","Ester","OT"],["Job","Jó","OT"],["Ps","Salmos","OT"],["Prov","Provérbios","OT"],
+  ["Eccl","Eclesiastes","OT"],["Song","Cantares","OT"],["Isa","Isaías","OT"],["Jer","Jeremias","OT"],
+  ["Lam","Lamentações","OT"],["Ezek","Ezequiel","OT"],["Dan","Daniel","OT"],["Hos","Oséias","OT"],
+  ["Joel","Joel","OT"],["Amos","Amós","OT"],["Obad","Obadias","OT"],["Jonah","Jonas","OT"],
+  ["Mic","Miquéias","OT"],["Nah","Naum","OT"],["Hab","Habacuque","OT"],["Zeph","Sofonias","OT"],
+  ["Hag","Ageu","OT"],["Zech","Zacarias","OT"],["Mal","Malaquias","OT"],
+  ["Matt","Mateus","NT"],["Mark","Marcos","NT"],["Luke","Lucas","NT"],["John","João","NT"],
+  ["Acts","Atos","NT"],["Rom","Romanos","NT"],["1Cor","1 Coríntios","NT"],["2Cor","2 Coríntios","NT"],
+  ["Gal","Gálatas","NT"],["Eph","Efésios","NT"],["Phil","Filipenses","NT"],["Col","Colossenses","NT"],
+  ["1Thess","1 Tessalonicenses","NT"],["2Thess","2 Tessalonicenses","NT"],["1Tim","1 Timóteo","NT"],
+  ["2Tim","2 Timóteo","NT"],["Titus","Tito","NT"],["Phlm","Filemom","NT"],["Heb","Hebreus","NT"],
+  ["Jas","Tiago","NT"],["1Pet","1 Pedro","NT"],["2Pet","2 Pedro","NT"],["1John","1 João","NT"],
+  ["2John","2 João","NT"],["3John","3 João","NT"],["Jude","Judas","NT"],["Rev","Apocalipse","NT"]
+];
+
+let bbPT = null;
+const bbCache = new Map();
+
+async function bbCarregarPT(){
+  if(bbPT) return bbPT;
+  const r = await fetch(BB_DADOS.pt, {cache:"force-cache"});
+  if(!r.ok) throw new Error("Não foi possível carregar a Almeida 1911.");
+  const j = await r.json();
+  if(!Array.isArray(j)) throw new Error("Formato inesperado da Almeida 1911.");
+  bbPT = j;
+  return bbPT;
+}
+
+async function bbMapaOriginal(codigo, ehAT){
+  const url = (ehAT ? BB_DADOS.hebraico : BB_DADOS.grego) + codigo + ".txt";
+  if(bbCache.has(url)) return bbCache.get(url);
+  const r = await fetch(url, {cache:"force-cache"});
+  if(!r.ok) return null;
+  const m = new Map();
+  for(const l of (await r.text()).split(/\r?\n/)){
+    const t = l.indexOf("\t");
+    if(t < 0) continue;
+    const p = l.slice(0, t).split(".");
+    m.set(p[1] + ":" + p[2], l.slice(t + 1).trim());
+  }
+  bbCache.set(url, m);
+  return m;
+}
+
+function bbNorm(s){
+  return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function bbIntervalos(ns){
+  const out = [];
+  let ini = ns[0], ant = ns[0];
+  for(let i = 1; i <= ns.length; i++){
+    if(ns[i] === ant + 1){ ant = ns[i]; continue; }
+    out.push(ini === ant ? String(ini) : ini + "–" + ant);
+    ini = ant = ns[i];
+  }
+  return out.join(", ");
+}
+
+/* Lê a referência digitada: "João 3.16", "João 3.16-18", "Salmos 23" ou só "João". */
+function bbLerReferencia(texto){
+  const t = bbNorm(texto).replace(/^salmo /, "salmos ");
+  let livro = -1, tam = 0;
+  BB_LIVROS.forEach(function(b, i){
+    const nome = bbNorm(b[1]);
+    if((t === nome || t.indexOf(nome + " ") === 0) && nome.length > tam){ livro = i; tam = nome.length; }
+  });
+  if(livro < 0) return {erro:"Não reconheci o livro. Escreva assim: João 3.16"};
+  const resto = t.slice(tam).trim();
+  if(!resto) return {livro:livro, cap:0, nums:[]};
+  const m = resto.match(/^(\d+)(?:\s*[.:]\s*([\d\s,\-–]+))?$/);
+  if(!m) return {erro:"Não entendi a referência. Escreva assim: João 3.16 ou João 3.16-18"};
+  const nums = [];
+  if(m[2]){
+    m[2].split(",").forEach(function(parte){
+      const p = parte.trim();
+      const x = p.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+      if(x){
+        for(let n = Number(x[1]); n <= Number(x[2]) && n < 1000; n++) nums.push(n);
+      }else if(/^\d+$/.test(p)){
+        nums.push(Number(p));
+      }
+    });
+  }
+  const unicos = Array.from(new Set(nums)).sort(function(a, b){ return a - b; });
+  return {livro:livro, cap:Number(m[1]), nums:unicos};
+}
+
+/* Monta a passagem com texto real, do mesmo jeito da Mesa de estudo. */
+async function bbMontarPassagem(escopo, codigoEtapa, textoReferencia){
+  const ref = bbLerReferencia(textoReferencia);
+  if(ref.erro) return {ok:false, erro:ref.erro};
+
+  const pt = await bbCarregarPT();
+  const livro = BB_LIVROS[ref.livro][1];
+  const codigoLivro = BB_LIVROS[ref.livro][0];
+  const ehAT = BB_LIVROS[ref.livro][2] === "OT";
+
+  if(escopo === "Livro"){
+    return {ok:true, passage:{book:livro, reference:livro, text:""}};
+  }
+
+  if(!ref.cap) return {ok:false, erro:"Informe também o capítulo. Exemplo: " + livro + " 3"};
+  const capitulo = pt[ref.livro].chapters[ref.cap - 1];
+  if(!capitulo) return {ok:false, erro:livro + " não tem o capítulo " + ref.cap + "."};
+
+  let nums = ref.nums;
+  let referencia;
+  if(escopo === "Capítulo"){
+    nums = capitulo.map(function(_, i){ return i + 1; });
+    referencia = livro + " " + ref.cap;
+  }else{
+    if(!nums.length) return {ok:false, erro:"Informe também o(s) versículo(s). Exemplo: " + livro + " " + ref.cap + ".1"};
+    if(nums[0] < 1 || nums[nums.length - 1] > capitulo.length){
+      return {ok:false, erro:livro + " " + ref.cap + " tem só " + capitulo.length + " versículos."};
+    }
+    referencia = livro + " " + ref.cap + ":" + bbIntervalos(nums);
+  }
+
+  const texto = nums.map(function(n){ return n + " " + (capitulo[n - 1] || ""); }).join("\n");
+  const passage = {book:livro, reference:referencia, text:texto};
+
+  if(escopo === "Palavra"){
+    const palavra = (window.prompt("Qual palavra deste texto você quer estudar?") || "").trim();
+    if(!palavra) return {ok:false, erro:"Informe a palavra para pesquisar."};
+    passage.word = palavra;
+  }
+
+  /* Texto original (hebraico ou grego), com as mesmas travas da Mesa. */
+  if(codigoEtapa === "01.8") return {ok:false, erro:"A Septuaginta não está carregada nesta página. Esta etapa não pode usar texto real."};
+  if(codigoEtapa === "01.6" && !ehAT) return {ok:false, erro:"01.6 é texto hebraico: serve só para livros do Antigo Testamento."};
+  if(codigoEtapa === "01.7" && ehAT) return {ok:false, erro:"01.7 é texto grego: serve só para livros do Novo Testamento."};
+
+  const lingua = /^(01\.[67]|03\.\d+|04\.\d+)$/.test(codigoEtapa);
+  let mapa = null;
+  try{ mapa = await bbMapaOriginal(codigoLivro, ehAT); }catch(e){}
+  const linhas = mapa
+    ? nums.map(function(n){ const v = mapa.get(ref.cap + ":" + n); return v ? n + " " + v : ""; }).filter(Boolean)
+    : [];
+
+  if(linhas.length){
+    passage.original = linhas.join("\n");
+    passage.originalLang = ehAT ? "hebraico, WLC" : "grego, Nestle 1904";
+    if(lingua) passage.text = "";
+  }else if(lingua){
+    return {ok:false, erro:"Não foi possível carregar o texto original desta passagem. Tente de novo."};
+  }
+
+  return {ok:true, passage:passage};
+}
  const SCOPES = ["Livro", "Capítulo", "Perícope", "Versículo", "Palavra"];
 
 function renderScopeBar() {
