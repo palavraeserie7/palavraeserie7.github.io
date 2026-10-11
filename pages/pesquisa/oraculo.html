@@ -678,7 +678,7 @@
                     </div>
                   </details>
                 </div>
-                <p class="consult-note">Em cada caminho, escolha pesquisar na web ou levar o assunto à área de consulta do Oráculo. A opção web abre resultados externos; a opção Oráculo preenche a busca principal para criar uma ficha provisória — ela ainda não faz apuração automática. Confirme o domínio, a data e o documento original antes de considerar uma informação verificada.</p>
+                <p class="consult-note">Digite um assunto no campo de busca e selecione o recurso desejado para pesquisar na web. Os resultados são externos; confirme o domínio, a data e o documento original antes de considerar uma informação verificada.</p>
               </div>
             </div>
 
@@ -1142,13 +1142,6 @@
   };
 
   document.querySelectorAll('[data-search]').forEach(button => {
-    const consultaBtn = document.createElement('button');
-    consultaBtn.type = 'button';
-    consultaBtn.className = 'consult-btn consult-local-btn';
-    consultaBtn.textContent = 'Área de consulta do Oráculo';
-    consultaBtn.setAttribute('aria-label', `Levar ${button.textContent.trim()} para a área de consulta do Oráculo`);
-    button.insertAdjacentElement('afterend', consultaBtn);
-
     button.addEventListener('click', () => {
       const termo = $('search-input').value.trim();
       if (!termo) {
@@ -1163,23 +1156,6 @@
       const query = `${termo} (${config.query})`;
       const url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
       window.open(url, '_blank', 'noopener,noreferrer');
-    });
-
-    consultaBtn.addEventListener('click', () => {
-      const campo = $('search-input');
-      const termo = campo.value.trim();
-      if (!termo) {
-        campo.focus();
-        campo.setCustomValidity('Digite um assunto antes de enviar para a área de consulta.');
-        campo.reportValidity();
-        return;
-      }
-      campo.setCustomValidity('');
-      const config = CONSULTAS_RECURSOS[button.dataset.search];
-      if (!config) return;
-      campo.value = `${termo} — fonte para consultar: ${config.label}`;
-      campo.scrollIntoView({behavior:'smooth', block:'center'});
-      campo.focus({preventScroll:true});
     });
   });
 
