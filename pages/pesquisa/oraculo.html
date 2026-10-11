@@ -220,6 +220,7 @@
     .consult-buttons{display:flex;flex-wrap:wrap;gap:7px}
     .consult-btn{min-height:34px;padding:7px 10px;border:1px solid #c8b783;border-radius:5px;background:#fffdf6;color:var(--ink);font-size:11.5px;font-weight:700;text-align:left;cursor:pointer;transition:background .12s,border-color .12s,color .12s}
     .consult-btn:hover,.consult-btn:focus-visible{border-color:var(--brass);background:var(--brass-wash);color:var(--ink)}
+    .consult-btn.consult-local-btn{background:#f4efe2;border-style:dashed;font-weight:650}
     .consult-note{margin-top:12px;padding-top:10px;border-top:1px solid var(--paper-line)}
     @media(max-width:600px){.consult-panel{padding:10px}.consult-groups{grid-template-columns:1fr}.consult-btn{flex:1 1 auto}.consult-group summary{min-height:46px}}
 
@@ -596,18 +597,6 @@
  
           <!-- ================= BUSCA ================= -->
           <section class="view" id="view-search" aria-label="Busca de ocorrências">
-            <form class="search-box" id="search-form" role="search">
-              <input
-                id="search-input"
-                type="search"
-                placeholder="Quem disse o quê? Ex.: Bíblia reescrita, projeto de lei, nome da pessoa..."
-                aria-label="Buscar ocorrência"
-                autocomplete="off"
-              >
-              <button class="btn" type="submit">BUSCAR</button>
-            </form>
-            <p class="search-hint">A busca externa depende da integração com serviços de pesquisa. Você pode iniciar uma ficha provisória para organizar a investigação.</p>
- 
             <div class="filters">
               <div>
                 <label for="f-tema">Redes sociais</label>
@@ -689,9 +678,22 @@
                     </div>
                   </details>
                 </div>
-                <p class="consult-note">As consultas abrem resultados de pesquisa na web; não representam integração direta com os sistemas consultados. Confirme o domínio, a data e o documento original antes de considerar uma informação verificada.</p>
+                <p class="consult-note">Em cada caminho, escolha pesquisar na web ou levar o assunto à área de consulta do Oráculo. A opção web abre resultados externos; a opção Oráculo preenche a busca principal para criar uma ficha provisória — ela ainda não faz apuração automática. Confirme o domínio, a data e o documento original antes de considerar uma informação verificada.</p>
               </div>
             </div>
+
+            <!-- Busca principal posicionada abaixo de todas as informações e opções de consulta -->
+            <form class="search-box" id="search-form" role="search">
+              <input
+                id="search-input"
+                type="search"
+                placeholder="Quem disse o quê? Ex.: Bíblia reescrita, projeto de lei, nome da pessoa..."
+                aria-label="Buscar ocorrência"
+                autocomplete="off"
+              >
+              <button class="btn" type="submit">BUSCAR</button>
+            </form>
+            <p class="search-hint">Use a busca para iniciar uma ficha provisória e organizar a investigação. As consultas por tipo de recurso abrem pesquisas externas direcionadas.</p>
  
           </section>
  
@@ -1140,6 +1142,13 @@
   };
 
   document.querySelectorAll('[data-search]').forEach(button => {
+    const consultaBtn = document.createElement('button');
+    consultaBtn.type = 'button';
+    consultaBtn.className = 'consult-btn consult-local-btn';
+    consultaBtn.textContent = 'Área de consulta do Oráculo';
+    consultaBtn.setAttribute('aria-label', `Levar ${button.textContent.trim()} para a área de consulta do Oráculo`);
+    button.insertAdjacentElement('afterend', consultaBtn);
+
     button.addEventListener('click', () => {
       const termo = $('search-input').value.trim();
       if (!termo) {
@@ -1154,6 +1163,23 @@
       const query = `${termo} (${config.query})`;
       const url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
       window.open(url, '_blank', 'noopener,noreferrer');
+    });
+
+    consultaBtn.addEventListener('click', () => {
+      const campo = $('search-input');
+      const termo = campo.value.trim();
+      if (!termo) {
+        campo.focus();
+        campo.setCustomValidity('Digite um assunto antes de enviar para a área de consulta.');
+        campo.reportValidity();
+        return;
+      }
+      campo.setCustomValidity('');
+      const config = CONSULTAS_RECURSOS[button.dataset.search];
+      if (!config) return;
+      campo.value = `${termo} — fonte para consultar: ${config.label}`;
+      campo.scrollIntoView({behavior:'smooth', block:'center'});
+      campo.focus({preventScroll:true});
     });
   });
 
