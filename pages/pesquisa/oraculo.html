@@ -1622,402 +1622,364 @@ REGRAS:
   }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
 })();
 </script>
-  <script>
+ <script>
 (function(){
- 
-  /* =====================================================
-     1. ESTILO
-     ===================================================== */
-  var css = `
+var KEY='oraculo_evidencia_audiovisual_v1';
+var css=`
 .av-open-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.av-open-btn{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 14px;border:1px solid var(--navy-soft);border-radius:6px;background:var(--navy);color:#dbe7f5;font-family:var(--font-body);font-size:11.5px;font-weight:700;letter-spacing:.05em;cursor:pointer;transition:background .15s ease}
+.av-open-btn{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 14px;border:1px solid var(--navy-soft);border-radius:6px;background:var(--navy);color:#dbe7f5;font-family:var(--font-body);font-size:11.5px;font-weight:700;letter-spacing:.05em;cursor:pointer}
 .av-open-btn:hover{background:var(--navy-soft);color:#fff}
 .av-open-hint{color:var(--ink-soft);font-size:11px}
- 
-.av-overlay{position:fixed;inset:0;z-index:1200;display:none;align-items:flex-start;justify-content:center;padding:28px 14px;overflow-y:auto;background:rgba(0,0,0,.6);backdrop-filter:blur(1px)}
+.av-overlay{position:fixed;inset:0;z-index:1200;display:none;align-items:flex-start;justify-content:center;padding:28px 14px;overflow-y:auto;background:rgba(0,0,0,.6)}
 .av-overlay.active{display:flex}
-.av-modal{width:min(720px,100%);padding:26px 28px 28px;border:1px solid #263754;border-radius:14px;background:#000;color:#f2f5fa;font-family:var(--font-body);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.av-modal{width:min(760px,100%);padding:24px 26px 26px;border:1px solid #263754;border-radius:14px;background:#000;color:#f2f5fa;font-family:var(--font-body);box-shadow:0 24px 60px rgba(0,0,0,.5)}
 .av-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.av-head h2{margin:0;color:#fff;font-family:var(--font-body);font-size:21px;font-weight:700;line-height:1.3}
-.av-close{flex:0 0 auto;width:32px;height:32px;border:1px solid #3a4a66;border-radius:50%;background:transparent;color:#c9d4e6;font-size:17px;line-height:1;cursor:pointer}
+.av-head h2{margin:0;color:#fff;font-family:var(--font-body);font-size:20px;font-weight:700;line-height:1.3}
+.av-close{flex:0 0 auto;width:32px;height:32px;border:1px solid #3a4a66;border-radius:50%;background:transparent;color:#c9d4e6;font-size:17px;cursor:pointer}
 .av-close:hover{background:#16233c;color:#fff}
-.av-goal{margin:14px 0 0;padding-bottom:18px;border-bottom:1px solid #1d2a42;color:#b9c5d8;font-size:14px;line-height:1.55}
-.av-prefill-note{margin:14px 0 0;padding:10px 12px;border-left:2px solid #d7b76a;background:#0b1220;color:#dbe7f5;font-size:12px;line-height:1.5}
- 
-.av-form{display:grid;gap:4px;margin-top:6px}
-.av-field{margin-top:16px}
-.av-field>label,.av-field>.av-label{display:block;margin-bottom:8px;color:#fff;font-size:14px;font-weight:700}
-.av-hint{margin:6px 2px 0;color:#9fb0c8;font-size:11.5px}
-.av-form input[type="text"],.av-form input[type="url"],.av-form input[type="date"],.av-form select,.av-form textarea{width:100%;padding:13px 18px;border:1px solid #3a4a66;border-radius:999px;background:#000;color:#f2f5fa;font:inherit;font-size:15px;color-scheme:dark}
-.av-form textarea{min-height:110px;border-radius:14px;resize:vertical;line-height:1.5}
-.av-form input::placeholder,.av-form textarea::placeholder{color:#7f90ab}
-.av-form input:focus,.av-form select:focus,.av-form textarea:focus{outline:none;border-color:#d7b76a}
-.av-form select{appearance:none;-webkit-appearance:none;padding-right:44px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23c9d4e6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 18px center}
- 
-.av-radios{display:grid;gap:12px;margin-top:4px}
-.av-radio{display:flex;align-items:center;gap:14px;color:#f2f5fa;font-size:16px;cursor:pointer}
-.av-radio input{appearance:none;-webkit-appearance:none;flex:0 0 auto;width:30px;height:30px;margin:0;border:1.5px solid #3a4a66;border-radius:50%;background:#000;display:grid;place-content:center;cursor:pointer}
-.av-radio input::before{content:"";width:12px;height:12px;border-radius:50%;background:#000;transform:scale(0);transition:transform .12s ease}
-.av-radio input:checked{background:#fff;border-color:#fff}
-.av-radio input:checked::before{transform:scale(1)}
-.av-radio input:focus-visible{outline:2px solid #d7b76a;outline-offset:2px}
- 
-.av-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid #1d2a42}
-.av-actions button{min-height:42px;padding:0 18px;border:0;border-radius:6px;background:var(--brass);color:#fffdf6;font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer}
-.av-actions button:hover{background:var(--brass-deep)}
-.av-actions button.secondary{background:#1b2740;color:#dbe7f5}
-.av-actions button.secondary:hover{background:#263754}
+.av-goal{margin:12px 0 0;color:#b9c5d8;font-size:13px;line-height:1.55}
+.av-prefill-note{margin:12px 0 0;padding:10px 12px;border-left:2px solid #d7b76a;background:#0b1220;color:#dbe7f5;font-size:12px;line-height:1.5}
+.av-top{display:flex;justify-content:flex-end;margin:14px 0 6px;color:#9fb0c8;font-size:12px}
+.av-bar{height:4px;background:#1b2740;border-radius:4px;overflow:hidden}
+.av-bar i{display:block;height:100%;width:0;background:#d7b76a;transition:width .25s}
+.av-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0}
+.av-tab{padding:9px 6px;border:1px solid #3a4a66;border-radius:8px;background:transparent;color:#b9c5d8;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer}
+.av-tab.on{background:#1b2740;border-color:#d7b76a;color:#fff}
+.av-tab.ok::after{content:" ✓";color:#7fd39b}
+.av-l{display:block;margin:0 0 5px;color:#9fb0c8;font-size:12px}
+.av-g{display:grid;gap:10px;margin-bottom:10px}
+.av-c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.av-c3{grid-template-columns:1fr 1.4fr 1fr}
+.av-c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.av-form input[type="text"],.av-form select{width:100%;padding:11px 14px;border:1px solid #3a4a66;border-radius:10px;background:#000;color:#f2f5fa;font:inherit;font-size:14px;color-scheme:dark}
+.av-form input::placeholder{color:#7f90ab}
+.av-form input:focus,.av-form select:focus{outline:none;border-color:#d7b76a}
+.av-hint{margin:0 0 10px;color:#9fb0c8;font-size:12px}
+.av-p{display:none}.av-p.on{display:block}
+.av-seg{display:flex;gap:6px;flex-wrap:wrap}
+.av-seg label{padding:8px 12px;border:1px solid #3a4a66;border-radius:8px;color:#b9c5d8;font-size:13px;cursor:pointer}
+.av-seg input{display:none}
+.av-seg label.on{background:#1b2740;border-color:#d7b76a;color:#fff}
+.av-it{position:relative;margin-bottom:8px;padding:12px;border:1px solid #263754;border-radius:10px;background:#0b1220}
+.av-rm{position:absolute;top:6px;right:8px;border:0;background:transparent;color:#9fb0c8;font-size:18px;cursor:pointer}
+.av-rm:hover{color:#fff}
+.av-add,.av-mini,.av-aux button{padding:8px 12px;border:1px solid #3a4a66;border-radius:8px;background:transparent;color:#dbe7f5;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer}
+.av-add:hover,.av-mini:hover,.av-aux button:hover{background:#16233c}
+.av-stamp{display:inline-block;padding:3px 9px;border-radius:8px;background:#0f2a1b;color:#7fd39b;font-size:12px}
+.av-sum{margin-top:14px;padding:10px 12px;border-radius:8px;background:#0b1220;color:#b9c5d8;font-size:12.5px;line-height:1.5}
+.av-nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid #1d2a42}
+.av-nav button{min-height:42px;padding:0 20px;border:0;border-radius:6px;background:var(--brass);color:#fffdf6;font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.av-nav button:hover{background:var(--brass-deep)}
+.av-nav #av-prev{background:#1b2740;color:#dbe7f5}
+.av-aux{display:flex;gap:8px;margin-top:10px}
 .av-status{min-height:18px;margin-top:10px;color:#7fd39b;font-size:12px}
- 
-.av-saved{margin-top:22px;padding-top:16px;border-top:1px solid #1d2a42}
-.av-saved h3{margin:0 0 10px;color:#9fb0c8;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.av-saved-item{margin:8px 0;padding:12px 14px;border:1px solid #263754;border-radius:8px;background:#0b1220;color:#dbe7f5;font-size:12.5px;line-height:1.5}
+.av-saved{margin-top:20px;padding-top:16px;border-top:1px solid #1d2a42}
+.av-saved-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.av-saved h3{margin:0;color:#9fb0c8;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.av-saved-item{position:relative;margin:8px 0;padding:12px 14px;border:1px solid #263754;border-radius:8px;background:#0b1220;color:#dbe7f5;font-size:12.5px;line-height:1.55}
 .av-saved-item strong{color:#fff}
 .av-saved-item a{color:#d7b76a;font-weight:700;word-break:break-all}
-.av-badge{display:inline-block;margin-bottom:5px;padding:2px 7px;border-radius:4px;background:#1b2740;color:#dbe7f5;font-size:9.5px;font-weight:700;letter-spacing:.05em}
+.av-badge{display:inline-block;margin-bottom:5px;padding:2px 7px;border-radius:4px;background:#1b2740;color:#dbe7f5;font-size:10px;font-weight:700;letter-spacing:.05em}
+.av-sub{margin-top:6px;padding-top:6px;border-top:1px dashed #263754;color:#b9c5d8}
+.av-del{position:absolute;top:8px;right:10px;border:0;background:transparent;color:#9fb0c8;font-size:11px;cursor:pointer;text-decoration:underline}
+.av-del:hover{color:#fff}
 .av-saved-empty{color:#7f90ab;font-size:12px}
- 
 .av-fill-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 12px;border:0;border-radius:5px;background:var(--navy);color:#eef2f8;font-family:var(--font-body);font-size:10.5px;font-weight:700;letter-spacing:.04em;cursor:pointer}
 .av-fill-btn:hover{background:var(--navy-soft);color:#fff}
- 
 @media(max-width:600px){
-  .av-overlay{padding:0}
-  .av-modal{min-height:100%;border-radius:0;padding:20px 16px 26px}
-  .av-head h2{font-size:18px}
+.av-overlay{padding:0}
+.av-modal{min-height:100%;border-radius:0;padding:18px 14px 24px}
+.av-c2,.av-c3,.av-c4{grid-template-columns:1fr 1fr}
+.av-head h2{font-size:17px}
 }
 `;
-  var st = document.createElement('style');
-  st.textContent = css;
-  document.head.appendChild(st);
- 
-  /* =====================================================
-     2. BOTÃO (acima do campo de busca) E FICHA
-     ===================================================== */
-  var searchForm = document.getElementById('oracle-form');
-  if(searchForm && searchForm.parentNode){
-    searchForm.insertAdjacentHTML('beforebegin', `
+var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+
+var sf=document.getElementById('oracle-form');
+if(sf&&sf.parentNode){sf.insertAdjacentHTML('beforebegin',`
 <div class="av-open-row">
-  <button type="button" class="av-open-btn" id="av-open" aria-haspopup="dialog" aria-controls="av-overlay">▶ EVIDÊNCIA AUDIOVISUAL</button>
-  <span class="av-open-hint">Nível D — classificar vídeos usados como prova</span>
-</div>`);
-  }
- 
-  document.body.insertAdjacentHTML('beforeend', `
+<button type="button" class="av-open-btn" id="av-open" aria-haspopup="dialog" aria-controls="av-overlay">▶ EVIDÊNCIA AUDIOVISUAL</button>
+<span class="av-open-hint">Nível D — registrar vídeos e publicações</span>
+</div>`);}
+
+document.body.insertAdjacentHTML('beforeend',`
 <div class="av-overlay" id="av-overlay" aria-hidden="true">
-  <div class="av-modal" role="dialog" aria-modal="true" aria-labelledby="av-title">
-    <div class="av-head">
-      <h2 id="av-title">Nível D — Tipo de Evidência Audiovisual</h2>
-      <button type="button" class="av-close" id="av-close" aria-label="Fechar formulário">×</button>
-    </div>
-    <p class="av-goal">Objetivo: classificar vídeos utilizados para localizar, verificar e documentar fatos, falas e acontecimentos.</p>
-    <div class="av-prefill-note" id="av-prefill-note" hidden></div>
- 
-    <form class="av-form" id="av-form" novalidate>
-      <div class="av-field">
-        <label for="av-tipo">1. Tipo de evidência audiovisual</label>
-        <select id="av-tipo" name="tipo">
-          <option>Vídeo original do acontecimento</option>
-          <option>Gravação de discurso ou pronunciamento</option>
-          <option>Transmissão ao vivo (arquivada)</option>
-          <option>Trecho editado ou recorte</option>
-          <option>Vídeo de canal oficial do órgão</option>
-          <option>Reportagem em vídeo</option>
-          <option>Vídeo publicado em rede social</option>
-          <option>Outro</option>
-        </select>
-      </div>
- 
-      <div class="av-field">
-        <label for="av-url">2. URL ou link do vídeo</label>
-        <input type="url" id="av-url" name="url" placeholder="https://...">
-      </div>
- 
-           <div class="av-field">
-        <label for="av-ano">3. Data do acontecimento ou da gravação</label>
-        <div class="av-date-row">
-          <input type="text" id="av-ano" name="ano" inputmode="numeric" maxlength="4" placeholder="Ano" autocomplete="off">
-          <select id="av-mes" name="mes" aria-label="Mês">
-            <option value="">Mês</option>
-            <option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option>
-            <option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option>
-            <option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option>
-            <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
-          </select>
-          <select id="av-dia" name="dia" aria-label="Dia">
-            <option value="">Dia</option>
-            <option value="01">1</option><option value="02">2</option><option value="03">3</option><option value="04">4</option>
-            <option value="05">5</option><option value="06">6</option><option value="07">7</option><option value="08">8</option>
-            <option value="09">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
-            <option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option>
-            <option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
-            <option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option>
-            <option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option>
-            <option value="29">29</option><option value="30">30</option><option value="31">31</option>
-          </select>
-        </div>
-        <p class="av-hint">Se não souber o dia ou o mês, deixe em branco. O ano é obrigatório quando houver data.</p>
-      </div>
- 
-      <div class="av-field">
-        <label for="av-tempo">4. Marcação de tempo do trecho relevante</label>
-        <input type="text" id="av-tempo" name="tempo" placeholder="Ex.: 00:12:35–00:13:10" autocomplete="off">
-        <p class="av-hint">Indique o início e o fim do trecho que precisa ser examinado.</p>
-      </div>
- 
-      <div class="av-field">
-        <label for="av-origem">5. Origem do vídeo</label>
-        <input type="text" id="av-origem" name="origem" placeholder="Ex.: canal oficial, emissora, arquivo público" autocomplete="off">
-      </div>
- 
-      <div class="av-field" role="radiogroup" aria-labelledby="av-aut-label">
-        <span class="av-label" id="av-aut-label">6. Situação da autenticidade</span>
-        <div class="av-radios">
-          <label class="av-radio"><input type="radio" name="autenticidade" value="Confirmada por verificação"> Confirmada por verificação</label>
-          <label class="av-radio"><input type="radio" name="autenticidade" value="Parcialmente verificada"> Parcialmente verificada</label>
-          <label class="av-radio"><input type="radio" name="autenticidade" value="Não verificada" checked> Não verificada</label>
-          <label class="av-radio"><input type="radio" name="autenticidade" value="Contestada"> Contestada</label>
-        </div>
-      </div>
- 
-      <div class="av-field">
-        <label for="av-obs">7. Observações e finalidade da comprovação</label>
-        <textarea id="av-obs" name="obs" placeholder="Descreva o que o vídeo pretende demonstrar, o contexto e eventuais limitações."></textarea>
-      </div>
- 
-      <div class="av-actions">
-        <button type="submit">SALVAR REGISTRO</button>
-        <button type="button" class="secondary" id="av-usar">USAR NA PESQUISA</button>
-        <button type="button" class="secondary" id="av-limpar">LIMPAR CAMPOS</button>
-      </div>
-      <div class="av-status" id="av-status" role="status" aria-live="polite"></div>
-    </form>
- 
-    <div class="av-saved">
-      <h3>Registros salvos neste navegador</h3>
-      <div id="av-saved-list"></div>
-    </div>
-  </div>
-</div>`);
- 
-  /* =====================================================
-     3. FUNCIONAMENTO DA FICHA
-     ===================================================== */
-  var KEY = 'oraculo_evidencia_audiovisual_v1';
-  var overlay = document.getElementById('av-overlay');
-  var openBtn = document.getElementById('av-open');
-  var closeBtn = document.getElementById('av-close');
-  var form = document.getElementById('av-form');
-  var statusEl = document.getElementById('av-status');
-  var listEl = document.getElementById('av-saved-list');
-  var note = document.getElementById('av-prefill-note');
-  var lastFocus = null;
- 
-  function esc(v){
-    var d = document.createElement('div');
-    d.textContent = String(v == null ? '' : v);
-    return d.innerHTML;
-  }
-  function getRecords(){
-    try { var v = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(v) ? v : []; }
-    catch(_){ return []; }
-  }
-  function setRecords(r){
-    try { localStorage.setItem(KEY, JSON.stringify(r)); return true; }
-    catch(_){ return false; }
-  }
-  function fmtDate(iso){
-    if(!iso) return '';
-    var p = iso.split('-');
-    return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : iso;
-  }
-  function say(msg){
-    statusEl.textContent = msg;
-    if(msg) setTimeout(function(){ if(statusEl.textContent === msg) statusEl.textContent = ''; }, 3500);
-  }
-  function safeUrl(u){
-    try { var x = new URL(u); return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : ''; }
-    catch(_){ return ''; }
-  }
-  function readForm(){
-    var fd = new FormData(form);
-    return {
-      tipo: fd.get('tipo') || '',
-      url: (fd.get('url') || '').trim(),
-      data: fd.get('data') || '',
-      tempo: (fd.get('tempo') || '').trim(),
-      origem: (fd.get('origem') || '').trim(),
-      autenticidade: fd.get('autenticidade') || '',
-      obs: (fd.get('obs') || '').trim()
-    };
-  }
-  function renderSaved(){
-    var recs = getRecords();
-    if(!recs.length){ listEl.innerHTML = '<div class="av-saved-empty">Nenhum registro salvo ainda.</div>'; return; }
-    listEl.innerHTML = recs.slice().reverse().map(function(r){
-      var link = safeUrl(r.url);
-      return '<article class="av-saved-item">' +
-        '<span class="av-badge">' + esc(r.autenticidade || 'SEM SITUAÇÃO').toUpperCase() + '</span><br>' +
-        '<strong>' + esc(r.tipo) + '</strong>' +
-        (r.origem ? ' · ' + esc(r.origem) : '') +
-        (r.data ? ' · ' + esc(fmtDate(r.data)) : '') +
-        (r.tempo ? '<br>Trecho: ' + esc(r.tempo) : '') +
-        (link ? '<br><a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Abrir vídeo</a>' : '') +
-        (r.obs ? '<br>' + esc(r.obs) : '') +
-        '</article>';
-    }).join('');
-  }
- 
-  function openModal(){
-    lastFocus = document.activeElement;
-    overlay.classList.add('active');
-    overlay.setAttribute('aria-hidden', 'false');
-    renderSaved();
-    var first = document.getElementById('av-tipo');
-    if(first) first.focus();
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal(){
-    overlay.classList.remove('active');
-    overlay.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    if(lastFocus && lastFocus.focus) lastFocus.focus();
-  }
- 
-  if(openBtn) openBtn.addEventListener('click', openModal);
-  closeBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('mousedown', function(e){ if(e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
-  });
- 
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    var rec = readForm();
-    if(rec.url && !safeUrl(rec.url)){ say('O link precisa começar com http:// ou https://'); document.getElementById('av-url').focus(); return; }
-    if(!rec.url && !rec.obs && !rec.origem){ say('Preencha ao menos o link, a origem ou as observações.'); return; }
-    rec.id = Date.now().toString(36) + Math.random().toString(36).slice(2);
-    rec.createdAt = new Date().toISOString();
-    var recs = getRecords(); recs.push(rec);
-    if(setRecords(recs)){ renderSaved(); say('Registro salvo.'); }
-    else say('Não foi possível salvar neste navegador.');
-  });
- 
-  document.getElementById('av-usar').addEventListener('click', function(){
-    var r = readForm();
-    var partes = ['Verificar evidência audiovisual (' + r.tipo + ')'];
-    if(r.url) partes.push('link: ' + r.url);
-    if(r.data) partes.push('data: ' + fmtDate(r.data));
-    if(r.tempo) partes.push('trecho: ' + r.tempo);
-    if(r.origem) partes.push('origem: ' + r.origem);
-    partes.push('autenticidade: ' + r.autenticidade);
-    if(r.obs) partes.push('finalidade: ' + r.obs);
-    var campo = document.getElementById('oracle-question');
-    if(campo){ campo.value = partes.join('; ') + '.'; }
-    closeModal();
-    if(campo) campo.focus();
-  });
- 
-  document.getElementById('av-limpar').addEventListener('click', function(){
-    form.reset();
-    if(note) note.hidden = true;
-    say('Campos limpos.');
-  });
- 
-  renderSaved();
- 
-  /* =====================================================
-     4. PREENCHIMENTO AUTOMÁTICO COM O QUE O ORÁCULO ACHOU
-     ===================================================== */
-  var original = window.renderOracleResult;
-  if(typeof original === 'function'){
-    window.renderOracleResult = function(data){
-      var html = original(data);
-      var list = (data && Array.isArray(data.sources)) ? data.sources : [];
-      window.__oraculoSources = list;
-      if(!list.length) return html;
- 
-      var box = document.createElement('div');
-      box.innerHTML = html;
-      var cards = box.querySelectorAll('.oracle-sources .oracle-result-source');
-      cards.forEach(function(card, i){
-        if(!list[i] || !list[i].url || card.querySelector('.av-fill-btn')) return;
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'av-fill-btn';
-        b.setAttribute('data-av-index', String(i));
-        b.textContent = '▶ REGISTRAR NA FICHA DE EVIDÊNCIA';
-        card.appendChild(document.createElement('br'));
-        card.appendChild(b);
-      });
-      return box.innerHTML;
-    };
-  }
- 
-  var SOCIAL = ['x.com','twitter.com','instagram.com','facebook.com','fb.watch','tiktok.com'];
- 
-  function hostOf(url){
-    try { return new URL(url).hostname.replace(/^www\./, ''); }
-    catch(_){ return ''; }
-  }
-  function isoDate(v){
-    if(!v) return '';
-    var s = String(v).trim();
-    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-    var br = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-    if(br) return br[3] + '-' + br[2] + '-' + br[1];
-    var d = new Date(s);
-    return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
-  }
-  function guessTipo(src){
-    var host = hostOf(src.url);
-    var cls = String(src.sourceClass || src.sourceTier || '').toLowerCase();
-    var type = String(src.type || '').toLowerCase();
-    var video = (typeof isVideoSource === 'function') ? isVideoSource(src) : false;
-    if(SOCIAL.indexOf(host) !== -1) return 'Vídeo publicado em rede social';
-    if(video && (cls.indexOf('oficial') !== -1 || cls.indexOf('official') !== -1)) return 'Vídeo de canal oficial do órgão';
-    if(video && (type.indexOf('news') !== -1 || type.indexOf('jornal') !== -1 || type.indexOf('imprensa') !== -1 || type.indexOf('reportagem') !== -1)) return 'Reportagem em vídeo';
-    if(video) return 'Vídeo original do acontecimento';
-    return 'Outro';
-  }
-  function setVal(id, v){
-    var el = document.getElementById(id);
-    if(el) el.value = v || '';
-  }
-  function prefillFromSource(src){
-    var pergunta = window.__oraculoLastQuestion || '';
-    var origem = [];
-    if(src.publisher || src.source || src.domain) origem.push(src.publisher || src.source || src.domain);
-    if(src.platform) origem.push(src.platform);
-    if(src.channelOrAccount) origem.push(src.channelOrAccount);
- 
-    setVal('av-tipo', guessTipo(src));
-    setVal('av-url', src.url);
-    setVal('av-data', isoDate(src.publishedAt));
-    setVal('av-tempo', '');
-    setVal('av-origem', origem.join(' · '));
- 
-    var nv = document.querySelector('#av-form input[name="autenticidade"][value="Não verificada"]');
-    if(nv) nv.checked = true;
- 
-    var obs = 'Localizado pelo Oráculo' + (pergunta ? ' na consulta: "' + pergunta + '"' : '') + '.';
-    if(src.title) obs += ' Título: ' + src.title + '.';
-    obs += ' Falta conferir a autenticidade e indicar o trecho relevante.';
-    setVal('av-obs', obs);
- 
-    if(note){
-      note.hidden = false;
-      note.textContent = 'Ficha preenchida com os dados encontrados pelo Oráculo. Confira, indique a marcação de tempo e ajuste a situação da autenticidade antes de salvar.';
-    }
-  }
- 
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('.av-fill-btn');
-    if(!btn) return;
-    var src = (window.__oraculoSources || [])[Number(btn.getAttribute('data-av-index'))];
-    if(!src) return;
-    prefillFromSource(src);
-    openModal();
-  });
+<div class="av-modal" role="dialog" aria-modal="true" aria-labelledby="av-title">
+<div class="av-head"><h2 id="av-title">Nível D — Evidência audiovisual</h2><button type="button" class="av-close" id="av-close" aria-label="Fechar formulário">×</button></div>
+<p class="av-goal">Registre a publicação como fato: quem publicou, quando, onde, com que alcance e que repercussão teve. A ficha não avalia se o conteúdo é verdadeiro.</p>
+<div class="av-prefill-note" id="av-prefill-note" hidden></div>
+<div class="av-top"><span id="av-pc">0% preenchido</span></div>
+<div class="av-bar"><i id="av-pb"></i></div>
+<div class="av-tabs" id="av-tabs">
+<button type="button" class="av-tab on" data-i="0">1 Publicação</button>
+<button type="button" class="av-tab" data-i="1">2 Alcance</button>
+<button type="button" class="av-tab" data-i="2">3 Repercussão</button>
+<button type="button" class="av-tab" data-i="3">4 Impacto</button>
+</div>
+<form class="av-form" id="av-form" novalidate onsubmit="return false">
+<div class="av-p on" id="av-p0">
+<div class="av-g av-c2">
+<div><span class="av-l">Quem publicou</span><input id="av-quem" type="text" placeholder="Canal, perfil ou órgão" autocomplete="off"></div>
+<div><span class="av-l">Plataforma</span><select id="av-plat"><option value="">Escolha</option><option>YouTube</option><option>Instagram</option><option>Facebook</option><option>X</option><option>TikTok</option><option>TV / emissora</option><option>Outra</option></select></div>
+</div>
+<div class="av-g"><div><span class="av-l">Título ou legenda</span><input id="av-tit" type="text" autocomplete="off"></div></div>
+<span class="av-l">Data da publicação</span>
+<div class="av-g av-c3" style="margin-bottom:4px">
+<input id="av-ano" type="text" inputmode="numeric" maxlength="4" placeholder="Ano" autocomplete="off">
+<select id="av-mes"><option value="">Mês</option><option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option><option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option><option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select>
+<select id="av-dia"><option value="">Dia</option></select>
+</div>
+<p class="av-hint">Se não souber o mês ou o dia, deixe em branco.</p>
+<div class="av-g"><div><span class="av-l">Link</span><input id="av-url" type="text" placeholder="https://..." autocomplete="off"></div></div>
+<span class="av-l">Situação da publicação</span>
+<div class="av-seg" id="av-seg">
+<label class="on"><input type="radio" name="avsit" value="Confirmada na conta de origem" checked>Confirmada na origem</label>
+<label><input type="radio" name="avsit" value="Encontrada só em cópia">Só em cópia</label>
+<label><input type="radio" name="avsit" value="Origem não confirmada">Origem não confirmada</label>
+<label><input type="radio" name="avsit" value="Removida">Removida</label>
+</div>
+</div>
+<div class="av-p" id="av-p1">
+<p class="av-hint">O alcance muda com o tempo. A data da consulta é registrada ao salvar.</p>
+<div class="av-g av-c4">
+<div><span class="av-l">Visualizações</span><input class="av-al" data-f="vis" type="text" inputmode="numeric" autocomplete="off"></div>
+<div><span class="av-l">Curtidas</span><input class="av-al" data-f="cur" type="text" inputmode="numeric" autocomplete="off"></div>
+<div><span class="av-l">Compartilhamentos</span><input class="av-al" data-f="comp" type="text" inputmode="numeric" autocomplete="off"></div>
+<div><span class="av-l">Comentários</span><input class="av-al" data-f="com" type="text" inputmode="numeric" autocomplete="off"></div>
+</div>
+<span class="av-stamp">consulta registrada ao salvar</span>
+</div>
+<div class="av-p" id="av-p2">
+<p class="av-hint">Quem se manifestou sobre a publicação. Você decide quem é relevante.</p>
+<div id="av-l2"></div><button type="button" class="av-add" data-add="2">+ Adicionar manifestação</button>
+</div>
+<div class="av-p" id="av-p3">
+<p class="av-hint">Efeitos documentados da publicação, sempre com link e data.</p>
+<div id="av-l3"></div><button type="button" class="av-add" data-add="3">+ Adicionar efeito</button>
+</div>
+</form>
+<div class="av-sum" id="av-sum"></div>
+<div class="av-nav"><button type="button" id="av-prev">Voltar</button><button type="button" id="av-next">Avançar</button></div>
+<div class="av-aux"><button type="button" id="av-usar">Usar na pesquisa</button><button type="button" id="av-limpar">Limpar campos</button></div>
+<div class="av-status" id="av-status" role="status" aria-live="polite"></div>
+<div class="av-saved">
+<div class="av-saved-head"><h3>Registros salvos neste navegador</h3><button type="button" class="av-mini" id="av-export">Exportar (.json)</button></div>
+<div id="av-saved-list"></div>
+</div>
+</div></div>`);
+
+function $(id){return document.getElementById(id)}
+function esc(v){var d=document.createElement('div');d.textContent=String(v==null?'':v);return d.innerHTML}
+function safeUrl(u){try{var x=new URL(u);return(x.protocol==='http:'||x.protocol==='https:')?x.href:''}catch(_){return ''}}
+function getRecs(){try{var v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return []}}
+function setRecs(r){try{localStorage.setItem(KEY,JSON.stringify(r));return true}catch(_){return false}}
+function fmt(iso){if(!iso)return '';var p=String(iso).split('-');if(p.length===3)return p[2]+'/'+p[1]+'/'+p[0];if(p.length===2)return p[1]+'/'+p[0];return p[0]}
+function today(){return new Date().toISOString().slice(0,10)}
+function say(m){var s=$('av-status');s.textContent=m;if(m)setTimeout(function(){if(s.textContent===m)s.textContent=''},3500)}
+
+var dia=$('av-dia');
+for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=(d<10?'0':'')+d;o.textContent=d;dia.appendChild(o)}
+
+var cur=0,tabs=document.querySelectorAll('.av-tab'),pans=[0,1,2,3].map(function(i){return $('av-p'+i)});
+function go(i){
+cur=Math.max(0,Math.min(3,i));
+tabs.forEach(function(t,k){t.classList.toggle('on',k===cur)});
+pans.forEach(function(p,k){p.classList.toggle('on',k===cur)});
+$('av-prev').style.visibility=cur===0?'hidden':'visible';
+$('av-next').textContent=cur===3?'Salvar registro':'Avançar';
+}
+
+function itemHtml(kind){
+if(kind==='2')return '<div class="av-g av-c2"><div><span class="av-l">Nome</span><input type="text" data-f="nome" autocomplete="off"></div><div><span class="av-l">Cargo ou instituição</span><input type="text" data-f="cargo" autocomplete="off"></div></div><div class="av-g av-c3" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:0"><div><span class="av-l">Tipo</span><select data-f="tipo"><option>Apoio</option><option>Crítica</option><option>Resposta oficial</option><option>Comentário</option></select></div><div><span class="av-l">Data</span><input type="text" data-f="data" placeholder="dd/mm/aaaa" autocomplete="off"></div><div><span class="av-l">Link da declaração</span><input type="text" data-f="url" autocomplete="off"></div></div>';
+return '<div class="av-g av-c2"><div><span class="av-l">Tipo de efeito</span><select data-f="tipo"><option>Cobertura da imprensa</option><option>Resposta de órgão público</option><option>Decisão judicial</option><option>Decisão administrativa</option><option>Mobilização</option></select></div><div><span class="av-l">Data</span><input type="text" data-f="data" placeholder="dd/mm/aaaa" autocomplete="off"></div></div><div class="av-g" style="margin-bottom:0"><div><span class="av-l">O que foi observado</span><input type="text" data-f="obs" autocomplete="off"></div><div><span class="av-l">Link da fonte</span><input type="text" data-f="url" autocomplete="off"></div></div>';
+}
+function addItem(kind){
+var w=document.createElement('div');w.className='av-it';
+w.innerHTML=itemHtml(kind)+'<button type="button" class="av-rm" aria-label="Remover item">×</button>';
+w.querySelector('.av-rm').addEventListener('click',function(){w.remove();upd()});
+$('av-l'+kind).appendChild(w);upd();
+}
+function readItems(id){
+var out=[];
+document.querySelectorAll('#'+id+' .av-it').forEach(function(it){
+var o={},any=false;
+it.querySelectorAll('[data-f]').forEach(function(f){var v=f.value.trim();o[f.dataset.f]=v;if(v&&f.tagName==='INPUT')any=true});
+if(any)out.push(o);
+});
+return out;
+}
+function sit(){var c=document.querySelector('input[name="avsit"]:checked');return c?c.value:''}
+function setSit(val){
+document.querySelectorAll('input[name="avsit"]').forEach(function(r){r.checked=(r.value===val)});
+document.querySelectorAll('#av-seg label').forEach(function(l){l.classList.toggle('on',l.querySelector('input').checked)});
+}
+function lerData(){
+var a=$('av-ano').value.trim(),m=$('av-mes').value,d=$('av-dia').value;
+if(!a&&!m&&!d)return{v:'',e:''};
+if(!/^\d{4}$/.test(a))return{v:'',e:'Informe o ano com 4 números (ex.: 2025).'};
+if(d&&!m)return{v:'',e:'Para informar o dia, escolha também o mês.'};
+if(d&&Number(d)>new Date(Number(a),Number(m),0).getDate())return{v:'',e:'Esse mês não tem o dia '+Number(d)+'.'};
+return{v:[a,m,d].filter(Boolean).join('-'),e:''};
+}
+function readAlc(){
+var o={},any=false;
+document.querySelectorAll('.av-al').forEach(function(i){var v=i.value.trim().slice(0,20);o[i.dataset.f]=v;if(v)any=true});
+return any?o:null;
+}
+
+function upd(){
+var m=readItems('av-l2'),e=readItems('av-l3');
+var ok=[!!($('av-quem').value.trim()&&$('av-url').value.trim()),!!readAlc(),m.length>0,e.length>0];
+tabs.forEach(function(t,k){t.classList.toggle('ok',ok[k])});
+var pct=Math.round(ok.filter(Boolean).length/4*100);
+$('av-pc').textContent=pct+'% preenchido';$('av-pb').style.width=pct+'%';
+var dt=[$('av-dia').value,$('av-mes').value,$('av-ano').value.trim()].filter(Boolean).join('/');
+var s=[$('av-quem').value.trim()||'Sem origem',$('av-plat').value,dt,sit()].filter(Boolean).join(' · ');
+$('av-sum').textContent='Resumo: '+s+' · '+m.length+' manifestação(ões) · '+e.length+' efeito(s)';
+}
+
+function resetAll(){
+$('av-form').reset();
+$('av-l2').innerHTML='';$('av-l3').innerHTML='';
+setSit('Confirmada na conta de origem');
+$('av-prefill-note').hidden=true;
+go(0);upd();
+}
+
+function lineA(a,q){
+var n=[['vis','visualizações'],['cur','curtidas'],['comp','compartilhamentos'],['com','comentários']].filter(function(p){return a[p[0]]}).map(function(p){return esc(a[p[0]])+' '+p[1]});
+return n.length?'<div class="av-sub">Alcance (consulta em '+esc(fmt(q))+'): '+n.join(' · ')+'</div>':'';
+}
+function lnk(u,t){var s=safeUrl(u);return s?' · <a href="'+esc(s)+'" target="_blank" rel="noopener noreferrer">'+t+'</a>':''}
+function renderSaved(){
+var recs=getRecs(),box=$('av-saved-list');
+if(!recs.length){box.innerHTML='<div class="av-saved-empty">Nenhum registro salvo ainda.</div>';return}
+box.innerHTML=recs.slice().reverse().map(function(r){
+var del='<button type="button" class="av-del" data-del="'+esc(r.id)+'">Apagar</button>';
+if(r.v===2){
+var h='<article class="av-saved-item">'+del+'<span class="av-badge">'+esc((r.situacao||'sem situação').toUpperCase())+'</span><br><strong>'+esc(r.titulo||r.quem||'Sem título')+'</strong>'+(r.titulo&&r.quem?' · '+esc(r.quem):'')+(r.plat?' · '+esc(r.plat):'')+(r.data?' · '+esc(fmt(r.data)):'')+lnk(r.url,'Abrir publicação');
+if(r.alcance)h+=lineA(r.alcance,r.consultaEm);
+(r.manifest||[]).forEach(function(x,i){h+=(i===0?'<div class="av-sub"><strong>Repercussão</strong></div>':'')+'<div>'+esc(x.nome||'Sem nome')+(x.cargo?' ('+esc(x.cargo)+')':'')+' — '+esc(x.tipo||'')+(x.data?' · '+esc(x.data):'')+lnk(x.url,'declaração')+'</div>'});
+(r.efeitos||[]).forEach(function(x,i){h+=(i===0?'<div class="av-sub"><strong>Impacto registrado</strong></div>':'')+'<div>'+esc(x.tipo||'')+(x.obs?': '+esc(x.obs):'')+(x.data?' · '+esc(x.data):'')+lnk(x.url,'fonte')+'</div>'});
+return h+'</article>';
+}
+var link=safeUrl(r.url);
+return '<article class="av-saved-item">'+del+'<span class="av-badge">'+esc((r.autenticidade||'REGISTRO ANTIGO').toUpperCase())+'</span><br><strong>'+esc(r.tipo||'Evidência')+'</strong>'+(r.origem?' · '+esc(r.origem):'')+(r.data?' · '+esc(fmt(r.data)):'')+(r.tempo?'<br>Trecho: '+esc(r.tempo):'')+(link?'<br><a href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">Abrir vídeo</a>':'')+(r.obs?'<br>'+esc(r.obs):'')+'</article>';
+}).join('');
+}
+
+var overlay=$('av-overlay'),lastFocus=null;
+function openModal(){lastFocus=document.activeElement;overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');renderSaved();document.body.style.overflow='hidden';$('av-quem').focus()}
+function closeModal(){overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+var ob=$('av-open');if(ob)ob.addEventListener('click',openModal);
+$('av-close').addEventListener('click',closeModal);
+overlay.addEventListener('mousedown',function(e){if(e.target===overlay)closeModal()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&overlay.classList.contains('active'))closeModal()});
+
+tabs.forEach(function(t){t.addEventListener('click',function(){go(Number(t.dataset.i))})});
+$('av-prev').addEventListener('click',function(){go(cur-1)});
+document.querySelectorAll('[data-add]').forEach(function(b){b.addEventListener('click',function(){addItem(b.dataset.add)})});
+$('av-seg').addEventListener('change',function(){setSit(sit());upd()});
+$('av-form').addEventListener('input',upd);
+$('av-form').addEventListener('change',upd);
+
+function save(){
+var dt=lerData();
+if(dt.e){go(0);say(dt.e);return}
+var url=$('av-url').value.trim();
+if(url&&!safeUrl(url)){go(0);say('O link precisa começar com http:// ou https://');return}
+var quem=$('av-quem').value.trim(),tit=$('av-tit').value.trim();
+if(!quem&&!tit&&!url){go(0);say('Preencha ao menos quem publicou, o título ou o link.');return}
+var alc=readAlc();
+var rec={v:2,id:Date.now().toString(36)+Math.random().toString(36).slice(2),createdAt:new Date().toISOString(),quem:quem,plat:$('av-plat').value,titulo:tit,data:dt.v,url:url,situacao:sit(),alcance:alc,consultaEm:alc?today():'',manifest:readItems('av-l2'),efeitos:readItems('av-l3')};
+var recs=getRecs();recs.push(rec);
+if(setRecs(recs)){renderSaved();resetAll();say('Registro salvo.')}
+else say('Não foi possível salvar neste navegador.');
+}
+$('av-next').addEventListener('click',function(){if(cur<3)go(cur+1);else save()});
+
+$('av-usar').addEventListener('click',function(){
+var dt=lerData(),p=['Verificar publicação audiovisual'];
+if($('av-quem').value.trim())p.push('publicada por: '+$('av-quem').value.trim());
+if($('av-plat').value)p.push('plataforma: '+$('av-plat').value);
+if($('av-tit').value.trim())p.push('título: '+$('av-tit').value.trim());
+if(dt.v)p.push('data: '+fmt(dt.v));
+if($('av-url').value.trim())p.push('link: '+$('av-url').value.trim());
+p.push('situação: '+sit());
+var c=$('oracle-question');if(c)c.value=p.join('; ')+'.';
+closeModal();if(c)c.focus();
+});
+$('av-limpar').addEventListener('click',function(){resetAll();say('Campos limpos.')});
+
+$('av-saved-list').addEventListener('click',function(e){
+var b=e.target.closest('.av-del');if(!b)return;
+if(!confirm('Apagar este registro?'))return;
+setRecs(getRecs().filter(function(r){return r.id!==b.getAttribute('data-del')}));
+renderSaved();say('Registro apagado.');
+});
+$('av-export').addEventListener('click',function(){
+var recs=getRecs();if(!recs.length){say('Nenhum registro para exportar.');return}
+var blob=new Blob([JSON.stringify(recs,null,2)],{type:'application/json'});
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='evidencias-audiovisuais.json';
+document.body.appendChild(a);a.click();a.remove();
+setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+});
+
+var orig=window.renderOracleResult;
+if(typeof orig==='function'){
+window.renderOracleResult=function(data){
+var html=orig(data);
+var list=(data&&Array.isArray(data.sources))?data.sources:[];
+window.__oraculoSources=list;
+if(!list.length)return html;
+var box=document.createElement('div');box.innerHTML=html;
+box.querySelectorAll('.oracle-sources .oracle-result-source').forEach(function(card,i){
+if(!list[i]||!list[i].url||card.querySelector('.av-fill-btn'))return;
+var b=document.createElement('button');b.type='button';b.className='av-fill-btn';
+b.setAttribute('data-av-index',String(i));b.textContent='▶ REGISTRAR NA FICHA DE EVIDÊNCIA';
+card.appendChild(document.createElement('br'));card.appendChild(b);
+});
+return box.innerHTML;
+};
+}
+function hostOf(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(_){return ''}}
+function isoDate(v){
+if(!v)return '';var s=String(v).trim();
+if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+var br=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);if(br)return br[3]+'-'+br[2]+'-'+br[1];
+var d=new Date(s);return isNaN(d.getTime())?'':d.toISOString().slice(0,10);
+}
+function guessPlat(src){
+var h=(hostOf(src.url)+' '+String(src.domain||'')).toLowerCase();
+if(/youtube|youtu\.be/.test(h))return 'YouTube';
+if(/instagram/.test(h))return 'Instagram';
+if(/facebook|fb\.watch/.test(h))return 'Facebook';
+if(/(^|\s|\.)x\.com|twitter/.test(h))return 'X';
+if(/tiktok/.test(h))return 'TikTok';
+return '';
+}
+function prefill(src){
+var q=window.__oraculoLastQuestion||'';
+resetAll();
+$('av-quem').value=src.publisher||src.source||src.domain||'';
+$('av-plat').value=guessPlat(src);
+$('av-tit').value=src.title||'';
+var p=isoDate(src.publishedAt).split('-');
+$('av-ano').value=p[0]||'';$('av-mes').value=p[1]||'';$('av-dia').value=p[2]||'';
+$('av-url').value=src.url||'';
+setSit('Origem não confirmada');
+var n=$('av-prefill-note');n.hidden=false;
+n.textContent='Ficha preenchida com o que o Oráculo encontrou'+(q?' na consulta "'+q+'"':'')+'. Confira a origem, a data e a situação antes de salvar.';
+upd();
+}
+document.addEventListener('click',function(e){
+var b=e.target.closest('.av-fill-btn');if(!b)return;
+var src=(window.__oraculoSources||[])[Number(b.getAttribute('data-av-index'))];
+if(!src)return;
+prefill(src);openModal();
+});
+
+go(0);upd();renderSaved();
 })();
 </script>
  
