@@ -1882,7 +1882,13 @@ document.querySelectorAll('[data-add]').forEach(function(b){b.addEventListener('
 $('av-seg').addEventListener('change',function(){setSit(sit());upd()});
 $('av-form').addEventListener('input',upd);
 $('av-form').addEventListener('change',upd);
-
+$('av-url').addEventListener('change',function(){
+  var u=safeUrl(this.value.trim());
+  if(!u)return;
+  var p=guessPlat({url:u,domain:hostOf(u)});
+  if(p&&!$('av-plat').value)$('av-plat').value=p;
+  upd();
+});
 function save(){
 var dt=lerData();
 if(dt.e){go(0);say(dt.e);return}
