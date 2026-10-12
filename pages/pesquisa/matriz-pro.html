@@ -1720,10 +1720,31 @@ const objetivosDasSubetapas = {
   "12.13": "Delimite onde terminam os dados e começam as suposições em cada leitura de {PASSAGEM}. [Com base na conclusão da análise de {RESULTADO DO PASSO ANTERIOR}, explique o que potencializou o sentido da referência bíblica em seu contexto. Em seguida, indique se há aplicação e a qual área da vida espiritual ou da vivência cristã ela se aplica.]",
   "12.14": "Apresente o relatório transversal da história da recepção interpretativa de {PASSAGEM}."
 }; 
+function limparMarkdown(t) {
+  return String(t || "")
+    .replace(/^\s*#{1,6}\s*/gm, "")
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/^\s*[\*\-]\s+/gm, "• ")
+    .replace(/\*/g, "")
+    .replace(/^\s*---+\s*$/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function aplicarReferencia(template, ref) {
+  const r = template
+    .replace(/\{PASSAGEM\}/g, ref)
+    .replace(/\{OBJETO\}/g, ref)
+    .replace(/\{LIVRO\}/g, ref)
+    .replace(/\{PALAVRA\}/g, ref)
+    .replace(/\{REFERENCIA\}/g, ref);
+  return r === template ? "Objeto da pesquisa: " + ref + ".\n\n" + template : r;
+}
+
 function extractStepCode(stepName) {
   const match = String(stepName || "").match(/^\d{2}\.\d+/);
   return match ? match[0] : "";
-} 
+}
 const CANONICAL_REFERENCE_MATRIX = {
   "01": {
     name: "TEXTO BÍBLICO",
@@ -2447,13 +2468,8 @@ function prepareQuestionForStep(skipIntroMessage) {
     return;
   }
  
-  if (template && reference) {
-    questionInput.value = template
-      .replace(/\{PASSAGEM\}/g, reference)
-      .replace(/\{OBJETO\}/g, reference)
-      .replace(/\{LIVRO\}/g, reference)
-      .replace(/\{PALAVRA\}/g, reference)
-      .replace(/\{REFERENCIA\}/g, reference);
+   if (template && reference) {
+    questionInput.value = aplicarReferencia(template, reference);
     return;
   }
  
@@ -2678,7 +2694,7 @@ async function runComparisonConsolidation() {
     }
  
     comparisonReport.classList.remove("pending");
-    comparisonReport.textContent = extractAuditReport(data);
+   comparisonReport.textContent = limparMarkdown(extractAuditReport(data));
   } catch (error) {
     console.error("Erro na comparação e consolidação:", error);
     comparisonReport.classList.remove("pending");
@@ -2823,7 +2839,7 @@ async function submitRevisor() {
       throw new Error(data?.error || "O Worker não conseguiu concluir a revisão.");
     }
  
-    report.textContent = extractAuditReport(data);
+   report.textContent = limparMarkdown(extractAuditReport(data));
   } catch (error) {
     console.error("Erro na Revisão Teológica:", error);
     report.textContent = formatComparisonError(error, { error: error?.message });
@@ -2878,14 +2894,9 @@ async function sendQuestion(event) {
     const template =
       objetivosDasSubetapas[code];
  
-    questionForApi =
+       questionForApi =
       template
-        ? template
-            .replace(/\{PASSAGEM\}/g, text)
-            .replace(/\{OBJETO\}/g, text)
-            .replace(/\{LIVRO\}/g, text)
-            .replace(/\{PALAVRA\}/g, text)
-            .replace(/\{REFERENCIA\}/g, text)
+        ? aplicarReferencia(template, text)
         : `Analise "${activeStep}" para: ${text}`;
  
     awaitingReference =
@@ -3096,12 +3107,13 @@ async function sendQuestion(event) {
        8. RESPOSTA DO WORKER
     --------------------------------------------- */
  
-    answerMessage.textContent =
+      answerMessage.textContent = limparMarkdown(
       data?.text ||
       data?.answer ||
       data?.response ||
       data?.result ||
-      "A consulta não devolveu conteúdo.";
+      "A consulta não devolveu conteúdo."
+    );
  
     lastMesaAnswer = answerMessage.textContent;
     lastMesaModule = activeModule || "";
