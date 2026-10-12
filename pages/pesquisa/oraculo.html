@@ -1,582 +1,2007 @@
 
-
-Matriz pro · HTML
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palavra & Série — Método Técnico de Pesquisa</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--p:#20d66b;--bg:#0b1428;--s:#111b30;--i:#0d172b;--t:#dbe7f5;--b:#263754;--a:#18bfff;--m:#91a4bd;--paper:#f4eedd;--card:#fbf7ec;--line:#ddcea4;--ink:#2c2418;--soft:#6c5c42;--brass:#9c7a32;--deep:#7c5f26;--wash:#ede0bd}
-*{box-sizing:border-box}
-body{margin:0;height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--t);font:14px "Segoe UI",Arial,sans-serif}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 24px;border-bottom:1px solid var(--b);background:var(--s)}
-h1{margin:0;font-size:16px;letter-spacing:1.4px;color:var(--p)}
-header p{margin:3px 0 0;color:var(--m);font-size:11px}
-.hr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.badge{padding:6px 10px;border:1px solid var(--b);border-radius:6px;color:var(--a);font-size:10px;font-weight:700;letter-spacing:.6px}
-#up{display:none;padding:8px 13px;border:1px solid var(--p);border-radius:6px;background:rgba(32,214,107,.1);color:var(--p);font-size:11px;font-weight:700;text-decoration:none}
-.btn{height:34px;padding:0 13px;border:1px solid #425674;border-radius:5px;background:var(--i);color:var(--t);font:700 11px "Segoe UI",Arial,sans-serif;letter-spacing:.6px;cursor:pointer;display:inline-flex;align-items:center;text-decoration:none}
-.btn:hover:not(:disabled){border-color:var(--a)}
-.btn:disabled{opacity:.5;cursor:wait}
-.btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
-.btn.gold:hover:not(:disabled){background:var(--deep)}
-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:16px;padding:16px}
-.panel{min-height:0;display:flex;flex-direction:column;gap:10px;border-radius:10px;padding:16px;overflow:hidden}
-.fonte{background:var(--s);border:1px solid var(--b)}
-.mesa{background:var(--paper);border:1px solid var(--line);color:var(--ink)}
-h3{margin:0;font-size:12px;letter-spacing:1.4px;color:var(--m)}
-.mesa h3{color:var(--soft)}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.row>*{min-width:0}
-.sel,.in{height:36px;border:1px solid var(--b);border-radius:5px;background:var(--bg);color:var(--t);padding:0 10px;font:13px "Segoe UI",Arial,sans-serif}
-.grow{flex:1 1 110px}
-.vs{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
-.v,.r{display:flex;gap:10px;width:100%;text-align:left;border:1px solid var(--b);border-radius:6px;background:var(--i);color:var(--t);padding:9px 12px;cursor:pointer;font:14px/1.6 Georgia,serif}
-.r{display:block}
-.r small{display:block;color:var(--a);font:700 11px "Segoe UI",Arial,sans-serif}
-.v b{color:var(--a);font:700 11px "Segoe UI",Arial,sans-serif;padding-top:4px}
-.v.on{background:var(--card);color:var(--ink);border-color:var(--brass);box-shadow:inset 4px 0 0 var(--brass)}
-.v.on b{color:var(--deep)}
-.v[dir=rtl]{text-align:right;flex-direction:row-reverse;font-size:17px}
-.v[hidden]{display:none}
-.msg{color:var(--m);font-size:12px;line-height:1.6}
-.tray{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px dashed var(--brass);border-radius:6px;font-size:12px;color:var(--line)}
-.tray strong{color:#fffdf6;font:15px Georgia,serif}
-.mesa .sel{background:#fffdf6;border-color:var(--line);color:var(--ink)}
-.mesa .btn{background:#fffdf6;border-color:var(--line);color:var(--ink)}
-.mesa .btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
-#lista{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
-.bl{margin:18px 0 4px;font-size:12px;letter-spacing:1.2px;color:var(--deep)}
-.bb{cursor:pointer;padding:8px 0;border-bottom:1px solid var(--line)}
-.et{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:6px;background:#fffdf6}
-.et.ok{border-left-color:var(--brass)}.et.na{opacity:.55}.et.ab{box-shadow:0 0 0 2px var(--brass)}
-.cab{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
-.st{width:30px;height:30px;flex:0 0 30px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--deep);font-size:15px;cursor:pointer}
-.cod{font:700 12px "Segoe UI",Arial,sans-serif;color:var(--deep)}
-.nm{flex:1;font:17px Georgia,serif}
-.tem{color:var(--brass)}
-.lv{font:700 10px "Segoe UI",Arial,sans-serif;letter-spacing:.5px;color:var(--soft);white-space:nowrap}
-.et.lk .nm{color:var(--soft)}
-.co{padding:0 14px 14px 56px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
-.ln{display:flex;gap:12px;align-items:flex-start;width:100%}
-.ds{flex:1;margin:0;color:var(--soft);font:14px/1.55 Georgia,serif}
-.tx{width:100%;min-height:170px;resize:vertical;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);padding:10px;font:17px/1.7 Georgia,serif}
-.ln .btn{flex:0 0 auto;white-space:nowrap}
-.ov{display:none;position:fixed;inset:0;z-index:50;align-items:center;justify-content:center;padding:20px;background:rgba(4,10,20,.78)}
-.bx{width:min(760px,100%);max-height:90vh;overflow:auto;padding:24px;border:1px solid var(--b);border-radius:10px;background:var(--s);color:var(--t)}
-.bx h2{margin:0;color:var(--a);font-size:18px}
-.bx label{display:block;margin:12px 0 5px;color:var(--a);font-size:11px;font-weight:700;letter-spacing:.7px}
-.bx small{display:block;margin-bottom:5px;color:var(--m);font-size:10px}
-.bx input,.bx textarea{width:100%;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:var(--i);color:var(--t);font:12px "Segoe UI",Arial,sans-serif}
-.bx textarea{resize:vertical}
-.rep{min-height:140px;max-height:320px;overflow:auto;padding:14px;border:1px solid #344762;border-radius:6px;background:var(--i);font-size:12px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px}
-.note{margin:12px 0;padding:10px 12px;border-left:3px solid var(--p);background:var(--i);color:#b9c7d8;font-size:12px}
-.arq{padding:6px 0;border-bottom:1px solid var(--b);white-space:pre-wrap;font:14px/1.6 Georgia,serif}
-#toast{display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;padding:12px 16px;border-radius:8px;background:#2c2418;color:#fffdf6;font-size:13px;max-width:90vw}
-@media(max-width:900px){body{height:auto}main{grid-template-columns:1fr}.panel{max-height:none}.vs,#lista{max-height:60vh}.ln{flex-direction:column}.co{padding-left:14px}}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oráculo — Consulta Geral</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,560;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0b1428;
+      --panel:#111b30;
+      --border:#263754;
+      --text:#dbe7f5;
+      --muted:#91a4bd;
+
+      --paper:#f4eedd;
+      --paper-card:#fbf7ec;
+      --paper-line:#ddcea4;
+      --ink:#2c2418;
+      --ink-soft:#6c5c42;
+      --brass:#9c7a32;
+      --brass-deep:#7c5f26;
+      --brass-wash:#ede0bd;
+      --navy:#0e1526;
+      --navy-soft:#1b2740;
+      --verified:#4b6b4e;
+
+      --font-display:'Fraunces',Georgia,serif;
+      --font-body:'Inter','Segoe UI',Tahoma,sans-serif;
+
+      /* legacy aliases kept so nothing else on the page breaks */
+      --accent:var(--brass);
+      --paper-border:var(--paper-line);
+    }
+
+    * { box-sizing:border-box; }
+
+    html, body {
+      margin:0;
+      width:100%;
+      min-height:100%;
+    }
+
+    body {
+      min-height:100vh;
+      background:var(--paper);
+      color:var(--text);
+      font-family:var(--font-body);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    :focus-visible {
+      outline:2px solid var(--brass);
+      outline-offset:2px;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      * { transition-duration:.01ms !important; animation-duration:.01ms !important; }
+    }
+
+    .oracle-page {
+      min-height:100vh;
+      width:100%;
+      padding:18px 0 0;
+      background:var(--paper);
+    }
+
+    .oracle-content {
+      width:100%;
+      margin:0;
+    }
+
+    .back-arrow {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-height:34px;
+      margin:0 0 16px 3.8%;
+      padding:0 14px;
+      border:1px solid var(--navy-soft);
+      border-radius:6px;
+      background:var(--navy);
+      color:#dbe7f5;
+      font-family:var(--font-body);
+      font-weight:600;
+      font-size:13px;
+      cursor:pointer;
+      text-decoration:none;
+      transition:background .15s ease;
+    }
+
+    .back-arrow:hover {
+      background:var(--navy-soft);
+      color:#fff;
+    }
+
+    .oracle-chat-panel {
+      width:92.4%;
+      margin:0 auto;
+      overflow:hidden;
+      border:1px solid var(--paper-line);
+      border-radius:10px;
+      background:var(--paper);
+      color:var(--ink);
+      box-shadow:0 18px 40px rgba(14,21,38,.16);
+    }
+
+    .ai-chat-header {
+      padding:28px 32px 20px;
+      border-bottom:1px solid var(--paper-line);
+      background:var(--paper-card);
+    }
+
+    .ai-chat-header h1 {
+      margin:0 0 12px;
+      color:var(--ink);
+      font-family:var(--font-display);
+      font-weight:650;
+      font-size:clamp(24px,3.6vw,34px);
+      letter-spacing:.2px;
+    }
+
+    .ai-chat-header p {
+      max-width:640px;
+      margin:0;
+      color:var(--ink-soft);
+      font-size:14.5px;
+      line-height:1.65;
+    }
+
+    .oracle-trust-note {
+      margin:16px 32px 12px;
+      padding:12px 14px;
+      border-left:2px solid var(--brass);
+      background:var(--brass-wash);
+      color:var(--ink-soft);
+      font-size:12px;
+      line-height:1.6;
+    }
+
+    .oracle-trust-note strong {
+      color:var(--ink);
+    }
+
+    .ai-chat-messages {
+      min-height:300px;
+      max-height:52vh;
+      overflow-y:auto;
+      padding:0 28px 18px;
+    }
+
+
+    /* =========================================================
+       ÍNDICE LATERAL DE 29 ÁREAS
+       ========================================================= */
+
+    .oracle-index-trigger {
+      position:fixed;
+      left:0;
+      top:50%;
+      z-index:1000;
+      transform:translateY(-50%);
+      padding:13px 10px;
+      border:1px solid var(--navy-soft);
+      border-left:0;
+      border-radius:0 8px 8px 0;
+      background:var(--navy);
+      color:#dbe7f5;
+      font-family:var(--font-body);
+      font-size:11px;
+      font-weight:600;
+      letter-spacing:.06em;
+      writing-mode:vertical-rl;
+      cursor:pointer;
+      box-shadow:0 6px 16px rgba(14,21,38,.3);
+      transition:background .15s ease, padding .15s ease;
+    }
+
+    .oracle-index-trigger:hover {
+      background:var(--navy-soft);
+      color:#fff;
+      padding-right:14px;
+    }
+
+    .oracle-index-overlay {
+      position:fixed;
+      inset:0;
+      z-index:1001;
+      display:none;
+      background:rgba(14,21,38,.45);
+      backdrop-filter:blur(1px);
+    }
+
+    .oracle-index-overlay.active {
+      display:block;
+    }
+
+    .oracle-index-panel {
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width:min(420px,88vw);
+      overflow-y:auto;
+      padding:26px 24px 30px;
+      background:var(--paper-card);
+      color:var(--ink);
+      box-shadow:16px 0 40px rgba(14,21,38,.28);
+    }
+
+    .oracle-index-header {
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:6px;
+      padding-bottom:16px;
+      border-bottom:2px solid var(--ink);
+    }
+
+    .oracle-index-header h2 {
+      margin:0;
+      color:var(--ink);
+      font-family:var(--font-display);
+      font-weight:600;
+      font-size:19px;
+      letter-spacing:.01em;
+    }
+
+    .oracle-index-close {
+      width:30px;
+      height:30px;
+      border:1px solid var(--paper-line);
+      border-radius:50%;
+      background:transparent;
+      color:var(--ink-soft);
+      font-size:16px;
+      line-height:1;
+      cursor:pointer;
+      transition:background .15s ease, color .15s ease;
+    }
+
+    .oracle-index-close:hover {
+      background:var(--brass-wash);
+      color:var(--ink);
+    }
+
+    .oracle-index-intro {
+      margin:14px 0 18px;
+      color:var(--ink-soft);
+      font-size:12.5px;
+      line-height:1.6;
+    }
+
+    .oracle-index-list {
+      display:flex;
+      flex-direction:column;
+    }
+
+    .oracle-index-item {
+      border-bottom:1px solid var(--paper-line);
+    }
+
+    .oracle-index-item:first-child {
+      border-top:1px solid var(--paper-line);
+    }
+
+    .oracle-index-area {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      width:100%;
+      min-height:46px;
+      padding:9px 6px;
+      border:0;
+      background:transparent;
+      color:var(--ink);
+      text-align:left;
+      font:inherit;
+      font-size:13.5px;
+      font-weight:500;
+      cursor:pointer;
+      transition:background .12s ease;
+    }
+
+    .oracle-index-area:hover {
+      background:var(--brass-wash);
+    }
+
+    .oracle-index-area.active {
+      background:var(--brass-wash);
+    }
+
+    .oracle-index-number {
+      flex:0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:26px;
+      height:20px;
+      padding:0 5px;
+      border:1px solid var(--brass);
+      border-radius:4px;
+      color:var(--brass-deep);
+      font-family:var(--font-body);
+      font-size:10.5px;
+      font-weight:700;
+      letter-spacing:.02em;
+    }
+
+    .oracle-index-name {
+      flex:1;
+      line-height:1.3;
+    }
+
+    .oracle-index-chevron {
+      flex:0 0 14px;
+      color:var(--brass);
+      text-align:right;
+      font-size:14px;
+      transition:transform .18s ease;
+    }
+
+    .oracle-index-area.active .oracle-index-chevron {
+      transform:rotate(90deg);
+    }
+
+    .oracle-index-subareas {
+      display:none;
+      padding:2px 6px 14px 44px;
+    }
+
+    .oracle-index-subareas.active {
+      display:block;
+    }
+
+    .oracle-index-subarea {
+      display:block;
+      width:100%;
+      margin:0;
+      padding:8px 0;
+      border:0;
+      border-bottom:1px solid var(--paper-line);
+      background:transparent;
+      color:var(--ink-soft);
+      text-align:left;
+      font-family:var(--font-body);
+      font-size:12.5px;
+      line-height:1.4;
+      cursor:pointer;
+      transition:color .12s ease;
+    }
+
+    .oracle-index-subarea:last-child {
+      border-bottom:0;
+    }
+
+    .oracle-index-subarea:hover {
+      color:var(--brass-deep);
+    }
+
+    .oracle-index-note {
+      margin-top:20px;
+      padding:12px 14px;
+      border-left:2px solid var(--brass);
+      background:var(--brass-wash);
+      color:var(--ink-soft);
+      font-size:11.5px;
+      line-height:1.55;
+    }
+
+    .oracle-index-note strong {
+      color:var(--ink);
+    }
+
+    .ai-chat-welcome {
+      position:relative;
+      padding:18px 20px 18px 52px;
+      background:var(--paper-card);
+      border:1px solid var(--paper-line);
+      border-radius:8px;
+      color:var(--ink-soft);
+      font-size:13.5px;
+      line-height:1.6;
+    }
+
+    .ai-chat-welcome::before {
+      content:'◈';
+      position:absolute;
+      left:18px;
+      top:18px;
+      color:var(--brass);
+      font-size:20px;
+    }
+
+    .ai-chat-welcome strong {
+      display:block;
+      margin-bottom:4px;
+      color:var(--ink);
+      font-family:var(--font-display);
+      font-size:16px;
+      font-weight:600;
+    }
+
+    .ai-chat-message {
+      margin:10px 0;
+      padding:11px 15px;
+      border-radius:8px;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
+
+    .ai-chat-message.user {
+      margin-left:auto;
+      max-width:85%;
+      background:var(--navy);
+      color:#eef2f8;
+      font-size:13.5px;
+    }
+
+    .ai-chat-answer {
+      margin:10px 0;
+      padding:16px 18px;
+      border-left:2px solid var(--brass);
+      background:var(--paper-card);
+      color:var(--ink);
+      font-size:13.5px;
+      line-height:1.65;
+    }
+
+    .oracle-sources {
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid var(--paper-line);
+    }
+
+    .oracle-sources h2,
+    .oracle-sources h3,
+    .oracle-sources h4 {
+      margin:0 0 10px;
+      color:var(--ink-soft);
+      font-family:var(--font-body);
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .oracle-source-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+      gap:10px;
+    }
+
+    .oracle-source-card {
+      display:block;
+      padding:13px 14px;
+      border:1px solid var(--paper-line);
+      border-top:3px solid var(--brass);
+      border-radius:5px;
+      background:var(--paper-card);
+      color:var(--ink-soft);
+      text-decoration:none;
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .oracle-source-card:nth-child(2) { border-top-color:var(--navy-soft); }
+    .oracle-source-card:nth-child(3) { border-top-color:var(--verified); }
+    .oracle-source-card:nth-child(4) { border-top-color:var(--brass-deep); }
+
+    .oracle-source-card strong {
+      display:block;
+      margin-bottom:3px;
+      color:var(--ink);
+      font-size:12.5px;
+      font-weight:600;
+    }
+
+    .oracle-result-meta {
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:6px;
+      background:var(--brass-wash);
+      color:var(--brass-deep);
+      font-size:11.5px;
+      line-height:1.5;
+    }
+
+    .oracle-result-source {
+      display:block;
+      margin-top:8px;
+      padding:10px 12px;
+      border-left:2px solid var(--verified);
+      background:var(--paper-card);
+      color:var(--ink-soft);
+      font-size:11.5px;
+      line-height:1.45;
+    }
+
+    .oracle-result-source a {
+      color:var(--brass-deep);
+      font-weight:700;
+    }
+
+    .oracle-media-badge {
+      display:inline-block;
+      margin-bottom:4px;
+      padding:2px 7px;
+      border-radius:4px;
+      background:var(--navy);
+      color:#eef2f8;
+      font-size:9.5px;
+      font-weight:700;
+      letter-spacing:.05em;
+    }
+
+    .oracle-result-source.is-video {
+      border-left-color:var(--navy-soft);
+    }
+
+    .oracle-video-embed {
+      position:relative;
+      width:100%;
+      max-width:420px;
+      margin-top:9px;
+      padding-top:56.25%;
+      border-radius:6px;
+      overflow:hidden;
+      background:var(--navy);
+    }
+
+    .oracle-video-embed iframe {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+    }
+
+    .ai-chat-input {
+      padding:20px 32px 26px;
+      border-top:1px solid var(--paper-line);
+      background:var(--paper-card);
+    }
+
+    .question-row {
+      display:flex;
+      gap:10px;
+    }
+
+    .question-row input {
+      flex:1;
+      min-width:0;
+      padding:13px 14px;
+      border:1px solid var(--paper-line);
+      border-radius:6px;
+      background:#fffdf6;
+      color:var(--ink);
+      font:inherit;
+      font-size:14px;
+      transition:border-color .15s ease;
+    }
+
+    .question-row input:focus {
+      border-color:var(--brass);
+    }
+
+    .question-row button {
+      min-height:44px;
+      padding:0 22px;
+      border:0;
+      border-radius:6px;
+      background:var(--brass);
+      color:#fffdf6;
+      font-family:var(--font-body);
+      font-weight:700;
+      font-size:13px;
+      letter-spacing:.03em;
+      cursor:pointer;
+      transition:background .15s ease;
+    }
+
+    .question-row button:hover {
+      background:var(--brass-deep);
+    }
+
+    .question-row button:disabled {
+      opacity:.55;
+      cursor:wait;
+    }
+
+    .ai-chat-loading {
+      display:none;
+      margin-top:10px;
+      color:var(--brass-deep);
+      font-size:12px;
+      font-style:italic;
+    }
+
+    .oracle-disclaimer {
+      margin-top:12px;
+      color:var(--ink-soft);
+      font-size:11px;
+      line-height:1.5;
+    }
+
+    @media (max-width:600px) {
+      .oracle-page { padding:10px 0 0; }
+      .oracle-chat-panel { width:100%; border-radius:0; }
+      .back-arrow { margin-left:15px; }
+      .ai-chat-header,
+      .ai-chat-input { padding-left:15px; padding-right:15px; }
+      .oracle-trust-note { margin-left:15px; margin-right:15px; }
+      .ai-chat-messages { padding-left:15px; padding-right:15px; }
+      .question-row { flex-direction:column; }
+      .question-row button { width:100%; }
+    }
+
+
+    /* =========================================================
+       RASTREAMENTO DE FONTES — ORDEM METODOLÓGICA
+       ========================================================= */
+    .oracle-tracking-trigger{
+      display:none;
+      position:fixed;right:0;top:50%;z-index:1000;transform:translateY(-50%);
+      padding:13px 10px;border:1px solid var(--navy-soft);border-right:0;
+      border-radius:8px 0 0 8px;background:var(--navy);color:#dbe7f5;
+      font-size:11px;font-weight:700;letter-spacing:.05em;writing-mode:vertical-rl;
+      cursor:pointer;box-shadow:0 6px 16px rgba(14,21,38,.3)
+    }
+    .oracle-tracking-trigger:hover{background:var(--navy-soft);color:#fff}
+    .oracle-tracking-overlay{position:fixed;inset:0;z-index:1100;display:none;background:rgba(14,21,38,.45);backdrop-filter:blur(1px)}
+    .oracle-tracking-overlay.active{display:block}
+    .oracle-tracking-panel{position:absolute;right:0;top:0;bottom:0;width:min(560px,94vw);overflow-y:auto;padding:24px;background:var(--paper-card);color:var(--ink);box-shadow:-16px 0 40px rgba(14,21,38,.28)}
+    .tracking-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+    .tracking-head h2{margin:0;font-family:var(--font-display);font-size:20px;font-weight:600}
+    .tracking-close{width:30px;height:30px;border:1px solid var(--paper-line);border-radius:50%;background:transparent;color:var(--ink-soft);font-size:16px;cursor:pointer}
+    .tracking-context{margin:14px 0;padding:12px;border-left:2px solid var(--brass);background:var(--brass-wash);font-size:12px;line-height:1.5}
+    .tracking-order{display:grid;gap:7px;margin:12px 0 20px}
+    .tracking-step{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--paper-line);background:#fffdf6;font-size:11.5px}
+    .tracking-step .num{font-weight:800;color:var(--brass-deep)}
+    .tracking-step .state{font-size:10px;color:var(--ink-soft)}
+    .tracking-step.active{border-color:var(--brass);background:var(--brass-wash)}
+    .tracking-form{display:grid;gap:8px;margin-top:12px}
+    .tracking-form label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
+    .tracking-form input,.tracking-form select,.tracking-form textarea{width:100%;padding:10px 11px;border:1px solid var(--paper-line);border-radius:5px;background:#fffdf6;color:var(--ink);font:inherit;font-size:12px}
+    .tracking-form textarea{min-height:72px;resize:vertical}
+    .tracking-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+    .tracking-actions button{padding:9px 13px;border:0;border-radius:5px;background:var(--brass);color:#fff;font-weight:700;font-size:11px;cursor:pointer}
+    .tracking-actions button.secondary{background:var(--navy)}
+    .tracking-publications{margin-top:20px;padding-top:16px;border-top:1px solid var(--paper-line)}
+    .tracking-publication{padding:12px;margin:8px 0;border:1px solid var(--paper-line);background:#fffdf6;font-size:11.5px;line-height:1.5}
+    .tracking-publication strong{color:var(--ink)}
+    .tracking-badge{display:inline-block;padding:2px 6px;margin-bottom:5px;border-radius:3px;background:var(--navy);color:#fff;font-size:9px;font-weight:800}
+    .tracking-publication a{color:var(--brass-deep);font-weight:700}
+    .tracking-classification{margin-top:7px;padding-top:7px;border-top:1px dashed var(--paper-line);color:var(--ink-soft);font-size:10.5px}
+    .tracking-note{margin-top:14px;color:var(--ink-soft);font-size:10.5px;line-height:1.55}
+
+
+    /* =========================================================
+       ÍNDICE DO ORÁCULO DENTRO DO BOTÃO LATERAL
+       ========================================================= */
+    .side-oracle-group {
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+
+    .side-oracle-toggle {
+      width:100%;
+      appearance:none;
+      -webkit-appearance:none;
+      cursor:pointer;
+      font-family:inherit;
+      text-align:left;
+    }
+
+    .side-oracle-label {
+      flex:1;
+    }
+
+    .side-oracle-chevron {
+      margin-left:auto;
+      color:#20d66b;
+      font-size:10px;
+      transition:transform .18s ease;
+    }
+
+    .side-oracle-toggle[aria-expanded="false"] .side-oracle-chevron {
+      transform:rotate(-90deg);
+    }
+
+    .side-oracle-index {
+      display:block;
+      margin:0 0 3px 5px;
+      padding:7px 5px 8px;
+      border-left:1px solid #263754;
+      max-height:52vh;
+      overflow-y:auto;
+      background:#0e172b;
+      border-radius:0 5px 5px 0;
+    }
+
+    .side-oracle-index[aria-hidden="true"] {
+      display:none;
+    }
+
+    .side-oracle-index-title {
+      padding:4px 6px 7px;
+      color:#9c7a32;
+      font-size:7.5px;
+      font-weight:900;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+      border-bottom:1px solid #263754;
+    }
+
+    .side-oracle-index .oracle-index-list {
+      display:flex;
+      flex-direction:column;
+    }
+
+    .side-oracle-index .oracle-index-item {
+      border-bottom:1px solid #263754;
+    }
+
+    .side-oracle-index .oracle-index-item:first-child {
+      border-top:0;
+    }
+
+    .side-oracle-index .oracle-index-area {
+      display:flex;
+      align-items:center;
+      gap:5px;
+      width:100%;
+      min-height:29px;
+      padding:5px 4px;
+      border:0;
+      background:transparent;
+      color:#dbe7f5;
+      text-align:left;
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      font-size:8px;
+      font-weight:700;
+      line-height:1.25;
+      cursor:pointer;
+    }
+
+    .side-oracle-index .oracle-index-area:hover,
+    .side-oracle-index .oracle-index-area.active {
+      background:#16233c;
+    }
+
+    .side-oracle-index .oracle-index-number {
+      min-width:20px;
+      height:16px;
+      padding:0 3px;
+      border:1px solid #9c7a32;
+      border-radius:3px;
+      color:#d7b76a;
+      font-size:7px;
+      font-weight:800;
+    }
+
+    .side-oracle-index .oracle-index-name {
+      flex:1;
+      line-height:1.2;
+    }
+
+    .side-oracle-index .oracle-index-chevron {
+      flex:0 0 9px;
+      color:#9c7a32;
+      font-size:10px;
+      text-align:right;
+      transition:transform .18s ease;
+    }
+
+    .side-oracle-index .oracle-index-area.active .oracle-index-chevron {
+      transform:rotate(90deg);
+    }
+
+    .side-oracle-index .oracle-index-subareas {
+      display:none;
+      padding:2px 3px 7px 29px;
+    }
+
+    .side-oracle-index .oracle-index-subareas.active {
+      display:block;
+    }
+
+    .side-oracle-index .oracle-index-subarea {
+      display:block;
+      width:100%;
+      padding:5px 0;
+      border:0;
+      border-bottom:1px solid #263754;
+      background:transparent;
+      color:#91a4bd;
+      text-align:left;
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      font-size:7.5px;
+      line-height:1.35;
+      cursor:pointer;
+    }
+
+    .side-oracle-index .oracle-index-subarea:last-child {
+      border-bottom:0;
+    }
+
+    .side-oracle-index .oracle-index-subarea:hover {
+      color:#d7b76a;
+    }
+
+    .side-oracle-index-note {
+      margin:7px 3px 0;
+      padding:6px;
+      border-left:2px solid #9c7a32;
+      background:#16233c;
+      color:#7c8fac;
+      font-size:7px;
+      line-height:1.4;
+    }
+
+    /* =========================================================
+       SHELL PADRÃO DA PLATAFORMA — MESMAS DIMENSÕES DA BÍBLIA
+       ========================================================= */
+    :root{ --side-w:168px; }
+    body{ background:#0b1428; color:#dbe7f5; font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; }
+    .app-shell{ display:flex; align-items:stretch; min-height:100vh; }
+    .side-nav{ flex:0 0 var(--side-w); width:var(--side-w); display:flex; flex-direction:column; gap:16px; padding:16px 10px; background:#111b30; border-right:1px solid #263754; position:sticky; top:0; height:100vh; overflow-y:auto; }
+    .side-brand{ padding:2px 4px 12px; border-bottom:1px solid #263754; }
+    .side-brand-link{ display:block; color:#20d66b; font-size:12px; font-weight:900; letter-spacing:1.2px; text-decoration:none; line-height:1.3; }
+    .side-brand-sub{ display:block; margin-top:3px; color:#7c8fac; font-size:8px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
+    .side-menu{ display:flex; flex-direction:column; gap:3px; }
+    .side-item{ display:flex; align-items:center; gap:7px; padding:8px 7px; border-radius:6px; border:1px solid transparent; color:#dbe7f5; text-decoration:none; font-size:9.5px; font-weight:800; letter-spacing:.3px; line-height:1.25; }
+    .side-item:hover,.side-item:focus-visible{ background:#16233c; outline:none; }
+    .side-item.active{ background:rgba(32,214,107,.12); border-color:#20d66b; color:#20d66b; }
+    .side-icon{ flex:0 0 auto; width:13px; font-size:12px; text-align:center; line-height:1; }
+    .side-footer-note{ margin-top:auto; padding-top:12px; border-top:1px solid #263754; color:#5f7192; font-size:8px; line-height:1.5; }
+    .content-area{ flex:1; min-width:0; display:flex; flex-direction:column; }
+    .site-header{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 20px; border-bottom:1px solid #263754; background:#111b30; position:sticky; top:0; z-index:20; }
+    .header-link{ padding:8px 11px; border:1px solid #536780; border-radius:7px; background:transparent; color:#dbe7f5; font-size:10px; font-weight:900; text-decoration:none; white-space:nowrap; }
+    .header-link:hover,.header-link:focus-visible{ border-color:#18bfff; background:#163451; outline:none; }
+    .content-area > main{ width:100%; max-width:none; flex:1; margin:0; padding:40px; background:#f4eedd; }
+    .content-area > main > .paper{ width:100%; max-width:none; margin:0; padding:24px; border:1px solid #ddcea4; border-radius:8px; background:#f4eedd; color:#2c2418; box-shadow:0 6px 18px rgba(55,45,30,.12); }
+    .oracle-page{ min-height:0; width:100%; padding:0; background:transparent; }
+    .oracle-content{ width:100%; margin:0; }
+    .oracle-chat-panel{ width:100%; margin:0; box-shadow:none; border-radius:8px; }
+    .oracle-index-trigger{ position:static; transform:none; writing-mode:horizontal-tb; display:inline-flex; margin:14px 28px 0; padding:8px 11px; border:1px solid #536780; border-radius:7px; background:#0e1526; color:#dbe7f5; box-shadow:none; font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif; font-size:10px; font-weight:900; letter-spacing:.06em; }
+    .oracle-index-trigger:hover{ background:#1b2740; color:#fff; padding-right:11px; }
+    @media(max-width:900px){
+      :root{ --side-w:100%; }
+      .app-shell{ flex-direction:column; }
+      .side-nav{ position:relative; top:auto; height:auto; width:100%; flex-direction:row; align-items:center; gap:10px; overflow-x:auto; border-right:0; border-bottom:1px solid #263754; }
+      .side-brand{ padding:0 12px 0 0; border-bottom:0; border-right:1px solid #263754; flex:0 0 auto; }
+      .side-menu{ flex-direction:row; gap:6px; }
+      .side-item{ white-space:nowrap; }
+      .side-footer-note{ display:none; }
+    }
+    @media(max-width:700px){
+      .content-area > main{ padding:12px 9px 28px; }
+      .site-header{ align-items:flex-start; flex-wrap:wrap; }
+      .header-link{ flex:1; text-align:center; }
+      .content-area > main > .paper{ padding:14px; }
+    }
+
+
+/* Ajuste de largura do painel ao shell padrão */
+.oracle-page { padding:0; }
+.oracle-chat-panel { width:100%; margin:0; border-left:0; border-right:0; border-radius:0; box-shadow:none; }
+@media (max-width:900px) { .oracle-page { padding:0; } }
+/* Fim do ajuste de largura do painel ao shell padrão */
+
+    /* Ajustes do índice incorporado ao menu lateral */
+    .side-oracle-group { position:relative; }
+    .side-oracle-toggle { border:1px solid transparent; }
+    .side-oracle-toggle.active { background:rgba(32,214,107,.12); border-color:#20d66b; color:#20d66b; }
+
+    @media(max-width:900px){
+      .side-oracle-group { flex:0 0 auto; }
+      .side-oracle-index {
+        position:absolute;
+        top:calc(100% + 3px);
+        left:0;
+        z-index:50;
+        width:min(330px,88vw);
+        max-height:60vh;
+        margin:0;
+        box-shadow:0 12px 28px rgba(0,0,0,.35);
+      }
+    }
+
+.oracle-source-class{display:inline-block;margin:4px 0 6px;padding:2px 6px;border:1px solid var(--paper-line);border-radius:3px;color:var(--brass-deep);background:#fffdf6;font-size:9px;font-weight:800;letter-spacing:.04em}
+.oracle-bible-invitation{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;padding:16px;border:1px solid var(--paper-line);border-left:3px solid var(--brass);background:var(--brass-wash)}
+.oracle-bible-invitation strong{display:block;margin-bottom:4px;color:var(--ink);font-family:var(--font-display);font-size:16px}.oracle-bible-invitation span{display:block;color:var(--ink-soft);font-size:11.5px;line-height:1.5}.oracle-bible-button{padding:10px 14px;border:0;border-radius:5px;background:var(--navy);color:#fff;font-size:10.5px;font-weight:800;cursor:pointer}
+@media(max-width:600px){.oracle-bible-invitation{flex-direction:column;align-items:stretch}}
+.oracle-index-desc{padding:2px 0 8px;color:var(--ink-soft);font-size:12px;font-style:italic;line-height:1.5}
+.side-oracle-index .oracle-index-desc{color:#91a4bd;font-size:7.5px;line-height:1.4;padding:2px 0 6px}
+ .side-oracle-index .oracle-index-subarea.selected{background:#16233c;color:#d7b76a;font-weight:800;border-left:2px solid #d7b76a;padding-left:6px}
+.oracle-index-subarea.selected{color:var(--brass-deep);font-weight:700}   
 </style>
 </head>
+
 <body>
-<header>
-  <div><h1>▤ MÉTODO TÉCNICO DE PESQUISA</h1><p>Escolha a passagem à esquerda e execute as etapas à direita.</p></div>
-  <div class="hr">
-    <span id="badge" class="badge">PLANO: —</span>
-    <a id="up" href="#" target="_blank" rel="noopener"></a>
-    <button type="button" class="btn" onclick="openRevisor('external_unit')">✎ REVISOR</button>
+  <div class="app-shell">
+    <aside class="side-nav" aria-label="Navegação da plataforma">
+      <div class="side-brand">
+        <a class="side-brand-link" href="index.html">PALAVRA &amp; SÉRIE</a>
+        <span class="side-brand-sub">Leitura bíblica</span>
+      </div>
+
+      <nav class="side-menu">
+        <a class="side-item" href="index.html"><span class="side-icon">⌂</span>PESQUISA</a>
+        <a class="side-item" href="areas-academicas.html"><span class="side-icon">▤</span>ÁREAS ACADÊMICAS</a>
+        <a class="side-item" href="biblia.html"><span class="side-icon">▤</span>BÍBLIA</a>
+        <a class="side-item" href="estante.html"><span class="side-icon">▤</span>ESTANTE</a>
+        <a class="side-item" href="sermoes.html"><span class="side-icon">▤</span>SERMÕES</a>
+        <a class="side-item" href="ponte-infantil.html"><span class="side-icon">✦</span>PONTE INFANTIL</a>
+        <a class="side-item" href="matriz-pro.html"><span class="side-icon">★</span>MATRIZ PRO</a>
+
+        <div class="side-oracle-group">
+          <button
+            type="button"
+            class="side-item side-oracle-toggle active"
+            id="side-oracle-toggle"
+            aria-expanded="true"
+            aria-controls="side-oracle-index"
+          >
+            <span class="side-icon">◆</span>
+            <span class="side-oracle-label">ORÁCULO</span>
+            <span class="side-oracle-chevron" aria-hidden="true">▾</span>
+          </button>
+
+          <div class="side-oracle-index" id="side-oracle-index">
+            <div class="side-oracle-index-title">NÍVEL D — CATEGORIA DE FONTES</div>
+            <div class="oracle-index-list" id="oracle-index-list"></div>
+            <div class="side-oracle-index-note">
+              Selecione uma categoria para ver o que ela rastreia e seus exemplos de fontes.
+A escolha orienta a consulta, mas não impede o Oráculo de considerar outras categorias.
+            </div>
+          </div>
+        </div>
+
+        <a class="side-item" href="analise-textual.html">
+          <span class="side-icon">✎</span>ANÁLISE TEXTUAL
+        </a>
+      </nav>
+
+      <p class="side-footer-note">
+        Módulo público: leitura independente da Sala do Escritor.
+      </p>
+    </aside>
+
+    <div class="content-area">
+      <header class="site-header">
+        <a class="header-link" href="index.html">← VOLTAR À PESQUISA</a>
+        <a class="header-link" href="sala-do-escritor.html">SALA DO ESCRITOR</a>
+      </header>
+
+      <main>
+        <section class="paper" aria-label="Oráculo — Consulta Geral">
+          <div class="oracle-page">
+            <div class="oracle-content">
+              <section class="oracle-chat-panel" aria-label="Consulta geral do Oráculo">
+
+        <header class="ai-chat-header">
+          <h1>ORÁCULO — FATOS, FONTES E BÍBLIA</h1>
+          <p>
+            Faça uma pergunta sobre um acontecimento, declaração, pessoa, proposta, instituição ou assunto relevante para a vida pública e para os valores que a Igreja defende. O Oráculo investiga o que aconteceu, rastreia as fontes e depois coloca a questão diante das Escrituras.
+          </p>
+        </header>
+
+       
+
+        <div class="ai-chat-messages" id="oracle-chat-messages">
+
+
+
+      <button type="button" class="oracle-tracking-trigger" id="oracle-tracking-trigger" aria-controls="oracle-tracking-overlay" aria-expanded="false">↗ RASTREAR</button>
+      <div class="oracle-tracking-overlay" id="oracle-tracking-overlay" aria-hidden="true">
+        <aside class="oracle-tracking-panel" role="dialog" aria-modal="true" aria-labelledby="tracking-title">
+          <div class="tracking-head">
+            <h2 id="tracking-title">RASTREAMENTO DE FONTES</h2>
+            <button type="button" class="tracking-close" id="tracking-close" aria-label="Fechar rastreamento">×</button>
+          </div>
+          <div class="tracking-context" id="tracking-context">
+            <strong>Objeto atual:</strong> consulta geral. Selecione uma área/subárea no índice ou informe uma entidade abaixo.
+          </div>
+          <strong style="font-size:11px;letter-spacing:.05em">ORDEM OBRIGATÓRIA DE BUSCA</strong>
+          <div class="tracking-order" id="tracking-order"></div>
+
+          <form class="tracking-form" id="tracking-form">
+            <label for="tracking-entity">Entidade / item pesquisado</label>
+            <input id="tracking-entity" name="entity" placeholder="Ex.: Senado Federal" required>
+            <label for="tracking-sphere">Esfera</label>
+            <select id="tracking-sphere" name="sphere">
+              <option value="federal">Federal</option><option value="estadual">Estadual</option><option value="municipal">Municipal</option><option value="outro">Outra / não definida</option>
+            </select>
+            <label for="tracking-url">URL da publicação encontrada</label>
+            <input id="tracking-url" name="url" type="url" placeholder="https://...">
+            <label for="tracking-title-input">Título da publicação</label>
+            <input id="tracking-title-input" name="title" placeholder="Título / descrição da publicação">
+            <label for="tracking-source">Fonte / veículo</label>
+            <input id="tracking-source" name="source" placeholder="Órgão, jornal, canal, perfil etc.">
+            <label for="tracking-type">Tipo</label>
+            <select id="tracking-type" name="type">
+              <option>Portal de Transparência</option><option>Acesso à Informação / LAI</option><option>Portal institucional</option><option>Diário Oficial</option><option>Tribunal de Contas</option><option>Controladoria</option><option>Base oficial de dados</option><option>Imprensa</option><option>Vídeo / audiovisual</option><option>Rede social</option><option>Outro</option>
+            </select>
+            <label for="tracking-date">Data da publicação</label>
+            <input id="tracking-date" name="date" type="date">
+            <label for="tracking-notes">Observações</label>
+            <textarea id="tracking-notes" name="notes" placeholder="Informações úteis para a análise posterior..."></textarea>
+            <div class="tracking-actions">
+              <button type="submit">REGISTRAR PUBLICAÇÃO</button>
+              <button type="button" class="secondary" id="tracking-clear">LIMPAR REGISTROS LOCAIS</button>
+            </div>
+          </form>
+
+          <div class="tracking-publications">
+            <strong style="font-size:11px;letter-spacing:.05em">PUBLICAÇÕES ENCONTRADAS</strong>
+            <div id="tracking-publications-list"></div>
+          </div>
+          <div class="tracking-note"><strong>Regra metodológica:</strong> registrar a existência da publicação antes de classificá-la. A classificação posterior poderá ser <em>Verdadeira, Mentirosa, Neutra</em> ou <em>Sem definição</em>. “Sem definição” não significa falsa; significa evidência insuficiente para concluir.</div>
+        </aside>
+      </div>
+         
+
+      
+
+        </div>
+
+        <div class="ai-chat-input">
+
+          <form class="question-row" id="oracle-form">
+            <input
+              id="oracle-question"
+              type="text"
+             placeholder="Pesquisa"
+              autocomplete="off"
+              required
+            >
+            <button type="submit">INVESTIGAR</button>
+          </form>
+
+          <div class="ai-chat-loading" id="oracle-chat-loading">
+            Pesquisando e verificando publicações...
+          </div>
+
+         
+
+        </div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   </div>
-</header>
- 
-<main>
-  <aside class="panel fonte">
-    <h3>FONTE BÍBLICA</h3>
-    <div class="row">
-      <select id="livro" class="sel grow" aria-label="Livro"></select>
-      <select id="cap" class="sel" style="width:76px" aria-label="Capítulo"></select>
-      <select id="modo" class="sel" aria-label="Texto"><option value="pt">Português</option><option value="or">Original</option><option value="tr">Grego TR</option></select>
-    </div>
-    <div class="row"><button id="ant" class="btn grow" type="button">← ANTERIOR</button><button id="prox" class="btn grow" type="button">PRÓXIMO →</button></div>
-    <div class="row">
-      <input id="busca" class="in grow" type="search" placeholder="Buscar palavra" aria-label="Buscar versículos">
-      <select id="escopo" class="sel" aria-label="Onde buscar"><option value="cap">Neste capítulo</option><option value="livro">Neste livro</option><option value="ot">Antigo Testamento</option><option value="nt">Novo Testamento</option><option value="all">Bíblia toda</option></select>
-    </div>
-    <div id="vs" class="vs"><span class="msg">Carregando o texto…</span></div>
-    <div class="tray"><span id="ref">Toque nos versículos para selecioná-los</span><button id="limpar" class="btn" type="button" style="margin-left:auto">LIMPAR</button></div>
-  </aside>
- 
-  <section class="panel mesa">
-    <div class="row"><select id="mzEsc" class="sel" aria-label="Escopo do estudo"></select><strong id="prog" style="flex:1;font-size:13px"></strong><button id="mzArq" class="btn" type="button">ARQUIVO</button></div>
-    <div id="lista"><span class="msg">Carregando a tabela…</span></div>
-  </section>
-</main>
- 
-<section id="arqOv" class="ov"><div class="bx"><h2>Arquivo de pesquisas</h2><p class="msg">Resultados das etapas, com data e horário.</p><div id="arqBody"></div><div class="row" style="justify-content:flex-end;margin-top:12px"><button type="button" class="btn" data-a="limpar" style="margin-right:auto;color:#ff6b6b">APAGAR TUDO</button><button type="button" class="btn" data-a="fechar">FECHAR</button></div></div></section>
- 
-<section id="revOv" class="ov" aria-hidden="true">
-  <div class="bx">
-    <div class="row" style="justify-content:space-between;align-items:flex-start">
-      <div><h2>REVISOR TEOLÓGICO</h2><p class="msg" style="max-width:520px">PESQUISAR → ANALISAR → REVISAR → CONSOLIDAR. O Revisor é uma segunda camada de pesquisa: audita metodológica e teologicamente o conteúdo, não é um corretor de texto.</p></div>
-      <button type="button" class="btn" onclick="closeRevisor()">FECHAR</button>
-    </div>
-    <div id="revNote" class="note"></div>
-    <label for="revTema">TEMA / ASSUNTO</label><input id="revTema" type="text" placeholder="Ex.: A doutrina da justificação em Romanos 3">
-    <label for="revSub">SUBETAPA OU CONTEXTO METODOLÓGICO (opcional)</label><input id="revSub" type="text" placeholder="Ex.: 06.14 — Síntese exegética (deixe vazio se não se aplicar)">
-    <label for="revRef">REFERÊNCIA DE COMPARAÇÃO</label><small>Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere fontes reconhecidas.</small><textarea id="revRef" style="min-height:110px" placeholder="Cole uma referência de comparação ou deixe vazio..."></textarea>
-    <label for="revCont">CONTEÚDO DO ESCRITOR</label><small>Cole aqui o texto a ser auditado (produzido por você, por outra IA, artigo, rascunho etc.).</small><textarea id="revCont" style="min-height:180px" placeholder="Cole aqui o conteúdo..."></textarea>
-    <label>RELATÓRIO DE AUDITORIA</label>
-    <div id="revRep" class="rep">O relatório de auditoria aparecerá aqui depois da revisão.</div>
-    <div class="row" style="justify-content:flex-end"><button id="revGo" type="button" class="btn gold" style="background:var(--a);border-color:var(--a);color:#061522" onclick="submitRevisor()">ENVIAR PARA REVISÃO</button></div>
-  </div>
-</section>
-<div id="toast" role="status"></div>
- 
-<script>
-const SB_URL="https://qmhdbuxomozdczgvpvcc.supabase.co",SB_KEY="sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8",WORKER="https://yellow-lab-f4b2.palavraeserie.workers.dev";
-const sb=window.supabase.createClient(SB_URL,SB_KEY);
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-let tTimer=null;
-function toast(msg){const e=$("toast");e.textContent=msg;e.style.display="block";clearTimeout(tTimer);tTimer=setTimeout(()=>{e.style.display="none"},6000)}
- 
-/* ===== NÍVEIS (fonte única; F=FREE P=PRO M=MASTER D=DOCTUS; um caractere por subetapa, módulos 01 a 12) ===== */
-const LV={F:"FREE",P:"PRO",M:"MASTER",D:"DOCTUS"},MATRIX_LEVELS={};
-["FFPPPPPPPMPM","PPPPMMMMMMMD","PPPPPPPPMMMMMMMM","PPPPPPPMMMMMM","MMMMMMMMMDDM","PPPPPPPMMMMMDD","PPPPPPPMMMMMMMD","MMMMMMMMMMMDMDD","MMMMMMMMMMMMMDD","MMMMMMMMMMMMDDD","MMMMMMDDDDDDD","MMMMMMMDDDDDDD"]
- .forEach((s,m)=>[...s].forEach((c,i)=>{MATRIX_LEVELS[String(m+1).padStart(2,"0")+"."+(i+1)]=LV[c]}));
-const NAMES={FREE:"FUNDAMENTOS",PRO:"FORMAÇÃO",MASTER:"APROFUNDAMENTO",DOCTUS:"ESPECIALIZAÇÃO"},RANK={FREE:0,PRO:1,MASTER:2,DOCTUS:3};
-const LINKS={PRO:"https://pay.kiwify.com.br/Vjp7c9i",MASTER:"https://pay.kiwify.com.br/Fx0qlhm",DOCTUS:"https://pay.kiwify.com.br/RAOCHCE"},NEXT={FREE:"PRO",PRO:"MASTER",MASTER:"DOCTUS"};
-let plan="FREE",email="";
-const lname=l=>NAMES[l]||l,lvl=c=>MATRIX_LEVELS[c]||"DOCTUS",allowed=c=>(RANK[plan]??0)>=(RANK[lvl(c)]??3);
-const link=l=>LINKS[l]?LINKS[l]+(email?"?email="+encodeURIComponent(email):""):"#";
-function head(){
-  $("badge").textContent="PLANO: "+lname(plan);
-  const b=$("up");
-  if(plan==="DOCTUS"){b.style.display="none";return}
-  b.style.display="inline-block";b.textContent="FAZER UPGRADE";b.href=link(NEXT[plan]||"PRO");
-}
-async function loadPlan(s){
-  email=s?.user?.email||"";plan="FREE";
-  if(s?.user?.id){try{const{data}=await sb.from("profiles").select("plano").eq("id",s.user.id).single();if(data)plan=String(data.plano||"FREE").toUpperCase()}catch(e){console.error(e)}}
-  head();mzRender();
-}
-sb.auth.onAuthStateChange(ev=>{if(ev==="INITIAL_SESSION"||ev==="SIGNED_OUT")sb.auth.getSession().then(({data})=>loadPlan(data.session))});
-async function getSession(){
-  const{data,error}=await sb.auth.getSession();
-  if(error||!data?.session)throw new Error("Sessão não encontrada. Para consultar, entre na sua conta de assinante.");
-  return data.session;
-}
- 
-/* ===== FONTE BÍBLICA (mesma da Sala do Escritor) ===== */
-const DATA={
-  pt:"https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/ALM1911%20-%20Almeida%201911.json",
-  wlc:"https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/wlc/",
-  greek:"https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/n4/",
-  tr:"https://raw.githubusercontent.com/metaxiamultimedia/scriptures-js-source-stepbible-tagnt-tr/main/data/stepbible-tagnt-tr/"
-};
-const BK="Gen:Gênesis,Exod:Êxodo,Lev:Levítico,Num:Números,Deut:Deuteronômio,Josh:Josué,Judg:Juízes,Ruth:Rute,1Sam:1 Samuel,2Sam:2 Samuel,1Kgs:1 Reis,2Kgs:2 Reis,1Chr:1 Crônicas,2Chr:2 Crônicas,Ezra:Esdras,Neh:Neemias,Esth:Ester,Job:Jó,Ps:Salmos,Prov:Provérbios,Eccl:Eclesiastes,Song:Cantares,Isa:Isaías,Jer:Jeremias,Lam:Lamentações,Ezek:Ezequiel,Dan:Daniel,Hos:Oséias,Joel:Joel,Amos:Amós,Obad:Obadias,Jonah:Jonas,Mic:Miquéias,Nah:Naum,Hab:Habacuque,Zeph:Sofonias,Hag:Ageu,Zech:Zacarias,Mal:Malaquias,Matt:Mateus,Mark:Marcos,Luke:Lucas,John:João,Acts:Atos,Rom:Romanos,1Cor:1 Coríntios,2Cor:2 Coríntios,Gal:Gálatas,Eph:Efésios,Phil:Filipenses,Col:Colossenses,1Thess:1 Tessalonicenses,2Thess:2 Tessalonicenses,1Tim:1 Timóteo,2Tim:2 Timóteo,Titus:Tito,Phlm:Filemom,Heb:Hebreus,Jas:Tiago,1Pet:1 Pedro,2Pet:2 Pedro,1John:1 João,2John:2 João,3John:3 João,Jude:Judas,Rev:Apocalipse".split(",").map(x=>x.split(":"));
-const isOT=l=>l<39;
-let PT=null;const cache=new Map();
-async function loadPT(){
-  if(PT)return PT;
-  const r=await fetch(DATA.pt,{cache:"force-cache"});
-  if(!r.ok)throw new Error("Não foi possível carregar Almeida 1911.");
-  PT=await r.json();
-  if(!Array.isArray(PT))throw new Error("Formato inesperado da Almeida 1911.");
-  return PT;
-}
-async function mapaOrig(code,ot){
-  const url=(ot?DATA.wlc:DATA.greek)+code+".txt";
-  if(cache.get(url))return cache.get(url);
-  const r=await fetch(url,{cache:"force-cache"});
-  if(!r.ok)return null;
-  const m=new Map();
-  for(const l of(await r.text()).split(/\r?\n/)){const t=l.indexOf("\t");if(t<0)continue;const p=l.slice(0,t).split(".");m.set(p[1]+":"+p[2],l.slice(t+1).trim())}
-  cache.set(url,m);return m;
-}
-async function mapaTR(code){
-  const ch="tr:"+code+":"+cur.c;
-  if(cache.has(ch))return cache.get(ch);
-  const q=(PT[cur.l].chapters[cur.c-1]||[]).length;
-  const rs=await Promise.all(Array.from({length:q},(_,i)=>fetch(DATA.tr+code+"/"+cur.c+"/"+(i+1)+".json",{cache:"force-cache"}).then(r=>r.ok?r.json():null).catch(()=>null)));
-  const m=new Map();
-  rs.forEach((d,i)=>{const t=d&&typeof d.text==="string"?d.text.trim():"";if(t)m.set(cur.c+":"+(i+1),t)});
-  cache.set(ch,m);return m;
-}
-let cur={l:0,c:1,modo:"pt"},sel=new Set(),versos=[],emBusca=false;
-const norm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-function intervalos(ns){
-  const out=[];let ini=ns[0],ant=ns[0];
-  for(let i=1;i<=ns.length;i++){if(ns[i]===ant+1){ant=ns[i];continue}out.push(ini===ant?String(ini):ini+"–"+ant);ini=ant=ns[i]}
-  return out.join(", ");
-}
-const referencia=()=>BK[cur.l][1]+" "+cur.c+":"+intervalos([...sel].sort((a,b)=>a-b));
-function bandeja(){$("ref").innerHTML=sel.size?"<strong>"+esc(referencia())+"</strong>":"Toque nos versículos para selecioná-los"}
-function capitulos(){
-  const n=PT[cur.l].chapters.length;
-  $("cap").innerHTML=Array.from({length:n},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+"</option>").join("");
-  if(cur.c>n)cur.c=n;
-  $("cap").value=String(cur.c);
-}
-async function lerVersos(){
-  const al=$("vs");al.innerHTML='<span class="msg">Carregando…</span>';sel.clear();bandeja();
-  try{
-    await loadPT();
-    const code=BK[cur.l][0],ot=isOT(cur.l);
-    if(cur.modo==="tr"&&ot){versos=[];al.innerHTML='<span class="msg">O Textus Receptus existe só para o Novo Testamento. No Antigo, escolha "Original" para ver o hebraico.</span>';return}
-    if(cur.modo==="pt")versos=(PT[cur.l].chapters[cur.c-1]||[]).map((t,i)=>({n:i+1,t}));
-    else{
-      const m=cur.modo==="tr"?await mapaTR(code):await mapaOrig(code,ot);
-      versos=[];
-      if(m)for(const[k,t]of m){const[c,v]=k.split(":").map(Number);if(c===cur.c)versos.push({n:v,t})}
-      versos.sort((a,b)=>a.n-b.n);
+  <script>
+    const AI_PROXY_URL = 'https://yellow-lab-f4b2.palavraeserie.workers.dev';
+
+    const form = document.getElementById('oracle-form');
+    const input = document.getElementById('oracle-question');
+    const messages = document.getElementById('oracle-chat-messages');
+    const loading = document.getElementById('oracle-chat-loading');
+
+   const ORACULO_AREAS = [
+  {id:'01',name:'Fontes Oficiais',tracks:'Rastreiam atos, decisões e posicionamentos institucionais.',subareas:['Leis','Decretos','Portarias','Resoluções','Notas oficiais','Comunicados governamentais']},
+  {id:'02',name:'Fontes Jornalísticas',tracks:'Rastreiam acontecimentos, declarações e investigações.',subareas:['Reportagens','Entrevistas','Notícias','Coberturas ao vivo','Jornalismo investigativo']},
+  {id:'03',name:'Fontes Legislativas',tracks:'Rastreiam a criação e a tramitação de decisões políticas.',subareas:['Projetos de lei','Votações','Discursos parlamentares','Atas','Registros de comissões']},
+  {id:'04',name:'Fontes Judiciais',tracks:'Rastreiam decisões judiciais e seus fundamentos.',subareas:['Sentenças','Acórdãos','Decisões liminares','Processos públicos','Votos de magistrados']},
+  {id:'05',name:'Fontes Declaratórias',tracks:'Rastreiam o que pessoas e instituições efetivamente disseram.',subareas:['Discursos integrais','Entrevistas gravadas','Pronunciamentos','Transcrições','Coletivas de imprensa']},
+  {id:'06',name:'Fontes Administrativas',tracks:'Rastreiam decisões e ações da administração pública.',subareas:['Atas de reuniões','Contratos','Licitações','Relatórios de gestão','Auditorias','Processos administrativos acessíveis']},
+  {id:'07',name:'Fontes Estatísticas e Econômicas',tracks:'Rastreiam mudanças e impactos sociais mensuráveis.',subareas:['Indicadores de emprego','Inflação','Renda','Educação','Saúde','Criminalidade','Desigualdade']},
+  {id:'08',name:'Fontes de Mobilização Social',tracks:'Rastreiam manifestações, reivindicações e movimentos coletivos.',subareas:['Comunicados de movimentos sociais','Sindicatos','Associações','Organizações civis','Registros de protestos']},
+  {id:'09',name:'Fontes Digitais e de Redes Sociais',tracks:'Rastreiam publicações, declarações e repercussões públicas.',subareas:['Publicações originais','Perfis verificados','Comunicados digitais','Registros arquivados de páginas']},
+  {id:'10',name:'Fontes Históricas e Arquivísticas',tracks:'Rastreiam a origem, a sequência e a evolução dos acontecimentos.',subareas:['Arquivos públicos','Jornais antigos','Documentos históricos','Registros audiovisuais','Versões anteriores de documentos']},
+  {id:'11',name:'Fontes Corporativas e Empresariais',tracks:'Rastreiam decisões privadas com repercussão econômica ou social.',subareas:['Comunicados empresariais','Relatórios financeiros','Atas públicas','Anúncios de políticas corporativas','Documentos regulatórios']},
+  {id:'12',name:'Fontes Científicas e Técnicas',tracks:'Rastreiam descobertas, alertas e evidências que podem orientar decisões sociais.',subareas:['Estudos científicos','Pareceres técnicos','Notas de agências reguladoras','Relatórios epidemiológicos','Avaliações de impacto']}
+];
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = String(value ?? '');
+      return div.innerHTML;
     }
-    const rtl=cur.modo==="or"&&ot;
-    al.innerHTML=versos.length?versos.map(v=>'<button type="button" class="v" data-n="'+v.n+'"'+(rtl?' dir="rtl"':"")+"><b>"+v.n+"</b><span>"+esc(v.t)+"</span></button>").join(""):'<span class="msg">Nenhum texto encontrado nesta passagem.</span>';
-    filtrar();
-  }catch(e){console.error(e);al.innerHTML='<span class="msg">Não foi possível carregar. Verifique a conexão e tente de novo.</span>'}
-}
-function filtrar(){
-  const q=norm($("busca").value.trim()),es=$("escopo").value;
-  if(es==="cap"){
-    if(emBusca){emBusca=false;lerVersos();return}
-    document.querySelectorAll("#vs .v").forEach(b=>{b.hidden=q&&!norm(b.textContent).includes(q)});
-    return;
-  }
-  buscarGlobal(q,es);
-}
-async function buscarGlobal(q,es){
-  const al=$("vs");emBusca=true;
-  if(q.length<3){al.innerHTML='<span class="msg">Digite ao menos 3 letras para buscar.</span>';return}
-  await loadPT();
-  const ach=[];let total=0;
-  for(let l=0;l<BK.length;l++){
-    if(es==="ot"&&!isOT(l))continue;if(es==="nt"&&isOT(l))continue;if(es==="livro"&&l!==cur.l)continue;
-    PT[l].chapters.forEach((cap,ci)=>cap.forEach((txt,vi)=>{if(norm(txt).includes(q)){total++;if(ach.length<100)ach.push({l,c:ci+1,n:vi+1,txt})}}));
-  }
-  if(!total){al.innerHTML='<span class="msg">Nenhum versículo encontrado com essa palavra.</span>';return}
-  al.innerHTML='<span class="msg">'+total+" resultado"+(total===1?"":"s")+(total>100?" · mostrando os 100 primeiros. Restrinja o alcance para refinar.":"")+" · busca na Almeida 1911</span>"+
-    ach.map(a=>'<button type="button" class="r" data-l="'+a.l+'" data-c="'+a.c+'" data-n="'+a.n+'"><small>'+esc(BK[a.l][1])+" "+a.c+":"+a.n+"</small>"+esc(a.txt)+"</button>").join("");
-}
-async function irPara(l,c,n){
-  cur.l=l;cur.c=c;$("livro").value=String(l);capitulos();$("escopo").value="cap";$("busca").value="";emBusca=false;
-  await lerVersos();
-  const b=document.querySelector('#vs .v[data-n="'+n+'"]');
-  if(b){b.click();b.scrollIntoView({block:"center"})}
-}
-async function mudarCap(d){
-  await loadPT();
-  let l=cur.l,c=cur.c+d;
-  if(c<1){if(l===0)return;l--;c=PT[l].chapters.length}
-  else if(c>PT[l].chapters.length){if(l===BK.length-1)return;l++;c=1}
-  cur.l=l;cur.c=c;$("livro").value=String(l);capitulos();$("escopo").value="cap";$("busca").value="";emBusca=false;lerVersos();
-}
-$("livro").innerHTML=BK.map((b,i)=>'<option value="'+i+'">'+esc(b[1])+"</option>").join("");
-$("livro").onchange=function(){cur.l=Number(this.value);cur.c=1;capitulos();lerVersos()};
-$("cap").onchange=function(){cur.c=Number(this.value);lerVersos()};
-$("modo").onchange=function(){cur.modo=this.value;lerVersos()};
-$("ant").onclick=()=>mudarCap(-1);$("prox").onclick=()=>mudarCap(1);
-$("busca").oninput=filtrar;$("escopo").onchange=filtrar;
-$("vs").onclick=function(ev){
-  const r=ev.target.closest(".r");
-  if(r){irPara(Number(r.dataset.l),Number(r.dataset.c),Number(r.dataset.n));return}
-  const b=ev.target.closest(".v");if(!b)return;
-  const n=Number(b.dataset.n);
-  if(sel.has(n)){sel.delete(n);b.classList.remove("on")}else{sel.add(n);b.classList.add("on")}
-  bandeja();
-};
-$("limpar").onclick=()=>{sel.clear();document.querySelectorAll("#vs .v.on").forEach(b=>b.classList.remove("on"));bandeja()};
- 
-/* ===== MESA DE ESTUDO (mesmas etapas do tabela.json e mesmo pedido ao Worker da Sala do Escritor) ===== */
-let TAB=null,mzEsc="Livro",aberta=null,abertos=new Set(),mzTimer=null;
-let actStep="",actModule="";
-let ST={m:{},arq:[]};
-try{const s=JSON.parse(localStorage.getItem("ps_matriz_mesa")||"null");if(s&&s.m)ST={m:s.m,arq:Array.isArray(s.arq)?s.arq:[]}}catch(e){}
-const gravar=()=>{try{localStorage.setItem("ps_matriz_mesa",JSON.stringify(ST))}catch(e){}};
-const mzD=()=>(ST.m[mzEsc]=ST.m[mzEsc]||{});
-const grupo=i=>(String(i.bloco)==="01"&&/^01\.[1-5]$/.test(i.cod))?"N":String(i.bloco);
-const feita=(m,i)=>((m[i.cod]&&m[i.cod].s)||0)>0||!!(m[i.cod]&&m[i.cod].t&&m[i.cod].t.trim());
-const modName=i=>i.bloco+" — "+String(i.bloco_nome).toUpperCase();
-const itens=()=>((TAB&&TAB[mzEsc])||[]).filter(i=>String(i.simbolo).indexOf("\u26A0")<0);
- 
-function mzRender(){
-  const lista=itens(),m=mzD();
-  const f=lista.filter(i=>feita(m,i)).length;
-  $("prog").textContent=f+" de "+lista.length+" etapas resolvidas · "+Math.round(100*f/Math.max(1,lista.length))+"%";
-  let h="",at="";
-  lista.forEach(i=>{
-    const g=grupo(i),ab=g==="N"||abertos.has(g);
-    if(g!==at){
-      at=g;
-      const dg=lista.filter(x=>grupo(x)===g),fg=dg.filter(x=>feita(m,x)).length;
-      h+=g==="N"?'<h4 class="bl">Núcleo do estudo · a Bíblia · '+fg+"/"+dg.length+"</h4>"
-        :'<h4 class="bl bb" data-g="'+g+'">'+(ab?"▾ ":"▸ ")+g+" · "+esc(i.bloco_nome)+" · "+fg+"/"+dg.length+"</h4>";
+
+    function cleanServiceText(value) {
+      return String(value || '').replace(/\bIA\b/gi, 'serviço de análise');
     }
-    if(!ab)return;
-    const e=m[i.cod]||{},s=e.s||0,o=aberta===i.cod,t=!!(e.t&&e.t.trim()),L=lvl(i.cod),lk=!allowed(i.cod);
-    h+='<div class="et'+(s===1||(s===0&&t)?" ok":s===2?" na":"")+(o?" ab":"")+(lk?" lk":"")+'" data-c="'+i.cod+'">'+
-      '<div class="cab"><button type="button" class="st" title="Pendente, resolvida ou não se aplica">'+["○","●","⊘"][s]+"</button>"+
-      '<span class="cod">'+i.cod+'</span><span class="nm">'+esc(i.nome)+"</span>"+(t?'<span class="tem" title="Tem resposta">✎</span>':"")+
-      '<span class="lv">'+esc(lname(L))+(lk?" 🔒":"")+"</span></div>"+
-      (o?'<div class="co">'+(lk
-        ?'<p class="ds">Esta etapa requer o plano '+esc(lname(L))+'. Faça upgrade para liberar esta análise.</p><a class="btn gold" target="_blank" rel="noopener" href="'+link(L)+'">ASSINAR '+esc(lname(L))+'</a><p class="ds"><strong>Antes de assinar:</strong> use no pagamento o mesmo e-mail da sua conta no site. É por ele que o plano é liberado.</p>'
-        :'<div class="ln"><p class="ds">'+esc(i.descricao)+'</p><button type="button" class="btn apag">APAGAR BUSCA</button><button type="button" class="btn gold pesq">EXECUTAR BUSCA</button></div>'+
-          '<textarea class="tx" placeholder="Sua resposta para esta etapa…">'+esc(e.t||"")+"</textarea>"+(t?'<button type="button" class="btn rv">ENVIAR PARA REVISÃO TEOLÓGICA</button>':""))+"</div>":"")+
-      "</div>";
-  });
-  const topo=$("lista").scrollTop;
-  $("lista").innerHTML=h||'<span class="msg">Nenhuma etapa nesta base.</span>';
-  $("lista").scrollTop=topo;
+
+    const VIDEO_HOSTS = [
+      'youtube.com','m.youtube.com','youtu.be','youtube-nocookie.com',
+      'vimeo.com','player.vimeo.com',
+      'tiktok.com','x.com','twitter.com','instagram.com','facebook.com','fb.watch'
+    ];
+
+    function isVideoSource(source) {
+      const mediaType = String(source.mediaType || '').toLowerCase();
+      const type = String(source.type || '').toLowerCase();
+      if (mediaType.includes('víde') || mediaType.includes('vide') ||
+          type.includes('víde') || type.includes('vide')) {
+        return true;
+      }
+      // O Worker real (grounding do Google Search) não envia mediaType/type,
+      // então também detectamos vídeo pelo domínio da própria URL da fonte.
+      if (!source.url) return false;
+      try {
+        const host = new URL(source.url).hostname.replace(/^www\./, '');
+        return VIDEO_HOSTS.includes(host);
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function getEmbedUrl(url) {
+      if (!url) return null;
+      try {
+        const u = new URL(url);
+        const host = u.hostname.replace(/^www\./, '');
+
+        if (host === 'youtu.be') {
+          const id = u.pathname.slice(1);
+          return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+        }
+
+        if (host === 'youtube.com' || host === 'm.youtube.com') {
+          const id = u.searchParams.get('v');
+          if (id) return `https://www.youtube-nocookie.com/embed/${id}`;
+          const shorts = u.pathname.match(/\/shorts\/([^/]+)/);
+          if (shorts) return `https://www.youtube-nocookie.com/embed/${shorts[1]}`;
+          return null;
+        }
+
+        if (host === 'vimeo.com') {
+          const id = u.pathname.split('/').filter(Boolean)[0];
+                    return id && /^\d+/.test(id) ? `https://player.vimeo.com/video/${id}` : null;
+        }
+      } catch (_) {
+        return null;
+      }
+      return null;
+    }
+
+
+    const oracleSideToggle = document.getElementById('side-oracle-toggle');
+    const oracleSideIndex = document.getElementById('side-oracle-index');
+    const indexList = document.getElementById('oracle-index-list');
+
+
+
+    const TRACKING_ORDER = [
+      ['1','Portal de Transparência próprio do órgão','official-own'],
+      ['2','Portal de Transparência do governo (federal, estadual ou municipal)','official-government'],
+      ['3','Portal oficial de Acesso à Informação / LAI','official-lai'],
+      ['4','Portal oficial institucional — Transparência, LAI, Prestação de Contas, Dados Abertos','official-institutional'],
+      ['5','Diário Oficial correspondente','official-gazette'],
+      ['6','Tribunal de Contas competente (TCU/TCE/TCM)','control-audit'],
+      ['7','Controladoria / órgão de controle competente','control'],
+      ['8','Base oficial de dados do governo','official-database'],
+      ['9','Fonte secundária — imprensa, mídia, perfis não oficiais etc.','secondary']
+    ];
+    let trackingContext = {area:'', subarea:'', entity:''};
+    const trackingOverlay = document.getElementById('oracle-tracking-overlay');
+    const trackingTrigger = document.getElementById('oracle-tracking-trigger');
+    const trackingClose = document.getElementById('tracking-close');
+    const trackingOrder = document.getElementById('tracking-order');
+    const trackingForm = document.getElementById('tracking-form');
+    const trackingList = document.getElementById('tracking-publications-list');
+    const trackingContextEl = document.getElementById('tracking-context');
+    const TRACKING_STORAGE_KEY = 'oraculo_tracking_publications_v1';
+
+    function renderTrackingOrder(){
+      trackingOrder.innerHTML = TRACKING_ORDER.map(item =>
+      `<div class="tracking-step" data-tier="item[0]"><spanclass="num">{item[0]}</span><span>${escapeHtml(item[1])}</span><span class="state">aguardar pesquisa</span></div>` 
+      ).join('');
+    }
+    function getTrackingRecords(){
+      try { const v=JSON.parse(localStorage.getItem(TRACKING_STORAGE_KEY)||'[]'); return Array.isArray(v)?v:[]; }
+      catch(_){ return []; }
+    }
+    function renderTrackingRecords(){
+      const records=getTrackingRecords();
+      if(!records.length){ trackingList.innerHTML='<div class="tracking-note">Nenhuma publicação registrada ainda.</div>'; return; }
+      trackingList.innerHTML=records.slice().reverse().map(r=>`
+        <article class="tracking-publication">
+          <span class="tracking-badge">${escapeHtml(r.type||'PUBLICAÇÃO')}</span>
+          <strong>${escapeHtml(r.title||'Sem título')}</strong><br>
+                   escapeHtml(r.source||'Fontenãoidentificada'){r.date?' · '+escapeHtml(r.date):''}<br>
+          ${r.entity?'<strong>Entidade:</strong> '+escapeHtml(r.entity):''}
+          ${r.sphere?' · '+escapeHtml(r.sphere):''}
+          ${r.url?'<br><a href="'+escapeHtml(r.url)+'" target="_blank" rel="noopener noreferrer">Abrir publicação original</a>':''}
+          ${r.notes?'<div class="tracking-classification"><strong>Observações:</strong> '+escapeHtml(r.notes)+'</div>':''}
+          <div class="tracking-classification"><strong>Classificação:</strong> ainda não realizada</div>
+        </article>`).join('');
+    }
+    function updateTrackingContext(){
+      const parts=[trackingContext.entity,trackingContext.area,trackingContext.subarea].filter(Boolean);
+      trackingContextEl.innerHTML='<strong>Objeto atual:</strong> '+escapeHtml(parts.join(' · ')||'consulta geral')+'<br><span>O rastreamento registra publicações; não determina a verdade nesta etapa.</span>';
+      if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
+    }
+    function openTracking(){ trackingOverlay.classList.add('active'); trackingOverlay.setAttribute('aria-hidden','false'); trackingTrigger.setAttribute('aria-expanded','true'); updateTrackingContext(); renderTrackingOrder(); renderTrackingRecords(); }
+    function closeTracking(){ trackingOverlay.classList.remove('active'); trackingOverlay.setAttribute('aria-hidden','true'); trackingTrigger.setAttribute('aria-expanded','false'); }
+    trackingTrigger.addEventListener('click',openTracking); trackingClose.addEventListener('click',closeTracking);
+    trackingOverlay.addEventListener('click',e=>{if(e.target===trackingOverlay)closeTracking();});
+    trackingForm.addEventListener('submit',e=>{
+      e.preventDefault(); const fd=new FormData(trackingForm); const record={
+        id:Date.now().toString(36)+Math.random().toString(36).slice(2), entity:fd.get('entity')||'', sphere:fd.get('sphere')||'', url:fd.get('url')||'', title:fd.get('title')||'', source:fd.get('source')||'', type:fd.get('type')||'', date:fd.get('date')||'', notes:fd.get('notes')||'', createdAt:new Date().toISOString()
+      }; const records=getTrackingRecords(); records.push(record); localStorage.setItem(TRACKING_STORAGE_KEY,JSON.stringify(records)); renderTrackingRecords(); trackingForm.reset(); if(trackingContext.entity) document.getElementById('tracking-entity').value=trackingContext.entity;
+    });
+    document.getElementById('tracking-clear').addEventListener('click',()=>{ if(confirm('Apagar os registros de publicações salvos neste navegador?')){localStorage.removeItem(TRACKING_STORAGE_KEY);renderTrackingRecords();} });
+
+ function renderOracleIndex() {
+  indexList.innerHTML = ORACULO_AREAS.map(area => `
+    <div class="oracle-index-item">
+      <button
+        type="button"
+        class="oracle-index-area"
+        data-area="${area.id}"
+        aria-expanded="false"
+      >
+        <span class="oracle-index-number">${area.id}</span>
+        <span class="oracle-index-name">${escapeHtml(area.name)}</span>
+        <span class="oracle-index-chevron">›</span>
+      </button>
+
+      <div class="oracle-index-subareas" data-subareas="${area.id}">
+        ${area.subareas.map(subarea => `
+          <button
+            type="button"
+            class="oracle-index-subarea"
+            data-area="${area.id}"
+            data-subarea="${escapeHtml(subarea)}"
+          >
+            ${escapeHtml(subarea)}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
 }
-async function loadTab(){
-  try{
-    const r=await fetch("tabela.json",{cache:"no-cache"});
-    if(!r.ok)throw new Error("tabela.json não encontrado");
-    TAB=await r.json();
-    if(!TAB[mzEsc])mzEsc=Object.keys(TAB)[0];
-    $("mzEsc").innerHTML=Object.keys(TAB).map(k=>'<option value="'+esc(k)+'">'+esc(k)+"</option>").join("");
-    $("mzEsc").value=mzEsc;
-    mzRender();
-  }catch(e){console.error(e);$("lista").innerHTML='<span class="msg">Não foi possível ler o tabela.json. Confira se ele está na mesma pasta desta página.</span>'}
-}
-$("mzEsc").onchange=function(){mzEsc=this.value;aberta=null;mzRender()};
- 
-function mzEscopoDaEtapa(it){return({"01.1":"Livro","01.2":"Capítulo","01.3":"Perícope","01.4":"Versículo","01.5":"Palavra"})[it.cod]||mzEsc}
-function mzPassagem(escopo){
-  const livro=BK[cur.l][1],cap=PT[cur.l].chapters[cur.c-1]||[],nums=[...sel].sort((a,b)=>a-b);
-  if(escopo==="Livro")return{ok:true,p:{book:livro,reference:livro,text:""}};
-  if(escopo==="Capítulo")return{ok:true,p:{book:livro,reference:livro+" "+cur.c,text:cap.map((t,i)=>(i+1)+" "+t).join("\n")}};
-  if(!nums.length)return{ok:false,erro:"Selecione, à esquerda, os versículos desta etapa."};
-  const ref=livro+" "+cur.c+":"+intervalos(nums),texto=nums.map(n=>n+" "+(cap[n-1]||"")).join("\n");
-  if(escopo==="Palavra"){
-    const w=(window.prompt("Qual palavra deste texto você quer estudar?")||"").trim();
-    if(!w)return{ok:false,erro:"Informe a palavra para pesquisar."};
-    return{ok:true,p:{book:livro,reference:ref,text:texto,word:w}};
-  }
-  return{ok:true,p:{book:livro,reference:ref,text:texto}};
-}
-async function mzOriginal(it,escopo){
-  if(escopo==="Livro")return{ok:true};
-  const cod=it.cod,code=BK[cur.l][0],ot=isOT(cur.l);
-  if(cod==="01.8")return{ok:false,erro:"A Septuaginta não está carregada nesta página. Esta etapa não pode usar texto real."};
-  if(cod==="01.6"&&!ot)return{ok:false,erro:"01.6 é texto hebraico: serve só para livros do Antigo Testamento."};
-  if(cod==="01.7"&&ot)return{ok:false,erro:"01.7 é texto grego: serve só para livros do Novo Testamento."};
-  const lingua=/^(01\.[67]|03\.\d+|04\.\d+)$/.test(cod);
-  const nums=escopo==="Capítulo"?Array.from({length:(PT[cur.l].chapters[cur.c-1]||[]).length},(_,i)=>i+1):[...sel].sort((a,b)=>a-b);
-  let m=null;try{m=await mapaOrig(code,ot)}catch(e){}
-  const linhas=m?nums.map(n=>m.get(cur.c+":"+n)?n+" "+m.get(cur.c+":"+n):"").filter(Boolean):[];
-  if(!linhas.length){return lingua?{ok:false,erro:"Não foi possível carregar o texto original desta passagem. Tente de novo."}:{ok:true}}
-  return{ok:true,original:linhas.join("\n"),lang:ot?"hebraico, WLC":"grego, Nestle 1904",lingua};
-}
-async function mzPesquisar(cod,btn){
-  const it=itens().find(x=>x.cod===cod);
-  if(!it)return;
-  if(!allowed(cod)){toast("Esta etapa requer o plano "+lname(lvl(cod))+".");return}
-  try{await loadPT()}catch(e){toast(e.message);return}
-  const escopo=mzEscopoDaEtapa(it),r=mzPassagem(escopo);
-  if(!r.ok){toast(r.erro);return}
-  const o=await mzOriginal(it,escopo);
-  if(!o.ok){toast(o.erro);return}
-  if(o.original){r.p.original=o.original;r.p.originalLang=o.lang;if(o.lingua)r.p.text=""}
-  const m=mzD(),atual=(m[cod]&&m[cod].t)||"";
-  if(atual.trim()&&!window.confirm("Esta etapa já tem texto. Substituir pela pesquisa?"))return;
-  btn.disabled=true;btn.textContent="PESQUISANDO…";
-  try{
-    const sess=await getSession();
-    const resp=await fetch(WORKER+"/api/pesquisa",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+sess.access_token},
-      body:JSON.stringify({analysisType:"textual_study_step",scope:escopo,stepCode:it.cod,stepName:it.nome,instruction:it.descricao,question:it.nome,passage:r.p})});
-    const d=await resp.json().catch(()=>({}));
-    if(resp.status===401){await sb.auth.signOut();throw new Error("Sua sessão expirou. Entre novamente.")}
-    if(!resp.ok||!d.ok)throw new Error(d.error||"Não foi possível pesquisar agora.");
-    const txt=String(d.text||d.answer||"").replace(/\*/g,"");
-    m[cod]=m[cod]||{};m[cod].t=txt;
-    ST.arq.unshift({id:String(Date.now()),em:new Date().toISOString(),cod,nome:it.nome,escopo,ref:r.p.reference||"",texto:txt});
-    gravar();mzRender();
-  }catch(e){console.error(e);toast(e.message||"Não foi possível pesquisar agora.");btn.disabled=false;btn.textContent="EXECUTAR BUSCA"}
-}
-$("lista").onclick=function(ev){
-  const h=ev.target.closest(".bb");
-  if(h){const g=h.dataset.g;if(abertos.has(g))abertos.delete(g);else abertos.add(g);mzRender();return}
-  const et=ev.target.closest(".et");if(!et)return;
-  const cod=et.dataset.c,m=mzD(),it=itens().find(x=>x.cod===cod);
-  if(ev.target.closest(".st")){m[cod]=m[cod]||{};m[cod].s=((m[cod].s||0)+1)%3;gravar();mzRender();return}
-  if(ev.target.closest(".apag")){m[cod]=m[cod]||{};m[cod].t="";gravar();mzRender();return}
-  if(ev.target.closest(".pesq")){mzPesquisar(cod,ev.target.closest(".pesq"));return}
-  if(ev.target.closest(".rv")){
-    lastMesaAnswer=(m[cod]&&m[cod].t||"").trim();lastMesaModule=it?modName(it):"";lastMesaStep=it?it.cod+" — "+it.nome:"";
-    actStep=lastMesaStep;actModule=lastMesaModule;openRevisor("platform_mesa");return;
-  }
-  if(ev.target.closest(".cab")){
-    aberta=aberta===cod?null:cod;
-    if(aberta&&it){abertos.add(grupo(it));actStep=it.cod+" — "+it.nome;actModule=modName(it)}
-    mzRender();
-    if(aberta){const el=$("lista").querySelector('.et[data-c="'+cod+'"]');if(el){el.scrollIntoView({block:"nearest"});const t=el.querySelector(".tx");if(t)t.focus()}}
-  }
-};
-$("lista").oninput=function(ev){
-  if(!ev.target.classList.contains("tx"))return;
-  const cod=ev.target.closest(".et").dataset.c,m=mzD();
-  m[cod]=m[cod]||{};m[cod].t=ev.target.value;
-  clearTimeout(mzTimer);mzTimer=setTimeout(gravar,400);
-};
- 
-/* ===== ARQUIVO ===== */
-const dataHora=iso=>{const d=iso?new Date(iso):null;return d&&!isNaN(d)?d.toLocaleDateString("pt-BR")+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"Data não registrada"};
-function arqDesenhar(){
-  $("arqBody").innerHTML=ST.arq.length?ST.arq.map(a=>'<div class="arq"><strong>'+esc(dataHora(a.em))+(a.cod?" — "+esc(a.cod)+" "+esc(a.nome||""):"")+(a.ref?" · "+esc(a.ref):"")+"</strong><br>"+esc(a.texto)+
-    '<div class="row" style="margin-top:6px"><button type="button" class="btn" data-a="copiar" data-id="'+esc(a.id)+'">COPIAR</button><button type="button" class="btn" data-a="excluir" data-id="'+esc(a.id)+'">EXCLUIR</button></div></div>').join(""):'<p class="msg">Nenhuma pesquisa arquivada ainda.</p>';
-}
-$("mzArq").onclick=()=>{arqDesenhar();$("arqOv").style.display="flex"};
-$("arqOv").onclick=function(ev){
-  if(ev.target===this){this.style.display="none";return}
-  const b=ev.target.closest("[data-a]");if(!b)return;
-  const a=b.dataset.a;
-  if(a==="fechar"){this.style.display="none";return}
-  if(a==="limpar"){if(!ST.arq.length||!window.confirm("Apagar TODAS as pesquisas do arquivo? Não dá para desfazer."))return;ST.arq=[];gravar();arqDesenhar();return}
-  const it=ST.arq.find(x=>x.id===b.dataset.id);if(!it)return;
-  if(a==="copiar"){if(navigator.clipboard)navigator.clipboard.writeText(it.texto);toast("Texto copiado.")}
-  else if(window.confirm("Excluir esta pesquisa do arquivo? Não dá para desfazer.")){ST.arq=ST.arq.filter(x=>x.id!==it.id);gravar();arqDesenhar()}
-};
- 
-/* ===== REVISOR TEOLÓGICO ===== */
-let lastMesaAnswer="",lastMesaModule="",lastMesaStep="",revisorOrigin="external_unit";
-const CAN={
- "01":{name:"TEXTO BÍBLICO",sources:"NA28; SBLGNT; BHS; BHQ; Septuaginta SBL; Textus Receptus/Scrivener como comparação histórica.",rule:"O texto bíblico é a fonte primária; o texto crítico eclético é o texto-base e tradições alternativas são testemunhos comparativos."},
- "02":{name:"CRÍTICA TEXTUAL",sources:"Bruce Metzger; NA28; BHS/BHQ; SBLGNT; Septuaginta.",rule:"Variantes relevantes devem ser sinalizadas e nunca apresentadas como fatos indiscutíveis."},
- "03":{name:"GRAMÁTICA E SINTAXE",sources:"Gramáticas gregas do NT; sintaxe grega avançada; gramáticas e sintaxe hebraicas; materiais de análise gramatical.",rule:"Não construir doutrina a partir de palavra isolada; considerar a palavra dentro da construção e do contexto."},
- "04":{name:"LÉXICO",sources:"BDAG como principal e LSJ como complementar no NT; HALOT como principal e BDB como complementar no AT.",rule:"O contexto determina o sentido; possibilidades semânticas não significam que todos os sentidos foram pretendidos."},
- "05":{name:"LÉXICO TEOLÓGICO",sources:"TDNT; NIDNTTE; TDOT; NIDOTTE.",rule:"O conceito teológico permanece subordinado ao uso efetivo da palavra no texto estudado."},
- "06":{name:"EXEGESE",sources:"BECNT; NIGTC; NICNT; Pillar; WBC; NICOT; Baker OT; AOTC.",rule:"Integrar argumento, estrutura, contexto, gênero e intenção comunicativa sem repetir mecanicamente as etapas anteriores."},
- "07":{name:"CONTEXTO HISTÓRICO-CULTURAL",sources:"Zondervan Encyclopedia of the Bible; IVP Bible Background Commentary; New Bible Dictionary; ANET; COS; Zondervan Atlas; Manners and Customs.",rule:"Não inserir pano de fundo especulativo sem fonte primária ou evidência material/arqueológica."},
- "08":{name:"HERMENÊUTICA E CONTROLE DE ERROS",sources:"Grant Osborne; D. A. Carson; Carson & Moo; Dillard & Longman; Fee & Stuart.",rule:"Auditar anacronismo, eisegese, falácia lexical, descontextualização, alegorização, generalização e transferência indevida AT–NT."},
- "09":{name:"TEOLOGIA BÍBLICA",sources:"G. K. Beale; Beale & Carson; Geerhardus Vos; Graeme Goldsworthy; Thomas Schreiner.",rule:"Localizar a passagem na trajetória temática do cânon, distinguindo-a do mecanismo textual específico do ANL-10."},
- "10":{name:"USO DO AT NO NT",sources:"Beale & Carson; NA28; BHS/BHQ; Septuaginta; BDAG; HALOT; NIDNTTE; NIDOTTE; TDNT; TDOT; comentários exegéticos.",rule:"Detectar citações, alusões, ecos, paralelos, uso da LXX, releituras cristológicas e cumprimento de promessas."},
- "11":{name:"TEOLOGIA SISTEMÁTICA",sources:"Grudem; Berkhof; Frame; Evangelical Dictionary of Theology.",rule:"Validar doutrinariamente sem determinar primariamente o significado; seguir texto → exegese → teologia bíblica → doutrina → teologia sistemática."},
- "12":{name:"COMPARAÇÃO DE INTERPRETAÇÕES",sources:"Reconsulta transversal dos ANLs 01–11, conforme as evidências e as interpretações concorrentes identificadas.",rule:"Preservar o debate acadêmico, localizar argumentos, pressupostos e grau de consenso, distinguindo fato textual de interpretação."}
-};
-function getCanonicalGuidance(){
-  const m=String(actStep||actModule||"").match(/^\s*(\d{2})/);
-  return(m&&CAN[m[1]])||{name:"MATRIZ CANÔNICA",sources:"Selecione uma subetapa para receber a sugestão de fontes prioritárias.",rule:"A conclusão deve ser proporcional às evidências e nenhuma fonte ou localização deve ser inventada."};
-}
-function comparisonPrompt(referenceText,writerContent,guidance){
-  const ref=referenceText||"Nenhuma referência foi colada. Use a sugestão canônica abaixo e selecione as fontes reconhecidas adequadas ao módulo e à subetapa.";
-  return `
-ANÁLISE DE COMPARAÇÃO E CONSOLIDAÇÃO
- 
-REFERÊNCIA DE COMPARAÇÃO FORNECIDA PELO USUÁRIO:
----
-${ref}
----
- 
-SUGESTÃO DA MATRIZ CANÔNICA DO WORKER:
-MÓDULO: ${guidance.name}
-FONTES PRIORITÁRIAS: ${guidance.sources}
-REGRA METODOLÓGICA: ${guidance.rule}
- 
-CONTEÚDO DO ESCRITOR — TEXTO A SER AUDITADO:
----
-${writerContent}
----
- 
+
+    function setOracleIndexOpen(open) {
+      oracleSideToggle.setAttribute('aria-expanded', String(open));
+      oracleSideIndex.setAttribute('aria-hidden', String(!open));
+    }
+
+    oracleSideToggle.addEventListener('click', () => {
+      const open = oracleSideToggle.getAttribute('aria-expanded') === 'true';
+      setOracleIndexOpen(!open);
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && oracleSideToggle.getAttribute('aria-expanded') === 'true') {
+        setOracleIndexOpen(false);
+        oracleSideToggle.focus();
+      }
+    });
+
+    indexList.addEventListener('click', event => {
+      const areaButton = event.target.closest('.oracle-index-area');
+
+      if (areaButton) {
+        const id = areaButton.dataset.area;
+        const subareas = indexList.querySelector(
+          `.oracle-index-subareas[data-subareas="${id}"]`
+        );
+
+        if (!subareas) return;
+
+        const willOpen = !subareas.classList.contains('active');
+
+        indexList.querySelectorAll('.oracle-index-subareas').forEach(box => {
+          box.classList.remove('active');
+        });
+
+        indexList.querySelectorAll('.oracle-index-area').forEach(button => {
+          button.classList.remove('active');
+          button.setAttribute('aria-expanded', 'false');
+        });
+
+        if (willOpen) {
+          subareas.classList.add('active');
+          areaButton.classList.add('active');
+          areaButton.setAttribute('aria-expanded', 'true');
+        }
+
+        return;
+      }
+
+      const subareaButton = event.target.closest('.oracle-index-subarea');
+
+      if (subareaButton) {
+        const area = ORACULO_AREAS.find(
+          item => item.id === subareaButton.dataset.area
+        );
+
+        if (!area) return;
+
+               const jaSelecionada = subareaButton.classList.contains('selected');
+
+        indexList.querySelectorAll('.oracle-index-subarea.selected').forEach(b => {
+          b.classList.remove('selected');
+        });
+
+        if (jaSelecionada) {
+          trackingContext.area = '';
+          trackingContext.subarea = '';
+        } else {
+          subareaButton.classList.add('selected');
+          trackingContext.area = area.name;
+          trackingContext.subarea = subareaButton.dataset.subarea;
+        }
+
+        input.focus();
+      }
+    });
+
+    renderOracleIndex();
+  setOracleIndexOpen(false);
+
+    function renderOracleResult(data) {
+      const text = cleanServiceText(
+               data.answer ||
+        data.text ||
+        data.response ||
+        'A investigação não devolveu uma resposta.'
+      );
+
+      const sources = Array.isArray(data.sources) ? data.sources : [];
+
+      let confidence = data.confidence || data.verificationStatus || '';
+      if (!confidence) {
+        // O Worker real não envia "confidence"; usamos o sinal que ele
+        // efetivamente fornece (grounded = achou fonte autorizada ou não).
+        if (data.grounded === true) confidence = 'fontes localizadas (grau não classificado pelo serviço)';
+        else if (data.grounded === false) confidence = 'nenhuma fonte autorizada localizada';
+        else confidence = 'não indicado pelo serviço';
+      }
+
+      const checkedAt = data.checkedAt
+        ? new Date(data.checkedAt).toLocaleString('pt-BR')
+        : 'momento da consulta';
+
+      let html =
+        '<div class="oracle-result-meta">' +
+        '<strong>Estado da verificação:</strong> ' +
+        escapeHtml(confidence) +
+        '<br><strong>Consultado em:</strong> ' +
+        escapeHtml(checkedAt) +
+        '</div>';
+
+      html +=
+        '<div class="oracle-result-text">' +
+        escapeHtml(text).replace(/\n/g, '<br>') +
+        '</div>';
+
+           html += '<div class="oracle-bible-invitation"><div><strong>O QUE A BÍBLIA DIZ?</strong><span>O Oráculo não dará um parecer próprio. Esta etapa coloca a questão diante das Escrituras.</span></div><button type="button" class="oracle-bible-button">CONSULTAR AS ESCRITURAS</button></div>';
+      if (sources.length) {
+        html +=
+          '<div class="oracle-sources">' +
+          '<h3>PUBLICAÇÕES / FONTES ENCONTRADAS</h3>' +
+          sources.map(source => {
+            const publisher = source.publisher || source.source || source.domain || 'Fonte não identificada';
+             const sourceTier = source.sourceTier || source.tier || source.sourceLevel || '';
+            const type = source.type || (source.domain ? 'resultado de busca' : 'conteúdo');
+            const sourceClass = String(source.sourceClass || source.sourceTier || '').toLowerCase().includes('original') ? 'FONTE ORIGINAL' : (String(source.sourceClass || source.sourceTier || '').toLowerCase().includes('official') || String(source.sourceClass || '').toLowerCase().includes('oficial') ? 'FONTE OFICIAL' : (type.toLowerCase().includes('news') || type.toLowerCase().includes('jornal') || type.toLowerCase().includes('imprensa') ? 'FONTE JORNALÍSTICA' : 'FONTE / PUBLICAÇÃO'));
+            const title = source.title || 'Sem título';
+            const date = source.publishedAt
+              ? ' · ' + escapeHtml(source.publishedAt)
+              : '';
+            const author = source.author
+              ? '<br>Autor: ' + escapeHtml(source.author)
+              : '';
+            const isVideo = isVideoSource(source);
+            const embedUrl = isVideo ? getEmbedUrl(source.url) : null;
+
+            const platformLine = (source.platform || source.channelOrAccount)
+              ? '<br>' +
+                (source.platform ? escapeHtml(source.platform) : '') +
+                (source.platform && source.channelOrAccount ? ' · ' : '') +
+                (source.channelOrAccount ? escapeHtml(source.channelOrAccount) : '')
+              : '';
+
+            const url = source.url
+              ? '<br><a href="' +
+                escapeHtml(source.url) +
+                '" target="_blank" rel="noopener noreferrer">' +
+                (isVideo ? '▶ Assistir na fonte original' : 'Abrir publicação original') +
+                '</a>'
+              : '';
+
+            const badge = isVideo
+              ? '<span class="oracle-media-badge">▶ VÍDEO</span> '
+              : '';
+
+            const embed = embedUrl
+              ? '<div class="oracle-video-embed"><iframe src="' +
+                escapeHtml(embedUrl) +
+                '" title="' + escapeHtml(title) + '" loading="lazy" ' +
+                'allow="accelerometer; encrypted-media; picture-in-picture" ' +
+                'allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
+              : '';
+
+            return (
+              '<div class="oracle-result-source' + (isVideo ? ' is-video' : '') + '">' +
+              badge +
+              '<span class="oracle-source-class">' + escapeHtml(sourceClass) + '</span><br><strong>' + escapeHtml(publisher) + '</strong> — '+
+              escapeHtml(type) + (sourceTier ? ' · <span class="tracking-badge">ETAPA '+escapeHtml(sourceTier)+'</span>' : '') +
+              '<br>' +
+              escapeHtml(title) +
+              date +
+              platformLine +
+              author +
+              url +
+              embed +
+              '</div>'
+            );
+          }).join('') +
+          '</div>';
+      } else {
+        html +=
+          '<div class="oracle-result-source">' +
+          '<strong>Publicações estruturadas não devolvidas.</strong><br>' +
+          'O serviço não apresentou links verificáveis para esta resposta. ' +
+          'Trate o resultado como orientação preliminar.' +
+          '</div>';
+      }
+
+      if (Array.isArray(data.searchQueries) && data.searchQueries.length) {
+        html +=
+          '<div class="oracle-result-meta">' +
+          '<strong>Consultas realizadas pelo serviço:</strong> ' +
+          data.searchQueries.map(q => escapeHtml(q)).join(' · ') +
+          '</div>';
+      }
+
+      if (Array.isArray(data.limitations) && data.limitations.length) {
+        html +=
+          '<div class="oracle-result-meta">' +
+          '<strong>Limitações:</strong> ' +
+          escapeHtml(data.limitations.join(' ')) +
+          '</div>';
+      }
+
+      return html;
+    }
+
+    messages.addEventListener('click', async event => {
+      const b = event.target.closest('.oracle-bible-button');
+      if (!b) return;
+      const question = b.dataset.question || window.__oraculoLastQuestion || '';
+      if (!question) return;
+      b.disabled = true; b.textContent = 'CONSULTANDO...';
+      const ans = document.createElement('div'); ans.className='ai-chat-answer';
+      ans.innerHTML='<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div><div>Consultando as Escrituras e organizando o contexto bíblico...</div>';
+      messages.appendChild(ans); messages.scrollTop=messages.scrollHeight;
+      const prompt = `ETAPA BÍBLICA DO ORÁCULO.\n\nQuestão investigada:\n${question}\n\nO Oráculo não dá parecer próprio. Nesta etapa, apresente livremente o que a Bíblia diz, sem suavizar sua afirmação para agradar à cultura, política, opinião pública ou ao pesquisador. Use somente afirmações bíblicas sustentáveis. Não invente versículos. Apresente: O QUE A BÍBLIA DIZ; TEXTOS BÍBLICOS; CONTEXTO; O QUE O TEXTO AFIRMA; INTERPRETAÇÕES RELEVANTES quando houver; SÍNTESE À LUZ DAS ESCRITURAS. Diferencie texto bíblico de interpretação humana.`;
+      try{
+        const r=await fetch(`${AI_PROXY_URL.replace(/\/$/,'')}/api/pesquisa`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'free',accessLevel:'free',question:prompt,topic:'ORÁCULO — O QUE A BÍBLIA DIZ?',module:'ORÁCULO — ETAPA BÍBLICA',discipline:'Bíblia',studyContext:{trackingContext}})});
+        const ct=r.headers.get('content-type')||''; let d=ct.includes('application/json')?await r.json():{error:await r.text()};
+        if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`);
+        if(typeof d.text==='string'&&d.text.trim().startsWith('{')){try{d=JSON.parse(d.text)}catch(_){} }
+        const text=d.text||d.answer||d.response||'A consulta bíblica não devolveu uma resposta.';
+        ans.innerHTML='<div class="oracle-result-meta"><strong>ETAPA:</strong> O QUE A BÍBLIA DIZ?</div><div class="oracle-result-text">'+escapeHtml(cleanServiceText(text)).replace(/\n/g,'<br>')+'</div>';
+      }catch(e){ ans.textContent='Não foi possível concluir a consulta bíblica: '+(e.message||'erro desconhecido'); }
+      finally{b.disabled=false;b.textContent='CONSULTAR AS ESCRITURAS';messages.scrollTop=messages.scrollHeight;}
+    });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+
+      const question = input.value.trim();
+      window.__oraculoLastQuestion = question;
+      if (!question) {
+        input.focus();
+        return;
+      }
+
+      const button = form.querySelector('button');
+      const userMessage = document.createElement('div');
+      const answer = document.createElement('div');
+
+      userMessage.className = 'ai-chat-message user';
+      userMessage.textContent = question;
+      messages.appendChild(userMessage);
+
+      answer.className = 'ai-chat-answer';
+      answer.textContent = 'A investigar a pergunta...';
+      messages.appendChild(answer);
+
+      input.value = '';
+      button.disabled = true;
+      loading.style.display = 'block';
+      messages.scrollTop = messages.scrollHeight;
+
+      const researchPrompt = `Atue como um mecanismo de pesquisa geral e editor responsável.
+
+Pergunta do pesquisador:
+${question}
+
 OBJETIVO:
-Compare o conteúdo do escritor com a referência de comparação. Quando a referência estiver vazia, selecione e priorize as fontes indicadas pela matriz canônica do Worker para o módulo e a subetapa atuais.
- 
-PROCEDIMENTO OBRIGATÓRIO:
-1. Identifique cada afirmação verificável do conteúdo do escritor.
-2. Compare cada afirmação com a referência fornecida ou, quando ela estiver vazia, com as fontes canônicas prioritárias sugeridas acima.
-3. Classifique cada afirmação com exatamente uma destas categorias: CONCORDÂNCIA, DIVERGÊNCIA, SUPORTE PARCIAL ou EVIDÊNCIA INSUFICIENTE.
-4. Explique o motivo da classificação, distinguindo o que está explicitamente documentado de qualquer inferência.
-5. Registre a fonte, o autor e a localização que fundamentam a classificação. Use página, capítulo, seção, verbete, referência bíblica, parágrafo ou outro local verificável.
-6. Não invente fontes, autores, páginas, citações ou localizações. Quando a localização não estiver disponível, escreva "localização não confirmada".
-7. O texto bíblico é a fonte primária quando o tema for textual; comentários e teologias não podem substituir o texto. Respeite também a regra metodológica específica da matriz canônica.
-8. Quando houver divergência entre intérpretes, preserve as interpretações concorrentes, localize seus argumentos e pressupostos e apresente uma conclusão proporcional às evidências.
-9. Se não houver base suficiente, classifique como EVIDÊNCIA INSUFICIENTE; ausência de evidência localizada não deve ser apresentada automaticamente como refutação.
-10. Finalize com uma síntese consolidada, principais divergências, lacunas de evidência e limitações da auditoria.
- 
-FORMATO PREFERENCIAL:
-RELATÓRIO DE AUDITORIA
- 
-Para cada afirmação: número, afirmação, classificação, comparação, fonte, autor, localização e justificativa.
-`;
-}
-function formatAuditItem(it,i){
-  const g=(...k)=>k.map(x=>it?.[x]).find(Boolean);
-  return `${i+1}. AFIRMAÇÃO\n${g("statement","claim","afirmacao","text")||"Afirmação não identificada"}\n\nCLASSIFICAÇÃO: ${g("classification","classificacao","status")||"EVIDÊNCIA INSUFICIENTE"}\nCOMPARAÇÃO: ${g("comparison","comparacao","analysis","analise")||"Comparação não informada."}\nFONTE: ${g("source","fonte","work","obra")||"Fonte não informada"}\nAUTOR: ${g("author","autor")||"Autor não informado"}\nLOCALIZAÇÃO: ${g("location","localizacao","reference")||"localização não confirmada"}\nJUSTIFICATIVA: ${g("basis","fundamentacao","justification","justificativa")||"Justificativa não informada."}`;
-}
-function formatComparisonError(error,data){
-  const raw=String(error?.message||data?.error||"Não foi possível realizar a auditoria."),n=raw.toLowerCase();
-  if(["limite de requisições","limite de créditos","quota","rate limit","resource exhausted","429"].some(k=>n.includes(k)))
-    return "RELATÓRIO DE AUDITORIA\n\nA análise não foi concluída porque o serviço de IA atingiu o limite de requisições ou créditos.\n\nO conteúdo do escritor e a referência permanecem salvos nesta sessão. Tente novamente mais tarde ou verifique a cota do projeto de IA.\n\nDetalhe técnico: "+raw;
-  return "RELATÓRIO DE AUDITORIA\n\nA análise não foi concluída.\n\n"+raw;
-}
-function extractAuditReport(d){
-  const items=[d?.claims,d?.afirmacoes,d?.items,d?.report?.claims,d?.report?.items,d?.audit?.claims,d?.audit?.items].find(Array.isArray);
-  if(items)return `${d?.summary||d?.synthesis||d?.sintese||"RELATÓRIO DE AUDITORIA"}\n\n${items.map(formatAuditItem).join("\n\n────────────────────────\n\n")}`;
-  if(typeof d?.report==="string")return d.report;
-  if(typeof d?.auditReport==="string")return d.auditReport;
-  return d?.text||d?.answer||d?.response||d?.result||"A comparação não devolveu conteúdo.";
-}
-function openRevisor(origin){
-  revisorOrigin=origin||"external_unit";
-  const mesa=revisorOrigin==="platform_mesa";
-  $("revNote").textContent=mesa?"Origem: conteúdo produzido na Mesa de Análise. Incluído no seu plano APROFUNDAMENTO — não consome unidade.":"Origem: conteúdo externo colado por você. Não exige plano APROFUNDAMENTO — consome 1 unidade de revisão.";
-  $("revTema").value=mesa?lastMesaModule:"";$("revSub").value=mesa?lastMesaStep:"";$("revCont").value=mesa?lastMesaAnswer:"";$("revRef").value="";
-  $("revRep").textContent="O relatório de auditoria aparecerá aqui depois da revisão.";
-  $("revOv").style.display="flex";
-}
-function closeRevisor(){$("revOv").style.display="none"}
-async function submitRevisor(){
-  const tema=$("revTema").value.trim(),sub=$("revSub").value.trim(),ref=$("revRef").value.trim(),cont=$("revCont").value.trim(),rep=$("revRep"),btn=$("revGo");
-  if(!cont){rep.textContent="Cole o conteúdo do escritor antes de enviar para revisão.";return}
-  if(revisorOrigin==="platform_mesa"&&plan!=="MASTER"&&plan!=="DOCTUS"){
-    rep.innerHTML='O Revisor Teológico para conteúdos da Mesa/Pergunta Livre é um recurso do plano APROFUNDAMENTO. Faça upgrade para liberar esta revisão.<br><br><a class="btn gold" target="_blank" rel="noopener" href="'+link("MASTER")+'">FAZER UPGRADE PARA APROFUNDAMENTO</a>';
-    return;
-  }
-  const guidance=tema?{name:tema,sources:"Selecionar fontes reconhecidas adequadas ao tema.",rule:"Aplicar a regra normativa do módulo/tema informado, quando identificável."}:getCanonicalGuidance();
-  rep.textContent="REVISÃO EM ANDAMENTO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
-  btn.disabled=true;btn.textContent="REVISANDO...";
-  try{
-    const sess=await getSession();
-    const payload={mode:"writing_private",accessLevel:"private",analysisType:"comparison_consolidation",origin:revisorOrigin,referenceText:ref,writerContent:cont,
-      canonicalGuidance:{module:guidance.name,sources:guidance.sources,rule:guidance.rule},question:comparisonPrompt(ref,cont,guidance),
-      topic:sub||tema||"REVISOR TEOLÓGICO",module:tema||"REVISOR TEOLÓGICO",discipline:"MÉTODO TÉCNICO DE PESQUISA"};
-    /* Não enviar stepCode quando a origem é external_unit, para não disparar a exigência de plano por subetapa no Worker. */
-    if(revisorOrigin==="platform_mesa"&&sub){const m=sub.match(/^\d{2}\.\d+/);if(m){payload.stepCode=m[0];payload.requiredLevel=lvl(m[0])}}
-    const resp=await fetch(WORKER+"/api/pesquisa",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+sess.access_token},body:JSON.stringify(payload)});
-    let d={};try{d=await resp.json()}catch{d={}}
-    if(resp.status===401){await sb.auth.signOut();throw new Error("Sua sessão expirou. Entre novamente.")}
-    if(resp.status===402)throw new Error(d?.error||"Você não tem unidades disponíveis. Compre um pacote para continuar.");
-    if(resp.status===403)throw new Error(d?.error||"Este item requer um plano superior ao seu plano atual.");
-    if(!resp.ok)throw new Error(d?.error||"O Worker não conseguiu concluir a revisão.");
-    rep.textContent=extractAuditReport(d);
-  }catch(e){console.error(e);rep.textContent=formatComparisonError(e,{error:e?.message})}
-  finally{btn.disabled=false;btn.textContent="ENVIAR PARA REVISÃO"}
-}
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeRevisor();$("arqOv").style.display="none"}});
- 
-/* ===== INICIALIZAÇÃO ===== */
-head();bandeja();loadTab();
-loadPT().then(()=>{capitulos();lerVersos()}).catch(e=>{console.error(e);$("vs").innerHTML='<span class="msg">Não foi possível carregar a Bíblia. Verifique a conexão.</span>'});
-</script>
+Responder à pergunta por meio de pesquisa interna em fontes e publicações adequadas ao assunto. O pesquisador não precisa indicar previamente a disciplina, área, site ou fonte.
+
+REGRAS:
+1. Classifique internamente o assunto e escolha os tipos de fonte adequados.
+2. Não restrinja a consulta a notícias.
+3. Priorize publicações, documentos e dados verificáveis.
+4. Para informações atuais, priorize conteúdo recente e informe a data.
+5. Não invente fontes, autores, datas, URLs ou evidências.
+6. Diferencie fatos publicados, interpretações, hipóteses, opiniões e ausência de evidência.
+7. Quando houver divergência relevante entre fontes, apresente-a claramente.
+8. Quando possível, apresente as publicações originais utilizadas.
+9. Para assuntos com provável registo audiovisual, procure também fontes em vídeo.
+10. Para vídeos de redes sociais, confirme a oficialidade do perfil; se não for possível, marque a fonte como não verificada.
+11. Se a evidência for insuficiente, declare essa limitação em vez de completar a lacuna por inferência.
+12. Quando a consulta envolver uma entidade ou órgão, siga esta ordem de busca: 1) Portal de Transparência próprio; 2) Portal de Transparência do governo ao qual pertence; 3) Acesso à Informação/LAI; 4) portal institucional; 5) Diário Oficial; 6) Tribunal de Contas competente; 7) Controladoria competente; 8) base oficial de dados; 9) fontes secundárias.
+13. Não pare necessariamente na primeira fonte encontrada: registre as publicações relevantes das etapas aplicáveis para formar o rastro documental.
+14. Canais oficiais do próprio órgão (site, YouTube, TV, Instagram, Facebook, X, LinkedIn, TikTok etc.) são fontes oficiais institucionais; não devem ser tratados como fonte secundária.
+15. Nesta etapa, registre a existência e os metadados da publicação. Não classifique o conteúdo como verdadeiro ou falso apenas por ter sido localizado.`;
+
+      try {
+        const response = await fetch(
+          `${AI_PROXY_URL.replace(/\/$/, '')}/api/pesquisa`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              mode: 'free',
+              accessLevel: 'free',
+                           question: question,
+              topic: 'ORÁCULO — CONSULTA GERAL',
+              module: 'ORÁCULO — CONSULTA GERAL',
+              discipline: '',
+              studyContext: {
+                trackingContext,
+                sourceOrder: TRACKING_ORDER.map(x => ({step:x[0], source:x[1]}))
+              }
+            })
+          }
+        );
+
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json')
+          ? await response.json()
+          : {error: await response.text()};
+
+        if (!response.ok) {
+          const serviceMessage =
+            data && typeof data.error === 'string'
+              ? data.error
+              : `O serviço devolveu HTTP ${response.status}.`;
+          throw new Error(serviceMessage);
+        }
+
+        let parsed = data || {};
+        if (typeof parsed.text === 'string' && parsed.text.trim().startsWith('{')) {
+          try {
+            parsed = JSON.parse(parsed.text);
+          } catch (_) {
+            parsed = {text: parsed.text};
+          }
+        }
+
+        answer.innerHTML = renderOracleResult(parsed);
+                const bibleBtn = answer.querySelector('.oracle-bible-button');
+        if (bibleBtn) bibleBtn.dataset.question = question;
+      } catch (error) {
+        console.error('Erro no chat Oráculo:', error);
+        const message = String(error && error.message || '');
+
+        if (message === 'Failed to fetch') {
+          answer.textContent =
+            'Não foi possível ligar ao serviço de investigação. Verifique a ligação e tente novamente.';
+        } else if (/quota|rate.?limit|billing|plan/i.test(message)) {
+                   answer.textContent =
+            'O serviço de investigação atingiu o limite de utilização. Tente novamente mais tarde. Detalhe técnico: ' + message;
+        } else {
+          answer.textContent =
+            `Não foi possível concluir a investigação: ${message}`;
+        }
+      } finally {
+        button.disabled = false;
+               
+        loading.style.display = 'none';
+        messages.scrollTop = messages.scrollHeight;
+      }
+    });
+
+    input.focus();
+  </script>
 <script>
 (function(){
-  var U="https://qmhdbuxomozdczgvpvcc.supabase.co",K="sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8",done=false;
-  function reg(pais,cidade){
-    if(done)return;done=true;
-    try{
-      var vid=localStorage.getItem("ps_visitante_id");
-      if(!vid){vid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+"-"+Math.random().toString(16).slice(2);localStorage.setItem("ps_visitante_id",vid)}
-      var p={pagina:"Método Técnico de Pesquisa",visitante_id:vid};if(pais)p.pais=pais;if(cidade)p.cidade=cidade;
-      fetch(U+"/rest/v1/visitas",{method:"POST",headers:{apikey:K,Authorization:"Bearer "+K,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(p)}).catch(function(){});
-    }catch(e){}
-  }
-  setTimeout(function(){reg(null,null)},2500);
-  fetch("https://ipapi.co/json/").then(function(r){return r.json()}).then(function(i){reg(i&&i.country_name,i&&i.city)}).catch(function(){reg(null,null)});
+  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+  var PAGINA = "Oráculo";
+
+  try{
+    var vid = localStorage.getItem("ps_visitante_id");
+    if(!vid){
+      vid = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+      localStorage.setItem("ps_visitante_id", vid);
+    }
+
+    fetch(SUPABASE_URL + "/rest/v1/visitas", {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ pagina: PAGINA, visitante_id: vid })
+    }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
+  }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
 })();
 </script>
+ <script>
+(function(){
+var KEY='oraculo_evidencia_audiovisual_v1';
+var css=`
+.av-open-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.av-open-btn{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 14px;border:1px solid var(--navy-soft);border-radius:6px;background:var(--navy);color:#dbe7f5;font-family:var(--font-body);font-size:11.5px;font-weight:700;letter-spacing:.05em;cursor:pointer}
+.av-open-btn:hover{background:var(--navy-soft);color:#fff}
+.av-open-hint{color:var(--ink-soft);font-size:11px}
+.av-overlay{position:fixed;inset:0;z-index:1200;display:none;align-items:flex-start;justify-content:center;padding:28px 14px;overflow-y:auto;background:rgba(0,0,0,.6)}
+.av-overlay.active{display:flex}
+.av-modal{width:min(760px,100%);padding:24px 26px 26px;border:1px solid #263754;border-radius:14px;background:#000;color:#f2f5fa;font-family:var(--font-body);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.av-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.av-head h2{margin:0;color:#fff;font-family:var(--font-body);font-size:20px;font-weight:700;line-height:1.3}
+.av-close{flex:0 0 auto;width:32px;height:32px;border:1px solid #3a4a66;border-radius:50%;background:transparent;color:#c9d4e6;font-size:17px;cursor:pointer}
+.av-close:hover{background:#16233c;color:#fff}
+.av-goal{margin:12px 0 0;color:#b9c5d8;font-size:13px;line-height:1.55}
+.av-prefill-note{margin:12px 0 0;padding:10px 12px;border-left:2px solid #d7b76a;background:#0b1220;color:#dbe7f5;font-size:12px;line-height:1.5}
+.av-top{display:flex;justify-content:flex-end;margin:14px 0 6px;color:#9fb0c8;font-size:12px}
+.av-bar{height:4px;background:#1b2740;border-radius:4px;overflow:hidden}
+.av-bar i{display:block;height:100%;width:0;background:#d7b76a;transition:width .25s}
+.av-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0}
+.av-tab{padding:9px 6px;border:1px solid #3a4a66;border-radius:8px;background:transparent;color:#b9c5d8;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer}
+.av-tab.on{background:#1b2740;border-color:#d7b76a;color:#fff}
+.av-tab.ok::after{content:" ✓";color:#7fd39b}
+.av-l{display:block;margin:0 0 5px;color:#9fb0c8;font-size:12px}
+.av-g{display:grid;gap:10px;margin-bottom:10px}
+.av-c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.av-c3{grid-template-columns:1fr 1.4fr 1fr}
+.av-c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.av-form input[type="text"],.av-form select{width:100%;padding:11px 14px;border:1px solid #3a4a66;border-radius:10px;background:#000;color:#f2f5fa;font:inherit;font-size:14px;color-scheme:dark}
+.av-form input::placeholder{color:#7f90ab}
+.av-form input:focus,.av-form select:focus{outline:none;border-color:#d7b76a}
+.av-hint{margin:0 0 10px;color:#9fb0c8;font-size:12px}
+.av-p{display:none}.av-p.on{display:block}
+.av-seg{display:flex;gap:6px;flex-wrap:wrap}
+.av-seg label{padding:8px 12px;border:1px solid #3a4a66;border-radius:8px;color:#b9c5d8;font-size:13px;cursor:pointer}
+.av-seg input{display:none}
+.av-seg label.on{background:#1b2740;border-color:#d7b76a;color:#fff}
+.av-it{position:relative;margin-bottom:8px;padding:12px;border:1px solid #263754;border-radius:10px;background:#0b1220}
+.av-rm{position:absolute;top:6px;right:8px;border:0;background:transparent;color:#9fb0c8;font-size:18px;cursor:pointer}
+.av-rm:hover{color:#fff}
+.av-add,.av-mini,.av-aux button{padding:8px 12px;border:1px solid #3a4a66;border-radius:8px;background:transparent;color:#dbe7f5;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer}
+.av-add:hover,.av-mini:hover,.av-aux button:hover{background:#16233c}
+.av-stamp{display:inline-block;padding:3px 9px;border-radius:8px;background:#0f2a1b;color:#7fd39b;font-size:12px}
+.av-sum{margin-top:14px;padding:10px 12px;border-radius:8px;background:#0b1220;color:#b9c5d8;font-size:12.5px;line-height:1.5}
+.av-nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid #1d2a42}
+.av-nav button{min-height:42px;padding:0 20px;border:0;border-radius:6px;background:var(--brass);color:#fffdf6;font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.av-nav button:hover{background:var(--brass-deep)}
+.av-nav #av-prev{background:#1b2740;color:#dbe7f5}
+.av-aux{display:flex;gap:8px;margin-top:10px}
+.av-status{min-height:18px;margin-top:10px;color:#7fd39b;font-size:12px}
+.av-saved{margin-top:20px;padding-top:16px;border-top:1px solid #1d2a42}
+.av-saved-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.av-saved h3{margin:0;color:#9fb0c8;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.av-saved-item{position:relative;margin:8px 0;padding:12px 14px;border:1px solid #263754;border-radius:8px;background:#0b1220;color:#dbe7f5;font-size:12.5px;line-height:1.55}
+.av-saved-item strong{color:#fff}
+.av-saved-item a{color:#d7b76a;font-weight:700;word-break:break-all}
+.av-badge{display:inline-block;margin-bottom:5px;padding:2px 7px;border-radius:4px;background:#1b2740;color:#dbe7f5;font-size:10px;font-weight:700;letter-spacing:.05em}
+.av-sub{margin-top:6px;padding-top:6px;border-top:1px dashed #263754;color:#b9c5d8}
+.av-del{position:absolute;top:8px;right:10px;border:0;background:transparent;color:#9fb0c8;font-size:11px;cursor:pointer;text-decoration:underline}
+.av-del:hover{color:#fff}
+.av-saved-empty{color:#7f90ab;font-size:12px}
+.av-fill-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 12px;border:0;border-radius:5px;background:var(--navy);color:#eef2f8;font-family:var(--font-body);font-size:10.5px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.av-fill-btn:hover{background:var(--navy-soft);color:#fff}
+@media(max-width:600px){
+.av-overlay{padding:0}
+.av-modal{min-height:100%;border-radius:0;padding:18px 14px 24px}
+.av-c2,.av-c3,.av-c4{grid-template-columns:1fr 1fr}
+.av-head h2{font-size:17px}
+}
+`;
+var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+
+var sf=document.getElementById('oracle-form');
+if(sf&&sf.parentNode){sf.insertAdjacentHTML('beforebegin',`
+<div class="av-open-row">
+<button type="button" class="av-open-btn" id="av-open" aria-haspopup="dialog" aria-controls="av-overlay">▶ EVIDÊNCIA AUDIOVISUAL</button>
+<span class="av-open-hint">Nível D — registrar vídeos e publicações</span>
+</div>`);}
+
+document.body.insertAdjacentHTML('beforeend',`
+<div class="av-overlay" id="av-overlay" aria-hidden="true">
+<div class="av-modal" role="dialog" aria-modal="true" aria-labelledby="av-title">
+<div class="av-head"><h2 id="av-title">Nível D — Evidência audiovisual</h2><button type="button" class="av-close" id="av-close" aria-label="Fechar formulário">×</button></div>
+<p class="av-goal">Registre a publicação como fato: quem publicou, quando, onde, com que alcance e que repercussão teve. A ficha não avalia se o conteúdo é verdadeiro.</p>
+<div class="av-prefill-note" id="av-prefill-note" hidden></div>
+<div class="av-top"><span id="av-pc">0% preenchido</span></div>
+<div class="av-bar"><i id="av-pb"></i></div>
+<div class="av-tabs" id="av-tabs">
+<button type="button" class="av-tab on" data-i="0">1 Publicação</button>
+<button type="button" class="av-tab" data-i="1">2 Alcance</button>
+<button type="button" class="av-tab" data-i="2">3 Repercussão</button>
+<button type="button" class="av-tab" data-i="3">4 Impacto</button>
+</div>
+<form class="av-form" id="av-form" novalidate onsubmit="return false">
+<div class="av-p on" id="av-p0">
+<div class="av-g av-c2">
+<div><span class="av-l">Quem publicou</span><input id="av-quem" type="text" placeholder="Canal, perfil ou órgão" autocomplete="off"></div>
+<div><span class="av-l">Plataforma</span><select id="av-plat"><option value="">Escolha</option><option>YouTube</option><option>Instagram</option><option>Facebook</option><option>X</option><option>TikTok</option><option>TV / emissora</option><option>Outra</option></select></div>
+</div>
+<div class="av-g"><div><span class="av-l">Título ou legenda</span><input id="av-tit" type="text" autocomplete="off"></div></div>
+<span class="av-l">Data da publicação</span>
+<div class="av-g av-c3" style="margin-bottom:4px">
+<input id="av-ano" type="text" inputmode="numeric" maxlength="4" placeholder="Ano" autocomplete="off">
+<select id="av-mes"><option value="">Mês</option><option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option><option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option><option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select>
+<select id="av-dia"><option value="">Dia</option></select>
+</div>
+<p class="av-hint">Se não souber o mês ou o dia, deixe em branco.</p>
+<div class="av-g"><div><span class="av-l">Link</span><input id="av-url" type="text" placeholder="https://..." autocomplete="off"></div></div>
+<span class="av-l">Situação da publicação</span>
+<div class="av-seg" id="av-seg">
+<label class="on"><input type="radio" name="avsit" value="Confirmada na conta de origem" checked>Confirmada na origem</label>
+<label><input type="radio" name="avsit" value="Encontrada só em cópia">Só em cópia</label>
+<label><input type="radio" name="avsit" value="Origem não confirmada">Origem não confirmada</label>
+<label><input type="radio" name="avsit" value="Removida">Removida</label>
+</div>
+</div>
+<div class="av-p" id="av-p1">
+<p class="av-hint">O alcance muda com o tempo. A data da consulta é registrada ao salvar.</p>
+<div class="av-g av-c4">
+<div><span class="av-l">Visualizações</span><input class="av-al" data-f="vis" type="text" inputmode="numeric" autocomplete="off"></div>
+<div><span class="av-l">Curtidas</span><input class="av-al" data-f="cur" type="text" inputmode="numeric" autocomplete="off"></div>
+<div><span class="av-l">Compartilhamentos</span><input class="av-al" data-f="comp" type="text" inputmode="numeric" autocomplete="off"></div>
+<div><span class="av-l">Comentários</span><input class="av-al" data-f="com" type="text" inputmode="numeric" autocomplete="off"></div>
+</div>
+<span class="av-stamp">consulta registrada ao salvar</span>
+</div>
+<div class="av-p" id="av-p2">
+<p class="av-hint">Quem se manifestou sobre a publicação. Você decide quem é relevante.</p>
+<div id="av-l2"></div><button type="button" class="av-add" data-add="2">+ Adicionar manifestação</button>
+</div>
+<div class="av-p" id="av-p3">
+<p class="av-hint">Efeitos documentados da publicação, sempre com link e data.</p>
+<div id="av-l3"></div><button type="button" class="av-add" data-add="3">+ Adicionar efeito</button>
+</div>
+</form>
+<div class="av-sum" id="av-sum"></div>
+<div class="av-nav"><button type="button" id="av-prev">Voltar</button><button type="button" id="av-next">Avançar</button></div>
+<div class="av-aux"><button type="button" id="av-usar">Usar na pesquisa</button><button type="button" id="av-limpar">Limpar campos</button></div>
+<div class="av-status" id="av-status" role="status" aria-live="polite"></div>
+<div class="av-saved">
+<div class="av-saved-head"><h3>Registros salvos neste navegador</h3><button type="button" class="av-mini" id="av-export">Exportar (.json)</button></div>
+<div id="av-saved-list"></div>
+</div>
+</div></div>`);
+
+function $(id){return document.getElementById(id)}
+function esc(v){var d=document.createElement('div');d.textContent=String(v==null?'':v);return d.innerHTML}
+function safeUrl(u){try{var x=new URL(u);return(x.protocol==='http:'||x.protocol==='https:')?x.href:''}catch(_){return ''}}
+function getRecs(){try{var v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return []}}
+function setRecs(r){try{localStorage.setItem(KEY,JSON.stringify(r));return true}catch(_){return false}}
+function fmt(iso){if(!iso)return '';var p=String(iso).split('-');if(p.length===3)return p[2]+'/'+p[1]+'/'+p[0];if(p.length===2)return p[1]+'/'+p[0];return p[0]}
+function today(){return new Date().toISOString().slice(0,10)}
+function say(m){var s=$('av-status');s.textContent=m;if(m)setTimeout(function(){if(s.textContent===m)s.textContent=''},3500)}
+
+var dia=$('av-dia');
+for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=(d<10?'0':'')+d;o.textContent=d;dia.appendChild(o)}
+
+var cur=0,tabs=document.querySelectorAll('.av-tab'),pans=[0,1,2,3].map(function(i){return $('av-p'+i)});
+function go(i){
+cur=Math.max(0,Math.min(3,i));
+tabs.forEach(function(t,k){t.classList.toggle('on',k===cur)});
+pans.forEach(function(p,k){p.classList.toggle('on',k===cur)});
+$('av-prev').style.visibility=cur===0?'hidden':'visible';
+$('av-next').textContent=cur===3?'Salvar registro':'Avançar';
+}
+
+function itemHtml(kind){
+if(kind==='2')return '<div class="av-g av-c2"><div><span class="av-l">Nome</span><input type="text" data-f="nome" autocomplete="off"></div><div><span class="av-l">Cargo ou instituição</span><input type="text" data-f="cargo" autocomplete="off"></div></div><div class="av-g av-c3" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:0"><div><span class="av-l">Tipo</span><select data-f="tipo"><option>Apoio</option><option>Crítica</option><option>Resposta oficial</option><option>Comentário</option></select></div><div><span class="av-l">Data</span><input type="text" data-f="data" placeholder="dd/mm/aaaa" autocomplete="off"></div><div><span class="av-l">Link da declaração</span><input type="text" data-f="url" autocomplete="off"></div></div>';
+return '<div class="av-g av-c2"><div><span class="av-l">Tipo de efeito</span><select data-f="tipo"><option>Cobertura da imprensa</option><option>Resposta de órgão público</option><option>Decisão judicial</option><option>Decisão administrativa</option><option>Mobilização</option></select></div><div><span class="av-l">Data</span><input type="text" data-f="data" placeholder="dd/mm/aaaa" autocomplete="off"></div></div><div class="av-g" style="margin-bottom:0"><div><span class="av-l">O que foi observado</span><input type="text" data-f="obs" autocomplete="off"></div><div><span class="av-l">Link da fonte</span><input type="text" data-f="url" autocomplete="off"></div></div>';
+}
+function addItem(kind){
+var w=document.createElement('div');w.className='av-it';
+w.innerHTML=itemHtml(kind)+'<button type="button" class="av-rm" aria-label="Remover item">×</button>';
+w.querySelector('.av-rm').addEventListener('click',function(){w.remove();upd()});
+$('av-l'+kind).appendChild(w);upd();
+}
+function readItems(id){
+var out=[];
+document.querySelectorAll('#'+id+' .av-it').forEach(function(it){
+var o={},any=false;
+it.querySelectorAll('[data-f]').forEach(function(f){var v=f.value.trim();o[f.dataset.f]=v;if(v&&f.tagName==='INPUT')any=true});
+if(any)out.push(o);
+});
+return out;
+}
+function sit(){var c=document.querySelector('input[name="avsit"]:checked');return c?c.value:''}
+function setSit(val){
+document.querySelectorAll('input[name="avsit"]').forEach(function(r){r.checked=(r.value===val)});
+document.querySelectorAll('#av-seg label').forEach(function(l){l.classList.toggle('on',l.querySelector('input').checked)});
+}
+function lerData(){
+var a=('av-ano').value.trim(),m=('av-mes').value,d=$('av-dia').value;
+if(!a&&!m&&!d)return{v:'',e:''};
+if(!/^\d{4}$/.test(a))return{v:'',e:'Informe o ano com 4 números (ex.: 2025).'};
+if(d&&!m)return{v:'',e:'Para informar o dia, escolha também o mês.'};
+if(d&&Number(d)>new Date(Number(a),Number(m),0).getDate())return{v:'',e:'Esse mês não tem o dia '+Number(d)+'.'};
+return{v:[a,m,d].filter(Boolean).join('-'),e:''};
+}
+function readAlc(){
+var o={},any=false;
+document.querySelectorAll('.av-al').forEach(function(i){var v=i.value.trim().slice(0,20);o[i.dataset.f]=v;if(v)any=true});
+return any?o:null;
+}
+
+function upd(){
+var m=readItems('av-l2'),e=readItems('av-l3');
+var ok=[!!(('av-quem').value.trim()&&('av-url').value.trim()),!!readAlc(),m.length>0,e.length>0];
+tabs.forEach(function(t,k){t.classList.toggle('ok',ok[k])});
+var pct=Math.round(ok.filter(Boolean).length/4*100);
+('av-pc').textContent=pct+'%preenchido';('av-pb').style.width=pct+'%';
+var dt=[('av-dia').value,('av-mes').value,$('av-ano').value.trim()].filter(Boolean).join('/');
+var s=[('av-quem').value.trim()||'Semorigem',('av-plat').value,dt,sit()].filter(Boolean).join(' · ');
+$('av-sum').textContent='Resumo: '+s+' · '+m.length+' manifestação(ões) · '+e.length+' efeito(s)';
+}
+
+function resetAll(){
+$('av-form').reset();
+('av-l2').innerHTML='';('av-l3').innerHTML='';
+setSit('Confirmada na conta de origem');
+$('av-prefill-note').hidden=true;
+go(0);upd();
+}
+
+function lineA(a,q){
+var n=[['vis','visualizações'],['cur','curtidas'],['comp','compartilhamentos'],['com','comentários']].filter(function(p){return a[p[0]]}).map(function(p){return esc(a[p[0]])+' '+p[1]});
+return n.length?'<div class="av-sub">Alcance (consulta em '+esc(fmt(q))+'): '+n.join(' · ')+'</div>':'';
+}
+function lnk(u,t){var s=safeUrl(u);return s?' · <a href="'+esc(s)+'" target="_blank" rel="noopener noreferrer">'+t+'</a>':''}
+function renderSaved(){
+var recs=getRecs(),box=$('av-saved-list');
+if(!recs.length){box.innerHTML='<div class="av-saved-empty">Nenhum registro salvo ainda.</div>';return}
+box.innerHTML=recs.slice().reverse().map(function(r){
+var del='<button type="button" class="av-del" data-del="'+esc(r.id)+'">Apagar</button>';
+if(r.v===2){
+var h='<article class="av-saved-item">'+del+'<span class="av-badge">'+esc((r.situacao||'sem situação').toUpperCase())+'</span><br><strong>'+esc(r.titulo||r.quem||'Sem título')+'</strong>'+(r.titulo&&r.quem?' · '+esc(r.quem):'')+(r.plat?' · '+esc(r.plat):'')+(r.data?' · '+esc(fmt(r.data)):'')+lnk(r.url,'Abrir publicação');
+if(r.alcance)h+=lineA(r.alcance,r.consultaEm);
+(r.manifest||[]).forEach(function(x,i){h+=(i===0?'<div class="av-sub"><strong>Repercussão</strong></div>':'')+'<div>'+esc(x.nome||'Sem nome')+(x.cargo?' ('+esc(x.cargo)+')':'')+' — '+esc(x.tipo||'')+(x.data?' · '+esc(x.data):'')+lnk(x.url,'declaração')+'</div>'});
+(r.efeitos||[]).forEach(function(x,i){h+=(i===0?'<div class="av-sub"><strong>Impacto registrado</strong></div>':'')+'<div>'+esc(x.tipo||'')+(x.obs?': '+esc(x.obs):'')+(x.data?' · '+esc(x.data):'')+lnk(x.url,'fonte')+'</div>'});
+return h+'</article>';
+}
+var link=safeUrl(r.url);
+return '<article class="av-saved-item">'+del+'<span class="av-badge">'+esc((r.autenticidade||'REGISTRO ANTIGO').toUpperCase())+'</span><br><strong>'+esc(r.tipo||'Evidência')+'</strong>'+(r.origem?' · '+esc(r.origem):'')+(r.data?' · '+esc(fmt(r.data)):'')+(r.tempo?'<br>Trecho: '+esc(r.tempo):'')+(link?'<br><a href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">Abrir vídeo</a>':'')+(r.obs?'<br>'+esc(r.obs):'')+'</article>';
+}).join('');
+}
+
+var overlay=$('av-overlay'),lastFocus=null;
+function openModal(){lastFocus=document.activeElement;overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');renderSaved();document.body.style.overflow='hidden';$('av-quem').focus()}
+function closeModal(){overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');document.body.style.overflow='';if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+var ob=$('av-open');if(ob)ob.addEventListener('click',openModal);
+$('av-close').addEventListener('click',closeModal);
+overlay.addEventListener('mousedown',function(e){if(e.target===overlay)closeModal()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&overlay.classList.contains('active'))closeModal()});
+
+tabs.forEach(function(t){t.addEventListener('click',function(){go(Number(t.dataset.i))})});
+$('av-prev').addEventListener('click',function(){go(cur-1)});
+document.querySelectorAll('[data-add]').forEach(function(b){b.addEventListener('click',function(){addItem(b.dataset.add)})});
+$('av-seg').addEventListener('change',function(){setSit(sit());upd()});
+$('av-form').addEventListener('input',upd);
+$('av-form').addEventListener('change',upd);
+var platAuto=false;
+$('av-plat').addEventListener('change',function(){platAuto=false;});
+function autoPlat(){
+  var u=safeUrl($('av-url').value.trim());
+  if(!u)return;
+  var p=guessPlat({url:u,domain:hostOf(u)});
+  if(p&&(!$('av-plat').value||platAuto)){
+    $('av-plat').value=p;
+    platAuto=true;
+    upd();
+  }
+}
+$('av-url').addEventListener('input',autoPlat);
+$('av-url').addEventListener('paste',function(){setTimeout(autoPlat,0);});
+$('av-url').addEventListener('change',autoPlat);
+function save(){
+var dt=lerData();
+if(dt.e){go(0);say(dt.e);return}
+var url=$('av-url').value.trim();
+if(url&&!safeUrl(url)){go(0);say('O link precisa começar com http:// ou https://');return}
+var quem=('av-quem').value.trim(),tit=('av-tit').value.trim();
+if(!quem&&!tit&&!url){go(0);say('Preencha ao menos quem publicou, o título ou o link.');return}
+var alc=readAlc();
+var rec={v:2,id:Date.now().toString(36)+Math.random().toString(36).slice(2),createdAt:new Date().toISOString(),quem:quem,plat:$('av-plat').value,titulo:tit,data:dt.v,url:url,situacao:sit(),alcance:alc,consultaEm:alc?today():'',manifest:readItems('av-l2'),efeitos:readItems('av-l3')};
+var recs=getRecs();recs.push(rec);
+if(setRecs(recs)){renderSaved();resetAll();say('Registro salvo.')}
+else say('Não foi possível salvar neste navegador.');
+}
+$('av-next').addEventListener('click',function(){if(cur<3)go(cur+1);else save()});
+
+$('av-usar').addEventListener('click',function(){
+var dt=lerData(),p=['Verificar publicação audiovisual'];
+if(('av-quem').value.trim())p.push('publicadapor:'+('av-quem').value.trim());
+if(('av-plat').value)p.push('plataforma:'+('av-plat').value);
+if(('av-tit').value.trim())p.push('título:'+('av-tit').value.trim());
+if(dt.v)p.push('data: '+fmt(dt.v));
+if(('av-url').value.trim())p.push('link:'+('av-url').value.trim());
+p.push('situação: '+sit());
+var c=$('oracle-question');if(c)c.value=p.join('; ')+'.';
+closeModal();if(c)c.focus();
+});
+$('av-limpar').addEventListener('click',function(){resetAll();say('Campos limpos.')});
+
+$('av-saved-list').addEventListener('click',function(e){
+var b=e.target.closest('.av-del');if(!b)return;
+if(!confirm('Apagar este registro?'))return;
+setRecs(getRecs().filter(function(r){return r.id!==b.getAttribute('data-del')}));
+renderSaved();say('Registro apagado.');
+});
+$('av-export').addEventListener('click',function(){
+var recs=getRecs();if(!recs.length){say('Nenhum registro para exportar.');return}
+var blob=new Blob([JSON.stringify(recs,null,2)],{type:'application/json'});
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='evidencias-audiovisuais.json';
+document.body.appendChild(a);a.click();a.remove();
+setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+});
+
+var orig=window.renderOracleResult;
+if(typeof orig==='function'){
+window.renderOracleResult=function(data){
+var html=orig(data);
+var list=(data&&Array.isArray(data.sources))?data.sources:[];
+window.__oraculoSources=list;
+if(!list.length)return html;
+var box=document.createElement('div');box.innerHTML=html;
+box.querySelectorAll('.oracle-sources .oracle-result-source').forEach(function(card,i){
+if(!list[i]||!list[i].url||card.querySelector('.av-fill-btn'))return;
+var b=document.createElement('button');b.type='button';b.className='av-fill-btn';
+b.setAttribute('data-av-index',String(i));b.textContent='▶ REGISTRAR NA FICHA DE EVIDÊNCIA';
+card.appendChild(document.createElement('br'));card.appendChild(b);
+});
+return box.innerHTML;
+};
+}
+function hostOf(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(_){return ''}}
+function isoDate(v){
+if(!v)return '';var s=String(v).trim();
+if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+var br=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);if(br)return br[3]+'-'+br[2]+'-'+br[1];
+var d=new Date(s);return isNaN(d.getTime())?'':d.toISOString().slice(0,10);
+}
+function guessPlat(src){
+var h=(hostOf(src.url)+' '+String(src.domain||'')).toLowerCase();
+if(/youtube|youtu\.be/.test(h))return 'YouTube';
+if(/instagram/.test(h))return 'Instagram';
+if(/facebook|fb\.watch/.test(h))return 'Facebook';
+if(/(^|\s|\.)x\.com|twitter/.test(h))return 'X';
+if(/tiktok/.test(h))return 'TikTok';
+return '';
+}
+function prefill(src){
+var q=window.__oraculoLastQuestion||'';
+resetAll();
+$('av-quem').value=src.publisher||src.source||src.domain||'';
+$('av-plat').value=guessPlat(src);
+$('av-tit').value=src.title||'';
+var p=isoDate(src.publishedAt).split('-');
+('av-ano').value=p[0]||'';('av-mes').value=p[1]||'';$('av-dia').value=p[2]||'';
+$('av-url').value=src.url||'';
+setSit('Origem não confirmada');
+var n=$('av-prefill-note');n.hidden=false;
+n.textContent='Ficha preenchida com o que o Oráculo encontrou'+(q?' na consulta "'+q+'"':'')+'. Confira a origem, a data e a situação antes de salvar.';
+upd();
+}
+document.addEventListener('click',function(e){
+var b=e.target.closest('.av-fill-btn');if(!b)return;
+var src=(window.__oraculoSources||[])[Number(b.getAttribute('data-av-index'))];
+if(!src)return;
+prefill(src);openModal();
+});
+
+go(0);upd();renderSaved();
+})();
+</script>
+ 
+
+
+
 </body>
 </html>
- 
 
 
 
