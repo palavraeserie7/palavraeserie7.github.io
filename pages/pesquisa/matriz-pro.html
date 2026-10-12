@@ -1171,6 +1171,14 @@ const MATRIX_LEVELS = {
 };
  
 const LEVEL_RANK = { FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 };
+ const LEVEL_DISPLAY = {
+  FREE:   { nome: "FUNDAMENTOS",    nivel: "NÍVEL I" },
+  PRO:    { nome: "FORMAÇÃO",       nivel: "NÍVEL II" },
+  MASTER: { nome: "APROFUNDAMENTO", nivel: "NÍVEL III" },
+  DOCTUS: { nome: "ESPECIALIZAÇÃO", nivel: "NÍVEL IV" }
+};
+function levelName(l)    { return (LEVEL_DISPLAY[l] || {}).nome  || l; }
+function levelTagText(l) { return (LEVEL_DISPLAY[l] || {}).nivel || l; }
  
 const CHECKOUT_LINKS = {
   PRO: "https://pay.kiwify.com.br/Vjp7c9i",
@@ -1989,7 +1997,7 @@ function renderModules() {
  
       levelTag.dataset.level = level;
  
-      levelTag.textContent = level;
+     levelTag.textContent = levelTagText(level);
  
       step.appendChild(label);
       step.appendChild(levelTag);
