@@ -1,3785 +1,586 @@
 
 
-
-<!DOCTYPE html>
+Matriz pro · HTML
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palavra &amp; Série — Sala do Escritor</title>
+<title>Palavra & Série — Método Técnico de Pesquisa</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- 
 <style>
-:root{
-  --p:#20d66b;
-  --bg:#0b1428;
-  --s:#111b30;
-  --c:#17243a;
-  --i:#0d172b;
-  --t:#dbe7f5;
-  --b:#263754;
-  --a:#18bfff;
-  --muted:#91a4bd;
- 
-  --radius:8px;
-  --shadow:0 18px 45px rgba(0,0,0,.28);
- 
-  --paper:#f4eedd;
-  --paper-card:#fbf7ec;
-  --paper-line:#ddcea4;
-  --ink:#2c2418;
-  --ink-soft:#6c5c42;
-  --brass:#9c7a32;
-  --brass-deep:#7c5f26;
-  --brass-wash:#ede0bd;
-}
- 
+:root{--p:#20d66b;--bg:#0b1428;--s:#111b30;--i:#0d172b;--t:#dbe7f5;--b:#263754;--a:#18bfff;--m:#91a4bd;--paper:#f4eedd;--card:#fbf7ec;--line:#ddcea4;--ink:#2c2418;--soft:#6c5c42;--brass:#9c7a32;--deep:#7c5f26;--wash:#ede0bd}
 *{box-sizing:border-box}
- 
-html{min-height:100%;overflow-y:auto;scroll-behavior:auto}
-body{overflow-y:auto}
- 
-body{
-  margin:0;
-  min-height:100vh;
-  color:var(--t);
-  background:
-    radial-gradient(circle at 12% 0%,rgba(24,191,255,.07),transparent 30%),
-    radial-gradient(circle at 90% 15%,rgba(32,214,107,.06),transparent 28%),
-    linear-gradient(145deg,#0b1428,#0c162b 55%,#091225);
-  font-family:"Segoe UI",Arial,Helvetica,sans-serif;
-}
- 
-header{
-  border-bottom:1px solid var(--b);
-  background:rgba(11,20,40,.94);
-  backdrop-filter:blur(10px);
-  position:sticky;
-  top:0;
-  z-index:20;
-}
- 
-.header-inner{
-  width:min(1180px,92%);
-  margin:auto;
-  min-height:54px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-}
- 
-.brand{display:flex;flex-direction:column;gap:2px}
-.brand-title{font-size:17px;font-weight:700;letter-spacing:1.8px}
-.brand-subtitle{color:var(--muted);font-size:10px;letter-spacing:1.2px}
- 
-.session{display:flex;align-items:center;gap:15px}
-.user-email{
-  color:var(--p);
-  font-size:12px;
-  max-width:280px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
- 
-.btn-logout{
-  border:1px solid var(--b);
-  background:var(--i);
-  color:var(--muted);
-  padding:9px 13px;
-  border-radius:5px;
-  cursor:pointer;
-  font-size:11px;
-  letter-spacing:1px;
-  transition:.2s;
-}
-.btn-logout:hover{border-color:var(--p);color:var(--t);background:#12203a}
-.btn-logout:disabled{opacity:.55;cursor:wait}
- 
-main{
-  width:min(1180px,92%);
-  margin:0 auto;
-  padding:24px 0 50px;
-}
- 
-.hero{margin-bottom:18px}
-.hero-label{color:var(--p);font-size:11px;letter-spacing:2px;margin-bottom:8px}
-.hero h1{margin:0;font-size:27px;font-weight:600;letter-spacing:.3px}
-.hero p{
-  margin:7px 0 0;
-  max-width:760px;
-  color:var(--muted);
-  line-height:1.55;
-  font-size:13px;
-}
- 
-.section-title{
-  color:var(--t);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:2px;
-  margin:18px 0 10px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.section-title::after{
-  content:"";
-  height:1px;
-  flex:1;
-  background:var(--b);
-}
- 
-.workspace{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:18px;
-}
- 
-.card{
-  position:relative;
-  background:linear-gradient(145deg,rgba(23,36,58,.98),rgba(17,27,48,.98));
-  border:1px solid var(--b);
-  border-radius:var(--radius);
-  padding:27px;
-  min-height:175px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  box-shadow:var(--shadow);
-}
- 
-.card-main{display:flex;gap:16px}
-.icon{
-  width:48px;
-  height:48px;
-  flex:0 0 48px;
-  border:1px solid #315071;
-  border-radius:6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:21px;
-  color:var(--a);
-  background:var(--i);
-}
-.card h2{margin:1px 0 9px;font-size:19px;font-weight:600;letter-spacing:.4px}
-.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}
- 
-.card-footer{
-  margin-top:27px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-}
-.card-status{color:#7187a3;font-size:10px;letter-spacing:1.2px;text-transform:uppercase}
- 
-.btn-open{
-  display:inline-block;
-  text-decoration:none;
-  border:1px solid #315071;
-  background:var(--i);
-  color:var(--t);
-  padding:10px 15px;
-  border-radius:5px;
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:1.2px;
-  transition:.2s;
-}
-.btn-open:hover{background:#14253e;border-color:var(--a);color:#fff}
- 
-.stats-card .card-main{width:100%}
-.stats-summary{
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
-  margin-bottom:18px;
-}
-.stats-summary .stat-box{
-  flex:1 1 140px;
-  border:1px solid var(--b);
-  border-radius:6px;
-  background:var(--i);
-  padding:14px 16px;
-}
-.stats-summary .stat-box .stat-num{
-  font-size:24px;
-  font-weight:700;
-  color:var(--p);
-}
-.stats-summary .stat-box .stat-label{
-  font-size:10px;
-  letter-spacing:1px;
-  color:var(--muted);
-  text-transform:uppercase;
-  margin-top:4px;
-}
-.stats-rank{display:flex;flex-direction:column;gap:8px}
-.stats-rank .rank-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.stats-rank .rank-name{
-  flex:0 0 150px;
-  font-size:12px;
-  color:var(--t);
-  font-weight:600;
-}
-.stats-rank .rank-bar-wrap{
-  flex:1;
-  height:8px;
-  background:var(--i);
-  border-radius:4px;
-  overflow:hidden;
-}
-.stats-rank .rank-bar{
-  height:100%;
-  background:linear-gradient(90deg,var(--p),var(--a));
-  border-radius:4px;
-}
-.stats-rank .rank-count{
-  flex:0 0 40px;
-  text-align:right;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:700;
-}
-.stats-refresh{
-  border:1px solid #315071;
-  background:var(--i);
-  color:var(--t);
-  padding:8px 13px;
-  border-radius:5px;
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:1px;
-  cursor:pointer;
-  transition:.2s;
-}
-.stats-refresh:hover{background:#14253e;border-color:var(--a);color:#fff}
-.stats-refresh:disabled{opacity:.6;cursor:default}
-.stats-msg{color:var(--muted);font-size:12px}
- 
-/* ---- painel de visitantes ampliado ---- */
-.stats-grid{
-  display:grid;
-  grid-template-columns:1.15fr .85fr;
-  gap:20px;
-  width:100%;
-}
-@media(max-width:900px){
-  .stats-grid{grid-template-columns:1fr;}
-}
-.stats-block{
-  border:1px solid var(--b);
-  border-radius:6px;
-  background:var(--i);
-  padding:16px 18px;
-}
-.stats-block h3{
-  margin:0 0 14px;
-  font-size:10px;
-  letter-spacing:1.6px;
-  color:var(--muted);
-  font-weight:700;
-  text-transform:uppercase;
-}
-.stats-live{
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  font-size:10px;
-  letter-spacing:.8px;
-  color:var(--p);
-  border:1px solid rgba(32,214,107,.35);
-  background:rgba(32,214,107,.08);
-  padding:5px 10px;
-  border-radius:20px;
-  margin-left:auto;
-}
-.stats-live i{
-  width:6px;height:6px;border-radius:50%;background:var(--p);
-  box-shadow:0 0 0 0 rgba(32,214,107,.6);
-  animation:statsPulse 2s infinite;
-}
-@keyframes statsPulse{
-  0%{box-shadow:0 0 0 0 rgba(32,214,107,.55);}
-  70%{box-shadow:0 0 0 7px rgba(32,214,107,0);}
-  100%{box-shadow:0 0 0 0 rgba(32,214,107,0);}
-}
-.stats-summary-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-.stats-hours{
-  display:flex;
-  align-items:flex-end;
-  gap:3px;
-  height:74px;
-}
-.stats-hour-col{
-  flex:1;
-  height:100%;
-  display:flex;
-  align-items:flex-end;
-}
-.stats-hour-bar{
-  width:100%;
-  min-height:2px;
-  border-radius:2px 2px 0 0;
-  background:var(--b);
-}
-.stats-hour-col.peak .stats-hour-bar{
-  background:linear-gradient(180deg,var(--a),var(--p));
-}
-.stats-hour-labels{
-  display:flex;
-  justify-content:space-between;
-  margin-top:6px;
-  color:#7187a3;
-  font-size:9px;
-  letter-spacing:.4px;
-}
-.stats-peak-note{
-  margin-top:12px;
-  padding-top:12px;
-  border-top:1px solid var(--b);
-  color:var(--muted);
-  font-size:11.5px;
-  line-height:1.6;
-}
-.stats-peak-note b{color:var(--p);font-weight:700;}
-.stats-loc-row{
-  display:flex;
-  align-items:center;
-  gap:11px;
-  padding:8px 0;
-  border-bottom:1px solid var(--b);
-}
-.stats-loc-row:last-child{border-bottom:none;}
-.stats-loc-name{flex:1;font-size:12.5px;color:var(--t);}
-.stats-loc-city{display:block;color:#7187a3;font-size:10px;margin-top:2px;}
-.stats-loc-bar{width:56px;height:5px;border-radius:4px;background:var(--b);overflow:hidden;}
-.stats-loc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--a));}
-.stats-loc-count{width:32px;text-align:right;font-size:12.5px;color:var(--muted);}
- 
-/* ---- campos editáveis do quadro de receita ---- */
-.fin-form{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:12px;
-}
-.fin-campo{
-  border:1px solid var(--b);
-  border-radius:6px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.fin-campo > span{
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:1px;
-  color:var(--p);
-}
-.fin-campo label{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-  font-size:10px;
-  color:var(--muted);
-  letter-spacing:.6px;
-}
-.fin-campo input{
-  height:34px;
-  border:1px solid var(--b);
-  border-radius:4px;
-  background:var(--bg);
-  color:var(--t);
-  padding:0 10px;
-  font:13px "Segoe UI",Arial,sans-serif;
-}
-.fin-campo input:focus{outline:none;border-color:var(--a)}
-@media(max-width:900px){.fin-form{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.fin-form{grid-template-columns:1fr}}
- 
-/* ---- confirmação das alterações do quadro de receita ---- */
-.fin-acoes{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:4px 0 12px;
-}
-.fin-estado{flex:1 1 260px;font-size:11.5px;line-height:1.5;color:var(--muted)}
-.fin-estado.pendente{color:#e0a030}
-.fin-confirmar{border-color:var(--p);color:var(--p)}
-.fin-confirmar:hover:not(:disabled){background:rgba(32,214,107,.12);border-color:var(--p)}
- 
-/* ---- botão que abre o painel de gestão ---- */
-.panel-toggle{
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  margin:6px 0 4px;
-  padding:18px 22px;
-  border:1px solid #315071;
-  border-radius:var(--radius);
-  background:linear-gradient(145deg,rgba(23,36,58,.98),rgba(17,27,48,.98));
-  color:var(--t);
-  cursor:pointer;
-  text-align:left;
-  font-family:inherit;
-  box-shadow:var(--shadow);
-  transition:.2s;
-}
-.panel-toggle:hover{border-color:var(--a);background:#14253e}
-.panel-toggle:focus-visible{outline:2px solid var(--a);outline-offset:2px}
-.panel-toggle-title{display:block;font-size:15px;font-weight:600;letter-spacing:.4px}
-.panel-toggle-sub{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.5}
-.panel-toggle-action{
-  flex:0 0 auto;
-  border:1px solid #315071;
-  border-radius:5px;
-  padding:9px 15px;
-  background:var(--i);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:1.2px;
-}
-.panel-toggle[aria-expanded="true"] .panel-toggle-action{
-  border-color:var(--p);
-  color:var(--p);
-}
-@media(max-width:600px){
-  .panel-toggle{flex-direction:column;align-items:flex-start}
-}
- 
-/* ---- receita e margem por plano ---- */
-.fin-row{
-  display:grid;
-  grid-template-columns:170px 1fr 190px;
-  gap:12px;
-  align-items:center;
-  padding:10px 0;
-  border-bottom:1px solid var(--b);
-}
-.fin-row:last-child{border-bottom:none}
-.fin-name{font-size:12.5px;color:var(--t);font-weight:600}
-.fin-name small{
-  display:block;
-  color:#7187a3;
-  font-size:10px;
-  font-weight:400;
-  margin-top:2px;
-}
-.fin-bar{
-  display:flex;
-  height:12px;
-  border-radius:4px;
-  overflow:hidden;
-  background:var(--b);
-}
-.fin-bar i{display:block;height:100%}
-.fin-taxa{background:#e0a030}
-.fin-ia{background:var(--a)}
-.fin-sobra{background:var(--p)}
-.fin-total{text-align:right;font-size:12px;color:var(--muted)}
-.fin-total b{color:var(--t)}
-.fin-legend{
-  display:flex;
-  gap:16px;
-  flex-wrap:wrap;
-  margin-top:12px;
-  font-size:10.5px;
-  color:var(--muted);
-}
-.fin-legend b{
-  display:inline-block;
-  width:9px;
-  height:9px;
-  border-radius:2px;
-  margin-right:6px;
-}
-@media(max-width:700px){
-  .fin-row{grid-template-columns:1fr}
-  .fin-total{text-align:left}
-}
- 
- 
-/* =====================================================
-   BÍBLIA PARALELA — OS TRÊS BLOCOS SÃO O LEITOR
-===================================================== */
- 
-.parallel-wrap{
-  border:1px solid var(--paper-line);
-  border-radius:var(--radius);
-  background:linear-gradient(145deg,var(--paper-card),var(--paper));
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  color:var(--ink);
-}
- 
-.parallel-toolbar{
-  padding:16px 18px;
-  border-bottom:1px solid var(--paper-line);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  background:var(--paper-card);
-}
- 
-.parallel-title{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width:0;
-}
- 
-.parallel-title-mark{
-  width:36px;
-  height:36px;
-  flex:0 0 36px;
-  border:1px solid var(--brass);
-  border-radius:6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--brass-deep);
-  background:var(--paper-card);
-  font-size:15px;
-}
- 
-.parallel-title h2{
-  margin:0;
-  font-size:17px;
-  font-weight:600;
-  color:var(--ink);
-}
- 
-.parallel-title p{
-  margin:3px 0 0;
-  color:var(--ink-soft);
-  font-size:10px;
-  letter-spacing:.7px;
-}
- 
-.parallel-ref{
-  color:var(--ink-soft);
-  font-size:10px;
-  letter-spacing:1.1px;
-  white-space:nowrap;
-}
- 
-/* Uma única grade: as três colunas permanecem alinhadas até o fim.
-   A página inteira é o eixo vertical de rolagem. */
-.parallel-reader{
-  width:100%;
-  overflow-x:auto;
-  overflow-y:visible;
-  overscroll-behavior-x:contain;
-}
- 
-.parallel-head,
-.verse-row{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  min-width:900px;
-}
- 
-.parallel-head{
-  position:sticky;
-  top:54px;
-  z-index:10;
-  border-bottom:1px solid var(--paper-line);
-  background:var(--paper-card);
-}
- 
-.parallel-head .source{
-  min-width:0;
-  padding:14px 16px 13px;
-  border-right:1px solid var(--paper-line);
-}
- 
-.parallel-head .source:last-child{border-right:0}
- 
-/* A Bíblia escolhida ocupa toda a área de leitura. */
-.parallel-head,
-.verse-row{
-  grid-template-columns:1fr;
-  min-width:0;
-}
- 
-.parallel-head .source[hidden],
-.verse-cell[hidden]{
-  display:none !important;
-}
- 
-.source-label{
-  display:block;
-  color:var(--brass-deep);
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:1.5px;
-  margin-bottom:4px;
-}
- 
-.source-name{
-  display:block;
-  color:var(--ink-soft);
-  font-size:9px;
-  letter-spacing:.8px;
-}
- 
-.parallel-head .source:nth-child(1) .source-label{color:var(--brass-deep)}
- 
-.parallel-body{
-  background:var(--paper);
-}
- 
-.verse-row{
-  border-bottom:1px solid var(--paper-line);
-}
- 
-.verse-row:last-child{border-bottom:0}
- 
-.verse-cell{
-  min-width:0;
-  padding:17px 18px 20px;
-  border-right:1px solid var(--paper-line);
-}
- 
-.verse-cell:last-child{border-right:0}
- 
-.verse-meta{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:9px;
-  color:var(--ink-soft);
-  font-size:9px;
-  letter-spacing:1px;
-}
- 
-.verse-number{
-  color:var(--brass-deep);
-  font-weight:700;
-}
- 
-.verse-text{
-  margin:0;
-  color:var(--ink);
-  font-size:14px;
-  line-height:1.9;
-}
- 
-.verse-cell.hebrew{
-  direction:rtl;
-  text-align:right;
-}
- 
-.verse-cell.hebrew .verse-meta{
-  direction:rtl;
-  justify-content:flex-start;
-}
- 
-.verse-cell.hebrew .verse-number{color:var(--brass-deep)}
- 
-.verse-cell.greek{direction:ltr;text-align:left}
-.verse-cell.portuguese{direction:ltr;text-align:left}
- 
-.empty-text{
-  color:var(--ink-soft);
-  font-size:12px;
-  line-height:1.7;
-  font-style:italic;
-}
- 
-.parallel-note{
-  padding:13px 18px;
-  border-top:1px solid var(--paper-line);
-  color:var(--ink-soft);
-  font-size:9px;
-  line-height:1.55;
-  letter-spacing:.5px;
-  background:var(--paper);
-}
- 
-.info{
-  margin-top:20px;
-  border:1px solid var(--paper-line);
-  border-radius:7px;
-  background:linear-gradient(145deg,var(--paper-card),var(--paper));
-  padding:18px 21px;
-}
- 
-.info-title{
-  font-size:10px;
-  color:var(--brass-deep);
-  letter-spacing:1.7px;
-  margin-bottom:8px;
-}
- 
-.info p{
-  margin:0;
-  color:var(--ink-soft);
-  font-size:11px;
-  line-height:1.7;
-}
- 
-footer{
-  border-top:1px solid var(--b);
-  padding:25px 0 35px;
-  background:#091225;
-}
- 
-.footer-inner{
-  width:min(1180px,92%);
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-}
- 
-.footer-left{color:#6f829b;font-size:10px;letter-spacing:1px}
-.footer-link{
-  color:#8ca1ba;
-  text-decoration:none;
-  font-size:10px;
-  letter-spacing:1px;
-  transition:.2s;
-}
-.footer-link:hover{color:var(--a)}
- 
-#loading{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#0b1428;
-  color:var(--muted);
-  font-size:12px;
-  letter-spacing:1.5px;
-}
- 
-#error{
-  display:none;
-  min-height:100vh;
-  align-items:center;
-  justify-content:center;
-  padding:30px;
-  text-align:center;
-  background:#0b1428;
-}
- 
-.error-box{
-  width:min(500px,100%);
-  border:1px solid var(--b);
-  background:var(--s);
-  padding:35px;
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-}
- 
-.error-box h2{margin-top:0;color:var(--t);font-size:18px}
-.error-box p{color:var(--muted);line-height:1.7;font-size:13px}
- 
-.btn-login{
-  display:inline-block;
-  margin-top:15px;
-  padding:11px 17px;
-  border:1px solid #315071;
-  color:var(--t);
-  background:var(--i);
-  text-decoration:none;
-  border-radius:5px;
-  font-size:10px;
-  letter-spacing:1.2px;
-}
- 
-@media(max-width:760px){
-  .header-inner{
-    min-height:72px;
-    align-items:flex-start;
-    padding:12px 0;
-    flex-direction:column;
-  }
- 
-  .session{width:100%;justify-content:space-between}
-  .user-email{max-width:210px}
-  main{padding-top:28px}
-  .hero h1{font-size:27px}
- 
-  .card-main{gap:15px}
-  .card-footer{align-items:flex-start;flex-direction:column}
- 
-  .parallel-toolbar{
-    align-items:flex-start;
-    flex-direction:column;
-  }
- 
-  .parallel-ref{white-space:normal}
- 
-  .parallel-head{
-    position:relative;
-  }
- 
-  .footer-inner{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-}
- 
-@media(max-width:480px){
-  main{width:calc(100% - 30px)}
-  .header-inner,.footer-inner{width:calc(100% - 30px)}
-  .card{padding:21px}
-  .hero h1{font-size:25px}
-  .icon{width:42px;height:42px;flex-basis:42px;font-size:18px}
-}
- 
-/* Controles funcionais da Bíblia paralela */
-.bible-controls{
-  display:flex;
-  align-items:flex-end;
-  gap:9px;
-  flex-wrap:wrap;
-  padding:13px 16px;
-  border-bottom:1px solid var(--paper-line);
-  background:var(--paper);
-}
- 
-.bible-controls label{
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  min-width:190px;
-}
- 
-.bible-controls label span{
-  color:var(--ink-soft);
-  font-size:8px;
-  font-weight:700;
-  letter-spacing:1.4px;
-}
- 
-.bible-controls select{
-  height:34px;
-  border:1px solid var(--paper-line);
-  border-radius:4px;
-  background:#fffdf6;
-  color:var(--ink);
-  padding:0 10px;
-  outline:none;
-  font:11px "Segoe UI",Arial,sans-serif;
-}
- 
-.bible-controls select:focus{
-  border-color:var(--brass);
-}
- 
-.chapter-control{min-width:105px!important;width:105px}
- 
-.reader-btn{
-  height:34px;
-  min-width:38px;
-  border:1px solid var(--paper-line);
-  border-radius:4px;
-  background:#fffdf6;
-  color:var(--ink);
-  cursor:pointer;
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:.8px;
-  transition:.2s;
-}
- 
-.reader-btn:hover{
-  border-color:var(--brass);
-  background:var(--brass-wash);
-}
- 
-.reader-btn.primary{
-  padding:0 14px;
-  color:#fffdf6;
-  border-color:var(--brass);
-  background:var(--brass);
-}
- 
-.reader-btn.primary:hover{
-  border-color:var(--brass-deep);
-  background:var(--brass-deep);
-}
- 
-.reader-btn:disabled{
-  opacity:.45;
-  cursor:wait;
-}
- 
-.reader-status{
-  align-self:center;
-  margin-left:auto;
-  color:var(--ink-soft);
-  font-size:8px;
-  letter-spacing:1px;
-}
- 
-.reader-loading,
-.reader-error{
-  min-height:180px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:30px;
-  color:var(--ink-soft);
-  font-size:10px;
-  letter-spacing:1px;
-  text-align:center;
-}
- 
-.reader-error{color:#a14747}
- 
-.verse-cell .verse-text{
-  white-space:pre-wrap;
-  word-break:normal;
-}
- 
-@media(max-width:760px){
-  .bible-controls label{
-    min-width:calc(100% - 10px);
-  }
-  .chapter-control{
-    width:105px;
-    min-width:105px!important;
-  }
-  .reader-status{
-    width:100%;
-    margin-left:0;
-  }
-}
-/* =====================================================
-   AJUSTE DE LEITURA E APROVEITAMENTO DA LARGURA
-===================================================== */
- 
-.header-inner,
-main,
-.footer-inner{
-  width:min(1500px,calc(100% - 48px));
-}
- 
-main{
-  padding:34px 0 68px;
-}
- 
-.hero{margin-bottom:26px}
-.hero-label{font-size:14px;margin-bottom:12px}
-.hero h1{font-size:40px;letter-spacing:.2px}
-.hero p{
-  max-width:980px;
-  margin-top:10px;
-  font-size:18px;
-  line-height:1.7;
-}
- 
-.section-title{
-  font-size:15px;
-  margin:30px 0 15px;
-  letter-spacing:2.2px;
-}
- 
-.workspace{gap:24px}
- 
-.card{
-  padding:32px;
-  min-height:205px;
-}
- 
-.card-main{gap:20px}
-.icon{
-  width:58px;
-  height:58px;
-  flex-basis:58px;
-  font-size:25px;
-}
-.card h2{font-size:27px;margin:0 0 12px}
-.card p{font-size:18px;line-height:1.75}
-.card-footer{margin-top:32px;gap:20px}
-.card-status{font-size:12px}
-.btn-open{padding:13px 20px;font-size:13px}
- 
-.parallel-toolbar{padding:22px 24px;gap:20px}
-.parallel-title{gap:15px}
-.parallel-title-mark{width:44px;height:44px;flex-basis:44px;font-size:18px}
-.parallel-title h2{font-size:25px}
-.parallel-title p{font-size:13px}
-.parallel-ref{font-size:13px}
- 
-.parallel-head .source{padding:18px 22px 17px}
-.source-label{font-size:13px}
-.source-name{font-size:12px}
-.verse-cell{padding:23px 25px 27px}
-.verse-meta{font-size:12px;margin-bottom:12px}
-.verse-text{font-size:20px;line-height:2}
-.empty-text{font-size:16px}
-.parallel-note{padding:17px 24px;font-size:12px;line-height:1.7}
- 
-.bible-controls{padding:17px 22px;gap:12px}
-.bible-controls label{min-width:215px;gap:6px}
-.bible-controls label span{font-size:10px}
-.bible-controls select{
-  height:40px;
-  padding:0 12px;
-  font-size:14px;
-}
-.chapter-control{min-width:120px!important;width:120px}
-.reader-btn{height:40px;min-width:44px;font-size:12px}
-.reader-btn.primary{padding:0 17px}
-.reader-status{font-size:11px}
- 
-.info{margin-top:28px;padding:22px 25px}
-.info-title{font-size:13px;margin-bottom:11px}
-.info p{font-size:15px;line-height:1.8}
- 
-.footer-left,.footer-link{font-size:12px}
- 
-@media(max-width:760px){
-  .header-inner,
-  main,
-  .footer-inner{
-    width:calc(100% - 32px);
-  }
- 
-  main{padding-top:30px}
-  .hero h1{font-size:32px}
-  .hero p{font-size:16px}
-  .section-title{font-size:12px;margin-top:24px}
-  .card{padding:24px}
-  .card h2{font-size:23px}
-  .card p{font-size:16px}
-  .parallel-toolbar{padding:20px}
-  .parallel-head .source{padding-left:18px;padding-right:18px}
-  .verse-cell{padding:20px 18px 23px}
-  .verse-text{font-size:18px;line-height:1.9}
-  .bible-controls{padding:16px}
-  .parallel-note{padding-left:18px;padding-right:18px}
-}
- /* ===== ATELIÊ DE CRIAÇÃO ===== */
-.at-grid{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:18px;margin:14px 0 6px}
-@media(max-width:900px){.at-grid{grid-template-columns:1fr}}
-.at-box{border:1px solid var(--b);border-radius:var(--radius);background:linear-gradient(145deg,rgba(23,36,58,.98),rgba(17,27,48,.98));box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
-.at-box h3{margin:0;font-size:13px;font-weight:700;letter-spacing:1.4px;color:var(--muted)}
-.at-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.at-row>*{min-width:0}
-.at-sel,.at-in{height:38px;border:1px solid var(--b);border-radius:5px;background:var(--bg);color:var(--t);padding:0 10px;font:13px "Segoe UI",Arial,sans-serif}
-.at-sel:focus,.at-in:focus{outline:none;border-color:var(--a)}
-.at-grow{flex:1 1 130px}
-.at-btn{height:38px;padding:0 14px;border:1px solid #315071;border-radius:5px;background:var(--i);color:var(--t);font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:.2s}
-.at-btn:hover:not(:disabled){border-color:var(--a);background:#14253e}
-.at-btn:disabled{opacity:.45;cursor:default}
-.at-btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
-.at-btn.gold:hover:not(:disabled){background:var(--brass-deep);border-color:var(--brass-deep)}
-.at-versos{max-height:430px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
-.at-v{display:flex;gap:10px;text-align:left;width:100%;border:1px solid var(--b);border-radius:6px;background:var(--i);color:var(--t);padding:10px 12px;cursor:pointer;font:14px/1.6 Georgia,"Times New Roman",serif;transition:.15s}
-.at-v:hover{border-color:#4a6a90}
-.at-v b{flex:0 0 auto;color:var(--a);font:700 11px "Segoe UI",Arial,sans-serif;padding-top:4px}
-.at-v.on{background:var(--paper-card);color:var(--ink);border-color:var(--brass);box-shadow:inset 4px 0 0 var(--brass)}
-.at-v.on b{color:var(--brass-deep)}
-.at-v[dir=rtl]{text-align:right;flex-direction:row-reverse;font-size:17px}
-.at-bandeja{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px dashed var(--brass);border-radius:6px;color:var(--paper-line);font-size:12px}
-.at-bandeja strong{color:#fffdf6;font-family:Georgia,serif;font-size:15px}
-.at-msg{color:var(--muted);font-size:12px;line-height:1.6}
-.at-editor{background:var(--paper-card);border-color:var(--paper-line);color:var(--ink)}
-.at-editor h3{color:var(--ink-soft)}
-.at-titulo{width:100%;height:auto;border:0;border-bottom:1px solid var(--paper-line);border-radius:0;background:transparent;color:var(--ink);padding:6px 2px 12px;font:600 28px/1.25 Georgia,"Times New Roman",serif}
-.at-titulo:focus{outline:none;border-color:var(--brass)}
-.at-titulo::placeholder{color:#b3a583}
-.at-texto{width:100%;min-height:440px;resize:vertical;border:0;background:transparent;color:var(--ink);padding:4px 2px;font:18px/1.95 Georgia,"Times New Roman",serif}
-.at-texto:focus{outline:none}
-.at-editor .at-sel{background:#fffdf6;border-color:var(--paper-line);color:var(--ink)}
-.at-editor .at-btn{background:#fffdf6;border-color:var(--paper-line);color:var(--ink)}
-.at-editor .at-btn:hover:not(:disabled){background:var(--brass-wash);border-color:var(--brass)}
-.at-editor .at-btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
-.at-rodape{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--paper-line);padding-top:12px;color:var(--ink-soft);font-size:12px}
-.at-foco{position:fixed;inset:0;z-index:60;background:var(--paper-card);overflow:auto;padding:28px min(8vw,120px)}
-.at-foco .at-box{box-shadow:none;border:0;background:transparent;max-width:860px;margin:auto}
-.at-foco .at-box{min-height:calc(100vh - 56px)}
-.at-foco .at-row{opacity:.4;transition:.2s}
-.at-foco .at-row:hover,.at-foco .at-row:focus-within{opacity:1}
-.at-foco .at-texto{flex:1;min-height:55vh;resize:none}
-.at-grid.foco-grid{display:block;margin:0}
-.at-grid.foco-grid .at-fontes{display:none}
-.at-r{display:block;text-align:left;width:100%;border:1px solid var(--b);border-radius:6px;background:var(--i);color:var(--t);padding:10px 12px;cursor:pointer;font:14px/1.6 Georgia,"Times New Roman",serif;transition:.15s}
-.at-r:hover{border-color:var(--a)}
-.at-r small{display:block;color:var(--a);font:700 11px "Segoe UI",Arial,sans-serif;margin-bottom:3px}
-.at-v[hidden],.at-r[hidden]{display:none}
- @media(min-width:761px){
-  main,.header-inner,.footer-inner{width:min(1800px,calc(100% - 64px))}
-}
-@media(min-width:901px){
-  .at-grid{grid-template-columns:minmax(360px,480px) 1fr;height:max(640px,calc(100vh - 260px))}
-  .at-box{min-height:0}
-  .at-versos{flex:1;max-height:none;min-height:0}
-  .at-texto{flex:1;min-height:0;resize:none}
-  .at-grid.foco-grid{height:auto}
-}
-@media(min-width:761px){
-  main,.header-inner,.footer-inner{width:min(1700px,calc(100% - 48px))}
-}
-@media(min-width:901px){
-  .at-grid{grid-template-columns:minmax(340px,460px) 1fr;height:max(620px,calc(100vh - 230px))}
-  .at-box{min-height:0}
-  .at-versos{flex:1;max-height:none;min-height:0}
-  .at-texto{flex:1;min-height:0}
-  .at-grid.foco-grid{height:auto}
-}
- .at-modelos{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px dashed var(--brass);border-radius:6px;background:#fffdf6}
-.at-modelos[hidden]{display:none}
-.at-modelos .at-in{background:#fffdf6;border:1px solid var(--paper-line);color:var(--ink)}
-.at-modelos textarea.at-in{height:170px;padding:10px;font:14px/1.6 Georgia,"Times New Roman",serif;resize:vertical}
-.at-modo{display:flex;gap:8px}
-.at-modo .at-btn.on{background:var(--brass);border-color:var(--brass);color:#fffdf6}
-.at-arvore{display:flex;flex-direction:column;gap:12px;overflow:auto;max-height:70vh;padding-right:4px}
-.at-arvore[hidden]{display:none}
-.at-foco .at-arvore{max-height:none;flex:1}
-@media(min-width:901px){.at-arvore{flex:1;min-height:0;max-height:none}}
-.at-a-livre{display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-soft)}
-.at-a-livre textarea{min-height:70px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);padding:10px;font:16px/1.7 Georgia,"Times New Roman",serif;resize:vertical}
-.at-a-ponto{border:1px solid var(--paper-line);border-left:4px solid var(--brass);border-radius:6px;background:#fffdf6;padding:12px;display:flex;flex-direction:column;gap:10px}
-.at-a-linha{display:flex;align-items:flex-start;gap:8px}
-.at-a-sub{margin-left:22px;padding-left:12px;border-left:2px solid var(--paper-line);display:flex;flex-direction:column;gap:8px}
-.at-a-det{margin-left:30px}
-.at-a-num{flex:0 0 30px;color:var(--brass-deep);font:700 16px Georgia,serif;padding-top:8px}
-.at-a-in{flex:1;min-width:0;resize:none;overflow:hidden;border:1px solid var(--paper-line);border-radius:5px;background:#fff;color:var(--ink);padding:8px 10px;font:16px/1.6 Georgia,"Times New Roman",serif}
-.at-a-in:focus{outline:none;border-color:var(--brass)}
-.at-a-acoes{display:flex;gap:4px;flex:0 0 auto}
-.at-a-acoes button{height:30px;padding:0 9px;border:1px solid var(--paper-line);border-radius:4px;background:var(--brass-wash);color:var(--brass-deep);font-size:10px;font-weight:700;letter-spacing:.6px;cursor:pointer}
-.at-a-acoes button:hover{border-color:var(--brass)}
-.at-a-barra{display:flex;gap:8px;flex-wrap:wrap}
-.at-a-barra button{height:38px;padding:0 14px;border:1px solid var(--paper-line);border-radius:5px;background:#fffdf6;color:var(--ink);font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer}
-.at-a-barra .at-a-novo{background:var(--brass);border-color:var(--brass);color:#fffdf6}
-/* ----- Ateliê v2 ----- */
-.at-a-acoes{flex-wrap:wrap;justify-content:flex-end;max-width:340px}
-.at-a-acoes button[data-act^="del"]{margin-left:12px;color:#a14747}
-.at-a-acoes button[data-act="addV"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
-.at-ativo{box-shadow:0 0 0 2px var(--brass)}
-.at-destino{font-size:12px;color:var(--paper-line);padding:0 2px}
-.at-destino strong{color:#fffdf6;font-family:Georgia,serif;font-size:14px}
-
-.at-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:95;display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:8px;background:#2c2418;color:#fffdf6;font-size:13px;box-shadow:0 12px 32px rgba(0,0,0,.4)}
-.at-toast[hidden]{display:none}
-.at-toast button{border:1px solid var(--brass);border-radius:4px;background:transparent;color:#f1d58a;font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 10px;cursor:pointer}
-
-#atPulpito{position:fixed;inset:0;z-index:90;background:#0b1428;color:#f4eedd;overflow:auto;padding:76px min(10vw,160px) 90px}
-#atPulpito[hidden]{display:none}
-.pul-barra{position:fixed;top:14px;right:18px;display:flex;gap:8px}
-.pul-barra button{height:38px;padding:0 14px;border:1px solid #315071;border-radius:5px;background:#0d172b;color:#dbe7f5;font-weight:700;cursor:pointer}
-#atPulpitoTexto{max-width:980px;margin:auto;font-family:Georgia,"Times New Roman",serif;line-height:1.7}
-#atPulpitoTexto h1{font-size:1.5em;color:#fff;margin:0 0 .7em}
-#atPulpitoTexto h2{font-size:1.1em;color:#e0b95a;margin:1.6em 0 .4em;letter-spacing:.5px}
-#atPulpitoTexto p{margin:.3em 0;white-space:pre-wrap}
-#atPulpitoTexto blockquote{margin:.9em 0;padding:.2em 0 .2em 1em;border-left:4px solid #9c7a32;color:#fff;font-style:italic}
- /* ----- Janela "Aplicar estrutura" (tabela de rastreio) ----- */
-.at-tab-fundo{position:fixed;inset:0;z-index:80;background:rgba(11,20,40,.72);display:flex;align-items:center;justify-content:center;padding:18px}
-.at-tab-fundo[hidden]{display:none}
-.at-tab-janela{width:min(760px,100%);max-height:calc(100vh - 36px);display:flex;flex-direction:column;background:var(--paper-card);color:var(--ink);border:1px solid var(--paper-line);border-radius:8px;box-shadow:0 18px 45px rgba(0,0,0,.4)}
-.at-tab-topo{padding:16px 20px;border-bottom:1px solid var(--paper-line);font:16px Georgia,serif}
-.at-tab-leg{margin-top:6px;font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-.at-tab-corpo{flex:1;overflow:auto;padding:6px 20px 14px}
-.at-tab-bloco{margin:16px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--paper-line);font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:1px;color:var(--brass-deep);text-transform:uppercase}
-.at-tab-item{display:flex;gap:10px;align-items:flex-start;padding:6px 2px;cursor:pointer;font:15px/1.5 Georgia,"Times New Roman",serif}
-.at-tab-item:hover{background:var(--brass-wash)}
-.at-tab-item input{margin-top:6px}
-.at-tab-ic{width:24px;text-align:center;flex:0 0 24px}
-.at-tab-cod{flex:0 0 46px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--brass-deep);padding-top:4px}
-.at-tab-tag{font:italic 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-.at-tab-rodape{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 20px;border-top:1px solid var(--paper-line)}
-.at-tab-aviso{margin-right:auto;font-size:12px;color:#a14747}
-.at-tab-msg{padding:30px 20px;font:14px/1.6 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
- /* ----- Mesa de estudo ----- */
-#atMesa{min-height:0}
-
-.mz-lista{display:flex;flex-direction:column;gap:8px;overflow:auto;padding-right:4px;max-height:70vh}
-@media(min-width:901px){.mz-lista{flex:1;min-height:0;max-height:none}}
-.mz-bl{margin:10px 0 2px;font:700 11px "Segoe UI",Arial,sans-serif;letter-spacing:1.2px;color:var(--brass-deep)}
-.mz-et{border:1px solid var(--paper-line);border-left:4px solid var(--paper-line);border-radius:6px;background:#fffdf6}
-.mz-et.feita{border-left-color:var(--brass)}
-.mz-et.na{opacity:.55}
-.mz-et.ab{box-shadow:0 0 0 2px var(--brass)}
-.mz-cab{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;color:var(--ink)}
-.mz-st{width:30px;height:30px;flex:0 0 30px;border:1px solid var(--paper-line);border-radius:50%;background:#fff;color:var(--brass-deep);font-size:15px;cursor:pointer}
-.mz-cod{font:700 12px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
-.mz-nome{flex:1;font:16px Georgia,"Times New Roman",serif}
-
-.mz-tem{color:var(--brass)}
-.mz-corpo{padding:0 12px 12px 52px;display:flex;flex-direction:column;gap:10px}
-.mz-desc{margin:0;color:var(--ink-soft);font:italic 15px/1.6 Georgia,"Times New Roman",serif}
-.mz-t{width:100%;min-height:110px;resize:vertical;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);padding:10px;font:17px/1.7 Georgia,"Times New Roman",serif}
-.mz-t:focus{outline:none;border-color:var(--brass)}
-/* ----- Mesa de estudo: visual limpo ----- */
-#atMesa .mz-lista{gap:6px}
-#atMesa .mz-bl{margin:20px 0 4px;font-size:12px}
-#atMesa .mz-et{border-left-width:3px}
-#atMesa .mz-cab{padding:13px 14px}
-#atMesa .mz-nome{font-size:17px}
-#atMesa .mz-corpo{padding:0 14px 14px 56px}
-#atMesa .mz-desc{font-size:14px;font-style:normal;line-height:1.55}
-#atMesa .mz-t{min-height:170px}
- #atMesa .mz-bl-b{cursor:pointer;padding:8px 0;border-bottom:1px solid var(--paper-line)}
-#atMesa .mz-bl-b:hover{color:var(--ink)}
- #atMesa .mz-linha{display:flex;gap:14px;align-items:flex-start}
-#atMesa .mz-linha .mz-desc{flex:1}
-#atMesa .mz-linha .at-btn{flex:0 0 auto;white-space:nowrap}
+body{margin:0;height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--t);font:14px "Segoe UI",Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 24px;border-bottom:1px solid var(--b);background:var(--s)}
+h1{margin:0;font-size:16px;letter-spacing:1.4px;color:var(--p)}
+header p{margin:3px 0 0;color:var(--m);font-size:11px}
+.hr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{padding:6px 10px;border:1px solid var(--b);border-radius:6px;color:var(--a);font-size:10px;font-weight:700;letter-spacing:.6px}
+#up{display:none;padding:8px 13px;border:1px solid var(--p);border-radius:6px;background:rgba(32,214,107,.1);color:var(--p);font-size:11px;font-weight:700;text-decoration:none}
+.btn{height:34px;padding:0 13px;border:1px solid #425674;border-radius:5px;background:var(--i);color:var(--t);font:700 11px "Segoe UI",Arial,sans-serif;letter-spacing:.6px;cursor:pointer;display:inline-flex;align-items:center;text-decoration:none}
+.btn:hover:not(:disabled){border-color:var(--a)}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.btn.gold:hover:not(:disabled){background:var(--deep)}
+main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:16px;padding:16px}
+.panel{min-height:0;display:flex;flex-direction:column;gap:10px;border-radius:10px;padding:16px;overflow:hidden}
+.fonte{background:var(--s);border:1px solid var(--b)}
+.mesa{background:var(--paper);border:1px solid var(--line);color:var(--ink)}
+h3{margin:0;font-size:12px;letter-spacing:1.4px;color:var(--m)}
+.mesa h3{color:var(--soft)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{min-width:0}
+.sel,.in{height:36px;border:1px solid var(--b);border-radius:5px;background:var(--bg);color:var(--t);padding:0 10px;font:13px "Segoe UI",Arial,sans-serif}
+.grow{flex:1 1 110px}
+.vs{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
+.v,.r{display:flex;gap:10px;width:100%;text-align:left;border:1px solid var(--b);border-radius:6px;background:var(--i);color:var(--t);padding:9px 12px;cursor:pointer;font:14px/1.6 Georgia,serif}
+.r{display:block}
+.r small{display:block;color:var(--a);font:700 11px "Segoe UI",Arial,sans-serif}
+.v b{color:var(--a);font:700 11px "Segoe UI",Arial,sans-serif;padding-top:4px}
+.v.on{background:var(--card);color:var(--ink);border-color:var(--brass);box-shadow:inset 4px 0 0 var(--brass)}
+.v.on b{color:var(--deep)}
+.v[dir=rtl]{text-align:right;flex-direction:row-reverse;font-size:17px}
+.v[hidden]{display:none}
+.msg{color:var(--m);font-size:12px;line-height:1.6}
+.tray{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px dashed var(--brass);border-radius:6px;font-size:12px;color:var(--line)}
+.tray strong{color:#fffdf6;font:15px Georgia,serif}
+.mesa .sel{background:#fffdf6;border-color:var(--line);color:var(--ink)}
+.mesa .btn{background:#fffdf6;border-color:var(--line);color:var(--ink)}
+.mesa .btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+#lista{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
+.bl{margin:18px 0 4px;font-size:12px;letter-spacing:1.2px;color:var(--deep)}
+.bb{cursor:pointer;padding:8px 0;border-bottom:1px solid var(--line)}
+.et{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:6px;background:#fffdf6}
+.et.ok{border-left-color:var(--brass)}.et.na{opacity:.55}.et.ab{box-shadow:0 0 0 2px var(--brass)}
+.cab{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.st{width:30px;height:30px;flex:0 0 30px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--deep);font-size:15px;cursor:pointer}
+.cod{font:700 12px "Segoe UI",Arial,sans-serif;color:var(--deep)}
+.nm{flex:1;font:17px Georgia,serif}
+.tem{color:var(--brass)}
+.lv{font:700 10px "Segoe UI",Arial,sans-serif;letter-spacing:.5px;color:var(--soft);white-space:nowrap}
+.et.lk .nm{color:var(--soft)}
+.co{padding:0 14px 14px 56px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.ln{display:flex;gap:12px;align-items:flex-start;width:100%}
+.ds{flex:1;margin:0;color:var(--soft);font:14px/1.55 Georgia,serif}
+.tx{width:100%;min-height:170px;resize:vertical;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);padding:10px;font:17px/1.7 Georgia,serif}
+.ln .btn{flex:0 0 auto;white-space:nowrap}
+.ov{display:none;position:fixed;inset:0;z-index:50;align-items:center;justify-content:center;padding:20px;background:rgba(4,10,20,.78)}
+.bx{width:min(760px,100%);max-height:90vh;overflow:auto;padding:24px;border:1px solid var(--b);border-radius:10px;background:var(--s);color:var(--t)}
+.bx h2{margin:0;color:var(--a);font-size:18px}
+.bx label{display:block;margin:12px 0 5px;color:var(--a);font-size:11px;font-weight:700;letter-spacing:.7px}
+.bx small{display:block;margin-bottom:5px;color:var(--m);font-size:10px}
+.bx input,.bx textarea{width:100%;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:var(--i);color:var(--t);font:12px "Segoe UI",Arial,sans-serif}
+.bx textarea{resize:vertical}
+.rep{min-height:140px;max-height:320px;overflow:auto;padding:14px;border:1px solid #344762;border-radius:6px;background:var(--i);font-size:12px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px}
+.note{margin:12px 0;padding:10px 12px;border-left:3px solid var(--p);background:var(--i);color:#b9c7d8;font-size:12px}
+.arq{padding:6px 0;border-bottom:1px solid var(--b);white-space:pre-wrap;font:14px/1.6 Georgia,serif}
+#toast{display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;padding:12px 16px;border-radius:8px;background:#2c2418;color:#fffdf6;font-size:13px;max-width:90vw}
+@media(max-width:900px){body{height:auto}main{grid-template-columns:1fr}.panel{max-height:none}.vs,#lista{max-height:60vh}.ln{flex-direction:column}.co{padding-left:14px}}
 </style>
 </head>
- 
 <body>
- 
-<div id="loading">ABRINDO SALA DO ESCRITOR...</div>
- 
-<div id="error">
-  <div class="error-box">
-    <h2>ACESSO RESTRITO</h2>
-    <p>A Sala do Escritor é uma área privada. Para entrar, é necessário estar autenticado.</p>
-    <a class="btn-login" href="entrada.html">IR PARA ENTRADA</a>
-  </div>
-</div>
- 
-<div id="app" style="display:none;">
- 
 <header>
-  <div class="header-inner">
-    <div class="brand">
-      <div class="brand-title">PALAVRA &amp; SÉRIE</div>
-      <div class="brand-subtitle">SALA DO ESCRITOR</div>
-    </div>
- 
-    <div class="session">
-      <div id="userEmail" class="user-email">—</div>
-      <button id="logoutBtn" class="btn-logout" type="button">SAIR</button>
-    </div>
+  <div><h1>▤ MÉTODO TÉCNICO DE PESQUISA</h1><p>Escolha a passagem à esquerda e execute as etapas à direita.</p></div>
+  <div class="hr">
+    <span id="badge" class="badge">PLANO: —</span>
+    <a id="up" href="#" target="_blank" rel="noopener"></a>
+    <button type="button" class="btn" onclick="openRevisor('external_unit')">✎ REVISOR</button>
   </div>
 </header>
  
 <main>
- 
-<section class="hero">
-  <div class="hero-label">ÁREA PRIVADA DE CRIAÇÃO</div>
-  <h1>Sala do Escritor</h1>
-  <p>
-    Este é o espaço de trabalho do autor. Aqui ficam reunidas as ferramentas
-    de criação, organização e gestão dos conteúdos produzidos dentro do
-    Palavra &amp; Série.
-  </p>
-</section>
- 
-<button id="painelToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="painelGestao">
-  <span>
-    <span class="panel-toggle-title">Painel de gestão</span>
-    <span class="panel-toggle-sub">Visitantes, setores mais consultados, assinantes, planos e receita.</span>
-  </span>
-  <span id="painelToggleAcao" class="panel-toggle-action">ABRIR</span>
-</button>
- 
-<div id="painelGestao" hidden>
- 
-<div class="section-title">VISITANTES E SETORES MAIS CONSULTADOS</div>
- 
-<section class="workspace">
-  <article class="card stats-card">
-    <div class="card-main">
-      <div style="width:100%">
- 
-        <div class="stats-summary">
-          <div class="stat-box">
-            <div class="stat-num" id="statTotalVisitas">—</div>
-            <div class="stat-label">Visitas registradas</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num" id="statVisitantesUnicos">—</div>
-            <div class="stat-label">Visitantes (aprox.)</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num" id="statMediaPorVisitante">—</div>
-            <div class="stat-label">Visitas por visitante</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num" id="statSetorTopo">—</div>
-            <div class="stat-label">Setor mais consultado</div>
-          </div>
-        </div>
- 
-        <div class="stats-grid">
- 
-          <div class="stats-block">
-            <h3>Setores mais consultados</h3>
-            <div class="stats-rank" id="statsRank">
-              <span class="stats-msg">Carregando estatísticas…</span>
-            </div>
-          </div>
- 
-          <div class="stats-block">
-            <h3>Localização dos visitantes</h3>
-            <div id="statsLocations">
-              <span class="stats-msg">Carregando localização…</span>
-            </div>
-          </div>
- 
-        </div>
- 
-        <div class="stats-block" style="margin-top:18px;">
-          <h3>Atividade por horário (horário local do navegador)</h3>
-          <div id="statsHoursWrap">
-            <span class="stats-msg">Carregando atividade por horário…</span>
-          </div>
-        </div>
- 
-      </div>
+  <aside class="panel fonte">
+    <h3>FONTE BÍBLICA</h3>
+    <div class="row">
+      <select id="livro" class="sel grow" aria-label="Livro"></select>
+      <select id="cap" class="sel" style="width:76px" aria-label="Capítulo"></select>
+      <select id="modo" class="sel" aria-label="Texto"><option value="pt">Português</option><option value="or">Original</option><option value="tr">Grego TR</option></select>
     </div>
- 
-    <div class="card-footer">
-      <span class="card-status" id="statsUpdatedAt">—</span>
-      <button class="stats-refresh" id="statsRefreshBtn" type="button">ATUALIZAR</button>
+    <div class="row"><button id="ant" class="btn grow" type="button">← ANTERIOR</button><button id="prox" class="btn grow" type="button">PRÓXIMO →</button></div>
+    <div class="row">
+      <input id="busca" class="in grow" type="search" placeholder="Buscar palavra" aria-label="Buscar versículos">
+      <select id="escopo" class="sel" aria-label="Onde buscar"><option value="cap">Neste capítulo</option><option value="livro">Neste livro</option><option value="ot">Antigo Testamento</option><option value="nt">Novo Testamento</option><option value="all">Bíblia toda</option></select>
     </div>
-  </article>
-</section>
+    <div id="vs" class="vs"><span class="msg">Carregando o texto…</span></div>
+    <div class="tray"><span id="ref">Toque nos versículos para selecioná-los</span><button id="limpar" class="btn" type="button" style="margin-left:auto">LIMPAR</button></div>
+  </aside>
  
-<div class="section-title">ASSINANTES E PLANOS</div>
- 
-<section class="workspace">
-  <article class="card stats-card">
-    <div class="card-main">
-      <div style="width:100%">
- 
-        <div class="stats-summary">
-          <div class="stat-box">
-            <div class="stat-num" id="planTotalAssinantes">—</div>
-            <div class="stat-label">Total de contas</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num" id="planPagantes">—</div>
-            <div class="stat-label">Pagantes (Pro+Master+Doctus)</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-num" id="planTaxaConversao">—</div>
-            <div class="stat-label">Taxa de conversão</div>
-          </div>
-        </div>
- 
-        <div class="stats-grid">
- 
-          <div class="stats-block">
-            <h3>Distribuição por plano</h3>
-            <div class="stats-rank" id="planRank">
-              <span class="stats-msg">Carregando planos…</span>
-            </div>
-          </div>
- 
-          <div class="stats-block">
-            <h3>Tempo médio de conta por plano</h3>
-            <div id="planTempo">
-              <span class="stats-msg">Carregando…</span>
-            </div>
-          </div>
- 
-        </div>
- 
-        <div class="stats-block" style="margin-top:18px;">
-          <h3>Receita e margem por plano</h3>
-          <div id="planFinanceiro">
-            <span class="stats-msg">Carregando…</span>
-          </div>
-        </div>
- 
-        <div class="stats-block" style="margin-top:18px;">
-          <h3>Desistência / cancelamentos</h3>
-          <div id="planDesistencia">
-            <span class="stats-msg">
-              Ainda não é possível calcular desistência: não existe registro de
-              cancelamento (nem coluna de data, nem o evento "Assinatura cancelada"
-              está configurado no webhook da Kiwify). Assim que isso for ligado,
-              essa área passa a mostrar quantas pessoas cancelaram e quando.
-            </span>
-          </div>
-        </div>
- 
-      </div>
-    </div>
- 
-    <div class="card-footer">
-      <span class="card-status" id="planUpdatedAt">—</span>
-      <button class="stats-refresh" id="planRefreshBtn" type="button">ATUALIZAR</button>
-    </div>
-  </article>
-</section>
- 
-</div>
- 
-<button id="ateliToggle" class="panel-toggle" type="button" aria-expanded="false" aria-controls="ateliPainel">
-  <span>
-    <span class="panel-toggle-title">Ateliê de criação</span>
-    <span class="panel-toggle-sub">Escreva sermões, devocionais e roteiros com os versículos a um clique.</span>
-  </span>
-  <span id="ateliToggleAcao" class="panel-toggle-action">ABRIR</span>
-</button>
- 
-<div id="ateliPainel" hidden>
-  <div class="at-grid" id="atGrid">
- 
-    <div class="at-box at-fontes">
-      <h3>FONTE BÍBLICA</h3>
-      <div class="at-row">
-        <select id="atLivro" class="at-sel at-grow" aria-label="Livro"></select>
-        <select id="atCap" class="at-sel" style="width:76px" aria-label="Capítulo"></select>
-       <select id="atModo" class="at-sel" aria-label="Texto">
-  <option value="pt">Português</option>
-  <option value="or">Original</option>
-  <option value="tr">Grego TR</option>
-</select>
-      </div>
-     <div class="at-row">
-  <button id="atAnt" class="at-btn at-grow" type="button">← ANTERIOR</button>
-  <button id="atProx" class="at-btn at-grow" type="button">PRÓXIMO →</button>
-</div>
-   <div class="at-row">
-  <input id="atBusca" class="at-in at-grow" type="search" placeholder="Buscar palavra" aria-label="Buscar versículos">
-  <select id="atEscopo" class="at-sel" aria-label="Onde buscar">
-    <option value="cap">Neste capítulo</option>
-    <option value="livro">Neste livro</option>
-    <option value="ot">Antigo Testamento</option>
-    <option value="nt">Novo Testamento</option>
-    <option value="all">Bíblia toda</option>
-  </select>
-</div>
-      <div id="atVersos" class="at-versos"><span class="at-msg">Abra o ateliê para carregar o texto.</span></div>
-      <div class="at-bandeja">
-        <span id="atRef">Toque nos versículos para selecioná-los</span>
-        <span style="margin-left:auto" class="at-row">
-          <button id="atLimpar" class="at-btn" type="button">LIMPAR</button>
-          <button id="atInserir" class="at-btn gold" type="button" disabled>INSERIR NO TEXTO</button>
-        </span>
-      </div>
-    </div>
- 
-    <div class="at-box at-editor" id="atEditor">
-      <div class="at-row">
-        <select id="atRasc" class="at-sel at-grow" aria-label="Rascunhos"></select>
-        <button id="atNovo" class="at-btn" type="button">NOVO</button>
-        <button id="atExcluir" class="at-btn" type="button">EXCLUIR</button>
-      </div>
-      <input id="atTitulo" class="at-titulo at-in" type="text" placeholder="Título da mensagem" aria-label="Título">
-           <div class="at-modo">
-        <button id="atModoTexto" class="at-btn on" type="button">TEXTO LIVRE</button>
-        <button id="atModoArvore" class="at-btn" type="button">ESTRUTURA DINÂMICA</button>
-      </div>
-        
-     
-      <textarea id="atTexto" class="at-texto" placeholder="Comece a escrever. Selecione versículos ao lado e insira-os onde o cursor estiver." aria-label="Texto"></textarea>
-      <div id="atArvore" class="at-arvore" hidden></div>
-     <div class="at-rodape">
-        <span id="atContagem">0 palavras</span>
-        <span id="atSalvo">—</span>
-        <span class="at-row">
-          
-          <button id="atFoco" class="at-btn gold" type="button">MODO FOCO</button>
-        </span>
-      </div>
-    </div>
- 
-  </div>
-</div>
- 
- 
- 
- 
-<section class="info">
-  <div class="info-title">SOBRE ESTA ÁREA</div>
-  <p>
-   A Sala do Escritor é uma área privada. Aqui ficam o Painel de gestão e o Ateliê de criação, com a Bíblia ao lado para escrever.
-  </p>
-</section>
- 
+  <section class="panel mesa">
+    <div class="row"><select id="mzEsc" class="sel" aria-label="Escopo do estudo"></select><strong id="prog" style="flex:1;font-size:13px"></strong><button id="mzArq" class="btn" type="button">ARQUIVO</button></div>
+    <div id="lista"><span class="msg">Carregando a tabela…</span></div>
+  </section>
 </main>
  
-<footer>
-  <div class="footer-inner">
-    <div class="footer-left">PALAVRA &amp; SÉRIE — SALA DO ESCRITOR</div>
-    <a class="footer-link" href="javascript:history.back()">← VOLTAR</a>
+<section id="arqOv" class="ov"><div class="bx"><h2>Arquivo de pesquisas</h2><p class="msg">Resultados das etapas, com data e horário.</p><div id="arqBody"></div><div class="row" style="justify-content:flex-end;margin-top:12px"><button type="button" class="btn" data-a="limpar" style="margin-right:auto;color:#ff6b6b">APAGAR TUDO</button><button type="button" class="btn" data-a="fechar">FECHAR</button></div></div></section>
+ 
+<section id="revOv" class="ov" aria-hidden="true">
+  <div class="bx">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div><h2>REVISOR TEOLÓGICO</h2><p class="msg" style="max-width:520px">PESQUISAR → ANALISAR → REVISAR → CONSOLIDAR. O Revisor é uma segunda camada de pesquisa: audita metodológica e teologicamente o conteúdo, não é um corretor de texto.</p></div>
+      <button type="button" class="btn" onclick="closeRevisor()">FECHAR</button>
+    </div>
+    <div id="revNote" class="note"></div>
+    <label for="revTema">TEMA / ASSUNTO</label><input id="revTema" type="text" placeholder="Ex.: A doutrina da justificação em Romanos 3">
+    <label for="revSub">SUBETAPA OU CONTEXTO METODOLÓGICO (opcional)</label><input id="revSub" type="text" placeholder="Ex.: 06.14 — Síntese exegética (deixe vazio se não se aplicar)">
+    <label for="revRef">REFERÊNCIA DE COMPARAÇÃO</label><small>Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere fontes reconhecidas.</small><textarea id="revRef" style="min-height:110px" placeholder="Cole uma referência de comparação ou deixe vazio..."></textarea>
+    <label for="revCont">CONTEÚDO DO ESCRITOR</label><small>Cole aqui o texto a ser auditado (produzido por você, por outra IA, artigo, rascunho etc.).</small><textarea id="revCont" style="min-height:180px" placeholder="Cole aqui o conteúdo..."></textarea>
+    <label>RELATÓRIO DE AUDITORIA</label>
+    <div id="revRep" class="rep">O relatório de auditoria aparecerá aqui depois da revisão.</div>
+    <div class="row" style="justify-content:flex-end"><button id="revGo" type="button" class="btn gold" style="background:var(--a);border-color:var(--a);color:#061522" onclick="submitRevisor()">ENVIAR PARA REVISÃO</button></div>
   </div>
-</footer>
- 
-</div>
- 
+</section>
+<div id="toast" role="status"></div>
  
 <script>
-const SUPABASE_URL =
-  "https://qmhdbuxomozdczgvpvcc.supabase.co";
+const SB_URL="https://qmhdbuxomozdczgvpvcc.supabase.co",SB_KEY="sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8",WORKER="https://yellow-lab-f4b2.palavraeserie.workers.dev";
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+let tTimer=null;
+function toast(msg){const e=$("toast");e.textContent=msg;e.style.display="block";clearTimeout(tTimer);tTimer=setTimeout(()=>{e.style.display="none"},6000)}
  
-const SUPABASE_ANON_KEY =
-  "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
+/* ===== NÍVEIS (fonte única; F=FREE P=PRO M=MASTER D=DOCTUS; um caractere por subetapa, módulos 01 a 12) ===== */
+const LV={F:"FREE",P:"PRO",M:"MASTER",D:"DOCTUS"},MATRIX_LEVELS={};
+["FFPPPPPPPMPM","PPPPMMMMMMMD","PPPPPPPPMMMMMMMM","PPPPPPPMMMMMM","MMMMMMMMMDDM","PPPPPPPMMMMMDD","PPPPPPPMMMMMMMD","MMMMMMMMMMMDMDD","MMMMMMMMMMMMMDD","MMMMMMMMMMMMDDD","MMMMMMDDDDDDD","MMMMMMMDDDDDDD"]
+ .forEach((s,m)=>[...s].forEach((c,i)=>{MATRIX_LEVELS[String(m+1).padStart(2,"0")+"."+(i+1)]=LV[c]}));
+const NAMES={FREE:"FUNDAMENTOS",PRO:"FORMAÇÃO",MASTER:"APROFUNDAMENTO",DOCTUS:"ESPECIALIZAÇÃO"},RANK={FREE:0,PRO:1,MASTER:2,DOCTUS:3};
+const LINKS={PRO:"https://pay.kiwify.com.br/Vjp7c9i",MASTER:"https://pay.kiwify.com.br/Fx0qlhm",DOCTUS:"https://pay.kiwify.com.br/RAOCHCE"},NEXT={FREE:"PRO",PRO:"MASTER",MASTER:"DOCTUS"};
+let plan="FREE",email="";
+const lname=l=>NAMES[l]||l,lvl=c=>MATRIX_LEVELS[c]||"DOCTUS",allowed=c=>(RANK[plan]??0)>=(RANK[lvl(c)]??3);
+const link=l=>LINKS[l]?LINKS[l]+(email?"?email="+encodeURIComponent(email):""):"#";
+function head(){
+  $("badge").textContent="PLANO: "+lname(plan);
+  const b=$("up");
+  if(plan==="DOCTUS"){b.style.display="none";return}
+  b.style.display="inline-block";b.textContent="FAZER UPGRADE";b.href=link(NEXT[plan]||"PRO");
+}
+async function loadPlan(s){
+  email=s?.user?.email||"";plan="FREE";
+  if(s?.user?.id){try{const{data}=await sb.from("profiles").select("plano").eq("id",s.user.id).single();if(data)plan=String(data.plano||"FREE").toUpperCase()}catch(e){console.error(e)}}
+  head();mzRender();
+}
+sb.auth.onAuthStateChange(ev=>{if(ev==="INITIAL_SESSION"||ev==="SIGNED_OUT")sb.auth.getSession().then(({data})=>loadPlan(data.session))});
+async function getSession(){
+  const{data,error}=await sb.auth.getSession();
+  if(error||!data?.session)throw new Error("Sessão não encontrada. Para consultar, entre na sua conta de assinante.");
+  return data.session;
+}
  
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
- 
-const loading = document.getElementById("loading");
-const app = document.getElementById("app");
-const errorBox = document.getElementById("error");
-const userEmail = document.getElementById("userEmail");
-const logoutBtn = document.getElementById("logoutBtn");
- 
- 
- 
-/*
-  Fontes:
-  - WLC: textos normalizados do Biblia Libera, provenientes do Open Scriptures Hebrew Bible.
-  - Nestle 1904: textos normalizados do Biblia Libera, provenientes da transcrição Biblical Humanities.
-  - Textus Receptus · Scrivener 1894: texto grego do pacote baseado no STEPBible TAGNT, carregado por capítulo.
-  - Almeida 1911: JSON público do projeto Smart Bible Versions.
-*/
- 
-const DATA = {
-  portuguese:
-    "https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/ALM1911%20-%20Almeida%201911.json",
- 
-  wlc:
-    "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/wlc/",
- 
-  greek:
-    "https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/n4/",
- 
-  tr:
-    "https://raw.githubusercontent.com/metaxiamultimedia/scriptures-js-source-stepbible-tagnt-tr/main/data/stepbible-tagnt-tr/"
+/* ===== FONTE BÍBLICA (mesma da Sala do Escritor) ===== */
+const DATA={
+  pt:"https://raw.githubusercontent.com/barretogustavo/smart-bible-versions/refs/heads/main/ALM1911%20-%20Almeida%201911.json",
+  wlc:"https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/wlc/",
+  greek:"https://raw.githubusercontent.com/biblialibera/biblialibera/main/sources/n4/",
+  tr:"https://raw.githubusercontent.com/metaxiamultimedia/scriptures-js-source-stepbible-tagnt-tr/main/data/stepbible-tagnt-tr/"
 };
- 
-const BOOKS = [
-  ["Gen","Gênesis","OT","Gênesis"],
-  ["Exod","Êxodo","OT","Êxodo"],
-  ["Lev","Levítico","OT","Levítico"],
-  ["Num","Números","OT","Números"],
-  ["Deut","Deuteronômio","OT","Deuteronômio"],
-  ["Josh","Josué","OT","Josué"],
-  ["Judg","Juízes","OT","Juízes"],
-  ["Ruth","Rute","OT","Rute"],
-  ["1Sam","1 Samuel","OT","1 Samuel"],
-  ["2Sam","2 Samuel","OT","2 Samuel"],
-  ["1Kgs","1 Reis","OT","1 Reis"],
-  ["2Kgs","2 Reis","OT","2 Reis"],
-  ["1Chr","1 Crônicas","OT","1 Crônicas"],
-  ["2Chr","2 Crônicas","OT","2 Crônicas"],
-  ["Ezra","Esdras","OT","Esdras"],
-  ["Neh","Neemias","OT","Neemias"],
-  ["Esth","Ester","OT","Ester"],
-  ["Job","Jó","OT","Jó"],
-  ["Ps","Salmos","OT","Salmos"],
-  ["Prov","Provérbios","OT","Provérbios"],
-  ["Eccl","Eclesiastes","OT","Eclesiastes"],
-  ["Song","Cantares","OT","Cantares"],
-  ["Isa","Isaías","OT","Isaías"],
-  ["Jer","Jeremias","OT","Jeremias"],
-  ["Lam","Lamentações","OT","Lamentações"],
-  ["Ezek","Ezequiel","OT","Ezequiel"],
-  ["Dan","Daniel","OT","Daniel"],
-  ["Hos","Oséias","OT","Oséias"],
-  ["Joel","Joel","OT","Joel"],
-  ["Amos","Amós","OT","Amós"],
-  ["Obad","Obadias","OT","Obadias"],
-  ["Jonah","Jonas","OT","Jonas"],
-  ["Mic","Miquéias","OT","Miquéias"],
-  ["Nah","Naum","OT","Naum"],
-  ["Hab","Habacuque","OT","Habacuque"],
-  ["Zeph","Sofonias","OT","Sofonias"],
-  ["Hag","Ageu","OT","Ageu"],
-  ["Zech","Zacarias","OT","Zacarias"],
-  ["Mal","Malaquias","OT","Malaquias"],
-  ["Matt","Mateus","NT","Mateus"],
-  ["Mark","Marcos","NT","Marcos"],
-  ["Luke","Lucas","NT","Lucas"],
-  ["John","João","NT","João"],
-  ["Acts","Atos","NT","Atos"],
-  ["Rom","Romanos","NT","Romanos"],
-  ["1Cor","1 Coríntios","NT","1 Coríntios"],
-  ["2Cor","2 Coríntios","NT","2 Coríntios"],
-  ["Gal","Gálatas","NT","Gálatas"],
-  ["Eph","Efésios","NT","Efésios"],
-  ["Phil","Filipenses","NT","Filipenses"],
-  ["Col","Colossenses","NT","Colossenses"],
-  ["1Thess","1 Tessalonicenses","NT","1 Tessalonicenses"],
-  ["2Thess","2 Tessalonicenses","NT","2 Tessalonicenses"],
-  ["1Tim","1 Timóteo","NT","1 Timóteo"],
-  ["2Tim","2 Timóteo","NT","2 Timóteo"],
-  ["Titus","Tito","NT","Tito"],
-  ["Phlm","Filemom","NT","Filemom"],
-  ["Heb","Hebreus","NT","Hebreus"],
-  ["Jas","Tiago","NT","Tiago"],
-  ["1Pet","1 Pedro","NT","1 Pedro"],
-  ["2Pet","2 Pedro","NT","2 Pedro"],
-  ["1John","1 João","NT","1 João"],
-  ["2John","2 João","NT","2 João"],
-  ["3John","3 João","NT","3 João"],
-  ["Jude","Judas","NT","Judas"],
-  ["Rev","Apocalipse","NT","Apocalipse"]
-];
- 
-let portugueseBible = null;
-const sourceCache = new Map();
-async function loadPortuguese(){
-  if(portugueseBible) return portugueseBible;
-  const response = await fetch(DATA.portuguese, {cache:"force-cache"});
-  if(!response.ok){
-    throw new Error("Não foi possível carregar Almeida 1911.");
-  }
-  portugueseBible = await response.json();
-  if(!Array.isArray(portugueseBible)){
-    throw new Error("Formato inesperado da Almeida 1911.");
-  }
-  return portugueseBible;
+const BK="Gen:Gênesis,Exod:Êxodo,Lev:Levítico,Num:Números,Deut:Deuteronômio,Josh:Josué,Judg:Juízes,Ruth:Rute,1Sam:1 Samuel,2Sam:2 Samuel,1Kgs:1 Reis,2Kgs:2 Reis,1Chr:1 Crônicas,2Chr:2 Crônicas,Ezra:Esdras,Neh:Neemias,Esth:Ester,Job:Jó,Ps:Salmos,Prov:Provérbios,Eccl:Eclesiastes,Song:Cantares,Isa:Isaías,Jer:Jeremias,Lam:Lamentações,Ezek:Ezequiel,Dan:Daniel,Hos:Oséias,Joel:Joel,Amos:Amós,Obad:Obadias,Jonah:Jonas,Mic:Miquéias,Nah:Naum,Hab:Habacuque,Zeph:Sofonias,Hag:Ageu,Zech:Zacarias,Mal:Malaquias,Matt:Mateus,Mark:Marcos,Luke:Lucas,John:João,Acts:Atos,Rom:Romanos,1Cor:1 Coríntios,2Cor:2 Coríntios,Gal:Gálatas,Eph:Efésios,Phil:Filipenses,Col:Colossenses,1Thess:1 Tessalonicenses,2Thess:2 Tessalonicenses,1Tim:1 Timóteo,2Tim:2 Timóteo,Titus:Tito,Phlm:Filemom,Heb:Hebreus,Jas:Tiago,1Pet:1 Pedro,2Pet:2 Pedro,1John:1 João,2John:2 João,3John:3 João,Jude:Judas,Rev:Apocalipse".split(",").map(x=>x.split(":"));
+const isOT=l=>l<39;
+let PT=null;const cache=new Map();
+async function loadPT(){
+  if(PT)return PT;
+  const r=await fetch(DATA.pt,{cache:"force-cache"});
+  if(!r.ok)throw new Error("Não foi possível carregar Almeida 1911.");
+  PT=await r.json();
+  if(!Array.isArray(PT))throw new Error("Formato inesperado da Almeida 1911.");
+  return PT;
 }
- 
-function getTRBookCode(bookCode){
-  return bookCode;
+async function mapaOrig(code,ot){
+  const url=(ot?DATA.wlc:DATA.greek)+code+".txt";
+  if(cache.get(url))return cache.get(url);
+  const r=await fetch(url,{cache:"force-cache"});
+  if(!r.ok)return null;
+  const m=new Map();
+  for(const l of(await r.text()).split(/\r?\n/)){const t=l.indexOf("\t");if(t<0)continue;const p=l.slice(0,t).split(".");m.set(p[1]+":"+p[2],l.slice(t+1).trim())}
+  cache.set(url,m);return m;
 }
- 
-function escapeHTML(value){
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
- 
- 
- 
-let verificacaoEmAndamento = false;
- 
- 
-/* =====================================================
-   VISITANTES E SETORES MAIS CONSULTADOS
-===================================================== */
- 
-const statTotalVisitas = document.getElementById("statTotalVisitas");
-const statVisitantesUnicos = document.getElementById("statVisitantesUnicos");
-const statMediaPorVisitante = document.getElementById("statMediaPorVisitante");
-const statSetorTopo = document.getElementById("statSetorTopo");
-const statsRank = document.getElementById("statsRank");
-const statsLocations = document.getElementById("statsLocations");
-const statsHoursWrap = document.getElementById("statsHoursWrap");
-const statsUpdatedAt = document.getElementById("statsUpdatedAt");
-const statsRefreshBtn = document.getElementById("statsRefreshBtn");
- 
-/*
-  Nomes possíveis de cada coluna, caso já existam na tabela "visitas"
-  com nomes diferentes dos usados aqui. Ajuste esta lista se sua
-  coluna de data/país/cidade tiver outro nome.
-*/
-const COLUNAS_DATA = ["created_at","criado_em","inserted_at","data_criacao","timestamp"];
-const COLUNAS_PAIS = ["pais","country","country_name"];
-const COLUNAS_CIDADE = ["cidade","city"];
- 
-function primeiraColunaPresente(linha, candidatos){
-  for(const nome of candidatos){
-    if(linha && Object.prototype.hasOwnProperty.call(linha, nome)){
-      return nome;
-    }
-  }
-  return null;
-}
- 
-async function carregarEstatisticasVisitas(){
-  if(!statsRefreshBtn) return;
- 
-  statsRefreshBtn.disabled = true;
-  statsRefreshBtn.textContent = "ATUALIZANDO...";
- 
-  try{
-    // select("*") em vez de listar colunas: assim funciona mesmo que
-    // "visitas" ainda não tenha as colunas de data/país/cidade.
-    const {data,error} =
-      await supabaseClient
-        .from("visitas")
-        .select("*");
- 
-    if(error) throw error;
- 
-    const linhas = data || [];
-    const primeira = linhas[0] || {};
-    const colData = primeiraColunaPresente(primeira, COLUNAS_DATA);
-    const colPais = primeiraColunaPresente(primeira, COLUNAS_PAIS);
-    const colCidade = primeiraColunaPresente(primeira, COLUNAS_CIDADE);
- 
-    // ---- total de visitas ----
-    statTotalVisitas.textContent = linhas.length;
- 
-    // ---- visitantes únicos (aproximado por visitante_id salvo no navegador) ----
-    const idsUnicos = new Set(
-      linhas.map(function(l){ return l.visitante_id; }).filter(Boolean)
-    );
-    statVisitantesUnicos.textContent = idsUnicos.size;
- 
-    statMediaPorVisitante.textContent = idsUnicos.size
-      ? (linhas.length / idsUnicos.size).toFixed(1)
-      : "—";
- 
-    // ---- ranking por setor/página ----
-    const contagem = {};
-    linhas.forEach(function(l){
-      const nome = l.pagina || "Desconhecido";
-      contagem[nome] = (contagem[nome] || 0) + 1;
-    });
- 
-    const ranking = Object.keys(contagem)
-      .map(function(nome){ return {nome:nome, total:contagem[nome]}; })
-      .sort(function(a,b){ return b.total - a.total; });
- 
-    statSetorTopo.textContent = ranking.length ? ranking[0].nome : "—";
- 
-    if(ranking.length === 0){
-      statsRank.innerHTML =
-        '<span class="stats-msg">Ainda não há visitas registradas.</span>';
-    }else{
-      const maior = ranking[0].total;
- 
-      statsRank.innerHTML = ranking.map(function(item){
-        const pct = Math.max(6, Math.round((item.total / maior) * 100));
-        return (
-          '<div class="rank-row">' +
-            '<div class="rank-name">' + escapeHTML(item.nome) + '</div>' +
-            '<div class="rank-bar-wrap"><div class="rank-bar" style="width:' + pct + '%"></div></div>' +
-            '<div class="rank-count">' + item.total + '</div>' +
-          '</div>'
-        );
-      }).join("");
-    }
- 
-    // ---- localização ----
-    if(!colPais){
-      statsLocations.innerHTML =
-        '<span class="stats-msg">Ainda sem coluna de país/cidade na tabela ' +
-        '"visitas". Assim que ela existir e novas visitas forem registradas, ' +
-        'a localização aparece aqui automaticamente.</span>';
-    }else{
-      const porPais = {};
-      linhas.forEach(function(l){
-        const pais = l[colPais] || "Não identificado";
-        const cidade = colCidade ? (l[colCidade] || "") : "";
-        if(!porPais[pais]) porPais[pais] = { total:0, cidades:{} };
-        porPais[pais].total++;
-        if(cidade){
-          porPais[pais].cidades[cidade] = (porPais[pais].cidades[cidade] || 0) + 1;
-        }
-      });
- 
-      const listaPaises = Object.keys(porPais)
-        .map(function(nome){ return {nome:nome, total:porPais[nome].total, cidades:porPais[nome].cidades}; })
-        .sort(function(a,b){ return b.total - a.total; });
- 
-      if(!listaPaises.length){
-        statsLocations.innerHTML =
-          '<span class="stats-msg">Ainda não há visitas com localização registrada.</span>';
-      }else{
-        const maiorPais = listaPaises[0].total;
- 
-        statsLocations.innerHTML = listaPaises.slice(0,6).map(function(item){
-          const pct = Math.max(6, Math.round((item.total / maiorPais) * 100));
-          const cidadesOrdenadas = Object.keys(item.cidades)
-            .sort(function(a,b){ return item.cidades[b]-item.cidades[a]; })
-            .slice(0,3)
-            .join(" · ");
- 
-          return (
-            '<div class="stats-loc-row">' +
-              '<div class="stats-loc-name">' + escapeHTML(item.nome) +
-                (cidadesOrdenadas ? '<span class="stats-loc-city">' + escapeHTML(cidadesOrdenadas) + '</span>' : '') +
-              '</div>' +
-              '<div class="stats-loc-bar"><i style="width:' + pct + '%"></i></div>' +
-              '<div class="stats-loc-count">' + item.total + '</div>' +
-            '</div>'
-          );
-        }).join("");
-      }
-    }
- 
-    // ---- atividade por horário ----
-    if(!colData){
-      statsHoursWrap.innerHTML =
-        '<span class="stats-msg">Ainda sem coluna de data/hora na tabela ' +
-        '"visitas" (ex.: created_at). Adicione essa coluna para ver o ' +
-        'gráfico de horário.</span>';
-    }else{
-      const porHora = new Array(24).fill(0);
-      linhas.forEach(function(l){
-        const valor = l[colData];
-        if(!valor) return;
-        const data = new Date(valor);
-        if(Number.isNaN(data.getTime())) return;
-        porHora[data.getHours()]++;
-      });
- 
-      const maiorHora = Math.max(1, ...porHora);
-      const horaPico = porHora.indexOf(maiorHora);
- 
-      const barrasHtml = porHora.map(function(qtd, hora){
-        const alturaPct = Math.max(3, Math.round((qtd / maiorHora) * 100));
-        const ehPico = qtd === maiorHora && qtd > 0;
-        return (
-          '<div class="stats-hour-col' + (ehPico ? ' peak' : '') + '" title="' + hora + 'h — ' + qtd + ' visitas">' +
-            '<div class="stats-hour-bar" style="height:' + alturaPct + '%"></div>' +
-          '</div>'
-        );
-      }).join("");
- 
-      const labelsHtml = [0,4,8,12,16,20].map(function(h){ return '<span>' + h + 'h</span>'; }).join("");
- 
-      const totalComData = porHora.reduce(function(a,b){ return a+b; }, 0);
- 
-      statsHoursWrap.innerHTML =
-        '<div class="stats-hours">' + barrasHtml + '</div>' +
-        '<div class="stats-hour-labels">' + labelsHtml + '</div>' +
-        (totalComData
-          ? '<div class="stats-peak-note">Pico de acessos por volta das <b>' + horaPico + 'h</b>.</div>'
-          : '<div class="stats-peak-note">Ainda não há visitas com horário registrado.</div>');
-    }
- 
-    const agora = new Date();
-    statsUpdatedAt.textContent =
-      "ATUALIZADO ÀS " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
- 
-  }catch(error){
-    console.error("Erro ao carregar estatísticas:",error);
-    statsRank.innerHTML =
-      '<span class="stats-msg">Não foi possível carregar as estatísticas agora.</span>';
-  }finally{
-    statsRefreshBtn.disabled = false;
-    statsRefreshBtn.textContent = "ATUALIZAR";
-  }
-}
- 
-if(statsRefreshBtn){
-  statsRefreshBtn.addEventListener("click",function(){
-    carregarEstatisticasVisitas();
-  });
-}
- 
-/* =====================================================
-   ASSINANTES E PLANOS
-===================================================== */
- 
-const PLANOS_ORDEM = ["doctus","master","pro","free"];
-const PLANOS_LABEL = { doctus:"Doctus", master:"Master", pro:"Pro", free:"Free" };
- 
-const planTotalAssinantes = document.getElementById("planTotalAssinantes");
-const planPagantes = document.getElementById("planPagantes");
-const planTaxaConversao = document.getElementById("planTaxaConversao");
-const planRank = document.getElementById("planRank");
-const planTempo = document.getElementById("planTempo");
-const planUpdatedAt = document.getElementById("planUpdatedAt");
-const planRefreshBtn = document.getElementById("planRefreshBtn");
- 
-function diasDesde(dataIso){
-  const data = new Date(dataIso);
-  if(Number.isNaN(data.getTime())) return null;
-  const diffMs = Date.now() - data.getTime();
-  return Math.max(0, Math.floor(diffMs / 86400000));
-}
- 
-function formatarDias(dias){
-  if(dias === null) return "—";
-  if(dias < 1) return "hoje";
-  if(dias < 30) return dias + " dia" + (dias === 1 ? "" : "s");
-  const meses = Math.round(dias / 30);
-  return meses + " mês" + (meses === 1 ? "" : "es");
-}
- 
-/* =====================================================
-   RECEITA E MARGEM POR PLANO
-   Valores fechados: preços na Kiwify (taxa de 8,99% + R$ 2,49 por
-   venda), 200 toques por mês e custo estimado de IA por toque.
-   Os campos do painel permitem simular outros valores; o botão
-   "Restaurar" volta para os valores fechados abaixo.
-===================================================== */
- 
-const FIN_TAXA_PCT = 0.0899;
-const FIN_TAXA_FIXA = 2.49;
-const FIN_CHAVE = "ps_fin_config";
- 
-const FIN_MODELOS = {
-  pro:    "Gemini 3.1 Flash-Lite",
-  master: "Gemini 3 Flash",
-  doctus: "Gemini 3.1 Pro"
-};
- 
-/* Valores fechados. O botão "Restaurar" do painel volta para estes. */
-const FIN_PADRAO = {
-  toques: 200,
-  planos: {
-    pro:    { preco:39.90,  iaPorToque:0.022 },
-    master: { preco:59.90,  iaPorToque:0.044 },
-    doctus: { preco:139.00, iaPorToque:0.176 }
-  },
-  pacotes: { p3:9.90, p5:14.90, p10:24.90 },
-  iaRevisao: 0.37
-};
- 
-const FIN_PACOTES = [
-  { id:"p3",  nome:"Pacote 3 revisões",  revisoes:3 },
-  { id:"p5",  nome:"Pacote 5 revisões",  revisoes:5 },
-  { id:"p10", nome:"Pacote 10 revisões", revisoes:10 }
-];
- 
-function finPadrao(){
-  return JSON.parse(JSON.stringify(FIN_PADRAO));
-}
- 
-function finNumero(valor, minimo){
-  if(valor === null || valor === undefined) return null;
-  const texto = String(valor).trim().replace(",", ".");
-  if(texto === "") return null;
-  const n = Number(texto);
-  return (Number.isFinite(n) && n >= minimo) ? n : null;
-}
- 
-function finCarregar(){
-  const cfg = finPadrao();
-  try{
-    const bruto = localStorage.getItem(FIN_CHAVE);
-    if(!bruto) return cfg;
-    const salvo = JSON.parse(bruto);
- 
-    const t = finNumero(salvo && salvo.toques, 1);
-    if(t !== null) cfg.toques = Math.round(t);
- 
-    ["pro","master","doctus"].forEach(function(p){
-      const s = salvo && salvo.planos && salvo.planos[p];
-      if(!s) return;
-      const preco = finNumero(s.preco, 0.01);
-      const ia = finNumero(s.iaPorToque, 0);
-      if(preco !== null) cfg.planos[p].preco = preco;
-      if(ia !== null) cfg.planos[p].iaPorToque = ia;
-    });
- 
-    FIN_PACOTES.forEach(function(k){
-      const v = finNumero(salvo && salvo.pacotes && salvo.pacotes[k.id], 0.01);
-      if(v !== null) cfg.pacotes[k.id] = v;
-    });
-    const r = finNumero(salvo && salvo.iaRevisao, 0);
-    if(r !== null) cfg.iaRevisao = r;
-  }catch(e){ /* armazenamento indisponível: usa os valores fechados */ }
-  return cfg;
-}
- 
-function finSalvar(){
-  try{ localStorage.setItem(FIN_CHAVE, JSON.stringify(finConfig)); }
-  catch(e){ /* sem armazenamento: vale só até recarregar */ }
-}
- 
-let finConfig = finCarregar();                                  // valores confirmados
-let finRascunho = JSON.parse(JSON.stringify(finConfig));       // o que está sendo editado
-let finContagem = {};
- 
-function brl(valor){
-  return valor.toLocaleString("pt-BR",{ style:"currency", currency:"BRL" });
-}
- 
-function finTexto(n){
-  return String(n).replace(".", ",");
-}
- 
-function finPendente(){
-  return JSON.stringify(finRascunho) !== JSON.stringify(finConfig);
-}
- 
-function finPreencherCampos(){
-  ["pro","master","doctus"].forEach(function(p){
-    const preco = document.getElementById("fin-preco-" + p);
-    const ia = document.getElementById("fin-ia-" + p);
-    if(preco) preco.value = finTexto(finRascunho.planos[p].preco.toFixed(2));
-    if(ia) ia.value = finTexto(finRascunho.planos[p].iaPorToque);
-  });
-  const toques = document.getElementById("fin-toques");
-  if(toques) toques.value = String(finRascunho.toques);
- 
-  FIN_PACOTES.forEach(function(k){
-    const campo = document.getElementById("fin-pacote-" + k.id);
-    if(campo) campo.value = finTexto(finRascunho.pacotes[k.id].toFixed(2));
-  });
-  const iaRev = document.getElementById("fin-ia-revisao");
-  if(iaRev) iaRev.value = finTexto(finRascunho.iaRevisao);
-}
- 
-function finAtualizarEstado(mensagemConfirmado){
-  const estado = document.getElementById("finEstado");
-  const confirmar = document.getElementById("finConfirmar");
-  const descartar = document.getElementById("finDescartar");
-  if(!estado) return;
- 
-  const pendente = finPendente();
- 
-  if(pendente){
-    estado.textContent =
-      "Alterações não confirmadas. Se você sair desta tela sem confirmar, os valores voltam ao que estava confirmado.";
-    estado.className = "fin-estado pendente";
-  }else{
-    estado.textContent = mensagemConfirmado || "Valores confirmados.";
-    estado.className = "fin-estado";
-  }
- 
-  if(confirmar) confirmar.disabled = !pendente;
-  if(descartar) descartar.disabled = !pendente;
-}
- 
-function finAoEditar(evento){
-  if(!evento.target || !evento.target.id || evento.target.id.indexOf("fin-") !== 0) return;
- 
-  const novo = finPadrao();
-  const t = finNumero(document.getElementById("fin-toques").value, 1);
-  novo.toques = t !== null ? Math.round(t) : finRascunho.toques;
- 
-  ["pro","master","doctus"].forEach(function(p){
-    const preco = finNumero(document.getElementById("fin-preco-" + p).value, 0.01);
-    const ia = finNumero(document.getElementById("fin-ia-" + p).value, 0);
-    novo.planos[p].preco = preco !== null ? preco : finRascunho.planos[p].preco;
-    novo.planos[p].iaPorToque = ia !== null ? ia : finRascunho.planos[p].iaPorToque;
-  });
- 
-  FIN_PACOTES.forEach(function(k){
-    const v = finNumero(document.getElementById("fin-pacote-" + k.id).value, 0.01);
-    novo.pacotes[k.id] = v !== null ? v : finRascunho.pacotes[k.id];
-  });
-  const r = finNumero(document.getElementById("fin-ia-revisao").value, 0);
-  novo.iaRevisao = r !== null ? r : finRascunho.iaRevisao;
- 
-  finRascunho = novo;
-  finPreencherCampos();
-  finDesenhar();
-  finAtualizarEstado();
-}
- 
-function finConfirmarAlteracoes(){
-  finConfig = JSON.parse(JSON.stringify(finRascunho));
-  finSalvar();
-  const agora = new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-  finAtualizarEstado("Confirmado às " + agora + ". Estes valores ficam guardados neste navegador.");
-}
- 
-function finDescartarAlteracoes(){
-  finRascunho = JSON.parse(JSON.stringify(finConfig));
-  finPreencherCampos();
-  finDesenhar();
-  finAtualizarEstado("Alterações descartadas. Valores confirmados mantidos.");
-}
- 
-function finMontarFormulario(){
-  const el = document.getElementById("planFinanceiro");
-  if(!el || document.getElementById("finForm")) return;
- 
-  const campos = ["pro","master","doctus"].map(function(p){
-    return (
-      '<div class="fin-campo"><span>' + PLANOS_LABEL[p] + '</span>' +
-        '<label>Preço por mês (R$)<input id="fin-preco-' + p + '" type="text" inputmode="decimal"></label>' +
-        '<label>IA por toque (R$)<input id="fin-ia-' + p + '" type="text" inputmode="decimal"></label>' +
-      '</div>'
-    );
-  }).join("");
- 
-  el.innerHTML =
-    '<div id="finForm" class="fin-form">' + campos +
-      '<div class="fin-campo"><span>Uso</span>' +
-        '<label>Toques por mês<input id="fin-toques" type="text" inputmode="numeric"></label>' +
-        '<button id="finRestaurar" class="stats-refresh" type="button">RESTAURAR VALORES FECHADOS</button>' +
-      '</div>' +
-      FIN_PACOTES.map(function(k){
-        return (
-          '<div class="fin-campo"><span>' + escapeHTML(k.nome) + '</span>' +
-            '<label>Preço por venda (R$)<input id="fin-pacote-' + k.id + '" type="text" inputmode="decimal"></label>' +
-          '</div>'
-        );
-      }).join("") +
-      '<div class="fin-campo"><span>IA dos pacotes</span>' +
-        '<label>IA por revisão (R$)<input id="fin-ia-revisao" type="text" inputmode="decimal"></label>' +
-      '</div>' +
-    '</div>' +
-    '<div class="fin-acoes">' +
-      '<div id="finEstado" class="fin-estado"></div>' +
-      '<button id="finDescartar" class="stats-refresh" type="button">DESCARTAR</button>' +
-      '<button id="finConfirmar" class="stats-refresh fin-confirmar" type="button">CONFIRMAR ALTERAÇÕES</button>' +
-    '</div>' +
-    '<div class="stats-msg" style="margin-bottom:6px">' +
-      'Calculadora: os números recalculam na hora, mas só valem depois de confirmar. ' +
-      'Isto não altera o preço cobrado na Kiwify.' +
-    '</div>' +
-    '<div id="finResultados"></div>';
- 
-  finPreencherCampos();
-  el.addEventListener("change", finAoEditar);
- 
-  document.getElementById("finRestaurar").addEventListener("click", function(){
-    finRascunho = finPadrao();
-    finPreencherCampos();
-    finDesenhar();
-    finAtualizarEstado();
-  });
-  document.getElementById("finConfirmar").addEventListener("click", finConfirmarAlteracoes);
-  document.getElementById("finDescartar").addEventListener("click", finDescartarAlteracoes);
- 
-  finAtualizarEstado();
-}
- 
-function finDesenhar(){
-  const el = document.getElementById("finResultados");
-  if(!el) return;
- 
-  let sobraTotal = 0;
-  let pagantes = 0;
- 
-  const linhasPlanos = ["doctus","master","pro"].map(function(plano){
-    const c = finRascunho.planos[plano];
-    const taxa = c.preco * FIN_TAXA_PCT + FIN_TAXA_FIXA;
-    const ia = c.iaPorToque * finRascunho.toques;
-    const sobra = c.preco - taxa - ia;
-    const n = finContagem[plano] || 0;
- 
-    sobraTotal += sobra * n;
-    pagantes += n;
- 
-    const larg = function(v){
-      return Math.max(0, Math.min(100, v / c.preco * 100)).toFixed(1);
-    };
- 
-    return (
-      '<div class="fin-row">' +
-        '<div class="fin-name">' + PLANOS_LABEL[plano] + ' · ' + brl(c.preco) +
-          '<small>' + escapeHTML(FIN_MODELOS[plano]) + '</small></div>' +
-        '<div class="fin-bar" title="Taxa ' + brl(taxa) + ' · IA ' + brl(ia) + ' · Sobra ' + brl(sobra) + '">' +
-          '<i class="fin-taxa" style="width:' + larg(taxa) + '%"></i>' +
-          '<i class="fin-ia" style="width:' + larg(ia) + '%"></i>' +
-          '<i class="fin-sobra" style="width:' + larg(sobra) + '%"></i>' +
-        '</div>' +
-        '<div class="fin-total">' + n + ' × ' + brl(sobra) + ' = <b>' + brl(sobra * n) + '</b></div>' +
-      '</div>'
-    );
-  }).join("");
- 
-  const linhasPacotes = FIN_PACOTES.map(function(base){
-    const k = { nome:base.nome, revisoes:base.revisoes, preco:finRascunho.pacotes[base.id] };
-    const taxa = k.preco * FIN_TAXA_PCT + FIN_TAXA_FIXA;
-    const ia = k.revisoes * finRascunho.iaRevisao;
-    const sobra = k.preco - taxa - ia;
-    const larg = function(v){
-      return Math.max(0, Math.min(100, v / k.preco * 100)).toFixed(1);
-    };
- 
-    return (
-      '<div class="fin-row">' +
-        '<div class="fin-name">' + escapeHTML(k.nome) + ' · ' + brl(k.preco) +
-          '<small>por venda</small></div>' +
-        '<div class="fin-bar" title="Taxa ' + brl(taxa) + ' · IA ' + brl(ia) + ' · Sobra ' + brl(sobra) + '">' +
-          '<i class="fin-taxa" style="width:' + larg(taxa) + '%"></i>' +
-          '<i class="fin-ia" style="width:' + larg(ia) + '%"></i>' +
-          '<i class="fin-sobra" style="width:' + larg(sobra) + '%"></i>' +
-        '</div>' +
-        '<div class="fin-total">sobra <b>' + brl(sobra) + '</b> por venda</div>' +
-      '</div>'
-    );
-  }).join("");
- 
-  el.innerHTML =
-    linhasPlanos +
-    '<div class="stats-peak-note">Sobra mensal estimada dos planos: <b>' + brl(sobraTotal) +
-      '</b> com ' + pagantes + ' assinante(s), supondo uso máximo de IA (' + finRascunho.toques + ' toques por mês).</div>' +
-    '<h3 style="margin:18px 0 6px">Pacotes avulsos de revisão</h3>' +
-    linhasPacotes +
-    '<div class="fin-legend">' +
-      '<span><b class="fin-taxa"></b>Taxa da Kiwify</span>' +
-      '<span><b class="fin-ia"></b>Custo de IA</span>' +
-      '<span><b class="fin-sobra"></b>Sobra</span>' +
-    '</div>';
-}
- 
-function renderFinanceiro(contagem){
-  finContagem = contagem || {};
-  finMontarFormulario();
-  finDesenhar();
-}
- 
-/* Sair da página com alterações não confirmadas: o navegador avisa. */
-window.addEventListener("beforeunload",function(evento){
-  if(finPendente()){
-    evento.preventDefault();
-    evento.returnValue = "";
-  }
-});
- 
-async function carregarEstatisticasPlanos(){
-  if(!planRefreshBtn) return;
- 
-  planRefreshBtn.disabled = true;
-  planRefreshBtn.textContent = "ATUALIZANDO...";
- 
-  try{
-    /*
-      Lê pela função admin_planos_lista (criada no banco): a tabela
-      "profiles" só deixa cada pessoa ver a própria linha, então a
-      leitura direta mostraria só a conta de quem está logado.
-    */
-    const {data,error} =
-      await supabaseClient.rpc("admin_planos_lista");
- 
-    if(error) throw error;
- 
-    const linhas = data || [];
- 
-    planTotalAssinantes.textContent = linhas.length;
- 
-    const contagem = {};
-    const diasPorPlano = {};
- 
-    linhas.forEach(function(l){
-      const plano = (l.plano || "free").toLowerCase();
-      contagem[plano] = (contagem[plano] || 0) + 1;
- 
-      const dias = diasDesde(l.criado_em);
-      if(dias !== null){
-        if(!diasPorPlano[plano]) diasPorPlano[plano] = [];
-        diasPorPlano[plano].push(dias);
-      }
-    });
- 
-    const pagantes = (contagem.pro||0) + (contagem.master||0) + (contagem.doctus||0);
-    planPagantes.textContent = pagantes;
-    planTaxaConversao.textContent = linhas.length
-      ? Math.round((pagantes / linhas.length) * 100) + "%"
-      : "—";
- 
-    renderFinanceiro(contagem);
- 
-    const maior = Math.max(1, ...PLANOS_ORDEM.map(function(p){ return contagem[p] || 0; }));
- 
-    planRank.innerHTML = PLANOS_ORDEM.map(function(plano){
-      const total = contagem[plano] || 0;
-      const pct = Math.max(4, Math.round((total / maior) * 100));
-      return (
-        '<div class="rank-row">' +
-          '<div class="rank-name">' + PLANOS_LABEL[plano] + '</div>' +
-          '<div class="rank-bar-wrap"><div class="rank-bar" style="width:' + pct + '%"></div></div>' +
-          '<div class="rank-count">' + total + '</div>' +
-        '</div>'
-      );
-    }).join("");
- 
-    planTempo.innerHTML = PLANOS_ORDEM.map(function(plano){
-      const lista = diasPorPlano[plano] || [];
-      if(!lista.length){
-        return (
-          '<div class="stats-loc-row">' +
-            '<div class="stats-loc-name">' + PLANOS_LABEL[plano] + '</div>' +
-            '<div class="stats-loc-count">—</div>' +
-          '</div>'
-        );
-      }
-      const media = Math.round(lista.reduce(function(a,b){return a+b;},0) / lista.length);
-      return (
-        '<div class="stats-loc-row">' +
-          '<div class="stats-loc-name">' + PLANOS_LABEL[plano] +
-            '<span class="stats-loc-city">conta criada há, em média, ' + formatarDias(media) + '</span>' +
-          '</div>' +
-          '<div class="stats-loc-count">' + lista.length + '</div>' +
-        '</div>'
-      );
-    }).join("");
- 
-    const agora = new Date();
-    planUpdatedAt.textContent =
-      "ATUALIZADO ÀS " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
- 
-  }catch(error){
-    console.error("Erro ao carregar planos:",error);
-    const motivo = error && error.message
-      ? ' Motivo: ' + escapeHTML(error.message)
-      : '';
-    planRank.innerHTML =
-      '<span class="stats-msg">Não foi possível carregar os planos agora.' + motivo + '</span>';
-    planTempo.innerHTML =
-      '<span class="stats-msg">Sem dados de contas.</span>';
-    // O quadro de preços e margens não depende da contagem de assinantes.
-    renderFinanceiro({});
-  }finally{
-    planRefreshBtn.disabled = false;
-    planRefreshBtn.textContent = "ATUALIZAR";
-  }
-}
- 
-if(planRefreshBtn){
-  planRefreshBtn.addEventListener("click",function(){
-    carregarEstatisticasPlanos();
-  });
-}
- 
-/* =====================================================
-   BOTÃO DO PAINEL DE GESTÃO
-   O painel fica fechado ao entrar e só carrega os dados
-   quando é aberto.
-===================================================== */
- 
-const painelGestao = document.getElementById("painelGestao");
-const painelToggle = document.getElementById("painelToggle");
-const painelToggleAcao = document.getElementById("painelToggleAcao");
- 
-if(painelToggle){
-  painelToggle.addEventListener("click",function(){
-    const abrir = painelGestao.hidden;
- 
-    if(!abrir && finPendente()){
-      const descartar = window.confirm(
-        "Há alterações não confirmadas no quadro de receita. Fechar o painel e descartá-las?"
-      );
-      if(!descartar) return;
-      finDescartarAlteracoes();
-    }
- 
-    painelGestao.hidden = !abrir;
-    painelToggle.setAttribute("aria-expanded", String(abrir));
-    painelToggleAcao.textContent = abrir ? "FECHAR" : "ABRIR";
- 
-    if(abrir){
-      carregarEstatisticasVisitas();
-      carregarEstatisticasPlanos();
-    }
-  });
-}
-/* =====================================================
-   BÍBLIA RECOLHÍVEL + ATELIÊ DE CRIAÇÃO
-===================================================== */
-(function(){
-const $ = id => document.getElementById(id) || document.createElement("div");
- 
-  /* ---- alternância genérica dos painéis ---- */
-  function ligarToggle(btnId, acaoId, painelId, aoAbrir){
-    const btn = $(btnId), acao = $(acaoId), painel = $(painelId);
-    btn.addEventListener("click", function(){
-      const abrir = painel.hidden;
-      painel.hidden = !abrir;
-      btn.setAttribute("aria-expanded", String(abrir));
-      acao.textContent = abrir ? "FECHAR" : "ABRIR";
-      if(abrir && aoAbrir) aoAbrir();
-    });
-  }
- 
-  ligarToggle("ateliToggle","ateliToggleAcao","ateliPainel",iniciarAtelie);
- 
-  /* ---- estado ---- */
-  const CHAVE = "ps_atelie";
-  let st = {r:[], a:null};
-  let cur = {livro:0, cap:1, modo:"pt"};
-  let sel = new Set(), versos = [], iniciado = false, timer = null;
- 
-  function carregarSalvo(){
-       try{
-      const s = JSON.parse(localStorage.getItem(CHAVE) || "null");
-      if(s && Array.isArray(s.r)) st = s;
-    }catch(e){}
-    if(!Array.isArray(st.arq)) st.arq = [];
-    st.r.forEach(function(d){
-      if(!d.mesa) return;
-      Object.keys(d.mesa).forEach(function(esc){
-        const grupo = d.mesa[esc] || {};
-        Object.keys(grupo).forEach(function(cod){
-          const e = grupo[cod];
-          if(e && typeof e.t === "string"){
-            if(e.t.trim()){
-              st.arq.push({id:String(Date.now()) + Math.random().toString(16).slice(2), em:null, cod:cod, nome:"", escopo:esc, ref:"", texto:e.t.trim()});
-            }
-            delete e.t;
-          }
-        });
-      });
-    });
-    if(!st.r.length) criarRascunho(true);
-    if(!st.r.some(x => x.id === st.a)) st.a = st.r[0].id;
-  }
-  function gravar(){
-    try{ localStorage.setItem(CHAVE, JSON.stringify(st, function(k,v){ return k==="t" ? undefined : v; })); }catch(e){}
-    $("atSalvo").textContent = "Salvo às " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-  }
-  const ativo = () => st.r.find(x => x.id === st.a);
- 
-  function criarRascunho(silencioso){
-    const d = {id:String(Date.now()), titulo:"", texto:""};
-    st.r.unshift(d); st.a = d.id;
-    if(!silencioso){ gravar(); desenharRascunhos(); mostrarRascunho(); }
-  }
-  function desenharRascunhos(){
-    $("atRasc").innerHTML = st.r.map(r =>
-      '<option value="' + r.id + '">' + escapeHTML(r.titulo || "Sem título") + '</option>').join("");
-    $("atRasc").value = st.a;
-  }
-  function mostrarRascunho(){
-    const d = ativo();
-    $("atTitulo").value = d.titulo;
-    $("atTexto").value = d.texto;
-   aplicarModo();
-  }
-  function contar(){
-   const t = textoAtual().trim();
-    const p = t ? t.split(/\s+/).length : 0;
-    const min = Math.max(1, Math.round(p / 130));
-    $("atContagem").textContent = p + " palavras" + (p ? " · cerca de " + min + " min de fala" : "");
-  }
-  function agendarGravacao(){
-    const d = ativo();
-    d.titulo = $("atTitulo").value;
-    d.texto = $("atTexto").value;
-    contar();
-    clearTimeout(timer);
-    timer = setTimeout(function(){
-      gravar();
-      const o = $("atRasc").querySelector('option[value="' + d.id + '"]');
-      if(o) o.textContent = d.titulo || "Sem título";
-    }, 500);
-  }
- 
-  /* ---- fonte bíblica ---- */
- 
-  async function mapaOriginal(code, ot){
-    const url = (ot ? DATA.wlc : DATA.greek) + code + ".txt";
-    if(sourceCache.get(url)) return sourceCache.get(url);
-    const r = await fetch(url, {cache:"force-cache"});
-    if(!r.ok) return null;
-    const m = new Map();
-    for(const l of (await r.text()).split(/\r?\n/)){
-      const t = l.indexOf("\t");
-      if(t < 0) continue;
-      const p = l.slice(0,t).split(".");
-      m.set(p[1] + ":" + p[2], l.slice(t+1).trim());
-    }
-    sourceCache.set(url, m);
-    return m;
-  }
- 
-
- 
 async function mapaTR(code){
-  const livro = getTRBookCode(code);
-  const chave = "tr:" + livro + ":" + cur.cap;
-  if(sourceCache.has(chave)) return sourceCache.get(chave);
- 
-  const qtd = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).length;
-  const respostas = await Promise.all(
-    Array.from({length:qtd}, function(_, i){
-      return fetch(DATA.tr + livro + "/" + cur.cap + "/" + (i+1) + ".json", {cache:"force-cache"})
-        .then(function(r){ return r.ok ? r.json() : null; })
-        .catch(function(){ return null; });
-    })
-  );
- 
-  const m = new Map();
-  respostas.forEach(function(d, i){
-    const t = d && typeof d.text === "string" ? d.text.trim() : "";
-    if(t) m.set(cur.cap + ":" + (i+1), t);
-  });
-  sourceCache.set(chave, m);
-  return m;
+  const ch="tr:"+code+":"+cur.c;
+  if(cache.has(ch))return cache.get(ch);
+  const q=(PT[cur.l].chapters[cur.c-1]||[]).length;
+  const rs=await Promise.all(Array.from({length:q},(_,i)=>fetch(DATA.tr+code+"/"+cur.c+"/"+(i+1)+".json",{cache:"force-cache"}).then(r=>r.ok?r.json():null).catch(()=>null)));
+  const m=new Map();
+  rs.forEach((d,i)=>{const t=d&&typeof d.text==="string"?d.text.trim():"";if(t)m.set(cur.c+":"+(i+1),t)});
+  cache.set(ch,m);return m;
 }
- 
+let cur={l:0,c:1,modo:"pt"},sel=new Set(),versos=[],emBusca=false;
+const norm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+function intervalos(ns){
+  const out=[];let ini=ns[0],ant=ns[0];
+  for(let i=1;i<=ns.length;i++){if(ns[i]===ant+1){ant=ns[i];continue}out.push(ini===ant?String(ini):ini+"–"+ant);ini=ant=ns[i]}
+  return out.join(", ");
+}
+const referencia=()=>BK[cur.l][1]+" "+cur.c+":"+intervalos([...sel].sort((a,b)=>a-b));
+function bandeja(){$("ref").innerHTML=sel.size?"<strong>"+esc(referencia())+"</strong>":"Toque nos versículos para selecioná-los"}
+function capitulos(){
+  const n=PT[cur.l].chapters.length;
+  $("cap").innerHTML=Array.from({length:n},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+"</option>").join("");
+  if(cur.c>n)cur.c=n;
+  $("cap").value=String(cur.c);
+}
 async function lerVersos(){
-  const alvo = $("atVersos");
-  alvo.innerHTML = '<span class="at-msg">Carregando…</span>';
-  sel.clear(); atualizarBandeja();
+  const al=$("vs");al.innerHTML='<span class="msg">Carregando…</span>';sel.clear();bandeja();
   try{
-    await loadPortuguese();
-    const [code,,test] = BOOKS[cur.livro];
- 
-    if(cur.modo === "tr" && test === "OT"){
-      versos = [];
-      alvo.innerHTML = '<span class="at-msg">O Textus Receptus existe só para o Novo Testamento. No Antigo, escolha "Original" para ver o hebraico.</span>';
-      return;
+    await loadPT();
+    const code=BK[cur.l][0],ot=isOT(cur.l);
+    if(cur.modo==="tr"&&ot){versos=[];al.innerHTML='<span class="msg">O Textus Receptus existe só para o Novo Testamento. No Antigo, escolha "Original" para ver o hebraico.</span>';return}
+    if(cur.modo==="pt")versos=(PT[cur.l].chapters[cur.c-1]||[]).map((t,i)=>({n:i+1,t}));
+    else{
+      const m=cur.modo==="tr"?await mapaTR(code):await mapaOrig(code,ot);
+      versos=[];
+      if(m)for(const[k,t]of m){const[c,v]=k.split(":").map(Number);if(c===cur.c)versos.push({n:v,t})}
+      versos.sort((a,b)=>a.n-b.n);
     }
- 
-    if(cur.modo === "pt"){
-      versos = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).map((t,i) => ({n:i+1, t}));
-    }else{
-      const m = cur.modo === "tr" ? await mapaTR(code) : await mapaOriginal(code, test === "OT");
-      versos = [];
-      if(m) for(const [k,t] of m){
-        const [c,v] = k.split(":").map(Number);
-        if(c === cur.cap) versos.push({n:v, t});
-      }
-      versos.sort((a,b) => a.n - b.n);
-    }
- 
-    const rtl = cur.modo === "or" && test === "OT";
-    alvo.innerHTML = versos.length ? versos.map(v =>
-      '<button type="button" class="at-v" data-n="' + v.n + '"' + (rtl ? ' dir="rtl"' : '') + '><b>' + v.n + '</b><span>' + escapeHTML(v.t) + '</span></button>'
-    ).join("") : '<span class="at-msg">Nenhum texto encontrado nesta passagem.</span>';
+    const rtl=cur.modo==="or"&&ot;
+    al.innerHTML=versos.length?versos.map(v=>'<button type="button" class="v" data-n="'+v.n+'"'+(rtl?' dir="rtl"':"")+"><b>"+v.n+"</b><span>"+esc(v.t)+"</span></button>").join(""):'<span class="msg">Nenhum texto encontrado nesta passagem.</span>';
     filtrar();
-  }catch(e){
-    console.error(e);
-    alvo.innerHTML = '<span class="at-msg">Não foi possível carregar. Verifique a conexão e tente de novo.</span>';
-  }
+  }catch(e){console.error(e);al.innerHTML='<span class="msg">Não foi possível carregar. Verifique a conexão e tente de novo.</span>'}
 }
- 
-const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-let emBusca = false;
- 
 function filtrar(){
-     
-  const q = norm($("atBusca").value.trim());
-  const escopo = $("atEscopo").value;
- 
-  if(escopo === "cap"){
-    if(emBusca){ emBusca = false; lerVersos(); return; }
-    document.querySelectorAll("#atVersos .at-v").forEach(b => {
-      b.hidden = q && !norm(b.textContent).includes(q);
-    });
+  const q=norm($("busca").value.trim()),es=$("escopo").value;
+  if(es==="cap"){
+    if(emBusca){emBusca=false;lerVersos();return}
+    document.querySelectorAll("#vs .v").forEach(b=>{b.hidden=q&&!norm(b.textContent).includes(q)});
     return;
   }
-  buscarGlobal(q, escopo);
+  buscarGlobal(q,es);
 }
- 
-async function buscarGlobal(q, escopo){
-  const alvo = $("atVersos");
-  emBusca = true;
- 
-  if(q.length < 3){
-    alvo.innerHTML = '<span class="at-msg">Digite ao menos 3 letras para buscar.</span>';
-    return;
+async function buscarGlobal(q,es){
+  const al=$("vs");emBusca=true;
+  if(q.length<3){al.innerHTML='<span class="msg">Digite ao menos 3 letras para buscar.</span>';return}
+  await loadPT();
+  const ach=[];let total=0;
+  for(let l=0;l<BK.length;l++){
+    if(es==="ot"&&!isOT(l))continue;if(es==="nt"&&isOT(l))continue;if(es==="livro"&&l!==cur.l)continue;
+    PT[l].chapters.forEach((cap,ci)=>cap.forEach((txt,vi)=>{if(norm(txt).includes(q)){total++;if(ach.length<100)ach.push({l,c:ci+1,n:vi+1,txt})}}));
   }
- 
-  await loadPortuguese();
-  const achados = [];
-  let total = 0;
- 
-  for(let l = 0; l < BOOKS.length; l++){
-    const t = BOOKS[l][2];
-    if(escopo === "ot" && t !== "OT") continue;
-    if(escopo === "nt" && t !== "NT") continue;
-    if(escopo === "livro" && l !== cur.livro) continue;
- 
-    portugueseBible[l].chapters.forEach(function(cap, ci){
-      cap.forEach(function(txt, vi){
-        if(norm(txt).includes(q)){
-          total++;
-          if(achados.length < 100) achados.push({l:l, c:ci+1, n:vi+1, txt:txt});
-        }
-      });
-    });
-  }
- 
-  if(!total){
-    alvo.innerHTML = '<span class="at-msg">Nenhum versículo encontrado com essa palavra.</span>';
-    return;
-  }
- 
-  alvo.innerHTML =
-    '<span class="at-msg">' + total + ' resultado' + (total === 1 ? '' : 's') +
-    (total > 100 ? ' · mostrando os 100 primeiros. Restrinja o alcance para refinar.' : '') +
-    ' · busca na Almeida 1911</span>' +
-    achados.map(function(a){
-      return '<button type="button" class="at-r" data-l="' + a.l + '" data-c="' + a.c + '" data-n="' + a.n + '">' +
-        '<small>' + escapeHTML(BOOKS[a.l][1]) + ' ' + a.c + ':' + a.n + '</small>' +
-        escapeHTML(a.txt) + '</button>';
-    }).join("");
+  if(!total){al.innerHTML='<span class="msg">Nenhum versículo encontrado com essa palavra.</span>';return}
+  al.innerHTML='<span class="msg">'+total+" resultado"+(total===1?"":"s")+(total>100?" · mostrando os 100 primeiros. Restrinja o alcance para refinar.":"")+" · busca na Almeida 1911</span>"+
+    ach.map(a=>'<button type="button" class="r" data-l="'+a.l+'" data-c="'+a.c+'" data-n="'+a.n+'"><small>'+esc(BK[a.l][1])+" "+a.c+":"+a.n+"</small>"+esc(a.txt)+"</button>").join("");
 }
- 
-async function irPara(l, c, n){
-  cur.livro = l; cur.cap = c;
-  $("atLivro").value = String(l);
-  preencherCapitulos();
-  $("atEscopo").value = "cap";
-  $("atBusca").value = "";
-  emBusca = false;
+async function irPara(l,c,n){
+  cur.l=l;cur.c=c;$("livro").value=String(l);capitulos();$("escopo").value="cap";$("busca").value="";emBusca=false;
   await lerVersos();
-  const b = document.querySelector('#atVersos .at-v[data-n="' + n + '"]');
-  if(b){ b.click(); b.scrollIntoView({block:"center"}); }
+  const b=document.querySelector('#vs .v[data-n="'+n+'"]');
+  if(b){b.click();b.scrollIntoView({block:"center"})}
 }
- 
-  function intervalos(ns){
-    const out = []; let ini = ns[0], ant = ns[0];
-    for(let i = 1; i <= ns.length; i++){
-      if(ns[i] === ant + 1){ ant = ns[i]; continue; }
-      out.push(ini === ant ? String(ini) : ini + "–" + ant);
-      ini = ant = ns[i];
-    }
-    return out.join(", ");
-  }
-  const referencia = () => BOOKS[cur.livro][1] + " " + cur.cap + ":" + intervalos([...sel].sort((a,b) => a-b));
- 
-  function atualizarBandeja(){
-    $("atInserir").disabled = !sel.size;
-    $("atRef").innerHTML = sel.size ? '<strong>' + escapeHTML(referencia()) + '</strong>' : "Toque nos versículos para selecioná-los";
-  }
- 
-function inserirNoCursor(texto){
-  const ta = $("atTexto");
-  const ini = ta.selectionStart, fim = ta.selectionEnd;
-  const antes = ta.value.slice(0, ini), depois = ta.value.slice(fim);
-  const pre = antes && !antes.endsWith("\n\n") ? (antes.endsWith("\n") ? "\n" : "\n\n") : "";
-  const pos = depois && !depois.startsWith("\n") ? "\n\n" : "";
-
-  ta.focus();
-  ta.setSelectionRange(ini, fim);
-  let ok = false;
-  try{ ok = document.execCommand("insertText", false, pre + texto + pos); }catch(e){}
-
-  if(!ok){
-    ta.value = antes + pre + texto + pos + depois;
-    const p = (antes + pre + texto + pos).length;
-    ta.setSelectionRange(p, p);
-  }
-  agendarGravacao();
+async function mudarCap(d){
+  await loadPT();
+  let l=cur.l,c=cur.c+d;
+  if(c<1){if(l===0)return;l--;c=PT[l].chapters.length}
+  else if(c>PT[l].chapters.length){if(l===BK.length-1)return;l++;c=1}
+  cur.l=l;cur.c=c;$("livro").value=String(l);capitulos();$("escopo").value="cap";$("busca").value="";emBusca=false;lerVersos();
 }
+$("livro").innerHTML=BK.map((b,i)=>'<option value="'+i+'">'+esc(b[1])+"</option>").join("");
+$("livro").onchange=function(){cur.l=Number(this.value);cur.c=1;capitulos();lerVersos()};
+$("cap").onchange=function(){cur.c=Number(this.value);lerVersos()};
+$("modo").onchange=function(){cur.modo=this.value;lerVersos()};
+$("ant").onclick=()=>mudarCap(-1);$("prox").onclick=()=>mudarCap(1);
+$("busca").oninput=filtrar;$("escopo").onchange=filtrar;
+$("vs").onclick=function(ev){
+  const r=ev.target.closest(".r");
+  if(r){irPara(Number(r.dataset.l),Number(r.dataset.c),Number(r.dataset.n));return}
+  const b=ev.target.closest(".v");if(!b)return;
+  const n=Number(b.dataset.n);
+  if(sel.has(n)){sel.delete(n);b.classList.remove("on")}else{sel.add(n);b.classList.add("on")}
+  bandeja();
+};
+$("limpar").onclick=()=>{sel.clear();document.querySelectorAll("#vs .v.on").forEach(b=>b.classList.remove("on"));bandeja()};
  
-  const MODELOS = {
-    sermao: "## Texto base\n\n\n## Introdução\n\n\n## Ponto 1\n\n\n## Ponto 2\n\n\n## Ponto 3\n\n\n## Aplicação\n\n\n## Chamado final\n",
-    devocional: "## Versículo do dia\n\n\n## O que o texto diz\n\n\n## O que ele significa para hoje\n\n\n## Oração\n",
-    post: "**Gancho (uma frase que prende)**\n\n\n**Versículo**\n\n\n**Reflexão em 3 linhas**\n\n\n**Convite para comentar**\n",
-    serie: "## Abertura\n\n\n## Contexto do texto\n\n\n## Cena central\n\n\n## Virada\n\n\n## Mensagem final\n"
-  };
-  /* ===== MODELOS DE ESTRUTURA POR GÊNERO ===== */
-  MODELOS.homiletico = ["I","II","III","IV","V"].map(function(n){
-    return "## " + n + ". Ponto principal\n\n1. Subtópico\n   a) Detalhe\n";
-  }).join("\n") + "\n## Conclusão\n";
+/* ===== MESA DE ESTUDO (mesmas etapas do tabela.json e mesmo pedido ao Worker da Sala do Escritor) ===== */
+let TAB=null,mzEsc="Livro",aberta=null,abertos=new Set(),mzTimer=null;
+let actStep="",actModule="";
+let ST={m:{},arq:[]};
+try{const s=JSON.parse(localStorage.getItem("ps_matriz_mesa")||"null");if(s&&s.m)ST={m:s.m,arq:Array.isArray(s.arq)?s.arq:[]}}catch(e){}
+const gravar=()=>{try{localStorage.setItem("ps_matriz_mesa",JSON.stringify(ST))}catch(e){}};
+const mzD=()=>(ST.m[mzEsc]=ST.m[mzEsc]||{});
+const grupo=i=>(String(i.bloco)==="01"&&/^01\.[1-5]$/.test(i.cod))?"N":String(i.bloco);
+const feita=(m,i)=>((m[i.cod]&&m[i.cod].s)||0)>0||!!(m[i.cod]&&m[i.cod].t&&m[i.cod].t.trim());
+const modName=i=>i.bloco+" — "+String(i.bloco_nome).toUpperCase();
+const itens=()=>((TAB&&TAB[mzEsc])||[]).filter(i=>String(i.simbolo).indexOf("\u26A0")<0);
  
-const BASE_MODELOS = [
-  {id:"sermao", nome:"Sermão", genero:"Sermão"},
-  {id:"homiletico", nome:"Sermão homilético (I, II, III…)", genero:"Sermão"},
-  {id:"devocional", nome:"Devocional", genero:"Devocional"},
-  {id:"post", nome:"Post para redes sociais", genero:"Redes sociais"},
-  {id:"serie", nome:"Roteiro de série", genero:"Série"}
-];
-  const CHAVE_M = "ps_modelos";
-  let meus = [], editando = null;
- 
-  function carregarModelos(){
-    try{ const m = JSON.parse(localStorage.getItem(CHAVE_M) || "[]"); if(Array.isArray(m)) meus = m; }catch(e){}
-  }
-  function gravarModelos(){
-    try{ localStorage.setItem(CHAVE_M, JSON.stringify(meus)); }catch(e){}
-  }
-  function todosModelos(){
-    return BASE_MODELOS.map(function(b){ return {id:b.id, nome:b.nome, genero:b.genero, texto:MODELOS[b.id]}; })
-      .concat(meus);
-  }
-
-function desenharModelos(sel){
-  const lista = todosModelos();
-  const generos = lista.map(m => m.genero).filter((g,i,a) => a.indexOf(g) === i);
-  $("atModelo").innerHTML = generos.map(function(g){
-    return '<optgroup label="' + escapeHTML(g) + '">' +
-      lista.filter(m => m.genero === g).map(m => '<option value="' + escapeHTML(m.id) + '">' + escapeHTML(m.nome) + '</option>').join("") +
-      '</optgroup>';
-  }).join("");
-  if(sel) $("atModelo").value = sel;
-}
-  function preencherPainel(){
-    const m = meus.find(x => x.id === $("atModelo").value);
-    editando = m ? m.id : null;
-    $("atMNome").value = m ? m.nome : "";
-    $("atMGenero").value = m ? m.genero : "";
-    $("atMTexto").value = m ? m.texto : "";
-  }
- 
-  /* ===== APLICAR ESTRUTURA: etapas vindas do tabela.json ===== */
-  let tabelaDados = null;
-  let tabelaFundo = null;
-    const ROTULOS_ESCOPO = {Livro:"01.1 Livro", "Capítulo":"01.2 Capítulo", "Perícope":"01.3 Contexto (perícope)", "Versículo":"01.4 Versículo", "Palavra":"01.5 Palavra"};
-
-  async function carregarTabela(){
-    if(tabelaDados) return tabelaDados;
-    const r = await fetch("tabela.json", {cache:"no-cache"});
-    if(!r.ok) throw new Error("tabela.json não encontrado");
-    tabelaDados = await r.json();
-    return tabelaDados;
-  }
-
-  function fecharTabela(){ if(tabelaFundo) tabelaFundo.hidden = true; }
-
-  async function abrirTabela(escopo){
-    if(!tabelaFundo){
-      tabelaFundo = document.createElement("div");
-      tabelaFundo.className = "at-tab-fundo";
-      tabelaFundo.hidden = true;
-      document.body.appendChild(tabelaFundo);
-      tabelaFundo.addEventListener("click", function(ev){
-        if(ev.target === tabelaFundo) fecharTabela();
-      });
-      document.addEventListener("keydown", function(ev){
-        if(ev.key === "Escape" && !tabelaFundo.hidden){
-          fecharTabela();
-          ev.stopImmediatePropagation();
-        }
-      }, true);
-    }
-
-    tabelaFundo.innerHTML = '<div class="at-tab-janela"><div class="at-tab-msg">Carregando etapas…</div></div>';
-    tabelaFundo.hidden = false;
-
-    let lista;
-    try{
-      const dados = await carregarTabela();
-      lista = dados[escopo];
-      if(!Array.isArray(lista) || !lista.length) throw new Error("lista vazia");lista = lista.filter(function(e){
-  return ["01.1","01.2","01.3","01.4","01.5"].indexOf(e.cod) < 0;
-});
-    }catch(e){
-      console.error(e);
-      tabelaFundo.innerHTML =
-        '<div class="at-tab-janela"><div class="at-tab-msg">Não foi possível carregar as etapas. ' +
-        'Verifique a conexão e se o arquivo tabela.json está na mesma pasta desta página.</div>' +
-        '<div class="at-tab-rodape"><button type="button" class="at-btn" data-tab="fechar">FECHAR</button></div></div>';
-      tabelaFundo.querySelector('[data-tab="fechar"]').onclick = fecharTabela;
-      return;
-    }
-
-    let blocoAtual = null, html = "";
-    lista.forEach(function(e, i){
-      if(e.bloco !== blocoAtual){
-        blocoAtual = e.bloco;
-        html += '<div class="at-tab-bloco">Bloco ' + escapeHTML(e.bloco) + ' — ' + escapeHTML(e.bloco_nome) + '</div>';
-      }
-      let tags = "";
-      if(String(e.simbolo).indexOf("\u26A0") >= 0) tags += ' <span class="at-tab-tag">(resumida)</span>';
-      if(e.cond) tags += ' <span class="at-tab-tag">[condicional]</span>';
-           if(escopo === "Palavra" && ["03.9","03.10","03.11"].indexOf(e.cod) >= 0) tags += ' <span class="at-tab-tag">(só se for verbo)</span>';
-      html += '<label class="at-tab-item"><input type="checkbox" data-i="' + i + '">' +
-        '<span class="at-tab-ic">' + escapeHTML(e.icone || "") + '</span>' +
-        '<span class="at-tab-cod">' + escapeHTML(e.cod) + '</span>' +
-        '<span>' + escapeHTML(e.nome) + tags + '</span></label>';
-    });
-
-    tabelaFundo.innerHTML =
-      '<div class="at-tab-janela" role="dialog" aria-modal="true">' +
-        '<div class="at-tab-topo"><strong>' + escapeHTML(ROTULOS_ESCOPO[escopo] || escopo) + '</strong> — escolha as etapas' +
-          '<div class="at-tab-leg">✅ entra · ⚠️ entra adaptada ou resumida · * condicional</div></div>' +
-        '<div class="at-tab-corpo">' + html + '</div>' +
-        '<div class="at-tab-rodape"><span class="at-tab-aviso"></span>' +
-          '<button type="button" class="at-btn" data-tab="fechar">CANCELAR</button>' +
-          '<button type="button" class="at-btn gold" data-tab="aplicar">APLICAR ESTRUTURA</button></div>' +
-      '</div>';
-
-    tabelaFundo.querySelector('[data-tab="fechar"]').onclick = fecharTabela;
-    tabelaFundo.querySelector('[data-tab="aplicar"]').onclick = function(){
-      const marcadas = Array.from(tabelaFundo.querySelectorAll('input[type="checkbox"]:checked'))
-        .map(function(c){ return Number(c.dataset.i); })
-        .sort(function(a, b){ return a - b; });
-      if(!marcadas.length){
-        tabelaFundo.querySelector(".at-tab-aviso").textContent = "Marque pelo menos uma etapa.";
-        return;
-      }
-      const texto = marcadas.map(function(i){
-        const e = lista[i];
-        return "## " + e.cod + " " + e.nome + "\n[" + e.descricao + "]";
-      }).join("\n\n");
-      fecharTabela();
-      inserirNoCursor(texto);
-    };
-  }
-
- 
-  function iniciarAtelie(){
-    if(iniciado) return;
-    iniciado = true;
-    carregarSalvo();
-     
-    $("atLivro").innerHTML = BOOKS.map((b,i) => '<option value="' + i + '">' + escapeHTML(b[1]) + '</option>').join("");
-    desenharRascunhos(); mostrarRascunho();
-    loadPortuguese().then(function(){ preencherCapitulos(); lerVersos(); });
-  }
-  function preencherCapitulos(){
-    const n = portugueseBible[cur.livro].chapters.length;
-    $("atCap").innerHTML = Array.from({length:n}, (_,i) => '<option value="' + (i+1) + '">' + (i+1) + '</option>').join("");
-    if(cur.cap > n) cur.cap = n;
-    $("atCap").value = String(cur.cap);
-  }
-  /* ===== ESTRUTURA HOMILÉTICA DINÂMICA ===== */
-  let noSel = null, timerA = null;
-  const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36);
-  const ROMANOS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
-  const romano = n => ROMANOS[n-1] || String(n);
-  const novoBloco = () => ({id:uid(), titulo:"", subs:[{id:uid(), titulo:"", dets:[]}]});
-  const modoArvore = () => { const d = ativo(); return !!d && d.modo === "arvore"; };
- 
-  function arvoreDe(d){
-    if(!d.arv) d.arv = {intro:"", blocos:[novoBloco()], conc:""};
-    return d.arv;
-  }
- 
-  function arvoreParaTexto(d){
-    const a = d.arv;
-    if(!a) return "";
-    const L = [];
-    if(a.intro.trim()) L.push("## Introdução\n\n" + a.intro.trim());
-    let n = 0;
-    a.blocos.forEach(function(b){
-      const subs = b.subs.map(function(s){
-        return {t:s.titulo.trim(), dets:s.dets.map(x => x.titulo.trim()).filter(Boolean)};
-      }).filter(s => s.t || s.dets.length);
-      if(!b.titulo.trim() && !subs.length) return;
-      n++;
-      const l = ["## " + romano(n) + ". " + (b.titulo.trim() || "(sem título)")];
-      subs.forEach(function(s,j){
-        l.push((j+1) + ". " + (s.t || "(sem título)"));
-        s.dets.forEach(function(x,k){ l.push("   " + String.fromCharCode(97+k) + ") " + x); });
-      });
-      L.push(l.join("\n"));
-    });
-    if(a.conc.trim()) L.push("## Conclusão\n\n" + a.conc.trim());
-    return L.join("\n\n");
-  }
- 
-  function textoAtual(){
-    const d = ativo();
-    return d && d.modo === "arvore" ? arvoreParaTexto(d) : $("atTexto").value;
-  }
- 
-  function ajustar(el){ el.style.height = "auto"; el.style.height = (el.scrollHeight + 2) + "px"; }
-  function ajustarCampos(){ $("atArvore").querySelectorAll(".at-a-in").forEach(ajustar); }
- 
-  function bt(acao, rotulo, b, s, d){
-    return '<button type="button" data-act="' + acao + '" data-b="' + b + '"' +
-      (s ? ' data-s="' + s + '"' : '') + (d ? ' data-d="' + d + '"' : '') + '>' + rotulo + '</button>';
-  }
-  function campo(k, valor, b, s, d, ph){
-    return '<textarea class="at-a-in" rows="1" data-k="' + k + '" data-b="' + b + '"' +
-      (s ? ' data-s="' + s + '"' : '') + (d ? ' data-d="' + d + '"' : '') +
-      ' placeholder="' + ph + '">' + escapeHTML(valor) + '</textarea>';
-  }
- 
-  function desenharArvore(){
-    const a = arvoreDe(ativo());
-    const topo = $("atArvore").scrollTop;
-    $("atArvore").innerHTML =
-      '<label class="at-a-livre">INTRODUÇÃO (LIVRE)<textarea data-k="intro" rows="3">' + escapeHTML(a.intro) + '</textarea></label>' +
-      a.blocos.map(function(b,i){
-        return '<div class="at-a-ponto">' +
-          '<div class="at-a-linha"><span class="at-a-num">' + romano(i+1) + '.</span>' +
-            campo("p", b.titulo, b.id, "", "", "Ponto principal") +
-          '<span class="at-a-acoes">' + bt("addV","+ VERSÍCULO",b.id) + bt("addS","+ SUBTÓPICO",b.id) + bt("sobe","↑",b.id) + bt("desce","↓",b.id) + bt("delB","EXCLUIR",b.id) + '</span></div>' +
-          b.subs.map(function(s,j){
-            return '<div class="at-a-sub"><div class="at-a-linha"><span class="at-a-num">' + (j+1) + '.</span>' +
-              campo("s", s.titulo, b.id, s.id, "", "Subtópico") +
-              '<span class="at-a-acoes">' + bt("addV","+ VERSÍCULO",b.id,s.id) + bt("addD","+ DETALHE",b.id,s.id) + bt("delS","EXCLUIR",b.id,s.id) + '</span></div>' +
-              s.dets.map(function(x,k){
-                return '<div class="at-a-linha at-a-det"><span class="at-a-num">' + String.fromCharCode(97+k) + ')</span>' +
-                  campo("d", x.titulo, b.id, s.id, x.id, "Detalhe ou versículo") +
-                  '<span class="at-a-acoes">' + bt("delD","EXCLUIR",b.id,s.id,x.id) + '</span></div>';
-              }).join("") + '</div>';
-          }).join("") + '</div>';
-      }).join("") +
-      '<div class="at-a-barra">' +
-        '<button type="button" class="at-a-novo" data-act="novoB">+ ADICIONAR NOVO PONTO PRINCIPAL</button>' +
-        '<button type="button" data-act="paraTexto">COPIAR TÓPICOS PARA O TEXTO</button>' +
-      '</div>' +
-      '<label class="at-a-livre">CONCLUSÃO (LIVRE)<textarea data-k="conc" rows="3">' + escapeHTML(a.conc) + '</textarea></label>';
-    $("atArvore").scrollTop = topo;
-    ajustarCampos();
-  }
- 
-  function aplicarModo(){
-    const d = ativo();
-    if(!d) return;
-    const arv = d.modo === "arvore";
-    noSel = null;
-    $("atTexto").style.display = arv ? "none" : "";
-    $("atArvore").hidden = !arv;
-    $("atModoTexto").classList.toggle("on", !arv);
-    $("atModoArvore").classList.toggle("on", arv);
-   
-    if(arv){ arvoreDe(d); desenharArvore(); }
-    contar();
-  }
- 
-  function inserirNaArvore(txt){
-    const a = arvoreDe(ativo());
-    const f = noSel;
-    if(!f){
-      $("atSalvo").textContent = "Clique num ponto ou subtópico para receber o versículo.";
-      return false;
-    }
-    if(f.campo){
-      a[f.campo] = (a[f.campo].trim() ? a[f.campo].replace(/\s+$/,"") + "\n\n" : "") + "> " + txt;
-    }else{
-      const b = a.blocos.find(x => x.id === f.b);
-      if(!b){ $("atSalvo").textContent = "Clique num ponto ou subtópico para receber o versículo."; return false; }
-      const s = f.s ? b.subs.find(x => x.id === f.s) : null;
-      if(s) s.dets.push({id:uid(), titulo:txt});
-      else b.subs.push({id:uid(), titulo:txt, dets:[]});
-    }
-    gravar(); desenharArvore(); contar();
-    return true;
-  }
- 
-  function passarParaTexto(){
-    const d = ativo();
-    const t = arvoreParaTexto(d);
-    d.modo = "texto";
-    if(t.trim()){
-      const atual = $("atTexto").value.replace(/\s+$/,"");
-      $("atTexto").value = (atual ? atual + "\n\n" : "") + t + "\n";
-      d.texto = $("atTexto").value;
-    }
-    gravar(); aplicarModo();
-  }
- 
-  $("atModoTexto").addEventListener("click", function(){ ativo().modo = "texto"; gravar(); aplicarModo(); });
-  $("atModoArvore").addEventListener("click", function(){ ativo().modo = "arvore"; gravar(); aplicarModo(); });
- 
-  $("atArvore").addEventListener("click", function(ev){
-    const el = ev.target.closest("[data-act]");
-    if(!el) return;
-    const acao = el.dataset.act;
-    if(acao === "paraTexto"){ passarParaTexto(); return; }
-    const a = arvoreDe(ativo());
-    if(acao === "novoB"){
-      a.blocos.push(novoBloco());
-    }else{
-      const b = a.blocos.find(x => x.id === el.dataset.b);
-      if(!b) return;
-      const s = el.dataset.s ? b.subs.find(x => x.id === el.dataset.s) : null;
-      if(acao === "sobe" || acao === "desce"){
-        const i = a.blocos.indexOf(b), j = i + (acao === "sobe" ? -1 : 1);
-        if(j < 0 || j >= a.blocos.length) return;
-        const troca = a.blocos[i]; a.blocos[i] = a.blocos[j]; a.blocos[j] = troca;
-      }else if(acao === "delB"){
-       
-        a.blocos = a.blocos.filter(x => x !== b);
-      }else if(acao === "addS"){
-        b.subs.push({id:uid(), titulo:"", dets:[]});
-      }else if(acao === "delS" && s){
-        b.subs = b.subs.filter(x => x !== s);
-      }else if(acao === "addD" && s){
-        s.dets.push({id:uid(), titulo:""});
-      }else if(acao === "delD" && s){
-        s.dets = s.dets.filter(x => x.id !== el.dataset.d);
-      }
-    }
-    gravar(); desenharArvore(); contar();
-  });
- 
-  $("atArvore").addEventListener("input", function(ev){
-    const el = ev.target, k = el.dataset.k;
-    if(!k) return;
-    const a = arvoreDe(ativo());
-    if(k === "intro" || k === "conc"){
-      a[k] = el.value;
-    }else{
-      const b = a.blocos.find(x => x.id === el.dataset.b);
-      if(!b) return;
-      if(k === "p"){
-        b.titulo = el.value;
-      }else{
-        const s = b.subs.find(x => x.id === el.dataset.s);
-        if(!s) return;
-        if(k === "s") s.titulo = el.value;
-        else{ const x = s.dets.find(y => y.id === el.dataset.d); if(x) x.titulo = el.value; }
-      }
-    }
-    if(el.classList.contains("at-a-in")) ajustar(el);
-    clearTimeout(timerA);
-    timerA = setTimeout(function(){ gravar(); contar(); }, 500);
-  });
- 
-  $("atArvore").addEventListener("focusin", function(ev){
-    const el = ev.target, k = el.dataset && el.dataset.k;
-    if(!k) return;
-    if(k === "intro" || k === "conc") noSel = {campo:k};
-    else noSel = {b:el.dataset.b, s:el.dataset.s || null};
-  });
- 
-  $("atArvore").addEventListener("keydown", function(ev){
-    if(ev.key === "Enter" && ev.target.classList && ev.target.classList.contains("at-a-in")) ev.preventDefault();
-  });
- 
-  window.addEventListener("resize", function(){ if(modoArvore()) ajustarCampos(); });
- /* ===== v2: destino do versículo, aviso, desfazer e púlpito ===== */
-
-/* aviso curto na tela, com ação opcional */
-let tTimer = null;
-const tEl = document.createElement("div");
-tEl.className = "at-toast"; tEl.hidden = true; tEl.setAttribute("role","status");
-document.body.appendChild(tEl);
-
-function toast(msg, rotulo, fn){
-  tEl.innerHTML = "";
-  const s = document.createElement("span"); s.textContent = msg; tEl.appendChild(s);
-  if(rotulo){
-    const b = document.createElement("button");
-    b.type = "button"; b.textContent = rotulo;
-    b.onclick = function(){ tEl.hidden = true; fn(); };
-    tEl.appendChild(b);
-  }
-  tEl.hidden = false;
-  clearTimeout(tTimer);
-  tTimer = setTimeout(function(){ tEl.hidden = true; }, 8000);
-}
-
-/* faixa "Receberá em..." acima da bandeja + destaque do campo ativo */
-const bandejaEl = document.querySelector(".at-bandeja");
-const destEl = document.createElement("div");
-destEl.className = "at-destino";
-bandejaEl.parentNode.insertBefore(destEl, bandejaEl);
-
-function marcarDestino(){
-  document.querySelectorAll(".at-ativo").forEach(e => e.classList.remove("at-ativo"));
-  if(!modoArvore()){
-    destEl.innerHTML = 'Receberá <strong>no cursor do texto</strong>';
-    return;
-  }
-  const a = arvoreDe(ativo());
-  let nome = "", alvo = null;
-
-  if(noSel && noSel.campo){
-    nome = noSel.campo === "intro" ? "Introdução" : "Conclusão";
-    const t = $("atArvore").querySelector('textarea[data-k="' + noSel.campo + '"]');
-    alvo = t && t.closest(".at-a-livre");
-  }else if(noSel){
-    const i = a.blocos.findIndex(x => x.id === noSel.b);
-    if(i >= 0){
-      nome = "Ponto " + romano(i+1);
-      alvo = $("atArvore").querySelectorAll(".at-a-ponto")[i];
-      if(noSel.s){
-        const j = a.blocos[i].subs.findIndex(x => x.id === noSel.s);
-        if(j >= 0){
-          nome += " › Subtópico " + (j+1);
-          alvo = alvo.querySelectorAll(".at-a-sub")[j];
-        }
-      }
-    }
-  }
-  if(alvo) alvo.classList.add("at-ativo");
-  destEl.innerHTML = nome
-    ? 'Receberá em <strong>' + escapeHTML(nome) + '</strong>'
-    : 'Clique num ponto, ou use <strong>+ VERSÍCULO</strong>';
-}
-new MutationObserver(marcarDestino).observe($("atArvore"), {childList:true});
-$("atArvore").addEventListener("focusin", marcarDestino);
-["atModoTexto","atModoArvore","atNovo","atExcluir"].forEach(function(id){
-  $(id).addEventListener("click", function(){ setTimeout(marcarDestino, 0); });
-});
-$("atRasc").addEventListener("change", function(){ setTimeout(marcarDestino, 0); });
-marcarDestino();
-
-/* + VERSÍCULO e DESFAZER de exclusões (fase de captura: roda antes do tratador antigo) */
-$("atArvore").addEventListener("click", function(ev){
-  const el = ev.target.closest("[data-act]");
-  if(!el) return;
-  const act = el.dataset.act;
-
-  if(act === "addV"){
-    ev.stopPropagation();
-    if(!sel.size){ toast("Selecione primeiro os versículos na lista à esquerda."); return; }
-    noSel = {b:el.dataset.b, s:el.dataset.s || null};
-    $("atInserir").click();
-    return;
-  }
-
-  if(act === "delB" || act === "delS" || act === "delD"){
-    const d = ativo(), snap = JSON.stringify(d.arv);
-    toast("Item excluído.", "DESFAZER", function(){
-      d.arv = JSON.parse(snap); gravar(); desenharArvore(); contar();
-    });
-  }
-}, true);
-
-/* aviso de inserção com DESFAZER */
-$("atInserir").addEventListener("click", function(){
-  if(!sel.size) return;
-  const ref = referencia();
-  const snap = modoArvore() ? JSON.stringify(ativo().arv) : null;
-  setTimeout(function(){
-    if(sel.size) return;                       // nada foi inserido
-    toast("Inserido: " + ref, "DESFAZER", function(){
-      if(snap){
-        ativo().arv = JSON.parse(snap); gravar(); desenharArvore(); contar();
-      }else{
-        $("atTexto").focus(); document.execCommand("undo");
-      }
-    });
-  }, 0);
-}, true);
-
-/* ===== modo púlpito: texto formatado, letra grande, só leitura ===== */
-let zoom = 26;
-const pul = document.createElement("div");
-pul.id = "atPulpito"; pul.hidden = true;
-pul.innerHTML =
-  '<div class="pul-barra">' +
-    '<button type="button" data-z="-2">A−</button>' +
-    '<button type="button" data-z="2">A+</button>' +
-    '<button type="button" data-z="0">FECHAR</button>' +
-  '</div><article id="atPulpitoTexto"></article>';
-document.body.appendChild(pul);
-const pulTxt = pul.querySelector("#atPulpitoTexto");
-
-function md(t){
-  const out = []; let cit = [];
-  const inl = s => escapeHTML(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>");
-  const fecha = () => { if(cit.length){ out.push("<blockquote>" + cit.join("<br>") + "</blockquote>"); cit = []; } };
-  t.split("\n").forEach(function(l){
-    if(/^>\s?/.test(l)){ cit.push(inl(l.replace(/^>\s?/,""))); return; }
-    fecha();
-    if(/^##\s/.test(l)) out.push("<h2>" + inl(l.slice(3)) + "</h2>");
-    else if(l.trim()) out.push("<p>" + inl(l) + "</p>");
-  });
-  fecha();
-  return out.join("");
-}
-
-function abrirPulpito(){
-  const d = ativo();
-  if(!d) return;
-  pulTxt.innerHTML = (d.titulo ? "<h1>" + escapeHTML(d.titulo) + "</h1>" : "") + md(textoAtual());
-  pulTxt.style.fontSize = zoom + "px";
-  pul.hidden = false;
-  pul.scrollTop = 0;
-}
-
-pul.addEventListener("click", function(ev){
-  const b = ev.target.closest("[data-z]");
-  if(!b) return;
-  const z = Number(b.dataset.z);
-  if(z === 0){ pul.hidden = true; return; }
-  zoom = Math.min(56, Math.max(16, zoom + z));
-  pulTxt.style.fontSize = zoom + "px";
-});
-
-$("atFoco").insertAdjacentHTML("beforebegin",
-  '<button id="atPulpitoBtn" class="at-btn" type="button" title="Ver formatado, em letra grande">PÚLPITO</button>');
-$("atPulpitoBtn").addEventListener("click", abrirPulpito);
-
-document.addEventListener("keydown", function(ev){
-  if(ev.key === "Escape" && !pul.hidden){ pul.hidden = true; ev.stopImmediatePropagation(); }
-}, true);
- /* ===== MESA DE ESTUDO: a tabela de rastreio como roteiro de trabalho ===== */
-let TAB = null, mzEsc = "Livro", mzAberta = null;
-let mzAbertos = new Set();
-const mz = document.createElement("div");
-mz.id = "atMesa"; mz.className = "at-box at-editor"; mz.style.display = "none";
-mz.innerHTML =
-  '<div class="at-row">' +
-    '<select id="mzEsc" class="at-sel" aria-label="Escopo do estudo"></select>' +
-    '<strong id="mzProg" style="flex:1;font-size:13px"></strong>' +
-   
-        '<button id="mzArq" class="at-btn" type="button">ARQUIVO</button>' +
-    '<button id="mzVoltar" class="at-btn" type="button">← EDITOR</button>' +
-  '</div>' +
- 
-  '<div id="mzLista" class="mz-lista"></div>' +
-  '<div class="at-rodape">' +
-    '<label><input id="mzDesc" type="checkbox"> incluir a descrição de cada etapa</label>' +
-    '<span id="mzCont"></span>' +
-    '<button id="mzMontar" class="at-btn gold" type="button">MONTAR NO EDITOR</button>' +
-  '</div>';
-$("atEditor").insertAdjacentElement("afterend", mz);
-
-document.querySelector(".at-modo").insertAdjacentHTML("beforeend",
-  '<button id="atModoMesa" class="at-btn" type="button">MESA DE ESTUDO</button>');
-
-function mzDados(){
-  const d = ativo();
-  d.mesa = d.mesa || {};
-  d.mesa[mzEsc] = d.mesa[mzEsc] || {};
-  return d.mesa[mzEsc];
-}
-const mzRes = (m, i) => (m[i.cod] && m[i.cod].s) || 0;
-
-
-
-function mzGrupo(i){
-  return (String(i.bloco) === "01" && /^01\.[1-5]$/.test(i.cod)) ? "N" : String(i.bloco);
-}
-const mzFeita = (m, i) => mzRes(m, i) > 0 || !!(m[i.cod] && m[i.cod].t && m[i.cod].t.trim());
-
-function mzContagem(){
-  const lista = (TAB && TAB[mzEsc]) || [];
-  const m = mzDados();
-  const feitas = lista.filter(i => mzFeita(m,i)).length;
-  const escritas = lista.filter(i => m[i.cod] && m[i.cod].t && m[i.cod].t.trim()).length;
-  $("mzProg").textContent = feitas + " de " + lista.length + " etapas resolvidas · " + Math.round(100 * feitas / Math.max(1, lista.length)) + "%";
-  $("mzCont").textContent = escritas + " com resposta escrita";
-}
-
 function mzRender(){
-  const lista = ((TAB && TAB[mzEsc]) || []).filter(i => String(i.simbolo).indexOf("\u26A0") < 0);
-  const m = mzDados();
-  mzContagem();
-
-  let html = "", atual = "";
-  lista.forEach(function(i){
-    const g = mzGrupo(i);
-    const aberto = g === "N" || mzAbertos.has(g);
-    if(g !== atual){
-      atual = g;
-      const doGrupo = lista.filter(x => mzGrupo(x) === g);
-      const f = doGrupo.filter(x => mzFeita(m,x)).length;
-      if(g === "N"){
-        html += '<h4 class="mz-bl">Núcleo do estudo · a Bíblia · ' + f + "/" + doGrupo.length + "</h4>";
-      }else{
-        html += '<h4 class="mz-bl mz-bl-b" data-g="' + g + '">' + (aberto ? "▾ " : "▸ ") + g + " · " +
-          escapeHTML(i.bloco_nome) + " · " + f + "/" + doGrupo.length + "</h4>";
-      }
+  const lista=itens(),m=mzD();
+  const f=lista.filter(i=>feita(m,i)).length;
+  $("prog").textContent=f+" de "+lista.length+" etapas resolvidas · "+Math.round(100*f/Math.max(1,lista.length))+"%";
+  let h="",at="";
+  lista.forEach(i=>{
+    const g=grupo(i),ab=g==="N"||abertos.has(g);
+    if(g!==at){
+      at=g;
+      const dg=lista.filter(x=>grupo(x)===g),fg=dg.filter(x=>feita(m,x)).length;
+      h+=g==="N"?'<h4 class="bl">Núcleo do estudo · a Bíblia · '+fg+"/"+dg.length+"</h4>"
+        :'<h4 class="bl bb" data-g="'+g+'">'+(ab?"▾ ":"▸ ")+g+" · "+esc(i.bloco_nome)+" · "+fg+"/"+dg.length+"</h4>";
     }
-    if(!aberto) return;
-
-    const e = m[i.cod] || {}, s = e.s || 0, ab = mzAberta === i.cod;
-    const tem = !!(e.t && e.t.trim());
-    html += '<div class="mz-et' + (s === 1 || (s === 0 && tem) ? " feita" : s === 2 ? " na" : "") + (ab ? " ab" : "") + '" data-c="' + i.cod + '">' +
-      '<div class="mz-cab">' +
-        '<button type="button" class="mz-st" title="Pendente, resolvida ou não se aplica">' + ["○","●","⊘"][s] + "</button>" +
-        '<span class="mz-cod">' + i.cod + '</span>' +
-        '<span class="mz-nome">' + escapeHTML(i.nome) + "</span>" +
-        (tem ? '<span class="mz-tem" title="Tem resposta">✎</span>' : "") +
-      "</div>" +
-                       (ab ? '<div class="mz-corpo"><div class="mz-linha"><p class="mz-desc">' + escapeHTML(i.descricao) + '</p>' +
-        '<button type="button" class="at-btn mz-apag">APAGAR BUSCA</button>' +
-        '<button type="button" class="at-btn gold mz-pesq">EXECUTAR BUSCA</button></div>' +
-        '<textarea class="mz-t" placeholder="Sua resposta para esta etapa…">' + escapeHTML(e.t || "") + "</textarea></div>" : "") +
+    if(!ab)return;
+    const e=m[i.cod]||{},s=e.s||0,o=aberta===i.cod,t=!!(e.t&&e.t.trim()),L=lvl(i.cod),lk=!allowed(i.cod);
+    h+='<div class="et'+(s===1||(s===0&&t)?" ok":s===2?" na":"")+(o?" ab":"")+(lk?" lk":"")+'" data-c="'+i.cod+'">'+
+      '<div class="cab"><button type="button" class="st" title="Pendente, resolvida ou não se aplica">'+["○","●","⊘"][s]+"</button>"+
+      '<span class="cod">'+i.cod+'</span><span class="nm">'+esc(i.nome)+"</span>"+(t?'<span class="tem" title="Tem resposta">✎</span>':"")+
+      '<span class="lv">'+esc(lname(L))+(lk?" 🔒":"")+"</span></div>"+
+      (o?'<div class="co">'+(lk
+        ?'<p class="ds">Esta etapa requer o plano '+esc(lname(L))+'. Faça upgrade para liberar esta análise.</p><a class="btn gold" target="_blank" rel="noopener" href="'+link(L)+'">ASSINAR '+esc(lname(L))+'</a><p class="ds"><strong>Antes de assinar:</strong> use no pagamento o mesmo e-mail da sua conta no site. É por ele que o plano é liberado.</p>'
+        :'<div class="ln"><p class="ds">'+esc(i.descricao)+'</p><button type="button" class="btn apag">APAGAR BUSCA</button><button type="button" class="btn gold pesq">EXECUTAR BUSCA</button></div>'+
+          '<textarea class="tx" placeholder="Sua resposta para esta etapa…">'+esc(e.t||"")+"</textarea>"+(t?'<button type="button" class="btn rv">ENVIAR PARA REVISÃO TEOLÓGICA</button>':""))+"</div>":"")+
       "</div>";
   });
-
-  const topo = $("mzLista").scrollTop;
-  $("mzLista").innerHTML = html || '<span class="at-msg">Nenhuma etapa nesta base.</span>';
-  $("mzLista").scrollTop = topo;
+  const topo=$("lista").scrollTop;
+  $("lista").innerHTML=h||'<span class="msg">Nenhuma etapa nesta base.</span>';
+  $("lista").scrollTop=topo;
 }
-
-async function mzAbrir(){
-  if(!ativo()) return;
-  mz.style.display = "";
-  $("atEditor").style.display = "none";
-  document.querySelectorAll(".at-modo .at-btn").forEach(b => b.classList.remove("on"));
-  $("atModoMesa").classList.add("on");
-  $("mzLista").innerHTML = '<span class="at-msg">Carregando a tabela…</span>';
+async function loadTab(){
   try{
-    if(!TAB) TAB = await carregarTabela();
-    if(!TAB[mzEsc]) mzEsc = Object.keys(TAB)[0];
-    $("mzEsc").innerHTML = Object.keys(TAB).map(k => '<option value="' + escapeHTML(k) + '">' + escapeHTML(k) + "</option>").join("");
-    $("mzEsc").value = mzEsc;
+    const r=await fetch("tabela.json",{cache:"no-cache"});
+    if(!r.ok)throw new Error("tabela.json não encontrado");
+    TAB=await r.json();
+    if(!TAB[mzEsc])mzEsc=Object.keys(TAB)[0];
+    $("mzEsc").innerHTML=Object.keys(TAB).map(k=>'<option value="'+esc(k)+'">'+esc(k)+"</option>").join("");
+    $("mzEsc").value=mzEsc;
     mzRender();
-  }catch(e){
-    console.error(e);
-    $("mzLista").innerHTML = '<span class="at-msg">Não foi possível ler o tabela.json. Confira se ele está na mesma pasta desta página.</span>';
-  }
+  }catch(e){console.error(e);$("lista").innerHTML='<span class="msg">Não foi possível ler o tabela.json. Confira se ele está na mesma pasta desta página.</span>'}
 }
-
-function mzFechar(){
-  mz.style.display = "none";
-  $("atEditor").style.display = "";
-  $("atModoMesa").classList.remove("on");
-  aplicarModo();
-}
-
-
-
-function mzAbrirEtapa(cod){
-   mzAberta = mzAberta === cod ? null : cod;
-  if(mzAberta){
-    const it = ((TAB && TAB[mzEsc]) || []).find(x => x.cod === cod);
-    if(it) mzAbertos.add(mzGrupo(it));
-  }
-  mzRender();
-  if(mzAberta){
-    const el = mz.querySelector('.mz-et[data-c="' + cod + '"]');
-    if(el){ el.scrollIntoView({block:"nearest"}); const t = el.querySelector(".mz-t"); if(t) t.focus(); }
-  }
-}
-
-let mzTimer = null;
-$("atModoMesa").addEventListener("click", mzAbrir);
-$("mzVoltar").addEventListener("click", mzFechar);
- /* ===== ARQUIVO: pesquisas antigas, com data e horário ===== */
-let arqFundo = null;
-function arqFechar(){ if(arqFundo) arqFundo.hidden = true; }
-function arqDataHora(iso){
-  if(!iso) return "Data não registrada";
-  const d = new Date(iso);
-  if(Number.isNaN(d.getTime())) return "Data não registrada";
-  return d.toLocaleDateString("pt-BR") + " às " + d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-}
-function arqDesenhar(){
-  const lista = (st.arq || []).slice().sort(function(a,b){
-    return (b.em ? Date.parse(b.em) : 0) - (a.em ? Date.parse(a.em) : 0);
-  });
-  const corpo = arqFundo.querySelector(".at-tab-corpo");
-  corpo.innerHTML = lista.length ? lista.map(function(a){
-    return '<div class="at-tab-bloco" style="text-transform:none">' + escapeHTML(arqDataHora(a.em)) +
-        (a.cod ? ' — ' + escapeHTML(a.cod) + ' ' + escapeHTML(a.nome || "") : '') +
-        (a.ref ? ' · ' + escapeHTML(a.ref) : '') + '</div>' +
-      '<div style="white-space:pre-wrap;font:15px/1.6 Georgia,serif;padding:6px 2px">' + escapeHTML(a.texto) + '</div>' +
-      '<div class="at-row" style="margin:4px 0 10px">' +
-        '<button type="button" class="at-btn" data-arq="copiar" data-id="' + escapeHTML(a.id) + '">COPIAR</button>' +
-        '<button type="button" class="at-btn" data-arq="excluir" data-id="' + escapeHTML(a.id) + '">EXCLUIR</button>' +
-      '</div>';
-  }).join("") : '<div class="at-tab-msg">Nenhuma pesquisa arquivada ainda.</div>';
-}
-function arqAbrir(){
-  if(!arqFundo){
-    arqFundo = document.createElement("div");
-    arqFundo.className = "at-tab-fundo";
-    arqFundo.hidden = true;
-    arqFundo.innerHTML =
-      '<div class="at-tab-janela" role="dialog" aria-modal="true">' +
-        '<div class="at-tab-topo"><strong>Arquivo de pesquisas</strong>' +
-          '<div class="at-tab-leg">Resultados da Mesa de estudo, com data e horário.</div></div>' +
-        '<div class="at-tab-corpo"></div>' +
-               '<div class="at-tab-rodape"><button type="button" class="at-btn" data-arq="limpar" style="margin-right:auto;color:#a14747">APAGAR TUDO</button><button type="button" class="at-btn" data-arq="fechar">FECHAR</button></div>' +
-      '</div>';
-    document.body.appendChild(arqFundo);
-    arqFundo.addEventListener("click", function(ev){
-      if(ev.target === arqFundo){ arqFechar(); return; }
-      const b = ev.target.closest("[data-arq]");
-      if(!b) return;
-      const acao = b.dataset.arq;
-      if(acao === "fechar"){ arqFechar(); return; }
-           if(acao === "limpar"){
-        if(!(st.arq || []).length){ toast("O arquivo já está vazio."); return; }
-        if(!window.confirm("Apagar TODAS as pesquisas do arquivo? Não dá para desfazer.")) return;
-        st.arq = [];
-        gravar(); arqDesenhar();
-        return;
-      }
-      const item = (st.arq || []).find(x => x.id === b.dataset.id);
-      if(!item) return;
-      if(acao === "copiar"){
-        if(navigator.clipboard) navigator.clipboard.writeText(item.texto);
-        toast("Texto copiado.");
-      }else if(acao === "excluir"){
-        if(!window.confirm("Excluir esta pesquisa do arquivo? Não dá para desfazer.")) return;
-        st.arq = st.arq.filter(x => x.id !== item.id);
-        gravar(); arqDesenhar();
-      }
-    });
-    document.addEventListener("keydown", function(ev){
-      if(ev.key === "Escape" && !arqFundo.hidden){ arqFechar(); ev.stopImmediatePropagation(); }
-    }, true);
-  }
-  arqDesenhar();
-  arqFundo.hidden = false;
-}
-$("mzArq").addEventListener("click", arqAbrir);
-$("atModoTexto").addEventListener("click", function(){ if(mz.style.display !== "none") mzFechar(); });
-$("atModoArvore").addEventListener("click", function(){ if(mz.style.display !== "none") mzFechar(); });
-$("atRasc").addEventListener("change", function(){ if(mz.style.display !== "none") mzRender(); });
-
-$("mzEsc").addEventListener("change", function(){ mzEsc = this.value; mzAberta = null; mzRender(); });
-
-
-
-
-
-
-
-$("mzLista").addEventListener("click", function(ev){
-  const et = ev.target.closest(".mz-et");
-  if(!et) return;
-  const cod = et.dataset.c, m = mzDados();
-
-  if(ev.target.closest(".mz-st")){
-    m[cod] = m[cod] || {};
-    m[cod].s = ((m[cod].s || 0) + 1) % 3;
-    gravar(); mzRender();
-    return;
-  }
-     if(ev.target.closest(".mz-apag")){
-    m[cod] = m[cod] || {};
-    m[cod].t = "";
-    gravar(); mzRender();
-    return;
-  }
-  if(ev.target.closest(".mz-pesq")){
-    mzPesquisar(cod, ev.target.closest(".mz-pesq"));
-    return;
-  }
-
-  if(ev.target.closest(".mz-cab")) mzAbrirEtapa(cod);
-});
-
-$("mzLista").addEventListener("input", function(ev){
-  if(!ev.target.classList.contains("mz-t")) return;
-  const cod = ev.target.closest(".mz-et").dataset.c, m = mzDados();
-  m[cod] = m[cod] || {};
-  m[cod].t = ev.target.value;
-  clearTimeout(mzTimer);
-   mzTimer = setTimeout(gravar, 400);
-  mzContagem();
-});
-
- $("mzLista").addEventListener("click", function(ev){
-  const h = ev.target.closest(".mz-bl-b");
-  if(!h) return;
-  const g = h.dataset.g;
-  if(mzAbertos.has(g)) mzAbertos.delete(g); else mzAbertos.add(g);
-  mzRender();
-});
-function mzEscopoDaEtapa(it){
-  const nucleo = {"01.1":"Livro","01.2":"Capítulo","01.3":"Perícope","01.4":"Versículo","01.5":"Palavra"};
-  return nucleo[it.cod] || mzEsc;
-}
-
+$("mzEsc").onchange=function(){mzEsc=this.value;aberta=null;mzRender()};
+ 
+function mzEscopoDaEtapa(it){return({"01.1":"Livro","01.2":"Capítulo","01.3":"Perícope","01.4":"Versículo","01.5":"Palavra"})[it.cod]||mzEsc}
 function mzPassagem(escopo){
-  const livro = BOOKS[cur.livro][1];
-  const cap = portugueseBible[cur.livro].chapters[cur.cap-1] || [];
-  const nums = [...sel].sort((a,b) => a-b);
-  if(escopo === "Livro") return {ok:true, p:{book:livro, reference:livro, text:""}};
-  if(escopo === "Capítulo"){
-    return {ok:true, p:{book:livro, reference:livro + " " + cur.cap, text:cap.map((t,i) => (i+1) + " " + t).join("\n")}};
+  const livro=BK[cur.l][1],cap=PT[cur.l].chapters[cur.c-1]||[],nums=[...sel].sort((a,b)=>a-b);
+  if(escopo==="Livro")return{ok:true,p:{book:livro,reference:livro,text:""}};
+  if(escopo==="Capítulo")return{ok:true,p:{book:livro,reference:livro+" "+cur.c,text:cap.map((t,i)=>(i+1)+" "+t).join("\n")}};
+  if(!nums.length)return{ok:false,erro:"Selecione, à esquerda, os versículos desta etapa."};
+  const ref=livro+" "+cur.c+":"+intervalos(nums),texto=nums.map(n=>n+" "+(cap[n-1]||"")).join("\n");
+  if(escopo==="Palavra"){
+    const w=(window.prompt("Qual palavra deste texto você quer estudar?")||"").trim();
+    if(!w)return{ok:false,erro:"Informe a palavra para pesquisar."};
+    return{ok:true,p:{book:livro,reference:ref,text:texto,word:w}};
   }
-  if(!nums.length) return {ok:false, erro:"Selecione, à esquerda, os versículos desta etapa."};
-  const ref = livro + " " + cur.cap + ":" + intervalos(nums);
-  const texto = nums.map(n => n + " " + (cap[n-1] || "")).join("\n");
-  if(escopo === "Palavra"){
-    const w = (window.prompt("Qual palavra deste texto você quer estudar?") || "").trim();
-    if(!w) return {ok:false, erro:"Informe a palavra para pesquisar."};
-    return {ok:true, p:{book:livro, reference:ref, text:texto, word:w}};
-  }
-  return {ok:true, p:{book:livro, reference:ref, text:texto}};
+  return{ok:true,p:{book:livro,reference:ref,text:texto}};
 }
-async function mzOriginal(it, escopo){
-  if(escopo === "Livro") return {ok:true};
-  const cod = it.cod;
-  const code = BOOKS[cur.livro][0], test = BOOKS[cur.livro][2];
-  if(cod === "01.8") return {ok:false, erro:"A Septuaginta não está carregada nesta página. Esta etapa não pode usar texto real."};
-  if(cod === "01.6" && test !== "OT") return {ok:false, erro:"01.6 é texto hebraico: serve só para livros do Antigo Testamento."};
-  if(cod === "01.7" && test !== "NT") return {ok:false, erro:"01.7 é texto grego: serve só para livros do Novo Testamento."};
-  const lingua = /^(01\.[67]|03\.\d+|04\.\d+)$/.test(cod);
-  let nums;
-  if(escopo === "Capítulo"){
-    const total = (portugueseBible[cur.livro].chapters[cur.cap-1] || []).length;
-    nums = Array.from({length:total}, (_,i) => i+1);
-  }else{
-    nums = [...sel].sort((a,b) => a-b);
-  }
-  let m = null;
-  try{ m = await mapaOriginal(code, test === "OT"); }catch(e){}
-  const linhas = m ? nums.map(n => m.get(cur.cap + ":" + n) ? n + " " + m.get(cur.cap + ":" + n) : "").filter(Boolean) : [];
-  if(!linhas.length){
-    if(lingua) return {ok:false, erro:"Não foi possível carregar o texto original desta passagem. Tente de novo."};
-    return {ok:true};
-  }
-  return {ok:true, original:linhas.join("\n"), lang:(test === "OT" ? "hebraico, WLC" : "grego, Nestle 1904"), lingua:lingua};
+async function mzOriginal(it,escopo){
+  if(escopo==="Livro")return{ok:true};
+  const cod=it.cod,code=BK[cur.l][0],ot=isOT(cur.l);
+  if(cod==="01.8")return{ok:false,erro:"A Septuaginta não está carregada nesta página. Esta etapa não pode usar texto real."};
+  if(cod==="01.6"&&!ot)return{ok:false,erro:"01.6 é texto hebraico: serve só para livros do Antigo Testamento."};
+  if(cod==="01.7"&&ot)return{ok:false,erro:"01.7 é texto grego: serve só para livros do Novo Testamento."};
+  const lingua=/^(01\.[67]|03\.\d+|04\.\d+)$/.test(cod);
+  const nums=escopo==="Capítulo"?Array.from({length:(PT[cur.l].chapters[cur.c-1]||[]).length},(_,i)=>i+1):[...sel].sort((a,b)=>a-b);
+  let m=null;try{m=await mapaOrig(code,ot)}catch(e){}
+  const linhas=m?nums.map(n=>m.get(cur.c+":"+n)?n+" "+m.get(cur.c+":"+n):"").filter(Boolean):[];
+  if(!linhas.length){return lingua?{ok:false,erro:"Não foi possível carregar o texto original desta passagem. Tente de novo."}:{ok:true}}
+  return{ok:true,original:linhas.join("\n"),lang:ot?"hebraico, WLC":"grego, Nestle 1904",lingua};
 }
-async function mzPesquisar(cod, btn){
-  const it = ((TAB && TAB[mzEsc]) || []).find(x => x.cod === cod);
-  if(!it) return;
-  const escopo = mzEscopoDaEtapa(it);
-  const r = mzPassagem(escopo);
-  if(!r.ok){ toast(r.erro); return; }
-   const o = await mzOriginal(it, escopo);
-  if(!o.ok){ toast(o.erro); return; }
-  if(o.original){
-    r.p.original = o.original;
-    r.p.originalLang = o.lang;
-    if(o.lingua) r.p.text = "";
-  }
-  const m = mzDados();
-  const atual = (m[cod] && m[cod].t) || "";
-  if(atual.trim() && !window.confirm("Esta etapa já tem texto. Substituir pela pesquisa?")) return;
-  btn.disabled = true; btn.textContent = "PESQUISANDO…";
+async function mzPesquisar(cod,btn){
+  const it=itens().find(x=>x.cod===cod);
+  if(!it)return;
+  if(!allowed(cod)){toast("Esta etapa requer o plano "+lname(lvl(cod))+".");return}
+  try{await loadPT()}catch(e){toast(e.message);return}
+  const escopo=mzEscopoDaEtapa(it),r=mzPassagem(escopo);
+  if(!r.ok){toast(r.erro);return}
+  const o=await mzOriginal(it,escopo);
+  if(!o.ok){toast(o.erro);return}
+  if(o.original){r.p.original=o.original;r.p.originalLang=o.lang;if(o.lingua)r.p.text=""}
+  const m=mzD(),atual=(m[cod]&&m[cod].t)||"";
+  if(atual.trim()&&!window.confirm("Esta etapa já tem texto. Substituir pela pesquisa?"))return;
+  btn.disabled=true;btn.textContent="PESQUISANDO…";
   try{
-    const sess = (await supabaseClient.auth.getSession()).data.session;
-    if(!sess) throw new Error("Sessão encerrada. Entre de novo.");
-    const resp = await fetch("https://yellow-lab-f4b2.palavraeserie.workers.dev/api/pesquisa", {
-      method:"POST",
-      headers:{"Content-Type":"application/json", "Authorization":"Bearer " + sess.access_token},
-      body: JSON.stringify({
-      analysisType:"textual_study_step",
-        scope:escopo,
-        stepCode:it.cod,
-        stepName:it.nome,
-        instruction:it.descricao,
-        question:it.nome,
-        passage:r.p
-      })
-    });
-    const dados = await resp.json().catch(() => ({}));
-    if(!resp.ok || !dados.ok) throw new Error(dados.error || "Não foi possível pesquisar agora.");
-    m[cod] = m[cod] || {};
-          const textoPesq = String(dados.text || dados.answer || "").replace(/\*/g, "");
-    m[cod].t = textoPesq;
-    st.arq = st.arq || [];
-    st.arq.unshift({id:String(Date.now()), em:new Date().toISOString(), cod:cod, nome:it.nome, escopo:escopo, ref:(r.p.reference || ""), texto:textoPesq});
-    gravar(); mzRender();
-  }catch(e){
-    console.error(e);
-    toast(e.message || "Não foi possível pesquisar agora.");
-    btn.disabled = false; btn.textContent = "EXECUTAR BUSCA ETAPA";
-  }
+    const sess=await getSession();
+    const resp=await fetch(WORKER+"/api/pesquisa",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+sess.access_token},
+      body:JSON.stringify({analysisType:"textual_study_step",scope:escopo,stepCode:it.cod,stepName:it.nome,instruction:it.descricao,question:it.nome,passage:r.p})});
+    const d=await resp.json().catch(()=>({}));
+    if(resp.status===401){await sb.auth.signOut();throw new Error("Sua sessão expirou. Entre novamente.")}
+    if(!resp.ok||!d.ok)throw new Error(d.error||"Não foi possível pesquisar agora.");
+    const txt=String(d.text||d.answer||"").replace(/\*/g,"");
+    m[cod]=m[cod]||{};m[cod].t=txt;
+    ST.arq.unshift({id:String(Date.now()),em:new Date().toISOString(),cod,nome:it.nome,escopo,ref:r.p.reference||"",texto:txt});
+    gravar();mzRender();
+  }catch(e){console.error(e);toast(e.message||"Não foi possível pesquisar agora.");btn.disabled=false;btn.textContent="EXECUTAR BUSCA"}
 }
-
-
-$("mzMontar").addEventListener("click", function(){
-  const m = mzDados(), comDesc = $("mzDesc").checked;
-  const partes = ((TAB && TAB[mzEsc]) || [])
-    .filter(i => m[i.cod] && m[i.cod].t && m[i.cod].t.trim())
-    .map(i => "## " + i.cod + " " + i.nome + "\n" + (comDesc ? "[" + i.descricao + "]\n" : "") + "\n" + m[i.cod].t.trim());
-  if(!partes.length){ $("mzCont").textContent = "Escreva ao menos uma resposta antes de montar."; return; }
-  const d = ativo();
-  d.modo = "texto"; gravar();
-  mzFechar();
-  inserirNoCursor(partes.join("\n\n") + "\n");
-});
-  /* ---- eventos ---- */
-  $("atLivro").addEventListener("change", function(){ cur.livro = Number(this.value); cur.cap = 1; preencherCapitulos(); lerVersos(); });
-  $("atCap").addEventListener("change", function(){ cur.cap = Number(this.value); lerVersos(); });
-  $("atModo").addEventListener("change", function(){ cur.modo = this.value; lerVersos(); });
- async function mudarCapitulo(delta){
-  await loadPortuguese();
-  let l = cur.livro, c = cur.cap + delta;
-  if(c < 1){
-    if(l === 0) return;
-    l--; c = portugueseBible[l].chapters.length;
-  }else if(c > portugueseBible[l].chapters.length){
-    if(l === BOOKS.length - 1) return;
-    l++; c = 1;
+$("lista").onclick=function(ev){
+  const h=ev.target.closest(".bb");
+  if(h){const g=h.dataset.g;if(abertos.has(g))abertos.delete(g);else abertos.add(g);mzRender();return}
+  const et=ev.target.closest(".et");if(!et)return;
+  const cod=et.dataset.c,m=mzD(),it=itens().find(x=>x.cod===cod);
+  if(ev.target.closest(".st")){m[cod]=m[cod]||{};m[cod].s=((m[cod].s||0)+1)%3;gravar();mzRender();return}
+  if(ev.target.closest(".apag")){m[cod]=m[cod]||{};m[cod].t="";gravar();mzRender();return}
+  if(ev.target.closest(".pesq")){mzPesquisar(cod,ev.target.closest(".pesq"));return}
+  if(ev.target.closest(".rv")){
+    lastMesaAnswer=(m[cod]&&m[cod].t||"").trim();lastMesaModule=it?modName(it):"";lastMesaStep=it?it.cod+" — "+it.nome:"";
+    actStep=lastMesaStep;actModule=lastMesaModule;openRevisor("platform_mesa");return;
   }
-  cur.livro = l; cur.cap = c;
-  $("atLivro").value = String(l);
-  preencherCapitulos();
-  $("atEscopo").value = "cap";
-  $("atBusca").value = "";
-  emBusca = false;
-  lerVersos();
+  if(ev.target.closest(".cab")){
+    aberta=aberta===cod?null:cod;
+    if(aberta&&it){abertos.add(grupo(it));actStep=it.cod+" — "+it.nome;actModule=modName(it)}
+    mzRender();
+    if(aberta){const el=$("lista").querySelector('.et[data-c="'+cod+'"]');if(el){el.scrollIntoView({block:"nearest"});const t=el.querySelector(".tx");if(t)t.focus()}}
+  }
+};
+$("lista").oninput=function(ev){
+  if(!ev.target.classList.contains("tx"))return;
+  const cod=ev.target.closest(".et").dataset.c,m=mzD();
+  m[cod]=m[cod]||{};m[cod].t=ev.target.value;
+  clearTimeout(mzTimer);mzTimer=setTimeout(gravar,400);
+};
+ 
+/* ===== ARQUIVO ===== */
+const dataHora=iso=>{const d=iso?new Date(iso):null;return d&&!isNaN(d)?d.toLocaleDateString("pt-BR")+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"Data não registrada"};
+function arqDesenhar(){
+  $("arqBody").innerHTML=ST.arq.length?ST.arq.map(a=>'<div class="arq"><strong>'+esc(dataHora(a.em))+(a.cod?" — "+esc(a.cod)+" "+esc(a.nome||""):"")+(a.ref?" · "+esc(a.ref):"")+"</strong><br>"+esc(a.texto)+
+    '<div class="row" style="margin-top:6px"><button type="button" class="btn" data-a="copiar" data-id="'+esc(a.id)+'">COPIAR</button><button type="button" class="btn" data-a="excluir" data-id="'+esc(a.id)+'">EXCLUIR</button></div></div>').join(""):'<p class="msg">Nenhuma pesquisa arquivada ainda.</p>';
 }
-$("atAnt").addEventListener("click", function(){ mudarCapitulo(-1); });
-$("atProx").addEventListener("click", function(){ mudarCapitulo(1); });
-  $("atBusca").addEventListener("input", filtrar);
-$("atEscopo").addEventListener("change", filtrar);
-$("atVersos").addEventListener("click", function(ev){
-  const r = ev.target.closest(".at-r");
-  if(r) irPara(Number(r.dataset.l), Number(r.dataset.c), Number(r.dataset.n));
-});
-  $("atVersos").addEventListener("click", function(ev){
-    const b = ev.target.closest(".at-v");
-    if(!b) return;
-    const n = Number(b.dataset.n);
-    if(sel.has(n)){ sel.delete(n); b.classList.remove("on"); } else { sel.add(n); b.classList.add("on"); }
-    atualizarBandeja();
-  });
-  $("atLimpar").addEventListener("click", function(){
-    sel.clear();
-    document.querySelectorAll("#atVersos .at-v.on").forEach(b => b.classList.remove("on"));
-    atualizarBandeja();
-  });
-  $("atInserir").addEventListener("click", function(){
-    const ordem = [...sel].sort((a,b) => a - b);
-    const texto = ordem.map(n => versos.find(v => v.n === n).t).join(" ");
-    if(modoArvore()){
-      if(!inserirNaArvore("“" + texto + "” — " + referencia())) return;
-    }else{
-           inserirNoCursor("> “" + texto + "”\n> — " + referencia());
-    }
-    $("atLimpar").click();
-  });
+$("mzArq").onclick=()=>{arqDesenhar();$("arqOv").style.display="flex"};
+$("arqOv").onclick=function(ev){
+  if(ev.target===this){this.style.display="none";return}
+  const b=ev.target.closest("[data-a]");if(!b)return;
+  const a=b.dataset.a;
+  if(a==="fechar"){this.style.display="none";return}
+  if(a==="limpar"){if(!ST.arq.length||!window.confirm("Apagar TODAS as pesquisas do arquivo? Não dá para desfazer."))return;ST.arq=[];gravar();arqDesenhar();return}
+  const it=ST.arq.find(x=>x.id===b.dataset.id);if(!it)return;
+  if(a==="copiar"){if(navigator.clipboard)navigator.clipboard.writeText(it.texto);toast("Texto copiado.")}
+  else if(window.confirm("Excluir esta pesquisa do arquivo? Não dá para desfazer.")){ST.arq=ST.arq.filter(x=>x.id!==it.id);gravar();arqDesenhar()}
+};
  
-  $("atTitulo").addEventListener("input", agendarGravacao);
-  $("atTexto").addEventListener("input", agendarGravacao);
-  $("atRasc").addEventListener("change", function(){ st.a = this.value; gravar(); mostrarRascunho(); });
-  $("atNovo").addEventListener("click", function(){ criarRascunho(false); $("atTitulo").focus(); });
-  $("atExcluir").addEventListener("click", function(){
-    if(!window.confirm("Excluir este rascunho? Não dá para desfazer.")) return;
-    st.r = st.r.filter(x => x.id !== st.a);
-    if(!st.r.length) criarRascunho(true);
-    st.a = st.r[0].id; gravar(); desenharRascunhos(); mostrarRascunho();
-  });
- 
-
- 
-  function alternarFoco(){
-    const on = !$("ateliPainel").classList.contains("at-foco");
-    $("ateliPainel").classList.toggle("at-foco", on);
-    $("atGrid").classList.toggle("foco-grid", on);
-    $("atFoco").textContent = on ? "SAIR DO FOCO" : "MODO FOCO";
-   $("atTexto").placeholder = on
-  ? "Comece a escrever. Saia do foco para inserir versículos."
-  : "Comece a escrever. Selecione versículos ao lado e insira-os onde o cursor estiver.";
-    if(on) $("atTexto").focus();
-  }
-  $("atFoco").addEventListener("click", alternarFoco);
-  document.addEventListener("keydown", function(ev){
-    if(ev.key === "Escape" && $("ateliPainel").classList.contains("at-foco")) alternarFoco();
-  });
-})(); 
-function prepararNovaVerificacao(){
-  app.style.display = "none";
-  errorBox.style.display = "none";
-  loading.style.display = "flex";
+/* ===== REVISOR TEOLÓGICO ===== */
+let lastMesaAnswer="",lastMesaModule="",lastMesaStep="",revisorOrigin="external_unit";
+const CAN={
+ "01":{name:"TEXTO BÍBLICO",sources:"NA28; SBLGNT; BHS; BHQ; Septuaginta SBL; Textus Receptus/Scrivener como comparação histórica.",rule:"O texto bíblico é a fonte primária; o texto crítico eclético é o texto-base e tradições alternativas são testemunhos comparativos."},
+ "02":{name:"CRÍTICA TEXTUAL",sources:"Bruce Metzger; NA28; BHS/BHQ; SBLGNT; Septuaginta.",rule:"Variantes relevantes devem ser sinalizadas e nunca apresentadas como fatos indiscutíveis."},
+ "03":{name:"GRAMÁTICA E SINTAXE",sources:"Gramáticas gregas do NT; sintaxe grega avançada; gramáticas e sintaxe hebraicas; materiais de análise gramatical.",rule:"Não construir doutrina a partir de palavra isolada; considerar a palavra dentro da construção e do contexto."},
+ "04":{name:"LÉXICO",sources:"BDAG como principal e LSJ como complementar no NT; HALOT como principal e BDB como complementar no AT.",rule:"O contexto determina o sentido; possibilidades semânticas não significam que todos os sentidos foram pretendidos."},
+ "05":{name:"LÉXICO TEOLÓGICO",sources:"TDNT; NIDNTTE; TDOT; NIDOTTE.",rule:"O conceito teológico permanece subordinado ao uso efetivo da palavra no texto estudado."},
+ "06":{name:"EXEGESE",sources:"BECNT; NIGTC; NICNT; Pillar; WBC; NICOT; Baker OT; AOTC.",rule:"Integrar argumento, estrutura, contexto, gênero e intenção comunicativa sem repetir mecanicamente as etapas anteriores."},
+ "07":{name:"CONTEXTO HISTÓRICO-CULTURAL",sources:"Zondervan Encyclopedia of the Bible; IVP Bible Background Commentary; New Bible Dictionary; ANET; COS; Zondervan Atlas; Manners and Customs.",rule:"Não inserir pano de fundo especulativo sem fonte primária ou evidência material/arqueológica."},
+ "08":{name:"HERMENÊUTICA E CONTROLE DE ERROS",sources:"Grant Osborne; D. A. Carson; Carson & Moo; Dillard & Longman; Fee & Stuart.",rule:"Auditar anacronismo, eisegese, falácia lexical, descontextualização, alegorização, generalização e transferência indevida AT–NT."},
+ "09":{name:"TEOLOGIA BÍBLICA",sources:"G. K. Beale; Beale & Carson; Geerhardus Vos; Graeme Goldsworthy; Thomas Schreiner.",rule:"Localizar a passagem na trajetória temática do cânon, distinguindo-a do mecanismo textual específico do ANL-10."},
+ "10":{name:"USO DO AT NO NT",sources:"Beale & Carson; NA28; BHS/BHQ; Septuaginta; BDAG; HALOT; NIDNTTE; NIDOTTE; TDNT; TDOT; comentários exegéticos.",rule:"Detectar citações, alusões, ecos, paralelos, uso da LXX, releituras cristológicas e cumprimento de promessas."},
+ "11":{name:"TEOLOGIA SISTEMÁTICA",sources:"Grudem; Berkhof; Frame; Evangelical Dictionary of Theology.",rule:"Validar doutrinariamente sem determinar primariamente o significado; seguir texto → exegese → teologia bíblica → doutrina → teologia sistemática."},
+ "12":{name:"COMPARAÇÃO DE INTERPRETAÇÕES",sources:"Reconsulta transversal dos ANLs 01–11, conforme as evidências e as interpretações concorrentes identificadas.",rule:"Preservar o debate acadêmico, localizar argumentos, pressupostos e grau de consenso, distinguindo fato textual de interpretação."}
+};
+function getCanonicalGuidance(){
+  const m=String(actStep||actModule||"").match(/^\s*(\d{2})/);
+  return(m&&CAN[m[1]])||{name:"MATRIZ CANÔNICA",sources:"Selecione uma subetapa para receber a sugestão de fontes prioritárias.",rule:"A conclusão deve ser proporcional às evidências e nenhuma fonte ou localização deve ser inventada."};
 }
+function comparisonPrompt(referenceText,writerContent,guidance){
+  const ref=referenceText||"Nenhuma referência foi colada. Use a sugestão canônica abaixo e selecione as fontes reconhecidas adequadas ao módulo e à subetapa.";
+  return `
+ANÁLISE DE COMPARAÇÃO E CONSOLIDAÇÃO
  
-async function verificarSessao(opcoes = {}){
-  if(verificacaoEmAndamento) return;
+REFERÊNCIA DE COMPARAÇÃO FORNECIDA PELO USUÁRIO:
+---
+${ref}
+---
  
-  verificacaoEmAndamento = true;
+SUGESTÃO DA MATRIZ CANÔNICA DO WORKER:
+MÓDULO: ${guidance.name}
+FONTES PRIORITÁRIAS: ${guidance.sources}
+REGRA METODOLÓGICA: ${guidance.rule}
  
-  if(opcoes.revalidar){
-    prepararNovaVerificacao();
+CONTEÚDO DO ESCRITOR — TEXTO A SER AUDITADO:
+---
+${writerContent}
+---
+ 
+OBJETIVO:
+Compare o conteúdo do escritor com a referência de comparação. Quando a referência estiver vazia, selecione e priorize as fontes indicadas pela matriz canônica do Worker para o módulo e a subetapa atuais.
+ 
+PROCEDIMENTO OBRIGATÓRIO:
+1. Identifique cada afirmação verificável do conteúdo do escritor.
+2. Compare cada afirmação com a referência fornecida ou, quando ela estiver vazia, com as fontes canônicas prioritárias sugeridas acima.
+3. Classifique cada afirmação com exatamente uma destas categorias: CONCORDÂNCIA, DIVERGÊNCIA, SUPORTE PARCIAL ou EVIDÊNCIA INSUFICIENTE.
+4. Explique o motivo da classificação, distinguindo o que está explicitamente documentado de qualquer inferência.
+5. Registre a fonte, o autor e a localização que fundamentam a classificação. Use página, capítulo, seção, verbete, referência bíblica, parágrafo ou outro local verificável.
+6. Não invente fontes, autores, páginas, citações ou localizações. Quando a localização não estiver disponível, escreva "localização não confirmada".
+7. O texto bíblico é a fonte primária quando o tema for textual; comentários e teologias não podem substituir o texto. Respeite também a regra metodológica específica da matriz canônica.
+8. Quando houver divergência entre intérpretes, preserve as interpretações concorrentes, localize seus argumentos e pressupostos e apresente uma conclusão proporcional às evidências.
+9. Se não houver base suficiente, classifique como EVIDÊNCIA INSUFICIENTE; ausência de evidência localizada não deve ser apresentada automaticamente como refutação.
+10. Finalize com uma síntese consolidada, principais divergências, lacunas de evidência e limitações da auditoria.
+ 
+FORMATO PREFERENCIAL:
+RELATÓRIO DE AUDITORIA
+ 
+Para cada afirmação: número, afirmação, classificação, comparação, fonte, autor, localização e justificativa.
+`;
+}
+function formatAuditItem(it,i){
+  const g=(...k)=>k.map(x=>it?.[x]).find(Boolean);
+  return `${i+1}. AFIRMAÇÃO\n${g("statement","claim","afirmacao","text")||"Afirmação não identificada"}\n\nCLASSIFICAÇÃO: ${g("classification","classificacao","status")||"EVIDÊNCIA INSUFICIENTE"}\nCOMPARAÇÃO: ${g("comparison","comparacao","analysis","analise")||"Comparação não informada."}\nFONTE: ${g("source","fonte","work","obra")||"Fonte não informada"}\nAUTOR: ${g("author","autor")||"Autor não informado"}\nLOCALIZAÇÃO: ${g("location","localizacao","reference")||"localização não confirmada"}\nJUSTIFICATIVA: ${g("basis","fundamentacao","justification","justificativa")||"Justificativa não informada."}`;
+}
+function formatComparisonError(error,data){
+  const raw=String(error?.message||data?.error||"Não foi possível realizar a auditoria."),n=raw.toLowerCase();
+  if(["limite de requisições","limite de créditos","quota","rate limit","resource exhausted","429"].some(k=>n.includes(k)))
+    return "RELATÓRIO DE AUDITORIA\n\nA análise não foi concluída porque o serviço de IA atingiu o limite de requisições ou créditos.\n\nO conteúdo do escritor e a referência permanecem salvos nesta sessão. Tente novamente mais tarde ou verifique a cota do projeto de IA.\n\nDetalhe técnico: "+raw;
+  return "RELATÓRIO DE AUDITORIA\n\nA análise não foi concluída.\n\n"+raw;
+}
+function extractAuditReport(d){
+  const items=[d?.claims,d?.afirmacoes,d?.items,d?.report?.claims,d?.report?.items,d?.audit?.claims,d?.audit?.items].find(Array.isArray);
+  if(items)return `${d?.summary||d?.synthesis||d?.sintese||"RELATÓRIO DE AUDITORIA"}\n\n${items.map(formatAuditItem).join("\n\n────────────────────────\n\n")}`;
+  if(typeof d?.report==="string")return d.report;
+  if(typeof d?.auditReport==="string")return d.auditReport;
+  return d?.text||d?.answer||d?.response||d?.result||"A comparação não devolveu conteúdo.";
+}
+function openRevisor(origin){
+  revisorOrigin=origin||"external_unit";
+  const mesa=revisorOrigin==="platform_mesa";
+  $("revNote").textContent=mesa?"Origem: conteúdo produzido na Mesa de Análise. Incluído no seu plano APROFUNDAMENTO — não consome unidade.":"Origem: conteúdo externo colado por você. Não exige plano APROFUNDAMENTO — consome 1 unidade de revisão.";
+  $("revTema").value=mesa?lastMesaModule:"";$("revSub").value=mesa?lastMesaStep:"";$("revCont").value=mesa?lastMesaAnswer:"";$("revRef").value="";
+  $("revRep").textContent="O relatório de auditoria aparecerá aqui depois da revisão.";
+  $("revOv").style.display="flex";
+}
+function closeRevisor(){$("revOv").style.display="none"}
+async function submitRevisor(){
+  const tema=$("revTema").value.trim(),sub=$("revSub").value.trim(),ref=$("revRef").value.trim(),cont=$("revCont").value.trim(),rep=$("revRep"),btn=$("revGo");
+  if(!cont){rep.textContent="Cole o conteúdo do escritor antes de enviar para revisão.";return}
+  if(revisorOrigin==="platform_mesa"&&plan!=="MASTER"&&plan!=="DOCTUS"){
+    rep.innerHTML='O Revisor Teológico para conteúdos da Mesa/Pergunta Livre é um recurso do plano APROFUNDAMENTO. Faça upgrade para liberar esta revisão.<br><br><a class="btn gold" target="_blank" rel="noopener" href="'+link("MASTER")+'">FAZER UPGRADE PARA APROFUNDAMENTO</a>';
+    return;
   }
- 
+  const guidance=tema?{name:tema,sources:"Selecionar fontes reconhecidas adequadas ao tema.",rule:"Aplicar a regra normativa do módulo/tema informado, quando identificável."}:getCanonicalGuidance();
+  rep.textContent="REVISÃO EM ANDAMENTO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
+  btn.disabled=true;btn.textContent="REVISANDO...";
   try{
-    const {data,error} =
-      await supabaseClient.auth.getSession();
- 
-    if(error) throw error;
- 
-    const session = data.session;
- 
-    if(!session){
-      userEmail.textContent = "—";
-      loading.style.display = "none";
-      app.style.display = "none";
-      errorBox.style.display = "flex";
-      return;
-    }
- 
-    userEmail.textContent =
-      session.user?.email || "AUTOR";
- 
-    loading.style.display = "none";
-    errorBox.style.display = "none";
-    app.style.display = "block";
- 
-  
- 
-    if(!painelGestao.hidden){
-      carregarEstatisticasVisitas();
-      carregarEstatisticasPlanos();
-    }
- 
-  }catch(error){
-    console.error("Erro ao verificar sessão:",error);
- 
-    loading.style.display = "none";
-    app.style.display = "none";
-    errorBox.style.display = "flex";
-  }finally{
-    verificacaoEmAndamento = false;
-  }
+    const sess=await getSession();
+    const payload={mode:"writing_private",accessLevel:"private",analysisType:"comparison_consolidation",origin:revisorOrigin,referenceText:ref,writerContent:cont,
+      canonicalGuidance:{module:guidance.name,sources:guidance.sources,rule:guidance.rule},question:comparisonPrompt(ref,cont,guidance),
+      topic:sub||tema||"REVISOR TEOLÓGICO",module:tema||"REVISOR TEOLÓGICO",discipline:"MÉTODO TÉCNICO DE PESQUISA"};
+    /* Não enviar stepCode quando a origem é external_unit, para não disparar a exigência de plano por subetapa no Worker. */
+    if(revisorOrigin==="platform_mesa"&&sub){const m=sub.match(/^\d{2}\.\d+/);if(m){payload.stepCode=m[0];payload.requiredLevel=lvl(m[0])}}
+    const resp=await fetch(WORKER+"/api/pesquisa",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+sess.access_token},body:JSON.stringify(payload)});
+    let d={};try{d=await resp.json()}catch{d={}}
+    if(resp.status===401){await sb.auth.signOut();throw new Error("Sua sessão expirou. Entre novamente.")}
+    if(resp.status===402)throw new Error(d?.error||"Você não tem unidades disponíveis. Compre um pacote para continuar.");
+    if(resp.status===403)throw new Error(d?.error||"Este item requer um plano superior ao seu plano atual.");
+    if(!resp.ok)throw new Error(d?.error||"O Worker não conseguiu concluir a revisão.");
+    rep.textContent=extractAuditReport(d);
+  }catch(e){console.error(e);rep.textContent=formatComparisonError(e,{error:e?.message})}
+  finally{btn.disabled=false;btn.textContent="ENVIAR PARA REVISÃO"}
 }
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeRevisor();$("arqOv").style.display="none"}});
  
-logoutBtn.addEventListener("click",function(){
-  /*
-    "SAIR" agora só sai da Sala do Escritor e volta para o site
-    principal — não encerra a sessão da conta. Assim, ao clicar em
-    "Sala do Escritor" novamente, a entrada é direta, sem pedir login
-    de novo. O login continua sendo o único portão de entrada da Sala.
-  */
-  window.location.href = "index.html";
-});
- 
-let sessaoInicialResolvida = false;
- 
-supabaseClient.auth.onAuthStateChange(function(event){
-  if(event === "INITIAL_SESSION"){
-    sessaoInicialResolvida = true;
-    verificarSessao();
-  }
-  if(event === "SIGNED_OUT"){
-    prepararNovaVerificacao();
-    window.location.replace("entrada.html");
-  }
-});
- 
-/*
-  Rede de segurança: em casos raros o evento INITIAL_SESSION pode
-  demorar. Se depois de 3s ele ainda não tiver disparado, verifica
-  a sessão do mesmo jeito para a página não travar carregando.
-*/
-setTimeout(function(){
-  if(!sessaoInicialResolvida) verificarSessao();
-},3000);
- 
-/*
-  A navegação pelo histórico pode restaurar esta página a partir da
-  Back-Forward Cache sem executar novamente o script. Ocultar o conteúdo
-  no pagehide e validar de novo no pageshow impede que a Sala fique exposta
-  com uma sessão antiga ou já encerrada.
-*/
-window.addEventListener("pagehide",function(){
-  prepararNovaVerificacao();
-});
- 
-window.addEventListener("pageshow",function(){
-  verificarSessao({revalidar:true});
-});
- 
-window.addEventListener("popstate",function(){
-  verificarSessao({revalidar:true});
-});
- 
-document.addEventListener("visibilitychange",function(){
-  if(document.visibilityState === "visible"){
-    verificarSessao({revalidar:true});
-  }
-});
+/* ===== INICIALIZAÇÃO ===== */
+head();bandeja();loadTab();
+loadPT().then(()=>{capitulos();lerVersos()}).catch(e=>{console.error(e);$("vs").innerHTML='<span class="msg">Não foi possível carregar a Bíblia. Verifique a conexão.</span>'});
 </script>
 <script>
 (function(){
-  var SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
-  var SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
-  var PAGINA = "Sala do Escritor";
- 
-  function registrarVisita(pais, cidade){
+  var U="https://qmhdbuxomozdczgvpvcc.supabase.co",K="sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8",done=false;
+  function reg(pais,cidade){
+    if(done)return;done=true;
     try{
-      var vid = localStorage.getItem("ps_visitante_id");
-      if(!vid){
-        vid = (window.crypto && crypto.randomUUID)
-          ? crypto.randomUUID()
-          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-        localStorage.setItem("ps_visitante_id", vid);
-      }
- 
-      var payload = { pagina: PAGINA, visitante_id: vid };
-      if(pais) payload.pais = pais;
-      if(cidade) payload.cidade = cidade;
- 
-      fetch(SUPABASE_URL + "/rest/v1/visitas", {
-        method: "POST",
-        headers: {
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-          "Content-Type": "application/json",
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify(payload)
-      }).catch(function(){ /* falha silenciosa: nunca atrapalha a navegação */ });
-    }catch(e){ /* localStorage bloqueado ou indisponível: ignora */ }
+      var vid=localStorage.getItem("ps_visitante_id");
+      if(!vid){vid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+"-"+Math.random().toString(16).slice(2);localStorage.setItem("ps_visitante_id",vid)}
+      var p={pagina:"Método Técnico de Pesquisa",visitante_id:vid};if(pais)p.pais=pais;if(cidade)p.cidade=cidade;
+      fetch(U+"/rest/v1/visitas",{method:"POST",headers:{apikey:K,Authorization:"Bearer "+K,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(p)}).catch(function(){});
+    }catch(e){}
   }
- 
-  /*
-    Localização aproximada por IP, via serviço gratuito (sem chave).
-    Se falhar ou demorar mais de 2.5s, a visita é registrada mesmo
-    assim, só que sem país/cidade — nunca trava a navegação.
-  */
-  var jaRegistrou = false;
-  function concluir(pais, cidade){
-    if(jaRegistrou) return;
-    jaRegistrou = true;
-    registrarVisita(pais, cidade);
-  }
- 
-  setTimeout(function(){ concluir(null, null); }, 2500);
- 
-  fetch("https://ipapi.co/json/")
-    .then(function(r){ return r.json(); })
-    .then(function(info){
-      concluir(info && info.country_name, info && info.city);
-    })
-    .catch(function(){ concluir(null, null); });
+  setTimeout(function(){reg(null,null)},2500);
+  fetch("https://ipapi.co/json/").then(function(r){return r.json()}).then(function(i){reg(i&&i.country_name,i&&i.city)}).catch(function(){reg(null,null)});
 })();
 </script>
 </body>
 </html>
  
- 
- 
- 
- 
 
 
 
+
+
+
+Claude terminou a resposta
