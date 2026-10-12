@@ -521,6 +521,7 @@ Oraculo · HTML
     .fontes-subg{margin:12px 0 6px;color:var(--ink-soft);font-size:11.5px;font-weight:600}
     .fontes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
     .fontes-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+    .fontes-row[hidden]{display:none}
     .fontes-opt{min-height:40px;padding:8px 12px;text-align:left;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font-family:var(--font-body);font-size:12.5px;cursor:pointer}
     .fontes-opt:hover{border-color:var(--brass)}
     .fontes-opt small{display:block;margin-top:1px;color:var(--ink-soft);font-size:11px}
@@ -544,6 +545,9 @@ Oraculo · HTML
     .fontes-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--paper-line)}
     .fontes-clear{min-height:36px;padding:0 14px;border:0;border-radius:5px;background:var(--navy);color:#fff;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer}
     .fontes-clear:hover{background:var(--navy-soft)}
+    .fontes-foot-btns{display:flex;gap:8px;flex-wrap:wrap}
+    .fontes-go{min-height:36px;padding:0 14px;border:0;border-radius:5px;background:var(--brass);color:#fffdf6;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer}
+    .fontes-go:hover{background:var(--brass-deep)}
     .fontes-foot span{color:var(--ink-soft);font-size:11.5px}
     @media (max-width:600px){ .fontes-block{padding-left:15px;padding-right:15px} }
 </style>
@@ -609,7 +613,7 @@ Oraculo · HTML
           <div class="sr-only" id="fontes-live" aria-live="polite"></div>
  
           <div class="fontes-panel" id="fontes-panel" hidden>
-            <p class="fontes-note"><strong>Nível D — categoria de fontes.</strong> A escolha orienta a consulta, mas não impede o Oráculo de considerar outras fontes. Nenhuma escolha é obrigatória.</p>
+            <p class="fontes-note"><strong>Nível D — categoria de fontes.</strong> A escolha orienta a consulta, mas não impede o Oráculo de considerar outras fontes. Nenhuma escolha é obrigatória.<br><strong>Como usar:</strong> escolha as fontes (opcional), escreva sua pergunta no campo <em>Pesquisa</em>, mais abaixo, e clique em <em>Investigar</em>. A resposta aparece na área entre este bloco e o campo de pesquisa.</p>
  
             <fieldset class="fontes-set">
               <legend>Quem emitiu a publicação <small>(escolha uma ou mais)</small></legend>
@@ -660,7 +664,10 @@ Oraculo · HTML
             </fieldset>
  
             <div class="fontes-foot">
-              <button type="button" class="fontes-clear" id="fontes-clear">LIMPAR FONTES</button>
+              <span class="fontes-foot-btns">
+                <button type="button" class="fontes-clear" id="fontes-clear">LIMPAR FONTES</button>
+                <button type="button" class="fontes-go" id="fontes-go">FECHAR E ESCREVER A PERGUNTA</button>
+              </span>
               <span>Pedido, não garantia.</span>
             </div>
           </div>
@@ -1176,6 +1183,12 @@ Oraculo · HTML
       fontesDom.per.value = ''; fontesDom.d1.value = ''; fontesDom.d2.value = '';
       document.querySelector('input[name="fontes-nada"][value="perguntar"]').checked = true;
       fontesSync();
+    });
+ 
+    document.getElementById('fontes-go').addEventListener('click', () => {
+      fontesSetOpen(false);
+      input.scrollIntoView({behavior:'smooth', block:'center'});
+      input.focus({preventScroll:true});
     });
  
     fontesSync();
