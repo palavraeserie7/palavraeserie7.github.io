@@ -1,8 +1,10 @@
 
 
-
+Matriz pro · HTML
 <!doctype html>
 <html lang="pt-BR">
+<head>
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -800,10 +802,6 @@ main {
  /* Painel de comparação removido: o Revisor é o único caminho de auditoria */
 .content { grid-template-columns:minmax(0,1fr) !important; }
 .content > .sheet { display:none !important; }
- .scope-bar { display:flex; flex-wrap:wrap; gap:6px; padding:10px 10px 0; }
-.scope-button { padding:6px 9px; border:1px solid var(--b); border-radius:5px; background:transparent; color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.4px; cursor:pointer; }
-.scope-button:hover { color:#fff; border-color:var(--a); }
-.scope-button.active { background:rgba(24,191,255,.14); border-color:var(--a); color:#fff; }
 </style>
 </head>
  
@@ -885,7 +883,6 @@ main {
  
   <section class="panel modules">
     <div class="panel-title">MÓDULOS DO MÉTODO</div>
-   <div id="scope-bar" class="scope-bar"></div>
     <div id="module-list" class="module-list"></div>
   </section>
  
@@ -1172,17 +1169,7 @@ const MATRIX_LEVELS = {
   "12.8": "DOCTUS", "12.9": "DOCTUS", "12.10": "DOCTUS", "12.11": "DOCTUS",
   "12.12": "DOCTUS", "12.13": "DOCTUS", "12.14": "DOCTUS"
 };
-
-const LEVEL_NAMES = {
-  FREE: "FUNDAMENTOS",
-  PRO: "FORMAÇÃO",
-  MASTER: "APROFUNDAMENTO",
-  DOCTUS: "ESPECIALIZAÇÃO"
-};
-
-function levelName(level) {
-  return LEVEL_NAMES[level] || level;
-} 
+ 
 const LEVEL_RANK = { FREE: 0, PRO: 1, MASTER: 2, DOCTUS: 3 };
  
 const CHECKOUT_LINKS = {
@@ -1253,7 +1240,7 @@ function getStepLevel(stepCode) {
 function updatePlanBadge() {
   const badge = document.getElementById("plan-badge");
   if (badge) {
-    badge.textContent ="PLANO: " + levelName(currentUserPlan);
+    badge.textContent = "PLANO: " + currentUserPlan;
   }
 }
  
@@ -1276,7 +1263,7 @@ function updateUpgradeButton() {
  
     if (!allowed) {
       btn.style.display = "inline-block";
-     btn.textContent = "ASSINAR " + levelName(level);
+      btn.textContent = "ASSINAR " + level;
       btn.href = getCheckoutLink(level);
       return;
     }
@@ -1914,68 +1901,7 @@ async function getAuthenticatedSession() {
 /* =====================================================
    RENDERIZAÇÃO DOS MÓDULOS
 ===================================================== */
-
-/* =====================================================
-   TABELA (tabela.json) — base dos módulos e subetapas
-===================================================== */
-
-let TABELA = null;
-let activeScope = "Livro";
-
-async function loadTabela() {
-  try {
-    const response = await fetch("tabela.json", { cache: "no-store" });
-    TABELA = await response.json();
-  } catch (error) {
-    console.error("Erro ao carregar tabela.json:", error);
-    TABELA = null;
-  }
-  renderModules();
-}
-
-function getModulesForScope() {
-  const list = (TABELA && TABELA[activeScope]) || [];
-  const modules = [];
-  list.forEach(item => {
-    if (!String(item.simbolo).includes("✅") || item.cond) return;
-    const name = item.bloco + " — " + String(item.bloco_nome).toUpperCase();
-    let module = modules.find(m => m.name === name);
-    if (!module) {
-      module = { name: name, items: [] };
-      modules.push(module);
-    }
-    module.items.push(item.cod + " — " + item.nome);
-  });
-  return modules;
-} 
- const SCOPES = ["Livro", "Capítulo", "Perícope", "Versículo", "Palavra"];
-
-function renderScopeBar() {
-  const bar = document.getElementById("scope-bar");
-  if (!bar) return;
-  bar.innerHTML = "";
-  SCOPES.forEach(scope => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "scope-button" + (scope === activeScope ? " active" : "");
-    b.textContent = scope;
-    b.onclick = () => selectScope(scope);
-    bar.appendChild(b);
-  });
-}
-
-function selectScope(scope) {
-  activeScope = scope;
-  activeModule = "";
-  activeStep = "";
-  awaitingReference = false;
-  renderScopeBar();
-  renderModules();
-  document.getElementById("workspace-context").textContent =
-    "Escopo: " + scope + " • selecione um módulo e uma subetapa";
-  messages.innerHTML = "";
-  questionInput.value = "";
-}
+ 
 function renderModules() {
  
   const root =
@@ -1983,7 +1909,7 @@ function renderModules() {
  
   root.innerHTML = "";
  
-getModulesForScope().forEach(module => {
+  PRO_MODULE_DATA.forEach(module => {
  
     const box =
       document.createElement("div");
@@ -2056,7 +1982,7 @@ getModulesForScope().forEach(module => {
  
       levelTag.dataset.level = level;
  
-     levelTag.textContent = levelName(level);
+      levelTag.textContent = level;
  
       step.appendChild(label);
       step.appendChild(levelTag);
@@ -2223,20 +2149,21 @@ function selectStep(
  
     messages.innerHTML =
       '<div class="message system locked-notice">' +
-      'A subetapa "' + stepName + '" requer o plano ' + levelName(level) +
+      'A subetapa "' + stepName + '" requer o plano ' + level +
     '. Faça upgrade para liberar esta análise.' +
 '<br><br>' +
 '<strong>Antes de assinar:</strong> use no pagamento o mesmo e-mail da sua conta no site. É por ele que o plano é liberado.' +
-
+'<br><br>' +
+'<strong>Antes de assinar:</strong> use no pagamento o mesmo e-mail da sua conta no site. É por ele que o plano é liberado.' +
 '<br><br>' +
       '<a href="' + getCheckoutLink(level) + '" target="_blank" ' +
       'style="display:inline-block;padding:8px 14px;background:#20d66b;' +
       'color:#07151f;border-radius:6px;text-decoration:none;' +
-      'font-weight:900;font-size:11px;">ASSINAR ' + levelName(level) + '</a>' +
+      'font-weight:900;font-size:11px;">ASSINAR ' + level + '</a>' +
       '</div>';
  
     questionInput.value = "";
-    questionInput.placeholder = "Disponível a partir do plano " + levelName(level) + ".";
+    questionInput.placeholder = "Disponível a partir do plano " + level + ".";
     awaitingReference = false;
  
     return;
@@ -2477,7 +2404,7 @@ function appendLockedMessage(text, level) {
     '<a href="' + getCheckoutLink(level) + '" target="_blank" ' +
     'style="display:inline-block;padding:8px 14px;background:#20d66b;' +
     'color:#07151f;border-radius:6px;text-decoration:none;' +
-    'font-weight:900;font-size:11px;">ASSINAR ' + levelName(level) + '</a>';
+    'font-weight:900;font-size:11px;">ASSINAR ' + level + '</a>';
   messages.appendChild(el);
   messages.scrollTop = messages.scrollHeight;
   persistMessages();
@@ -2944,7 +2871,7 @@ async function sendQuestion(event) {
  
     appendLockedMessage(
       "A subetapa \"" + activeStep + "\" requer o plano " +
-     levelName(getStepLevel(stepCode)) +
+      getStepLevel(stepCode) +
       ". Faça upgrade para continuar.",
       getStepLevel(stepCode)
     );
@@ -3299,8 +3226,6 @@ document.addEventListener("keydown", (event) => {
 updatePlanBadge();
 updateUpgradeButton();
 renderModules();
-loadTabela();
-renderScopeBar();
 </script>
  
 <script>
