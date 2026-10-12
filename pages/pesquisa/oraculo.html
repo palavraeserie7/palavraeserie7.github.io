@@ -1298,11 +1298,21 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
 
         if (!area) return;
 
-        trackingContext.area = area.name;
-        trackingContext.subarea = subareaButton.dataset.subarea;
-              input.value =
-          `Pesquisar em ${area.name}: ${subareaButton.dataset.subarea}.`;
-        setOracleIndexOpen(false);
+               const jaSelecionada = subareaButton.classList.contains('selected');
+
+        indexList.querySelectorAll('.oracle-index-subarea.selected').forEach(b => {
+          b.classList.remove('selected');
+        });
+
+        if (jaSelecionada) {
+          trackingContext.area = '';
+          trackingContext.subarea = '';
+        } else {
+          subareaButton.classList.add('selected');
+          trackingContext.area = area.name;
+          trackingContext.subarea = subareaButton.dataset.subarea;
+        }
+
         input.focus();
       }
     });
