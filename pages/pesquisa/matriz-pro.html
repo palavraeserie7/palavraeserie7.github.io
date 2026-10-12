@@ -227,6 +227,7 @@ main {
   letter-spacing:.4px;
   color:#07151f;
   background:var(--p);
+   white-space:nowrap;
 }
  
 .step-level[data-level="FREE"] { background:#4a9bd6; color:#04121f; }
@@ -238,7 +239,7 @@ main {
   color:var(--lock);
   cursor:pointer;
 }
- 
+  
 .step.locked .step-level {
   background:transparent;
   border:1px solid var(--lock);
@@ -2726,13 +2727,13 @@ function openRevisor(origin) {
   if (!overlay) return;
  
   if (revisorOrigin === "platform_mesa") {
-    note.textContent = "Origem: conteúdo produzido na Mesa de Análise. Incluído no seu plano MASTER — não consome unidade.";
+    note.textContent = "Origem: conteúdo produzido na Mesa de Análise.Incluído no seu plano (Nível III ou IV) — não consome unidade.";
     document.getElementById("revisor-tema").value = lastMesaModule || "";
     document.getElementById("revisor-subetapa").value = lastMesaStep || "";
     document.getElementById("revisor-conteudo").value = lastMesaAnswer || "";
     document.getElementById("revisor-referencia").value = "";
   } else {
-    note.textContent = "Origem: conteúdo externo colado por você. Não exige plano MASTER — consome 1 unidade de revisão.";
+    note.textContent = "Origem: conteúdo externo colado por você. Não exige o Nível III — consome 1 unidade de revisão.";
     document.getElementById("revisor-tema").value = "";
     document.getElementById("revisor-subetapa").value = "";
     document.getElementById("revisor-conteudo").value = "";
@@ -2767,12 +2768,12 @@ async function submitRevisor() {
     currentUserPlan !== "DOCTUS"
   ) {
     report.innerHTML =
-      "O Revisor Teológico para conteúdos da Mesa/Pergunta Livre é um recurso do plano MASTER. " +
+      "O Revisor Teológico para conteúdos da Mesa/Pergunta Livreé um recurso do Nível III — Aprofundamento.  " +
       "Faça upgrade para liberar esta revisão.<br><br>" +
       '<a href="' + getCheckoutLink("MASTER") + '" target="_blank" rel="noopener" ' +
       'style="display:inline-block;padding:8px 14px;background:#20d66b;color:#07151f;' +
       'border-radius:6px;text-decoration:none;font-weight:900;font-size:11px;">' +
-      "FAZER UPGRADE PARA MASTER</a>";
+      "FAZER UPGRADE PARA APROFUNDAMENTO</a>";
     return;
   }
 
