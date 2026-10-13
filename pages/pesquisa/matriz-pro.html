@@ -2751,7 +2751,141 @@ function closeRevisor() {
   const overlay = document.getElementById("revisor-overlay");
   if (overlay) overlay.style.display = "none";
 }
- 
+
+ /* ===== REVISÕES ESPECIALIZADAS (R1 a R7) ===== */
+const REVIEW_LIST = [
+  { code: "R3", nome: "Contexto literário",           level: "FREE" },
+  { code: "R4", nome: "Histórico-cultural",           level: "PRO" },
+  { code: "R5", nome: "Excessos interpretativos",     level: "PRO" },
+  { code: "R6", nome: "Alcance e teologia bíblica",   level: "MASTER" },
+  { code: "R1", nome: "Léxico",                       level: "MASTER" },
+  { code: "R2", nome: "Gramática e sintaxe",          level: "DOCTUS" },
+  { code: "R7", nome: "Síntese e veredito",           level: "DOCTUS" }
+];
+let reviewResults = {};
+
+function renderReviewButtons() {
+  const box = document.getElementById("revisor-named-buttons");
+  if (!box) return;
+  box.innerHTML = "";
+  REVIEW_LIST.forEach(function (r) {
+    const allowed = (LEVEL_RANK[currentUserPlan] ?? 0) >= (LEVEL_RANK[r.level] ?? 3);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.id = "rv-btn-" + r.code;
+    b.textContent = (allowed ? "" : "🔒 ") + r.nome + " · " + levelTagText(r.level);
+    b.style.cssText = "padding:8px 12px;border-radius:6px;font-size:10px;font-weight:900;cursor:pointer;" +
+      (allowed
+        ? "border:0;background:#20d66b;color:#07151f;"
+        : "border:1px solid #5a6b85;background:transparent;color:#91a4bd;");
+    b.onclick = function () { runNamedReview(r.code); };
+    box.appendChild(b);
+  });
+}
+
+function formatReviewResult(code, res) {
+  if (!res || typeof res !== "object") return "Resposta vazia.";
+  var t = "";
+  if (code === "R7") {
+    t += "VEREDITO: " + String(res.veredito || "—").toUpperCase() + "\n";
+    if (res.coerencia) {
+      t += "NOTA DE COERÊNCIA: " + res.coerencia.nota + "/10\n" + (res.coerencia.parecer || "") + "\n";
+      (res.coerencia.pontas_soltas || []).forEach(function (p) { t += "• Ponta solta: " + p + "\n"; });
+    }
+    t += "\nJUSTIFICATIVA: " + (res.justificativa || "—") + "\n";
+    (res.correcoes_prioritarias || []).forEach(function (c, i) {
+      t += "\nCORREÇÃO " + (i + 1) + " (" + (c.origem || "") + " · " + (c.etapa || "") + ")\nTrecho: " + (c.trecho || "") + "\nComo corrigir: " + (c.correcao || "") + "\n";
+    });
+    (res.pendencias_de_conferencia || []).forEach(function (p) {
+      t += "\nPARA CONFERIR (" + (p.origem || "") + " · " + (p.etapa || "") + "): " + (p.trecho || "") + "\n";
+    });
+    (res.lacunas || []).forEach(function (l) { t += "• Lacuna: " + l + "\n"; });
+    return t.trim();
+  }
+  (res.etapas || []).forEach(function (e) {
+    t += "ETAPA " + (e.etapa || "") + " — " + String(e.status || "").replace(/_/g, " ").toUpperCase() + "\n";
+    if (e.observacao) t += e.observacao + "\n";
+    (e.achados || []).forEach(function (a, i) {
+      t += "\n  " + (i + 1) + ". TRECHO: " + (a.trecho || "") +
+        "\n     PROBLEMA: " + (a.problema || "") +
+        "\n     GRAVIDADE: " + (a.gravidade || "") + " · CONFIANÇA: " + (a.confianca || "") +
+        (a.requer_conferencia ? " · REQUER CONFERÊNCIA" : "") +
+        "\n     COMO CORRIGIR: " + (a.correcao || "") + "\n";
+    });
+    t += "\n";
+  });
+  return t.trim() || "Sem resultado.";
+}
+
+async function runNamedReview(code) {
+  const out = document.getElementById("revisor-named-report");
+  const conteudo = document.getElementById("revisor-conteudo").value.trim();
+  const item = REVIEW_LIST.find(function (r) { return r.code === code; });
+  if (!item) return;
+  if (!conteudo) {
+    out.textContent = "Cole o conteúdo do escritor antes de pedir uma revisão.";
+    return;
+  }
+  const allowed = (LEVEL_RANK[currentUserPlan] ?? 0) >= (LEVEL_RANK[item.level] ?? 3);
+  if (!allowed) {
+    if (!confirm("Esta revisão é do nível " + levelName(item.level) + ". Você pode rodá-la gastando 1 unidade avulsa. Continuar?")) return;
+  }
+  const btn = document.getElementById("rv-btn-" + code);
+  if (btn) { btn.disabled = true; btn.style.opacity = ".55"; }
+  out.textContent = "REVISANDO: " + item.nome + "...";
+
+  try {
+    const session = await getAuthenticatedSession();
+    if (!session.access_token) throw new Error("O Supabase não forneceu um token de acesso.");
+
+    const pareceres = {};
+    ["R1","R2","R3","R4","R5","R6"].forEach(function (k) { if (reviewResults[k]) pareceres[k] = reviewResults[k]; });
+
+    const tema = document.getElementById("revisor-tema").value.trim();
+    const sub = document.getElementById("revisor-subetapa").value.trim();
+    const referencia = document.getElementById("revisor-referencia").value.trim();
+
+    const response = await fetch(AI_PROXY_URL + "/api/pesquisa", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + session.access_token
+      },
+      body: JSON.stringify({
+        mode: "writing_private",
+        accessLevel: "private",
+        analysisType: "review_named",
+        reviewCode: code,
+        writerContent: conteudo,
+        referenceText: referencia,
+        pareceres: code === "R7" ? pareceres : undefined,
+        topic: sub || tema || "REVISOR TEOLÓGICO",
+        module: tema || "REVISOR TEOLÓGICO",
+        discipline: "MÉTODO TÉCNICO DE PESQUISA"
+      })
+    });
+
+    let data = {};
+    try { data = await response.json(); } catch { data = {}; }
+
+    if (response.status === 401) {
+      await supabaseClient.auth.signOut();
+      throw new Error("Sua sessão expirou. Entre novamente.");
+    }
+    if (!response.ok) {
+      throw new Error(data?.error || "Não foi possível concluir esta revisão.");
+    }
+
+    reviewResults[code] = data.result;
+    const cobrado = data.charged === "toque" ? "1 toque" : "1 unidade avulsa";
+    out.textContent = item.nome.toUpperCase() + " (gastou " + cobrado + ")\n\n" + formatReviewResult(code, data.result);
+  } catch (error) {
+    console.error("Erro na revisão especializada:", error);
+    out.textContent = "A revisão não foi concluída.\n\n" + (error?.message || "Erro desconhecido.");
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = "1"; }
+  }
+}
 async function submitRevisor() {
   const tema = document.getElementById("revisor-tema").value.trim();
   const subetapaInput = document.getElementById("revisor-subetapa").value.trim();
