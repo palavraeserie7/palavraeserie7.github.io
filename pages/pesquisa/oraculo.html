@@ -1257,49 +1257,63 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
     const decreeFollowup = document.getElementById('decree-followup');
     const decreeUrls = {
       federal: 'https://www4.planalto.gov.br/legislacao/portal-legis/busca-avancada',
-      estadual: 'https://www4.planalto.gov.br/legislacao/portal-legis/legislacao-estadual',
+      estadual: 'https://www4.planalto.gov.br/legislacao/portal-legis/legislacao-estadual/legislacoes-estaduais',
       df: 'https://www.sinj.df.gov.br/sinj/',
-      camaraFederal: 'https://www.camara.leg.br/legislacao/busca'
+      legislativoFederal: 'https://www.camara.leg.br/legislacao/pesquisa-avancada',
+      lexml: 'https://www.lexml.gov.br/'
     };
+    const decreeStates = [
+      ['AC','Acre'],['AL','Alagoas'],['AP','Amapá'],['AM','Amazonas'],
+      ['BA','Bahia'],['CE','Ceará'],['DF','Distrito Federal'],['ES','Espírito Santo'],
+      ['GO','Goiás'],['MA','Maranhão'],['MT','Mato Grosso'],['MS','Mato Grosso do Sul'],
+      ['MG','Minas Gerais'],['PA','Pará'],['PB','Paraíba'],['PR','Paraná'],
+      ['PE','Pernambuco'],['PI','Piauí'],['RJ','Rio de Janeiro'],['RN','Rio Grande do Norte'],
+      ['RS','Rio Grande do Sul'],['RO','Rondônia'],['RR','Roraima'],['SC','Santa Catarina'],
+      ['SP','São Paulo'],['SE','Sergipe'],['TO','Tocantins']
+    ];
+    const decreeStateOptions = '<option value="">Selecione o estado</option>' +
+      decreeStates.map(x => '<option value="'+x[0]+'">'+x[1]+'</option>').join('');
     function openDecreeModal(){decreeModal.classList.add('active');decreeModal.setAttribute('aria-hidden','false');decreeFollowup.hidden=true;decreeFollowup.innerHTML='';}
     function closeDecreeModal(){decreeModal.classList.remove('active');decreeModal.setAttribute('aria-hidden','true');}
     document.getElementById('decree-close').addEventListener('click',closeDecreeModal);
     decreeModal.addEventListener('click',e=>{if(e.target===decreeModal)closeDecreeModal();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&decreeModal.classList.contains('active'))closeDecreeModal();});
     function decreeLink(url,label,primary){return '<a class="decree-action '+(primary?'primary':'')+'" href="'+escapeHtml(url)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(label)+' ↗</a>';}
+    function officialSearchUrl(query){return 'https://www.google.com/search?q='+encodeURIComponent(query);}
     function showDecreeFollowup(kind){
       let html='';
       if(kind==='federal'){
-        html='<h3>Decretos Federais</h3><p class="decree-intro">A pesquisa avançada permite pesquisar por tipo do ato, número, data e termos.</p>'+decreeLink(decreeUrls.federal,'Abrir pesquisa oficial',true);
+        html='<h3>Decretos Federais</h3><p class="decree-intro">A Presidência da República oferece pesquisa por tipo do ato, número, data e assunto.</p>'+decreeLink(decreeUrls.federal,'Abrir pesquisa oficial da Presidência',true);
       } else if(kind==='estadual'){
-        html='<h3>Decretos Estaduais</h3><p class="decree-intro">Selecione o estado no diretório oficial. Os links de legislação estadual são mantidos pelos respectivos governos.</p>'+decreeLink(decreeUrls.estadual,'Abrir diretório oficial dos estados',true);
+        html='<h3>Decretos Estaduais</h3><p class="decree-intro">Selecione o estado. O diretório oficial do Portal da Legislação encaminha para a legislação estadual correspondente.</p><div class="decree-fields"><label for="decree-state">Estado<select id="decree-state">'+decreeStateOptions+'</select></label></div>'+decreeLink(decreeUrls.estadual,'Abrir diretório oficial estadual',true);
       } else if(kind==='df'){
-        html='<h3>Decretos do Distrito Federal</h3><p class="decree-intro">Consulte o sistema de legislação do Distrito Federal.</p>'+decreeLink(decreeUrls.df,'Abrir SINJ-DF',true)+' '+decreeLink('https://www.google.com/search?q='+encodeURIComponent('site:df.gov.br legislação decreto Distrito Federal'),'Localizar alternativa oficial',false);
+        html='<h3>Decretos do Distrito Federal</h3><p class="decree-intro">O SINJ-DF permite pesquisar normas, incluindo decretos, e também disponibiliza o Diário da Câmara Legislativa.</p>'+decreeLink(decreeUrls.df,'Abrir pesquisa oficial do SINJ-DF',true);
       } else if(kind==='municipal'){
-        html='<h3>Decretos Municipais</h3><p class="decree-intro">Informe município e estado para localizar o portal oficial da prefeitura ou a base legislativa municipal.</p><div class="decree-fields"><label for="decree-city">Município<input id="decree-city" placeholder="Ex.: Campinas" autocomplete="address-level2"></label><label for="decree-state">Estado<select id="decree-state"><option value="">Selecione o estado</option>'+[['AC','Acre'],['AL','Alagoas'],['AP','Amapá'],['AM','Amazonas'],['BA','Bahia'],['CE','Ceará'],['DF','Distrito Federal'],['ES','Espírito Santo'],['GO','Goiás'],['MA','Maranhão'],['MT','Mato Grosso'],['MS','Mato Grosso do Sul'],['MG','Minas Gerais'],['PA','Pará'],['PB','Paraíba'],['PR','Paraná'],['PE','Pernambuco'],['PI','Piauí'],['RJ','Rio de Janeiro'],['RN','Rio Grande do Norte'],['RS','Rio Grande do Sul'],['RO','Rondônia'],['RR','Roraima'],['SC','Santa Catarina'],['SP','São Paulo'],['SE','Sergipe'],['TO','Tocantins']].map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select></label></div><button type="button" class="decree-action primary" id="decree-municipal-search">LOCALIZAR FONTE OFICIAL ↗</button>';
+        html='<h3>Decretos Municipais</h3><p class="decree-intro">Não existe um catálogo nacional único de decretos municipais. Informe município e estado para localizar o portal oficial competente; o resultado é uma busca de localização, não a fonte em si.</p><div class="decree-fields"><label for="decree-city">Município<input id="decree-city" placeholder="Ex.: Campinas" autocomplete="address-level2"></label><label for="decree-state">Estado<select id="decree-state">'+decreeStateOptions+'</select></label></div><button type="button" class="decree-action primary" id="decree-municipal-search">LOCALIZAR PORTAL OFICIAL ↗</button>';
       } else if(kind==='legislativo'){
-        html='<h3>Decretos Legislativos</h3><p class="decree-intro">Escolha a esfera do Poder Legislativo responsável.</p><div class="decree-fields"><label for="decree-leg-sphere">Esfera<select id="decree-leg-sphere"><option value="federal">Federal — Congresso Nacional</option><option value="estadual">Estadual — Assembleia Legislativa</option><option value="df">Distrito Federal — Câmara Legislativa</option><option value="municipal">Municipal — Câmara Municipal</option></select></label><label for="decree-leg-place">Estado ou município (quando aplicável)<input id="decree-leg-place" placeholder="Ex.: Minas Gerais ou Campinas, SP"></label></div><button type="button" class="decree-action primary" id="decree-leg-search">LOCALIZAR FONTE OFICIAL ↗</button>';
+        html='<h3>Decretos Legislativos</h3><p class="decree-intro">Escolha a esfera. Na esfera federal, a pesquisa oficial da Câmara dos Deputados permite filtrar decretos legislativos. Para as demais esferas, o Oráculo abre uma busca restrita a portais institucionais, pois não há uma base nacional única.</p><div class="decree-fields"><label for="decree-leg-sphere">Esfera<select id="decree-leg-sphere"><option value="federal">Federal — Congresso Nacional</option><option value="estadual">Estadual — Assembleia Legislativa</option><option value="df">Distrito Federal — Câmara Legislativa</option><option value="municipal">Municipal — Câmara Municipal</option></select></label><label for="decree-leg-place">Estado ou município (quando aplicável)<input id="decree-leg-place" placeholder="Ex.: Minas Gerais ou Campinas, SP"></label></div><button type="button" class="decree-action primary" id="decree-leg-search">LOCALIZAR FONTE OFICIAL ↗</button>';
       }
       decreeFollowup.innerHTML=html;decreeFollowup.hidden=false;
       const municipalBtn=document.getElementById('decree-municipal-search');
       if(municipalBtn)municipalBtn.addEventListener('click',()=>{
         const city=document.getElementById('decree-city').value.trim(),state=document.getElementById('decree-state').value;
         if(!city||!state){alert('Informe o município e selecione o estado.');return;}
-        const q='portal oficial legislação decretos prefeitura câmara municipal '+city+' '+state+' site:gov.br OR site:leg.br';
-        window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');
+        const stateName=decreeStates.find(x=>x[0]===state)?.[1]||state;
+        window.open(officialSearchUrl('site:gov.br OR site:leg.br legislação decretos prefeitura câmara municipal '+city+' '+stateName),'_blank','noopener');
       });
       const legBtn=document.getElementById('decree-leg-search');
       if(legBtn)legBtn.addEventListener('click',()=>{
         const sphere=document.getElementById('decree-leg-sphere').value,place=document.getElementById('decree-leg-place').value.trim();
-        let url='',q='';
-        if(sphere==='federal')url=decreeUrls.federal;
-        else if(sphere==='df')url=decreeUrls.df;
-        else {q=(sphere==='estadual'?'portal oficial Assembleia Legislativa decretos legislativos ':'portal oficial Câmara Municipal decretos legislativos ')+place+' site:leg.br OR site:gov.br';url='https://www.google.com/search?q='+encodeURIComponent(q);}
+        if(sphere!=='federal'&&!place){alert('Informe o estado ou município para localizar o Poder Legislativo competente.');return;}
+        let url;
+        if(sphere==='federal') url=decreeUrls.legislativoFederal;
+        else if(sphere==='df') url=decreeUrls.df;
+        else if(sphere==='estadual') url=officialSearchUrl('site:leg.br OR site:gov.br Assembleia Legislativa '+place+' decreto legislativo');
+        else url=officialSearchUrl('site:leg.br OR site:gov.br Câmara Municipal '+place+' decreto legislativo');
         window.open(url,'_blank','noopener');
       });
     }
     decreeModal.addEventListener('click',e=>{const b=e.target.closest('[data-decree-kind]');if(b)showDecreeFollowup(b.dataset.decreeKind);});
-
  function renderOracleIndex() {
   indexList.innerHTML = ORACULO_AREAS.map(area => `
     <div class="oracle-index-item">
