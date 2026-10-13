@@ -928,7 +928,7 @@
 .decree-action{display:inline-block;margin:5px 6px 0 0;padding:10px 13px;border:0;border-radius:5px;background:var(--navy);color:white;font-size:11px;font-weight:800;text-decoration:none;cursor:pointer}
 .decree-action.primary{background:var(--brass);color:white}
 .decree-help{margin-top:12px;padding:10px 12px;background:var(--brass-wash);color:var(--ink-soft);font-size:11px;line-height:1.5}
-/* === INÍCIO: menu lateral — Oráculo preenche o espaço e cada bloco rola === */
+/* === INÍCIO: menu lateral — Oráculo preenche o espaço; só o bloco aberto rola === */
 aside:has(.side-menu){
   display:flex !important;
   flex-direction:column !important;
@@ -965,17 +965,31 @@ aside:has(.side-menu){
 #side-oracle-index .side-oracle-index-note{
   flex:0 0 auto !important;
 }
-/* lista das 12 categorias: ocupa o espaço livre e rola */
+
+/* lista das 12 categorias: fica parada (só rola se a tela for muito baixa) */
 #side-oracle-index .oracle-index-list{
   flex:1 1 auto !important;
   min-height:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
   overflow-y:auto !important;
   scrollbar-width:thin;
   scrollbar-color:rgba(201,162,75,.6) transparent;
 }
-/* cada categoria aberta: seus itens rolam sozinhos */
-#side-oracle-index .oracle-index-subareas{
-  max-height:45vh !important;
+#side-oracle-index .oracle-index-list > *{ flex:0 0 auto !important; }
+#side-oracle-index .oracle-index-area{ flex:0 0 auto !important; }
+
+/* categoria aberta: ocupa o espaço que sobra e só ela rola */
+#side-oracle-index .oracle-index-list > *:has(> .oracle-index-subareas.active){
+  flex:1 1 auto !important;
+  min-height:170px !important;
+  display:flex !important;
+  flex-direction:column !important;
+}
+#side-oracle-index .oracle-index-subareas.active{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  max-height:none !important;
   overflow-y:auto !important;
   scrollbar-width:thin;
   scrollbar-color:rgba(201,162,75,.6) transparent;
