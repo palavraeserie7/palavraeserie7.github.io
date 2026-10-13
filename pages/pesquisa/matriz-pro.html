@@ -2785,11 +2785,35 @@ function renderReviewButtons() {
   });
 }
 
+var REVIEW_INFO = {
+  R1: { funcao: "Audita o uso das palavras: sentido lexical e falácias de linguagem.", ideal: "análise de palavra ou argumento baseado em termos do original" },
+  R2: { funcao: "Confere se a gramática e a sintaxe do original sustentam a tese.", ideal: "análise gramatical ou tese que dependa de tempo verbal, caso, voz etc." },
+  R3: { funcao: "Verifica se a conclusão respeita o contexto literário e não recorta o texto.", ideal: "comentário de versículo, perícope ou capítulo" },
+  R4: { funcao: "Confere a viabilidade histórico-cultural e detecta anacronismo.", ideal: "texto que faça afirmações sobre história, costumes ou época" },
+  R5: { funcao: "Aponta pressupostos, eisegese e alegorização indevida.", ideal: "comentário interpretativo ou aplicação do texto" },
+  R6: { funcao: "Avalia generalização indevida, relação AT-NT e descrição versus prescrição.", ideal: "texto que aplique o trecho a todos ou extraia normas de narrativas" },
+  R7: { funcao: "Sintetiza os pareceres anteriores em nota de coerência e veredito.", ideal: "uso após rodar as demais revisões" }
+};
+var STEP_NAMES = {
+  "08.1": "Identificação dos pressupostos", "08.2": "Controle do contexto",
+  "08.3": "Controle do sentido lexical", "08.4": "Controle gramatical e sintático",
+  "08.5": "Controle do contexto histórico-cultural", "08.6": "Detecção de eisegese",
+  "08.7": "Detecção de anacronismo", "08.8": "Detecção de falácia lexical",
+  "08.9": "Detecção de descontextualização", "08.10": "Controle de alegorização indevida",
+  "08.11": "Controle de generalização indevida", "08.12": "Controle da relação AT–NT",
+  "08.13": "Descrição versus prescrição", "08.14": "Coerência da interpretação com as evidências",
+  "08.15": "Veredito hermenêutico"
+};
+
 function formatReviewResult(code, res) {
   if (!res || typeof res !== "object") return "Resposta vazia.";
-  var t = "";
+  var info = REVIEW_INFO[code] || {};
+  var item = REVIEW_LIST.find(function (r) { return r.code === code; }) || {};
+  var t = "FUNÇÃO: " + (info.funcao || "") + "\n" +
+          "NÍVEL: " + levelTagText(item.level) + " · " + levelName(item.level) + "\n";
+
   if (code === "R7") {
-    t += "VEREDITO: " + String(res.veredito || "—").toUpperCase() + "\n";
+    t += "\nVEREDITO: " + String(res.veredito || "—").replace(/_/g, " ").toUpperCase() + "\n";
     if (res.coerencia) {
       t += "NOTA DE COERÊNCIA: " + res.coerencia.nota + "/10\n" + (res.coerencia.parecer || "") + "\n";
       (res.coerencia.pontas_soltas || []).forEach(function (p) { t += "• Ponta solta: " + p + "\n"; });
@@ -2804,8 +2828,20 @@ function formatReviewResult(code, res) {
     (res.lacunas || []).forEach(function (l) { t += "• Lacuna: " + l + "\n"; });
     return t.trim();
   }
-  (res.etapas || []).forEach(function (e) {
-    t += "ETAPA " + (e.etapa || "") + " — " + String(e.status || "").replace(/_/g, " ").toUpperCase() + "\n";
+
+  var etapas = res.etapas || [];
+  var nProb = 0, nOk = 0, nNA = 0;
+  etapas.forEach(function (e) {
+    if (e.status === "problemas") nProb++;
+    else if (e.status === "sem_problemas") nOk++;
+    else nNA++;
+  });
+  t += "RESUMO: " + etapas.length + " etapa(s): " + nProb + " com problemas, " + nOk + " sem problemas, " + nNA + " não aplicável(is).\n";
+
+  etapas.forEach(function (e) {
+    var nome = STEP_NAMES[e.etapa] ? " — " + STEP_NAMES[e.etapa] : "";
+    var st = String(e.status || "").replace(/_/g, " ").toUpperCase();
+    t += "\n────────────────\nETAPA " + (e.etapa || "") + nome + "\nRESULTADO: " + st + "\n";
     if (e.observacao) t += e.observacao + "\n";
     (e.achados || []).forEach(function (a, i) {
       t += "\n  " + (i + 1) + ". TRECHO: " + (a.trecho || "") +
@@ -2814,9 +2850,13 @@ function formatReviewResult(code, res) {
         (a.requer_conferencia ? " · REQUER CONFERÊNCIA" : "") +
         "\n     COMO CORRIGIR: " + (a.correcao || "") + "\n";
     });
-    t += "\n";
   });
-  return t.trim() || "Sem resultado.";
+
+  if (nNA === etapas.length && etapas.length > 0) {
+    t += "\n────────────────\nOBSERVAÇÃO: nenhuma etapa se aplicou a este texto. Esta revisão é indicada para: " +
+         (info.ideal || "outro tipo de conteúdo") + ". Tente outra revisão.\n";
+  }
+  return t.trim();
 }
 
 async function runNamedReview(code) {
