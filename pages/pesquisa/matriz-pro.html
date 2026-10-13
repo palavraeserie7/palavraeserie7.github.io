@@ -1037,10 +1037,7 @@ main {
  
     <div style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;margin-bottom:6px;">RELATÓRIO DE AUDITORIA</div>
     <div id="revisor-report" style="min-height:150px;max-height:320px;overflow:auto;padding:14px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font-size:11px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px;">O relatório de auditoria aparecerá aqui depois da revisão.</div>
-
-       <div style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;margin:4px 0 6px;">REVISÕES ESPECIALIZADAS (cada uma gasta 1 toque)</div>
-    <div id="revisor-named-buttons" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"></div>
-    <div id="revisor-named-report" style="max-height:320px;overflow:auto;padding:14px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font-size:11px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px;">Cole o conteúdo acima e escolha uma revisão especializada.</div>
+ 
     <div style="display:flex;justify-content:flex-end;">
       <button id="revisor-submit" type="button" onclick="submitRevisor()" style="padding:10px 16px;border:0;border-radius:6px;background:#18bfff;color:#061522;font-weight:900;cursor:pointer;">ENVIAR PARA REVISÃO</button>
     </div>
@@ -2744,8 +2741,6 @@ function openRevisor(origin) {
   }
  
   document.getElementById("revisor-report").textContent = "O relatório de auditoria aparecerá aqui depois da revisão.";
-  reviewResults = {};
-  renderReviewButtons();
   overlay.style.display = "flex";
 }
  
@@ -2753,182 +2748,7 @@ function closeRevisor() {
   const overlay = document.getElementById("revisor-overlay");
   if (overlay) overlay.style.display = "none";
 }
-
- /* ===== REVISÕES ESPECIALIZADAS (R1 a R7) ===== */
-const REVIEW_LIST = [
-  { code: "R3", nome: "Contexto literário",           level: "FREE" },
-  { code: "R4", nome: "Histórico-cultural",           level: "PRO" },
-  { code: "R5", nome: "Excessos interpretativos",     level: "PRO" },
-  { code: "R6", nome: "Alcance e teologia bíblica",   level: "MASTER" },
-  { code: "R1", nome: "Léxico",                       level: "MASTER" },
-  { code: "R2", nome: "Gramática e sintaxe",          level: "DOCTUS" },
-  { code: "R7", nome: "Síntese e veredito",           level: "DOCTUS" }
-];
-let reviewResults = {};
-
-function renderReviewButtons() {
-  const box = document.getElementById("revisor-named-buttons");
-  if (!box) return;
-  box.innerHTML = "";
-  REVIEW_LIST.forEach(function (r) {
-    const allowed = (LEVEL_RANK[currentUserPlan] ?? 0) >= (LEVEL_RANK[r.level] ?? 3);
-    const b = document.createElement("button");
-    b.type = "button";
-    b.id = "rv-btn-" + r.code;
-    b.textContent = (allowed ? "" : "🔒 ") + r.nome + " · " + levelTagText(r.level);
-    b.style.cssText = "padding:8px 12px;border-radius:6px;font-size:10px;font-weight:900;cursor:pointer;" +
-      (allowed
-        ? "border:0;background:#20d66b;color:#07151f;"
-        : "border:1px solid #5a6b85;background:transparent;color:#91a4bd;");
-    b.onclick = function () { runNamedReview(r.code); };
-    box.appendChild(b);
-  });
-}
-
-var REVIEW_INFO = {
-  R1: { funcao: "Audita o uso das palavras: sentido lexical e falácias de linguagem.", ideal: "análise de palavra ou argumento baseado em termos do original" },
-  R2: { funcao: "Confere se a gramática e a sintaxe do original sustentam a tese.", ideal: "análise gramatical ou tese que dependa de tempo verbal, caso, voz etc." },
-  R3: { funcao: "Verifica se a conclusão respeita o contexto literário e não recorta o texto.", ideal: "comentário de versículo, perícope ou capítulo" },
-  R4: { funcao: "Confere a viabilidade histórico-cultural e detecta anacronismo.", ideal: "texto que faça afirmações sobre história, costumes ou época" },
-  R5: { funcao: "Aponta pressupostos, eisegese e alegorização indevida.", ideal: "comentário interpretativo ou aplicação do texto" },
-  R6: { funcao: "Avalia generalização indevida, relação AT-NT e descrição versus prescrição.", ideal: "texto que aplique o trecho a todos ou extraia normas de narrativas" },
-  R7: { funcao: "Sintetiza os pareceres anteriores em nota de coerência e veredito.", ideal: "uso após rodar as demais revisões" }
-};
-var STEP_NAMES = {
-  "08.1": "Identificação dos pressupostos", "08.2": "Controle do contexto",
-  "08.3": "Controle do sentido lexical", "08.4": "Controle gramatical e sintático",
-  "08.5": "Controle do contexto histórico-cultural", "08.6": "Detecção de eisegese",
-  "08.7": "Detecção de anacronismo", "08.8": "Detecção de falácia lexical",
-  "08.9": "Detecção de descontextualização", "08.10": "Controle de alegorização indevida",
-  "08.11": "Controle de generalização indevida", "08.12": "Controle da relação AT–NT",
-  "08.13": "Descrição versus prescrição", "08.14": "Coerência da interpretação com as evidências",
-  "08.15": "Veredito hermenêutico"
-};
-
-function formatReviewResult(code, res) {
-  if (!res || typeof res !== "object") return "Resposta vazia.";
-  var info = REVIEW_INFO[code] || {};
-  var item = REVIEW_LIST.find(function (r) { return r.code === code; }) || {};
-  var t = "FUNÇÃO: " + (info.funcao || "") + "\n" +
-          "NÍVEL: " + levelTagText(item.level) + " · " + levelName(item.level) + "\n";
-
-  if (code === "R7") {
-    t += "\nVEREDITO: " + String(res.veredito || "—").replace(/_/g, " ").toUpperCase() + "\n";
-    if (res.coerencia) {
-      t += "NOTA DE COERÊNCIA: " + res.coerencia.nota + "/10\n" + (res.coerencia.parecer || "") + "\n";
-      (res.coerencia.pontas_soltas || []).forEach(function (p) { t += "• Ponta solta: " + p + "\n"; });
-    }
-    t += "\nJUSTIFICATIVA: " + (res.justificativa || "—") + "\n";
-    (res.correcoes_prioritarias || []).forEach(function (c, i) {
-      t += "\nCORREÇÃO " + (i + 1) + " (" + (c.origem || "") + " · " + (c.etapa || "") + ")\nTrecho: " + (c.trecho || "") + "\nComo corrigir: " + (c.correcao || "") + "\n";
-    });
-    (res.pendencias_de_conferencia || []).forEach(function (p) {
-      t += "\nPARA CONFERIR (" + (p.origem || "") + " · " + (p.etapa || "") + "): " + (p.trecho || "") + "\n";
-    });
-    (res.lacunas || []).forEach(function (l) { t += "• Lacuna: " + l + "\n"; });
-    return t.trim();
-  }
-
-  var etapas = res.etapas || [];
-  var nProb = 0, nOk = 0, nNA = 0;
-  etapas.forEach(function (e) {
-    if (e.status === "problemas") nProb++;
-    else if (e.status === "sem_problemas") nOk++;
-    else nNA++;
-  });
-  t += "RESUMO: " + etapas.length + " etapa(s): " + nProb + " com problemas, " + nOk + " sem problemas, " + nNA + " não aplicável(is).\n";
-
-  etapas.forEach(function (e) {
-    var nome = STEP_NAMES[e.etapa] ? " — " + STEP_NAMES[e.etapa] : "";
-    var st = String(e.status || "").replace(/_/g, " ").toUpperCase();
-    t += "\n────────────────\nETAPA " + (e.etapa || "") + nome + "\nRESULTADO: " + st + "\n";
-    if (e.observacao) t += e.observacao + "\n";
-    (e.achados || []).forEach(function (a, i) {
-      t += "\n  " + (i + 1) + ". TRECHO: " + (a.trecho || "") +
-        "\n     PROBLEMA: " + (a.problema || "") +
-        "\n     GRAVIDADE: " + (a.gravidade || "") + " · CONFIANÇA: " + (a.confianca || "") +
-        (a.requer_conferencia ? " · REQUER CONFERÊNCIA" : "") +
-        "\n     COMO CORRIGIR: " + (a.correcao || "") + "\n";
-    });
-  });
-
-  if (nNA === etapas.length && etapas.length > 0) {
-    t += "\n────────────────\nOBSERVAÇÃO: nenhuma etapa se aplicou a este texto. Esta revisão é indicada para: " +
-         (info.ideal || "outro tipo de conteúdo") + ". Tente outra revisão.\n";
-  }
-  return t.trim();
-}
-
-async function runNamedReview(code) {
-  const out = document.getElementById("revisor-named-report");
-  const conteudo = document.getElementById("revisor-conteudo").value.trim();
-  const item = REVIEW_LIST.find(function (r) { return r.code === code; });
-  if (!item) return;
-  if (!conteudo) {
-    out.textContent = "Cole o conteúdo do escritor antes de pedir uma revisão.";
-    return;
-  }
-  const allowed = (LEVEL_RANK[currentUserPlan] ?? 0) >= (LEVEL_RANK[item.level] ?? 3);
-  if (!allowed) {
-    if (!confirm("Esta revisão é do nível " + levelName(item.level) + ". Você pode rodá-la gastando 1 unidade avulsa. Continuar?")) return;
-  }
-  const btn = document.getElementById("rv-btn-" + code);
-  if (btn) { btn.disabled = true; btn.style.opacity = ".55"; }
-  out.textContent = "REVISANDO: " + item.nome + "...";
-
-  try {
-    const session = await getAuthenticatedSession();
-    if (!session.access_token) throw new Error("O Supabase não forneceu um token de acesso.");
-
-    const pareceres = {};
-    ["R1","R2","R3","R4","R5","R6"].forEach(function (k) { if (reviewResults[k]) pareceres[k] = reviewResults[k]; });
-
-    const tema = document.getElementById("revisor-tema").value.trim();
-    const sub = document.getElementById("revisor-subetapa").value.trim();
-    const referencia = document.getElementById("revisor-referencia").value.trim();
-
-    const response = await fetch(AI_PROXY_URL + "/api/pesquisa", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + session.access_token
-      },
-      body: JSON.stringify({
-        mode: "writing_private",
-        accessLevel: "private",
-        analysisType: "review_named",
-        question: "Revisão especializada " + code,
-        reviewCode: code,
-        writerContent: conteudo,
-        referenceText: referencia,
-        pareceres: code === "R7" ? pareceres : undefined,
-        topic: sub || tema || "REVISOR TEOLÓGICO",
-        module: tema || "REVISOR TEOLÓGICO",
-        discipline: "MÉTODO TÉCNICO DE PESQUISA"
-      })
-    });
-
-    let data = {};
-    try { data = await response.json(); } catch { data = {}; }
-
-    if (response.status === 401) {
-      await supabaseClient.auth.signOut();
-      throw new Error("Sua sessão expirou. Entre novamente.");
-    }
-    if (!response.ok) {
-      throw new Error(data?.error || "Não foi possível concluir esta revisão.");
-    }
-
-    reviewResults[code] = data.result;
-    const cobrado = data.charged === "toque" ? "1 toque" : "1 unidade avulsa";
-    out.textContent = item.nome.toUpperCase() + " (gastou " + cobrado + ")\n\n" + formatReviewResult(code, data.result);
-  } catch (error) {
-    console.error("Erro na revisão especializada:", error);
-    out.textContent = "A revisão não foi concluída.\n\n" + (error?.message || "Erro desconhecido.");
-  } finally {
-    if (btn) { btn.disabled = false; btn.style.opacity = "1"; }
-  }
-}
+ 
 async function submitRevisor() {
   const tema = document.getElementById("revisor-tema").value.trim();
   const subetapaInput = document.getElementById("revisor-subetapa").value.trim();
@@ -3460,6 +3280,7 @@ renderModules();
 </body>
 </html>
  
+
 
 
 
