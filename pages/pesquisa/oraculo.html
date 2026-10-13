@@ -901,12 +901,7 @@
 .oracle-index-desc{padding:2px 0 8px;color:var(--ink-soft);font-size:12px;font-style:italic;line-height:1.5}
 .side-oracle-index .oracle-index-desc{color:#91a4bd;font-size:7.5px;line-height:1.4;padding:2px 0 6px}
  .side-oracle-index .oracle-index-subarea.selected{background:#16233c;color:#d7b76a;font-weight:800;border-left:2px solid #d7b76a;padding-left:6px}
-.oracle-index-subarea.selected{color:var(--brass-deep);font-weight:700}
-.oracle-decree-categories{display:none;padding:5px 0 8px 14px;margin:2px 0 6px 8px;border-left:2px solid #d7b76a}
-.oracle-decree-categories.active{display:block}
-.oracle-decree-category{display:block;width:100%;text-align:left;padding:9px 10px;margin:3px 0;border:1px solid rgba(215,183,106,.25);border-radius:6px;background:rgba(215,183,106,.07);color:inherit;font:inherit;font-size:.88em;cursor:pointer}
-.oracle-decree-category:hover{background:rgba(215,183,106,.16)}
-   
+.oracle-index-subarea.selected{color:var(--brass-deep);font-weight:700}   
 
 /* Localizador oficial de decretos */
 .decree-modal{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(8,15,29,.72)}
@@ -919,6 +914,12 @@
 .decree-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px;margin:16px 0}
 .decree-option{display:block;padding:13px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);text-align:left;font:inherit;cursor:pointer}
 .decree-option:hover,.decree-option:focus-visible{border-color:var(--brass);background:var(--brass-wash)}
+/* Categorias de decretos exibidas diretamente dentro do índice lateral */
+.decree-inline-submenu{display:none;margin:0 6px 8px 44px;padding:5px 0 5px 10px;border-left:2px solid var(--brass);background:rgba(237,224,189,.35)}
+.decree-inline-submenu.active{display:block}
+.decree-inline-category{display:block;width:100%;padding:8px 8px;border:0;border-bottom:1px solid var(--paper-line);background:transparent;color:var(--ink-soft);text-align:left;font:inherit;font-size:11.5px;line-height:1.35;cursor:pointer}
+.decree-inline-category:last-child{border-bottom:0}
+.decree-inline-category:hover,.decree-inline-category:focus-visible{background:var(--brass-wash);color:var(--brass-deep)}
 .decree-option strong{display:block;margin-bottom:4px;font-size:13px}
 .decree-option span{display:block;color:var(--ink-soft);font-size:11px;line-height:1.45}
 .decree-fields{display:grid;gap:9px;margin:12px 0}
@@ -1262,65 +1263,71 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
     const decreeFollowup = document.getElementById('decree-followup');
     const decreeUrls = {
       federal: 'https://www4.planalto.gov.br/legislacao/portal-legis/busca-avancada',
-      estadual: 'https://www4.planalto.gov.br/legislacao/portal-legis/legislacao-estadual',
+      estadual: 'https://www4.planalto.gov.br/legislacao/portal-legis/legislacao-estadual/legislacoes-estaduais',
       df: 'https://www.sinj.df.gov.br/sinj/',
-      camaraFederal: 'https://www.camara.leg.br/legislacao/busca'
+      legislativoFederal: 'https://www.camara.leg.br/legislacao/pesquisa-avancada',
+      lexml: 'https://www.lexml.gov.br/'
     };
-    function openDecreeModal(kind){
-      decreeModal.classList.add('active');
-      decreeModal.setAttribute('aria-hidden','false');
-      decreeFollowup.hidden=true;
-      decreeFollowup.innerHTML='';
-      const options=decreeModal.querySelector('.decree-options');
-      if(options) options.hidden=!!kind;
-      if(kind) showDecreeFollowup(kind);
-    }
-    function closeDecreeModal(){
-      decreeModal.classList.remove('active');
-      decreeModal.setAttribute('aria-hidden','true');
-      const options=decreeModal.querySelector('.decree-options');
-      if(options) options.hidden=false;
-      decreeFollowup.hidden=true;
-      decreeFollowup.innerHTML='';
-    }
+    const decreeStates = [
+      ['AC','Acre'],['AL','Alagoas'],['AP','Amapá'],['AM','Amazonas'],
+      ['BA','Bahia'],['CE','Ceará'],['DF','Distrito Federal'],['ES','Espírito Santo'],
+      ['GO','Goiás'],['MA','Maranhão'],['MT','Mato Grosso'],['MS','Mato Grosso do Sul'],
+      ['MG','Minas Gerais'],['PA','Pará'],['PB','Paraíba'],['PR','Paraná'],
+      ['PE','Pernambuco'],['PI','Piauí'],['RJ','Rio de Janeiro'],['RN','Rio Grande do Norte'],
+      ['RS','Rio Grande do Sul'],['RO','Rondônia'],['RR','Roraima'],['SC','Santa Catarina'],
+      ['SP','São Paulo'],['SE','Sergipe'],['TO','Tocantins']
+    ];
+    const decreeStateOptions = '<option value="">Selecione o estado</option>' +
+      decreeStates.map(x => '<option value="'+x[0]+'">'+x[1]+'</option>').join('');
+    function openDecreeModal(){decreeModal.classList.add('active');decreeModal.setAttribute('aria-hidden','false');decreeFollowup.hidden=true;decreeFollowup.innerHTML='';}
+    function closeDecreeModal(){decreeModal.classList.remove('active');decreeModal.setAttribute('aria-hidden','true');}
     document.getElementById('decree-close').addEventListener('click',closeDecreeModal);
     decreeModal.addEventListener('click',e=>{if(e.target===decreeModal)closeDecreeModal();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&decreeModal.classList.contains('active'))closeDecreeModal();});
     function decreeLink(url,label,primary){return '<a class="decree-action '+(primary?'primary':'')+'" href="'+escapeHtml(url)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(label)+' ↗</a>';}
+    function officialSearchUrl(query){return 'https://www.google.com/search?q='+encodeURIComponent(query);}
     function showDecreeFollowup(kind){
       let html='';
       if(kind==='federal'){
-        html='<h3>Decretos Federais</h3><p class="decree-intro">A pesquisa avançada permite pesquisar por tipo do ato, número, data e termos.</p>'+decreeLink(decreeUrls.federal,'Abrir pesquisa oficial',true);
+        html='<h3>Decretos Federais</h3><p class="decree-intro">A Presidência da República oferece pesquisa por tipo do ato, número, data e assunto.</p>'+decreeLink(decreeUrls.federal,'Abrir pesquisa oficial da Presidência',true);
       } else if(kind==='estadual'){
-        html='<h3>Decretos Estaduais</h3><p class="decree-intro">Selecione o estado no diretório oficial. Os links de legislação estadual são mantidos pelos respectivos governos.</p>'+decreeLink(decreeUrls.estadual,'Abrir diretório oficial dos estados',true);
+        html='<h3>Decretos Estaduais</h3><p class="decree-intro">Selecione o estado. O diretório oficial do Portal da Legislação encaminha para a legislação estadual correspondente.</p><div class="decree-fields"><label for="decree-state">Estado<select id="decree-state">'+decreeStateOptions+'</select></label></div>'+decreeLink(decreeUrls.estadual,'Abrir diretório oficial estadual',true);
       } else if(kind==='df'){
-        html='<h3>Decretos do Distrito Federal</h3><p class="decree-intro">Consulte o sistema de legislação do Distrito Federal.</p>'+decreeLink(decreeUrls.df,'Abrir SINJ-DF',true)+' '+decreeLink('https://www.google.com/search?q='+encodeURIComponent('site:df.gov.br legislação decreto Distrito Federal'),'Localizar alternativa oficial',false);
+        html='<h3>Decretos do Distrito Federal</h3><p class="decree-intro">O SINJ-DF permite pesquisar normas, incluindo decretos, e também disponibiliza o Diário da Câmara Legislativa.</p>'+decreeLink(decreeUrls.df,'Abrir pesquisa oficial do SINJ-DF',true);
       } else if(kind==='municipal'){
-        html='<h3>Decretos Municipais</h3><p class="decree-intro">Informe município e estado para localizar o portal oficial da prefeitura ou a base legislativa municipal.</p><div class="decree-fields"><label for="decree-city">Município<input id="decree-city" placeholder="Ex.: Campinas" autocomplete="address-level2"></label><label for="decree-state">Estado<select id="decree-state"><option value="">Selecione o estado</option>'+[['AC','Acre'],['AL','Alagoas'],['AP','Amapá'],['AM','Amazonas'],['BA','Bahia'],['CE','Ceará'],['DF','Distrito Federal'],['ES','Espírito Santo'],['GO','Goiás'],['MA','Maranhão'],['MT','Mato Grosso'],['MS','Mato Grosso do Sul'],['MG','Minas Gerais'],['PA','Pará'],['PB','Paraíba'],['PR','Paraná'],['PE','Pernambuco'],['PI','Piauí'],['RJ','Rio de Janeiro'],['RN','Rio Grande do Norte'],['RS','Rio Grande do Sul'],['RO','Rondônia'],['RR','Roraima'],['SC','Santa Catarina'],['SP','São Paulo'],['SE','Sergipe'],['TO','Tocantins']].map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select></label></div><button type="button" class="decree-action primary" id="decree-municipal-search">LOCALIZAR FONTE OFICIAL ↗</button>';
+        html='<h3>Decretos Municipais</h3><p class="decree-intro">Não existe um catálogo nacional único de decretos municipais. Informe município e estado para localizar o portal oficial competente; o resultado é uma busca de localização, não a fonte em si.</p><div class="decree-fields"><label for="decree-city">Município<input id="decree-city" placeholder="Ex.: Campinas" autocomplete="address-level2"></label><label for="decree-state">Estado<select id="decree-state">'+decreeStateOptions+'</select></label></div><button type="button" class="decree-action primary" id="decree-municipal-search">LOCALIZAR PORTAL OFICIAL ↗</button>';
       } else if(kind==='legislativo'){
-        html='<h3>Decretos Legislativos</h3><p class="decree-intro">Escolha a esfera do Poder Legislativo responsável.</p><div class="decree-fields"><label for="decree-leg-sphere">Esfera<select id="decree-leg-sphere"><option value="federal">Federal — Congresso Nacional</option><option value="estadual">Estadual — Assembleia Legislativa</option><option value="df">Distrito Federal — Câmara Legislativa</option><option value="municipal">Municipal — Câmara Municipal</option></select></label><label for="decree-leg-place">Estado ou município (quando aplicável)<input id="decree-leg-place" placeholder="Ex.: Minas Gerais ou Campinas, SP"></label></div><button type="button" class="decree-action primary" id="decree-leg-search">LOCALIZAR FONTE OFICIAL ↗</button>';
+        html='<h3>Decretos Legislativos</h3><p class="decree-intro">Escolha a esfera. Na esfera federal, a pesquisa oficial da Câmara dos Deputados permite filtrar decretos legislativos. Para as demais esferas, o Oráculo abre uma busca restrita a portais institucionais, pois não há uma base nacional única.</p><div class="decree-fields"><label for="decree-leg-sphere">Esfera<select id="decree-leg-sphere"><option value="federal">Federal — Congresso Nacional</option><option value="estadual">Estadual — Assembleia Legislativa</option><option value="df">Distrito Federal — Câmara Legislativa</option><option value="municipal">Municipal — Câmara Municipal</option></select></label><label for="decree-leg-place">Estado ou município (quando aplicável)<input id="decree-leg-place" placeholder="Ex.: Minas Gerais ou Campinas, SP"></label></div><button type="button" class="decree-action primary" id="decree-leg-search">LOCALIZAR FONTE OFICIAL ↗</button>';
       }
       decreeFollowup.innerHTML=html;decreeFollowup.hidden=false;
       const municipalBtn=document.getElementById('decree-municipal-search');
       if(municipalBtn)municipalBtn.addEventListener('click',()=>{
         const city=document.getElementById('decree-city').value.trim(),state=document.getElementById('decree-state').value;
         if(!city||!state){alert('Informe o município e selecione o estado.');return;}
-        const q='portal oficial legislação decretos prefeitura câmara municipal '+city+' '+state+' site:gov.br OR site:leg.br';
-        window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');
+        const stateName=decreeStates.find(x=>x[0]===state)?.[1]||state;
+        window.open(officialSearchUrl('site:gov.br OR site:leg.br legislação decretos prefeitura câmara municipal '+city+' '+stateName),'_blank','noopener');
       });
       const legBtn=document.getElementById('decree-leg-search');
       if(legBtn)legBtn.addEventListener('click',()=>{
         const sphere=document.getElementById('decree-leg-sphere').value,place=document.getElementById('decree-leg-place').value.trim();
-        let url='',q='';
-        if(sphere==='federal')url=decreeUrls.federal;
-        else if(sphere==='df')url=decreeUrls.df;
-        else {q=(sphere==='estadual'?'portal oficial Assembleia Legislativa decretos legislativos ':'portal oficial Câmara Municipal decretos legislativos ')+place+' site:leg.br OR site:gov.br';url='https://www.google.com/search?q='+encodeURIComponent(q);}
+        if(sphere!=='federal'&&!place){alert('Informe o estado ou município para localizar o Poder Legislativo competente.');return;}
+        let url;
+        if(sphere==='federal') url=decreeUrls.legislativoFederal;
+        else if(sphere==='df') url=decreeUrls.df;
+        else if(sphere==='estadual') url=officialSearchUrl('site:leg.br OR site:gov.br Assembleia Legislativa '+place+' decreto legislativo');
+        else url=officialSearchUrl('site:leg.br OR site:gov.br Câmara Municipal '+place+' decreto legislativo');
         window.open(url,'_blank','noopener');
       });
     }
     decreeModal.addEventListener('click',e=>{const b=e.target.closest('[data-decree-kind]');if(b)showDecreeFollowup(b.dataset.decreeKind);});
-
  function renderOracleIndex() {
+  const decreeCategories = [
+    ['federal','Decretos Federais'],
+    ['estadual','Decretos Estaduais'],
+    ['df','Decretos do Distrito Federal'],
+    ['municipal','Decretos Municipais'],
+    ['legislativo','Decretos Legislativos']
+  ];
   indexList.innerHTML = ORACULO_AREAS.map(area => `
     <div class="oracle-index-item">
       <button
@@ -1333,7 +1340,6 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
         <span class="oracle-index-name">${escapeHtml(area.name)}</span>
         <span class="oracle-index-chevron">›</span>
       </button>
-
       <div class="oracle-index-subareas" data-subareas="${area.id}">
         ${area.subareas.map(subarea => `
           <button
@@ -1341,15 +1347,20 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
             class="oracle-index-subarea"
             data-area="${area.id}"
             data-subarea="${escapeHtml(subarea)}"
+            aria-expanded="false"
           >
-            ${escapeHtml(subarea)}
+            ${escapeHtml(subarea)}${/^Decretos$/i.test(subarea) ? ' <span aria-hidden="true">›</span>' : ''}
           </button>
+          ${/^Decretos$/i.test(subarea) ? `
+            <div class="decree-inline-submenu" data-decree-inline="${area.id}" aria-label="Categorias de decretos">
+              ${decreeCategories.map(([kind,label]) => `<button type="button" class="decree-inline-category" data-decree-kind="${kind}">${label} <span aria-hidden="true">↗</span></button>`).join('')}
+            </div>
+          ` : ''}
         `).join('')}
       </div>
     </div>
   `).join('');
 }
-
     function setOracleIndexOpen(open) {
       oracleSideToggle.setAttribute('aria-expanded', String(open));
       oracleSideIndex.setAttribute('aria-hidden', String(!open));
@@ -1398,32 +1409,21 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
         return;
       }
 
-      const decreeCategoryButton = event.target.closest('.oracle-decree-category');
-      if (decreeCategoryButton) {
-        openDecreeModal(decreeCategoryButton.dataset.decreeKind);
+      const inlineCategory = event.target.closest('.decree-inline-category');
+      if (inlineCategory) {
+        openDecreeModal();
+        showDecreeFollowup(inlineCategory.dataset.decreeKind);
         return;
       }
-
       const subareaButton = event.target.closest('.oracle-index-subarea');
-
       if (subareaButton) {
         const selectedSubarea = String(subareaButton.dataset.subarea || '').trim();
         if (/^Decretos$/i.test(selectedSubarea)) {
-          const parent = subareaButton.parentElement;
-          let categories = parent.querySelector('.oracle-decree-categories');
-          if (!categories) {
-            categories = document.createElement('div');
-            categories.className = 'oracle-decree-categories';
-            categories.innerHTML = `
-              <button type="button" class="oracle-decree-category" data-decree-kind="federal">01. Decretos Federais</button>
-              <button type="button" class="oracle-decree-category" data-decree-kind="estadual">02. Decretos Estaduais</button>
-              <button type="button" class="oracle-decree-category" data-decree-kind="df">03. Decretos do Distrito Federal</button>
-              <button type="button" class="oracle-decree-category" data-decree-kind="municipal">04. Decretos Municipais</button>
-              <button type="button" class="oracle-decree-category" data-decree-kind="legislativo">05. Decretos Legislativos</button>`;
-            subareaButton.insertAdjacentElement('afterend', categories);
-          }
-          categories.classList.toggle('active');
-          subareaButton.classList.toggle('selected', categories.classList.contains('active'));
+          const inlineMenu = indexList.querySelector(`[data-decree-inline="${subareaButton.dataset.area}"]`);
+          const opening = !inlineMenu.classList.contains('active');
+          inlineMenu.classList.toggle('active', opening);
+          subareaButton.setAttribute('aria-expanded', String(opening));
+          subareaButton.classList.toggle('selected', opening);
           return;
         }
         const area = ORACULO_AREAS.find(
