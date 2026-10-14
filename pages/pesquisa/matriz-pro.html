@@ -803,6 +803,88 @@ main {
  /* Painel de comparação removido: o Revisor é o único caminho de auditoria */
 .content { grid-template-columns:minmax(0,1fr) !important; }
 .content > .sheet { display:none !important; }
+ /* ===== ARQUIVO DE PESQUISAS ===== */
+#arquivo-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:10001;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(4,10,20,.78);
+}
+.arquivo-box {
+  width:min(820px,100%);
+  max-height:88vh;
+  display:flex;
+  flex-direction:column;
+  padding:22px;
+  border:1px solid var(--b);
+  border-radius:10px;
+  background:var(--s);
+  color:var(--t);
+}
+.arquivo-top {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.arquivo-top h2 { margin:0; color:var(--a); font-size:18px; }
+.arquivo-top p { margin:6px 0 0; color:var(--muted); font-size:11px; line-height:1.5; }
+#arquivo-busca {
+  width:100%;
+  margin-bottom:12px;
+  padding:10px 12px;
+  border:1px solid #344762;
+  border-radius:6px;
+  background:var(--i);
+  color:var(--t);
+  font:inherit;
+  font-size:12px;
+  outline:none;
+}
+#arquivo-busca:focus { border-color:var(--p); }
+#arquivo-lista { flex:1; min-height:0; overflow:auto; }
+.arquivo-vazio { padding:30px 10px; text-align:center; color:var(--muted); font-size:12px; line-height:1.6; }
+.arquivo-item {
+  margin-bottom:10px;
+  padding:12px 14px;
+  border:1px solid var(--b);
+  border-radius:8px;
+  background:var(--i);
+}
+.arquivo-item-titulo { color:var(--p); font-size:12px; font-weight:900; }
+.arquivo-item-meta { margin-top:3px; color:var(--muted); font-size:10px; }
+.arquivo-item-corpo {
+  display:none;
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:6px;
+  background:#111b30;
+  font-size:11px;
+  line-height:1.6;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.arquivo-item-corpo.aberto { display:block; }
+.arquivo-item-corpo strong { color:var(--a); }
+.arquivo-acoes { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.arquivo-acoes button {
+  padding:6px 10px;
+  border:1px solid #425674;
+  border-radius:5px;
+  background:transparent;
+  color:var(--t);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.4px;
+  cursor:pointer;
+}
+.arquivo-acoes button:hover { border-color:var(--p); color:var(--p); }
+.arquivo-acoes button.perigo:hover { border-color:var(--error); color:var(--error); }
 </style>
 </head>
  
@@ -864,6 +946,14 @@ main {
       aria-label="Abrir Revisor Teológico"
     >
       ✎ REVISOR
+    </button>
+       <button
+      type="button"
+      class="help-button"
+      onclick="abrirArquivo()"
+      aria-label="Abrir arquivo de pesquisas"
+    >
+      🗂 ARQUIVO
     </button>
     <button
       type="button"
@@ -1046,7 +1136,19 @@ main {
   </div>
 </section>
 <!-- <<<<<<<<<< REVISOR <<<<<<<<<< FIM — PARTE 1 de 5 <<<<<<<<<< -->
- 
+ <section id="arquivo-overlay" aria-hidden="true" onclick="if(event.target===this)fecharArquivo()">
+  <div class="arquivo-box">
+    <div class="arquivo-top">
+      <div>
+        <h2>ARQUIVO DE PESQUISAS</h2>
+        <p>Suas pesquisas feitas na Mesa de Análise ficam guardadas aqui, neste navegador.</p>
+      </div>
+      <button type="button" class="help-button" onclick="fecharArquivo()">FECHAR</button>
+    </div>
+    <input id="arquivo-busca" type="text" placeholder="Buscar por passagem, subetapa, pergunta ou resposta..." oninput="renderArquivo()">
+    <div id="arquivo-lista"></div>
+  </div>
+</section>
 <script>
 /* =====================================================
    SUPABASE
@@ -3940,6 +4042,7 @@ async function sendQuestion(event) {
 
     // >>>>>>>>>> REVISOR >>>>>>>>>> INÍCIO — PARTE 4a de 5: botão enviar para revisão >>>>>>>>>>
     lastMesaAnswer = answerMessage.textContent;
+       salvarNoArquivo(text, lastMesaAnswer);
     lastMesaModule = activeModule || "";
     lastMesaStep = activeStep || "";
  
@@ -4046,6 +4149,163 @@ document.addEventListener("keydown", (event) => {
 });
  
 /* =====================================================
+   ARQUIVO DE PESQUISAS
+===================================================== */
+
+const ARQUIVO_KEY = "palavraSerieMatrizProArquivo";
+
+function lerArquivo() {
+  try {
+    return JSON.parse(localStorage.getItem(ARQUIVO_KEY) || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function gravarArquivo(lista) {
+  try {
+    localStorage.setItem(ARQUIVO_KEY, JSON.stringify(lista));
+  } catch (e) {
+    alert("Não foi possível salvar no arquivo: o espaço do navegador está cheio. Apague pesquisas antigas.");
+  }
+}
+
+function salvarNoArquivo(pergunta, resposta) {
+  if (!resposta) return;
+  const lista = lerArquivo();
+  lista.unshift({
+    id: Date.now(),
+    data: new Date().toISOString(),
+    modulo: activeModule || "",
+    subetapa: activeStep || "",
+    referencia: getSavedReference(),
+    pergunta: pergunta || "",
+    resposta: resposta
+  });
+  gravarArquivo(lista.slice(0, 200));
+}
+
+function abrirArquivo() {
+  const overlay = document.getElementById("arquivo-overlay");
+  if (!overlay) return;
+  document.getElementById("arquivo-busca").value = "";
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+  renderArquivo();
+}
+
+function fecharArquivo() {
+  const overlay = document.getElementById("arquivo-overlay");
+  if (!overlay) return;
+  overlay.style.display = "none";
+  overlay.setAttribute("aria-hidden", "true");
+}
+
+function renderArquivo() {
+  const box = document.getElementById("arquivo-lista");
+  const termo = (document.getElementById("arquivo-busca").value || "").toLowerCase().trim();
+  const todos = lerArquivo();
+  const lista = todos.filter(function (item) {
+    if (!termo) return true;
+    return [item.modulo, item.subetapa, item.referencia, item.pergunta, item.resposta]
+      .join(" ").toLowerCase().indexOf(termo) !== -1;
+  });
+
+  box.innerHTML = "";
+
+  if (!lista.length) {
+    const vazio = document.createElement("div");
+    vazio.className = "arquivo-vazio";
+    vazio.textContent = todos.length
+      ? "Nenhuma pesquisa encontrada para essa busca."
+      : "Nenhuma pesquisa guardada ainda. Cada resposta da Mesa de Análise será salva aqui automaticamente.";
+    box.appendChild(vazio);
+    return;
+  }
+
+  lista.forEach(function (item) {
+    const card = document.createElement("div");
+    card.className = "arquivo-item";
+
+    const titulo = document.createElement("div");
+    titulo.className = "arquivo-item-titulo";
+    titulo.textContent = item.subetapa || item.modulo || "Consulta livre";
+    card.appendChild(titulo);
+
+    const meta = document.createElement("div");
+    meta.className = "arquivo-item-meta";
+    meta.textContent = new Date(item.data).toLocaleString("pt-BR") +
+      (item.referencia ? " • " + item.referencia : "");
+    card.appendChild(meta);
+
+    const corpo = document.createElement("div");
+    corpo.className = "arquivo-item-corpo";
+    const lbP = document.createElement("strong");
+    lbP.textContent = "PERGUNTA\n";
+    const lbR = document.createElement("strong");
+    lbR.textContent = "\n\nRESPOSTA\n";
+    corpo.appendChild(lbP);
+    corpo.appendChild(document.createTextNode(item.pergunta));
+    corpo.appendChild(lbR);
+    corpo.appendChild(document.createTextNode(item.resposta));
+    card.appendChild(corpo);
+
+    const acoes = document.createElement("div");
+    acoes.className = "arquivo-acoes";
+
+    const bVer = document.createElement("button");
+    bVer.type = "button";
+    bVer.textContent = "VER";
+    bVer.onclick = function () {
+      const aberto = corpo.classList.toggle("aberto");
+      bVer.textContent = aberto ? "ESCONDER" : "VER";
+    };
+
+    const bCopiar = document.createElement("button");
+    bCopiar.type = "button";
+    bCopiar.textContent = "COPIAR RESPOSTA";
+    bCopiar.onclick = function () {
+      navigator.clipboard.writeText(item.resposta).then(function () {
+        bCopiar.textContent = "COPIADO ✓";
+        setTimeout(function () { bCopiar.textContent = "COPIAR RESPOSTA"; }, 1500);
+      });
+    };
+
+    const bRevisar = document.createElement("button");
+    bRevisar.type = "button";
+    bRevisar.textContent = "ENVIAR PARA REVISÃO";
+    bRevisar.onclick = function () {
+      lastMesaAnswer = item.resposta;
+      lastMesaModule = item.modulo;
+      lastMesaStep = item.subetapa;
+      fecharArquivo();
+      openRevisor("platform_mesa");
+    };
+
+    const bApagar = document.createElement("button");
+    bApagar.type = "button";
+    bApagar.className = "perigo";
+    bApagar.textContent = "APAGAR";
+    bApagar.onclick = function () {
+      if (!confirm("Apagar esta pesquisa do arquivo?")) return;
+      gravarArquivo(lerArquivo().filter(function (x) { return x.id !== item.id; }));
+      renderArquivo();
+    };
+
+    acoes.appendChild(bVer);
+    acoes.appendChild(bCopiar);
+    acoes.appendChild(bRevisar);
+    acoes.appendChild(bApagar);
+    card.appendChild(acoes);
+
+    box.appendChild(card);
+  });
+}
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") fecharArquivo();
+});
+ /* =====================================================
    INICIALIZAÇÃO
 ===================================================== */
  
