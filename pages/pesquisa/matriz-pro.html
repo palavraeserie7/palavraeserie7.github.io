@@ -2532,7 +2532,8 @@ function prepareQuestionForStep(skipIntroMessage) {
     }
     return;
   }
- 
+
+  prepararCaixa(activeStep, questionInput);
    if (template && reference) {
     questionInput.value = aplicarReferencia(template, reference);
     return;
@@ -2547,7 +2548,26 @@ function prepareQuestionForStep(skipIntroMessage) {
     );
   }
 }
- 
+function extraDaSubetapa(cod) {
+  const [mod, sub] = String(cod).split(".");
+  const n = parseInt(sub, 10);
+
+  if (mod === "04") return {
+    placeholder: n === 1 ? "Palavra-chave (opcional: se vazio, o revisor escolhe)" : "Palavra-chave do texto"
+  };
+  if (mod === "05") return {
+    placeholder: n === 1 ? "Conceito teológico (opcional: se vazio, o revisor escolhe)" : "Conceito teológico"
+  };
+  if (mod === "08") return {
+    placeholder: "Interpretação a ser testada (ex.: Deus me dá sucesso em tudo)"
+  };
+  return null;
+}
+
+function prepararCaixa(cod, caixa) {
+  const extra = extraDaSubetapa(cod);
+  caixa.placeholder = extra ? extra.placeholder : "Escreva sua pergunta...";
+} 
  
 /* =====================================================
    COMPARAÇÃO E CONSOLIDAÇÃO AO WORKER
