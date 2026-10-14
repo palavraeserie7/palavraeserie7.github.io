@@ -1732,6 +1732,59 @@ const objetivosDasSubetapas = {
   "12.13": "Delimite onde terminam os dados e começam as suposições em cada leitura de {PASSAGEM}. [Com base na conclusão da análise de {RESULTADO DO PASSO ANTERIOR}, explique o que potencializou o sentido da referência bíblica em seu contexto. Em seguida, indique se há aplicação e a qual área da vida espiritual ou da vivência cristã ela se aplica.]",
   "12.14": "Apresente o relatório transversal da história da recepção interpretativa de {PASSAGEM}."
 }; 
+// ===== Dado extra por subetapa (usa a caixa existente) =====
+function extraDaSubetapa(cod) {
+  const [mod, sub] = cod.split(".");
+  const n = parseInt(sub, 10);
+
+  if (mod === "04") return {
+    rotulo: "Palavra em foco",
+    placeholder: n === 1 ? "Palavra-chave (opcional: se vazio, o revisor escolhe)" : "Palavra-chave do texto",
+    obrigatorio: n > 1
+  };
+  if (mod === "05") return {
+    rotulo: "Conceito teológico em foco",
+    placeholder: n === 1 ? "Conceito teológico (opcional: se vazio, o revisor escolhe)" : "Conceito teológico",
+    obrigatorio: n > 1
+  };
+  if (mod === "08") return {
+    rotulo: "Interpretação a ser avaliada",
+    placeholder: "Interpretação a ser testada (ex.: Deus me dá sucesso em tudo)",
+    obrigatorio: true
+  };
+  return null;
+}
+
+function prepararCaixa(cod, caixa) {
+  const extra = extraDaSubetapa(cod);
+  caixa.placeholder = extra ? extra.placeholder : "Escreva sua pergunta...";
+}
+
+function prepararEnvio(cod, ref, textoCaixa, anterior) {
+  const extra = extraDaSubetapa(cod);
+  const texto = (textoCaixa || "").trim();
+
+  if (extra && extra.obrigatorio && !texto) {
+    return { ok: false, aviso: `Informe na caixa abaixo: ${extra.rotulo.toLowerCase()}.` };
+  }
+
+  let p = objetivosDasSubetapas[cod].replaceAll("{PASSAGEM}", ref);
+
+  if (anterior) p = p.replace(/\{(?!PASSAGEM)[^}]+\}/g, "o resultado a seguir:\n" + anterior + "\n");
+  else p = p.replace(/\s*\[Com base na conclusão[^\]]*\]/, "");
+
+  const partes = [`Referência: ${ref}`];
+  if (extra && texto) partes.push(`${extra.rotulo}: ${texto}`);
+  partes.push(p);
+  if (!extra && texto) partes.push(`Pergunta adicional do assinante: ${texto}`);
+
+  return {
+    ok: true,
+    enviarAoRevisor: partes.join("\n\n"),
+    mostrarNaTela: `${cod} · ${ref}` + (extra && texto ? ` · ${texto}` : "")
+  };
+}
+ 
 function limparMarkdown(t) {
   return String(t || "")
     .replace(/^\s*#{1,6}\s*/gm, "")
