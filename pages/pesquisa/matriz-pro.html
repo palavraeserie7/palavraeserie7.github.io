@@ -885,6 +885,41 @@ main {
 }
 .arquivo-acoes button:hover { border-color:var(--p); color:var(--p); }
 .arquivo-acoes button.perigo:hover { border-color:var(--error); color:var(--error); }
+ /* ===== ARQUIVO: lista compacta e detalhe ===== */
+.arquivo-item { cursor:pointer; }
+.arquivo-item:hover { border-color:var(--a); }
+.arquivo-preview {
+  margin-top:8px;
+  color:#b9c7d8;
+  font-size:11px;
+  line-height:1.5;
+  overflow:hidden;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+}
+.arquivo-barra {
+  position:sticky;
+  top:0;
+  z-index:1;
+  margin-top:0;
+  padding-bottom:10px;
+  background:var(--s);
+}
+.arquivo-contagem { margin-bottom:8px; color:var(--muted); font-size:10px; }
+.arquivo-mais {
+  display:block;
+  margin:10px auto 0;
+  padding:8px 16px;
+  border:1px solid #425674;
+  border-radius:6px;
+  background:transparent;
+  color:var(--t);
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.arquivo-mais:hover { border-color:var(--p); color:var(--p); }
 </style>
 </head>
  
@@ -4306,6 +4341,189 @@ function renderArquivo() {
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") fecharArquivo();
 });
+ /* ===== ARQUIVO: nova lista e tela de detalhe (substitui as versões anteriores) ===== */
+
+let arquivoAberto = null;
+let arquivoLimite = 50;
+let arquivoScroll = 0;
+
+function abrirArquivo() {
+  const overlay = document.getElementById("arquivo-overlay");
+  if (!overlay) return;
+  const busca = document.getElementById("arquivo-busca");
+  busca.value = "";
+  busca.oninput = function () {
+    arquivoLimite = 50;
+    renderArquivo();
+  };
+  arquivoAberto = null;
+  arquivoLimite = 50;
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
+  renderArquivo();
+}
+
+function renderArquivo() {
+  const box = document.getElementById("arquivo-lista");
+  const busca = document.getElementById("arquivo-busca");
+  const todos = lerArquivo();
+  box.innerHTML = "";
+
+  /* ---------- TELA DE DETALHE ---------- */
+  if (arquivoAberto !== null) {
+    const item = todos.find(function (x) { return x.id === arquivoAberto; });
+    if (item) {
+      busca.style.display = "none";
+
+      const barra = document.createElement("div");
+      barra.className = "arquivo-acoes arquivo-barra";
+
+      const bVoltar = document.createElement("button");
+      bVoltar.type = "button";
+      bVoltar.textContent = "← VOLTAR";
+      bVoltar.onclick = function () {
+        arquivoAberto = null;
+        renderArquivo();
+        box.scrollTop = arquivoScroll;
+      };
+
+      const bCopiar = document.createElement("button");
+      bCopiar.type = "button";
+      bCopiar.textContent = "COPIAR RESPOSTA";
+      bCopiar.onclick = function () {
+        navigator.clipboard.writeText(item.resposta).then(function () {
+          bCopiar.textContent = "COPIADO ✓";
+          setTimeout(function () { bCopiar.textContent = "COPIAR RESPOSTA"; }, 1500);
+        });
+      };
+
+      const bRevisar = document.createElement("button");
+      bRevisar.type = "button";
+      bRevisar.textContent = "ENVIAR PARA REVISÃO";
+      bRevisar.onclick = function () {
+        lastMesaAnswer = item.resposta;
+        lastMesaModule = item.modulo;
+        lastMesaStep = item.subetapa;
+        fecharArquivo();
+        openRevisor("platform_mesa");
+      };
+
+      const bApagar = document.createElement("button");
+      bApagar.type = "button";
+      bApagar.className = "perigo";
+      bApagar.textContent = "APAGAR";
+      bApagar.onclick = function () {
+        if (!confirm("Apagar esta pesquisa do arquivo?")) return;
+        gravarArquivo(lerArquivo().filter(function (x) { return x.id !== item.id; }));
+        arquivoAberto = null;
+        renderArquivo();
+        box.scrollTop = arquivoScroll;
+      };
+
+      barra.appendChild(bVoltar);
+      barra.appendChild(bCopiar);
+      barra.appendChild(bRevisar);
+      barra.appendChild(bApagar);
+      box.appendChild(barra);
+
+      const titulo = document.createElement("div");
+      titulo.className = "arquivo-item-titulo";
+      titulo.textContent = item.subetapa || item.modulo || "Consulta livre";
+      box.appendChild(titulo);
+
+      const meta = document.createElement("div");
+      meta.className = "arquivo-item-meta";
+      meta.textContent = new Date(item.data).toLocaleString("pt-BR") +
+        (item.referencia ? " • " + item.referencia : "");
+      box.appendChild(meta);
+
+      const corpo = document.createElement("div");
+      corpo.className = "arquivo-item-corpo aberto";
+      const lbP = document.createElement("strong");
+      lbP.textContent = "PERGUNTA\n";
+      const lbR = document.createElement("strong");
+      lbR.textContent = "\n\nRESPOSTA\n";
+      corpo.appendChild(lbP);
+      corpo.appendChild(document.createTextNode(item.pergunta));
+      corpo.appendChild(lbR);
+      corpo.appendChild(document.createTextNode(item.resposta));
+      box.appendChild(corpo);
+
+      box.scrollTop = 0;
+      return;
+    }
+    arquivoAberto = null;
+  }
+
+  /* ---------- TELA DE LISTA ---------- */
+  busca.style.display = "block";
+
+  const termo = (busca.value || "").toLowerCase().trim();
+  const filtrados = todos.filter(function (item) {
+    if (!termo) return true;
+    return [item.modulo, item.subetapa, item.referencia, item.pergunta, item.resposta]
+      .join(" ").toLowerCase().indexOf(termo) !== -1;
+  });
+
+  if (!filtrados.length) {
+    const vazio = document.createElement("div");
+    vazio.className = "arquivo-vazio";
+    vazio.textContent = todos.length
+      ? "Nenhuma pesquisa encontrada para essa busca."
+      : "Nenhuma pesquisa guardada ainda. Cada resposta da Mesa de Análise será salva aqui automaticamente.";
+    box.appendChild(vazio);
+    return;
+  }
+
+  const visiveis = filtrados.slice(0, arquivoLimite);
+
+  const contagem = document.createElement("div");
+  contagem.className = "arquivo-contagem";
+  contagem.textContent = "Mostrando " + visiveis.length + " de " + filtrados.length + " pesquisa(s)";
+  box.appendChild(contagem);
+
+  visiveis.forEach(function (item) {
+    const card = document.createElement("div");
+    card.className = "arquivo-item";
+    card.onclick = function () {
+      arquivoScroll = box.scrollTop;
+      arquivoAberto = item.id;
+      renderArquivo();
+    };
+
+    const titulo = document.createElement("div");
+    titulo.className = "arquivo-item-titulo";
+    titulo.textContent = item.subetapa || item.modulo || "Consulta livre";
+    card.appendChild(titulo);
+
+    const meta = document.createElement("div");
+    meta.className = "arquivo-item-meta";
+    meta.textContent = new Date(item.data).toLocaleString("pt-BR") +
+      (item.referencia ? " • " + item.referencia : "");
+    card.appendChild(meta);
+
+    const previa = document.createElement("div");
+    previa.className = "arquivo-preview";
+    previa.textContent = String(item.resposta || "").replace(/\s+/g, " ").slice(0, 220);
+    card.appendChild(previa);
+
+    box.appendChild(card);
+  });
+
+  if (filtrados.length > visiveis.length) {
+    const mais = document.createElement("button");
+    mais.type = "button";
+    mais.className = "arquivo-mais";
+    mais.textContent = "MOSTRAR MAIS 50";
+    mais.onclick = function () {
+      arquivoScroll = box.scrollTop;
+      arquivoLimite += 50;
+      renderArquivo();
+      box.scrollTop = arquivoScroll;
+    };
+    box.appendChild(mais);
+  }
+}
  /* =====================================================
    INICIALIZAÇÃO
 ===================================================== */
