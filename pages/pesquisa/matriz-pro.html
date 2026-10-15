@@ -3250,24 +3250,15 @@ function questionDraftKey() {
  
  
 function persistMessages() {
- 
-  if (!activeStep) {
-    return;
-  }
- 
-  localStorage.setItem(
-    messagesKey(),
-    messages.innerHTML
-  );
+  /* A conversa não é mais guardada por etapa.
+     O histórico fica somente no ARQUIVO. */
 }
  
  
 function loadMessages() {
- 
-  if (!activeStep) {
-    messages.innerHTML = "";
-    return false;
-  }
+  messages.innerHTML = "";
+  return false;
+}
  
  
   const saved =
@@ -3286,17 +3277,8 @@ function loadMessages() {
  
  
 function persistQuestionDraft() {
- 
-  if (!activeStep) {
-    return;
-  }
- 
-  localStorage.setItem(
-    questionDraftKey(),
-    questionInput.value
-  );
+  /* Rascunho não é mais guardado. */
 }
- 
  
 /* =====================================================
    REFERÊNCIA (PASSAGEM/TEMA) — GLOBAL
@@ -3388,19 +3370,11 @@ function prepareQuestionForStep(skipIntroMessage) {
     return;
   }
  
-  const savedDraft =
-    localStorage.getItem(
-      questionDraftKey()
-    );
  
-  if (savedDraft) {
-    questionInput.value = savedDraft;
-    return;
-  }
  
   const code = extractStepCode(activeStep);
   const config = M01_INPUT_CONFIG[code];
-  const reference = getSavedReference();
+ const reference = "";
   const template = objetivosDasSubetapas[code];
  
   questionInput.placeholder = config
@@ -4518,7 +4492,12 @@ function renderArquivo() {
  /* =====================================================
    INICIALIZAÇÃO
 ===================================================== */
- 
+ Object.keys(localStorage).forEach(function (k) {
+  if (k.indexOf("palavraSerieMatrizProChat:") === 0 ||
+      k.indexOf("palavraSerieMatrizProRascunho:") === 0) {
+    localStorage.removeItem(k);
+  }
+});
 updatePlanBadge();
 updateUpgradeButton();
 renderModules();
