@@ -3715,13 +3715,12 @@ async function submitRevisor() {
     return;
   }
 
-  if (
-    revisorOrigin === "platform_mesa" &&
+    if (
     currentUserPlan !== "MASTER" &&
     currentUserPlan !== "DOCTUS"
   ) {
     report.innerHTML =
-     "O Revisor Teológico para conteúdos da Mesa/Pergunta Livre é um recurso do Nível III — Aprofundamento. " +
+     "O Revisor Teológico é exclusivo dos Níveis III (Aprofundamento) e IV (Especialização). " +
       "Faça upgrade para liberar esta revisão.<br><br>" +
       '<a href="' + getCheckoutLink("MASTER") + '" target="_blank" rel="noopener" ' +
       'style="display:inline-block;padding:8px 14px;background:#20d66b;color:#07151f;' +
@@ -3789,9 +3788,7 @@ async function submitRevisor() {
       throw new Error("Sua sessão expirou. Entre novamente.");
     }
  
-    if (response.status === 402) {
-      throw new Error(data?.error || "Você não tem unidades disponíveis. Compre um pacote para continuar.");
-    }
+   
  
     if (response.status === 403) {
       throw new Error(data?.error || "Este item requer um plano superior ao seu plano atual.");
