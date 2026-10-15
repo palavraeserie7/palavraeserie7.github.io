@@ -4588,12 +4588,20 @@ function iniciarBiblia() {
   const sel = document.getElementById("bible-livro");
   if (!sel) return;
   sel.innerHTML = "";
+
+  const vazio = document.createElement("option");
+  vazio.value = "";
+  vazio.textContent = "— escolher livro —";
+  sel.appendChild(vazio);
+
   BIBLIA_LIVROS.forEach(function (l) {
     const o = document.createElement("option");
     o.value = l[0];
     o.textContent = l[0];
     sel.appendChild(o);
   });
+
+  document.getElementById("bible-cap").onchange = atualizarVersiculos;
   atualizarCapitulos();
 }
 
@@ -4601,13 +4609,34 @@ function atualizarCapitulos() {
   const livro = document.getElementById("bible-livro").value;
   const cap = document.getElementById("bible-cap");
   const dados = BIBLIA_LIVROS.find(function (l) { return l[0] === livro; });
-  const total = dados ? dados[1] : 1;
+  const total = dados ? dados[1] : 0;
+
   cap.innerHTML = "";
+  const vazio = document.createElement("option");
+  vazio.value = "";
+  vazio.textContent = "— capítulo —";
+  cap.appendChild(vazio);
+
   for (let i = 1; i <= total; i++) {
     const o = document.createElement("option");
     o.value = i;
     o.textContent = i;
     cap.appendChild(o);
+  }
+
+  cap.disabled = !dados;
+  atualizarVersiculos();
+}
+
+function atualizarVersiculos() {
+  const temCap = document.getElementById("bible-cap").value !== "";
+  const v1 = document.getElementById("bible-v1");
+  const v2 = document.getElementById("bible-v2");
+  v1.disabled = !temCap;
+  v2.disabled = !temCap;
+  if (!temCap) {
+    v1.value = "";
+    v2.value = "";
   }
 }
 
@@ -4625,12 +4654,20 @@ function usarBiblia() {
   const palavra = document.getElementById("bible-palavra").value.trim();
   const status = document.getElementById("bible-status");
 
-  let ref = livro + " " + cap;
-  if (v1) {
-    ref += ":" + v1;
-    if (v2 && v2 > v1) ref += "-" + v2;
+  let ref = livro;
+  if (livro && cap) {
+    ref += " " + cap;
+    if (v1) {
+      ref += ":" + v1;
+      if (v2 && v2 > v1) ref += "-" + v2;
+    }
   }
-  if (palavra) ref = palavra + " (" + ref + ")";
+  if (palavra) ref = livro ? palavra + " (" + ref + ")" : palavra;
+
+  if (!ref) {
+    status.textContent = "Escolha ao menos um livro ou digite uma palavra.";
+    return;
+  }
 
   saveReference(ref);
 
