@@ -803,6 +803,70 @@ main {
  /* Painel de comparação removido: o Revisor é o único caminho de auditoria */
 .content { grid-template-columns:minmax(0,1fr) !important; }
 .content > .sheet { display:none !important; }
+ /* ===== SELETOR DE REFERÊNCIA BÍBLICA ===== */
+.head-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.bible-toggle {
+  padding:8px 14px;
+  border:1px solid #425674;
+  border-radius:6px;
+  background:transparent;
+  color:var(--t);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+  cursor:pointer;
+}
+.bible-toggle:hover { border-color:var(--p); color:var(--p); }
+.bible-panel {
+  display:none;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:12px;
+  margin-top:14px;
+  padding:14px;
+  border:1px solid var(--b);
+  border-radius:8px;
+  background:var(--i);
+}
+.bible-panel.aberto { display:flex; }
+.bible-field { display:flex; flex-direction:column; gap:5px; }
+.bible-field label {
+  color:var(--a);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.7px;
+}
+.bible-field select,
+.bible-field input {
+  padding:8px 10px;
+  border:1px solid #344762;
+  border-radius:6px;
+  background:#111b30;
+  color:var(--t);
+  font:inherit;
+  font-size:12px;
+  outline:none;
+}
+.bible-field select:focus,
+.bible-field input:focus { border-color:var(--p); }
+.bible-vers { display:flex; gap:6px; }
+.bible-vers input { width:70px; }
+.bible-use {
+  padding:9px 14px;
+  border:0;
+  border-radius:6px;
+  background:var(--p);
+  color:#07151f;
+  font-size:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.bible-status { width:100%; color:var(--muted); font-size:10px; }
  /* ===== ARQUIVO DE PESQUISAS ===== */
 #arquivo-overlay {
   display:none;
@@ -1009,7 +1073,34 @@ main {
   <section class="panel workspace">
  
     <div id="workspace-head" class="workspace-head">
-      <h2>REVISOR TEOLÓGICO</h2>
+            <div class="head-row">
+        <h2>REVISOR TEOLÓGICO</h2>
+        <button type="button" class="bible-toggle" onclick="toggleBiblia()">📖 BÍBLIA ▾</button>
+      </div>
+
+      <div id="bible-panel" class="bible-panel">
+        <div class="bible-field">
+          <label for="bible-livro">LIVRO</label>
+          <select id="bible-livro" onchange="atualizarCapitulos()"></select>
+        </div>
+        <div class="bible-field">
+          <label for="bible-cap">CAPÍTULO</label>
+          <select id="bible-cap"></select>
+        </div>
+        <div class="bible-field">
+          <label for="bible-v1">VERSÍCULO</label>
+          <div class="bible-vers">
+            <input id="bible-v1" type="number" min="1" placeholder="de">
+            <input id="bible-v2" type="number" min="1" placeholder="até">
+          </div>
+        </div>
+        <div class="bible-field">
+          <label for="bible-palavra">PALAVRA (opcional)</label>
+          <input id="bible-palavra" type="text" placeholder="ex.: santidade">
+        </div>
+        <button type="button" class="bible-use" onclick="usarBiblia()">USAR COMO OBJETO</button>
+        <div id="bible-status" class="bible-status"></div>
+      </div>
       <p>
        SELECIONE UM MÓDULO E UMA SUBETAPA PARA FAZER SEUS ESTUDOS
       </p>
@@ -4473,6 +4564,98 @@ function renderArquivo() {
     box.appendChild(mais);
   }
 }
+
+ /* ===== SELETOR DE REFERÊNCIA BÍBLICA ===== */
+
+const BIBLIA_LIVROS = [
+  ["Gênesis",50],["Êxodo",40],["Levítico",27],["Números",36],["Deuteronômio",34],
+  ["Josué",24],["Juízes",21],["Rute",4],["1 Samuel",31],["2 Samuel",24],
+  ["1 Reis",22],["2 Reis",25],["1 Crônicas",29],["2 Crônicas",36],["Esdras",10],
+  ["Neemias",13],["Ester",10],["Jó",42],["Salmos",150],["Provérbios",31],
+  ["Eclesiastes",12],["Cantares",8],["Isaías",66],["Jeremias",52],["Lamentações",5],
+  ["Ezequiel",48],["Daniel",12],["Oseias",14],["Joel",3],["Amós",9],
+  ["Obadias",1],["Jonas",4],["Miqueias",7],["Naum",3],["Habacuque",3],
+  ["Sofonias",3],["Ageu",2],["Zacarias",14],["Malaquias",4],
+  ["Mateus",28],["Marcos",16],["Lucas",24],["João",21],["Atos",28],
+  ["Romanos",16],["1 Coríntios",16],["2 Coríntios",13],["Gálatas",6],["Efésios",6],
+  ["Filipenses",4],["Colossenses",4],["1 Tessalonicenses",5],["2 Tessalonicenses",3],
+  ["1 Timóteo",6],["2 Timóteo",4],["Tito",3],["Filemom",1],["Hebreus",13],
+  ["Tiago",5],["1 Pedro",5],["2 Pedro",3],["1 João",5],["2 João",1],
+  ["3 João",1],["Judas",1],["Apocalipse",22]
+];
+
+function iniciarBiblia() {
+  const sel = document.getElementById("bible-livro");
+  if (!sel) return;
+  sel.innerHTML = "";
+  BIBLIA_LIVROS.forEach(function (l) {
+    const o = document.createElement("option");
+    o.value = l[0];
+    o.textContent = l[0];
+    sel.appendChild(o);
+  });
+  atualizarCapitulos();
+}
+
+function atualizarCapitulos() {
+  const livro = document.getElementById("bible-livro").value;
+  const cap = document.getElementById("bible-cap");
+  const dados = BIBLIA_LIVROS.find(function (l) { return l[0] === livro; });
+  const total = dados ? dados[1] : 1;
+  cap.innerHTML = "";
+  for (let i = 1; i <= total; i++) {
+    const o = document.createElement("option");
+    o.value = i;
+    o.textContent = i;
+    cap.appendChild(o);
+  }
+}
+
+function toggleBiblia() {
+  const painel = document.getElementById("bible-panel");
+  const aberto = painel.classList.toggle("aberto");
+  document.querySelector(".bible-toggle").textContent = aberto ? "📖 BÍBLIA ▴" : "📖 BÍBLIA ▾";
+}
+
+function usarBiblia() {
+  const livro = document.getElementById("bible-livro").value;
+  const cap = document.getElementById("bible-cap").value;
+  const v1 = parseInt(document.getElementById("bible-v1").value, 10);
+  const v2 = parseInt(document.getElementById("bible-v2").value, 10);
+  const palavra = document.getElementById("bible-palavra").value.trim();
+  const status = document.getElementById("bible-status");
+
+  let ref = livro + " " + cap;
+  if (v1) {
+    ref += ":" + v1;
+    if (v2 && v2 > v1) ref += "-" + v2;
+  }
+  if (palavra) ref = palavra + " (" + ref + ")";
+
+  saveReference(ref);
+
+  if (!activeStep) {
+    status.textContent = "Referência guardada: " + ref + ". Agora escolha uma subetapa.";
+    return;
+  }
+
+  const code = extractStepCode(activeStep);
+  if (!stepIsAllowed(code, currentUserPlan)) {
+    status.textContent = "Referência guardada: " + ref + ". Esta subetapa requer um plano superior.";
+    return;
+  }
+
+  const template = objetivosDasSubetapas[code];
+  questionInput.value = template
+    ? aplicarReferencia(template, ref)
+    : "Objeto da pesquisa: " + ref + ".";
+  awaitingReference = false;
+  status.textContent = "Objeto definido: " + ref;
+  toggleBiblia();
+  questionInput.focus();
+}
+
+iniciarBiblia();
  /* =====================================================
    INICIALIZAÇÃO
 ===================================================== */
