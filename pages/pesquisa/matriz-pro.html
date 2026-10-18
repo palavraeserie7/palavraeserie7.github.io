@@ -1115,6 +1115,20 @@ main {
 }
 
 /* <<<<<<<<<< FIM — MENU LATERAL <<<<<<<<<< */
+ /* >>>>>>>>>> INÍCIO — CORES DA CLASSIFICAÇÃO >>>>>>>>>> */
+.cls {
+  display:inline-block;
+  padding:1px 9px;
+  border-radius:4px;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.4px;
+}
+.cls-conc  { background:rgba(32,214,107,.16);  color:#4ee88f; border:1px solid rgba(32,214,107,.45); }
+.cls-div   { background:rgba(255,107,107,.16); color:#ff8a8a; border:1px solid rgba(255,107,107,.5); }
+.cls-parc  { background:rgba(242,178,60,.16);  color:#f2b23c; border:1px solid rgba(242,178,60,.5); }
+.cls-insuf { background:rgba(145,164,189,.16); color:#b7c6da; border:1px solid rgba(145,164,189,.45); }
+/* <<<<<<<<<< FIM — CORES DA CLASSIFICAÇÃO <<<<<<<<<< */
 </style>
 </head>
  
@@ -2967,7 +2981,37 @@ function limparMarkdown(t) {
     .trim();
 }
 // <<<<<<<<<< FIM — LIMPEZA DE MARKDOWN COM TABELAS <<<<<<<<<<
+ 
+// >>>>>>>>>> INÍCIO — COLORIR CLASSIFICAÇÃO DO RELATÓRIO >>>>>>>>>>
+function classeClassificacao(valor) {
+  var s = String(valor || "").toUpperCase().trim();
+  if (s.indexOf("CONCORD") === 0) return "cls-conc";
+  if (s.indexOf("DIVERG") === 0) return "cls-div";
+  if (s.indexOf("SUPORTE") === 0) return "cls-parc";
+  if (s.indexOf("EVID") === 0) return "cls-insuf";
+  return "";
+}
 
+function colorirRelatorio(el) {
+  if (!el) return;
+  var linhas = String(el.textContent || "").split("\n");
+  el.textContent = "";
+  linhas.forEach(function (linha, i) {
+    var m = linha.match(/^(\s*(?:•\s*)?CLASSIFICAÇÃO:\s*)(.*)$/i);
+    var classe = m ? classeClassificacao(m[2]) : "";
+    if (m && classe) {
+      el.appendChild(document.createTextNode(m[1]));
+      var tag = document.createElement("span");
+      tag.className = "cls " + classe;
+      tag.textContent = m[2];
+      el.appendChild(tag);
+    } else {
+      el.appendChild(document.createTextNode(linha));
+    }
+    if (i < linhas.length - 1) el.appendChild(document.createTextNode("\n"));
+  });
+}
+// <<<<<<<<<< FIM — COLORIR CLASSIFICAÇÃO DO RELATÓRIO <<<<<<<<<<
 function aplicarReferencia(template, ref) {
   const r = template
     .replace(/\{PASSAGEM\}/g, ref)
@@ -4023,7 +4067,10 @@ async function submitRevisor() {
       throw new Error(data?.error || "O Worker não conseguiu concluir a revisão.");
     }
  
-   report.textContent = limparMarkdown(extractAuditReport(data));
+     report.textContent = limparMarkdown(extractAuditReport(data));
+   // >>>>>>>>>> INÍCIO — CHAMADA DAS CORES >>>>>>>>>>
+   colorirRelatorio(report);
+   // <<<<<<<<<< FIM — CHAMADA DAS CORES <<<<<<<<<<
   } catch (error) {
     console.error("Erro na Revisão Teológica:", error);
     report.textContent = formatComparisonError(error, { error: error?.message });
