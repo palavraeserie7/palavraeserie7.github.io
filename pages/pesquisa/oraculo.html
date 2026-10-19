@@ -1069,7 +1069,7 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
     const loading = document.getElementById('oracle-chat-loading');
 
    const ORACULO_AREAS = [
-  {id:'01',name:'Fontes Oficiais',tracks:'Rastreiam atos, decisões e posicionamentos institucionais.',subareas:['Leis','Decretos','Portarias','Resoluções','Notas oficiais','Comunicados governamentais']},
+ {id:'01',name:'Fontes Oficiais',url:'fontes-oficiais.html',tracks:'Rastreiam atos, decisões e posicionamentos institucionais.',subareas:['Leis','Decretos','Portarias','Resoluções','Notas oficiais','Comunicados governamentais']},
   {id:'02',name:'Fontes Jornalísticas',tracks:'Rastreiam acontecimentos, declarações e investigações.',subareas:['Reportagens','Entrevistas','Notícias','Coberturas ao vivo','Jornalismo investigativo']},
   {id:'03',name:'Fontes Legislativas',tracks:'Rastreiam a criação e a tramitação de decisões políticas.',subareas:['Projetos de lei','Votações','Discursos parlamentares','Atas','Registros de comissões']},
   {id:'04',name:'Fontes Judiciais',tracks:'Rastreiam decisões judiciais e seus fundamentos.',subareas:['Sentenças','Acórdãos','Decisões liminares','Processos públicos','Votos de magistrados']},
@@ -1265,6 +1265,11 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
 
       if (areaButton) {
         const id = areaButton.dataset.area;
+                const areaData = ORACULO_AREAS.find(item => item.id === id);
+        if (areaData && areaData.url) {
+          window.location.href = areaData.url;
+          return;
+        }
         const subareas = indexList.querySelector(
           `.oracle-index-subareas[data-subareas="${id}"]`
         );
