@@ -7,6 +7,7 @@
   <title>Oráculo — Consulta Geral</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,560;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1062,6 +1063,21 @@ A escolha orienta a consulta, mas não impede o Oráculo de considerar outras ca
   </div>
   <script>
     const AI_PROXY_URL = 'https://yellow-lab-f4b2.palavraeserie.workers.dev';
+    const supabaseClient = window.supabase.createClient(
+  "https://qmhdbuxomozdczgvpvcc.supabase.co",
+  "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8"
+);
+
+async function cabecalhosOraculo() {
+  const h = {'Content-Type': 'application/json'};
+  try {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session && data.session.access_token) {
+      h['Authorization'] = 'Bearer ' + data.session.access_token;
+    }
+  } catch (_) {}
+  return h;
+}
 
     const form = document.getElementById('oracle-form');
     const input = document.getElementById('oracle-question');
@@ -1531,9 +1547,7 @@ REGRAS:
           `${AI_PROXY_URL.replace(/\/$/, '')}/api/pesquisa`,
           {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: await cabecalhosOraculo(),
             body: JSON.stringify({
               mode: 'free',
               accessLevel: 'free',
