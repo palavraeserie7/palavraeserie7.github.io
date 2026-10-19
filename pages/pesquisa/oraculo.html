@@ -1480,7 +1480,7 @@ async function cabecalhosOraculo() {
       messages.appendChild(ans); messages.scrollTop=messages.scrollHeight;
       const prompt = `ETAPA BÍBLICA DO ORÁCULO.\n\nQuestão investigada:\n${question}\n\nO Oráculo não dá parecer próprio. Nesta etapa, apresente livremente o que a Bíblia diz, sem suavizar sua afirmação para agradar à cultura, política, opinião pública ou ao pesquisador. Use somente afirmações bíblicas sustentáveis. Não invente versículos. Apresente: O QUE A BÍBLIA DIZ; TEXTOS BÍBLICOS; CONTEXTO; O QUE O TEXTO AFIRMA; INTERPRETAÇÕES RELEVANTES quando houver; SÍNTESE À LUZ DAS ESCRITURAS. Diferencie texto bíblico de interpretação humana.`;
       try{
-        const r=await fetch(`${AI_PROXY_URL.replace(/\/$/,'')}/api/pesquisa`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'free',accessLevel:'free',question:prompt,topic:'ORÁCULO — O QUE A BÍBLIA DIZ?',module:'ORÁCULO — ETAPA BÍBLICA',discipline:'Bíblia',studyContext:{trackingContext}})});
+        const r=await fetch(`${AI_PROXY_URL.replace(/\/$/,'')}/api/pesquisa`,{method:'POST',headers:await cabecalhosOraculo(),body:JSON.stringify({mode:'free',accessLevel:'free',question:prompt,topic:'ORÁCULO — O QUE A BÍBLIA DIZ?',module:'ORÁCULO — ETAPA BÍBLICA',discipline:'Bíblia',studyContext:{trackingContext}})});
         const ct=r.headers.get('content-type')||''; let d=ct.includes('application/json')?await r.json():{error:await r.text()};
         if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`);
         if(typeof d.text==='string'&&d.text.trim().startsWith('{')){try{d=JSON.parse(d.text)}catch(_){} }
