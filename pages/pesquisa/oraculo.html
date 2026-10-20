@@ -1115,6 +1115,163 @@
         upd();
       }
     }
+    
+
+    /* === Preenche 'Quem publicou' a partir do link colado === */
+    var NOMES_SITES={
+      'acervo.estadao.com.br':'Acervo Estadão',
+      'acervo.folha.uol.com.br':'Acervo Folha',
+      'acervo.oglobo.globo.com':'Acervo O Globo',
+      'afp.com':'AFP',
+      'agenciabrasil.ebc.com.br':'Agência Brasil',
+      'agenciagov.ebc.com.br':'Agência Gov',
+      'al.sp.gov.br':'Assembleia Legislativa de São Paulo',
+      'alerj.rj.gov.br':'Assembleia Legislativa do Rio de Janeiro',
+      'almg.gov.br':'Assembleia Legislativa de Minas Gerais',
+      'anistia.org.br':'Anistia Internacional Brasil',
+      'aosfatos.org':'Aos Fatos',
+      'apnews.com':'Associated Press',
+      'apublica.org':'Agência Pública',
+      'arquivoestado.sp.gov.br':'Arquivo Público do Estado de São Paulo',
+      'b3.com.br':'B3',
+      'band.uol.com.br':'Band',
+      'bbc.com':'BBC News Brasil',
+      'bcb.gov.br':'Banco Central do Brasil',
+      'bloomberg.com':'Bloomberg',
+      'bn.gov.br':'Biblioteca Nacional',
+      'bndigital.bn.gov.br':'Hemeroteca Digital Brasileira',
+      'boatos.org':'Boatos.org',
+      'brasil.io':'Brasil.IO',
+      'camara.leg.br':'TV Câmara',
+      'cartacapital.com.br':'CartaCapital',
+      'cdc.gov':'CDC (EUA)',
+      'cl.df.gov.br':'Câmara Legislativa do Distrito Federal',
+      'cnabrasil.org.br':'CNA',
+      'cnbb.org.br':'CNBB',
+      'cnj.jus.br':'Conselho Nacional de Justiça',
+      'cnmp.mp.br':'Conselho Nacional do Ministério Público',
+      'cnnbrasil.com.br':'CNN Brasil',
+      'cochrane.org':'Cochrane',
+      'congressonacional.leg.br':'Congresso Nacional',
+      'conjur.com.br':'Conjur',
+      'contag.org.br':'CONTAG',
+      'correiobraziliense.com.br':'Correio Braziliense',
+      'cpdoc.fgv.br':'CPDOC / FGV',
+      'cptnacional.org.br':'CPT',
+      'cut.org.br':'CUT',
+      'dados.gov.br':'Dados Abertos do Governo Federal',
+      'dadosabertos.camara.leg.br':'Câmara',
+      'datafolha.folha.uol.com.br':'Datafolha',
+      'datasus.saude.gov.br':'DATASUS',
+      'dieese.org.br':'DIEESE',
+      'e-farsas.com':'E-Farsas',
+      'embrapa.br':'Embrapa',
+      'estadao.com.br':'O Estado de S. Paulo',
+      'exame.com':'Exame',
+      'falabr.cgu.gov.br':'Fala.BR',
+      'folha.uol.com.br':'Folha de S.Paulo',
+      'forumseguranca.org.br':'Fórum Brasileiro de Segurança Pública',
+      'fsindical.org.br':'Força Sindical',
+      'ft.com':'Financial Times',
+      'g1.globo.com':'g1',
+      'gazetadopovo.com.br':'Gazeta do Povo',
+      'genialquaest.com.br':'Quaest',
+      'hrw.org':'Human Rights Watch',
+      'ibge.gov.br':'IBGE',
+      'imf.org':'Fundo Monetário Internacional',
+      'in.gov.br':'Diário Oficial da União',
+      'infomoney.com.br':'InfoMoney',
+      'intercept.com.br':'The Intercept Brasil',
+      'ipcc.ch':'IPCC',
+      'ipea.gov.br':'Atlas da Violência (IPEA)',
+      'jusbrasil.com.br':'JusBrasil',
+      'lexml.gov.br':'LexML',
+      'lupa.news':'Agência Lupa',
+      'mbl.org.br':'MBL',
+      'memoriaglobo.globo.com':'Memória Globo',
+      'metropoles.com':'Metrópoles',
+      'mpf.mp.br':'Ministério Público Federal',
+      'mst.org.br':'MST',
+      'mtst.org':'MTST',
+      'nature.com':'Nature',
+      'nexojornal.com.br':'Nexo Jornal',
+      'oglobo.globo.com':'O Globo',
+      'paho.org':'OPAS',
+      'periodicos.capes.gov.br':'Portal de Periódicos CAPES',
+      'planalto.gov.br':'Planalto',
+      'pncp.gov.br':'Portal Nacional de Contratações Públicas (PNCP)',
+      'poder360.com.br':'Poder360',
+      'portal.fiocruz.br':'Fiocruz',
+      'portal.stf.jus.br':'Supremo Tribunal Federal',
+      'portal.tcu.gov.br':'Tribunal de Contas da União',
+      'portaldatransparencia.gov.br':'Portal da Transparência',
+      'portalibre.fgv.br':'FGV IBRE',
+      'projetocomprova.com.br':'Projeto Comprova',
+      'pubmed.ncbi.nlm.nih.gov':'PubMed',
+      'queridodiario.ok.org.br':'Querido Diário',
+      'r7.com':'R7',
+      'reuters.com':'Reuters',
+      'revistaoeste.com':'Revista Oeste',
+      'saopaulo.sp.leg.br':'Câmara Municipal de São Paulo',
+      'scielo.org':'SciELO',
+      'science.org':'Science',
+      'sec.gov':'SEC (EUA)',
+      'senado.leg.br':'TV Senado',
+      'socioambiental.org':'Instituto Socioambiental',
+      'stj.jus.br':'Superior Tribunal de Justiça',
+      'stm.jus.br':'Superior Tribunal Militar',
+      'tc.df.gov.br':'Tribunal de Contas do Distrito Federal',
+      'tce.sp.gov.br':'Tribunal de Contas do Estado de São Paulo',
+      'tcm.sp.gov.br':'Tribunal de Contas do Município de São Paulo',
+      'tesourotransparente.gov.br':'Tesouro Transparente',
+      'thelancet.com':'The Lancet',
+      'tjdft.jus.br':'Tribunal de Justiça do Distrito Federal',
+      'tjsp.jus.br':'Tribunal de Justiça de São Paulo',
+      'trf1.jus.br':'Tribunal Regional Federal da 1ª Região',
+      'trf3.jus.br':'Tribunal Regional Federal da 3ª Região',
+      'tse.jus.br':'Tribunal Superior Eleitoral',
+      'tst.jus.br':'Tribunal Superior do Trabalho',
+      'tvbrasil.ebc.com.br':'TV Brasil',
+      'un.org':'ONU',
+      'une.org.br':'UNE',
+      'uol.com.br':'UOL',
+      'valor.globo.com':'Valor Econômico',
+      'veja.abril.com.br':'Veja',
+      'vemprarua.net':'Vem Pra Rua',
+      'who.int':'Organização Mundial da Saúde',
+      'worldbank.org':'Banco Mundial'
+    };
+    var SEM_NOME_AUTO=['youtube.com','youtu.be','instagram.com','facebook.com','fb.watch','x.com','twitter.com','tiktok.com','t.me','web.archive.org','archive.org','vertexaisearch.cloud.google.com','google.com','news.google.com'];
+    function nomeDoSite(h){
+      h=String(h||'').toLowerCase().replace(/^www\d*\./,'');
+      for(var i=0;i<SEM_NOME_AUTO.length;i++){ var s=SEM_NOME_AUTO[i]; if(h===s||h.endsWith('.'+s)) return ''; }
+      for(var d in NOMES_SITES){ if(h===d||h.endsWith('.'+d)) return NOMES_SITES[d]; }
+      return h;
+    }
+    var quemAuto=false;
+    $('av-quem').addEventListener('input',function(){ quemAuto=false; });
+    function autoQuem(){
+      var u=safeUrl($('av-url').value.trim());
+      if(!u) return;
+      var nome=nomeDoSite(hostOf(u));
+      if(!nome) return;
+      if(!$('av-quem').value.trim() || quemAuto){
+        $('av-quem').value=nome;
+        quemAuto=true;
+        upd();
+      }
+    }
+    $('av-url').addEventListener('input',autoQuem);
+    $('av-url').addEventListener('paste',function(){ setTimeout(autoQuem,0); });
+    $('av-url').addEventListener('change',autoQuem);
+    /* === fim === */
+ 
+ 
+
+
+
+
+
     $('av-url').addEventListener('input',autoPlat);
     $('av-url').addEventListener('paste',function(){ setTimeout(autoPlat,0); });
     $('av-url').addEventListener('change',autoPlat);
