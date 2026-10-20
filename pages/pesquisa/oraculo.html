@@ -632,7 +632,9 @@
           trackingContext.area = area.name;
           trackingContext.subarea = subareaButton.dataset.subarea;
         }
- 
+         if (!jaSelecionada && !input.value.trim() && lastQuestion) {
+          input.value = lastQuestion;
+        }
         if (!jaSelecionada && input.value.trim()) {
           form.requestSubmit();
         } else {
@@ -799,7 +801,8 @@
             discipline: '',
             studyContext: {
               trackingContext,
-              sourceOrder: TRACKING_ORDER.map(x => ({step:x[0], source:x[1]}))
+              sourceOrder: TRACKING_ORDER.map(x => ({step:x[0], source:x[1]})),
+              previousFindings: lastSources.slice(0,8).map(s => [s.publisher||s.domain||'', s.title||''].join(' — ')).join('\n')
             }
           })
         });
