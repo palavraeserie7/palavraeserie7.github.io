@@ -3774,19 +3774,52 @@ document.addEventListener("visibilitychange",function(){
 })();
 </script>
  
-
-
-<!-- ===== BOTÃO DIAGRAMAR (passo 1: só abre a tela em branco) =====
-     COLE ESTE BLOCO INTEIRO no seu sala-do-escritor.html,
-     logo ANTES da última tag </body> (depois dos dois </script> que já existem). -->
+<!-- ===== DIAGRAMAR — passo 2: escolha de gênero e extensão =====
+     SUBSTITUA o bloco anterior (o que começava com <style> ... #dgTela ... e terminava no </script>)
+     por ESTE bloco inteiro. Local: logo ANTES da última tag </body>. -->
  
 <style>
-/* tela em branco do Diagramador */
 #dgTela{position:fixed;inset:0;z-index:70;background:var(--paper-card);color:var(--ink);display:flex;flex-direction:column}
 #dgTela[hidden]{display:none}
 .dg-barra{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;border-bottom:1px solid var(--paper-line)}
 .dg-barra strong{font:600 20px Georgia,"Times New Roman",serif}
-.dg-area{flex:1;overflow:auto}
+.dg-area{flex:1;overflow:auto;padding:24px 22px 28px}
+.dg-miolo{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:30px}
+.dg-sec h3{margin:0 0 4px;font:600 19px Georgia,"Times New Roman",serif;color:var(--ink)}
+.dg-sec>p{margin:0 0 14px;color:var(--ink-soft);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+ 
+/* gênero: categorias à esquerda, tipos à direita */
+.dg-genero{display:grid;grid-template-columns:minmax(240px,320px) 1fr;gap:18px;align-items:start}
+.dg-cats{display:flex;flex-direction:column;gap:6px}
+.dg-cat{display:flex;gap:10px;align-items:baseline;text-align:left;width:100%;padding:11px 13px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);cursor:pointer;font:16px/1.35 Georgia,"Times New Roman",serif}
+.dg-cat:hover{border-color:var(--brass)}
+.dg-cat b{flex:0 0 22px;color:var(--brass-deep);font:700 13px "Segoe UI",Arial,sans-serif}
+.dg-cat[aria-pressed="true"]{background:var(--brass-wash);border-color:var(--brass);box-shadow:inset 4px 0 0 var(--brass)}
+.dg-cat.tem small{display:block;color:var(--brass-deep);font:12px "Segoe UI",Arial,sans-serif;margin-top:2px}
+.dg-tipos-box{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;padding:16px}
+.dg-tipos-box h4{margin:0;font:600 18px Georgia,"Times New Roman",serif}
+.dg-tipos-box p{margin:3px 0 14px;color:var(--ink-soft);font:13.5px/1.5 "Segoe UI",Arial,sans-serif}
+.dg-tipos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.dg-tipo{display:flex;gap:10px;align-items:baseline;text-align:left;padding:12px 13px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer;font:15.5px/1.35 Georgia,"Times New Roman",serif}
+.dg-tipo:hover{border-color:var(--brass)}
+.dg-tipo b{flex:0 0 auto;color:var(--brass-deep);font:700 12.5px "Segoe UI",Arial,sans-serif}
+.dg-tipo[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.dg-tipo[aria-pressed="true"] b{color:#f6e6b8}
+ 
+/* extensão */
+.dg-exts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.dg-ext{text-align:left;padding:11px 13px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);cursor:pointer;font:15.5px/1.3 Georgia,"Times New Roman",serif}
+.dg-ext:hover{border-color:var(--brass)}
+.dg-ext b{display:block;color:var(--brass-deep);font:700 12px "Segoe UI",Arial,sans-serif;margin-bottom:2px}
+.dg-ext small{display:block;color:var(--ink-soft);font:12.5px "Segoe UI",Arial,sans-serif;margin-top:3px}
+.dg-ext[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.dg-ext[aria-pressed="true"] b,.dg-ext[aria-pressed="true"] small{color:#f6e6b8}
+ 
+/* rodapé com resumo */
+.dg-rodape{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:13px 22px;border-top:1px solid var(--paper-line);background:var(--paper)}
+.dg-resumo{flex:1 1 280px;font:14px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.dg-resumo strong{color:var(--ink);font-family:Georgia,"Times New Roman",serif;font-size:15.5px}
+@media(max-width:800px){.dg-genero{grid-template-columns:1fr}}
 </style>
  
 <div id="dgTela" hidden role="dialog" aria-modal="true" aria-labelledby="dgTitulo">
@@ -3794,40 +3827,146 @@ document.addEventListener("visibilitychange",function(){
     <strong id="dgTitulo">Diagramador</strong>
     <button id="dgFechar" class="at-btn" type="button">FECHAR</button>
   </div>
-  <div class="dg-area" id="dgArea"><!-- tela em branco: o diagramador entra aqui --></div>
+  <div class="dg-area" id="dgArea">
+    <div class="dg-miolo">
+      <section class="dg-sec">
+        <h3>1. Que tipo de publicação é esta?</h3>
+        <p>Escolha o gênero e, depois, o tipo exato. Isso vai definir a diagramação mais adequada.</p>
+        <div class="dg-genero">
+          <div class="dg-cats" id="dgCats"></div>
+          <div class="dg-tipos-box" id="dgTiposBox"></div>
+        </div>
+      </section>
+      <section class="dg-sec">
+        <h3>2. Qual o tamanho da obra?</h3>
+        <p>A extensão é independente do gênero: um sermão e um romance podem ter qualquer tamanho.</p>
+        <div class="dg-exts" id="dgExts"></div>
+      </section>
+    </div>
+  </div>
+  <div class="dg-rodape">
+    <div class="dg-resumo" id="dgResumo" role="status"></div>
+    <button id="dgLimpar" class="at-btn" type="button">LIMPAR ESCOLHA</button>
+    <button id="dgConfirmar" class="at-btn gold" type="button" disabled>CONFIRMAR ESCOLHA</button>
+  </div>
 </div>
  
 <script>
 (function(){
-  var tela  = document.getElementById("dgTela");
-  var fechar = document.getElementById("dgFechar");
+  /* ---------- ÍNDICE GERAL (conforme enviado) ---------- */
+  var GENEROS = [
+    {n:1, nome:"Textos breves", desc:"", tipos:["Microtextos","Pensamentos e frases comentadas","Mensagens e notas","Reflexões curtas","Meditações","Cartas breves"]},
+    {n:2, nome:"Artigos e ensaios", desc:"", tipos:["Artigos informativos","Artigos de opinião","Ensaios literários","Ensaios filosóficos","Estudos temáticos","Resenhas e críticas"]},
+    {n:3, nome:"Literatura e poesia", desc:"", tipos:["Poemas","Prosa poética","Contos e microcontos","Crônicas","Fábulas e parábolas","Romances e novelas","Peças teatrais e roteiros"]},
+    {n:4, nome:"Devocionais e espiritualidade", desc:"Leituras individuais ou coleções", tipos:["Devocionais diários","Meditações bíblicas","Orações e mensagens de fé","Estudos bíblicos","Sermões e esboços","Testemunhos","Planos de leitura","Estudos teológicos"]},
+    {n:5, nome:"Estudos e educação", desc:"Materiais didáticos e de aprendizagem", tipos:["Apostilas","Cadernos de estudo","Lições e exercícios","Resumos didáticos","Pesquisas e trabalhos acadêmicos","Estudos de caso"]},
+    {n:6, nome:"Dicionários e glossários", desc:"Obras de consulta por assunto ou idioma", tipos:["Mini glossários","Glossários temáticos","Vocabulários especializados","Dicionários de termos","Dicionários de idiomas","Dicionários técnicos","Léxicos e concordâncias"]},
+    {n:7, nome:"Enciclopédias e referências", desc:"Conteúdo organizado para consulta", tipos:["Enciclopédias","Compêndios","Atlas e cronologias","Biografias de referência","Catálogos e repertórios","Índices e bibliografias"]},
+    {n:8, nome:"Guias e manuais", desc:"Orientações práticas e técnicas", tipos:["Guias práticos","Manuais de instrução","Tutoriais escritos","Procedimentos e checklists","Modelos de documentos","Cadernos de ferramentas"]},
+    {n:9, nome:"Livros e e-books", desc:"Obras curtas, médias e extensas", tipos:["Livros curtos","Livros digitais completos","Biografias e autobiografias","Livros técnicos","Coletâneas e antologias","Livros por capítulos"]},
+    {n:10, nome:"Coleções e periódicos", desc:"Publicações seriadas e conjuntos de obras", tipos:["Séries de textos","Revistas digitais","Boletins e informativos","Coleções temáticas","Livros em fascículos","Anais e atas de eventos"]}
+  ];
+  var EXTENSOES = [
+    ["E01","Micro","1 página"],["E02","Breve","2–5 páginas"],["E03","Curta","6–10 páginas"],
+    ["E04","Compacta","11–20 páginas"],["E05","Intermediária","21–50 páginas"],["E06","Livro curto","51–100 páginas"],
+    ["E07","Livro médio","101–200 páginas"],["E08","Livro extenso","201–500 páginas"],
+    ["E09","Obra volumosa","501–1.000 páginas"],["E10","Obra de referência","Mais de 1.000 páginas"]
+  ];
  
-  // cria o botão e coloca ao lado de MESA DE ESTUDO
-  var btn = document.createElement("button");
-  btn.id = "atModoDiagramar";
-  btn.type = "button";
-  btn.className = "at-btn";
-  btn.textContent = "DIAGRAMAR";
+  /* ---------- estado ---------- */
+  var CHAVE = "ps_diagramador";
+  var cat = 1, tipo = null, ext = null;
+  try{
+    var s = JSON.parse(localStorage.getItem(CHAVE) || "null");
+    if(s){ tipo = s.tipo || null; ext = s.ext || null; if(tipo) cat = Number(String(tipo).split(".")[0]) || 1; }
+  }catch(e){}
  
-  var mesa = document.getElementById("atModoMesa");
-  if(mesa){ mesa.insertAdjacentElement("afterend", btn); }
-  else{
-    var grupo = document.querySelector(".at-modo");
-    if(grupo) grupo.appendChild(btn);
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var tela = $("dgTela");
+ 
+  function nomeTipo(cod){
+    if(!cod) return "";
+    var p = cod.split("."), g = GENEROS[Number(p[0]) - 1];
+    return g ? g.tipos[Number(p[1]) - 1] : "";
   }
  
-  function abrir(){ tela.hidden = false; fechar.focus(); }
-  function fecharTela(){ tela.hidden = true; btn.focus(); }
+  /* ---------- desenho ---------- */
+  function desenhar(){
+    var g = GENEROS[cat - 1];
  
+    $("dgCats").innerHTML = GENEROS.map(function(x){
+      var escolhido = tipo && Number(tipo.split(".")[0]) === x.n;
+      return '<button type="button" class="dg-cat' + (escolhido ? ' tem' : '') + '" data-cat="' + x.n + '" aria-pressed="' + (x.n === cat) + '">' +
+        '<b>' + x.n + '</b><span>' + esc(x.nome) +
+        (escolhido ? '<small>' + esc(nomeTipo(tipo)) + '</small>' : '') + '</span></button>';
+    }).join("");
+ 
+    $("dgTiposBox").innerHTML =
+      '<h4>' + g.n + '. ' + esc(g.nome) + '</h4>' +
+      '<p>' + (g.desc ? esc(g.desc) + ' · ' : '') + 'Escolha o tipo.</p>' +
+      '<div class="dg-tipos">' + g.tipos.map(function(t, i){
+        var cod = g.n + "." + (i + 1);
+        return '<button type="button" class="dg-tipo" data-tipo="' + cod + '" aria-pressed="' + (tipo === cod) + '">' +
+          '<b>' + cod + '</b><span>' + esc(t) + '</span></button>';
+      }).join("") + '</div>';
+ 
+    $("dgExts").innerHTML = EXTENSOES.map(function(e){
+      return '<button type="button" class="dg-ext" data-ext="' + e[0] + '" aria-pressed="' + (ext === e[0]) + '">' +
+        '<b>' + e[0] + '</b>' + esc(e[1]) + '<small>' + esc(e[2]) + '</small></button>';
+    }).join("");
+ 
+    resumo();
+  }
+ 
+  function resumo(msg){
+    var e = EXTENSOES.filter(function(x){ return x[0] === ext; })[0];
+    var partes = [];
+    partes.push(tipo ? '<strong>' + tipo + ' ' + esc(nomeTipo(tipo)) + '</strong>' : 'Gênero: <em>falta escolher</em>');
+    partes.push(e ? '<strong>' + e[0] + ' ' + esc(e[1]) + '</strong> (' + esc(e[2]) + ')' : 'Extensão: <em>falta escolher</em>');
+    $("dgResumo").innerHTML = (msg ? '<strong>' + esc(msg) + '</strong> ' : '') + partes.join(' &nbsp;·&nbsp; ');
+    $("dgConfirmar").disabled = !(tipo && ext);
+  }
+ 
+  /* ---------- eventos ---------- */
+  $("dgCats").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-cat]"); if(!b) return;
+    cat = Number(b.dataset.cat); desenhar();
+  });
+  $("dgTiposBox").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-tipo]"); if(!b) return;
+    tipo = b.dataset.tipo; desenhar();
+  });
+  $("dgExts").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-ext]"); if(!b) return;
+    ext = b.dataset.ext; desenhar();
+  });
+  $("dgLimpar").addEventListener("click", function(){
+    tipo = null; ext = null;
+    try{ localStorage.removeItem(CHAVE); }catch(e){}
+    desenhar();
+  });
+  $("dgConfirmar").addEventListener("click", function(){
+    if(!(tipo && ext)) return;
+    try{ localStorage.setItem(CHAVE, JSON.stringify({tipo:tipo, ext:ext})); }catch(e){}
+    resumo("Escolha registrada.");
+    /* PRÓXIMO PASSO: aqui entra a tela de colar o texto. */
+  });
+ 
+  /* ---------- botão ao lado de MESA DE ESTUDO ---------- */
+  var btn = document.createElement("button");
+  btn.id = "atModoDiagramar"; btn.type = "button"; btn.className = "at-btn"; btn.textContent = "DIAGRAMAR";
+  var mesa = $("atModoMesa");
+  if(mesa){ mesa.insertAdjacentElement("afterend", btn); }
+  else{ var grupo = document.querySelector(".at-modo"); if(grupo) grupo.appendChild(btn); }
+ 
+  function abrir(){ desenhar(); tela.hidden = false; $("dgFechar").focus(); }
+  function fechar(){ tela.hidden = true; btn.focus(); }
   btn.addEventListener("click", abrir);
-  fechar.addEventListener("click", fecharTela);
+  $("dgFechar").addEventListener("click", fechar);
  
-  // Esc fecha só esta tela (sem sair do modo foco por baixo)
   document.addEventListener("keydown", function(ev){
-    if(ev.key === "Escape" && !tela.hidden){
-      fecharTela();
-      ev.stopImmediatePropagation();
-    }
+    if(ev.key === "Escape" && !tela.hidden){ fechar(); ev.stopImmediatePropagation(); }
   }, true);
 })();
 </script>
