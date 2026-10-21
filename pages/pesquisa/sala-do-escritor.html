@@ -4010,9 +4010,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     <button id="dgEfechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
     <h3 id="dgEtitulo"></h3>
     <p class="dg-edesc" id="dgEdesc"></p>
-    <textarea id="dgTexto" placeholder="Cole aqui o texto ou use CRIAR MODELO para começar."></textarea>
+    <textarea id="dgTexto" placeholder="Cole aqui o texto desta parte."></textarea>
     <div class="dg-ebotoes">
-      <button id="dgModelo" class="at-btn" type="button">CRIAR MODELO</button>
       <button id="dgApagar" class="at-btn" type="button">APAGAR TEXTO</button>
       <span class="dg-status" id="dgStatus" role="status"></span>
       <button id="dgSalvar" class="at-btn gold" type="button">SALVAR</button>
@@ -4028,34 +4027,34 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   var status = document.getElementById("dgStatus");
   if(!lista || !ed || !txt) return;
  
-  /* [código, nome, descrição, modelo] */
+  /* [código, nome, descrição] */
   var GRUPOS = [
     {g:"Antes do texto", itens:[
-      ["D01","Capa","Título, subtítulo, autor e editora.","Título:\nSubtítulo:\nAutor:\nEditora:"],
-      ["D02","Página de rosto","Identificação da obra, autor e editora.","Título:\nSubtítulo:\nAutor:\nEditora:\nCidade e ano:"],
-      ["D03","Direitos autorais","Copyright e direitos de reprodução.","© Ano Nome do autor\nTodos os direitos reservados.\nÉ proibida a reprodução total ou parcial sem autorização.\n\nEditora:\nRevisão:\nCapa e diagramação:"],
-      ["D04","Dedicatória","Texto de dedicação.","Dedico este livro a ..."],
-      ["D05","Palavra do autor","Apresentação e intenção da obra.","Querido leitor,\n\n"],
-      ["D06","Introdução","Contextualização do devocional.","Introdução\n\n"],
-      ["D07","Como usar o devocional","Orientações de leitura.","Como usar este devocional\n\n1. \n2. \n3. "],
-      ["D08","Sumário","Partes, dias, títulos e páginas.","Parte 1 — Título .......... página\nDia 1 — Título .......... página"],
-      ["D09","Abertura de parte","Número e título da parte.","Parte 1\nTítulo da parte\n\nFrase ou versículo de abertura (opcional)"]
+      ["D01","Capa","Título, subtítulo, autor e editora."],
+      ["D02","Página de rosto","Identificação da obra, autor e editora."],
+      ["D03","Direitos autorais","Copyright e direitos de reprodução."],
+      ["D04","Dedicatória","Texto de dedicação."],
+      ["D05","Palavra do autor","Apresentação e intenção da obra."],
+      ["D06","Introdução","Contextualização do devocional."],
+      ["D07","Como usar o devocional","Orientações de leitura."],
+      ["D08","Sumário","Partes, dias, títulos e páginas."],
+      ["D09","Abertura de parte","Número e título da parte."]
     ]},
     {g:"D10 — Dia devocional completo", itens:[
-      ["D10.1","Abertura do dia","Número do dia e título.","Dia 1\nTítulo do dia"],
-      ["D10.2","Texto bíblico central","Versículo ou passagem do dia.","Texto bíblico:\n\n(Livro capítulo:versículo)"],
-      ["D10.3","Desenvolvimento devocional","Corpo da mensagem do dia.","\n"],
-      ["D10.4","Reflexão","Perguntas ou pontos para pensar.","Reflexão\n\n1. \n2. "],
-      ["D10.5","Leitura complementar","Passagens para ler em seguida.","Leitura complementar:\n"],
-      ["D10.6","Oração","Oração final do dia.","Oração\n\nSenhor, \n\nAmém."]
+      ["D10.1","Abertura do dia","Número do dia e título."],
+      ["D10.2","Texto bíblico central","Versículo ou passagem do dia."],
+      ["D10.3","Desenvolvimento devocional","Corpo da mensagem do dia."],
+      ["D10.4","Reflexão","Perguntas ou pontos para pensar."],
+      ["D10.5","Leitura complementar","Passagens para ler em seguida."],
+      ["D10.6","Oração","Oração final do dia."]
     ]},
     {g:"Depois do texto", itens:[
-      ["D11","Encerramento","Conclusão da jornada.","Encerramento\n\n"],
-      ["D12","Palavra final","Mensagem de despedida.","Palavra final\n\n"],
-      ["D13","Sobre o autor","Biografia do autor.","Sobre o autor\n\n"],
-      ["D14","Missão ministerial","Propósito ministerial.","Missão ministerial\n\n"],
-      ["D15","Apresentação da editora","Identidade editorial.","Sobre a editora\n\n"],
-      ["D16","Cabeçalho, rodapé e paginação","Regras de paginação e elementos recorrentes.","Cabeçalho:\nRodapé:\nNumeração de páginas:"]
+      ["D11","Encerramento","Conclusão da jornada."],
+      ["D12","Palavra final","Mensagem de despedida."],
+      ["D13","Sobre o autor","Biografia do autor."],
+      ["D14","Missão ministerial","Propósito ministerial."],
+      ["D15","Apresentação da editora","Identidade editorial."],
+      ["D16","Cabeçalho, rodapé e paginação","Regras de paginação e elementos recorrentes."]
     ]}
   ];
  
@@ -4232,13 +4231,6 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     if(!listaAberta()) abrirLista(); /* a lista continua aberta para escolher outra parte */
   }
  
-  document.getElementById("dgModelo").addEventListener("click", function(){
-    var it = achar(atual); if(!it) return;
-    if(txt.value.trim() && !confirm("Já existe texto aqui. Substituir pelo modelo?")) return;
-    txt.value = it[3];
-    status.textContent = "Modelo criado. Edite e salve.";
-    txt.focus();
-  });
   document.getElementById("dgSalvar").addEventListener("click", function(){
     if(!atual) return;
     if(txt.value.trim()) salvos[atual] = txt.value; else delete salvos[atual];
