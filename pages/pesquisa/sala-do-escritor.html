@@ -3974,17 +3974,18 @@ Botao diagramar mesa v2 · HTML
 </script>
 <!-- ===== INÍCIO: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
 <style>
-.modal-diagramacao{display:none;position:fixed;inset:0;z-index:99999;background:rgba(30,22,10,.6);padding:20px;overflow-y:auto}
-.modal-diagramacao.aberto{display:block}
-.conteudo-diagramacao{position:relative;max-width:720px;margin:30px auto;padding:30px 32px 26px;background:var(--paper-card,#fffdf6);color:var(--ink,#2a2217);border:1px solid var(--paper-line,#e3d8bd);border-radius:10px;font-family:Georgia,"Times New Roman",serif}
-.conteudo-diagramacao h2{margin:0 0 2px;padding-right:34px;font:600 24px Georgia,"Times New Roman",serif}
-.conteudo-diagramacao .dg-sub{margin:0 0 18px;color:var(--ink-soft,#6b5f48);font:14px "Segoe UI",Arial,sans-serif}
-.fechar-diagramacao{position:absolute;top:12px;right:16px;border:none;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:var(--ink,#2a2217)}
-.dg-rotulo{display:block;margin:0 0 6px;color:var(--brass-deep,#7d5f1e);font:700 11px "Segoe UI",Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}
-#dgParte{width:100%;padding:13px 14px;border:2px solid var(--brass,#a07d33);border-radius:8px;background:var(--paper-card,#fffdf6);color:var(--ink,#2a2217);font:700 16px Georgia,"Times New Roman",serif;cursor:pointer}
-#dgParte optgroup{font:700 15px "Segoe UI",Arial,sans-serif;color:var(--ink,#2a2217)}
-#dgParte option{font:400 15px "Segoe UI",Arial,sans-serif}
-.dg-dica{margin:10px 0 0;color:var(--ink-soft,#6b5f48);font:13.5px/1.5 "Segoe UI",Arial,sans-serif}
+/* seta no botão 4.1, indicando que ele abre uma lista */
+.dg-tipo[data-tipo="4.1"]::after{content:"\25BE";margin-left:auto;padding-left:8px;font:700 14px "Segoe UI",Arial,sans-serif;transition:transform .15s}
+body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
+
+/* lista que abre embaixo do botão 4.1 */
+#dgLista{display:none;position:fixed;z-index:99999;overflow-y:auto;background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;box-shadow:0 12px 30px rgba(30,22,10,.35);padding:4px 0}
+#dgLista.aberta{display:block}
+.dgl-grupo{padding:10px 14px 4px;color:var(--ink,#2a2217);font:700 14px "Segoe UI",Arial,sans-serif}
+.dgl-item{display:flex;align-items:baseline;gap:10px;width:100%;padding:8px 14px 8px 26px;border:0;background:transparent;color:var(--ink,#2a2217);text-align:left;cursor:pointer;font:15.5px/1.35 Georgia,"Times New Roman",serif}
+.dgl-item:hover,.dgl-item:focus{background:var(--brass-wash,#f3e9cc);outline:none}
+.dgl-item b{flex:0 0 auto;min-width:44px;color:var(--brass-deep,#7d5f1e);font:700 12.5px "Segoe UI",Arial,sans-serif}
+.dgl-item i{margin-left:auto;font-style:normal;font-weight:700;color:var(--brass-deep,#7d5f1e)}
 
 /* janela de colar / criar */
 .dg-editor{display:none;position:fixed;inset:0;z-index:100000;background:rgba(30,22,10,.65);padding:20px;overflow-y:auto}
@@ -3992,28 +3993,19 @@ Botao diagramar mesa v2 · HTML
 .dg-editor-box{position:relative;max-width:820px;margin:30px auto;padding:26px 28px 22px;background:var(--paper-card,#fffdf6);color:var(--ink,#2a2217);border:1px solid var(--paper-line,#e3d8bd);border-radius:10px;font-family:Georgia,"Times New Roman",serif}
 .dg-editor-box h3{margin:0 0 2px;padding-right:34px;font:600 22px Georgia,"Times New Roman",serif}
 .dg-editor-box .dg-edesc{margin:0 0 14px;color:var(--ink-soft,#6b5f48);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+.dg-x{position:absolute;top:12px;right:16px;border:none;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:var(--ink,#2a2217)}
 #dgTexto{width:100%;min-height:340px;padding:14px;border:1px solid var(--paper-line,#e3d8bd);border-radius:8px;background:#fff;color:var(--ink,#2a2217);font:16px/1.6 Georgia,"Times New Roman",serif;resize:vertical;box-sizing:border-box}
 #dgTexto:focus{outline:2px solid var(--brass,#a07d33)}
 .dg-ebotoes{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px}
 .dg-ebotoes .dg-status{flex:1 1 180px;color:var(--brass-deep,#7d5f1e);font:600 13.5px "Segoe UI",Arial,sans-serif}
-@media(max-width:600px){.conteudo-diagramacao,.dg-editor-box{margin:10px auto;padding:22px 16px}}
+@media(max-width:600px){.dg-editor-box{margin:10px auto;padding:22px 16px}}
 </style>
 
-<div id="menu-diagramacao" class="modal-diagramacao" role="dialog" aria-modal="true" aria-labelledby="titulo-diagramacao">
-  <div class="conteudo-diagramacao">
-    <button id="fechar-diagramacao" class="fechar-diagramacao" type="button" aria-label="Fechar">&times;</button>
-    <h2 id="titulo-diagramacao">Menu Geral de Diagramação</h2>
-    <p class="dg-sub">Padrão editorial para devocionais</p>
-
-    <label class="dg-rotulo" for="dgParte">Parte do livro</label>
-    <select id="dgParte"></select>
-    <p class="dg-dica">Escolha uma parte para colar ou criar o texto. As partes com ✓ já têm texto salvo.</p>
-  </div>
-</div>
+<div id="dgLista" role="listbox" aria-label="Partes do livro"></div>
 
 <div id="dg-editor" class="dg-editor" role="dialog" aria-modal="true" aria-labelledby="dgEtitulo">
   <div class="dg-editor-box">
-    <button id="dgEfechar" class="fechar-diagramacao" type="button" aria-label="Fechar">&times;</button>
+    <button id="dgEfechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
     <h3 id="dgEtitulo"></h3>
     <p class="dg-edesc" id="dgEdesc"></p>
     <textarea id="dgTexto" placeholder="Cole aqui o texto ou use CRIAR MODELO para começar."></textarea>
@@ -4028,12 +4020,11 @@ Botao diagramar mesa v2 · HTML
 
 <script>
 (function(){
-  var menu = document.getElementById("menu-diagramacao");
-  var fecharMenuBtn = document.getElementById("fechar-diagramacao");
-  var sel = document.getElementById("dgParte");
+  var lista = document.getElementById("dgLista");
   var ed = document.getElementById("dg-editor");
   var txt = document.getElementById("dgTexto");
-  if(!menu || !fecharMenuBtn || !sel || !ed || !txt) return;
+  var status = document.getElementById("dgStatus");
+  if(!lista || !ed || !txt) return;
 
   /* [código, nome, descrição, modelo] */
   var GRUPOS = [
@@ -4078,20 +4069,73 @@ Botao diagramar mesa v2 · HTML
     return null;
   }
 
+  /* ---------- lista que abre embaixo do botão 4.1 ---------- */
+  function botao(){ return document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
+  function listaAberta(){ return lista.classList.contains("aberta"); }
+
   function montarLista(){
-    var h = '<option value="">Escolha a parte…</option>';
+    var h = "";
     GRUPOS.forEach(function(g){
-      h += '<optgroup label="' + g.g + '">';
+      h += '<div class="dgl-grupo">' + g.g + '</div>';
       g.itens.forEach(function(it){
-        h += '<option value="' + it[0] + '">' + it[0] + ' — ' + it[1] + (salvos[it[0]] ? '  ✓' : '') + '</option>';
+        h += '<button type="button" class="dgl-item" role="option" data-cod="' + it[0] + '" title="' + it[2] + '">' +
+             '<b>' + it[0] + '</b><span>' + it[1] + '</span>' + (salvos[it[0]] ? '<i>✓</i>' : '') + '</button>';
       });
-      h += '</optgroup>';
     });
-    sel.innerHTML = h;
+    lista.innerHTML = h;
   }
 
+  function posicionar(){
+    var b = botao();
+    if(!b){ fecharLista(); return; }
+    var r = b.getBoundingClientRect();
+    var w = Math.min(Math.max(r.width, 380), window.innerWidth - 24);
+    var left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12));
+    var top = r.bottom + 4;
+    lista.style.width = w + "px";
+    lista.style.left = left + "px";
+    lista.style.top = top + "px";
+    lista.style.maxHeight = Math.max(220, window.innerHeight - top - 16) + "px";
+  }
+
+  function abrirLista(){
+    if(!botao()) return;
+    montarLista();
+    lista.classList.add("aberta");
+    document.body.classList.add("dg-lista-aberta");
+    posicionar();
+    lista.scrollTop = 0;
+  }
+  function fecharLista(){
+    lista.classList.remove("aberta");
+    document.body.classList.remove("dg-lista-aberta");
+  }
+
+  /* clique no 4.1 abre/fecha; clique em qualquer outro lugar fecha */
+  document.addEventListener("click", function(ev){
+    if(ed.classList.contains("aberto")) return;
+    var t = ev.target;
+    if(t.closest && t.closest("#dgLista")) return;
+    var b = t.closest && t.closest("[data-tipo]");
+    if(b && b.dataset.tipo === "4.1"){
+      if(listaAberta()) fecharLista(); else abrirLista();
+      setTimeout(posicionar, 0); /* o Diagramador redesenha os botões; reposiciona depois */
+    } else {
+      fecharLista();
+    }
+  }, true);
+
+  lista.addEventListener("click", function(ev){
+    var it = ev.target.closest(".dgl-item"); if(!it) return;
+    fecharLista();
+    abrirEditor(it.dataset.cod);
+  });
+
+  window.addEventListener("resize", function(){ if(listaAberta()) posicionar(); });
+  window.addEventListener("scroll", function(){ if(listaAberta()) posicionar(); }, true);
+
+  /* ---------- janela de colar / criar ---------- */
   var atual = null;
-  var status = document.getElementById("dgStatus");
 
   function abrirEditor(cod){
     var it = achar(cod); if(!it) return;
@@ -4107,14 +4151,8 @@ Botao diagramar mesa v2 · HTML
   function fecharEditor(){
     ed.classList.remove("aberto");
     atual = null;
-    montarLista();
-    sel.focus();
+    abrirLista(); /* volta para a lista, para escolher outra parte */
   }
-
-  function abrirMenu(){ montarLista(); menu.classList.add("aberto"); menu.scrollTop = 0; sel.focus(); }
-  function fecharMenu(){ menu.classList.remove("aberto"); }
-
-  sel.addEventListener("change", function(){ if(sel.value) abrirEditor(sel.value); });
 
   document.getElementById("dgModelo").addEventListener("click", function(){
     var it = achar(atual); if(!it) return;
@@ -4138,20 +4176,11 @@ Botao diagramar mesa v2 · HTML
   document.getElementById("dgEfechar").addEventListener("click", fecharEditor);
   ed.addEventListener("click", function(ev){ if(ev.target === ed) fecharEditor(); });
 
-  /* clique em 4.1 Devocionais diários */
-  document.addEventListener("click", function(ev){
-    var b = ev.target.closest && ev.target.closest('[data-tipo="4.1"]');
-    if(b) abrirMenu();
-  }, true);
-
-  fecharMenuBtn.addEventListener("click", fecharMenu);
-  menu.addEventListener("click", function(ev){ if(ev.target === menu) fecharMenu(); });
-
-  /* ESC: fecha primeiro a janela de texto, depois o menu, sem fechar o Diagramador */
+  /* ESC: fecha a janela de texto, depois a lista, sem fechar o Diagramador por baixo */
   window.addEventListener("keydown", function(ev){
     if(ev.key !== "Escape") return;
     if(ed.classList.contains("aberto")){ fecharEditor(); ev.stopImmediatePropagation(); }
-    else if(menu.classList.contains("aberto")){ fecharMenu(); ev.stopImmediatePropagation(); }
+    else if(listaAberta()){ fecharLista(); ev.stopImmediatePropagation(); }
   }, true);
 })();
 </script>
