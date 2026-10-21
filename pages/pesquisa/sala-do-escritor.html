@@ -3972,13 +3972,16 @@ Botao diagramar mesa v2 · HTML
   }, true);
 })();
 </script>
+
+
+Menu diagramacao 4 1 · HTML
 <!-- ===== INÍCIO: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
 <style>
 /* seta no botão 4.1, indicando que ele abre uma lista */
 .dg-tipo[data-tipo="4.1"]::after{content:"\25BE";margin-left:auto;padding-left:8px;font:700 14px "Segoe UI",Arial,sans-serif;transition:transform .15s}
 body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
-
-/* lista que abre embaixo do botão 4.1 */
+ 
+/* lista que abre no painel à direita do conteúdo */
 #dgLista{display:none;position:fixed;z-index:99999;overflow-y:auto;background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;box-shadow:0 12px 30px rgba(30,22,10,.35);padding:4px 0}
 #dgLista.aberta{display:block}
 .dgl-grupo{padding:10px 14px 4px;color:var(--ink,#2a2217);font:700 14px "Segoe UI",Arial,sans-serif}
@@ -3986,7 +3989,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 .dgl-item:hover,.dgl-item:focus{background:var(--brass-wash,#f3e9cc);outline:none}
 .dgl-item b{flex:0 0 auto;min-width:44px;color:var(--brass-deep,#7d5f1e);font:700 12.5px "Segoe UI",Arial,sans-serif}
 .dgl-item i{margin-left:auto;font-style:normal;font-weight:700;color:var(--brass-deep,#7d5f1e)}
-
+ 
 /* janela de colar / criar */
 .dg-editor{display:none;position:fixed;inset:0;z-index:100000;background:rgba(30,22,10,.65);padding:20px;overflow-y:auto}
 .dg-editor.aberto{display:block}
@@ -4000,9 +4003,9 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 .dg-ebotoes .dg-status{flex:1 1 180px;color:var(--brass-deep,#7d5f1e);font:600 13.5px "Segoe UI",Arial,sans-serif}
 @media(max-width:600px){.dg-editor-box{margin:10px auto;padding:22px 16px}}
 </style>
-
+ 
 <div id="dgLista" role="listbox" aria-label="Partes do livro"></div>
-
+ 
 <div id="dg-editor" class="dg-editor" role="dialog" aria-modal="true" aria-labelledby="dgEtitulo">
   <div class="dg-editor-box">
     <button id="dgEfechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
@@ -4017,7 +4020,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     </div>
   </div>
 </div>
-
+ 
 <script>
 (function(){
   var lista = document.getElementById("dgLista");
@@ -4025,7 +4028,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   var txt = document.getElementById("dgTexto");
   var status = document.getElementById("dgStatus");
   if(!lista || !ed || !txt) return;
-
+ 
   /* [código, nome, descrição, modelo] */
   var GRUPOS = [
     {g:"Antes do texto", itens:[
@@ -4056,23 +4059,23 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       ["D16","Cabeçalho, rodapé e paginação","Regras de paginação e elementos recorrentes.","Cabeçalho:\nRodapé:\nNumeração de páginas:"]
     ]}
   ];
-
+ 
   var CHAVE = "ps_diagramador_partes";
   var salvos = {};
   try{ salvos = JSON.parse(localStorage.getItem(CHAVE) || "{}") || {}; }catch(e){ salvos = {}; }
   function gravar(){ try{ localStorage.setItem(CHAVE, JSON.stringify(salvos)); }catch(e){} }
-
+ 
   function achar(cod){
     for(var i = 0; i < GRUPOS.length; i++)
       for(var j = 0; j < GRUPOS[i].itens.length; j++)
         if(GRUPOS[i].itens[j][0] === cod) return GRUPOS[i].itens[j];
     return null;
   }
-
-  /* ---------- lista que abre embaixo do botão 4.1 ---------- */
+ 
+  /* ---------- lista que abre à direita do conteúdo ---------- */
   function botao(){ return document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
   function listaAberta(){ return lista.classList.contains("aberta"); }
-
+ 
   function montarLista(){
     var h = "";
     GRUPOS.forEach(function(g){
@@ -4084,56 +4087,62 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     });
     lista.innerHTML = h;
   }
-
- /* área ocupada pelos cartões E01–E10 (seção 2), sem depender de ID */
-function areaCartoes(){
-  var achados = Array.prototype.filter.call(
-    document.querySelectorAll("button, div, a, li"),
-    function(el){
-      if(el.closest("#dgLista")) return false;
-      var t = (el.textContent || "").trim();
-      return /^E\d{2}/.test(t) && t.length < 80 && el.getBoundingClientRect().width > 0;
-    }
-  );
-  if(!achados.length) return null;
-  var esq = Infinity, dir = 0, base = 0;
-  achados.forEach(function(el){
-    var r = el.getBoundingClientRect();
-    esq  = Math.min(esq, r.left);
-    dir  = Math.max(dir, r.right);
-    base = Math.max(base, r.bottom);
-  });
-  return { left: esq, width: dir - esq, bottom: base };
-}
-
-function posicionar(){
-  var b = botao();
-  if(!b){ fecharLista(); return; }
-
-  var a = areaCartoes();
-  if(a){
-    var top = a.bottom + 16;
-    var altura = Math.max(260, window.innerHeight - top - 90);
-    lista.style.left = a.left + "px";
-    lista.style.width = a.width + "px";
-    lista.style.top = top + "px";
-    lista.style.height = altura + "px";
-    lista.style.maxHeight = altura + "px";
-    return;
+ 
+  /* container que envolve o botão 4.1 e os cartões E01–E10 (.dg-miolo) */
+  function containerPagina(){
+    var b = botao(); if(!b) return null;
+    var cartao = document.querySelector("#dgExts .dg-ext");
+    if(!cartao) return null;
+    var c = b.parentElement;
+    while(c && !c.contains(cartao)) c = c.parentElement;
+    return c;
   }
-
-  /* plano B: comportamento antigo */
-  var r = b.getBoundingClientRect();
-  var w = Math.min(Math.max(r.width, 380), window.innerWidth - 24);
-  var left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12));
-  var top2 = r.bottom + 4;
-  lista.style.width = w + "px";
-  lista.style.left = left + "px";
-  lista.style.top = top2 + "px";
-  lista.style.height = "";
-  lista.style.maxHeight = Math.max(220, window.innerHeight - top2 - 16) + "px";
-}
-
+ 
+  function soltarConteudo(){
+    var c = containerPagina();
+    if(!c) return;
+    c.style.marginLeft = "";
+    c.style.marginRight = "";
+    c.style.maxWidth = "";
+  }
+ 
+  function posicionar(){
+    var b = botao();
+    if(!b){ fecharLista(); return; }
+ 
+    var c = containerPagina();
+    if(c && window.innerWidth >= 1000){
+      /* conteúdo para a esquerda */
+      c.style.marginLeft = "0";
+      c.style.marginRight = "auto";
+      c.style.maxWidth = "min(56vw, 1000px)";
+ 
+      /* painel na área livre à direita */
+      var r = c.getBoundingClientRect();
+      var left = r.right + 24;
+      var top = 84;                                              /* abaixo do cabeçalho "Diagramador" */
+      var altura = Math.max(260, window.innerHeight - top - 90); /* acima da barra Limpar/Confirmar */
+      lista.style.left = left + "px";
+      lista.style.top = top + "px";
+      lista.style.width = Math.max(320, window.innerWidth - left - 24) + "px";
+      lista.style.height = altura + "px";
+      lista.style.maxHeight = altura + "px";
+      return;
+    }
+ 
+    /* plano B (tela estreita): embaixo do botão 4.1 */
+    soltarConteudo();
+    var rb = b.getBoundingClientRect();
+    var w = Math.min(Math.max(rb.width, 380), window.innerWidth - 24);
+    var l2 = Math.max(12, Math.min(rb.left, window.innerWidth - w - 12));
+    var t2 = rb.bottom + 4;
+    lista.style.width = w + "px";
+    lista.style.left = l2 + "px";
+    lista.style.top = t2 + "px";
+    lista.style.height = "";
+    lista.style.maxHeight = Math.max(220, window.innerHeight - t2 - 16) + "px";
+  }
+ 
   function abrirLista(){
     if(!botao()) return;
     montarLista();
@@ -4145,8 +4154,9 @@ function posicionar(){
   function fecharLista(){
     lista.classList.remove("aberta");
     document.body.classList.remove("dg-lista-aberta");
+    soltarConteudo();
   }
-
+ 
   /* clique no 4.1 abre/fecha; clique em qualquer outro lugar fecha */
   document.addEventListener("click", function(ev){
     if(ed.classList.contains("aberto")) return;
@@ -4155,24 +4165,24 @@ function posicionar(){
     var b = t.closest && t.closest("[data-tipo]");
     if(b && b.dataset.tipo === "4.1"){
       if(listaAberta()) fecharLista(); else abrirLista();
-      setTimeout(posicionar, 0); /* o Diagramador redesenha os botões; reposiciona depois */
+      setTimeout(function(){ if(listaAberta()) posicionar(); }, 0); /* o Diagramador redesenha os botões */
     } else {
       fecharLista();
     }
   }, true);
-
+ 
   lista.addEventListener("click", function(ev){
     var it = ev.target.closest(".dgl-item"); if(!it) return;
     fecharLista();
     abrirEditor(it.dataset.cod);
   });
-
+ 
   window.addEventListener("resize", function(){ if(listaAberta()) posicionar(); });
   window.addEventListener("scroll", function(){ if(listaAberta()) posicionar(); }, true);
-
+ 
   /* ---------- janela de colar / criar ---------- */
   var atual = null;
-
+ 
   function abrirEditor(cod){
     var it = achar(cod); if(!it) return;
     atual = cod;
@@ -4189,7 +4199,7 @@ function posicionar(){
     atual = null;
     abrirLista(); /* volta para a lista, para escolher outra parte */
   }
-
+ 
   document.getElementById("dgModelo").addEventListener("click", function(){
     var it = achar(atual); if(!it) return;
     if(txt.value.trim() && !confirm("Já existe texto aqui. Substituir pelo modelo?")) return;
@@ -4211,7 +4221,7 @@ function posicionar(){
   });
   document.getElementById("dgEfechar").addEventListener("click", fecharEditor);
   ed.addEventListener("click", function(ev){ if(ev.target === ed) fecharEditor(); });
-
+ 
   /* ESC: fecha a janela de texto, depois a lista, sem fechar o Diagramador por baixo */
   window.addEventListener("keydown", function(ev){
     if(ev.key !== "Escape") return;
@@ -4221,6 +4231,13 @@ function posicionar(){
 })();
 </script>
 <!-- ===== FIM: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
+ 
+
+
+
+
+Claude terminou a resposta
+
 </body>
 </html>
  
