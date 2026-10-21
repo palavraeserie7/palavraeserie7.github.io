@@ -3773,6 +3773,65 @@ document.addEventListener("visibilitychange",function(){
     .catch(function(){ concluir(null, null); });
 })();
 </script>
+ 
+
+
+<!-- ===== BOTÃO DIAGRAMAR (passo 1: só abre a tela em branco) =====
+     COLE ESTE BLOCO INTEIRO no seu sala-do-escritor.html,
+     logo ANTES da última tag </body> (depois dos dois </script> que já existem). -->
+ 
+<style>
+/* tela em branco do Diagramador */
+#dgTela{position:fixed;inset:0;z-index:70;background:var(--paper-card);color:var(--ink);display:flex;flex-direction:column}
+#dgTela[hidden]{display:none}
+.dg-barra{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;border-bottom:1px solid var(--paper-line)}
+.dg-barra strong{font:600 20px Georgia,"Times New Roman",serif}
+.dg-area{flex:1;overflow:auto}
+</style>
+ 
+<div id="dgTela" hidden role="dialog" aria-modal="true" aria-labelledby="dgTitulo">
+  <div class="dg-barra">
+    <strong id="dgTitulo">Diagramador</strong>
+    <button id="dgFechar" class="at-btn" type="button">FECHAR</button>
+  </div>
+  <div class="dg-area" id="dgArea"><!-- tela em branco: o diagramador entra aqui --></div>
+</div>
+ 
+<script>
+(function(){
+  var tela  = document.getElementById("dgTela");
+  var fechar = document.getElementById("dgFechar");
+ 
+  // cria o botão e coloca ao lado de MESA DE ESTUDO
+  var btn = document.createElement("button");
+  btn.id = "atModoDiagramar";
+  btn.type = "button";
+  btn.className = "at-btn";
+  btn.textContent = "DIAGRAMAR";
+ 
+  var mesa = document.getElementById("atModoMesa");
+  if(mesa){ mesa.insertAdjacentElement("afterend", btn); }
+  else{
+    var grupo = document.querySelector(".at-modo");
+    if(grupo) grupo.appendChild(btn);
+  }
+ 
+  function abrir(){ tela.hidden = false; fechar.focus(); }
+  function fecharTela(){ tela.hidden = true; btn.focus(); }
+ 
+  btn.addEventListener("click", abrir);
+  fechar.addEventListener("click", fecharTela);
+ 
+  // Esc fecha só esta tela (sem sair do modo foco por baixo)
+  document.addEventListener("keydown", function(ev){
+    if(ev.key === "Escape" && !tela.hidden){
+      fecharTela();
+      ev.stopImmediatePropagation();
+    }
+  }, true);
+})();
+</script>
+
 </body>
 </html>
  
