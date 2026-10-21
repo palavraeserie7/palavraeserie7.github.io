@@ -3773,7 +3773,7 @@ document.addEventListener("visibilitychange",function(){
     .catch(function(){ concluir(null, null); });
 })();
 </script>
-<!-- ===== DIAGRAMAR — passo 3: gênero, extensão, saída e papel =====
+<!-- ===== DIAGRAMAR — passo 5: gênero, extensão (por palavras ou por unidades), saída e papel =====
      SUBSTITUA o bloco anterior (do <style> ... #dgTela ... até o </script>)
      por ESTE bloco inteiro. Local: logo ANTES da última tag </body>. -->
 
@@ -3786,7 +3786,7 @@ document.addEventListener("visibilitychange",function(){
 .dg-miolo{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:30px}
 .dg-sec h3{margin:0 0 4px;font:600 19px Georgia,"Times New Roman",serif;color:var(--ink)}
 .dg-sec>p{margin:0 0 14px;color:var(--ink-soft);font:14px/1.5 "Segoe UI",Arial,sans-serif}
-.dg-sec[hidden]{display:none}
+.dg-sec[hidden],.dg-medir[hidden],.dg-grade[hidden],.dg-grade label[hidden]{display:none}
 
 /* gênero: categorias à esquerda, tipos à direita */
 .dg-genero{display:grid;grid-template-columns:minmax(240px,320px) 1fr;gap:18px;align-items:start}
@@ -3811,12 +3811,32 @@ document.addEventListener("visibilitychange",function(){
 .dg-exts{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
 .dg-saidas{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 .dg-papeis{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
-.dg-ext{text-align:left;padding:11px 13px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);cursor:pointer;font:15.5px/1.3 Georgia,"Times New Roman",serif}
+.dg-ext{position:relative;text-align:left;padding:11px 13px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);cursor:pointer;font:15.5px/1.3 Georgia,"Times New Roman",serif}
 .dg-ext:hover{border-color:var(--brass)}
 .dg-ext b{display:block;color:var(--brass-deep);font:700 12px "Segoe UI",Arial,sans-serif;margin-bottom:2px}
 .dg-ext small{display:block;color:var(--ink-soft);font:12.5px/1.4 "Segoe UI",Arial,sans-serif;margin-top:3px}
 .dg-ext[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
 .dg-ext[aria-pressed="true"] b,.dg-ext[aria-pressed="true"] small{color:#f6e6b8}
+.dg-ext.sug{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass-wash)}
+.dg-ext .tag{position:absolute;top:-9px;right:8px;background:var(--brass-deep);color:#fffdf6;font:700 10.5px "Segoe UI",Arial,sans-serif;letter-spacing:.04em;padding:2px 7px;border-radius:10px}
+
+/* caixas de medição */
+.dg-medir{border:1px dashed var(--brass);border-radius:8px;background:#fffdf6;padding:14px 16px;margin-bottom:16px}
+.dg-medir h4{margin:0 0 4px;font:600 16.5px Georgia,"Times New Roman",serif;color:var(--ink)}
+.dg-medir>p{margin:0 0 10px;color:var(--ink-soft);font:13.5px/1.5 "Segoe UI",Arial,sans-serif}
+.dg-medir textarea{width:100%;min-height:90px;resize:vertical;box-sizing:border-box;padding:10px 12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:15px/1.5 Georgia,"Times New Roman",serif}
+.dg-medir-linha{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;font:14px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.dg-medir-linha input{width:130px;padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:15px "Segoe UI",Arial,sans-serif}
+.dg-unid{border-style:solid}
+.dg-grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:6px 0 10px}
+.dg-grade label{display:flex;flex-direction:column;gap:5px;font:13px/1.35 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.dg-grade input,.dg-grade select{padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:15px "Segoe UI",Arial,sans-serif;width:100%;box-sizing:border-box}
+.dg-trocar{background:none;border:0;padding:0;color:var(--brass-deep);text-decoration:underline;cursor:pointer;font:13px "Segoe UI",Arial,sans-serif}
+.dg-sugestao{margin-top:12px;font:14px/1.6 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.dg-sugestao strong{color:var(--ink);font-family:Georgia,"Times New Roman",serif;font-size:15.5px}
+.dg-sugestao .nota{display:block;margin-top:4px;font-size:12.5px}
+.dg-sugestao .aviso{display:block;margin-top:6px;padding:8px 10px;border-left:3px solid var(--brass);background:var(--brass-wash);color:var(--ink);font-size:13px}
+.dg-sugestao button{margin-top:8px}
 
 /* rodapé com resumo */
 .dg-rodape{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:13px 22px;border-top:1px solid var(--paper-line);background:var(--paper)}
@@ -3843,6 +3863,43 @@ document.addEventListener("visibilitychange",function(){
       <section class="dg-sec">
         <h3>2. Qual o tamanho da obra?</h3>
         <p>A extensão é independente do gênero: um sermão e um romance podem ter qualquer tamanho.</p>
+
+        <!-- modo por unidades (só para tipos com unidades fixas) -->
+        <div class="dg-medir dg-unid" id="dgUnidBox" hidden>
+          <h4 id="dgUnidTit"></h4>
+          <p id="dgUnidTxt"></p>
+          <div class="dg-grade" id="dgGrade">
+            <label>Quantidade de <span id="dgUnidNome">unidades</span>
+              <input id="dgUn" type="number" min="1" step="1" inputmode="numeric" placeholder="ex.: 365">
+            </label>
+            <label>Como cada uma ocupa o papel?
+              <select id="dgModo">
+                <option value="porpag">Várias por página (você informa quantas)</option>
+                <option value="paginas">Cada uma ocupa várias páginas</option>
+                <option value="texto">Cada uma começa em página nova (tamanho pelo texto)</option>
+                <option value="fluxo">Texto corrido (usar o total de palavras)</option>
+              </select>
+            </label>
+            <label id="dgParamL"><span id="dgParamT">Quantas por página?</span>
+              <input id="dgParam" type="number" min="0.5" step="any" inputmode="decimal">
+            </label>
+            <label>Páginas iniciais e finais
+              <input id="dgFb" type="number" min="0" step="1" inputmode="numeric">
+            </label>
+          </div>
+          <button type="button" class="dg-trocar" id="dgSoTexto"></button>
+        </div>
+
+        <div class="dg-medir">
+          <h4 id="dgMedirTit">Não sabe o tamanho? Descubra pelo seu texto</h4>
+          <p id="dgMedirTxt">Cole o texto abaixo (ou digite só o número de palavras). O texto não é guardado: só a contagem.</p>
+          <textarea id="dgTexto" placeholder="Cole aqui o seu texto…" aria-label="Texto para medir"></textarea>
+          <div class="dg-medir-linha">
+            <label for="dgPalavras">Ou informe as palavras:</label>
+            <input id="dgPalavras" type="number" min="1" step="1" inputmode="numeric" placeholder="ex.: 12000">
+          </div>
+          <div class="dg-sugestao" id="dgSugestao" role="status"></div>
+        </div>
         <div class="dg-exts" id="dgExts"></div>
       </section>
       <section class="dg-sec">
@@ -3879,11 +3936,12 @@ document.addEventListener("visibilitychange",function(){
     {n:9, nome:"Livros e e-books", desc:"Obras curtas, médias e extensas", tipos:["Livros curtos","Livros digitais completos","Biografias e autobiografias","Livros técnicos","Coletâneas e antologias","Livros por capítulos"]},
     {n:10, nome:"Coleções e periódicos", desc:"Publicações seriadas e conjuntos de obras", tipos:["Séries de textos","Revistas digitais","Boletins e informativos","Coleções temáticas","Livros em fascículos","Anais e atas de eventos"]}
   ];
+  /* [código, nome, descrição, limite superior de páginas] */
   var EXTENSOES = [
-    ["E01","Micro","1 página"],["E02","Breve","2–5 páginas"],["E03","Curta","6–10 páginas"],
-    ["E04","Compacta","11–20 páginas"],["E05","Intermediária","21–50 páginas"],["E06","Livro curto","51–100 páginas"],
-    ["E07","Livro médio","101–200 páginas"],["E08","Livro extenso","201–500 páginas"],
-    ["E09","Obra volumosa","501–1.000 páginas"],["E10","Obra de referência","Mais de 1.000 páginas"]
+    ["E01","Micro","1 página",1],["E02","Breve","2–5 páginas",5],["E03","Curta","6–10 páginas",10],
+    ["E04","Compacta","11–20 páginas",20],["E05","Intermediária","21–50 páginas",50],["E06","Livro curto","51–100 páginas",100],
+    ["E07","Livro médio","101–200 páginas",200],["E08","Livro extenso","201–500 páginas",500],
+    ["E09","Obra volumosa","501–1.000 páginas",1000],["E10","Obra de referência","Mais de 1.000 páginas",Infinity]
   ];
   /* [código, nome, descrição, impresso?] */
   var SAIDAS = [
@@ -3894,28 +3952,72 @@ document.addEventListener("visibilitychange",function(){
     ["S5","Kindle (Amazon KDP)","E-book preparado para publicar na Amazon.",false],
     ["S6","Documento Word","Arquivo editável para revisar ou enviar a uma editora.",false]
   ];
+  /* [código, nome, medidas, palavras por página (estimativa em corpo 11–12, prosa)] */
   var PAPEIS = [
-    ["P1","A4","21 × 29,7 cm"],
-    ["P2","A5","14,8 × 21 cm"],
-    ["P3","Livro 14 × 21","14 × 21 cm"],
-    ["P4","Livro 16 × 23","16 × 23 cm"],
-    ["P5","Bolso","11 × 18 cm"],
-    ["P6","Carta (EUA)","21,6 × 27,9 cm"]
+    ["P1","A4","21 × 29,7 cm",480],
+    ["P2","A5","14,8 × 21 cm",300],
+    ["P3","Livro 14 × 21","14 × 21 cm",280],
+    ["P4","Livro 16 × 23","16 × 23 cm",340],
+    ["P5","Bolso","11 × 18 cm",200],
+    ["P6","Carta (EUA)","21,6 × 27,9 cm",470]
   ];
+  var PPP_PADRAO = 350;   /* palavras por página quando não há papel (tela, EPUB…) */
+  var FB_PADRAO = 8;      /* páginas iniciais e finais quando o tipo não define */
+
+  /* ---------- TIPOS COM UNIDADES FIXAS ----------
+     u = nome das unidades · m = modo inicial · v = valor inicial do parâmetro · fb = páginas iniciais/finais
+     Para tirar um tipo do modo por unidades, apague a linha dele. */
+  var PERFIS = {
+    "1.1":{u:"microtextos",m:"porpag",v:2},
+    "1.2":{u:"pensamentos",m:"porpag",v:1},
+    "1.3":{u:"mensagens",m:"porpag",v:2},
+    "1.4":{u:"reflexões",m:"texto",v:200},
+    "1.5":{u:"meditações",m:"porpag",v:1},
+    "1.6":{u:"cartas",m:"texto",v:250},
+    "3.1":{u:"poemas",m:"porpag",v:1},
+    "3.3":{u:"contos",m:"texto",v:1500},
+    "3.4":{u:"crônicas",m:"texto",v:700},
+    "3.5":{u:"fábulas",m:"texto",v:300},
+    "4.1":{u:"leituras",m:"porpag",v:1},
+    "4.2":{u:"meditações",m:"porpag",v:1},
+    "4.3":{u:"orações",m:"porpag",v:1},
+    "4.4":{u:"estudos",m:"texto",v:800},
+    "4.5":{u:"sermões",m:"texto",v:1800},
+    "4.6":{u:"testemunhos",m:"texto",v:600},
+    "4.7":{u:"dias de leitura",m:"porpag",v:1},
+    "5.3":{u:"lições",m:"texto",v:800},
+    "6.1":{u:"verbetes",m:"porpag",v:15,fb:4},
+    "6.2":{u:"verbetes",m:"porpag",v:12,fb:8},
+    "6.3":{u:"verbetes",m:"porpag",v:12,fb:8},
+    "6.4":{u:"verbetes",m:"porpag",v:12,fb:10},
+    "6.5":{u:"verbetes",m:"porpag",v:12,fb:10},
+    "6.6":{u:"verbetes",m:"porpag",v:12,fb:10},
+    "6.7":{u:"verbetes",m:"porpag",v:15,fb:10},
+    "10.2":{u:"edições",m:"paginas",v:24,fb:2},
+    "10.3":{u:"edições",m:"paginas",v:4,fb:0},
+    "10.5":{u:"fascículos",m:"paginas",v:32,fb:2}
+  };
+  var PARAM_PADRAO = {porpag:1, paginas:2, texto:250, fluxo:null};
+  var PARAM_ROTULO = {porpag:"Quantas por página?", paginas:"Páginas ocupadas por unidade", texto:"Média de palavras por unidade", fluxo:""};
 
   /* ---------- estado ---------- */
   var CHAVE = "ps_diagramador";
-  var cat = 1, tipo = null, ext = null, saida = null, papel = null;
+  var cat = 1, tipo = null, ext = null, saida = null, papel = null, palavras = null;
+  var un = null, modo = "porpag", param = 1, fb = null, soTexto = false;
   try{
     var s = JSON.parse(localStorage.getItem(CHAVE) || "null");
     if(s){
       tipo = s.tipo || null; ext = s.ext || null; saida = s.saida || null; papel = s.papel || null;
+      palavras = s.palavras || null;
+      un = s.un || null; modo = s.modo || "porpag"; param = (s.param != null) ? s.param : null;
+      fb = (s.fb != null) ? s.fb : null; soTexto = !!s.soTexto;
       if(tipo) cat = Number(String(tipo).split(".")[0]) || 1;
     }
   }catch(e){}
 
   var $ = function(id){ return document.getElementById(id); };
   var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var num = function(n){ return Number(n).toLocaleString("pt-BR"); };
   var tela = $("dgTela");
 
   function nomeTipo(cod){
@@ -3925,10 +4027,131 @@ document.addEventListener("visibilitychange",function(){
   }
   function achar(lista, cod){ return lista.filter(function(x){ return x[0] === cod; })[0]; }
   function ehImpresso(){ var x = achar(SAIDAS, saida); return !!(x && x[3]); }
+  function perfil(){ return tipo ? (PERFIS[tipo] || null) : null; }
+
+  /* ---------- painel de unidades: valores dos campos ---------- */
+  function sincronizar(){
+    var pf = perfil();
+    $("dgUn").value = un || "";
+    $("dgModo").value = modo;
+    $("dgParam").value = param || "";
+    var fbPad = (pf && pf.fb != null) ? pf.fb : FB_PADRAO;
+    $("dgFb").value = (fb != null) ? fb : "";
+    $("dgFb").placeholder = "padrão: " + fbPad;
+  }
+  function aplicarPerfil(){
+    var pf = perfil();
+    if(pf){ modo = pf.m; param = pf.v || null; fb = null; un = null; }
+    sincronizar();
+  }
+  /* mostra/esconde e rotula (não mexe nos valores digitados) */
+  function atualizarPainel(){
+    var pf = perfil(), usa = !!(pf && !soTexto);
+    $("dgUnidBox").hidden = !pf;
+    if(pf){
+      $("dgUnidTit").textContent = "Esta obra tem unidades fixas: conte por " + pf.u;
+      $("dgUnidTxt").textContent = "Em " + nomeTipo(tipo).toLowerCase() + ", o tamanho depende de quantas " + pf.u +
+        " há e de como cada uma ocupa a página, mais do que do total de palavras.";
+      $("dgUnidNome").textContent = pf.u;
+      $("dgParamT").textContent = PARAM_ROTULO[modo] || "";
+      $("dgParamL").hidden = (modo === "fluxo");
+      $("dgGrade").hidden = !usa;
+      $("dgSoTexto").textContent = usa ? "Prefiro calcular só pelas palavras" : "Voltar a contar por " + pf.u;
+    }
+    $("dgMedirTit").textContent = usa ? "Opcional: confira com o seu texto" : "Não sabe o tamanho? Descubra pelo seu texto";
+    $("dgMedirTxt").textContent = usa
+      ? "Cole o texto (ou digite o total de palavras) para conferir se cada unidade cabe no espaço escolhido. O texto não é guardado: só a contagem."
+      : "Cole o texto abaixo (ou digite só o número de palavras). O texto não é guardado: só a contagem.";
+  }
+
+  /* ---------- estimativa de páginas ---------- */
+  function estimar(){
+    var pf = perfil(), imp = ehImpresso();
+    var p = imp ? achar(PAPEIS, papel) : null;
+    var wpp = p ? p[3] : PPP_PADRAO;
+    var usa = !!(pf && !soTexto);
+    var corpo, desc, fbp = 0, aviso = "", verso = false;
+
+    if(usa){
+      if(!un) return null;
+      fbp = (fb != null) ? fb : ((pf.fb != null) ? pf.fb : FB_PADRAO);
+      if(modo === "porpag"){
+        var n = param > 0 ? param : 1;
+        corpo = Math.ceil(un / n);
+        desc = num(un) + " " + pf.u + ", " + num(n) + " por página = " + num(corpo) + " páginas";
+        if(palavras){
+          var med = Math.round(palavras / un), cap = Math.round(wpp / n);
+          if(med > cap) aviso = "Conferência: a média do seu texto é de " + num(med) + " palavras por unidade, mas cabem cerca de " + num(cap) +
+            " no espaço escolhido. O livro ficará maior que o calculado. Considere “Cada uma começa em página nova”.";
+        }
+      }else if(modo === "paginas"){
+        var x = param > 0 ? param : 1;
+        corpo = Math.ceil(un * x);
+        desc = num(un) + " " + pf.u + " × " + num(x) + " página(s) = " + num(corpo) + " páginas";
+        if(palavras){
+          var med2 = Math.round(palavras / un), cap2 = Math.round(wpp * x);
+          if(med2 > cap2) aviso = "Conferência: a média do seu texto é de " + num(med2) + " palavras por unidade, mas cabem cerca de " + num(cap2) +
+            " em " + num(x) + " página(s). Aumente as páginas por unidade.";
+        }
+      }else if(modo === "texto"){
+        var k = param > 0 ? param : 250;
+        var por = Math.max(1, Math.ceil(k / wpp));
+        corpo = un * por;
+        desc = num(un) + " " + pf.u + " × " + num(por) + " página(s) (cada uma começa em página nova; " + num(k) + " palavras em média) = " + num(corpo) + " páginas";
+      }else{ /* fluxo */
+        if(!palavras) return {pend:true};
+        corpo = Math.max(1, Math.ceil(palavras / wpp));
+        desc = num(palavras) + " palavras ÷ " + num(wpp) + " por página = " + num(corpo) + " páginas";
+      }
+    }else{
+      if(!palavras) return null;
+      verso = (tipo === "3.1" || tipo === "3.2");   /* versos: muito branco na página */
+      if(verso) wpp = Math.round(wpp * 0.4);
+      corpo = Math.max(1, Math.ceil(palavras / wpp));
+      desc = num(palavras) + " palavras ÷ " + num(wpp) + " por página = " + num(corpo) + " páginas";
+    }
+
+    var total = corpo + fbp, arred = false;
+    if(imp && total % 2){ total++; arred = true; }   /* papel é frente e verso */
+    total = Math.max(1, total);
+    var idx = 0;
+    while(idx < EXTENSOES.length - 1 && total > EXTENSOES[idx][3]) idx++;
+    return {pag:total, wpp:wpp, papel:p, verso:verso, ext:EXTENSOES[idx][0], idx:idx,
+            desc:desc, fb:fbp, arred:arred, aviso:aviso, unid:usa, imp:imp};
+  }
+
+  function desenharSugestao(est){
+    var box = $("dgSugestao");
+    if(!est){ box.innerHTML = ""; return; }
+    if(est.pend){
+      box.innerHTML = 'Para o modo “texto corrido”, informe o total de palavras no campo acima.';
+      return;
+    }
+    var e = EXTENSOES[est.idx];
+    var base = est.papel ? 'em ' + esc(est.papel[1]) : 'em tela (sem papel definido)';
+    var h = 'Cerca de <strong>' + num(est.pag) + ' ' + (est.pag === 1 ? 'página' : 'páginas') + '</strong> ' + base + '.<br>' +
+            'Extensão adequada: <strong>' + e[0] + ' ' + esc(e[1]) + '</strong> (' + esc(e[2]) + ').';
+    h += '<span class="nota">Conta: ' + esc(est.desc) +
+         (est.fb ? ' + ' + num(est.fb) + ' páginas iniciais e finais' : '') +
+         (est.arred ? ' + 1 para fechar a folha (frente e verso)' : '') + '.</span>';
+    h += '<span class="nota">Base de ' + num(est.wpp) + ' palavras por página' + (est.verso ? ' (ajustada para versos)' : '') + '.' +
+         (!est.papel ? ' Se a saída for impressa, o número muda quando você escolher o papel.' : '') +
+         ' Imagens e capítulos novos em página própria podem aumentar o total.</span>';
+    if(est.aviso) h += '<span class="aviso">' + esc(est.aviso) + '</span>';
+    if(ext !== e[0]){
+      h += '<button type="button" class="at-btn gold" data-usar="' + e[0] + '">USAR SUGESTÃO (' + e[0] + ')</button>';
+    }else{
+      h += '<span class="nota"><strong>Você já escolheu a extensão sugerida.</strong></span>';
+    }
+    box.innerHTML = h;
+  }
 
   /* ---------- desenho ---------- */
   function desenhar(){
     var g = GENEROS[cat - 1];
+    atualizarPainel();
+    var est = estimar();
+    var sugExt = (est && !est.pend) ? est.ext : null;
 
     $("dgCats").innerHTML = GENEROS.map(function(x){
       var escolhido = tipo && Number(tipo.split(".")[0]) === x.n;
@@ -3947,9 +4170,13 @@ document.addEventListener("visibilitychange",function(){
       }).join("") + '</div>';
 
     $("dgExts").innerHTML = EXTENSOES.map(function(e){
-      return '<button type="button" class="dg-ext" data-ext="' + e[0] + '" aria-pressed="' + (ext === e[0]) + '">' +
+      var sug = sugExt === e[0];
+      return '<button type="button" class="dg-ext' + (sug ? ' sug' : '') + '" data-ext="' + e[0] + '" aria-pressed="' + (ext === e[0]) + '">' +
+        (sug ? '<span class="tag">SUGERIDA</span>' : '') +
         '<b>' + e[0] + '</b>' + esc(e[1]) + '<small>' + esc(e[2]) + '</small></button>';
     }).join("");
+
+    desenharSugestao(est);
 
     $("dgSaidas").innerHTML = SAIDAS.map(function(x){
       return '<button type="button" class="dg-ext" data-saida="' + x[0] + '" aria-pressed="' + (saida === x[0]) + '">' +
@@ -3987,11 +4214,20 @@ document.addEventListener("visibilitychange",function(){
   });
   $("dgTiposBox").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-tipo]"); if(!b) return;
-    tipo = b.dataset.tipo; desenhar();
+    if(tipo !== b.dataset.tipo){
+      tipo = b.dataset.tipo;
+      soTexto = false;
+      aplicarPerfil();
+    }
+    desenhar();
   });
   $("dgExts").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-ext]"); if(!b) return;
     ext = b.dataset.ext; desenhar();
+  });
+  $("dgSugestao").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-usar]"); if(!b) return;
+    ext = b.dataset.usar; desenhar();
   });
   $("dgSaidas").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-saida]"); if(!b) return;
@@ -4003,16 +4239,61 @@ document.addEventListener("visibilitychange",function(){
     var b = ev.target.closest("[data-papel]"); if(!b) return;
     papel = b.dataset.papel; desenhar();
   });
+
+  /* painel de unidades */
+  $("dgUn").addEventListener("input", function(){
+    var n = parseInt(this.value, 10);
+    un = (n > 0) ? n : null; desenhar();
+  });
+  $("dgModo").addEventListener("change", function(){
+    modo = this.value;
+    param = PARAM_PADRAO[modo];
+    sincronizar(); desenhar();
+  });
+  $("dgParam").addEventListener("input", function(){
+    var n = parseFloat(String(this.value).replace(",", "."));
+    param = (n > 0) ? n : null; desenhar();
+  });
+  $("dgFb").addEventListener("input", function(){
+    var n = parseInt(this.value, 10);
+    fb = (n >= 0) ? n : null; desenhar();
+  });
+  $("dgSoTexto").addEventListener("click", function(){
+    soTexto = !soTexto; desenhar();
+  });
+
+  /* medir texto colado */
+  $("dgTexto").addEventListener("input", function(){
+    var t = this.value.trim();
+    palavras = t ? t.split(/\s+/).filter(Boolean).length : null;
+    $("dgPalavras").value = palavras || "";
+    desenhar();
+  });
+  /* ou digitar o número de palavras */
+  $("dgPalavras").addEventListener("input", function(){
+    var n = parseInt(this.value, 10);
+    palavras = (n > 0) ? n : null;
+    desenhar();
+  });
+
   $("dgLimpar").addEventListener("click", function(){
-    tipo = null; ext = null; saida = null; papel = null;
+    tipo = null; ext = null; saida = null; papel = null; palavras = null;
+    un = null; modo = "porpag"; param = 1; fb = null; soTexto = false;
+    $("dgTexto").value = ""; $("dgPalavras").value = "";
+    sincronizar();
     try{ localStorage.removeItem(CHAVE); }catch(e){}
     desenhar();
   });
   $("dgConfirmar").addEventListener("click", function(){
     if($("dgConfirmar").disabled) return;
-    try{ localStorage.setItem(CHAVE, JSON.stringify({tipo:tipo, ext:ext, saida:saida, papel:papel})); }catch(e){}
+    try{
+      localStorage.setItem(CHAVE, JSON.stringify({
+        tipo:tipo, ext:ext, saida:saida, papel:papel, palavras:palavras,
+        un:un, modo:modo, param:param, fb:fb, soTexto:soTexto
+      }));
+    }catch(e){}
     resumo("Escolha registrada.");
-    /* PRÓXIMO PASSO: aqui entra a tela de colar o texto. */
+    /* PRÓXIMO PASSO: aqui entra a tela de colar o texto para diagramar. */
   });
 
   /* ---------- botão ao lado de MESA DE ESTUDO ---------- */
@@ -4022,7 +4303,11 @@ document.addEventListener("visibilitychange",function(){
   if(mesa){ mesa.insertAdjacentElement("afterend", btn); }
   else{ var grupo = document.querySelector(".at-modo"); if(grupo) grupo.appendChild(btn); }
 
-  function abrir(){ desenhar(); tela.hidden = false; $("dgFechar").focus(); }
+  function abrir(){
+    if(palavras) $("dgPalavras").value = palavras;
+    sincronizar();
+    desenhar(); tela.hidden = false; $("dgFechar").focus();
+  }
   function fechar(){ tela.hidden = true; btn.focus(); }
   btn.addEventListener("click", abrir);
   $("dgFechar").addEventListener("click", fechar);
@@ -4032,8 +4317,6 @@ document.addEventListener("visibilitychange",function(){
   }, true);
 })();
 </script>
-
-
 </body>
 </html>
  
