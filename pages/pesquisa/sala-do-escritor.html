@@ -3972,12 +3972,19 @@ document.addEventListener("visibilitychange",function(){
   }, true);
 })();
 </script>
+
+
+
 <!-- ===== INÍCIO: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
+<!-- v3: saída principal PDF Digital A5 + normas de tipografia por parte (tipografia-devocional-a5.json).
+     COMO APLICAR: no seu sala-do-escritor.html, apague TUDO entre o comentário "INÍCIO: MENU DE DIAGRAMAÇÃO (4.1)"
+     e o comentário "FIM: MENU DE DIAGRAMAÇÃO (4.1)" (inclusive os dois) e cole este bloco no lugar.
+     Depois, coloque o arquivo tipografia-devocional-a5.json na mesma pasta da página (ao lado do tabela.json). -->
 <style>
 /* seta no botão 4.1, indicando que ele abre uma lista */
 .dg-tipo[data-tipo="4.1"]::after{content:"\25BE";margin-left:auto;padding-left:8px;font:700 14px "Segoe UI",Arial,sans-serif;transition:transform .15s}
 body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
-
+ 
 /* lista: painel à direita do conteúdo */
 #dgLista{display:none;position:fixed;z-index:99999;overflow-y:auto;background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;box-shadow:0 12px 30px rgba(30,22,10,.35);padding:4px 0}
 #dgLista.aberta{display:block}
@@ -3986,7 +3993,9 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 .dgl-item:hover,.dgl-item:focus{background:var(--brass-wash,#f3e9cc);outline:none}
 .dgl-item b{flex:0 0 auto;min-width:44px;color:var(--brass-deep,#7d5f1e);font:700 12.5px "Segoe UI",Arial,sans-serif}
 .dgl-item i{margin-left:auto;font-style:normal;font-weight:700;color:var(--brass-deep,#7d5f1e)}
-
+/* parte que está aberta no editor */
+.dgl-item.ativa{background:var(--brass-wash,#f3e9cc);box-shadow:inset 4px 0 0 var(--brass,#a07d33)}
+ 
 /* editor (colar / criar): painel na área limpa abaixo dos cartões, à esquerda da lista */
 .dg-editor{display:none;position:fixed;z-index:100000}
 .dg-editor.aberto{display:block}
@@ -3995,28 +4004,36 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 .dg-editor-box h3{margin:0;font:600 22px Georgia,"Times New Roman",serif}
 .dg-saidas{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .dg-saidas>span{color:var(--ink-soft,#6b5f48);font:700 11.5px "Segoe UI",Arial,sans-serif;letter-spacing:.06em}
-.dg-saida{padding:6px 11px;border:1px solid var(--paper-line,#e3d8bd);border-radius:6px;background:#fff;color:var(--ink,#2a2217);cursor:pointer;font:700 12px "Segoe UI",Arial,sans-serif}
-.dg-saida:hover{border-color:var(--brass,#a07d33)}
+.dg-saida{padding:6px 11px;border:1px solid var(--paper-line,#e3d8bd);border-radius:6px;background:#fff;color:var(--ink,#2a2217);cursor:default;font:700 12px "Segoe UI",Arial,sans-serif}
+.dg-saida small{margin-left:6px;font:600 10px "Segoe UI",Arial,sans-serif;opacity:.85}
+/* saída principal acesa ("ativa") */
 .dg-saida[aria-pressed="true"]{background:var(--brass,#a07d33);border-color:var(--brass,#a07d33);color:#fffdf6}
+.dg-saida.pulso{animation:dgPulso .9s ease-out}
+@keyframes dgPulso{0%{box-shadow:0 0 0 0 rgba(160,125,51,.75)}100%{box-shadow:0 0 0 12px rgba(160,125,51,0)}}
+/* saídas que ainda vão ser criadas */
+.dg-saida[disabled]{opacity:.55;border-style:dashed;cursor:not-allowed}
 #dgDiagramar:disabled{opacity:.45;cursor:not-allowed}
-.dg-editor-box .dg-edesc{margin:0 0 12px;color:var(--ink-soft,#6b5f48);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+.dg-editor-box .dg-edesc{margin:0 0 6px;color:var(--ink-soft,#6b5f48);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+.dg-editor-box .dg-normas{margin:0 0 10px;color:var(--brass-deep,#7d5f1e);font:600 12.5px "Segoe UI",Arial,sans-serif}
+.dg-editor-box .dg-normas.erro{color:#a14747}
 .dg-x{position:absolute;top:10px;right:14px;border:none;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:var(--ink,#2a2217)}
 #dgTexto{flex:1 1 auto;width:100%;min-height:120px;padding:14px;border:1px solid var(--paper-line,#e3d8bd);border-radius:8px;background:#fff;color:var(--ink,#2a2217);font:16px/1.6 Georgia,"Times New Roman",serif;resize:none;box-sizing:border-box}
 #dgTexto:focus{outline:2px solid var(--brass,#a07d33)}
 .dg-ebotoes{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
 .dg-ebotoes .dg-status{flex:1 1 180px;color:var(--brass-deep,#7d5f1e);font:600 13.5px "Segoe UI",Arial,sans-serif}
 </style>
-
+ 
 <div id="dgLista" role="listbox" aria-label="Partes do livro"></div>
-
+ 
 <div id="dg-editor" class="dg-editor" role="dialog" aria-modal="false" aria-labelledby="dgEtitulo">
   <div class="dg-editor-box">
     <button id="dgEfechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
     <div class="dg-ehead">
       <h3 id="dgEtitulo"></h3>
-      <div class="dg-saidas" id="dgSaidas" role="group" aria-label="Saídas em PDF"></div>
+      <div class="dg-saidas" id="dgSaidas" role="group" aria-label="Saídas"></div>
     </div>
     <p class="dg-edesc" id="dgEdesc"></p>
+    <p class="dg-normas" id="dgNormas" role="status"></p>
     <textarea id="dgTexto" placeholder="Cole aqui o texto desta parte."></textarea>
     <div class="dg-ebotoes">
       <button id="dgApagar" class="at-btn" type="button">APAGAR TEXTO</button>
@@ -4026,15 +4043,16 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     </div>
   </div>
 </div>
-
+ 
 <script>
 (function(){
   var lista = document.getElementById("dgLista");
   var ed = document.getElementById("dg-editor");
   var txt = document.getElementById("dgTexto");
   var status = document.getElementById("dgStatus");
+  var elNormas = document.getElementById("dgNormas");
   if(!lista || !ed || !txt) return;
-
+ 
   /* [código, nome, descrição] */
   var GRUPOS = [
     {g:"Antes do texto", itens:[
@@ -4065,38 +4083,84 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       ["D16","Cabeçalho, rodapé e paginação","Regras de paginação e elementos recorrentes."]
     ]}
   ];
-
+ 
   var CHAVE = "ps_diagramador_partes";
   var salvos = {};
   try{ salvos = JSON.parse(localStorage.getItem(CHAVE) || "{}") || {}; }catch(e){ salvos = {}; }
   function gravar(){ try{ localStorage.setItem(CHAVE, JSON.stringify(salvos)); }catch(e){} }
-
+ 
   function achar(cod){
     for(var i = 0; i < GRUPOS.length; i++)
       for(var j = 0; j < GRUPOS[i].itens.length; j++)
         if(GRUPOS[i].itens[j][0] === cod) return GRUPOS[i].itens[j];
     return null;
   }
-
+ 
+  /* ---------- NORMAS: carregadas do JSON, funcionam como o "prompt" da parte ---------- */
+  var NORMAS_URL = "tipografia-devocional-a5.json";
+  var normasDados = null, normasPromessa = null;
+  var normaAtual = null;     /* normas da parte aberta (nos bastidores) */
+  var saidaAtiva = false;    /* a saída principal acende quando as normas da parte carregam */
+ 
+  function carregarNormas(){
+    if(normasDados) return Promise.resolve(normasDados);
+    if(normasPromessa) return normasPromessa;
+    normasPromessa = fetch(NORMAS_URL, {cache:"no-cache"})
+      .then(function(r){ if(!r.ok) throw new Error("não encontrado"); return r.json(); })
+      .then(function(d){ normasDados = d; return d; })
+      .catch(function(e){ normasPromessa = null; throw e; });
+    return normasPromessa;
+  }
+ 
+  function acharNorma(d, cod){
+    var partes = d.partes || [];
+    for(var i = 0; i < partes.length; i++){
+      if(partes[i].cod === cod) return {parte: partes[i], pai: null};
+      var sub = partes[i].subpartes || [];
+      for(var j = 0; j < sub.length; j++)
+        if(sub[j].cod === cod) return {parte: sub[j], pai: partes[i]};
+    }
+    return null;
+  }
+ 
+  function montarPrompt(d, ach){
+    var s = d.saidas[d.saida_principal];
+    var l = [];
+    l.push("SAÍDA: " + s.nome + " — página " + s.pagina_mm[0] + " × " + s.pagina_mm[1] + " mm, margem lateral " + s.margem_lateral_pt + " pt, fonte " + s.fonte + ".");
+    l.push("PARTE: " + ach.parte.cod + " — " + ach.parte.nome + ".");
+    if(ach.parte.prompt) l.push(ach.parte.prompt);
+    var regras = ((ach.pai && ach.pai.regras) || []).concat(ach.parte.regras || []);
+    if(regras.length) l.push("REGRAS:\n- " + regras.join("\n- "));
+    var c = d.global.corpo;
+    l.push("PADRÃO DO CORPO: " + c.tamanho_pt + " pt, entrelinha " + c.entrelinha_pt + " pt, " + c.alinhamento +
+           ", sem recuo de primeira linha, " + c.espaco_entre_paragrafos_pt + " pt entre parágrafos.");
+    return l.join("\n\n");
+  }
+ 
+  function mostrarNormas(msg, erro){
+    elNormas.textContent = msg || "";
+    elNormas.className = "dg-normas" + (erro ? " erro" : "");
+  }
+ 
   /* ---------- lista à direita do conteúdo ---------- */
   function botao(){ return document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
   function listaAberta(){ return lista.classList.contains("aberta"); }
   function editorAberto(){ return ed.classList.contains("aberto"); }
-
+ 
   function montarLista(){
     var rolagem = lista.scrollTop;
     var h = "";
     GRUPOS.forEach(function(g){
       h += '<div class="dgl-grupo">' + g.g + '</div>';
       g.itens.forEach(function(it){
-        h += '<button type="button" class="dgl-item" role="option" data-cod="' + it[0] + '" title="' + it[2] + '">' +
+        h += '<button type="button" class="dgl-item' + (it[0] === atual ? ' ativa' : '') + '" role="option" data-cod="' + it[0] + '" title="' + it[2] + '">' +
              '<b>' + it[0] + '</b><span>' + it[1] + '</span>' + (salvos[it[0]] ? '<i>✓</i>' : '') + '</button>';
       });
     });
     lista.innerHTML = h;
     lista.scrollTop = rolagem;
   }
-
+ 
   /* container que envolve o botão 4.1 e os cartões E01–E10 (.dg-miolo) */
   function containerPagina(){
     var b = botao(); if(!b) return null;
@@ -4106,7 +4170,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     while(c && !c.contains(cartao)) c = c.parentElement;
     return c;
   }
-
+ 
   function soltarConteudo(){
     var c = containerPagina();
     if(!c) return;
@@ -4114,23 +4178,21 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     c.style.marginRight = "";
     c.style.maxWidth = "";
   }
-
+ 
   function posicionar(){
     var b = botao();
     if(!b){ fecharLista(); return; }
-
+ 
     var c = containerPagina();
     if(c && window.innerWidth >= 1000){
-      /* conteúdo para a esquerda */
       c.style.marginLeft = "0";
       c.style.marginRight = "auto";
       c.style.maxWidth = "min(56vw, 1000px)";
-
-      /* painel na área livre à direita */
+ 
       var r = c.getBoundingClientRect();
       var left = r.right + 24;
-      var top = 84;                                              /* abaixo do cabeçalho "Diagramador" */
-      var altura = Math.max(260, window.innerHeight - top - 90); /* acima da barra Limpar/Confirmar */
+      var top = 84;
+      var altura = Math.max(260, window.innerHeight - top - 90);
       lista.style.left = left + "px";
       lista.style.top = top + "px";
       lista.style.width = Math.max(320, window.innerWidth - left - 24) + "px";
@@ -4138,8 +4200,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       lista.style.maxHeight = altura + "px";
       return;
     }
-
-    /* plano B (tela estreita): embaixo do botão 4.1 */
+ 
     soltarConteudo();
     var rb = b.getBoundingClientRect();
     var w = Math.min(Math.max(rb.width, 380), window.innerWidth - 24);
@@ -4151,8 +4212,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     lista.style.height = "";
     lista.style.maxHeight = Math.max(220, window.innerHeight - t2 - 16) + "px";
   }
-
-  /* editor: área limpa abaixo dos cartões E01–E10, à esquerda da lista */
+ 
   function posicionarEditor(){
     var c = containerPagina();
     var ex = document.getElementById("dgExts");
@@ -4168,14 +4228,13 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       ed.style.height = altura + "px";
       return;
     }
-    /* plano B (tela estreita): painel sobre a página */
     var larg = Math.min(820, window.innerWidth - 24);
     ed.style.left = Math.max(12, (window.innerWidth - larg) / 2) + "px";
     ed.style.top = "84px";
     ed.style.width = larg + "px";
     ed.style.height = Math.max(300, window.innerHeight - 84 - 90) + "px";
   }
-
+ 
   function abrirLista(){
     if(!botao()) return;
     montarLista();
@@ -4189,9 +4248,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     document.body.classList.remove("dg-lista-aberta");
     soltarConteudo();
   }
-
-  /* clique no 4.1 abre/fecha; clique em qualquer outro lugar fecha
-     (com o editor aberto, os cliques fora são ignorados) */
+ 
   document.addEventListener("click", function(ev){
     if(editorAberto()) return;
     var t = ev.target;
@@ -4199,112 +4256,151 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     var b = t.closest && t.closest("[data-tipo]");
     if(b && b.dataset.tipo === "4.1"){
       if(listaAberta()) fecharLista(); else abrirLista();
-      setTimeout(function(){ if(listaAberta()) posicionar(); }, 0); /* o Diagramador redesenha os botões */
+      setTimeout(function(){ if(listaAberta()) posicionar(); }, 0);
     } else {
       fecharLista();
     }
   }, true);
-
-  /* escolher uma parte na lista abre o editor sem fechar a lista */
+ 
+  /* escolher uma parte na lista abre o editor e carrega as normas dela */
   lista.addEventListener("click", function(ev){
     var it = ev.target.closest(".dgl-item"); if(!it) return;
     abrirEditor(it.dataset.cod);
   });
-
+ 
   function reposicionar(){
     if(listaAberta()) posicionar();
     if(editorAberto()) posicionarEditor();
   }
   window.addEventListener("resize", reposicionar);
   window.addEventListener("scroll", reposicionar, true);
-
+ 
+  /* ---------- saídas: a principal (PDF Digital A5) e as que virão depois ---------- */
+  var btnDiag = document.getElementById("dgDiagramar");
+ 
+  function nomeSaidaPrincipal(){
+    if(normasDados){
+      var s = normasDados.saidas && normasDados.saidas[normasDados.saida_principal];
+      if(s && s.nome) return s.nome;
+    }
+    return "PDF Digital A5";
+  }
+  function saidasEmBreve(){
+    var out = [];
+    if(normasDados && normasDados.saidas){
+      Object.keys(normasDados.saidas).forEach(function(k){
+        var s = normasDados.saidas[k];
+        if(s && s.em_breve) out.push(s.nome);
+      });
+    }
+    if(!out.length) out = ["PDF Impresso","PDF Celular","PDF Tablet","Kindle (EPUB)"];
+    return out;
+  }
+ 
+  function desenharSaidas(pulso){
+    var h = '<span>SAÍDA:</span>' +
+      '<button type="button" class="dg-saida' + (pulso ? ' pulso' : '') + '" data-saida="principal" aria-pressed="' + saidaAtiva + '"' +
+      ' title="Saída principal">' + (saidaAtiva ? '● ' : '') + nomeSaidaPrincipal() + '<small>' + (saidaAtiva ? 'ATIVA' : 'PRINCIPAL') + '</small></button>';
+    saidasEmBreve().forEach(function(n){
+      h += '<button type="button" class="dg-saida" disabled title="Em breve">' + n + '<small>EM BREVE</small></button>';
+    });
+    document.getElementById("dgSaidas").innerHTML = h;
+  }
+ 
+  function atualizarDiagramar(){
+    btnDiag.disabled = !(txt.value.trim() && saidaAtiva && normaAtual);
+  }
+ 
   /* ---------- editor de colar / criar ---------- */
   var atual = null;
-
+ 
   function abrirEditor(cod){
     var it = achar(cod); if(!it) return;
     atual = cod;
+    normaAtual = null;
+    saidaAtiva = false;
     document.getElementById("dgEtitulo").textContent = it[0] + " — " + it[1];
     document.getElementById("dgEdesc").textContent = it[2];
     txt.value = salvos[cod] || "";
     status.textContent = "";
+    mostrarNormas("Carregando normas desta parte…");
+    desenharSaidas(false);
     atualizarDiagramar();
     if(!listaAberta()) abrirLista();
+    montarLista();
     ed.classList.add("aberto");
     posicionarEditor();
     txt.focus({preventScroll:true});
+ 
+    var minha = cod;
+    carregarNormas().then(function(d){
+      if(atual !== minha) return;               /* o usuário já trocou de parte */
+      var ach = acharNorma(d, minha);
+      if(!ach){
+        mostrarNormas("Esta parte ainda não tem normas no arquivo de tipografia.", true);
+        desenharSaidas(false); atualizarDiagramar();
+        return;
+      }
+      normaAtual = {
+        cod: ach.parte.cod,
+        nome: ach.parte.nome,
+        saida: d.saida_principal,
+        parte: ach.parte,
+        pai: ach.pai,
+        global: d.global,
+        pagina: d.saidas[d.saida_principal],
+        prompt: montarPrompt(d, ach)
+      };
+      saidaAtiva = true;                         /* a saída principal acende (reativada) */
+      desenharSaidas(true);
+      mostrarNormas("Normas carregadas: " + ach.parte.cod + " · " + nomeSaidaPrincipal());
+      atualizarDiagramar();
+    }).catch(function(e){
+      if(atual !== minha) return;
+      console.error(e);
+      mostrarNormas("Não foi possível ler tipografia-devocional-a5.json. Confira se ele está na mesma pasta desta página.", true);
+      desenharSaidas(false); atualizarDiagramar();
+    });
   }
+ 
   function fecharEditor(){
     ed.classList.remove("aberto");
     atual = null;
-    if(!listaAberta()) abrirLista(); /* a lista continua aberta para escolher outra parte */
+    normaAtual = null;
+    saidaAtiva = false;
+    if(!listaAberta()) abrirLista();
+    else montarLista();
   }
-
-  /* ---------- saídas em PDF (ao lado do título) + DIAGRAMAR ---------- */
-  var SAIDAS = [
-    ["impresso","PDF Impresso"],
-    ["digital","PDF Digital"],
-    ["celular","PDF Celular"],
-    ["tablet","PDF Tablet"],
-    ["kindle","Kindle (EPUB)"]
-  ];
-  var CHAVE_SAIDAS = "ps_diagramador_saidas";
-  var saidas = [];
-  try{ saidas = JSON.parse(localStorage.getItem(CHAVE_SAIDAS) || "[]") || []; }catch(e){ saidas = []; }
-  var btnDiag = document.getElementById("dgDiagramar");
-
-  function desenharSaidas(){
-    var todos = saidas.length === SAIDAS.length;
-    var h = '<span>SAÍDA:</span>' +
-      '<button type="button" class="dg-saida" data-saida="todos" aria-pressed="' + todos + '">TODOS OS MEIOS</button>';
-    SAIDAS.forEach(function(x){
-      h += '<button type="button" class="dg-saida" data-saida="' + x[0] + '" aria-pressed="' + (saidas.indexOf(x[0]) > -1) + '">' + x[1] + '</button>';
-    });
-    document.getElementById("dgSaidas").innerHTML = h;
-  }
-  function atualizarDiagramar(){
-    btnDiag.disabled = !(txt.value.trim() && saidas.length);
-  }
-  document.getElementById("dgSaidas").addEventListener("click", function(ev){
-    var b = ev.target.closest("[data-saida]"); if(!b) return;
-    var v = b.dataset.saida;
-    if(v === "todos"){
-      saidas = (saidas.length === SAIDAS.length) ? [] : SAIDAS.map(function(x){ return x[0]; });
-    } else {
-      var i = saidas.indexOf(v);
-      if(i > -1) saidas.splice(i, 1); else saidas.push(v);
-    }
-    try{ localStorage.setItem(CHAVE_SAIDAS, JSON.stringify(saidas)); }catch(e){}
-    desenharSaidas();
-    atualizarDiagramar();
-  });
+ 
   txt.addEventListener("input", atualizarDiagramar);
-  desenharSaidas();
-
+  desenharSaidas(false);
+ 
   btnDiag.addEventListener("click", function(){
-    if(!atual) return;
+    if(!atual || !normaAtual) return;
     var tipoSel = document.querySelector('#dgTiposBox .dg-tipo[aria-pressed="true"]');
     var extSel = document.querySelector('#dgExts .dg-ext[aria-pressed="true"]');
     if(!extSel){ status.textContent = "Escolha o tamanho da obra (E01–E10) antes de diagramar."; return; }
-    /* guarda o texto antes de diagramar */
     salvos[atual] = txt.value; gravar(); montarLista();
     var pedido = {
       parte: atual,
       texto: txt.value,
       tipo: tipoSel ? tipoSel.dataset.tipo : null,
       extensao: extSel.dataset.ext,
-      saidas: saidas.slice()
+      saida: normaAtual.saida,
+      saidas: [normaAtual.saida],
+      normas: normaAtual,            /* medidas e regras da parte */
+      prompt: normaAtual.prompt      /* instrução pronta, nos bastidores */
     };
     /* PRÓXIMO PASSO: quem gera a página/PDF escuta este evento */
     document.dispatchEvent(new CustomEvent("dg:diagramar", {detail: pedido}));
-    status.textContent = "Diagramação solicitada: " + pedido.parte + " · " + pedido.extensao + " · " + saidas.join(", ");
+    status.textContent = "Diagramação solicitada: " + pedido.parte + " · " + pedido.extensao + " · " + pedido.saida;
   });
-
+ 
   document.getElementById("dgSalvar").addEventListener("click", function(){
     if(!atual) return;
     if(txt.value.trim()) salvos[atual] = txt.value; else delete salvos[atual];
     gravar();
-    montarLista(); /* atualiza o ✓ da parte salva */
+    montarLista();
     status.textContent = "Salvo.";
   });
   document.getElementById("dgApagar").addEventListener("click", function(){
@@ -4316,7 +4412,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     status.textContent = "Texto apagado.";
   });
   document.getElementById("dgEfechar").addEventListener("click", fecharEditor);
-
+ 
   /* ESC: fecha o editor, depois a lista, sem fechar o Diagramador por baixo */
   window.addEventListener("keydown", function(ev){
     if(ev.key !== "Escape") return;
@@ -4326,9 +4422,6 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 })();
 </script>
 <!-- ===== FIM: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
-
-
-
 
 </body>
 </html>
