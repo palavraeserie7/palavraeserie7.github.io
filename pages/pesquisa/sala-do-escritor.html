@@ -3973,7 +3973,82 @@ Botao diagramar mesa v2 · HTML
 })();
 </script>
  
+<!-- ===== INÍCIO: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
+<style>
+.modal-diagramacao{display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.65);padding:20px;overflow-y:auto}
+.modal-diagramacao.aberto{display:block}
+.conteudo-diagramacao{position:relative;max-width:750px;margin:30px auto;padding:28px;background:#fff;color:#292d29;border-radius:12px;font-family:Arial,sans-serif}
+.conteudo-diagramacao h2{margin:0 0 4px;padding-right:30px;font-family:Georgia,"Times New Roman",serif}
+.conteudo-diagramacao>p{margin:0 0 14px;color:#5b605b}
+.conteudo-diagramacao details{border-bottom:1px solid #ddd;padding:13px 0}
+.conteudo-diagramacao summary{cursor:pointer;font-weight:bold;color:#344b3d}
+.conteudo-diagramacao details p{margin:6px 0 0}
+.fechar-diagramacao{position:absolute;top:12px;right:16px;border:none;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:#292d29}
+@media(max-width:600px){.conteudo-diagramacao{margin:10px auto;padding:20px}}
+</style>
 
+<div id="menu-diagramacao" class="modal-diagramacao" role="dialog" aria-modal="true" aria-labelledby="titulo-diagramacao">
+  <div class="conteudo-diagramacao">
+    <button id="fechar-diagramacao" class="fechar-diagramacao" type="button" aria-label="Fechar">&times;</button>
+
+    <h2 id="titulo-diagramacao">Menu Geral de Diagramação</h2>
+    <p>Padrão editorial para devocionais</p>
+
+    <details><summary>D01 — Capa</summary>Título, subtítulo, autor e editora.</details>
+    <details><summary>D02 — Página de rosto</summary>Identificação da obra, autor e editora.</details>
+    <details><summary>D03 — Direitos autorais</summary>Copyright e direitos de reprodução.</details>
+    <details><summary>D04 — Dedicatória</summary>Texto de dedicação.</details>
+    <details><summary>D05 — Palavra do autor</summary>Apresentação e intenção da obra.</details>
+    <details><summary>D06 — Introdução</summary>Contextualização do devocional.</details>
+    <details><summary>D07 — Como usar o devocional</summary>Orientações de leitura.</details>
+    <details><summary>D08 — Sumário</summary>Partes, dias, títulos e páginas.</details>
+    <details><summary>D09 — Abertura de parte</summary>Número e título da parte.</details>
+
+    <details open>
+      <summary>D10 — Dia devocional completo</summary>
+      <p>D10.1 — Abertura do dia</p>
+      <p>D10.2 — Texto bíblico central</p>
+      <p>D10.3 — Desenvolvimento devocional</p>
+      <p>D10.4 — Reflexão</p>
+      <p>D10.5 — Leitura complementar</p>
+      <p>D10.6 — Oração</p>
+    </details>
+
+    <details><summary>D11 — Encerramento</summary>Conclusão da jornada.</details>
+    <details><summary>D12 — Palavra final</summary>Mensagem de despedida.</details>
+    <details><summary>D13 — Sobre o autor</summary>Biografia do autor.</details>
+    <details><summary>D14 — Missão ministerial</summary>Propósito ministerial.</details>
+    <details><summary>D15 — Apresentação da editora</summary>Identidade editorial.</details>
+    <details><summary>D16 — Cabeçalho, rodapé e paginação</summary>Regras de paginação e elementos recorrentes.</details>
+  </div>
+</div>
+
+<script>
+(function(){
+  var menu = document.getElementById("menu-diagramacao");
+  var fechar = document.getElementById("fechar-diagramacao");
+  if(!menu || !fechar) return;
+
+  function abrirMenu(){ menu.classList.add("aberto"); fechar.focus(); }
+  function fecharMenu(){ menu.classList.remove("aberto"); }
+
+  document.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest('[data-tipo="4.1"]');
+    if(b) abrirMenu();
+  }, true);
+
+  fechar.addEventListener("click", fecharMenu);
+  menu.addEventListener("click", function(ev){ if(ev.target === menu) fecharMenu(); });
+
+  window.addEventListener("keydown", function(ev){
+    if(ev.key === "Escape" && menu.classList.contains("aberto")){
+      fecharMenu();
+      ev.stopImmediatePropagation();
+    }
+  }, true);
+})();
+</script>
+<!-- ===== FIM: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
 
 
 </body>
