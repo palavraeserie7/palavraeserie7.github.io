@@ -3972,15 +3972,12 @@ document.addEventListener("visibilitychange",function(){
   }, true);
 })();
 </script>
-
-
-Menu diagramacao 4 1 v2 · HTML
 <!-- ===== INÍCIO: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
 <style>
 /* seta no botão 4.1, indicando que ele abre uma lista */
 .dg-tipo[data-tipo="4.1"]::after{content:"\25BE";margin-left:auto;padding-left:8px;font:700 14px "Segoe UI",Arial,sans-serif;transition:transform .15s}
 body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
- 
+
 /* lista: painel à direita do conteúdo */
 #dgLista{display:none;position:fixed;z-index:99999;overflow-y:auto;background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;box-shadow:0 12px 30px rgba(30,22,10,.35);padding:4px 0}
 #dgLista.aberta{display:block}
@@ -3989,7 +3986,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 .dgl-item:hover,.dgl-item:focus{background:var(--brass-wash,#f3e9cc);outline:none}
 .dgl-item b{flex:0 0 auto;min-width:44px;color:var(--brass-deep,#7d5f1e);font:700 12.5px "Segoe UI",Arial,sans-serif}
 .dgl-item i{margin-left:auto;font-style:normal;font-weight:700;color:var(--brass-deep,#7d5f1e)}
- 
+
 /* editor (colar / criar): painel na área limpa abaixo dos cartões, à esquerda da lista */
 .dg-editor{display:none;position:fixed;z-index:100000}
 .dg-editor.aberto{display:block}
@@ -4009,9 +4006,9 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 .dg-ebotoes{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
 .dg-ebotoes .dg-status{flex:1 1 180px;color:var(--brass-deep,#7d5f1e);font:600 13.5px "Segoe UI",Arial,sans-serif}
 </style>
- 
+
 <div id="dgLista" role="listbox" aria-label="Partes do livro"></div>
- 
+
 <div id="dg-editor" class="dg-editor" role="dialog" aria-modal="false" aria-labelledby="dgEtitulo">
   <div class="dg-editor-box">
     <button id="dgEfechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
@@ -4029,7 +4026,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     </div>
   </div>
 </div>
- 
+
 <script>
 (function(){
   var lista = document.getElementById("dgLista");
@@ -4037,7 +4034,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   var txt = document.getElementById("dgTexto");
   var status = document.getElementById("dgStatus");
   if(!lista || !ed || !txt) return;
- 
+
   /* [código, nome, descrição] */
   var GRUPOS = [
     {g:"Antes do texto", itens:[
@@ -4068,24 +4065,24 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       ["D16","Cabeçalho, rodapé e paginação","Regras de paginação e elementos recorrentes."]
     ]}
   ];
- 
+
   var CHAVE = "ps_diagramador_partes";
   var salvos = {};
   try{ salvos = JSON.parse(localStorage.getItem(CHAVE) || "{}") || {}; }catch(e){ salvos = {}; }
   function gravar(){ try{ localStorage.setItem(CHAVE, JSON.stringify(salvos)); }catch(e){} }
- 
+
   function achar(cod){
     for(var i = 0; i < GRUPOS.length; i++)
       for(var j = 0; j < GRUPOS[i].itens.length; j++)
         if(GRUPOS[i].itens[j][0] === cod) return GRUPOS[i].itens[j];
     return null;
   }
- 
+
   /* ---------- lista à direita do conteúdo ---------- */
   function botao(){ return document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
   function listaAberta(){ return lista.classList.contains("aberta"); }
   function editorAberto(){ return ed.classList.contains("aberto"); }
- 
+
   function montarLista(){
     var rolagem = lista.scrollTop;
     var h = "";
@@ -4099,7 +4096,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     lista.innerHTML = h;
     lista.scrollTop = rolagem;
   }
- 
+
   /* container que envolve o botão 4.1 e os cartões E01–E10 (.dg-miolo) */
   function containerPagina(){
     var b = botao(); if(!b) return null;
@@ -4109,7 +4106,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     while(c && !c.contains(cartao)) c = c.parentElement;
     return c;
   }
- 
+
   function soltarConteudo(){
     var c = containerPagina();
     if(!c) return;
@@ -4117,18 +4114,18 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     c.style.marginRight = "";
     c.style.maxWidth = "";
   }
- 
+
   function posicionar(){
     var b = botao();
     if(!b){ fecharLista(); return; }
- 
+
     var c = containerPagina();
     if(c && window.innerWidth >= 1000){
       /* conteúdo para a esquerda */
       c.style.marginLeft = "0";
       c.style.marginRight = "auto";
       c.style.maxWidth = "min(56vw, 1000px)";
- 
+
       /* painel na área livre à direita */
       var r = c.getBoundingClientRect();
       var left = r.right + 24;
@@ -4141,7 +4138,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       lista.style.maxHeight = altura + "px";
       return;
     }
- 
+
     /* plano B (tela estreita): embaixo do botão 4.1 */
     soltarConteudo();
     var rb = b.getBoundingClientRect();
@@ -4154,7 +4151,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     lista.style.height = "";
     lista.style.maxHeight = Math.max(220, window.innerHeight - t2 - 16) + "px";
   }
- 
+
   /* editor: área limpa abaixo dos cartões E01–E10, à esquerda da lista */
   function posicionarEditor(){
     var c = containerPagina();
@@ -4178,7 +4175,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     ed.style.width = larg + "px";
     ed.style.height = Math.max(300, window.innerHeight - 84 - 90) + "px";
   }
- 
+
   function abrirLista(){
     if(!botao()) return;
     montarLista();
@@ -4192,7 +4189,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     document.body.classList.remove("dg-lista-aberta");
     soltarConteudo();
   }
- 
+
   /* clique no 4.1 abre/fecha; clique em qualquer outro lugar fecha
      (com o editor aberto, os cliques fora são ignorados) */
   document.addEventListener("click", function(ev){
@@ -4207,23 +4204,23 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       fecharLista();
     }
   }, true);
- 
+
   /* escolher uma parte na lista abre o editor sem fechar a lista */
   lista.addEventListener("click", function(ev){
     var it = ev.target.closest(".dgl-item"); if(!it) return;
     abrirEditor(it.dataset.cod);
   });
- 
+
   function reposicionar(){
     if(listaAberta()) posicionar();
     if(editorAberto()) posicionarEditor();
   }
   window.addEventListener("resize", reposicionar);
   window.addEventListener("scroll", reposicionar, true);
- 
+
   /* ---------- editor de colar / criar ---------- */
   var atual = null;
- 
+
   function abrirEditor(cod){
     var it = achar(cod); if(!it) return;
     atual = cod;
@@ -4242,19 +4239,20 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     atual = null;
     if(!listaAberta()) abrirLista(); /* a lista continua aberta para escolher outra parte */
   }
- 
+
   /* ---------- saídas em PDF (ao lado do título) + DIAGRAMAR ---------- */
   var SAIDAS = [
     ["impresso","PDF Impresso"],
     ["digital","PDF Digital"],
     ["celular","PDF Celular"],
-    ["tablet","PDF Tablet"]
+    ["tablet","PDF Tablet"],
+    ["kindle","Kindle (EPUB)"]
   ];
   var CHAVE_SAIDAS = "ps_diagramador_saidas";
   var saidas = [];
   try{ saidas = JSON.parse(localStorage.getItem(CHAVE_SAIDAS) || "[]") || []; }catch(e){ saidas = []; }
   var btnDiag = document.getElementById("dgDiagramar");
- 
+
   function desenharSaidas(){
     var todos = saidas.length === SAIDAS.length;
     var h = '<span>SAÍDA:</span>' +
@@ -4282,7 +4280,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   });
   txt.addEventListener("input", atualizarDiagramar);
   desenharSaidas();
- 
+
   btnDiag.addEventListener("click", function(){
     if(!atual) return;
     var tipoSel = document.querySelector('#dgTiposBox .dg-tipo[aria-pressed="true"]');
@@ -4301,7 +4299,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     document.dispatchEvent(new CustomEvent("dg:diagramar", {detail: pedido}));
     status.textContent = "Diagramação solicitada: " + pedido.parte + " · " + pedido.extensao + " · " + saidas.join(", ");
   });
- 
+
   document.getElementById("dgSalvar").addEventListener("click", function(){
     if(!atual) return;
     if(txt.value.trim()) salvos[atual] = txt.value; else delete salvos[atual];
@@ -4318,7 +4316,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     status.textContent = "Texto apagado.";
   });
   document.getElementById("dgEfechar").addEventListener("click", fecharEditor);
- 
+
   /* ESC: fecha o editor, depois a lista, sem fechar o Diagramador por baixo */
   window.addEventListener("keydown", function(ev){
     if(ev.key !== "Escape") return;
@@ -4328,12 +4326,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 })();
 </script>
 <!-- ===== FIM: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
- 
 
-
-
-
-Claude terminou a resposta
 
 
 
