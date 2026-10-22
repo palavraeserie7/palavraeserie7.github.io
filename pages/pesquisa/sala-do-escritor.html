@@ -3974,29 +3974,35 @@ document.addEventListener("visibilitychange",function(){
 </script>
 
 
-
+Menu diagramacao 4 1 v4 · HTML
 <!-- ===== INÍCIO: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
-<!-- v3: saída principal PDF Digital A5 + normas de tipografia por parte (tipografia-devocional-a5.json).
+<!-- v4: partes de 3 tipos (livro, dados fixos, automática) + tela "Meus dados fixos" + partes opcionais + títulos editáveis.
      COMO APLICAR: no seu sala-do-escritor.html, apague TUDO entre o comentário "INÍCIO: MENU DE DIAGRAMAÇÃO (4.1)"
      e o comentário "FIM: MENU DE DIAGRAMAÇÃO (4.1)" (inclusive os dois) e cole este bloco no lugar.
-     Depois, coloque o arquivo tipografia-devocional-a5.json na mesma pasta da página (ao lado do tabela.json). -->
+     O arquivo tipografia-devocional-a5.json (versão 3) fica na mesma pasta da página. -->
 <style>
 /* seta no botão 4.1, indicando que ele abre uma lista */
 .dg-tipo[data-tipo="4.1"]::after{content:"\25BE";margin-left:auto;padding-left:8px;font:700 14px "Segoe UI",Arial,sans-serif;transition:transform .15s}
 body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
+.dg-hide{display:none!important}
  
 /* lista: painel à direita do conteúdo */
 #dgLista{display:none;position:fixed;z-index:99999;overflow-y:auto;background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;box-shadow:0 12px 30px rgba(30,22,10,.35);padding:4px 0}
 #dgLista.aberta{display:block}
+.dgl-fixos{display:flex;align-items:center;gap:10px;width:calc(100% - 20px);margin:8px 10px 4px;padding:10px 14px;border:1px solid var(--brass,#a07d33);border-radius:6px;background:var(--brass-wash,#f3e9cc);color:var(--ink,#2a2217);cursor:pointer;text-align:left;font:700 13.5px "Segoe UI",Arial,sans-serif}
+.dgl-fixos:hover,.dgl-fixos:focus{background:#ecdfb8;outline:none}
+.dgl-fixos span{margin-left:auto;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--brass-deep,#7d5f1e)}
+.dgl-fixos span.falta{color:#a14747}
 .dgl-grupo{padding:10px 14px 4px;color:var(--ink,#2a2217);font:700 14px "Segoe UI",Arial,sans-serif}
 .dgl-item{display:flex;align-items:baseline;gap:10px;width:100%;padding:8px 14px 8px 26px;border:0;background:transparent;color:var(--ink,#2a2217);text-align:left;cursor:pointer;font:15.5px/1.35 Georgia,"Times New Roman",serif}
 .dgl-item:hover,.dgl-item:focus{background:var(--brass-wash,#f3e9cc);outline:none}
 .dgl-item b{flex:0 0 auto;min-width:44px;color:var(--brass-deep,#7d5f1e);font:700 12.5px "Segoe UI",Arial,sans-serif}
 .dgl-item i{margin-left:auto;font-style:normal;font-weight:700;color:var(--brass-deep,#7d5f1e)}
-/* parte que está aberta no editor */
+.dgl-item i.t{font:600 11.5px "Segoe UI",Arial,sans-serif;opacity:.85}
+.dgl-item i.falta{color:#a14747;opacity:1}
 .dgl-item.ativa{background:var(--brass-wash,#f3e9cc);box-shadow:inset 4px 0 0 var(--brass,#a07d33)}
  
-/* editor (colar / criar): painel na área limpa abaixo dos cartões, à esquerda da lista */
+/* painéis (editor da parte e meus dados fixos): área limpa abaixo dos cartões, à esquerda da lista */
 .dg-editor{display:none;position:fixed;z-index:100000}
 .dg-editor.aberto{display:block}
 .dg-editor-box{position:relative;height:100%;box-sizing:border-box;display:flex;flex-direction:column;padding:22px 24px 18px;background:var(--paper-card,#fffdf6);color:var(--ink,#2a2217);border:2px solid var(--brass,#a07d33);border-radius:8px;box-shadow:0 12px 30px rgba(30,22,10,.35);font-family:Georgia,"Times New Roman",serif}
@@ -4006,25 +4012,41 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 .dg-saidas>span{color:var(--ink-soft,#6b5f48);font:700 11.5px "Segoe UI",Arial,sans-serif;letter-spacing:.06em}
 .dg-saida{padding:6px 11px;border:1px solid var(--paper-line,#e3d8bd);border-radius:6px;background:#fff;color:var(--ink,#2a2217);cursor:default;font:700 12px "Segoe UI",Arial,sans-serif}
 .dg-saida small{margin-left:6px;font:600 10px "Segoe UI",Arial,sans-serif;opacity:.85}
-/* saída principal acesa ("ativa") */
 .dg-saida[aria-pressed="true"]{background:var(--brass,#a07d33);border-color:var(--brass,#a07d33);color:#fffdf6}
 .dg-saida.pulso{animation:dgPulso .9s ease-out}
 @keyframes dgPulso{0%{box-shadow:0 0 0 0 rgba(160,125,51,.75)}100%{box-shadow:0 0 0 12px rgba(160,125,51,0)}}
-/* saídas que ainda vão ser criadas */
 .dg-saida[disabled]{opacity:.55;border-style:dashed;cursor:not-allowed}
 #dgDiagramar:disabled{opacity:.45;cursor:not-allowed}
 .dg-editor-box .dg-edesc{margin:0 0 6px;color:var(--ink-soft,#6b5f48);font:14px/1.5 "Segoe UI",Arial,sans-serif}
 .dg-editor-box .dg-normas{margin:0 0 10px;color:var(--brass-deep,#7d5f1e);font:600 12.5px "Segoe UI",Arial,sans-serif}
 .dg-editor-box .dg-normas.erro{color:#a14747}
 .dg-x{position:absolute;top:10px;right:14px;border:none;background:transparent;font-size:30px;line-height:1;cursor:pointer;color:var(--ink,#2a2217)}
+ 
+/* campo de título/rótulo da parte */
+.dg-titulo-box{display:flex;flex-direction:column;gap:4px;margin:0 0 10px}
+.dg-titulo-box label,.dg-fx-campo label{font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.04em;color:var(--ink-soft,#6b5f48)}
+.dg-titulo-box input,.dg-fx-campo input,.dg-fx-campo textarea{width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--paper-line,#e3d8bd);border-radius:8px;background:#fff;color:var(--ink,#2a2217);font:15.5px/1.5 Georgia,"Times New Roman",serif}
+.dg-titulo-box input:focus,.dg-fx-campo input:focus,.dg-fx-campo textarea:focus{outline:2px solid var(--brass,#a07d33)}
+ 
+/* aviso (partes automáticas, omitidas, fixas) */
+.dg-aviso{margin:0 0 10px;padding:14px 16px;border:1px dashed var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);color:var(--ink,#2a2217);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+ 
 #dgTexto{flex:1 1 auto;width:100%;min-height:120px;padding:14px;border:1px solid var(--paper-line,#e3d8bd);border-radius:8px;background:#fff;color:var(--ink,#2a2217);font:16px/1.6 Georgia,"Times New Roman",serif;resize:none;box-sizing:border-box}
 #dgTexto:focus{outline:2px solid var(--brass,#a07d33)}
+#dgTexto[readonly]{background:#faf6e8;color:var(--ink-soft,#6b5f48)}
 .dg-ebotoes{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
 .dg-ebotoes .dg-status{flex:1 1 180px;color:var(--brass-deep,#7d5f1e);font:600 13.5px "Segoe UI",Arial,sans-serif}
+ 
+/* tela Meus dados fixos */
+.dg-fx-campos{flex:1 1 auto;overflow-y:auto;padding:4px 4px 4px 0;display:flex;flex-direction:column;gap:14px}
+.dg-fx-campo{display:flex;flex-direction:column;gap:4px}
+.dg-fx-campo small{color:var(--ink-soft,#6b5f48);font:12.5px/1.4 "Segoe UI",Arial,sans-serif}
+.dg-fx-campo textarea{resize:vertical}
 </style>
  
 <div id="dgLista" role="listbox" aria-label="Partes do livro"></div>
  
+<!-- editor de uma parte -->
 <div id="dg-editor" class="dg-editor" role="dialog" aria-modal="false" aria-labelledby="dgEtitulo">
   <div class="dg-editor-box">
     <button id="dgEfechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
@@ -4034,12 +4056,36 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     </div>
     <p class="dg-edesc" id="dgEdesc"></p>
     <p class="dg-normas" id="dgNormas" role="status"></p>
+    <div class="dg-titulo-box dg-hide" id="dgTituloBox">
+      <label id="dgTituloLbl" for="dgTituloInp">Título desta parte</label>
+      <input id="dgTituloInp" type="text">
+    </div>
+    <div class="dg-aviso dg-hide" id="dgAviso" role="status"></div>
     <textarea id="dgTexto" placeholder="Cole aqui o texto desta parte."></textarea>
     <div class="dg-ebotoes">
       <button id="dgApagar" class="at-btn" type="button">APAGAR TEXTO</button>
+      <button id="dgOmitir" class="at-btn dg-hide" type="button">OMITIR ESTA PARTE</button>
+      <button id="dgIrFixos" class="at-btn dg-hide" type="button">EDITAR EM MEUS DADOS FIXOS</button>
       <span class="dg-status" id="dgStatus" role="status"></span>
       <button id="dgDiagramar" class="at-btn" type="button" disabled>DIAGRAMAR</button>
       <button id="dgSalvar" class="at-btn gold" type="button">SALVAR</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- tela Meus dados fixos -->
+<div id="dg-fixos" class="dg-editor" role="dialog" aria-modal="false" aria-labelledby="dgFxTitulo">
+  <div class="dg-editor-box">
+    <button id="dgFxFechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
+    <div class="dg-ehead"><h3 id="dgFxTitulo">Meus dados fixos</h3></div>
+    <p class="dg-edesc">Preencha uma vez. Estes dados entram sozinhos em todos os livros: direitos autorais, sobre o autor, missão ministerial, apresentação da editora e assinaturas.</p>
+    <div class="dg-fx-campos" id="dgFxCampos"></div>
+    <div class="dg-ebotoes">
+      <button id="dgFxExportar" class="at-btn" type="button">EXPORTAR</button>
+      <button id="dgFxImportar" class="at-btn" type="button">IMPORTAR</button>
+      <input id="dgFxArquivo" type="file" accept=".json,application/json" class="dg-hide">
+      <span class="dg-status" id="dgFxStatus" role="status"></span>
+      <button id="dgFxSalvar" class="at-btn gold" type="button">SALVAR</button>
     </div>
   </div>
 </div>
@@ -4048,10 +4094,20 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 (function(){
   var lista = document.getElementById("dgLista");
   var ed = document.getElementById("dg-editor");
+  var fx = document.getElementById("dg-fixos");
   var txt = document.getElementById("dgTexto");
   var status = document.getElementById("dgStatus");
   var elNormas = document.getElementById("dgNormas");
-  if(!lista || !ed || !txt) return;
+  var boxTitulo = document.getElementById("dgTituloBox");
+  var lblTitulo = document.getElementById("dgTituloLbl");
+  var inpTitulo = document.getElementById("dgTituloInp");
+  var elAviso = document.getElementById("dgAviso");
+  var btnApagar = document.getElementById("dgApagar");
+  var btnSalvar = document.getElementById("dgSalvar");
+  var btnOmitir = document.getElementById("dgOmitir");
+  var btnIrFixos = document.getElementById("dgIrFixos");
+  var btnDiag = document.getElementById("dgDiagramar");
+  if(!lista || !ed || !fx || !txt) return;
  
   /* [código, nome, descrição] */
   var GRUPOS = [
@@ -4084,23 +4140,50 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     ]}
   ];
  
-  var CHAVE = "ps_diagramador_partes";
-  var salvos = {};
-  try{ salvos = JSON.parse(localStorage.getItem(CHAVE) || "{}") || {}; }catch(e){ salvos = {}; }
-  function gravar(){ try{ localStorage.setItem(CHAVE, JSON.stringify(salvos)); }catch(e){} }
+  /* ---------- armazenamento (no navegador) ---------- */
+  var CHAVE = "ps_diagramador_partes";            /* texto de cada parte */
+  var CHAVE_TIT = "ps_diagramador_titulos";       /* títulos/rótulos trocados pelo autor */
+  var CHAVE_OM = "ps_diagramador_omitidas";       /* partes opcionais omitidas */
+  var CHAVE_FX = "ps_diagramador_fixos";          /* meus dados fixos */
+  function ler(ch){ try{ return JSON.parse(localStorage.getItem(ch) || "{}") || {}; }catch(e){ return {}; } }
+  function gravarChave(ch, o){ try{ localStorage.setItem(ch, JSON.stringify(o)); }catch(e){} }
+  var salvos = ler(CHAVE), titulos = ler(CHAVE_TIT), omitidas = ler(CHAVE_OM), fixos = ler(CHAVE_FX);
+  function gravar(){ gravarChave(CHAVE, salvos); }
  
-  function achar(cod){
-    for(var i = 0; i < GRUPOS.length; i++)
-      for(var j = 0; j < GRUPOS[i].itens.length; j++)
-        if(GRUPOS[i].itens[j][0] === cod) return GRUPOS[i].itens[j];
-    return null;
+  /* ---------- dados fixos ---------- */
+  var MODELO_DIREITOS = "Copyright © {ANO} por {AUTOR}. Todos os direitos reservados.\n\n" +
+    "Nenhuma parte desta publicação pode ser reproduzida, distribuída ou transmitida por qualquer forma ou meio, incluindo fotocópias, gravações ou outros métodos eletrônicos ou mecânicos, sem a permissão prévia por escrito do autor, exceto no caso de citações breves em resenhas críticas e outros usos não comerciais permitidos pela lei de direitos autorais.\n\n" +
+    "Esta é uma publicação independente da {EDITORA}.";
+ 
+  var CAMPOS_FX = [
+    {k:"autor_nome", rotulo:"Nome do autor", tipo:"input"},
+    {k:"editora_nome", rotulo:"Nome da editora", tipo:"input"},
+    {k:"direitos_autorais", rotulo:"Direitos autorais", tipo:"area", rows:8, dica:"Use {AUTOR}, {EDITORA} e {ANO}: são trocados automaticamente em cada livro."},
+    {k:"sobre_o_autor", rotulo:"Sobre o autor (biografia)", tipo:"area", rows:5},
+    {k:"missao_ministerial", rotulo:"Missão ministerial (opcional)", tipo:"area", rows:4},
+    {k:"sobre_a_editora", rotulo:"Apresentação da editora", tipo:"area", rows:5}
+  ];
+ 
+  function getFixo(k){
+    if(typeof fixos[k] === "string") return fixos[k];
+    return k === "direitos_autorais" ? MODELO_DIREITOS : "";
+  }
+  function resolver(s){
+    return String(s || "")
+      .replace(/\{ANO\}/g, String(new Date().getFullYear()))
+      .replace(/\{AUTOR\}/g, fixos.autor_nome || "{AUTOR}")
+      .replace(/\{EDITORA\}/g, fixos.editora_nome || "{EDITORA}");
+  }
+  function fixosCompletos(){
+    return !!((fixos.autor_nome||"").trim() && (fixos.editora_nome||"").trim() &&
+              (fixos.sobre_o_autor||"").trim() && (fixos.sobre_a_editora||"").trim());
   }
  
   /* ---------- NORMAS: carregadas do JSON, funcionam como o "prompt" da parte ---------- */
   var NORMAS_URL = "tipografia-devocional-a5.json";
   var normasDados = null, normasPromessa = null;
-  var normaAtual = null;     /* normas da parte aberta (nos bastidores) */
-  var saidaAtiva = false;    /* a saída principal acende quando as normas da parte carregam */
+  var normaAtual = null;
+  var saidaAtiva = false;
  
   function carregarNormas(){
     if(normasDados) return Promise.resolve(normasDados);
@@ -4142,26 +4225,93 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     elNormas.className = "dg-normas" + (erro ? " erro" : "");
   }
  
+  /* ---------- tipo de cada parte: livro | fixo | auto ---------- */
+  /* Valores de reserva, usados enquanto o JSON não carregou; depois o JSON manda. */
+  var RESERVA = {
+    "D03":{t:"fixo", c:"direitos_autorais"},
+    "D13":{t:"fixo", c:"sobre_o_autor"},
+    "D14":{t:"fixo", c:"missao_ministerial", o:1},
+    "D15":{t:"fixo", c:"sobre_a_editora"},
+    "D08":{t:"auto"},
+    "D09":{t:"auto", o:1},
+    "D16":{t:"auto"},
+    "D10.2":{o:1}, "D10.4":{o:1}, "D10.5":{o:1}, "D10.6":{o:1}
+  };
+  var AVISOS = {
+    "D08":"O sumário é montado automaticamente a partir das partes e dos dias do livro.",
+    "D09":"A abertura de parte é montada automaticamente a partir da divisão do livro em partes. Omita esta parte se o livro não for dividido em partes.",
+    "D16":"Cabeçalho, rodapé e numeração são aplicados automaticamente em todas as páginas de texto."
+  };
+ 
+  function info(cod){
+    var f = RESERVA[cod] || {};
+    var r = {tipo: f.t || "livro", campo: f.c || null, opcional: !!f.o, titulo: null, rotulo: null};
+    if(normasDados){
+      var a = acharNorma(normasDados, cod);
+      if(a){
+        var p = a.parte, o = p.conteudo && p.conteudo.origem;
+        if(o === "cadastro_fixo") r.tipo = "fixo";
+        else if(o === "automatico") r.tipo = "auto";
+        else if(o === "livro") r.tipo = "livro";
+        if(p.conteudo && p.conteudo.campo) r.campo = p.conteudo.campo;
+        r.opcional = !!p.opcional;
+        r.titulo = p.titulo_padrao || null;
+        r.rotulo = p.rotulo_padrao || null;
+      }
+    }
+    return r;
+  }
+ 
+  function fixoPronto(cod){
+    var inf = info(cod);
+    if(inf.tipo !== "fixo" || !inf.campo) return false;
+    var v = getFixo(inf.campo).trim();
+    if(!v) return false;
+    if(inf.campo === "direitos_autorais")
+      return !!((fixos.autor_nome||"").trim() && (fixos.editora_nome||"").trim());
+    return true;
+  }
+ 
+  function tituloPadrao(cod){
+    var inf = info(cod);
+    var p = inf.titulo || inf.rotulo;
+    return p ? resolver(p) : null;
+  }
+  function tituloDe(cod){
+    var p = tituloPadrao(cod);
+    if(!p) return null;
+    return titulos[cod] || p;
+  }
+ 
   /* ---------- lista à direita do conteúdo ---------- */
   function botao(){ return document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
   function listaAberta(){ return lista.classList.contains("aberta"); }
   function editorAberto(){ return ed.classList.contains("aberto"); }
+  function fixosAberto(){ return fx.classList.contains("aberto"); }
+ 
+  function marca(cod){
+    var inf = info(cod);
+    if(omitidas[cod]) return '<i class="t">omitida</i>';
+    if(inf.tipo === "auto") return '<i class="t">automática</i>';
+    if(inf.tipo === "fixo") return fixoPronto(cod) ? '<i>✓</i>' : '<i class="t falta">preencher</i>';
+    return salvos[cod] ? '<i>✓</i>' : '';
+  }
  
   function montarLista(){
     var rolagem = lista.scrollTop;
-    var h = "";
+    var h = '<button type="button" class="dgl-fixos" data-acao="fixos">⚙ Meus dados fixos' +
+            '<span class="' + (fixosCompletos() ? '' : 'falta') + '">' + (fixosCompletos() ? '✓ preenchidos' : 'preencher') + '</span></button>';
     GRUPOS.forEach(function(g){
       h += '<div class="dgl-grupo">' + g.g + '</div>';
       g.itens.forEach(function(it){
         h += '<button type="button" class="dgl-item' + (it[0] === atual ? ' ativa' : '') + '" role="option" data-cod="' + it[0] + '" title="' + it[2] + '">' +
-             '<b>' + it[0] + '</b><span>' + it[1] + '</span>' + (salvos[it[0]] ? '<i>✓</i>' : '') + '</button>';
+             '<b>' + it[0] + '</b><span>' + it[1] + '</span>' + marca(it[0]) + '</button>';
       });
     });
     lista.innerHTML = h;
     lista.scrollTop = rolagem;
   }
  
-  /* container que envolve o botão 4.1 e os cartões E01–E10 (.dg-miolo) */
   function containerPagina(){
     var b = botao(); if(!b) return null;
     var cartao = document.querySelector("#dgExts .dg-ext");
@@ -4213,26 +4363,31 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     lista.style.maxHeight = Math.max(220, window.innerHeight - t2 - 16) + "px";
   }
  
+  /* posiciona os dois painéis (editor da parte e meus dados fixos) no mesmo lugar */
   function posicionarEditor(){
     var c = containerPagina();
     var ex = document.getElementById("dgExts");
+    var L, T, W, H;
     if(c && ex && window.innerWidth >= 1000 && listaAberta()){
       var rc = c.getBoundingClientRect();
       var re = ex.getBoundingClientRect();
       var rl = lista.getBoundingClientRect();
-      var top = re.bottom + 16;
-      var altura = Math.max(300, window.innerHeight - top - 90);
-      ed.style.left = rc.left + "px";
-      ed.style.top = top + "px";
-      ed.style.width = Math.max(300, rl.left - 24 - rc.left) + "px";
-      ed.style.height = altura + "px";
-      return;
+      T = re.bottom + 16;
+      H = Math.max(300, window.innerHeight - T - 90);
+      L = rc.left;
+      W = Math.max(300, rl.left - 24 - rc.left);
+    } else {
+      W = Math.min(820, window.innerWidth - 24);
+      L = Math.max(12, (window.innerWidth - W) / 2);
+      T = 84;
+      H = Math.max(300, window.innerHeight - 84 - 90);
     }
-    var larg = Math.min(820, window.innerWidth - 24);
-    ed.style.left = Math.max(12, (window.innerWidth - larg) / 2) + "px";
-    ed.style.top = "84px";
-    ed.style.width = larg + "px";
-    ed.style.height = Math.max(300, window.innerHeight - 84 - 90) + "px";
+    [ed, fx].forEach(function(el){
+      el.style.left = L + "px";
+      el.style.top = T + "px";
+      el.style.width = W + "px";
+      el.style.height = H + "px";
+    });
   }
  
   function abrirLista(){
@@ -4242,6 +4397,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     document.body.classList.add("dg-lista-aberta");
     posicionar();
     lista.scrollTop = 0;
+    /* carrega o JSON em silêncio para a lista já mostrar partes automáticas e opcionais */
+    carregarNormas().then(function(){ if(listaAberta()) montarLista(); }).catch(function(){});
   }
   function fecharLista(){
     lista.classList.remove("aberta");
@@ -4250,7 +4407,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   }
  
   document.addEventListener("click", function(ev){
-    if(editorAberto()) return;
+    if(editorAberto() || fixosAberto()) return;
     var t = ev.target;
     if(t.closest && t.closest("#dgLista")) return;
     var b = t.closest && t.closest("[data-tipo]");
@@ -4262,22 +4419,20 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     }
   }, true);
  
-  /* escolher uma parte na lista abre o editor e carrega as normas dela */
   lista.addEventListener("click", function(ev){
+    if(ev.target.closest(".dgl-fixos")){ abrirFixos(null); return; }
     var it = ev.target.closest(".dgl-item"); if(!it) return;
     abrirEditor(it.dataset.cod);
   });
  
   function reposicionar(){
     if(listaAberta()) posicionar();
-    if(editorAberto()) posicionarEditor();
+    if(editorAberto() || fixosAberto()) posicionarEditor();
   }
   window.addEventListener("resize", reposicionar);
   window.addEventListener("scroll", reposicionar, true);
  
   /* ---------- saídas: a principal (PDF Digital A5) e as que virão depois ---------- */
-  var btnDiag = document.getElementById("dgDiagramar");
- 
   function nomeSaidaPrincipal(){
     if(normasDados){
       var s = normasDados.saidas && normasDados.saidas[normasDados.saida_principal];
@@ -4307,15 +4462,66 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     document.getElementById("dgSaidas").innerHTML = h;
   }
  
+  /* a parte está pronta para diagramar? */
+  function parteProntaParaDiagramar(){
+    if(!atual || !normaAtual || !saidaAtiva) return false;
+    if(omitidas[atual]) return true;
+    var inf = info(atual);
+    if(inf.tipo === "auto") return true;
+    if(inf.tipo === "fixo") return fixoPronto(atual);
+    return !!txt.value.trim();
+  }
   function atualizarDiagramar(){
-    btnDiag.disabled = !(txt.value.trim() && saidaAtiva && normaAtual);
+    btnDiag.disabled = !parteProntaParaDiagramar();
   }
  
-  /* ---------- editor de colar / criar ---------- */
+  /* ---------- editor de uma parte ---------- */
   var atual = null;
+  var voltaCod = null;   /* parte para a qual voltar depois de editar os dados fixos */
+ 
+  /* ajusta a tela do editor conforme o tipo da parte */
+  function renderModo(){
+    if(!atual) return;
+    var inf = info(atual), om = !!omitidas[atual];
+ 
+    /* título ou rótulo editável */
+    var padrao = tituloPadrao(atual);
+    var temTitulo = inf.tipo !== "auto" && !!padrao && !om;
+    boxTitulo.classList.toggle("dg-hide", !temTitulo);
+    if(temTitulo){
+      lblTitulo.textContent = inf.titulo ? "Título desta parte" : "Rótulo desta seção";
+      inpTitulo.value = titulos[atual] || padrao;
+    }
+ 
+    /* caixa de texto */
+    var mostraTxt = !om && (inf.tipo === "livro" || (inf.tipo === "fixo" && fixoPronto(atual)));
+    txt.classList.toggle("dg-hide", !mostraTxt);
+    txt.readOnly = inf.tipo !== "livro";
+    txt.placeholder = inf.tipo === "livro" ? "Cole aqui o texto desta parte." : "";
+    if(inf.tipo === "fixo") txt.value = resolver(getFixo(inf.campo));
+ 
+    /* aviso */
+    var msg = "";
+    if(om) msg = "Esta parte será omitida do livro: não gera páginas.";
+    else if(inf.tipo === "auto") msg = AVISOS[atual] || "Esta parte é montada automaticamente.";
+    else if(inf.tipo === "fixo" && !fixoPronto(atual)) msg = "Faltam dados em Meus dados fixos para montar esta parte. Clique em EDITAR EM MEUS DADOS FIXOS e preencha.";
+    else if(inf.tipo === "fixo") msg = "Texto vindo de Meus dados fixos. Para alterar, use EDITAR EM MEUS DADOS FIXOS.";
+    elAviso.textContent = msg;
+    elAviso.classList.toggle("dg-hide", !msg);
+ 
+    /* botões */
+    var livroAtivo = inf.tipo === "livro" && !om;
+    btnApagar.classList.toggle("dg-hide", !livroAtivo);
+    btnSalvar.classList.toggle("dg-hide", !livroAtivo);
+    btnOmitir.classList.toggle("dg-hide", !inf.opcional);
+    btnOmitir.textContent = om ? "INCLUIR ESTA PARTE" : "OMITIR ESTA PARTE";
+    btnIrFixos.classList.toggle("dg-hide", inf.tipo !== "fixo");
+  }
  
   function abrirEditor(cod){
     var it = achar(cod); if(!it) return;
+    fx.classList.remove("aberto");
+    voltaCod = null;
     atual = cod;
     normaAtual = null;
     saidaAtiva = false;
@@ -4325,16 +4531,17 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     status.textContent = "";
     mostrarNormas("Carregando normas desta parte…");
     desenharSaidas(false);
+    renderModo();
     atualizarDiagramar();
     if(!listaAberta()) abrirLista();
     montarLista();
     ed.classList.add("aberto");
     posicionarEditor();
-    txt.focus({preventScroll:true});
+    if(!txt.classList.contains("dg-hide") && !txt.readOnly) txt.focus({preventScroll:true});
  
     var minha = cod;
     carregarNormas().then(function(d){
-      if(atual !== minha) return;               /* o usuário já trocou de parte */
+      if(atual !== minha) return;
       var ach = acharNorma(d, minha);
       if(!ach){
         mostrarNormas("Esta parte ainda não tem normas no arquivo de tipografia.", true);
@@ -4351,9 +4558,11 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
         pagina: d.saidas[d.saida_principal],
         prompt: montarPrompt(d, ach)
       };
-      saidaAtiva = true;                         /* a saída principal acende (reativada) */
+      saidaAtiva = true;
       desenharSaidas(true);
       mostrarNormas("Normas carregadas: " + ach.parte.cod + " · " + nomeSaidaPrincipal());
+      renderModo();          /* agora com o tipo e o título padrão vindos do JSON */
+      montarLista();
       atualizarDiagramar();
     }).catch(function(e){
       if(atual !== minha) return;
@@ -4361,6 +4570,13 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       mostrarNormas("Não foi possível ler tipografia-devocional-a5.json. Confira se ele está na mesma pasta desta página.", true);
       desenharSaidas(false); atualizarDiagramar();
     });
+  }
+ 
+  function achar(cod){
+    for(var i = 0; i < GRUPOS.length; i++)
+      for(var j = 0; j < GRUPOS[i].itens.length; j++)
+        if(GRUPOS[i].itens[j][0] === cod) return GRUPOS[i].itens[j];
+    return null;
   }
  
   function fecharEditor(){
@@ -4375,35 +4591,82 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   txt.addEventListener("input", atualizarDiagramar);
   desenharSaidas(false);
  
+  /* título/rótulo: guarda o que o autor digitar; se voltar ao padrão, apaga */
+  inpTitulo.addEventListener("input", function(){
+    if(!atual) return;
+    var padrao = tituloPadrao(atual) || "";
+    var v = inpTitulo.value.trim();
+    if(!v || v === padrao) delete titulos[atual]; else titulos[atual] = v;
+    gravarChave(CHAVE_TIT, titulos);
+  });
+ 
+  /* omitir / incluir parte opcional */
+  btnOmitir.addEventListener("click", function(){
+    if(!atual) return;
+    if(omitidas[atual]){ delete omitidas[atual]; status.textContent = "Parte incluída no livro."; }
+    else { omitidas[atual] = true; status.textContent = "Parte omitida do livro."; }
+    gravarChave(CHAVE_OM, omitidas);
+    renderModo();
+    montarLista();
+    atualizarDiagramar();
+  });
+ 
+  btnIrFixos.addEventListener("click", function(){ if(atual) abrirFixos(atual); });
+ 
+  /* ---------- DIAGRAMAR ---------- */
   btnDiag.addEventListener("click", function(){
     if(!atual || !normaAtual) return;
     var tipoSel = document.querySelector('#dgTiposBox .dg-tipo[aria-pressed="true"]');
     var extSel = document.querySelector('#dgExts .dg-ext[aria-pressed="true"]');
     if(!extSel){ status.textContent = "Escolha o tamanho da obra (E01–E10) antes de diagramar."; return; }
-    salvos[atual] = txt.value; gravar(); montarLista();
+ 
+    var inf = info(atual), om = !!omitidas[atual];
+    if(inf.tipo === "livro" && !om){ salvos[atual] = txt.value; gravar(); }
+    montarLista();
+ 
+    var texto = "";
+    if(!om){
+      if(inf.tipo === "livro") texto = txt.value;
+      else if(inf.tipo === "fixo") texto = resolver(getFixo(inf.campo));
+    }
+    var titulo = om ? null : tituloDe(atual);
+ 
+    var prompt = normaAtual.prompt;
+    if(om) prompt = "PARTE: " + normaAtual.cod + " — " + normaAtual.nome + ".\n\nPARTE OMITIDA neste livro: não gerar páginas e não incluir no sumário.";
+    else if(titulo) prompt += "\n\nTÍTULO/RÓTULO A USAR NESTA PARTE: " + titulo + " (no lugar do padrão).";
+ 
     var pedido = {
       parte: atual,
-      texto: txt.value,
+      tipo_conteudo: inf.tipo,                  /* livro | fixo | auto */
+      omitida: om,
+      titulo: titulo,
+      texto: texto,
+      partes_omitidas: Object.keys(omitidas).filter(function(k){ return omitidas[k]; }),
+      fixos: {
+        autor: fixos.autor_nome || "",
+        editora: fixos.editora_nome || "",
+        ano: new Date().getFullYear()
+      },
       tipo: tipoSel ? tipoSel.dataset.tipo : null,
       extensao: extSel.dataset.ext,
       saida: normaAtual.saida,
       saidas: [normaAtual.saida],
-      normas: normaAtual,            /* medidas e regras da parte */
-      prompt: normaAtual.prompt      /* instrução pronta, nos bastidores */
+      normas: normaAtual,
+      prompt: prompt
     };
     /* PRÓXIMO PASSO: quem gera a página/PDF escuta este evento */
     document.dispatchEvent(new CustomEvent("dg:diagramar", {detail: pedido}));
     status.textContent = "Diagramação solicitada: " + pedido.parte + " · " + pedido.extensao + " · " + pedido.saida;
   });
  
-  document.getElementById("dgSalvar").addEventListener("click", function(){
+  btnSalvar.addEventListener("click", function(){
     if(!atual) return;
     if(txt.value.trim()) salvos[atual] = txt.value; else delete salvos[atual];
     gravar();
     montarLista();
     status.textContent = "Salvo.";
   });
-  document.getElementById("dgApagar").addEventListener("click", function(){
+  btnApagar.addEventListener("click", function(){
     if(!atual || !txt.value) return;
     if(!confirm("Apagar o texto desta parte?")) return;
     txt.value = ""; delete salvos[atual]; gravar();
@@ -4413,10 +4676,102 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   });
   document.getElementById("dgEfechar").addEventListener("click", fecharEditor);
  
-  /* ESC: fecha o editor, depois a lista, sem fechar o Diagramador por baixo */
+  /* ---------- tela Meus dados fixos ---------- */
+  var fxCampos = document.getElementById("dgFxCampos");
+  var fxStatus = document.getElementById("dgFxStatus");
+ 
+  function montarFormFixos(){
+    var h = "";
+    CAMPOS_FX.forEach(function(c){
+      h += '<div class="dg-fx-campo"><label for="fx_' + c.k + '">' + c.rotulo + '</label>';
+      if(c.tipo === "input") h += '<input id="fx_' + c.k + '" type="text">';
+      else h += '<textarea id="fx_' + c.k + '" rows="' + (c.rows || 4) + '"></textarea>';
+      if(c.dica) h += '<small>' + c.dica + '</small>';
+      if(c.k === "direitos_autorais") h += '<div><button type="button" class="at-btn" id="dgFxModelo">RESTAURAR TEXTO-MODELO</button></div>';
+      h += '</div>';
+    });
+    fxCampos.innerHTML = h;
+    CAMPOS_FX.forEach(function(c){
+      document.getElementById("fx_" + c.k).value = getFixo(c.k);
+    });
+    var bm = document.getElementById("dgFxModelo");
+    if(bm) bm.addEventListener("click", function(){
+      document.getElementById("fx_direitos_autorais").value = MODELO_DIREITOS;
+      fxStatus.textContent = "Texto-modelo restaurado. Clique em SALVAR para guardar.";
+    });
+  }
+  function lerFormFixos(){
+    var o = {};
+    CAMPOS_FX.forEach(function(c){
+      var el = document.getElementById("fx_" + c.k);
+      o[c.k] = el ? el.value.trim() : "";
+    });
+    return o;
+  }
+ 
+  function abrirFixos(volta){
+    voltaCod = volta || null;
+    ed.classList.remove("aberto");
+    atual = null; normaAtual = null; saidaAtiva = false;
+    fxStatus.textContent = "";
+    montarFormFixos();
+    if(!listaAberta()) abrirLista();
+    montarLista();
+    fx.classList.add("aberto");
+    posicionarEditor();
+  }
+  function fecharFixos(){
+    fx.classList.remove("aberto");
+    var v = voltaCod; voltaCod = null;
+    if(v) abrirEditor(v); else montarLista();
+  }
+ 
+  document.getElementById("dgFxSalvar").addEventListener("click", function(){
+    fixos = lerFormFixos();
+    gravarChave(CHAVE_FX, fixos);
+    if(voltaCod){ fecharFixos(); return; }   /* volta para a parte, já atualizada */
+    montarLista();
+    fxStatus.textContent = "Dados fixos salvos.";
+  });
+  document.getElementById("dgFxFechar").addEventListener("click", fecharFixos);
+ 
+  document.getElementById("dgFxExportar").addEventListener("click", function(){
+    var dados = {tipo:"meus-dados-fixos", versao:1, fixos: lerFormFixos()};
+    var blob = new Blob([JSON.stringify(dados, null, 2)], {type:"application/json"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "meus-dados-fixos.json";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    fxStatus.textContent = "Arquivo exportado.";
+  });
+  var fxArquivo = document.getElementById("dgFxArquivo");
+  document.getElementById("dgFxImportar").addEventListener("click", function(){ fxArquivo.click(); });
+  fxArquivo.addEventListener("change", function(){
+    var f = fxArquivo.files && fxArquivo.files[0]; if(!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      try{
+        var d = JSON.parse(rd.result);
+        var src = (d && d.fixos) ? d.fixos : d;
+        CAMPOS_FX.forEach(function(c){
+          if(typeof src[c.k] === "string") document.getElementById("fx_" + c.k).value = src[c.k];
+        });
+        fxStatus.textContent = "Importado. Clique em SALVAR para guardar.";
+      }catch(e){
+        fxStatus.textContent = "Arquivo inválido.";
+      }
+      fxArquivo.value = "";
+    };
+    rd.readAsText(f);
+  });
+ 
+  /* ESC: fecha os dados fixos ou o editor, depois a lista, sem fechar o Diagramador por baixo */
   window.addEventListener("keydown", function(ev){
     if(ev.key !== "Escape") return;
-    if(editorAberto()){ fecharEditor(); ev.stopImmediatePropagation(); }
+    if(fixosAberto()){ fecharFixos(); ev.stopImmediatePropagation(); }
+    else if(editorAberto()){ fecharEditor(); ev.stopImmediatePropagation(); }
     else if(listaAberta()){ fecharLista(); ev.stopImmediatePropagation(); }
   }, true);
 })();
