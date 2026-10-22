@@ -3955,12 +3955,15 @@ document.addEventListener("visibilitychange",function(){
     /* PRÓXIMO PASSO: aqui entra a tela de colar o texto. */
   });
  
-  /* ---------- botão ao lado de MESA DE ESTUDO ---------- */
+  /* ---------- card Diagramador na página inicial (independente do Ateliê) ---------- */
   var btn = document.createElement("button");
-  btn.id = "atModoDiagramar"; btn.type = "button"; btn.className = "at-btn"; btn.textContent = "DIAGRAMAR";
-  var mesa = $("atModoMesa");
-  if(mesa){ mesa.insertAdjacentElement("afterend", btn); }
-  else{ var grupo = document.querySelector(".at-modo"); if(grupo) grupo.appendChild(btn); }
+  btn.id = "dgCardToggle"; btn.type = "button"; btn.className = "panel-toggle";
+  btn.innerHTML =
+    '<span><span class="panel-toggle-title">Diagramador</span>' +
+    '<span class="panel-toggle-sub">Diagrame livros, devocionais e outras obras: escolha o tipo e o tamanho, cole o texto e gere as páginas.</span></span>' +
+    '<span class="panel-toggle-action">ABRIR</span>';
+  var ancoraCard = document.getElementById("ateliPainel");
+  if(ancoraCard){ ancoraCard.insertAdjacentElement("afterend", btn); }
  
   function abrir(){ desenhar(); tela.hidden = false; $("dgFechar").focus(); }
   function fechar(){ tela.hidden = true; btn.focus(); }
@@ -5802,28 +5805,6 @@ Bloco livro completo · HTML
 })();
 </script>
 <!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
- <!-- ===== INÍCIO: CARD DIAGRAMADOR (página inicial) ===== -->
-<script>
-(function(){
-  var ancora = document.getElementById("esPainel") || document.getElementById("ateliPainel");
-  var original = document.getElementById("atModoDiagramar");
-  if(!ancora || !original) return;
-
-  var card = document.createElement("button");
-  card.id = "dgCardToggle";
-  card.type = "button";
-  card.className = "panel-toggle";
-  card.innerHTML =
-    '<span><span class="panel-toggle-title">Diagramador</span>' +
-    '<span class="panel-toggle-sub">Diagrame livros, devocionais e outras obras: escolha o tipo e o tamanho, cole o texto e gere as páginas.</span></span>' +
-    '<span class="panel-toggle-action">ABRIR</span>';
-
-  ancora.insertAdjacentElement("afterend", card);
-  card.addEventListener("click", function(){ original.click(); });
-})();
-</script>
-<!-- ===== FIM: CARD DIAGRAMADOR (página inicial) ===== -->
-
 
 
 
