@@ -5804,6 +5804,348 @@ Bloco livro completo · HTML
 <!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
  
 
+Estudio de criacao bloco · HTML
+<!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (estrutura, sem Worker) =====
+     COMO APLICAR: cole este bloco inteiro logo ANTES da última tag </body> do sala-do-escritor.html
+     (depois do bloco "FIM: LIVRO COMPLETO"). Não precisa mexer em mais nada.
+     Ele cria sozinho um botão "Estúdio de criação" abaixo do Ateliê. -->
+<style>
+#esPainel .es-passos{display:flex;gap:8px;flex-wrap:wrap}
+#esPainel .es-passos .at-btn.on{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.es-box{border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink);padding:18px;display:flex;flex-direction:column;gap:14px}
+.es-box h3{margin:0;font:600 20px Georgia,"Times New Roman",serif}
+.es-box p.es-nota{margin:0;color:var(--ink-soft);font:13.5px/1.5 "Segoe UI",Arial,sans-serif}
+.es-box .at-sel,.es-box .at-in{background:#fffdf6;border-color:var(--paper-line);color:var(--ink)}
+.es-box .at-btn{background:#fffdf6;border-color:var(--paper-line);color:var(--ink)}
+.es-box .at-btn:hover:not(:disabled){background:var(--brass-wash);border-color:var(--brass)}
+.es-box .at-btn.gold{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.es-cartoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.es-cartao{text-align:left;padding:12px 13px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);cursor:pointer;font:16px/1.3 Georgia,"Times New Roman",serif}
+.es-cartao:hover{border-color:var(--brass)}
+.es-cartao[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+.es-campo{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.es-texto{width:100%;min-height:300px;resize:vertical;box-sizing:border-box;padding:14px;border:1px solid var(--paper-line);border-radius:8px;background:#fff;color:var(--ink);font:18px/1.8 Georgia,"Times New Roman",serif}
+.es-texto:focus{outline:2px solid var(--brass)}
+.es-msg{min-height:1.4em;font:600 13.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+.es-msg.erro{color:#a14747}
+.es-fotos{display:flex;gap:8px;flex-wrap:wrap}
+.es-foto{position:relative;width:90px;height:90px;border-radius:6px;overflow:hidden;border:1px solid var(--paper-line)}
+.es-foto img{width:100%;height:100%;object-fit:cover}
+.es-foto button{position:absolute;top:2px;right:2px;width:22px;height:22px;border:0;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;cursor:pointer}
+.es-previa{display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:18px;align-items:start}
+@media(max-width:800px){.es-previa{grid-template-columns:1fr}}
+.es-tela{position:relative;width:100%;max-width:380px;background:#1b1b1b center/cover no-repeat;border-radius:8px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;transition:background-image .6s}
+.es-tela.f916{aspect-ratio:9/16}.es-tela.f11{aspect-ratio:1/1}.es-tela.f169{aspect-ratio:16/9;max-width:100%}
+.es-tela::before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.65))}
+.es-legenda{position:relative;padding:18px;text-align:center;color:#fff;font:600 17px/1.5 Georgia,serif;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.es-dest{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.es-dest label{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;cursor:pointer;font:14px/1.4 "Segoe UI",Arial,sans-serif}
+.es-dest small{display:block;color:var(--ink-soft);font-size:12px}
+.es-vers{display:flex;flex-direction:column;gap:6px}
+.es-vers div{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;font:14px Georgia,serif}
+.es-vers div span{flex:1}
+</style>
+ 
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var ancora = $("ateliPainel");
+  if(!ancora) return;
+ 
+  /* ---------- botão + painel (abaixo do Ateliê) ---------- */
+  var btn = document.createElement("button");
+  btn.id = "esToggle"; btn.type = "button"; btn.className = "panel-toggle";
+  btn.setAttribute("aria-expanded","false"); btn.setAttribute("aria-controls","esPainel");
+  btn.innerHTML = '<span><span class="panel-toggle-title">Estúdio de criação</span>' +
+    '<span class="panel-toggle-sub">Escreva uma mensagem espiritual, dê voz, música e imagens, e exporte para as redes.</span></span>' +
+    '<span id="esToggleAcao" class="panel-toggle-action">ABRIR</span>';
+  var painel = document.createElement("div");
+  painel.id = "esPainel"; painel.hidden = true;
+  ancora.insertAdjacentElement("afterend", painel);
+  ancora.insertAdjacentElement("afterend", btn);
+ 
+  painel.innerHTML =
+    '<div class="es-passos" style="margin:14px 0">' +
+      '<button type="button" class="at-btn on" data-p="1">1. CRIAR</button>' +
+      '<button type="button" class="at-btn" data-p="2">2. VOZ, MÚSICA E IMAGENS</button>' +
+      '<button type="button" class="at-btn" data-p="3">3. PRÉVIA</button>' +
+      '<button type="button" class="at-btn" data-p="4">4. EXPORTAR</button>' +
+    '</div>' +
+ 
+    /* ===== PASSO 1 ===== */
+    '<div class="es-box" data-passo="1">' +
+      '<h3>O que você quer criar?</h3>' +
+      '<div class="es-cartoes" id="esTipos"></div>' +
+      '<div class="at-row">' +
+        '<label class="es-campo">Tom da mensagem<select id="esTom" class="at-sel">' +
+          '<option>Acolhedor</option><option>Solene</option><option>Esperançoso</option><option>Firme</option><option>Poético</option></select></label>' +
+        '<label class="es-campo">Duração desejada<select id="esDur" class="at-sel">' +
+          '<option value="30">cerca de 30 segundos</option><option value="60" selected>cerca de 1 minuto</option>' +
+          '<option value="120">cerca de 2 minutos</option><option value="300">cerca de 5 minutos</option></select></label>' +
+        '<label class="es-campo es-grow" style="flex:1 1 220px">Assunto ou passagem (opcional)<input id="esAssunto" class="at-in" type="text" placeholder="Ex.: Salmo 91, confiança em tempos difíceis"></label>' +
+      '</div>' +
+      '<input id="esTitulo" class="at-in" type="text" placeholder="Título (opcional)" style="font:600 20px Georgia,serif;height:46px">' +
+      '<textarea id="esTexto" class="es-texto" placeholder="Escreva aqui, ou use os botões de IA abaixo."></textarea>' +
+      '<div class="at-row"><span id="esConta" class="es-msg" style="flex:1"></span></div>' +
+      '<div class="at-row">' +
+        '<button type="button" class="at-btn gold" data-ia="criar">CRIAR COM IA</button>' +
+        '<button type="button" class="at-btn" data-ia="reescrever">REESCREVER</button>' +
+        '<button type="button" class="at-btn" data-ia="aumentar">AUMENTAR A DURAÇÃO</button>' +
+        '<button type="button" class="at-btn" data-ia="tom">ADAPTAR O TOM</button>' +
+      '</div>' +
+      '<div class="at-row">' +
+        '<button type="button" class="at-btn" id="esPuxar">PUXAR TEXTO DO ATELIÊ</button>' +
+        '<button type="button" class="at-btn" id="esGuardar">GUARDAR VERSÃO</button>' +
+        '<button type="button" class="at-btn" id="esLimpar">LIMPAR</button>' +
+      '</div>' +
+      '<div id="esVersoesBox"><p class="es-nota">Versões guardadas (use para criar outras versões do mesmo texto):</p><div class="es-vers" id="esVers"></div></div>' +
+      '<div id="esMsg1" class="es-msg" role="status"></div>' +
+    '</div>' +
+ 
+    /* ===== PASSO 2 ===== */
+    '<div class="es-box" data-passo="2" hidden>' +
+      '<h3>Voz, música e imagens</h3>' +
+      '<div class="at-row">' +
+        '<label class="es-campo">Voz<select id="esVoz" class="at-sel"></select></label>' +
+        '<label class="es-campo">Velocidade<select id="esVel" class="at-sel"><option value="0.85">Lenta</option><option value="1" selected>Normal</option><option value="1.15">Rápida</option></select></label>' +
+        '<label class="es-campo">Formato do vídeo<select id="esFormato" class="at-sel"><option value="f916">Vertical 9:16 (TikTok, Reels, Shorts)</option><option value="f11">Quadrado 1:1 (Feed)</option><option value="f169">Horizontal 16:9 (YouTube)</option></select></label>' +
+      '</div>' +
+      '<p class="es-nota">As vozes desta lista vêm do seu navegador, são só para ouvir e testar. As vozes profissionais para gerar o arquivo entram quando ligarmos o serviço de voz.</p>' +
+      '<div class="at-row">' +
+        '<label class="es-campo">Música de fundo<select id="esMusica" class="at-sel"><option value="">Sem música</option><option value="propria">Usar um arquivo meu…</option></select></label>' +
+        '<label class="es-campo">Volume da música<input id="esVolMus" type="range" min="0" max="100" value="25"></label>' +
+        '<input id="esMusArq" type="file" accept="audio/*" hidden>' +
+      '</div>' +
+      '<p class="es-nota">Use somente músicas e imagens que você tenha licença para publicar nas redes. Senão a rede pode bloquear ou remover o vídeo.</p>' +
+      '<div class="at-row"><button type="button" class="at-btn" id="esAddFoto">ADICIONAR IMAGENS DE FUNDO</button><input id="esFotoArq" type="file" accept="image/*" multiple hidden>' +
+        '<span class="es-nota">As imagens não precisam ter relação com o que é dito.</span></div>' +
+      '<div class="es-fotos" id="esFotos"></div>' +
+      '<div id="esMsg2" class="es-msg" role="status"></div>' +
+    '</div>' +
+ 
+    /* ===== PASSO 3 ===== */
+    '<div class="es-box" data-passo="3" hidden>' +
+      '<h3>Prévia</h3>' +
+      '<div class="es-previa">' +
+        '<div class="es-tela f916" id="esTela"><div class="es-legenda" id="esLegenda">Sua mensagem aparece aqui.</div></div>' +
+        '<div style="display:flex;flex-direction:column;gap:12px">' +
+          '<div id="esResumo" class="es-nota"></div>' +
+          '<div class="at-row"><button type="button" class="at-btn gold" id="esOuvir">OUVIR NO NAVEGADOR</button><button type="button" class="at-btn" id="esParar">PARAR</button></div>' +
+          '<p class="es-nota">Esta prévia usa a voz do navegador e as imagens que você escolheu. O arquivo final (MP3/MP4) é gerado no passo seguinte, depois de ligarmos o Worker.</p>' +
+        '</div>' +
+      '</div>' +
+      '<div id="esMsg3" class="es-msg" role="status"></div>' +
+    '</div>' +
+ 
+    /* ===== PASSO 4 ===== */
+    '<div class="es-box" data-passo="4" hidden>' +
+      '<h3>Exportar</h3>' +
+      '<p class="es-nota">Marque onde vai publicar. O arquivo sai no formato certo para cada rede.</p>' +
+      '<div class="es-dest" id="esDest"></div>' +
+      '<div class="at-row">' +
+        '<button type="button" class="at-btn gold" data-exp="mp3">EXPORTAR ÁUDIO (MP3)</button>' +
+        '<button type="button" class="at-btn gold" data-exp="mp4">EXPORTAR VÍDEO (MP4)</button>' +
+      '</div>' +
+      '<p class="es-nota">A publicação direta nas redes depende das regras e permissões de cada uma e fica para uma etapa futura. Por enquanto você baixa o arquivo e publica.</p>' +
+      '<div id="esMsg4" class="es-msg" role="status"></div>' +
+    '</div>';
+ 
+  /* ---------- abrir/fechar ---------- */
+  btn.addEventListener("click", function(){
+    var abrir = painel.hidden;
+    painel.hidden = !abrir;
+    btn.setAttribute("aria-expanded", String(abrir));
+    $("esToggleAcao").textContent = abrir ? "FECHAR" : "ABRIR";
+  });
+ 
+  /* ---------- passos ---------- */
+  function passo(n){
+    painel.querySelectorAll("[data-passo]").forEach(function(b){ b.hidden = b.dataset.passo !== String(n); });
+    painel.querySelectorAll(".es-passos .at-btn").forEach(function(b){ b.classList.toggle("on", b.dataset.p === String(n)); });
+    if(n === 3) desenharPrevia();
+    if(n !== 3) pararVoz();
+  }
+  painel.querySelector(".es-passos").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-p]"); if(b) passo(Number(b.dataset.p));
+  });
+ 
+  /* ---------- estado e gravação (neste navegador) ---------- */
+  var CH = "ps_estudio";
+  var TIPOS = ["Salmo","Oração","Mensagem de Deus","Reflexão bíblica","Texto espiritual original"];
+  var st = {tipo:TIPOS[0], versoes:[]};
+  try{ var s = JSON.parse(localStorage.getItem(CH)||"null"); if(s){ st.tipo = s.tipo || st.tipo; st.versoes = Array.isArray(s.versoes)?s.versoes:[]; } }catch(e){}
+  function gravar(){ try{ localStorage.setItem(CH, JSON.stringify(st)); }catch(e){} }
+  function msg(n, t, erro){ var el = $("esMsg"+n); el.textContent = t || ""; el.className = "es-msg" + (erro ? " erro" : ""); }
+ 
+  /* ---------- passo 1 ---------- */
+  function tipos(){
+    $("esTipos").innerHTML = TIPOS.map(function(t){
+      return '<button type="button" class="es-cartao" data-t="'+esc(t)+'" aria-pressed="'+(t===st.tipo)+'">'+esc(t)+'</button>';
+    }).join("");
+  }
+  $("esTipos").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-t]"); if(!b) return;
+    st.tipo = b.dataset.t; gravar(); tipos();
+  });
+  function contar(){
+    var t = $("esTexto").value.trim(), p = t ? t.split(/\s+/).length : 0;
+    var seg = Math.round(p / 130 * 60);
+    $("esConta").textContent = p + " palavras · fala de cerca de " + (seg >= 60 ? Math.floor(seg/60) + " min " + (seg%60) + " s" : seg + " s");
+  }
+  $("esTexto").addEventListener("input", contar);
+ 
+  function versoes(){
+    $("esVers").innerHTML = st.versoes.length ? st.versoes.map(function(v,i){
+      return '<div><span>'+esc(v.titulo || "Sem título")+' · '+esc(v.tipo)+'</span>' +
+        '<button type="button" class="at-btn" data-v="abrir" data-i="'+i+'">ABRIR</button>' +
+        '<button type="button" class="at-btn" data-v="del" data-i="'+i+'">EXCLUIR</button></div>';
+    }).join("") : '<span class="es-nota">Nenhuma versão guardada ainda.</span>';
+  }
+  $("esGuardar").addEventListener("click", function(){
+    var t = $("esTexto").value.trim();
+    if(!t){ msg(1,"Escreva algo antes de guardar.",true); return; }
+    st.versoes.unshift({titulo:$("esTitulo").value.trim(), tipo:st.tipo, tom:$("esTom").value, texto:t, em:new Date().toISOString()});
+    gravar(); versoes(); msg(1,"Versão guardada.");
+  });
+  $("esVers").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-v]"); if(!b) return;
+    var v = st.versoes[Number(b.dataset.i)]; if(!v) return;
+    if(b.dataset.v === "abrir"){
+      st.tipo = v.tipo; $("esTitulo").value = v.titulo; $("esTexto").value = v.texto; $("esTom").value = v.tom || "Acolhedor";
+      gravar(); tipos(); contar(); msg(1,"Versão aberta. Altere à vontade e guarde como nova versão.");
+    }else if(window.confirm("Excluir esta versão? Não dá para desfazer.")){
+      st.versoes.splice(Number(b.dataset.i),1); gravar(); versoes();
+    }
+  });
+  $("esLimpar").addEventListener("click", function(){
+    if($("esTexto").value.trim() && !window.confirm("Limpar o título e o texto desta tela?")) return;
+    $("esTitulo").value = ""; $("esTexto").value = ""; contar(); msg(1,"");
+  });
+  $("esPuxar").addEventListener("click", function(){
+    var t = $("atTexto"), ti = $("atTitulo");
+    var txt = t ? t.value.replace(/^##\s*/gm,"").replace(/^>\s?/gm,"").trim() : "";
+    if(!txt){ msg(1,"O texto do Ateliê está vazio.",true); return; }
+    if($("esTexto").value.trim() && !window.confirm("Substituir o texto desta tela pelo do Ateliê?")) return;
+    $("esTexto").value = txt; if(ti && ti.value && !$("esTitulo").value) $("esTitulo").value = ti.value;
+    contar(); msg(1,"Texto do Ateliê trazido para cá.");
+  });
+ 
+  /* botões de IA: ficam prontos, mas só funcionam quando o Worker for ligado */
+  painel.addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-ia]"); if(!b) return;
+    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:$("esTom").value, duracao:Number($("esDur").value),
+      assunto:$("esAssunto").value.trim(), titulo:$("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
+    if(det.acao !== "criar" && !det.texto.trim()){ msg(1,"Escreva ou crie um texto antes de usar esta opção.",true); return; }
+    document.dispatchEvent(new CustomEvent("estudio:ia", {detail:det}));
+    if(!det.tratado) msg(1,"A IA ainda não está ligada. Isso será feito no próximo passo, junto com o Worker.",true);
+  });
+ 
+  /* ---------- passo 2: vozes, música, imagens ---------- */
+  function vozes(){
+    if(!window.speechSynthesis){ $("esVoz").innerHTML = '<option>Sem suporte neste navegador</option>'; return; }
+    var lista = speechSynthesis.getVoices().filter(function(v){ return /^pt/i.test(v.lang); });
+    if(!lista.length) lista = speechSynthesis.getVoices();
+    $("esVoz").innerHTML = lista.length ? lista.map(function(v,i){
+      return '<option value="'+esc(v.name)+'">'+esc(v.name)+' ('+esc(v.lang)+')</option>';
+    }).join("") : '<option value="">Voz padrão do navegador</option>';
+  }
+  if(window.speechSynthesis){ vozes(); speechSynthesis.onvoiceschanged = vozes; }
+ 
+  var fotos = [], musicaUrl = null, audio = null;
+  function desenharFotos(){
+    $("esFotos").innerHTML = fotos.map(function(u,i){
+      return '<div class="es-foto"><img src="'+u+'" alt=""><button type="button" data-f="'+i+'" aria-label="Remover imagem">×</button></div>';
+    }).join("");
+  }
+  $("esAddFoto").addEventListener("click", function(){ $("esFotoArq").click(); });
+  $("esFotoArq").addEventListener("change", function(){
+    Array.prototype.forEach.call(this.files, function(f){ fotos.push(URL.createObjectURL(f)); });
+    this.value = ""; desenharFotos(); msg(2, fotos.length + " imagem(ns) escolhida(s). Elas valem só enquanto esta página estiver aberta.");
+  });
+  $("esFotos").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-f]"); if(!b) return;
+    fotos.splice(Number(b.dataset.f),1); desenharFotos();
+  });
+  $("esMusica").addEventListener("change", function(){ if(this.value === "propria") $("esMusArq").click(); else musicaUrl = null; });
+  $("esMusArq").addEventListener("change", function(){
+    var f = this.files && this.files[0];
+    if(f){ musicaUrl = URL.createObjectURL(f); msg(2,"Música escolhida: " + f.name); }
+    else { $("esMusica").value = ""; }
+    this.value = "";
+  });
+ 
+  /* ---------- passo 3: prévia ---------- */
+  var tel = $("esTela"), leg = $("esLegenda"), tFoto = null;
+  function desenharPrevia(){
+    tel.className = "es-tela " + $("esFormato").value;
+    tel.style.backgroundImage = fotos[0] ? 'url("'+fotos[0]+'")' : "";
+    leg.textContent = ($("esTitulo").value.trim() || $("esTexto").value.trim().split(/\n/)[0] || "Sua mensagem aparece aqui.").slice(0,140);
+    var p = $("esTexto").value.trim() ? $("esTexto").value.trim().split(/\s+/).length : 0;
+    $("esResumo").innerHTML = '<b>' + esc(st.tipo) + '</b> · tom ' + esc($("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
+      fotos.length + ' imagem(ns) · ' + ($("esMusica").value ? 'com música' : 'sem música');
+  }
+  function pararVoz(){
+    if(window.speechSynthesis) speechSynthesis.cancel();
+    clearInterval(tFoto); if(audio){ audio.pause(); audio = null; }
+  }
+  $("esParar").addEventListener("click", function(){ pararVoz(); desenharPrevia(); });
+  $("esOuvir").addEventListener("click", function(){
+    var t = $("esTexto").value.trim();
+    if(!t){ msg(3,"Escreva um texto no passo 1.",true); return; }
+    if(!window.speechSynthesis){ msg(3,"Este navegador não tem voz embutida.",true); return; }
+    pararVoz(); msg(3,"");
+    var frases = t.replace(/\n+/g," ").match(/[^.!?…]+[.!?…]*/g) || [t];
+    var u = new SpeechSynthesisUtterance(t);
+    var nome = $("esVoz").value, v = speechSynthesis.getVoices().filter(function(x){ return x.name === nome; })[0];
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "pt-BR";
+    u.rate = Number($("esVel").value);
+    var i = 0;
+    u.onboundary = function(ev){
+      if(ev.name && ev.name !== "word") return;
+      var acumulado = 0, k = 0;
+      for(; k < frases.length; k++){ acumulado += frases[k].length; if(acumulado >= ev.charIndex) break; }
+      leg.textContent = (frases[Math.min(k, frases.length-1)] || "").trim();
+    };
+    u.onend = function(){ pararVoz(); desenharPrevia(); };
+    if(fotos.length > 1){ tFoto = setInterval(function(){ i = (i+1) % fotos.length; tel.style.backgroundImage = 'url("'+fotos[i]+'")'; }, 6000); }
+    if(musicaUrl && $("esMusica").value === "propria"){
+      audio = new Audio(musicaUrl); audio.loop = true; audio.volume = Number($("esVolMus").value)/100; audio.play().catch(function(){});
+    }
+    speechSynthesis.speak(u);
+  });
+  $("esFormato").addEventListener("change", desenharPrevia);
+ 
+  /* ---------- passo 4: exportar ---------- */
+  var DESTINOS = [
+    ["tiktok","TikTok","vertical 9:16, até 10 min"],
+    ["instagram","Instagram","Reels vertical 9:16, Feed 1:1"],
+    ["facebook","Facebook","vertical, quadrado ou horizontal"],
+    ["youtube","YouTube","Shorts vertical ou vídeo horizontal 16:9"]
+  ];
+  $("esDest").innerHTML = DESTINOS.map(function(d){
+    return '<label><input type="checkbox" value="'+d[0]+'" checked><span>'+d[1]+'<small>'+d[2]+'</small></span></label>';
+  }).join("");
+  painel.addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-exp]"); if(!b) return;
+    if(!$("esTexto").value.trim()){ msg(4,"Escreva um texto no passo 1 antes de exportar.",true); return; }
+    var det = {tipoArquivo:b.dataset.exp, destinos:Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; }),
+      formato:$("esFormato").value, voz:$("esVoz").value, velocidade:Number($("esVel").value),
+      musica:$("esMusica").value ? "propria" : "", volumeMusica:Number($("esVolMus").value),
+      imagens:fotos.length, titulo:$("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
+    if(!det.destinos.length){ msg(4,"Marque pelo menos uma rede.",true); return; }
+    document.dispatchEvent(new CustomEvent("estudio:exportar", {detail:det}));
+    if(!det.tratado) msg(4,"A geração do arquivo ainda não está ligada. Entra no próximo passo, junto com o Worker.",true);
+  });
+ 
+  tipos(); versoes(); contar();
+})();
+</script>
+<!-- ===== FIM: ESTÚDIO DE CRIAÇÃO ===== -->
+ 
+Claude terminou a resposta
+
+
 
 
 
