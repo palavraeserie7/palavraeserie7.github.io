@@ -4786,6 +4786,157 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 </script>
 <!-- ===== FIM: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
 
+
+
+<!-- ===== INÍCIO: GERADOR DE PÁGINA (passo 3) =====
+     Cole este bloco inteiro logo ANTES da última tag </body>, depois do bloco FIM: MENU DE DIAGRAMAÇÃO (4.1).
+     Não apague nada do que já existe. -->
+ 
+<style>
+#dgPrevia{display:none;position:fixed;inset:0;z-index:100010;background:rgba(30,22,10,.72);align-items:center;justify-content:center;padding:16px}
+#dgPrevia.aberta{display:flex}
+.dgp-box{display:flex;flex-direction:column;gap:12px;max-height:100%;background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;padding:16px 18px;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.dgp-topo{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dgp-topo strong{flex:1 1 auto;font:600 17px Georgia,"Times New Roman",serif;color:var(--ink,#2a2217)}
+#dgpFrame{width:560px;max-width:calc(100vw - 70px);height:calc(100vh - 150px);min-height:300px;border:1px solid #bbb;background:#fff}
+.dgp-nota{font:12.5px "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
+</style>
+ 
+<div id="dgPrevia" role="dialog" aria-modal="true" aria-labelledby="dgpTitulo">
+  <div class="dgp-box">
+    <div class="dgp-topo">
+      <strong id="dgpTitulo">Prévia</strong>
+      <button id="dgpPdf" class="at-btn gold" type="button">BAIXAR PDF</button>
+      <button id="dgpFechar" class="at-btn" type="button">FECHAR PRÉVIA</button>
+    </div>
+    <iframe id="dgpFrame" title="Prévia da página"></iframe>
+    <div class="dgp-nota">Ao clicar em BAIXAR PDF, na janela que abrir escolha <b>Salvar como PDF</b> em "Destino" e clique em Salvar.</div>
+  </div>
+</div>
+ 
+<script>
+(function(){
+  var previa = document.getElementById("dgPrevia");
+  var frame = document.getElementById("dgpFrame");
+  if(!previa || !frame) return;
+ 
+  function esc(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function num(v, padrao){ var n = Number(v); return isFinite(n) && v !== null && v !== "" ? n : padrao; }
+ 
+  function paragrafos(texto){
+    return String(texto || "").split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+  }
+ 
+  function montarHtml(p){
+    var n = p.normas || {};
+    var pg = n.pagina || {};
+    var corpo = (n.global && n.global.corpo) || {};
+    var dim = pg.pagina_mm || [148, 210];
+    var W = num(dim[0], 148), H = num(dim[1], 210);
+    var lateral = num(pg.margem_lateral_pt, 51);
+    var topo = num(pg.margem_superior_pt, 54);
+    var base = num(pg.margem_inferior_pt, 54);
+    var fonte = String(pg.fonte || "").replace(/["'<>]/g, "");
+    var familia = (fonte ? '"' + fonte + '", ' : "") + 'Georgia, "Times New Roman", serif';
+    var tam = num(corpo.tamanho_pt, 11);
+    var ent = num(corpo.entrelinha_pt, 15);
+    var esp = num(corpo.espaco_entre_paragrafos_pt, 6);
+    var alin = /just/i.test(String(corpo.alinhamento || "")) ? "justify" : "left";
+    var ouro = "#a07d33", tinta = "#2a2217";
+    var cod = p.parte;
+    var autor = (p.fixos && p.fixos.autor) || "";
+    var editora = (p.fixos && p.fixos.editora) || "";
+    var linhas = paragrafos(p.texto);
+    var conteudo = "", fixa = false;
+ 
+    if(p.omitida){
+      conteudo = '<p style="text-align:center;color:#777">Esta parte foi omitida do livro.</p>';
+    } else if(p.tipo_conteudo === "auto"){
+      conteudo = '<p style="text-align:center;color:#777">Esta parte é montada automaticamente a partir do livro inteiro. Ela será gerada quando o livro completo for diagramado.</p>';
+    } else if(cod === "D01"){
+      fixa = true;
+      var tit = linhas[0] || "(sem título)";
+      var sub = linhas.slice(1).join(" ");
+      conteudo =
+        '<div class="capa">' +
+        '<div class="c-topo"></div>' +
+        '<div class="c-meio"><h1>' + esc(tit) + '</h1><div class="filete"></div>' +
+        (sub ? '<h2>' + esc(sub) + '</h2>' : '') + '</div>' +
+        '<div class="c-base"><div class="autor">' + esc(autor) + '</div><div class="editora">' + esc(editora) + '</div></div>' +
+        '</div>';
+    } else if(cod === "D02"){
+      fixa = true;
+      var tit2 = linhas[0] || "(sem título)";
+      var sub2 = linhas.slice(1).join(" ");
+      conteudo =
+        '<div class="capa rosto">' +
+        '<div class="c-topo"><div class="autor">' + esc(autor) + '</div></div>' +
+        '<div class="c-meio"><h1>' + esc(tit2) + '</h1><div class="filete"></div>' +
+        (sub2 ? '<h2>' + esc(sub2) + '</h2>' : '') + '</div>' +
+        '<div class="c-base"><div class="editora">' + esc(editora) + '</div></div>' +
+        '</div>';
+    } else {
+      var h = "";
+      if(p.titulo) h += '<h3 class="tit">' + esc(p.titulo) + '</h3>';
+      if(!linhas.length) h += '<p style="color:#777">(texto vazio)</p>';
+      linhas.forEach(function(l){ h += '<p>' + esc(l) + '</p>'; });
+      conteudo = h;
+    }
+ 
+    var margemPagina = fixa ? "0" : topo + "pt " + lateral + "pt " + base + "pt " + lateral + "pt";
+    var paddingTela = fixa ? "0" : topo + "pt " + lateral + "pt " + base + "pt " + lateral + "pt";
+ 
+    var css =
+      '@page{size:' + W + 'mm ' + H + 'mm;margin:' + margemPagina + '}' +
+      '*{box-sizing:border-box}' +
+      'html,body{margin:0;padding:0;background:#fff;color:' + tinta + '}' +
+      'body{font-family:' + familia + ';font-size:' + tam + 'pt;line-height:' + ent + 'pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+      '.folha{width:' + W + 'mm;min-height:' + H + 'mm;padding:' + paddingTela + '}' +
+      '@media print{.folha{width:auto;min-height:0;padding:0}}' +
+      '.folha p{margin:0 0 ' + esp + 'pt;text-align:' + alin + ';text-indent:0;hyphens:auto}' +
+      '.tit{margin:0 0 18pt;text-align:center;font-size:' + (tam + 5) + 'pt;line-height:1.25;font-weight:600}' +
+      '.capa{width:' + W + 'mm;height:' + (H - 0.5) + 'mm;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:22mm 14mm 20mm;border:0;overflow:hidden;background:#fffdf6;position:relative}' +
+      '.capa:before{content:"";position:absolute;inset:7mm;border:1.2pt solid ' + ouro + ';pointer-events:none}' +
+      '.c-topo{min-height:10mm}' +
+      '.c-meio{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;align-items:center}' +
+      '.capa h1{margin:0;font-size:34pt;line-height:1.15;font-weight:600}' +
+      '.capa .filete{width:30mm;height:1.5pt;background:' + ouro + ';margin:9mm 0}' +
+      '.capa h2{margin:0;font-size:15pt;line-height:1.35;font-weight:400;font-style:italic}' +
+      '.autor{font-size:14pt;letter-spacing:.08em;text-transform:uppercase}' +
+      '.editora{font-size:10.5pt;margin-top:2mm;color:' + ouro + '}' +
+      '.rosto .autor{font-size:13pt}';
+ 
+    return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>' + esc(p.parte) + '</title><style>' + css + '</style></head><body><div class="folha">' + conteudo + '</div></body></html>';
+  }
+ 
+  function abrirPrevia(p){
+    document.getElementById("dgpTitulo").textContent = "Prévia — " + p.parte + (p.normas && p.normas.nome ? " · " + p.normas.nome : "") + " · " + (p.saida || "");
+    frame.srcdoc = montarHtml(p);
+    previa.classList.add("aberta");
+    document.getElementById("dgpPdf").focus();
+  }
+  function fecharPrevia(){ previa.classList.remove("aberta"); frame.srcdoc = ""; }
+ 
+  document.addEventListener("dg:diagramar", function(ev){
+    try{ abrirPrevia(ev.detail); }
+    catch(e){ console.error(e); alert("Não foi possível montar a página. Abra o console (F12) para ver o erro."); }
+  });
+ 
+  document.getElementById("dgpFechar").addEventListener("click", fecharPrevia);
+  document.getElementById("dgpPdf").addEventListener("click", function(){
+    try{ frame.contentWindow.focus(); frame.contentWindow.print(); }
+    catch(e){ console.error(e); alert("Não foi possível abrir a janela de impressão."); }
+  });
+ 
+  window.addEventListener("keydown", function(ev){
+    if(ev.key === "Escape" && previa.classList.contains("aberta")){ fecharPrevia(); ev.stopImmediatePropagation(); }
+  }, true);
+})();
+</script>
+<!-- ===== FIM: GERADOR DE PÁGINA (passo 3) ===== -->
+ 
+
+
 </body>
 </html>
  
