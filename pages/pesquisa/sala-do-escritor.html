@@ -4065,7 +4065,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     <div class="dg-ebotoes">
       <button id="dgApagar" class="at-btn" type="button">APAGAR TEXTO</button>
       <button id="dgOmitir" class="at-btn dg-hide" type="button">OMITIR ESTA PARTE</button>
-      <button id="dgIrFixos" class="at-btn dg-hide" type="button">EDITAR EM MEUS DADOS FIXOS</button>
+      <button id="dgIrFixos" class="at-btn dg-hide" type="button">ALTERAR DADOS DO AUTOR E DA EDITORA</button>
       <span class="dg-status" id="dgStatus" role="status"></span>
       <button id="dgDiagramar" class="at-btn" type="button" disabled>DIAGRAMAR</button>
       <button id="dgSalvar" class="at-btn gold" type="button">SALVAR</button>
@@ -4077,8 +4077,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 <div id="dg-fixos" class="dg-editor" role="dialog" aria-modal="false" aria-labelledby="dgFxTitulo">
   <div class="dg-editor-box">
     <button id="dgFxFechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
-    <div class="dg-ehead"><h3 id="dgFxTitulo">Meus dados fixos</h3></div>
-    <p class="dg-edesc">Preencha uma vez. Estes dados entram sozinhos em todos os livros: direitos autorais, sobre o autor, missão ministerial, apresentação da editora e assinaturas.</p>
+    <div class="dg-ehead"><h3 id="dgFxTitulo">Dados do autor e da editora</h3></div>
+    <p class="dg-edesc">Já vêm preenchidos e entram sozinhos em todos os livros: capa, rosto, direitos autorais, sobre o autor, missão, apresentação da editora e assinaturas. Altere só se algo mudar.</p>
     <div class="dg-fx-campos" id="dgFxCampos"></div>
     <div class="dg-ebotoes">
       <button id="dgFxExportar" class="at-btn" type="button">EXPORTAR</button>
@@ -4150,34 +4150,28 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   var salvos = ler(CHAVE), titulos = ler(CHAVE_TIT), omitidas = ler(CHAVE_OM), fixos = ler(CHAVE_FX);
   function gravar(){ gravarChave(CHAVE, salvos); }
  
-  /* ---------- dados fixos ---------- */
-  var MODELO_DIREITOS = "Copyright © {ANO} por {AUTOR}. Todos os direitos reservados.\n\n" +
-    "Nenhuma parte desta publicação pode ser reproduzida, distribuída ou transmitida por qualquer forma ou meio, incluindo fotocópias, gravações ou outros métodos eletrônicos ou mecânicos, sem a permissão prévia por escrito do autor, exceto no caso de citações breves em resenhas críticas e outros usos não comerciais permitidos pela lei de direitos autorais.\n\n" +
-    "Esta é uma publicação independente da {EDITORA}.";
- 
+  /* ---------- dados fixos: já vêm preenchidos pelo JSON (conteudo_fixo); aqui ficam só as trocas do autor ---------- */
   var CAMPOS_FX = [
     {k:"autor_nome", rotulo:"Nome do autor", tipo:"input"},
     {k:"editora_nome", rotulo:"Nome da editora", tipo:"input"},
-    {k:"direitos_autorais", rotulo:"Direitos autorais", tipo:"area", rows:8, dica:"Use {AUTOR}, {EDITORA} e {ANO}: são trocados automaticamente em cada livro."},
+    {k:"direitos_autorais", rotulo:"Direitos autorais", tipo:"area", rows:8, dica:"{AUTOR}, {EDITORA} e {ANO} são trocados automaticamente em cada livro."},
     {k:"sobre_o_autor", rotulo:"Sobre o autor (biografia)", tipo:"area", rows:5},
-    {k:"missao_ministerial", rotulo:"Missão ministerial (opcional)", tipo:"area", rows:4},
+    {k:"missao_ministerial", rotulo:"Missão ministerial", tipo:"area", rows:4},
     {k:"sobre_a_editora", rotulo:"Apresentação da editora", tipo:"area", rows:5}
   ];
  
-  function getFixo(k){
-    if(typeof fixos[k] === "string") return fixos[k];
-    return k === "direitos_autorais" ? MODELO_DIREITOS : "";
+  function padraoFixo(k){
+    var c = normasDados && normasDados.conteudo_fixo && normasDados.conteudo_fixo.campos;
+    return (c && typeof c[k] === "string") ? c[k] : "";
   }
+  function getFixo(k){ return typeof fixos[k] === "string" ? fixos[k] : padraoFixo(k); }
   function resolver(s){
     return String(s || "")
       .replace(/\{ANO\}/g, String(new Date().getFullYear()))
-      .replace(/\{AUTOR\}/g, fixos.autor_nome || "{AUTOR}")
-      .replace(/\{EDITORA\}/g, fixos.editora_nome || "{EDITORA}");
+      .replace(/\{AUTOR\}/g, getFixo("autor_nome") || "{AUTOR}")
+      .replace(/\{EDITORA\}/g, getFixo("editora_nome") || "{EDITORA}");
   }
-  function fixosCompletos(){
-    return !!((fixos.autor_nome||"").trim() && (fixos.editora_nome||"").trim() &&
-              (fixos.sobre_o_autor||"").trim() && (fixos.sobre_a_editora||"").trim());
-  }
+  function fixosCompletos(){ return !!(getFixo("autor_nome").trim() && getFixo("editora_nome").trim()); }
  
   /* ---------- NORMAS: carregadas do JSON, funcionam como o "prompt" da parte ---------- */
   var NORMAS_URL = "tipografia-devocional-a5.json";
@@ -4243,6 +4237,14 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     "D16":"Cabeçalho, rodapé e numeração são aplicados automaticamente em todas as páginas de texto."
   };
  
+  /* partes de livro em que autor/editora entram sozinhos */
+  var NOTAS_AUTO = {
+    "D01": function(){ return "Autor e editora entram automaticamente (" + getFixo("autor_nome") + " · " + getFixo("editora_nome") + "). Digite só o título e o subtítulo."; },
+    "D02": function(){ return "Autor e editora entram automaticamente (" + getFixo("autor_nome") + " · " + getFixo("editora_nome") + "). Digite só o título e o subtítulo."; },
+    "D05": function(){ return "A assinatura (" + getFixo("autor_nome") + ") é adicionada automaticamente ao final."; },
+    "D12": function(){ return "A assinatura com autor e editora é adicionada automaticamente ao final."; }
+  };
+ 
   function info(cod){
     var f = RESERVA[cod] || {};
     var r = {tipo: f.t || "livro", campo: f.c || null, opcional: !!f.o, titulo: null, rotulo: null};
@@ -4267,9 +4269,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     if(inf.tipo !== "fixo" || !inf.campo) return false;
     var v = getFixo(inf.campo).trim();
     if(!v) return false;
-    if(inf.campo === "direitos_autorais")
-      return !!((fixos.autor_nome||"").trim() && (fixos.editora_nome||"").trim());
-    return true;
+    return !!(getFixo("autor_nome").trim() && getFixo("editora_nome").trim());
   }
  
   function tituloPadrao(cod){
@@ -4299,8 +4299,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
  
   function montarLista(){
     var rolagem = lista.scrollTop;
-    var h = '<button type="button" class="dgl-fixos" data-acao="fixos">⚙ Meus dados fixos' +
-            '<span class="' + (fixosCompletos() ? '' : 'falta') + '">' + (fixosCompletos() ? '✓ preenchidos' : 'preencher') + '</span></button>';
+    var h = '<button type="button" class="dgl-fixos" data-acao="fixos">⚙ Dados do autor e da editora<span>' + (normasDados ? 'automáticos' : '…') + '</span></button>';
     GRUPOS.forEach(function(g){
       h += '<div class="dgl-grupo">' + g.g + '</div>';
       g.itens.forEach(function(it){
@@ -4504,8 +4503,9 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     var msg = "";
     if(om) msg = "Esta parte será omitida do livro: não gera páginas.";
     else if(inf.tipo === "auto") msg = AVISOS[atual] || "Esta parte é montada automaticamente.";
-    else if(inf.tipo === "fixo" && !fixoPronto(atual)) msg = "Faltam dados em Meus dados fixos para montar esta parte. Clique em EDITAR EM MEUS DADOS FIXOS e preencha.";
-    else if(inf.tipo === "fixo") msg = "Texto vindo de Meus dados fixos. Para alterar, use EDITAR EM MEUS DADOS FIXOS.";
+    else if(inf.tipo === "fixo" && !fixoPronto(atual)) msg = "Faltam o nome do autor ou da editora. Clique em ALTERAR DADOS DO AUTOR E DA EDITORA e preencha.";
+    else if(inf.tipo === "fixo") msg = "Texto preenchido automaticamente. Para mudar, use ALTERAR DADOS DO AUTOR E DA EDITORA.";
+    else if(inf.tipo === "livro" && NOTAS_AUTO[atual]) msg = NOTAS_AUTO[atual]();
     elAviso.textContent = msg;
     elAviso.classList.toggle("dg-hide", !msg);
  
@@ -4591,6 +4591,12 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   txt.addEventListener("input", atualizarDiagramar);
   desenharSaidas(false);
  
+  /* carrega o JSON logo no início: dele vêm os dados fixos já preenchidos */
+  carregarNormas().then(function(){
+    if(listaAberta()) montarLista();
+    if(editorAberto()) renderModo();
+  }).catch(function(){});
+ 
   /* título/rótulo: guarda o que o autor digitar; se voltar ao padrão, apaga */
   inpTitulo.addEventListener("input", function(){
     if(!atual) return;
@@ -4643,8 +4649,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       texto: texto,
       partes_omitidas: Object.keys(omitidas).filter(function(k){ return omitidas[k]; }),
       fixos: {
-        autor: fixos.autor_nome || "",
-        editora: fixos.editora_nome || "",
+        autor: getFixo("autor_nome"),
+        editora: getFixo("editora_nome"),
         ano: new Date().getFullYear()
       },
       tipo: tipoSel ? tipoSel.dataset.tipo : null,
@@ -4687,7 +4693,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       if(c.tipo === "input") h += '<input id="fx_' + c.k + '" type="text">';
       else h += '<textarea id="fx_' + c.k + '" rows="' + (c.rows || 4) + '"></textarea>';
       if(c.dica) h += '<small>' + c.dica + '</small>';
-      if(c.k === "direitos_autorais") h += '<div><button type="button" class="at-btn" id="dgFxModelo">RESTAURAR TEXTO-MODELO</button></div>';
+      if(c.k === "direitos_autorais") h += '<div><button type="button" class="at-btn" id="dgFxModelo">RESTAURAR TEXTO PADRÃO</button></div>';
       h += '</div>';
     });
     fxCampos.innerHTML = h;
@@ -4696,8 +4702,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     });
     var bm = document.getElementById("dgFxModelo");
     if(bm) bm.addEventListener("click", function(){
-      document.getElementById("fx_direitos_autorais").value = MODELO_DIREITOS;
-      fxStatus.textContent = "Texto-modelo restaurado. Clique em SALVAR para guardar.";
+      document.getElementById("fx_direitos_autorais").value = padraoFixo("direitos_autorais");
+      fxStatus.textContent = "Texto padrão restaurado. Clique em SALVAR para guardar.";
     });
   }
   function lerFormFixos(){
@@ -4727,7 +4733,9 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   }
  
   document.getElementById("dgFxSalvar").addEventListener("click", function(){
-    fixos = lerFormFixos();
+    var f = lerFormFixos(), o = {};
+    CAMPOS_FX.forEach(function(c){ if(f[c.k] !== padraoFixo(c.k).trim()) o[c.k] = f[c.k]; });   /* guarda só o que difere do padrão */
+    fixos = o;
     gravarChave(CHAVE_FX, fixos);
     if(voltaCod){ fecharFixos(); return; }   /* volta para a parte, já atualizada */
     montarLista();
