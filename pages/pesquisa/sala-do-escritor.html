@@ -6285,7 +6285,41 @@ body.dg-livro-vivo .dgp-nota{display:none}
 })();
 </script>
 <!-- ===== FIM: PRÉVIA SEGUE A PARTE ESCOLHIDA ===== -->
- 
+ <!-- ===== INÍCIO: SUMÁRIO CLICÁVEL NA PRÉVIA ===== -->
+<script>
+(function(){
+  var frame = document.getElementById("dgpFrame");
+  if(!frame) return;
+
+  function ligar(){
+    var doc, win;
+    try{ doc = frame.contentDocument; win = frame.contentWindow; }catch(e){ return; }
+    if(!doc || !doc.body || doc.body.__dgToc) return;
+    doc.body.__dgToc = true;
+
+    /* captura o clique antes do navegador tentar navegar */
+    doc.addEventListener("click", function(ev){
+      var a = ev.target.closest && ev.target.closest("a[href]");
+      if(!a) return;
+      var h = a.getAttribute("href") || "";
+      var i = h.indexOf("#");
+      if(i < 0) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      var alvo = doc.getElementById(h.slice(i + 1));
+      var pg = alvo && alvo.closest ? alvo.closest(".pagedjs_page") : null;
+      if(pg) win.scrollTo(0, Math.max(0, pg.getBoundingClientRect().top + (win.scrollY || 0) - 12));
+    }, true);
+  }
+
+  /* liga quando o livro termina de montar (o Paged.js refaz os links ao final) */
+  window.addEventListener("message", function(ev){
+    if(ev.source !== frame.contentWindow || !ev.data || ev.data.dgTotal == null) return;
+    setTimeout(ligar, 50);
+  });
+})();
+</script>
+<!-- ===== FIM: SUMÁRIO CLICÁVEL NA PRÉVIA ===== -->
  <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (estrutura, sem Worker) =====
      COMO APLICAR: cole este bloco inteiro logo ANTES da última tag </body> do sala-do-escritor.html
      (depois do bloco "FIM: LIVRO COMPLETO"). Não precisa mexer em mais nada.
