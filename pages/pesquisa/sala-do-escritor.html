@@ -4885,8 +4885,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     s = s.replace(/\s+(?:--|-|–)\s+/g, " — ");
     s = s.replace(/(^|[\s(\[—])"/g, "$1“").replace(/"/g, "”");
     s = s.replace(/(^|[\s(\[—“])'/g, "$1‘").replace(/'/g, "’");
-    s = s.replace(/(^|[\s(“—])([1-3])\s([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+\s\d+:\d)/g, "$1$2 $3");
-    s = s.replace(/(^|[\s(“—])([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+)\s(\d+:\d)/g, "$1$2 $3");
+    s = s.replace(/(^|[\s(“—])([1-3])\s([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+\s\d+:\d)/g, "12 $3");
+    s = s.replace(/(^|[\s(“—])([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+)\s(\d+:\d)/g, "12 $3");
     return s;
   }
   function T(s){ return esc(tip(s)); }
@@ -5234,7 +5234,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     o.push('html{-webkit-print-color-adjust:exact;print-color-adjust:exact}');
     o.push('body{margin:0;font-family:' + F + ';font-size:' + num(c.tamanho_pt, 10.3) + 'pt;line-height:' + num(c.entrelinha_pt, 14.6) + 'pt;color:#111;hyphens:auto;-webkit-hyphens:auto}');
     o.push('.sec{display:block}');
-    if(!iso) o.push('.rt{break-before:page}.lt{break-before:page}.np{break-before:page}');
+    if(!iso) o.push('.rt{break-before:right}.lt{break-before:left}.np{break-before:page}');
     o.push('.set-livro,.set-cab{display:block;height:0;overflow:hidden;font-size:0;line-height:0}');
     o.push('.set-livro{string-set:livro content(text)}');
     /* o Paged.js guarda UM seletor por nome de string: título de parte e título do dia precisam estar na mesma regra */
@@ -6513,7 +6513,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   $("esGuardar").addEventListener("click", function(){
     var t = $("esTexto").value.trim();
     if(!t){ msg(1,"Escreva algo antes de guardar.",true); return; }
-    st.versoes.unshift({titulo:$("esTitulo").value.trim(), tipo:st.tipo, tom:$("esTom").value, texto:t, em:new Date().toISOString()});
+    st.versoes.unshift({titulo:("esTitulo").value.trim(),tipo:st.tipo,tom:("esTom").value, texto:t, em:new Date().toISOString()});
     gravar(); versoes(); msg(1,"Versão guardada.");
   });
   $("esVers").addEventListener("click", function(ev){
@@ -6535,15 +6535,15 @@ body.dg-livro-vivo .dgp-nota{display:none}
     var txt = t ? t.value.replace(/^##\s*/gm,"").replace(/^>\s?/gm,"").trim() : "";
     if(!txt){ msg(1,"O texto do Ateliê está vazio.",true); return; }
     if($("esTexto").value.trim() && !window.confirm("Substituir o texto desta tela pelo do Ateliê?")) return;
-    $("esTexto").value = txt; if(ti && ti.value && !$("esTitulo").value) $("esTitulo").value = ti.value;
+    ("esTexto").value=txt;if(ti&&ti.value&&!("esTitulo").value) $("esTitulo").value = ti.value;
     contar(); msg(1,"Texto do Ateliê trazido para cá.");
   });
  
   /* botões de IA: ficam prontos, mas só funcionam quando o Worker for ligado */
   painel.addEventListener("click", function(ev){
     var b = ev.target.closest("[data-ia]"); if(!b) return;
-    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:$("esTom").value, duracao:Number($("esDur").value),
-      assunto:$("esAssunto").value.trim(), titulo:$("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
+    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:("esTom").value,duracao:Number(("esDur").value),
+      assunto:("esAssunto").value.trim(),titulo:("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
     if(det.acao !== "criar" && !det.texto.trim()){ msg(1,"Escreva ou crie um texto antes de usar esta opção.",true); return; }
     document.dispatchEvent(new CustomEvent("estudio:ia", {detail:det}));
     if(!det.tratado) msg(1,"A IA ainda não está ligada. Isso será feito no próximo passo, junto com o Worker.",true);
@@ -6590,7 +6590,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
     tel.style.backgroundImage = fotos[0] ? 'url("'+fotos[0]+'")' : "";
     leg.textContent = ($("esTitulo").value.trim() || $("esTexto").value.trim().split(/\n/)[0] || "Sua mensagem aparece aqui.").slice(0,140);
     var p = $("esTexto").value.trim() ? $("esTexto").value.trim().split(/\s+/).length : 0;
-    $("esResumo").innerHTML = '<b>' + esc(st.tipo) + '</b> · tom ' + esc($("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
+    ("esResumo").innerHTML='<b>'+esc(st.tipo)+'</b>·tom'+esc(("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
       fotos.length + ' imagem(ns) · ' + ($("esMusica").value ? 'com música' : 'sem música');
   }
   function pararVoz(){
@@ -6638,9 +6638,9 @@ body.dg-livro-vivo .dgp-nota{display:none}
     var b = ev.target.closest("[data-exp]"); if(!b) return;
     if(!$("esTexto").value.trim()){ msg(4,"Escreva um texto no passo 1 antes de exportar.",true); return; }
     var det = {tipoArquivo:b.dataset.exp, destinos:Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; }),
-      formato:$("esFormato").value, voz:$("esVoz").value, velocidade:Number($("esVel").value),
-      musica:$("esMusica").value ? "propria" : "", volumeMusica:Number($("esVolMus").value),
-      imagens:fotos.length, titulo:$("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
+      formato:("esFormato").value,voz:("esVoz").value, velocidade:Number($("esVel").value),
+      musica:("esMusica").value?"propria":"",volumeMusica:Number(("esVolMus").value),
+      imagens:fotos.length, titulo:("esTitulo").value.trim(),texto:("esTexto").value, tratado:false};
     if(!det.destinos.length){ msg(4,"Marque pelo menos uma rede.",true); return; }
     document.dispatchEvent(new CustomEvent("estudio:exportar", {detail:det}));
     if(!det.tratado) msg(4,"A geração do arquivo ainda não está ligada. Entra no próximo passo, junto com o Worker.",true);
@@ -6663,7 +6663,4 @@ body.dg-livro-vivo .dgp-nota{display:none}
  
  
  
-
-
-
 
