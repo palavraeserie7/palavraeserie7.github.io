@@ -4789,7 +4789,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 </script>
 <!-- ===== FIM: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
 
-Claude
+ Claude
 
 
 Bloco livro completo · HTML
@@ -5277,7 +5277,8 @@ Bloco livro completo · HTML
   function documento(K, S, iso){
     var corpo = S.map(function(s){ return sec(s.cls, s.id, s.inner); }).join("");
     var urls = window.DG_PAGED_URL ? [window.DG_PAGED_URL] : [URL_PAGED, "https://cdn.jsdelivr.net/npm/pagedjs@0.4.3/dist/paged.polyfill.js"];
-    var carga = 'window.PagedConfig={auto:true,after:function(f){try{parent.postMessage({dgTotal:f.total},"*")}catch(e){}}};' +
+    var telaCss = "@media screen{html,body{background:#7a7a7a}.pagedjs_pages{display:flex!important;flex-direction:column;align-items:center;gap:14px;padding:16px 0}.pagedjs_page{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.45);margin:0!important}}";
+    var carga = 'window.PagedConfig={auto:true,after:function(f){try{var st=document.createElement("style");st.textContent=' + JSON.stringify(telaCss) + ';document.head.appendChild(st)}catch(e){}try{parent.postMessage({dgTotal:f.total},"*")}catch(e){}}};' +
       'var u=' + JSON.stringify(urls) + ',i=0;function t(){if(i>=u.length){try{parent.postMessage({dgErro:1},"*")}catch(e){}return}var s=document.createElement("script");s.src=u[i++];s.onerror=t;document.body.appendChild(s)}t();';
     return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Livro</title><style>' + css(K, iso) + '</style></head><body>' +
            corpo + '<script>' + carga + '<\/script></body></html>';
@@ -5300,7 +5301,7 @@ Bloco livro completo · HTML
  
   window.addEventListener("message", function(ev){
     if(!ev.data || ev.source !== frame.contentWindow) return;
-    if(ev.data.dgTotal != null) document.getElementById("dgpInfo").textContent = "Total: " + ev.data.dgTotal + (ev.data.dgTotal === 1 ? " página" : " páginas");
+    if(ev.data.dgTotal != null) document.getElementById("dgpInfo").textContent = "Total: " + ev.data.dgTotal + (ev.data.dgTotal === 1 ? " página" : " páginas") + (window.__dgExtra || "");
     if(ev.data.dgErro) document.getElementById("dgpInfo").textContent = "Não foi possível carregar o paginador (Paged.js). Confira a internet.";
   });
  
@@ -5765,7 +5766,9 @@ Bloco livro completo · HTML
         if(!S.length){ alert("O livro ainda está vazio. Abra uma parte, escreva o texto e clique em DIAGRAMAR."); return; }
         var dg = diasGuardados(), ds = Object.keys(dg), nd = ds.length, ps = padrao(), fora = 0;
         ds.forEach(function(n){ var t = totalDia(dg[n]); if(t < ps.total[0] || t > ps.total[1]) fora++; });
-        abrir("Livro completo", documento(K, S, false), "Montando páginas… · " + nd + (nd === 1 ? " dia" : " dias") + (fora ? " · " + fora + " fora da faixa de palavras" : ""));
+        var falta = [["D01", "Capa"], ["D05", "Palavra do autor"], ["D06", "Introdução"], ["D07", "Como usar"], ["D11", "Encerramento"], ["D12", "Palavra final"]].filter(function(x){ return !textoParte(x[0]) || omitida(x[0]); }).map(function(x){ return x[1]; });
+        window.__dgExtra = " · " + nd + (nd === 1 ? " dia" : " dias") + (fora ? " · " + fora + " fora da faixa de palavras" : "") + (falta.length ? " · sem texto salvo: " + falta.join(", ") : "");
+        abrir("Livro completo", documento(K, S, false), "Montando páginas…" + window.__dgExtra);
       }).catch(function(e){ console.error(e); alert("Não foi possível ler tipografia-devocional-a5.json."); });
     });
     bLimpar.addEventListener("click", function(){
@@ -5862,12 +5865,18 @@ Bloco livro completo · HTML
  
       var S = montarSecoes(K, so);
       if(!S.length){ abrir(tituloJan, avisoHtml("Não há conteúdo para mostrar nesta parte."), ""); return; }
+      window.__dgExtra = "";
       abrir(tituloJan, documento(K, S, true), "Montando páginas…");
     }).catch(function(e){ console.error(e); alert("Não foi possível montar a página. Abra o console (F12) para ver o erro."); });
   });
 })();
 </script>
 <!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
+ 
+Claude terminou a resposta
+
+
+
 
 
 Estudio de criacao bloco · HTML
