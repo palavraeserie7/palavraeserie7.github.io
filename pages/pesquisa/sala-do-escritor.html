@@ -5887,7 +5887,31 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 })();
 </script>
 <!-- ===== FIM: FECHAR TUDO JUNTO ===== -->
-
+<!-- ===== INÍCIO: SEM ESCOLHA DE TAMANHO =====  -->
+ 
+<style>
+#dgExts{display:none!important}
+#dgTela .dg-sec:nth-of-type(2){display:none!important}
+</style>
+<script>
+(function(){
+  var tela = document.getElementById("dgTela");
+  if(!tela) return;
+  /* o tamanho vira automático: E07 (101–200 páginas), o que serve ao devocional de 30 dias */
+  function garantir(){
+    if(tela.hidden) return;
+    if(document.querySelector('#dgExts .dg-ext[aria-pressed="true"]')) return;
+    var b = document.querySelector('#dgExts .dg-ext[data-ext="E07"]');
+    if(b) b.click();
+  }
+  tela.addEventListener("click", function(ev){
+    if(ev.target.closest && ev.target.closest(".dg-cat")) setTimeout(garantir, 0);
+  });
+  new MutationObserver(function(){ if(!tela.hidden) setTimeout(garantir, 0); }).observe(tela, {attributes:true, attributeFilter:["hidden"]});
+  garantir();
+})();
+</script>
+<!-- ===== FIM: SEM ESCOLHA DE TAMANHO ===== -->
 
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (estrutura, sem Worker) =====
      COMO APLICAR: cole este bloco inteiro logo ANTES da última tag </body> do sala-do-escritor.html
