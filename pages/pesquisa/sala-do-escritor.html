@@ -5913,6 +5913,187 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 </script>
 <!-- ===== FIM: SEM ESCOLHA DE TAMANHO ===== -->
 
+<!-- ===== INÍCIO: CAPA E CONTRACAPA EM IMAGEM ===== -->
+ 
+<style>
+#dgImgBox{margin:0 0 10px;padding:12px 14px;border:1px solid var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);color:var(--ink,#2a2217)}
+#dgImgBox .dgi-tit{margin:0 0 4px;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.04em}
+#dgImgBox .dgi-nota{margin:0 0 10px;font:13px/1.45 "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
+#dgImgBox .dgi-cols{display:flex;flex-wrap:wrap;gap:14px}
+#dgImgBox .dgi-col{flex:1 1 230px;display:flex;gap:10px;align-items:flex-start}
+#dgImgBox .dgi-mini{flex:0 0 74px;height:105px;display:flex;align-items:center;justify-content:center;text-align:center;border:1px dashed var(--brass,#a07d33);border-radius:4px;background:#fff center/cover no-repeat;color:var(--ink-soft,#6b5f48);font:11px "Segoe UI",Arial,sans-serif}
+#dgImgBox .dgi-dir{display:flex;flex-direction:column;gap:6px;min-width:0}
+#dgImgBox .dgi-dir b{font:700 13px "Segoe UI",Arial,sans-serif}
+#dgImgBox .dgi-info{font:12px/1.4 "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
+#dgImgBox .dgi-bt{display:flex;flex-wrap:wrap;gap:6px}
+#dgImgBox .at-btn{padding:6px 10px;font-size:11px}
+#dgImgBox button[disabled]{opacity:.45;cursor:not-allowed}
+</style>
+ 
+<script>
+(function(){
+  var CH = "ps_diagramador_imagens";   /* {capa:{d,w,h,aviso}, contracapa:{...}} */
+  var LARG = 1240;                     /* largura máxima guardada (px): A5 a ~212 dpi */
+  var QUAL = 0.85;                     /* qualidade JPG */
+  var RAZAO = 148 / 210;               /* proporção A5 */
+  var NOMES = {capa: "Capa (frente)", contracapa: "Contracapa (fim do livro)"};
+  var CHAVES = ["capa", "contracapa"];
+ 
+  function $(id){ return document.getElementById(id); }
+  function lerImgs(){ try{ return JSON.parse(localStorage.getItem(CH) || "{}") || {}; }catch(e){ return {}; } }
+  function gravarImgs(o){ try{ localStorage.setItem(CH, JSON.stringify(o)); return true; }catch(e){ return false; } }
+ 
+  var tit = $("dgEtitulo"), txt = $("dgTexto"), frame = $("dgpFrame");
+  if(!tit || !txt || !frame) return;
+ 
+  /* ---------- caixa de imagens dentro do editor da D01 ---------- */
+  var box = document.createElement("div");
+  box.id = "dgImgBox";
+  box.className = "dg-hide";
+  var h = '<p class="dgi-tit">IMAGENS DA CAPA (feitas no Canva)</p>' +
+          '<p class="dgi-nota">Use PNG ou JPG no tamanho A5 (148 × 210 mm). A imagem ocupa a página inteira, sem margens. ' +
+          'Continue digitando o título e o subtítulo abaixo: eles são usados na página de rosto e no cabeçalho.</p>' +
+          '<div class="dgi-cols">';
+  CHAVES.forEach(function(k){
+    h += '<div class="dgi-col">' +
+           '<div class="dgi-mini" id="dgiMini_' + k + '">sem imagem</div>' +
+           '<div class="dgi-dir"><b>' + NOMES[k] + '</b>' +
+             '<div class="dgi-info" id="dgiInfo_' + k + '"></div>' +
+             '<div class="dgi-bt">' +
+               '<button type="button" class="at-btn" data-acao="escolher" data-k="' + k + '">ESCOLHER IMAGEM</button>' +
+               '<button type="button" class="at-btn" data-acao="remover" data-k="' + k + '" id="dgiRem_' + k + '">REMOVER</button>' +
+             '</div>' +
+             '<input type="file" accept="image/png,image/jpeg,image/webp" class="dg-hide" id="dgiArq_' + k + '">' +
+           '</div></div>';
+  });
+  h += '</div>';
+  box.innerHTML = h;
+  txt.insertAdjacentElement("beforebegin", box);
+ 
+  function desenhar(){
+    var im = lerImgs();
+    CHAVES.forEach(function(k){
+      var m = $("dgiMini_" + k), i = $("dgiInfo_" + k), v = im[k];
+      if(v && v.d){
+        m.style.backgroundImage = 'url("' + v.d + '")';
+        m.textContent = "";
+        i.textContent = v.w + " × " + v.h + " px · " + Math.round(v.d.length * 0.75 / 1024) + " KB" + (v.aviso ? " · " + v.aviso : "");
+      } else {
+        m.style.backgroundImage = "";
+        m.textContent = "sem imagem";
+        i.textContent = (k === "capa") ? "Sem imagem: o livro usa a capa de texto." : "Sem imagem: o livro termina sem contracapa.";
+      }
+      $("dgiRem_" + k).disabled = !(v && v.d);
+    });
+  }
+  function eD01(){ return /^D01(\s|$)/.test((tit.textContent || "").trim()); }
+  function atualizar(){
+    box.classList.toggle("dg-hide", !eD01());
+    if(eD01()) desenhar();
+  }
+  if(window.MutationObserver) new MutationObserver(atualizar).observe(tit, {childList: true, characterData: true, subtree: true});
+  atualizar();
+ 
+  function msg(t){ var s = $("dgStatus"); if(s) s.textContent = t; }
+ 
+  /* ---------- ler, reduzir e guardar a imagem ---------- */
+  function processar(k, file){
+    if(!file) return;
+    if(!/^image\//.test(file.type)){ alert("Escolha um arquivo de imagem (PNG ou JPG)."); return; }
+    var rd = new FileReader();
+    rd.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        var w = img.naturalWidth, hh = img.naturalHeight;
+        var esc = Math.min(1, LARG / w), cw = Math.round(w * esc), alt = Math.round(hh * esc);
+        var c = document.createElement("canvas");
+        c.width = cw; c.height = alt;
+        var g = c.getContext("2d");
+        g.fillStyle = "#fff"; g.fillRect(0, 0, cw, alt);   /* fundo branco (PNG transparente) */
+        g.drawImage(img, 0, 0, cw, alt);
+        var d = c.toDataURL("image/jpeg", QUAL);
+        var aviso = (Math.abs((w / hh) / RAZAO - 1) > 0.03) ? "fora da proporção A5 (será cortada nas bordas)" : "";
+        var im = lerImgs();
+        im[k] = {d: d, w: cw, h: alt, aviso: aviso};
+        if(!gravarImgs(im)){
+          alert("O navegador não conseguiu guardar esta imagem (sem espaço). Use uma imagem menor ou remova a outra.");
+          return;
+        }
+        desenhar();
+        msg(NOMES[k] + " salva." + (aviso ? " Atenção: " + aviso + "." : ""));
+      };
+      img.onerror = function(){ alert("Não foi possível abrir esta imagem."); };
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(file);
+  }
+ 
+  CHAVES.forEach(function(k){
+    var inp = $("dgiArq_" + k);
+    inp.addEventListener("change", function(){
+      var f = inp.files && inp.files[0];
+      if(f){
+        var im = lerImgs();
+        if(im[k] && im[k].d && !confirm("Já existe uma imagem de " + NOMES[k].toLowerCase() + ". Substituir pela nova?")){ inp.value = ""; return; }
+        processar(k, f);
+      }
+      inp.value = "";
+    });
+  });
+ 
+  box.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("button"); if(!b) return;
+    var k = b.dataset.k;
+    if(b.dataset.acao === "escolher"){ $("dgiArq_" + k).click(); return; }
+    if(b.dataset.acao === "remover"){
+      if(!confirm("Remover a imagem de " + NOMES[k].toLowerCase() + "?")) return;
+      var im = lerImgs(); delete im[k]; gravarImgs(im);
+      desenhar(); msg(NOMES[k] + " removida.");
+    }
+  });
+ 
+  /* ---------- coloca as imagens no HTML da prévia (sem mexer no código do livro) ---------- */
+  function sec(cls, inner, extra){ return '<section class="sec ' + cls + '"' + (extra || "") + '>' + inner + '</section>'; }
+  function pagina(src){ return '<div class="fl"><img alt="" src="' + src + '" style="display:block;width:100%;height:100%;object-fit:cover"></div>'; }
+ 
+  function transformar(html){
+    if(typeof html !== "string" || html.indexOf('class="sec ') < 0) return html;
+    var im = lerImgs();
+    var capa = im.capa && im.capa.d, contra = im.contracapa && im.contracapa.d;
+    var cheio = html.indexOf("break-before:right") > -1;          /* livro completo */
+    var temCapa = html.indexOf('class="sec pg-capa"') > -1;       /* prévia da D01 */
+    if(!cheio && !temCapa) return html;                           /* prévia de outra parte: não mexe */
+ 
+    if(capa){
+      var re = /<section class="sec pg-capa"[^>]*>([\s\S]*?)<\/section>/;
+      var m = re.exec(html);
+      if(m){
+        var s = /<span class="set-livro">[\s\S]*?<\/span>/.exec(m[1]);   /* guarda o título corrente do cabeçalho */
+        var set = s ? s[0] : "";
+        html = html.replace(re, function(){ return sec("pg-capa", set + pagina(capa)); });
+      } else {
+        html = html.replace("<body>", function(){ return "<body>" + sec("pg-capa", pagina(capa)); });
+      }
+    }
+    if(contra && cheio){
+      var i = html.lastIndexOf("<script>");
+      if(i > -1) html = html.slice(0, i) + sec("pg-capa", pagina(contra), ' style="break-before:left"') + html.slice(i);
+    }
+    return html;
+  }
+ 
+  var desc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+  if(desc && desc.set){
+    Object.defineProperty(frame, "srcdoc", {
+      configurable: true,
+      get: function(){ return desc.get.call(frame); },
+      set: function(v){ desc.set.call(frame, transformar(v)); }
+    });
+  }
+})();
+</script>
+<!-- ===== FIM: CAPA E CONTRACAPA EM IMAGEM ===== -->
+
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (estrutura, sem Worker) =====
      COMO APLICAR: cole este bloco inteiro logo ANTES da última tag </body> do sala-do-escritor.html
      (depois do bloco "FIM: LIVRO COMPLETO"). Não precisa mexer em mais nada.
