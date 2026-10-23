@@ -6093,7 +6093,117 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 })();
 </script>
 <!-- ===== FIM: CAPA E CONTRACAPA EM IMAGEM ===== -->
+<!-- ===== INÍCIO: PRÉVIA AO VIVO (livro na coluna da direita) ===== -->
+<style>
+body.dg-livro-vivo #dgLista{height:var(--dg-lh)!important;max-height:var(--dg-lh)!important}
+body.dg-livro-vivo #dgPrevia.aberta{display:block;inset:auto;left:var(--dg-pl);top:var(--dg-pt);width:var(--dg-pw);height:var(--dg-ph);padding:0;background:transparent;z-index:99998}
+body.dg-livro-vivo .dgp-box{width:100%;height:100%;padding:10px 12px;gap:8px;box-shadow:0 12px 30px rgba(30,22,10,.35)}
+body.dg-livro-vivo .dgp-topo strong{font-size:15px}
+body.dg-livro-vivo .dgp-nota{display:none}
+</style>
+<script>
+(function(){
+  var previa = document.getElementById("dgPrevia");
+  var frame = document.getElementById("dgpFrame");
+  var lista = document.getElementById("dgLista");
+  var pdf = document.getElementById("dgpPdf");
+  if(!previa || !frame || !lista) return;
 
+  var dock = false, pend = null, timer = null;
+  var raiz = document.documentElement;
+
+  /* o botão BAIXAR PDF não pode roubar o cursor quando a prévia se atualiza */
+  if(pdf){
+    pdf.focus = function(o){ if(!dock) HTMLElement.prototype.focus.call(pdf, o); };
+  }
+
+  function medir(){
+    if(!dock) return;
+    var avail = window.innerHeight - 84 - 90;
+    var aberta = lista.classList.contains("aberta");
+    var left, width, lh = 0;
+    if(aberta){
+      var r = lista.getBoundingClientRect();
+      left = r.left; width = r.width;
+      lh = Math.max(190, Math.round(avail * 0.34));
+    } else {
+      left = Math.round(window.innerWidth * 0.6);
+      width = window.innerWidth - left - 24;
+    }
+    var gap = aberta ? lh + 12 : 0;
+    raiz.style.setProperty("--dg-lh", lh + "px");
+    raiz.style.setProperty("--dg-pl", left + "px");
+    raiz.style.setProperty("--dg-pw", width + "px");
+    raiz.style.setProperty("--dg-pt", (84 + gap) + "px");
+    raiz.style.setProperty("--dg-ph", Math.max(260, avail - gap) + "px");
+  }
+  function ligar(){ dock = true; document.body.classList.add("dg-livro-vivo"); medir(); }
+  function desligar(){ dock = false; document.body.classList.remove("dg-livro-vivo"); }
+
+  window.addEventListener("resize", medir);
+  window.addEventListener("scroll", medir, true);
+  if(window.MutationObserver){
+    new MutationObserver(medir).observe(lista, {attributes: true, attributeFilter: ["class"]});
+    new MutationObserver(function(){
+      if(!previa.classList.contains("aberta") && dock) desligar();
+    }).observe(previa, {attributes: true, attributeFilter: ["class"]});
+  }
+
+  /* ao clicar em ABRIR LIVRO: acopla na coluna da direita (se a tela for larga) */
+  document.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("#dgLivroAbrir");
+    if(!b) return;
+    if(window.innerWidth >= 1000) ligar(); else desligar();
+    pend = null;
+    if(previa.classList.contains("aberta")){
+      try{ pend = frame.contentWindow.scrollY || 0; }catch(e){}
+    }
+  }, true);
+
+  /* depois que o Paged.js termina, volta para onde você estava na rolagem */
+  window.addEventListener("message", function(ev){
+    if(ev.source !== frame.contentWindow || !ev.data || ev.data.dgTotal == null || pend == null) return;
+    var y = pend; pend = null;
+    setTimeout(function(){ try{ frame.contentWindow.scrollTo(0, y); }catch(e){} }, 60);
+  });
+
+  function refazer(){
+    if(!dock || !previa.classList.contains("aberta")) return;
+    var b = document.getElementById("dgLivroAbrir");
+    if(b) b.click();
+  }
+  function agendar(ms){
+    clearTimeout(timer);
+    timer = setTimeout(refazer, ms || 500);
+  }
+
+  /* com a prévia acoplada, a prévia de uma parte só vira o livro inteiro atualizado */
+  var d = Object.getOwnPropertyDescriptor(frame, "srcdoc") || Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+  if(d && d.set){
+    Object.defineProperty(frame, "srcdoc", {
+      configurable: true,
+      get: function(){ return d.get.call(frame); },
+      set: function(v){
+        if(dock && typeof v === "string" && v && v.indexOf("break-before:right") < 0){ agendar(400); return; }
+        d.set.call(frame, v);
+      }
+    });
+  }
+
+  /* o que atualiza o livro sozinho */
+  var GATILHOS = "#dgSalvar,#dgApagar,#dgOmitir,#dgFxSalvar,#dgPadSalvar,#dgPadDesfazer,#dgPadRestaurar,#dgLivroDesf,#dgLivroLimpar,#dgImgBox [data-acao='remover']";
+  document.addEventListener("click", function(ev){
+    if(dock && ev.target.closest && ev.target.closest(GATILHOS)) agendar(500);
+  });
+  document.addEventListener("change", function(ev){
+    if(dock && ev.target && /^dgiArq_/.test(ev.target.id || "")) agendar(1000);
+  });
+  document.addEventListener("input", function(ev){
+    if(dock && ev.target && ev.target.id === "dgTituloInp") agendar(1200);
+  });
+})();
+</script>
+<!-- ===== FIM: PRÉVIA AO VIVO ===== -->
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (estrutura, sem Worker) =====
      COMO APLICAR: cole este bloco inteiro logo ANTES da última tag </body> do sala-do-escritor.html
      (depois do bloco "FIM: LIVRO COMPLETO"). Não precisa mexer em mais nada.
