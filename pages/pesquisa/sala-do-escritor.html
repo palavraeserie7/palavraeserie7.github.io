@@ -6312,6 +6312,27 @@ body.dg-livro-vivo .dgp-nota{display:none}
 })();
 </script>
 <!-- ===== FIM: SUMÁRIO CLICÁVEL NA PRÉVIA ===== -->
+ <!-- ===== INÍCIO: SEM PÁGINAS EM BRANCO (PDF digital) ===== -->
+<script>
+(function(){
+  var frame = document.getElementById("dgpFrame");
+  if(!frame) return;
+  var d = Object.getOwnPropertyDescriptor(frame, "srcdoc") || Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+  if(!d || !d.set) return;
+  Object.defineProperty(frame, "srcdoc", {
+    configurable: true,
+    get: function(){ return d.get.call(frame); },
+    set: function(v){
+      if(typeof v === "string" && v.indexOf("break-before:right") > -1){
+        /* cada parte começa na página seguinte, sem pular para a ímpar */
+        v = v.replace("</style>", ".rt{break-before:page!important}</style>");
+      }
+      d.set.call(frame, v);
+    }
+  });
+})();
+</script>
+<!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
                                                       ESTÚDIO 
 <!-- ====================================================================================================================== --> 
  
