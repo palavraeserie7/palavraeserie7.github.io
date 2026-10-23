@@ -4789,6 +4789,10 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 </script>
 <!-- ===== FIM: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
 
+Claude
+
+
+Bloco livro completo · HTML
 <!-- ===== INÍCIO: LIVRO COMPLETO (passo 4) =====
      Este bloco SUBSTITUI o bloco "GERADOR DE PÁGINA (passo 3)".
      Apague o bloco do passo 3 inteiro (da linha "INÍCIO: GERADOR DE PÁGINA" até "FIM: GERADOR DE PÁGINA (passo 3)")
@@ -4830,8 +4834,18 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 .dgp-nota{font:12.5px "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
 #dgDiaBox small{color:var(--ink-soft,#6b5f48);font:12.5px/1.4 "Segoe UI",Arial,sans-serif}
 #dgDiaInp{width:120px!important}
-#dgSalvoBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 0;padding:8px 12px;border:1px dashed var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink,#2a2217)}
+#dgSalvoBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 0;padding:5px 10px;border:1px dashed var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);font:600 12.5px "Segoe UI",Arial,sans-serif;color:var(--ink,#2a2217)}
+#dgSalvoBar #dgSalvoTxt{flex:1 1 auto}
+#dgSalvoBar .at-btn{padding:5px 9px;font-size:11px}
 #dgSalvoBar.dg-hide{display:none!important}
+/* limpeza da janela de edição: some o que é repetido; os botões ficam sempre visíveis */
+#dg-editor .dg-saida[disabled]{display:none!important}
+#dg-editor .dg-normas:not(.erro){display:none}
+#dg-editor .dg-editor-box{overflow-y:auto}
+#dg-editor .dg-ebotoes{position:sticky;bottom:0;z-index:2;margin-top:8px;padding:10px 0 0;background:var(--paper-card,#fffdf6)}
+#dg-editor #dgTexto{min-height:90px}
+/* telas baixas (notebook): a janela de edição abre por cima, no alto, em vez de ficar fora da tela */
+@media (max-height:1100px) and (min-width:1000px){#dg-editor,#dg-fixos{top:84px!important;height:calc(100vh - 174px)!important}}
 #dgLivroMenu{display:none;position:fixed;z-index:100020;flex-direction:column;gap:6px;width:260px;padding:10px;background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;box-shadow:0 12px 30px rgba(30,22,10,.35)}
 #dgLivroMenu.aberto{display:flex}
 </style>
@@ -5385,18 +5399,17 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
  
   function atualizarContadores(){
     var cod = codAberto(); if(!ehDia(cod)) return;
-    var base = txt.value || textoSalvo(cod) || "";
     var ps = padrao(), cont = $("dgCont"), nomeEl = $("dgSecNome");
     nomeEl.textContent = ""; cont.textContent = ""; cont.className = "dgd-cont";
     if(cod === "D10.3"){
-      var secs = secoesDesenv(), n = contarDesenv(base);
+      var secs = secoesDesenv(), n = contarDesenv(txt.value);
       secs.forEach(function(s, i){
         var el = $("dgSecBox").querySelector('[data-c="' + i + '"]');
         if(el) pintar(el, n[i], s.min, s.max);
       });
     } else if(COD_CONT[cod]){
       var s = secaoPad(cod);
-      if(s){ nomeEl.textContent = "Seção: " + s.nome; pintar(cont, contarParte(cod, base), s.min, s.max); }
+      if(s){ nomeEl.textContent = "Seção: " + s.nome; pintar(cont, contarParte(cod, txt.value), s.min, s.max); }
     }
     var dia = diaAtual(), tot = $("dgTotalDia");
     if(!dia){ tot.textContent = ""; tot.className = "dgd-cont"; return; }
@@ -5429,7 +5442,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     var editavel = cod && !txt.readOnly && (ehDia(cod) || !txt.classList.contains("dg-hide")) && !/^D(03|08|09|13|14|15|16)$/.test(cod);
     if(!editavel || (ehDia(cod) && !diaAtual())){ bar.classList.add("dg-hide"); return; }
     var s = textoSalvo(cod), n = s ? (s.trim().match(/\S+/g) || []).length : 0;
-    $("dgSalvoTxt").textContent = s ? ("Já salvo no livro (" + n + " palavras). A caixa começa vazia; o texto salvo continua guardado no arquivo do livro.") : "Ainda não salvo no livro.";
+    $("dgSalvoTxt").textContent = s ? ("Já salvo no livro (" + n + " palavras)") : "Ainda não salvo no livro";
+    $("dgSalvoTxt").title = "A caixa começa vazia; o texto salvo continua guardado no arquivo do livro.";
     $("dgCarregarSalvo").classList.toggle("dg-hide", !s);
     bar.classList.remove("dg-hide");
   }
@@ -5854,7 +5868,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 })();
 </script>
 <!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
- 
+
 
 Estudio de criacao bloco · HTML
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (estrutura, sem Worker) =====
