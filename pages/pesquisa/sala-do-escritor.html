@@ -5868,9 +5868,27 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   });
 })();
 </script>
-<!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
 
-Estudio de criacao bloco · HTML
+ <!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
+ <!-- ===== INÍCIO: FECHAR TUDO JUNTO =====  -->
+<script>
+(function(){
+  var tela = document.getElementById("dgTela");
+  if(!tela || !window.MutationObserver) return;
+  function fecharTudo(){
+    if(!tela.hidden) return;
+    ["dgLista"].forEach(function(id){ var e = document.getElementById(id); if(e) e.classList.remove("aberta"); });
+    ["dg-editor","dg-fixos"].forEach(function(id){ var e = document.getElementById(id); if(e) e.classList.remove("aberto"); });
+    var p = document.getElementById("dgPrevia"); if(p) p.classList.remove("aberta");
+    var m = document.getElementById("dgLivroMenu"); if(m) m.classList.remove("aberto");
+    document.body.classList.remove("dg-lista-aberta");
+  }
+  new MutationObserver(fecharTudo).observe(tela, {attributes:true, attributeFilter:["hidden"]});
+})();
+</script>
+<!-- ===== FIM: FECHAR TUDO JUNTO ===== -->
+
+
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (estrutura, sem Worker) =====
      COMO APLICAR: cole este bloco inteiro logo ANTES da última tag </body> do sala-do-escritor.html
      (depois do bloco "FIM: LIVRO COMPLETO"). Não precisa mexer em mais nada.
