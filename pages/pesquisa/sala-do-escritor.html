@@ -4789,8 +4789,6 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 </script>
 <!-- ===== FIM: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
 
-
-Bloco livro completo · HTML
 <!-- ===== INÍCIO: LIVRO COMPLETO (passo 4) =====
      Este bloco SUBSTITUI o bloco "GERADOR DE PÁGINA (passo 3)".
      Apague o bloco do passo 3 inteiro (da linha "INÍCIO: GERADOR DE PÁGINA" até "FIM: GERADOR DE PÁGINA (passo 3)")
@@ -4832,6 +4830,8 @@ Bloco livro completo · HTML
 .dgp-nota{font:12.5px "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
 #dgDiaBox small{color:var(--ink-soft,#6b5f48);font:12.5px/1.4 "Segoe UI",Arial,sans-serif}
 #dgDiaInp{width:120px!important}
+#dgSalvoBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 0;padding:8px 12px;border:1px dashed var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink,#2a2217)}
+#dgSalvoBar.dg-hide{display:none!important}
 #dgLivroMenu{display:none;position:fixed;z-index:100020;flex-direction:column;gap:6px;width:260px;padding:10px;background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;box-shadow:0 12px 30px rgba(30,22,10,.35)}
 #dgLivroMenu.aberto{display:flex}
 </style>
@@ -5322,6 +5322,11 @@ Bloco livro completo · HTML
     '<div id="dgSecNome" class="dgd-sec"></div><div id="dgCont" class="dgd-cont"></div>' +
     '<div id="dgSecBox" class="dg-hide"></div>' +
     '<div id="dgTotalDia" class="dgd-cont"></div>';
+  var barra = document.createElement("div");
+  barra.id = "dgSalvoBar"; barra.className = "dg-hide";
+  barra.innerHTML = '<span id="dgSalvoTxt"></span><button id="dgCarregarSalvo" class="at-btn dg-hide" type="button">CARREGAR SALVO PARA EDITAR</button>';
+  var ebt = document.querySelector("#dg-editor .dg-ebotoes");
+  if(ebt) ebt.insertAdjacentElement("beforebegin", barra);
   var ancora = $("dgTituloBox") || $("dgAviso");
   if(ancora) ancora.insertAdjacentElement("beforebegin", diaBox);
   var diaInp = $("dgDiaInp");
@@ -5380,38 +5385,65 @@ Bloco livro completo · HTML
  
   function atualizarContadores(){
     var cod = codAberto(); if(!ehDia(cod)) return;
+    var base = txt.value || textoSalvo(cod) || "";
     var ps = padrao(), cont = $("dgCont"), nomeEl = $("dgSecNome");
     nomeEl.textContent = ""; cont.textContent = ""; cont.className = "dgd-cont";
     if(cod === "D10.3"){
-      var secs = secoesDesenv(), n = contarDesenv(txt.value);
+      var secs = secoesDesenv(), n = contarDesenv(base);
       secs.forEach(function(s, i){
         var el = $("dgSecBox").querySelector('[data-c="' + i + '"]');
         if(el) pintar(el, n[i], s.min, s.max);
       });
     } else if(COD_CONT[cod]){
       var s = secaoPad(cod);
-      if(s){ nomeEl.textContent = "Seção: " + s.nome; pintar(cont, contarParte(cod, txt.value), s.min, s.max); }
+      if(s){ nomeEl.textContent = "Seção: " + s.nome; pintar(cont, contarParte(cod, base), s.min, s.max); }
     }
     var dia = diaAtual(), tot = $("dgTotalDia");
     if(!dia){ tot.textContent = ""; tot.className = "dgd-cont"; return; }
     var L = ler(K_LIVRO), partes = {};
     ["D10.2", "D10.3", "D10.4", "D10.6"].forEach(function(c){
-      var v = (c === cod) ? txt.value : L[c + "@" + dia];
+      var v = (c === cod && txt.value) ? txt.value : L[c + "@" + dia];
       if(v) partes[c] = v;
     });
     pintar(tot, totalDia(partes), ps.total[0], ps.total[1], "Dia " + dia + " no total: ");
   }
  
-  function carregarDoDia(){
-    var cod = codAberto(); if(!ehDia(cod)) return;
-    var dia = diaAtual(), L = ler(K_LIVRO);
-    var t = (dia ? L[cod + "@" + dia] : "") || "";
-    txt.value = t;
-    if(cod === "D10.3") preencherCaixas(t);
+  /* a caixa abre vazia: o que já foi salvo fica guardado só no arquivo do livro */
+  function textoSalvo(cod){
+    if(!cod) return null;
+    if(ehDia(cod)){ var dia = diaAtual(); var v = dia ? ler(K_LIVRO)[cod + "@" + dia] : null; return (typeof v === "string" && v.trim()) ? v : null; }
+    var t = ler(K_PARTES)[cod];
+    return (typeof t === "string" && t.trim()) ? t : null;
+  }
+  function esvaziarCaixa(){
+    var cod = codAberto();
+    if(!cod || txt.readOnly) return;
+    if(!ehDia(cod) && txt.classList.contains("dg-hide")) return;
+    txt.value = "";
+    if(cod === "D10.3") Array.prototype.forEach.call($("dgSecBox").querySelectorAll("textarea"), function(a){ a.value = ""; });
     evInput(txt);
   }
+  function carregarDoDia(){ esvaziarCaixa(); }
+  function atualizarSalvoBar(){
+    var cod = codAberto(), bar = $("dgSalvoBar");
+    var editavel = cod && !txt.readOnly && (ehDia(cod) || !txt.classList.contains("dg-hide")) && !/^D(03|08|09|13|14|15|16)$/.test(cod);
+    if(!editavel || (ehDia(cod) && !diaAtual())){ bar.classList.add("dg-hide"); return; }
+    var s = textoSalvo(cod), n = s ? (s.trim().match(/\S+/g) || []).length : 0;
+    $("dgSalvoTxt").textContent = s ? ("Já salvo no livro (" + n + " palavras). A caixa começa vazia; o texto salvo continua guardado no arquivo do livro.") : "Ainda não salvo no livro.";
+    $("dgCarregarSalvo").classList.toggle("dg-hide", !s);
+    bar.classList.remove("dg-hide");
+  }
+  function carregarSalvoNaCaixa(){
+    var cod = codAberto(), t = textoSalvo(cod);
+    if(t === null) return;
+    if(txt.value.trim() && txt.value !== t && !confirm("A caixa tem um texto que ainda não foi salvo. Trocar pelo texto salvo?")) return;
+    txt.value = t;
+    if(cod === "D10.3") preencherCaixas(t);
+    evInput(txt); atualizarSalvoBar();
+  }
  
-  function atualizarDiaBox(){
+  function atualizarDiaBox(abrindo){
+    abrindo = (abrindo === true);
     var cod = codAberto(), eh = ehDia(cod);
     var secModo = eh && cod === "D10.3", cont = eh && !!COD_CONT[cod];
     diaBox.classList.toggle("dg-hide", !eh);
@@ -5419,16 +5451,33 @@ Bloco livro completo · HTML
     var tb = $("dgTituloBox"); if(tb) tb.classList.toggle("dg-ocultar", secModo || cont);
     txt.classList.toggle("dg-ocultar", secModo);
     $("dgSecBox").classList.toggle("dg-hide", !secModo);
-    if(!eh) return;
+    if(!eh){ if(abrindo) esvaziarCaixa(); atualizarSalvoBar(); return; }
     $("dgDiaDica").textContent = DICAS[cod] || "";
     if(secModo) montarCaixas();
-    carregarDoDia();
+    if(abrindo) esvaziarCaixa();
     atualizarContadores();
+    atualizarSalvoBar();
   }
  
   var tit = $("dgEtitulo");
-  if(tit && window.MutationObserver) new MutationObserver(atualizarDiaBox).observe(tit, {childList: true, characterData: true, subtree: true});
-  txt.addEventListener("input", atualizarContadores);
+  if(tit && window.MutationObserver) new MutationObserver(function(){ atualizarDiaBox(true); }).observe(tit, {childList: true, characterData: true, subtree: true});
+  txt.addEventListener("input", function(){ atualizarContadores(); atualizarSalvoBar(); });
+  document.addEventListener("click", function(ev){
+    var t = ev.target;
+    if(t && t.closest && t.closest("#dgCarregarSalvo")){ carregarSalvoNaCaixa(); return; }
+    var b = t && t.closest && t.closest("#dgSalvar, #dgDiagramar"); if(!b) return;
+    var cod = codAberto(); if(!cod || ehDia(cod) || txt.readOnly || txt.classList.contains("dg-hide")) return;
+    var P = ler(K_PARTES), salvo = (typeof P[cod] === "string" && P[cod].trim()) ? P[cod] : null;
+    if(b.id === "dgSalvar" && !txt.value.trim() && salvo !== null){
+      ev.stopImmediatePropagation(); ev.preventDefault();
+      alert("A caixa está vazia. Para não apagar o que já está salvo, nada foi alterado.\n\nPara editar o texto salvo, clique em CARREGAR SALVO PARA EDITAR.");
+      return;
+    }
+    if(txt.value.trim() && salvo !== null && salvo !== txt.value){
+      if(!confirm("Já existe um texto salvo para esta parte.\n\nSubstituir pelo texto atual?")){ ev.stopImmediatePropagation(); ev.preventDefault(); }
+    }
+  }, true);
+  setTimeout(function(){ if(bSalvar) bSalvar.addEventListener("click", function(){ setTimeout(atualizarSalvoBar, 0); }); }, 0);
   $("dgSecBox").addEventListener("input", function(){ txt.value = combinarCaixas(); evInput(txt); });
   diaInp.addEventListener("focus", function(){ diaAnt = diaInp.value; });
   diaInp.addEventListener("change", function(){
@@ -5805,8 +5854,6 @@ Bloco livro completo · HTML
 })();
 </script>
 <!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
-
-
  
 
 Estudio de criacao bloco · HTML
