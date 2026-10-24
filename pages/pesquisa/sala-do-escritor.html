@@ -6333,7 +6333,127 @@ body.dg-livro-vivo .dgp-nota{display:none}
 })();
 </script>
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
+<!-- ===== INÍCIO: DIA LIVRE (capítulo normal) ===== -->
+<style>
+body.dg-dia-livre #dgSecBox{display:none!important}
+body.dg-dia-livre #dgTexto.dg-ocultar{display:block!important}
+body.dg-dia-livre #dgDiaBox.dgd-cresce{flex:0 0 auto;overflow:visible}
+body.dg-dia-livre #dgSecNome,
+body.dg-dia-livre #dgCont,
+body.dg-dia-livre #dgTotalDia{display:none!important}
+#dgLivreBox{display:flex;align-items:center;gap:8px;margin:6px 0 2px;cursor:pointer;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink,#2a2217)}
+#dgLivreBox input{width:16px;height:16px;accent-color:var(--brass,#a07d33)}
+#dgRotuloBox{display:none;flex-direction:column;gap:4px;margin:6px 0 4px}
+body.dg-dia-livre #dgRotuloBox{display:flex}
+#dgRotuloBox label{font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.04em;color:var(--ink-soft,#6b5f48)}
+#dgRotuloBox input{width:100%;box-sizing:border-box;padding:8px 11px;border:1px solid var(--paper-line,#e3d8bd);border-radius:8px;background:#fff;color:var(--ink,#2a2217);font:15px Georgia,"Times New Roman",serif}
+#dgRotuloBox small{color:var(--ink-soft,#6b5f48);font:12.5px/1.4 "Segoe UI",Arial,sans-serif}
+</style>
+<script>
+(function(){
+  var K = "ps_diagramador_dia_livre";
+  var K_ROT = "ps_diagramador_rotulo_dia";
+  var PADRAO = "DIA {N}";
 
+  function livre(){ try{ return localStorage.getItem(K) === "1"; }catch(e){ return false; } }
+  function modelo(){ try{ return localStorage.getItem(K_ROT) || PADRAO; }catch(e){ return PADRAO; } }
+  function rotulo(n){ return modelo().replace(/\{N\}/g, String(n)); }
+  function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function aplicar(){ document.body.classList.toggle("dg-dia-livre", livre()); }
+  function codAberto(){
+    var t = (document.getElementById("dgEtitulo") || {}).textContent || "";
+    var m = /^(D\d+(?:\.\d)?)/.exec(t.trim());
+    return m ? m[1] : null;
+  }
+
+  var caixa = document.getElementById("dgDiaBox");
+  var frame = document.getElementById("dgpFrame");
+  var previa = document.getElementById("dgPrevia");
+  var txt = document.getElementById("dgTexto");
+  if(!caixa || !frame || !txt) return;
+  var linha = caixa.querySelector(".dgd-linha");
+  if(!linha) return;
+
+  /* caixinha "Dia livre" */
+  var lb = document.createElement("label");
+  lb.id = "dgLivreBox";
+  lb.innerHTML = '<input type="checkbox" id="dgLivreChk"> Dia livre: capítulo normal, sem seções fixas nem faixas de palavras';
+  linha.insertAdjacentElement("afterend", lb);
+
+  /* campo do rótulo do dia (só aparece no modo livre) */
+  var rb = document.createElement("div");
+  rb.id = "dgRotuloBox";
+  rb.innerHTML = '<label for="dgRotuloInp">Rótulo do dia</label>' +
+    '<input id="dgRotuloInp" type="text" maxlength="60">' +
+    '<small>Use {N} para o número do dia. Exemplo: Capítulo {N}, Dia {N}</small>';
+  lb.insertAdjacentElement("afterend", rb);
+
+  var chk = document.getElementById("dgLivreChk");
+  var inp = document.getElementById("dgRotuloInp");
+  chk.checked = livre();
+  inp.value = modelo();
+  aplicar();
+
+  chk.addEventListener("change", function(){
+    try{ localStorage.setItem(K, chk.checked ? "1" : "0"); }catch(e){}
+    aplicar();
+    /* ao ligar o modo livre com o D10.3 aberto, tira as linhas "# Nome da seção" da caixa */
+    if(chk.checked && codAberto() === "D10.3" && /^#/m.test(txt.value)){
+      txt.value = txt.value.split(/\r?\n/).filter(function(l){ return !/^#+\s*/.test(l); }).join("\n");
+      txt.dispatchEvent(new Event("input", {bubbles:true}));
+    }
+  });
+
+  /* guarda o rótulo e atualiza a prévia ao vivo, se estiver aberta */
+  var timer = null;
+  inp.addEventListener("input", function(){
+    var v = inp.value.trim();
+    try{
+      if(!v || v === PADRAO) localStorage.removeItem(K_ROT); else localStorage.setItem(K_ROT, v);
+    }catch(e){}
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      var b = document.getElementById("dgLivroAbrir");
+      if(b && previa && previa.classList.contains("aberta") && document.body.classList.contains("dg-livro-vivo")) b.click();
+    }, 1200);
+  });
+
+  /* troca o "DIA N" do cabeçalho do dia pelo rótulo escolhido */
+  var d = Object.getOwnPropertyDescriptor(frame, "srcdoc") || Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+  if(d && d.set){
+    Object.defineProperty(frame, "srcdoc", {
+      configurable: true,
+      get: function(){ return d.get.call(frame); },
+      set: function(v){
+        if(livre() && typeof v === "string"){
+          v = v.replace(/<div class="dn">DIA (\d+)<\/div>/g, function(_, n){
+            return '<div class="dn">' + esc(rotulo(n)) + '</div>';
+          });
+        }
+        d.set.call(frame, v);
+      }
+    });
+  }
+
+  /* sem o aviso "fora da estrutura editorial" no modo livre */
+  var confirmOriginal = window.confirm;
+  window.confirm = function(m){
+    if(livre() && /fora da estrutura editorial/.test(String(m))) return true;
+    return confirmOriginal.call(window, m);
+  };
+
+  /* sem o "N fora da faixa de palavras" no topo da prévia */
+  var info = document.getElementById("dgpInfo");
+  if(info && window.MutationObserver){
+    new MutationObserver(function(){
+      if(!livre()) return;
+      var t = info.textContent, n = t.replace(/ · \d+ fora da faixa de palavras/, "");
+      if(n !== t) info.textContent = n;
+    }).observe(info, {childList:true, characterData:true, subtree:true});
+  }
+})();
+</script>
+<!-- ===== FIM: DIA LIVRE ===== -->
 
                                                       ESTÚDIO 
 <!-- ====================================================================================================================== --> 
