@@ -6454,7 +6454,35 @@ body.dg-dia-livre #dgRotuloBox{display:flex}
 })();
 </script>
 <!-- ===== FIM: DIA LIVRE ===== -->
+<!-- ===== INÍCIO: BOTÃO MODELO DO DIA (rodapé) ===== -->
+<style>
+body.dg-dia-livre #dgPadFooter{display:none!important}
+</style>
+<script>
+(function(){
+  var chk = document.getElementById("dgLivreChk");
+  var ref = document.getElementById("dgPadFooter");
+  if(!chk || !ref) return;
 
+  var b = document.createElement("button");
+  b.id = "dgModeloBtn"; b.type = "button"; b.className = "at-btn";
+  ref.insertAdjacentElement("beforebegin", b);
+
+  function atualizar(){
+    b.textContent = "MODELO DO DIA: " + (chk.checked ? "LIVRE" : "PADRÃO");
+  }
+  b.addEventListener("click", function(){
+    var indo = chk.checked ? "PADRÃO (5 seções com faixas de palavras)" : "LIVRE (capítulo normal)";
+    if(!confirm("Trocar o modelo do dia para " + indo + "?\n\nVale para o livro inteiro. Os textos salvos não são apagados.")) return;
+    chk.checked = !chk.checked;
+    chk.dispatchEvent(new Event("change", {bubbles:true}));
+    atualizar();
+  });
+  chk.addEventListener("change", atualizar);
+  atualizar();
+})();
+</script>
+<!-- ===== FIM: BOTÃO MODELO DO DIA ===== -->
                                                       ESTÚDIO 
 <!-- ====================================================================================================================== --> 
  
