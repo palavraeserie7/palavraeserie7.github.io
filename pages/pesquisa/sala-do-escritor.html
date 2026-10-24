@@ -6664,7 +6664,141 @@ body.dg-livro-vivo .dgp-nota{display:none}
 })();
 </script>
 <!-- ===== FIM: ESTÚDIO DE CRIAÇÃO ===== -->
+
+
+
+<!-- ===== INÍCIO: ÁREA 1 — CRIAR FUNCIONANDO (modo demonstração, sem Worker) =====
+     COMO APLICAR: cole este bloco logo ANTES da última tag </body>,
+     DEPOIS do bloco "FIM: ESTÚDIO DE CRIAÇÃO". Não mexa em mais nada. -->
+<style>
+.a1-res{border:1px dashed var(--brass);border-radius:8px;background:#fffdf6;padding:14px;display:flex;flex-direction:column;gap:10px}
+.a1-res[hidden]{display:none!important}
+.a1-res strong{font:600 16px Georgia,serif;color:var(--ink)}
+.a1-res textarea{width:100%;min-height:200px;box-sizing:border-box;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:16px/1.7 Georgia,serif;resize:vertical}
+.a1-demo{font:600 12.5px "Segoe UI",Arial,sans-serif;color:#a14747}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel");
+  if(!painel || !$("esTexto")) return;
+  var txt = $("esTexto");
  
+  /* ---------- novos botões (linha de baixo da área 1) ---------- */
+  var linha = $("esLimpar").parentElement;
+  function novo(id, rot){
+    var b = document.createElement("button");
+    b.type = "button"; b.id = id; b.className = "at-btn"; b.textContent = rot;
+    linha.appendChild(b); return b;
+  }
+  var bNum = novo("a1Numeros", "TIRAR NÚMEROS DOS VERSÍCULOS");
+  var bOuvir = novo("a1Ouvir", "OUVIR");
+  var bParar = novo("a1Parar", "PARAR");
+  var bDesf = novo("a1Desfazer", "DESFAZER");
+  bDesf.disabled = true;
+ 
+  /* ---------- caixa de resultado (aparece depois de um botão de IA) ---------- */
+  var res = document.createElement("div");
+  res.className = "a1-res"; res.hidden = true;
+  res.innerHTML =
+    '<strong id="a1ResTit">Resultado</strong>' +
+    '<div class="a1-demo" id="a1Demo"></div>' +
+    '<textarea id="a1ResTxt" aria-label="Resultado"></textarea>' +
+    '<div class="at-row">' +
+      '<button type="button" class="at-btn gold" id="a1Usar">USAR ESTE TEXTO</button>' +
+      '<button type="button" class="at-btn" id="a1Descartar">DESCARTAR</button>' +
+    '</div>';
+  var ref = $("esVersoesBox");
+  ref.parentNode.insertBefore(res, ref);
+ 
+  /* ---------- desfazer: guarda o texto antes de cada troca ---------- */
+  var pilha = [];
+  function guardar(){ pilha.push({t:txt.value, ti:$("esTitulo").value}); if(pilha.length > 20) pilha.shift(); bDesf.disabled = false; }
+  function pôr(t){ txt.value = t; txt.dispatchEvent(new Event("input", {bubbles:true})); }
+  bDesf.addEventListener("click", function(){
+    var u = pilha.pop(); if(!u) return;
+    pôr(u.t); $("esTitulo").value = u.ti;
+    bDesf.disabled = !pilha.length;
+    $("esMsg1").textContent = "Texto anterior de volta."; $("esMsg1").className = "es-msg";
+  });
+ 
+  /* ---------- função REAL: tirar números dos versículos ---------- */
+  bNum.addEventListener("click", function(){
+    var t = txt.value;
+    if(!t.trim()){ $("esMsg1").textContent = "Não há texto."; $("esMsg1").className = "es-msg erro"; return; }
+    var novoT = t.split(/\r?\n/)
+      .filter(function(l){ return !/^\s*\d{1,3}\s*$/.test(l); })      /* linhas só com número */
+      .map(function(l){ return l.replace(/^\s*\d{1,3}[.)]?\s+(?=\D)/, ""); }) /* número no começo da linha */
+      .join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    if(novoT === t.trim()){ $("esMsg1").textContent = "Não encontrei números para tirar."; $("esMsg1").className = "es-msg"; return; }
+    guardar(); pôr(novoT);
+    $("esMsg1").textContent = "Números tirados. Se não gostou, clique em DESFAZER."; $("esMsg1").className = "es-msg";
+  });
+ 
+  /* ---------- função REAL: ouvir o texto aqui mesmo ---------- */
+  function parar(){ if(window.speechSynthesis) speechSynthesis.cancel(); }
+  bParar.addEventListener("click", parar);
+  bOuvir.addEventListener("click", function(){
+    var t = txt.value.trim();
+    if(!t){ $("esMsg1").textContent = "Escreva um texto para ouvir."; $("esMsg1").className = "es-msg erro"; return; }
+    if(!window.speechSynthesis){ $("esMsg1").textContent = "Este navegador não tem voz embutida."; $("esMsg1").className = "es-msg erro"; return; }
+    parar();
+    var u = new SpeechSynthesisUtterance(t.replace(/^\s*\d{1,3}\s*$/gm, ""));
+    var nome = $("esVoz") && $("esVoz").value;
+    var v = speechSynthesis.getVoices().filter(function(x){ return x.name === nome; })[0];
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "pt-BR";
+    u.rate = Number(($("esVel") && $("esVel").value) || 1);
+    speechSynthesis.speak(u);
+    $("esMsg1").textContent = "Falando com a voz escolhida no passo 2."; $("esMsg1").className = "es-msg";
+  });
+ 
+  /* ---------- MODO DEMONSTRAÇÃO dos 4 botões de IA ----------
+     Mostra o caminho completo (pedir → esperar → ver resultado → usar/descartar/desfazer).
+     O texto devolvido é só de exemplo. Na etapa do Worker, só esta função é trocada. */
+  var NOMES = {criar:"Criar com IA", reescrever:"Reescrever", aumentar:"Aumentar a duração", tom:"Adaptar o tom"};
+  function demo(d){
+    var min = Math.round(d.duracao/60*10)/10;
+    var cab = d.tipo + " · tom " + d.tom.toLowerCase() + " · cerca de " + (d.duracao >= 60 ? min + " min" : d.duracao + " s");
+    if(d.acao === "criar"){
+      return "[exemplo] " + cab + (d.assunto ? "\nAssunto: " + d.assunto : "") +
+        "\n\nSenhor, neste momento eu me aquieto diante de Ti.\nTu conheces o meu caminho e sabes de que preciso.\nSustenta o meu coração e renova a minha esperança.\nAmém.";
+    }
+    var corpo = d.texto.trim();
+    if(d.acao === "reescrever") return "[exemplo: aqui voltaria o texto reescrito]\n\n" + corpo;
+    if(d.acao === "aumentar") return "[exemplo: aqui voltaria o texto ampliado para " + (d.duracao >= 60 ? min + " min" : d.duracao + " s") + "]\n\n" + corpo;
+    return "[exemplo: aqui voltaria o texto no tom " + d.tom.toLowerCase() + "]\n\n" + corpo;
+  }
+ 
+  document.addEventListener("estudio:ia", function(ev){
+    var d = ev.detail; d.tratado = true;
+    var tit = $("a1ResTit"), caixa = $("a1ResTxt");
+    res.hidden = false; $("a1Usar").disabled = true;
+    tit.textContent = NOMES[d.acao] + " — trabalhando…";
+    $("a1Demo").textContent = ""; caixa.value = "";
+    $("esMsg1").textContent = "";
+    setTimeout(function(){
+      caixa.value = demo(d);
+      tit.textContent = NOMES[d.acao] + " — resultado";
+      $("a1Demo").textContent = "MODO DEMONSTRAÇÃO: este texto é só um exemplo. A IA de verdade entra quando ligarmos o Worker.";
+      $("a1Usar").disabled = false;
+      res.scrollIntoView({block:"nearest", behavior:"smooth"});
+    }, 900);
+  });
+ 
+  $("a1Usar").addEventListener("click", function(){
+    guardar(); pôr($("a1ResTxt").value);
+    res.hidden = true;
+    $("esMsg1").textContent = "Texto trocado. Se não gostou, clique em DESFAZER."; $("esMsg1").className = "es-msg";
+  });
+  $("a1Descartar").addEventListener("click", function(){ res.hidden = true; });
+})();
+</script>
+<!-- ===== FIM: ÁREA 1 — CRIAR FUNCIONANDO ===== -->
+ 
+
+
+
+
 </body>
 </html>
  
