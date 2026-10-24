@@ -6868,14 +6868,73 @@ body.dg-livro-vivo .dgp-nota{display:none}
 })();
 </script>
 <!-- ===== FIM: ÁREA 1 — BUSCAR PASSAGEM E AJUSTAR À DURAÇÃO ===== -->
+
+
+
+<!-- ===== INÍCIO: ÁREA 1 — LIGAR A IA (rota /api/escrita) ===== -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  if(!$("a1Usar") || !$("a1ResTxt")) return;
  
-
-
-
-
-
-
-
+  var URL_ESCRITA = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/escrita";
+  var NOMES = {criar:"Criar com IA", reescrever:"Reescrever", aumentar:"Aumentar a duração", tom:"Adaptar o tom"};
+  var res = $("a1ResTit").parentElement;
+ 
+  function travar(sim){
+    document.querySelectorAll("#esPainel [data-ia]").forEach(function(b){ b.disabled = sim; });
+  }
+  function erro(texto, tit){
+    res.hidden = false;
+    $("a1ResTit").textContent = tit;
+    $("a1Demo").textContent = texto;
+    $("a1ResTxt").value = "";
+    $("a1Usar").disabled = true;
+  }
+ 
+  /* fase de captura + stopImmediatePropagation: impede o modo demonstração de rodar junto */
+  document.addEventListener("estudio:ia", async function(ev){
+    ev.stopImmediatePropagation();
+    var d = ev.detail; d.tratado = true;
+    var nome = NOMES[d.acao] || "IA";
+ 
+    res.hidden = false;
+    $("a1Usar").disabled = true;
+    $("a1ResTit").textContent = nome + " — trabalhando…";
+    $("a1Demo").textContent = "";
+    $("a1ResTxt").value = "";
+    $("esMsg1").textContent = "";
+    travar(true);
+ 
+    var ctl = new AbortController();
+    var t = setTimeout(function(){ ctl.abort(); }, 70000);
+    try{
+      var sess = (await supabaseClient.auth.getSession()).data.session;
+      if(!sess) throw new Error("Sessão encerrada. Entre de novo.");
+      var r = await fetch(URL_ESCRITA, {
+        method: "POST",
+        signal: ctl.signal,
+        headers: {"Content-Type":"application/json", "Authorization":"Bearer " + sess.access_token},
+        body: JSON.stringify({acao:d.acao, tipo:d.tipo, tom:d.tom, duracao:d.duracao, assunto:d.assunto, titulo:d.titulo, texto:d.texto})
+      });
+      var dados = await r.json().catch(function(){ return {}; });
+      if(!r.ok || !dados.ok) throw new Error(dados.error || "Não foi possível escrever agora.");
+      $("a1ResTxt").value = dados.text || "";
+      $("a1ResTit").textContent = nome + " — resultado";
+      $("a1Demo").textContent = "Texto escrito pela IA. Leia e confira antes de usar.";
+      $("a1Usar").disabled = false;
+      res.scrollIntoView({block:"nearest", behavior:"smooth"});
+    }catch(e){
+      console.error(e);
+      erro(e.name === "AbortError" ? "A IA demorou demais. Tente de novo." : (e.message || "Não foi possível escrever agora."), nome + " — não deu certo");
+    }finally{
+      clearTimeout(t);
+      travar(false);
+    }
+  }, true);
+})();
+</script>
+<!-- ===== FIM: ÁREA 1 — LIGAR A IA ===== -->
 
 </body>
 </html>
