@@ -6794,7 +6794,85 @@ body.dg-livro-vivo .dgp-nota{display:none}
 })();
 </script>
 <!-- ===== FIM: ÁREA 1 — CRIAR FUNCIONANDO ===== -->
+
+<!-- ===== INÍCIO: ÁREA 1 — BUSCAR PASSAGEM E AJUSTAR À DURAÇÃO (sem IA) ===== -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var txt = $("esTexto"), linha = $("a1Desfazer") && $("a1Desfazer").parentElement;
+  if(!txt || !linha) return;
  
+  function msg(t, erro){ $("esMsg1").textContent = t; $("esMsg1").className = "es-msg" + (erro ? " erro" : ""); }
+  function pôr(t){
+    txt.focus(); txt.select();
+    var ok = false;
+    try{ ok = document.execCommand("insertText", false, t); }catch(e){}
+    if(!ok) txt.value = t;
+    txt.dispatchEvent(new Event("input", {bubbles:true}));
+  }
+  function novo(id, rot){
+    var b = document.createElement("button");
+    b.type = "button"; b.id = id; b.className = "at-btn"; b.textContent = rot;
+    linha.appendChild(b); return b;
+  }
+  var bBuscar = novo("a1Buscar", "BUSCAR PASSAGEM");
+  var bAjustar = novo("a1Ajustar", "AJUSTAR À DURAÇÃO");
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
+ 
+  /* ---------- BUSCAR PASSAGEM: usa a Bíblia Almeida que a página já carrega ---------- */
+  bBuscar.addEventListener("click", async function(){
+    var entrada = $("esAssunto").value.trim();
+    var m = /^(.+?)\s+(\d+)(?::(\d+)(?:\s*[-–]\s*(\d+))?)?$/.exec(entrada);
+    if(!m){ msg("Escreva a passagem no campo Assunto, assim: Salmos 91 ou João 3:16-18.", true); return; }
+    var nome = norm(m[1]), idx = -1, i;
+    for(i = 0; i < BOOKS.length; i++){ if(norm(BOOKS[i][1]) === nome){ idx = i; break; } }
+    if(idx < 0) for(i = 0; i < BOOKS.length; i++){ if(norm(BOOKS[i][1]).indexOf(nome) === 0 || nome.indexOf(norm(BOOKS[i][1]).slice(0,-1)) === 0){ idx = i; break; } }
+    if(idx < 0){ msg("Não achei o livro \"" + m[1] + "\". Confira o nome (ex.: Salmos, Mateus, 1 João).", true); return; }
+    msg("Buscando…");
+    try{
+      await loadPortuguese();
+      var cap = portugueseBible[idx].chapters[Number(m[2]) - 1];
+      if(!cap){ msg("Esse capítulo não existe em " + BOOKS[idx][1] + ".", true); return; }
+      var de = m[3] ? Number(m[3]) : 1, ate = m[4] ? Number(m[4]) : (m[3] ? de : cap.length);
+      if(de < 1 || ate > cap.length || ate < de){ msg("Esses versículos não existem. O capítulo tem " + cap.length + ".", true); return; }
+      var versos = cap.slice(de - 1, ate).map(function(v){ return v.trim(); });
+      var ref = BOOKS[idx][1] + " " + m[2] + (m[3] ? ":" + de + (ate > de ? "–" + ate : "") : "");
+      if(txt.value.trim() && !window.confirm("Substituir o texto atual por " + ref + "?\n(Se errar, Ctrl+Z na caixa do texto volta.)")){ msg(""); return; }
+      pôr(versos.join("\n"));
+      if(!$("esTitulo").value.trim()) $("esTitulo").value = ref;
+      msg(ref + " trazido da Bíblia Almeida 1911, sem números.");
+    }catch(e){ console.error(e); msg("Não foi possível carregar a Bíblia agora. Confira a internet.", true); }
+  });
+ 
+  /* ---------- AJUSTAR À DURAÇÃO: corta no fim de uma frase para caber no tempo ---------- */
+  bAjustar.addEventListener("click", function(){
+    var t = txt.value.trim();
+    if(!t){ msg("Não há texto para ajustar.", true); return; }
+    var alvo = Math.round(Number($("esDur").value) / 60 * 130);        /* ~130 palavras por minuto */
+    var palavras = t.split(/\s+/).length;
+    if(palavras <= alvo){
+      msg("O texto tem " + palavras + " palavras e cabe no tempo escolhido (até " + alvo + "). Para deixar MAIOR, é preciso a IA.", false); return;
+    }
+    var frases = t.match(/[^.!?…\n]+[.!?…]+["”’)]*\s*|[^.!?…\n]+$|\n+/g) || [t];
+    var saida = "", cont = 0;
+    for(var i = 0; i < frases.length; i++){
+      var n = frases[i].trim() ? frases[i].trim().split(/\s+/).length : 0;
+      if(cont + n > alvo && cont > 0) break;
+      saida += frases[i]; cont += n;
+    }
+    saida = saida.trim();
+    if(!window.confirm("O texto tem " + palavras + " palavras e o alvo é cerca de " + alvo + ".\nCortar no fim de uma frase, ficando com " + cont + " palavras?\n(Se errar, Ctrl+Z na caixa do texto volta.)")) return;
+    pôr(saida);
+    msg("Texto cortado para " + cont + " palavras.");
+  });
+})();
+</script>
+<!-- ===== FIM: ÁREA 1 — BUSCAR PASSAGEM E AJUSTAR À DURAÇÃO ===== -->
+ 
+
+
+
+
 
 
 
