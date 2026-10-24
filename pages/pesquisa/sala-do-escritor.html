@@ -6454,9 +6454,11 @@ body.dg-dia-livre #dgRotuloBox{display:flex}
 })();
 </script>
 <!-- ===== FIM: DIA LIVRE ===== -->
-<!-- ===== INÍCIO: BOTÃO MODELO DO DIA (rodapé) ===== -->
+ <!-- ===== INÍCIO: BOTÃO MODELO DO DIA (rodapé) ===== -->
 <style>
+/* modo padrão: só o PADRÃO DO DIA; modo livre: só o MODELO DO DIA */
 body.dg-dia-livre #dgPadFooter{display:none!important}
+body:not(.dg-dia-livre) #dgModeloBtn{display:none!important}
 </style>
 <script>
 (function(){
@@ -6466,23 +6468,18 @@ body.dg-dia-livre #dgPadFooter{display:none!important}
 
   var b = document.createElement("button");
   b.id = "dgModeloBtn"; b.type = "button"; b.className = "at-btn";
+  b.textContent = "MODELO DO DIA: LIVRE";
   ref.insertAdjacentElement("beforebegin", b);
 
-  function atualizar(){
-    b.textContent = "MODELO DO DIA: " + (chk.checked ? "LIVRE" : "PADRÃO");
-  }
   b.addEventListener("click", function(){
-    var indo = chk.checked ? "PADRÃO (5 seções com faixas de palavras)" : "LIVRE (capítulo normal)";
-    if(!confirm("Trocar o modelo do dia para " + indo + "?\n\nVale para o livro inteiro. Os textos salvos não são apagados.")) return;
-    chk.checked = !chk.checked;
+    if(!confirm("Voltar o modelo do dia para PADRÃO (5 seções com faixas de palavras)?\n\nVale para o livro inteiro. Os textos salvos não são apagados.")) return;
+    chk.checked = false;
     chk.dispatchEvent(new Event("change", {bubbles:true}));
-    atualizar();
   });
-  chk.addEventListener("change", atualizar);
-  atualizar();
 })();
 </script>
 <!-- ===== FIM: BOTÃO MODELO DO DIA ===== -->
+
                                                       ESTÚDIO 
 <!-- ====================================================================================================================== --> 
  
