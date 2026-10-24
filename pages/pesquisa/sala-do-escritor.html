@@ -6573,15 +6573,15 @@ st.versoes.unshift({
     var txt = t ? t.value.replace(/^##\s*/gm,"").replace(/^>\s?/gm,"").trim() : "";
     if(!txt){ msg(1,"O texto do Ateliê está vazio.",true); return; }
     if($("esTexto").value.trim() && !window.confirm("Substituir o texto desta tela pelo do Ateliê?")) return;
-    ("esTexto").value=txt;if(ti&&ti.value&&!("esTitulo").value) $("esTitulo").value = ti.value;
+    $("esTexto").value=txt;if(ti&&ti.value&&!$("esTitulo").value) $("esTitulo").value = ti.value;
     contar(); msg(1,"Texto do Ateliê trazido para cá.");
   });
  
   /* botões de IA: ficam prontos, mas só funcionam quando o Worker for ligado */
   painel.addEventListener("click", function(ev){
     var b = ev.target.closest("[data-ia]"); if(!b) return;
-    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:("esTom").value,duracao:Number(("esDur").value),
-      assunto:("esAssunto").value.trim(),titulo:("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
+    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:$("esTom").value,duracao:Number($("esDur").value),
+      assunto:$("esAssunto").value.trim(),titulo:$("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
     if(det.acao !== "criar" && !det.texto.trim()){ msg(1,"Escreva ou crie um texto antes de usar esta opção.",true); return; }
     document.dispatchEvent(new CustomEvent("estudio:ia", {detail:det}));
     if(!det.tratado) msg(1,"A IA ainda não está ligada. Isso será feito no próximo passo, junto com o Worker.",true);
@@ -6628,7 +6628,7 @@ st.versoes.unshift({
     tel.style.backgroundImage = fotos[0] ? 'url("'+fotos[0]+'")' : "";
     leg.textContent = ($("esTitulo").value.trim() || $("esTexto").value.trim().split(/\n/)[0] || "Sua mensagem aparece aqui.").slice(0,140);
     var p = $("esTexto").value.trim() ? $("esTexto").value.trim().split(/\s+/).length : 0;
-    ("esResumo").innerHTML='<b>'+esc(st.tipo)+'</b>·tom'+esc(("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
+    $("esResumo").innerHTML='<b>'+esc(st.tipo)+'</b>·tom'+esc($("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
       fotos.length + ' imagem(ns) · ' + ($("esMusica").value ? 'com música' : 'sem música');
   }
   function pararVoz(){
@@ -6676,9 +6676,9 @@ st.versoes.unshift({
     var b = ev.target.closest("[data-exp]"); if(!b) return;
     if(!$("esTexto").value.trim()){ msg(4,"Escreva um texto no passo 1 antes de exportar.",true); return; }
     var det = {tipoArquivo:b.dataset.exp, destinos:Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; }),
-      formato:("esFormato").value,voz:("esVoz").value, velocidade:Number($("esVel").value),
-      musica:("esMusica").value?"propria":"",volumeMusica:Number(("esVolMus").value),
-      imagens:fotos.length, titulo:("esTitulo").value.trim(),texto:("esTexto").value, tratado:false};
+      formato:$("esFormato").value,voz:$("esVoz").value, velocidade:Number($("esVel").value),
+      musica:$("esMusica").value?"propria":"",volumeMusica:Number($("esVolMus").value),
+      imagens:fotos.length, titulo:$("esTitulo").value.trim(),texto:$("esTexto").value, tratado:false};
     if(!det.destinos.length){ msg(4,"Marque pelo menos uma rede.",true); return; }
     document.dispatchEvent(new CustomEvent("estudio:exportar", {detail:det}));
     if(!det.tratado) msg(4,"A geração do arquivo ainda não está ligada. Entra no próximo passo, junto com o Worker.",true);
