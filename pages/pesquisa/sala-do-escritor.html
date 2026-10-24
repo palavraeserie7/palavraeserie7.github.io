@@ -6484,6 +6484,112 @@ body:not(.dg-dia-livre) #dgModeloBtn{display:none!important}
 body.dg-dia-livre #dgAbrirPad{display:none!important}
 </style>
 <!-- ===== FIM ===== -->
+ <!-- ===== INÍCIO: DIA LIVRE, FLUXO COMO D01–D08 ===== -->
+<style>
+body.dg-dia-livre #dgLista .dgl-item[data-cod="D10.2"],
+body.dg-dia-livre #dgLista .dgl-item[data-cod="D10.4"],
+body.dg-dia-livre #dgLista .dgl-item[data-cod="D10.5"],
+body.dg-dia-livre #dgLista .dgl-item[data-cod="D10.6"]{display:none}
+</style>
+<script>
+(function(){
+  var K_LIVRO = "ps_diagramador_livro";
+  var K_OM = "ps_diagramador_omitidas";
+  var K_ANT = "ps_diagramador_omitidas_antes";
+  var K_ROT = "ps_diagramador_rotulo_dia";
+  var QUATRO = ["D10.2","D10.4","D10.5","D10.6"];
+  var NOMES = {"D10.1":"Título do capítulo","D10.3":"Texto do capítulo"};
+
+  var chk = document.getElementById("dgLivreChk");
+  var lista = document.getElementById("dgLista");
+  var frame = document.getElementById("dgpFrame");
+  var previa = document.getElementById("dgPrevia");
+  var diaInp = document.getElementById("dgDiaInp");
+  if(!chk || !lista || !frame) return;
+
+  function lerJ(k){ try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } }
+  function gravarJ(k, o){ try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} }
+  function livre(){ return document.body.classList.contains("dg-dia-livre"); }
+  function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function modelo(){ try{ return localStorage.getItem(K_ROT) || "DIA {N}"; }catch(e){ return "DIA {N}"; } }
+  function rot(n){ return modelo().replace(/\{N\}/g, String(n)); }
+
+  /* omite sozinho as 4 partes no modo livre e restaura ao voltar ao padrão */
+  function sincronizar(){
+    var om = lerJ(K_OM), ant = lerJ(K_ANT);
+    if(livre()){
+      if(!ant.guardado){
+        ant = {guardado: true, v: {}};
+        QUATRO.forEach(function(c){ ant.v[c] = !!om[c]; });
+        gravarJ(K_ANT, ant);
+      }
+      QUATRO.forEach(function(c){ om[c] = true; });
+    } else if(ant.guardado){
+      QUATRO.forEach(function(c){ if(ant.v[c]) om[c] = true; else delete om[c]; });
+      try{ localStorage.removeItem(K_ANT); }catch(e){}
+    }
+    gravarJ(K_OM, om);
+  }
+
+  /* ✓ e nomes da lista, valendo para o dia escolhido */
+  function marcar(){
+    if(!livre()) return;
+    var dia = diaInp ? parseInt(diaInp.value, 10) : 0, L = lerJ(K_LIVRO);
+    Array.prototype.forEach.call(lista.querySelectorAll(".dgl-item"), function(it){
+      var c = it.dataset.cod;
+      if(!NOMES[c]) return;
+      var sp = it.querySelector("span");
+      if(sp && sp.textContent !== NOMES[c]) sp.textContent = NOMES[c];
+      var v = dia ? L[c + "@" + dia] : null;
+      var tem = (typeof v === "string" && v.trim());
+      var i = it.querySelector("i");
+      if(tem){
+        if(!i){ i = document.createElement("i"); it.appendChild(i); }
+        if(i.textContent !== "✓"){ i.className = ""; i.textContent = "✓"; }
+      } else if(i){ i.remove(); }
+    });
+  }
+  if(window.MutationObserver) new MutationObserver(marcar).observe(lista, {childList: true, subtree: true});
+  if(diaInp) diaInp.addEventListener("change", function(){ setTimeout(marcar, 0); });
+
+  function refazerPrevia(){
+    var b = document.getElementById("dgLivroAbrir");
+    if(b && previa && previa.classList.contains("aberta") && document.body.classList.contains("dg-livro-vivo")) b.click();
+  }
+
+  chk.addEventListener("change", function(){
+    sincronizar(); marcar();
+    setTimeout(refazerPrevia, 400);
+  });
+
+  /* o menu grava as omissões com uma cópia antiga: reaplica depois de OMITIR/INCLUIR e de SALVAR */
+  document.addEventListener("click", function(ev){
+    var t = ev.target;
+    if(!t || !t.closest) return;
+    if(t.closest("#dgOmitir")) setTimeout(sincronizar, 0);
+    if(t.closest("#dgSalvar, #dgApagar, #dgDiagramar")) setTimeout(marcar, 80);
+  });
+
+  sincronizar(); marcar();
+
+  /* sumário e cabeçalho da página usam o rótulo escolhido */
+  var d = Object.getOwnPropertyDescriptor(frame, "srcdoc") || Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+  if(d && d.set){
+    Object.defineProperty(frame, "srcdoc", {
+      configurable: true,
+      get: function(){ return d.get.call(frame); },
+      set: function(v){
+        if(livre() && typeof v === "string" && modelo() !== "DIA {N}"){
+          v = v.replace(/<span class="set-cab">Dia (\d+) — /g, function(_, n){ return '<span class="set-cab">' + esc(rot(n)) + ' — '; })
+               .replace(/<b>Dia (\d+)<\/b>/g, function(_, n){ return '<b>' + esc(rot(n)) + '</b>'; });
+        }
+        d.set.call(frame, v);
+      }
+    });
+  }
+})();
+</script>
+<!-- ===== FIM: DIA LIVRE, FLUXO COMO D01–D08 ===== -->
 
                                                       ESTÚDIO 
 <!-- ====================================================================================================================== --> 
