@@ -6556,15 +6556,37 @@ body.dg-livro-vivo .dgp-nota{display:none}
     var redes = modo === 'redes';
     modos.querySelector('[data-modo="redes"]').setAttribute('aria-pressed',String(redes));
     modos.querySelector('[data-modo="filme"]').setAttribute('aria-pressed',String(!redes));
+    /* Mantém cada fluxo visualmente separado: os controles rápidos e as etapas
+       não aparecem junto do planejador de filmes bíblicos. */
+    tipoRapido.hidden = !redes;
     passosOriginais.hidden = !redes;
     caixasOriginais.forEach(function(c){c.hidden = redes ? c.dataset.passo !== '1' : true;});
     filme.classList.toggle('ativo',!redes);
     if(redes){var caixaAtiva=painel.querySelector('.es-box[data-passo="1"]');if(caixaAtiva)caixaAtiva.hidden=false;}
+    painel.setAttribute('data-modo-ativo', redes ? 'redes' : 'filme');
   }
   modos.addEventListener('click',function(ev){var b=ev.target.closest('[data-modo]');if(b)mudarModo(b.dataset.modo);});
   document.getElementById('esFilmeAddCena').addEventListener('click',function(){adicionarCena();});
   document.getElementById('esFilmeVoltar').addEventListener('click',function(){mudarModo('redes');});
-  document.getElementById('esFilmeSalvarPlano').addEventListener('click',function(){var titulo=document.getElementById('esFilmeHistoria').value.trim();if(titulo&&!document.getElementById('esPubTitulo').value.trim())document.getElementById('esPubTitulo').value=titulo;document.getElementById('esFilmeMsg').textContent='Plano organizado nesta tela. O salvamento permanente, a geração de cenas e a exportação serão ligados na etapa do Worker.';document.getElementById('esPubStatus').textContent='Destino preparado para: '+(document.getElementById('esPubTitulo').value.trim()||'projeto sem título')+'. Ainda não publicado.';});
+  document.getElementById('esFilmeSalvarPlano').addEventListener('click',function(){
+    var titulo=document.getElementById('esFilmeHistoria').value.trim();
+    if(titulo&&!document.getElementById('esPubTitulo').value.trim())document.getElementById('esPubTitulo').value=titulo;
+    var plano={historia:document.getElementById('esFilmeHistoria').value,passagem:document.getElementById('esFilmePassagem').value,estilo:document.getElementById('esFilmeEstilo').value,duracao:document.getElementById('esFilmeDuracao').value,resumo:document.getElementById('esFilmeResumo').value,voz:document.getElementById('esFilmeVoz').value,musica:document.getElementById('esFilmeMusica').value,cenas:Array.prototype.map.call(cenas.children,function(card){return {titulo:card.querySelector('.es-cena-titulo').value,descricao:card.querySelector('.es-cena-desc').value};}),publicacao:{titulo:document.getElementById('esPubTitulo').value,destino:document.getElementById('esPubDestino').value,capa:document.getElementById('esPubCapa').value,visibilidade:document.getElementById('esPubVisibilidade').value,descricao:document.getElementById('esPubDescricao').value}};
+    try{localStorage.setItem('ps_estudio_plano_filme',JSON.stringify(plano));document.getElementById('esFilmeMsg').textContent='Plano guardado neste navegador. Ele ainda não foi enviado ao servidor nem publicado.';}
+    catch(e){document.getElementById('esFilmeMsg').textContent='Não foi possível guardar neste navegador. Os campos continuam nesta tela; tente novamente ou verifique as configurações do navegador.';}
+    document.getElementById('esPubStatus').textContent='Destino preparado para: '+(document.getElementById('esPubTitulo').value.trim()||'projeto sem título')+'. Ainda não publicado.';
+  });
+  /* Recupera o rascunho local, sem enviar dados ao Worker. */
+  try{
+    var planoGuardado=JSON.parse(localStorage.getItem('ps_estudio_plano_filme')||'null');
+    if(planoGuardado){
+      var mapaCampos={historia:'esFilmeHistoria',passagem:'esFilmePassagem',estilo:'esFilmeEstilo',duracao:'esFilmeDuracao',resumo:'esFilmeResumo',voz:'esFilmeVoz',musica:'esFilmeMusica'};
+      Object.keys(mapaCampos).forEach(function(k){if(planoGuardado[k]!=null)document.getElementById(mapaCampos[k]).value=planoGuardado[k];});
+      if(Array.isArray(planoGuardado.cenas)&&planoGuardado.cenas.length){cenas.innerHTML='';planoGuardado.cenas.forEach(function(c){adicionarCena(c.titulo,c.descricao);});}
+      if(planoGuardado.publicacao){var pm={titulo:'esPubTitulo',destino:'esPubDestino',capa:'esPubCapa',visibilidade:'esPubVisibilidade',descricao:'esPubDescricao'};Object.keys(pm).forEach(function(k){if(planoGuardado.publicacao[k]!=null)document.getElementById(pm[k]).value=planoGuardado.publicacao[k];});}
+      document.getElementById('esFilmeMsg').textContent='Rascunho local recuperado deste navegador. Ainda não enviado ao servidor.';
+    }
+  }catch(e){}
   document.getElementById('esTipoRapidoSelect').addEventListener('change',function(){var campo=document.getElementById('esTitulo');if(campo&&!campo.value.trim())campo.value=this.value;});
   adicionarCena('Apresentação da história','Apresente o contexto bíblico e os personagens principais.');
   adicionarCena('O conflito','Mostre o desafio central da narrativa.');
