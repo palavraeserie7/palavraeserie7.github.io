@@ -570,6 +570,49 @@
     #cfgBox .linha button.sec{background:transparent;color:var(--muted)}
     #cfgBox .linha button.danger{background:#a14747;border-color:#a14747}
     .aviso-fase{margin:0 0 14px;padding:10px 12px;border:1px dashed #b99b61;border-radius:8px;background:#fbf4e1;color:#6b5a38;font-size:11.5px;line-height:1.5}
+ 
+    /* ---------- Refinamento visual: vitrine de livraria ---------- */
+    main{padding:34px 40px}
+    .paper{padding:30px 30px 26px;border-radius:12px}
+    .eyebrow{letter-spacing:2px}
+    h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(28px,4vw,42px);letter-spacing:.4px}
+    .intro{max-width:760px;color:#6b5f48;font-size:14.5px}
+    .shelf-tabs{gap:6px;margin:6px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+    .shelf-tab{padding:10px 16px;border-radius:999px}
+    .shelf-nav{padding:6px 0 8px;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;margin-bottom:14px}
+    .shelf-nav-title{display:none}
+    .gn-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+    .gn{flex:0 0 auto;border-radius:999px;white-space:nowrap;padding:7px 12px}
+    .gn-row + .gn-row{border-top:0;padding-top:0;margin-top:6px}
+    .shelf-toolbar{grid-template-columns:minmax(220px,2fr) minmax(130px,.7fr) auto;align-items:end;border-radius:12px}
+    .shelf-toolbar label.adv{display:none}
+    .shelf-toolbar.open{grid-template-columns:minmax(220px,2fr) minmax(130px,.7fr) auto repeat(4,minmax(120px,1fr))}
+    .shelf-toolbar.open label.adv{display:grid;grid-column:auto}
+    .more-btn{height:38px;padding:0 14px;border:1px solid #cdbfaa;border-radius:6px;background:#fffaf0;color:var(--muted);font-size:10.5px;font-weight:900;letter-spacing:.4px;cursor:pointer}
+    @media(max-width:1050px){.shelf-toolbar,.shelf-toolbar.open{grid-template-columns:1fr 1fr}.shelf-toolbar.open label.adv{grid-column:auto}}
+    @media(max-width:700px){main{padding:12px 9px 28px}.paper{padding:16px 12px}.shelf-toolbar,.shelf-toolbar.open{grid-template-columns:1fr}}
+    .catalog{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:22px 20px;align-items:start}
+    .book{padding:0;min-height:0;border:0;border-radius:10px;background:transparent;transition:transform .15s}
+    .book:hover{transform:translateY(-3px)}
+    .cover3{position:relative;aspect-ratio:2/3;border-radius:6px 10px 10px 6px;overflow:hidden;box-shadow:0 10px 22px rgba(40,30,15,.28),inset 6px 0 8px -4px rgba(0,0,0,.35);display:flex}
+    .cover3.img{background:#e9dfc9}
+    .cover3 img{display:block;width:100%;height:100%;object-fit:cover}
+    .cover3 .mold{margin:12px;flex:1;border:1.5px solid;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:14px 10px;text-align:center}
+    .cover3 .mold b{font:700 15px/1.25 Georgia,"Times New Roman",serif;letter-spacing:.6px;text-transform:uppercase}
+    .cover3 .mold small{font:600 9.5px "Segoe UI",sans-serif;letter-spacing:1.2px;text-transform:uppercase;opacity:.85}
+    .ribbon{position:absolute;top:10px;right:0;padding:4px 10px 4px 12px;border-radius:4px 0 0 4px;font:900 9.5px "Segoe UI",sans-serif;letter-spacing:.8px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+    .ribbon.free{background:#1f8f4e;color:#fff}
+    .ribbon.paid{background:#b8892d;color:#fff}
+    .book.lock .cover3{filter:saturate(.7)}
+    .binfo{padding:12px 2px 0}
+    .binfo .gen{display:block;margin-bottom:4px}
+    .book h2{font:700 15px/1.3 Georgia,"Times New Roman",serif;margin:0 0 3px}
+    .book .author{margin:0 0 6px;text-transform:none;font-size:11.5px;font-weight:600;letter-spacing:0;color:#8a7a5e}
+    .book .description{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5}
+    .bfoot{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .bfoot .price{margin:0;font-size:13px;font-weight:900;color:#7b5b1a}
+    .bfoot .acts{margin-top:0}
+    .shelf-empty{padding:34px 20px;font-size:13px;line-height:1.6}
   </style>
 </head>
  
@@ -624,7 +667,7 @@
               PESQUISAR
               <input id="search" type="search" placeholder="Título, autor ou descrição" aria-label="Pesquisar no catálogo">
             </label>
-            <label>
+            <label class="adv">
               TIPO
               <select id="contentType" aria-label="Tipo de conteúdo">
                 <option value="">TODOS</option>
@@ -636,7 +679,7 @@
                 <option>INFANTIL</option>
               </select>
             </label>
-            <label>
+            <label class="adv">
               PÚBLICO
               <select id="audience" aria-label="Público">
                 <option value="">TODOS</option>
@@ -646,7 +689,7 @@
                 <option>ACADÉMICOS</option>
               </select>
             </label>
-            <label>
+            <label class="adv">
               NÍVEL
               <select id="depth" aria-label="Profundidade">
                 <option value="">TODOS</option>
@@ -656,7 +699,7 @@
                 <option>ESPECIALIZADO</option>
               </select>
             </label>
-            <label>
+            <label class="adv">
               FORMATO
               <select id="format" aria-label="Formato">
                 <option value="">TODOS</option>
@@ -674,6 +717,7 @@
                 <option value="paid">PAGO</option>
               </select>
             </label>
+            <button type="button" class="more-btn" id="moreBtn" aria-expanded="false">MAIS FILTROS ▾</button>
           </div>
  
           <div id="catalog" class="catalog" aria-live="polite"></div>
@@ -755,20 +799,9 @@
  
   /* ---------- catálogo fixo (seed) ---------- */
   var SEED = {
-    free: [
-      { title:'Guia de Leitura Bíblica', author:'Palavra & Série', cover:'LEITURA BÍBLICA', description:'Orientações introdutórias para observar passagem, contexto, estrutura e aplicação responsável.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'ESTUDO GUIADO', genero:'4.4' },
-      { title:'Introdução ao Estudo Bíblico', author:'Palavra & Série', cover:'ESTUDO BÍBLICO', description:'Material de orientação para organizar uma pesquisa bíblica pessoal.', contentType:'ESTUDO BÍBLICO', audience:'JOVENS', depth:'BÁSICO', format:'MATERIAL DIDÁTICO', genero:'4.4' },
-      { title:'Glossário de Termos Bíblicos', author:'Palavra & Série', cover:'GLOSSÁRIO', description:'Vocabulário inicial para acompanhar a leitura e a investigação do texto.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'6.2' }
-    ],
-    pro: [
-      { title:'Caderno de Grego do Novo Testamento', author:'Palavra & Série', cover:'GREGO DO NT', description:'Material de apoio para texto grego, morfologia, sintaxe e leitura do SBLGNT.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'5.2' },
-      { title:'Caderno de Hebraico do Antigo Testamento', author:'Palavra & Série', cover:'HEBRAICO DO AT', description:'Material de apoio para texto hebraico, formas, léxico e leitura do OSHB.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'5.2' },
-      { title:'Manual da Matriz Canónica', author:'Palavra & Série', cover:'MATRIZ CANÓNICA', description:'Guia dos módulos, fontes prioritárias e regras de investigação da plataforma.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'8.1' }
-    ],
-    own: [
-      { title:'Além da Régua', author:'A. F. Santos', cover:'ALÉM DA RÉGUA', description:'Livro do autor. A capa pode ser divulgada na estante; o conteúdo permanece fechado nesta etapa.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.2' },
-      { title:'Você Não é um Acidente', author:'A. F. Santos', cover:'VOCÊ NÃO É UM ACIDENTE', description:'Devocional de 30 dias para redescobrir o seu valor em Deus.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.1' }
-    ],
+    free: [],
+    pro: [],
+    own: [],
     external: [
       { title:'Matthew Henry — Commentary on the Whole Bible', author:'Matthew Henry', cover:'COMENTÁRIO', description:'Comentário cristão clássico disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'7.1', url:'https://www.ccel.org/ccel/henry/mhc' },
       { title:'The Pilgrim’s Progress', author:'John Bunyan', cover:'PEREGRINO', description:'Alegoria cristã clássica disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'3.6', url:'https://www.ccel.org/ccel/bunyan/pilgrim' },
@@ -895,13 +928,18 @@
     } else { row.innerHTML = ""; row.hidden = true; }
   }
  
+  var TONS = [["#16213d","#c9a24a"],["#2b1f17","#d4b072"],["#1d3a33","#d9c27a"],["#3a1e2a","#d8b36a"],["#26324a","#cfae63"],["#2f2a22","#c7a15a"]];
+  function tom(s){ var h = 0; String(s).split("").forEach(function(c){ h = (h * 31 + c.charCodeAt(0)) >>> 0; }); return TONS[h % TONS.length]; }
   function cartao(b){
     var pago = ehPago(b), lock = !podeLer(b);
-    var capa = b.capa
-      ? '<div class="cover img"><img alt="Capa de ' + esc(b.title) + '" src="' + b.capa + '"></div>'
-      : '<div class="cover">' + esc(b.cover) + '</div>';
-    var selo = b.acesso === "own" ? '<span class="badge b-own">DO AUTOR</span>'
-      : (pago ? '<span class="badge b-paid">' + (lock ? '🔒 ' : '') + ROTULO[b.acesso] + '</span>' : '<span class="badge b-free">GRÁTIS</span>');
+    var fita = b.acesso === "own" ? '' : (pago ? '<span class="ribbon paid">' + (lock ? '🔒 ' : '') + ROTULO[b.acesso] + '</span>' : '<span class="ribbon free">GRÁTIS</span>');
+    var capa;
+    if(b.capa){
+      capa = '<div class="cover3 img"><img alt="Capa de ' + esc(b.title) + '" src="' + b.capa + '">' + fita + '</div>';
+    } else {
+      var c = tom(b.title);
+      capa = '<div class="cover3" style="background:' + c[0] + ';color:' + c[1] + '"><div class="mold" style="border-color:' + c[1] + '"><b>' + esc(b.cover || b.title) + '</b><small>' + esc(b.author) + '</small></div>' + fita + '</div>';
+    }
     var gen = b.genero ? '<span class="gen">' + esc(b.genero) + ' · ' + esc(nomeTipo(b.genero) || nomeGenero(b.genero)) + '</span>' : '';
     var preco = (pago && b.preco) ? '<span class="price">' + esc(b.preco) + '</span>' : '';
     var acts = "";
@@ -909,19 +947,18 @@
       if(!lock) acts += '<button type="button" data-act="ler" data-id="' + esc(b.id) + '">LER AGORA</button>';
       else {
         if(b.url) acts += '<a class="btn" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">COMPRAR</a>';
-        acts += '<button type="button" class="sec" data-act="ler" data-id="' + esc(b.id) + '" disabled>🔒 PLANO ' + ROTULO[b.acesso] + '</button>';
+        else acts += '<button type="button" class="sec" disabled>🔒 PLANO ' + ROTULO[b.acesso] + '</button>';
       }
-      acts += '<button type="button" class="sec" data-act="cfg" data-id="' + esc(b.id) + '">AJUSTAR</button>';
+      acts += '<button type="button" class="sec" data-act="cfg" data-id="' + esc(b.id) + '" title="Ajustar acesso, preço e descrição">AJUSTAR</button>';
     } else if(b.url){
-      acts += '<a class="btn" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA OFICIAL ↗</a>';
+      acts += '<a class="btn" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA ↗</a>';
     }
-    var pg = b.paginas ? ' · ' + b.paginas + ' págs.' : '';
+    var pg = b.paginas ? b.paginas + ' páginas' : '';
     return '<article class="book' + (lock ? ' lock' : '') + '">' + capa +
-      '<div class="book-top">' + selo + gen + preco + '</div>' +
-      '<h2>' + esc(b.title) + '</h2><p class="author">' + esc(b.author) + esc(pg) + '</p>' +
-      '<p class="description">' + esc(b.description) + '</p>' +
-      (lock ? '<p class="lockmsg">Conteúdo pago: disponível a partir do plano ' + ROTULO[b.acesso] + (b.url ? ' ou por compra avulsa.' : '.') + '</p>' : '') +
-      (acts ? '<div class="acts">' + acts + '</div>' : '') + '</article>';
+      '<div class="binfo">' + gen + '<h2>' + esc(b.title) + '</h2>' +
+      '<p class="author">' + esc(b.author) + (b.author && pg ? ' · ' : '') + esc(pg) + '</p>' +
+      (b.description ? '<p class="description">' + esc(b.description) + '</p>' : '') +
+      '<div class="bfoot">' + preco + (acts ? '<div class="acts">' + acts + '</div>' : '') + '</div></div></article>';
   }
  
   function render(){
@@ -935,9 +972,14 @@
     });
     $("catalog").innerHTML = lista.map(cartao).join("");
     var vazio = $("empty");
-    vazio.textContent = (section === "own" && !meus.length && !lista.length)
-      ? "Nenhum livro enviado ainda. No Diagramador, escolha 4.1 ou 9.6 e clique em ENVIAR PARA A ESTANTE."
-      : "Nenhum item corresponde aos filtros selecionados.";
+    var MSG = {
+      free: "Nenhum livro grátis na estante ainda. No Diagramador, clique em ENVIAR PARA A ESTANTE e escolha o acesso GRÁTIS.",
+      pro: "Nenhum livro pago na estante ainda. No Diagramador, clique em ENVIAR PARA A ESTANTE e escolha um acesso PAGO.",
+      own: "Nenhum livro enviado ainda. No Diagramador, escolha 4.1 ou 9.6 e clique em ENVIAR PARA A ESTANTE.",
+      external: "Nenhuma referência externa com esses filtros."
+    };
+    var filtrando = $("search").value.trim() || $("access").value || genero || $("contentType").value || $("audience").value || $("depth").value || $("format").value;
+    vazio.textContent = filtrando ? "Nenhum livro corresponde aos filtros selecionados." : MSG[section];
     vazio.style.display = lista.length ? "none" : "block";
   }
  
@@ -1000,6 +1042,10 @@
     if(b.dataset.g != null){ genero = Number(b.dataset.g) || 0; tipoSel = null; }
     else if(b.dataset.t != null){ tipoSel = b.dataset.t || null; }
     render();
+  });
+  $("moreBtn").addEventListener("click", function(){
+    var tb = document.querySelector(".shelf-toolbar"), on = !tb.classList.contains("open");
+    tb.classList.toggle("open", on); this.setAttribute("aria-expanded", on); this.textContent = on ? "MENOS FILTROS ▴" : "MAIS FILTROS ▾";
   });
   document.querySelectorAll(".shelf-tab").forEach(function(tab){
     tab.addEventListener("click", function(){
@@ -1070,6 +1116,5 @@
 </script>
 </body>
 </html>
- 
  
  
