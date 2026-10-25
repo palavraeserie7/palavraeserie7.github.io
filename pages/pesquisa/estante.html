@@ -918,6 +918,7 @@
     });
     var h = '<button type="button" class="gn' + (!genero ? ' on' : '') + '" data-g="0"><b>TODOS</b><i>' + base.length + '</i></button>';
     GENEROS.forEach(function(g){
+    if(!cont[g.n] && genero !== g.n) return;
       h += '<button type="button" class="gn' + (genero === g.n ? ' on' : '') + (cont[g.n] ? '' : ' vazio') + '" data-g="' + g.n + '"><b>' + g.n + '</b> ' + esc(g.nome) + '<i>' + (cont[g.n] || 0) + '</i></button>';
     });
     $("gnGeneros").innerHTML = h;
@@ -926,6 +927,7 @@
       var g = GENEROS[genero - 1], t = '<button type="button" class="gn' + (!tipoSel ? ' on' : '') + '" data-t="">TODOS OS TIPOS</button>';
       g.tipos.forEach(function(nome, i){
         var cod = genero + "." + (i + 1), n = contT[cod] || 0;
+        if(!n && tipoSel !== cod) return;
         t += '<button type="button" class="gn' + (tipoSel === cod ? ' on' : '') + (n ? '' : ' vazio') + '" data-t="' + cod + '"><b>' + cod + '</b> ' + esc(nome) + '<i>' + n + '</i></button>';
       });
       row.innerHTML = t; row.hidden = false;
