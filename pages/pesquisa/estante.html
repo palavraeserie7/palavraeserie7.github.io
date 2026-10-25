@@ -1,6 +1,4 @@
-BLOQUEIO
 
-Estante · HTML
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -62,8 +60,8 @@ Estante · HTML
 </script>
 <!-- ==================================================================== -->
  
-
-
+ 
+ 
  
  
   <meta charset="utf-8">
@@ -516,6 +514,62 @@ Estante · HTML
  
       .shelf-toolbar{grid-template-columns:1fr}
     }
+ 
+    /* ---------- Prateleiras por gênero (arquitetura nova) ---------- */
+    .shelf-nav{margin:0 0 12px;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--card)}
+    .shelf-nav-title{margin:0 0 8px;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.7px;text-transform:uppercase}
+    .gn-row{display:flex;flex-wrap:wrap;gap:6px}
+    .gn-row + .gn-row{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+    .gn{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid #cdbfaa;border-radius:6px;background:#fffaf0;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.2px;cursor:pointer}
+    .gn:hover{background:#f1eadb}
+    .gn.on{background:var(--muted);border-color:var(--muted);color:#fffaf0}
+    .gn i{font-style:normal;font-size:10px;opacity:.75}
+    .gn.vazio{opacity:.55}
+    .gn b{font-weight:900}
+    .shelf-toolbar{grid-template-columns:minmax(210px,1.4fr) repeat(5,1fr)}
+    @media(max-width:1050px){.shelf-toolbar{grid-template-columns:minmax(190px,1fr) 1fr 1fr}}
+    @media(max-width:700px){.shelf-toolbar{grid-template-columns:1fr}}
+ 
+    /* ---------- Cartões: capa, selo grátis/pago, ações ---------- */
+    .book .cover{position:relative;overflow:hidden}
+    .book .cover.img{padding:0;min-height:0;aspect-ratio:148/210;max-height:300px;background:#e9dfc9}
+    .book .cover.img img{display:block;width:100%;height:100%;object-fit:cover}
+    .book-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px}
+    .badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:9.5px;font-weight:900;letter-spacing:.6px}
+    .b-free{background:#dff3e4;color:#17663a;border:1px solid #9bd3ac}
+    .b-paid{background:#f3e6c6;color:#7b5b1a;border:1px solid #d1b46a}
+    .b-own{background:#e5e3dd;color:#5a5448;border:1px solid #c8c2b3}
+    .gen{color:#9b8b70;font-size:9.5px;font-weight:800;letter-spacing:.3px}
+    .book.lock .cover img{filter:grayscale(.5) brightness(.9)}
+    .lockmsg{margin:10px 0 0;color:#7b5b1a;font-size:11px;font-weight:800;line-height:1.4}
+    .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .acts button,.acts a.btn{margin:0;padding:8px 12px;border:1px solid var(--muted);border-radius:6px;background:var(--muted);color:#fffaf0;font-size:10.5px;font-weight:900;letter-spacing:.4px;text-decoration:none;cursor:pointer}
+    .acts button.sec{background:transparent;color:var(--muted)}
+    .acts button:hover,.acts a.btn:hover{filter:brightness(1.08)}
+    .price{color:#7b5b1a;font-size:12px;font-weight:900;margin-left:auto}
+ 
+    /* ---------- Leitor e janela de ajustes ---------- */
+    #reader{display:none;position:fixed;inset:0;z-index:5000;background:#1a1d24;flex-direction:column}
+    #reader.on{display:flex}
+    #reader header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;background:var(--panel);border-bottom:1px solid #263754;color:var(--text)}
+    #reader header strong{flex:1;min-width:140px;font-size:14px}
+    #reader header span{font-size:11px;color:#9fb2cf}
+    #reader iframe{flex:1;width:100%;border:0;background:#7a7a7a}
+    .rbtn{padding:8px 12px;border:1px solid #536780;border-radius:7px;background:transparent;color:var(--text);font-size:10px;font-weight:900;cursor:pointer}
+    .rbtn.gold{background:#a07d33;border-color:#a07d33;color:#fffdf6}
+    #cfgBox{display:none;position:fixed;inset:0;z-index:5100;background:rgba(10,16,30,.62);align-items:center;justify-content:center;padding:16px}
+    #cfgBox.on{display:flex}
+    #cfgBox .box{width:min(520px,100%);max-height:92vh;overflow:auto;padding:20px;border:2px solid var(--muted);border-radius:10px;background:var(--card);color:var(--ink)}
+    #cfgBox h3{margin:0 0 4px;font-size:18px}
+    #cfgBox p.sub{margin:0 0 12px;color:#806f53;font-size:12px}
+    #cfgBox label{display:grid;gap:5px;margin:0 0 10px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.6px;text-transform:uppercase}
+    #cfgBox input,#cfgBox select,#cfgBox textarea{width:100%;padding:8px 9px;border:1px solid #cdbfaa;border-radius:6px;background:#fffaf0;color:var(--ink);font-size:13px;text-transform:none;letter-spacing:0;font-weight:400}
+    #cfgBox textarea{min-height:80px;resize:vertical}
+    #cfgBox .linha{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;margin-top:14px}
+    #cfgBox .linha button{padding:9px 14px;border:1px solid var(--muted);border-radius:6px;background:var(--muted);color:#fffaf0;font-size:11px;font-weight:900;cursor:pointer}
+    #cfgBox .linha button.sec{background:transparent;color:var(--muted)}
+    #cfgBox .linha button.danger{background:#a14747;border-color:#a14747}
+    .aviso-fase{margin:0 0 14px;padding:10px 12px;border:1px dashed #b99b61;border-radius:8px;background:#fbf4e1;color:#6b5a38;font-size:11.5px;line-height:1.5}
   </style>
 </head>
  
@@ -547,10 +601,9 @@ Estante · HTML
           <h1 id="page-title">MINHA ESTANTE</h1>
  
           <p class="intro">
-            Catálogo organizado para materiais gratuitos, conteúdos PRO, livros do
-            autor e referências externas autorizadas. Este arquivo é autônomo:
-            seus estilos, dados e scripts ficam separados dos menus do MÉTODO
-            TÉCNICO DE PESQUISA.
+            Catálogo organizado por gênero, com conteúdos gratuitos e pagos (PRO, MASTER e DOCTUS),
+            livros do autor e referências externas autorizadas. Os livros do autor chegam
+            pelo Diagramador (botão ENVIAR PARA A ESTANTE).
           </p>
  
           <div class="shelf-tabs" role="tablist" aria-label="Seções da estante">
@@ -558,6 +611,12 @@ Estante · HTML
             <button class="shelf-tab" type="button" data-section="pro">PRO</button>
             <button class="shelf-tab" type="button" data-section="own">MEUS LIVROS</button>
             <button class="shelf-tab" type="button" data-section="external">REFERÊNCIAS EXTERNAS</button>
+          </div>
+ 
+          <div class="shelf-nav" id="shelfNav" aria-label="Prateleiras por gênero">
+            <p class="shelf-nav-title">Prateleiras · escolha o gênero e o tipo</p>
+            <div class="gn-row" id="gnGeneros"></div>
+            <div class="gn-row" id="gnTipos" hidden></div>
           </div>
  
           <div class="shelf-toolbar" aria-label="Filtros da estante">
@@ -607,6 +666,14 @@ Estante · HTML
                 <option>MATERIAL DIDÁTICO</option>
               </select>
             </label>
+            <label>
+              ACESSO
+              <select id="access" aria-label="Acesso">
+                <option value="">TODOS</option>
+                <option value="free">GRÁTIS</option>
+                <option value="paid">PAGO</option>
+              </select>
+            </label>
           </div>
  
           <div id="catalog" class="catalog" aria-live="polite"></div>
@@ -622,63 +689,334 @@ Estante · HTML
     </div>
   </div>
  
+  <div id="reader" role="dialog" aria-modal="true" aria-label="Leitor de livro">
+    <header>
+      <strong id="rTitulo"></strong>
+      <span id="rInfo"></span>
+      <button class="rbtn gold" id="rPdf" type="button">BAIXAR PDF</button>
+      <button class="rbtn" id="rFechar" type="button">FECHAR</button>
+    </header>
+    <iframe id="rFrame" title="Livro"></iframe>
+  </div>
+ 
+  <div id="cfgBox" role="dialog" aria-modal="true" aria-labelledby="cfgTit">
+    <div class="box">
+      <h3 id="cfgTit">Ajustar livro</h3>
+      <p class="sub" id="cfgSub"></p>
+      <label>Título<input id="cfgTitulo" type="text"></label>
+      <label>Acesso
+        <select id="cfgAcesso">
+          <option value="free">GRÁTIS — qualquer leitor</option>
+          <option value="pro">PAGO — plano PRO ou superior</option>
+          <option value="master">PAGO — plano MASTER ou superior</option>
+          <option value="doctus">PAGO — plano DOCTUS</option>
+        </select>
+      </label>
+      <label>Preço (texto livre, opcional)<input id="cfgPreco" type="text" placeholder="Ex.: R$ 19,90"></label>
+      <label>Link de compra (opcional)<input id="cfgUrl" type="url" placeholder="https://..."></label>
+      <label>Descrição curta<textarea id="cfgDesc"></textarea></label>
+      <div class="linha">
+        <button id="cfgRemover" class="danger" type="button">REMOVER DA ESTANTE</button>
+        <span style="display:flex;gap:8px">
+          <button id="cfgCancelar" class="sec" type="button">CANCELAR</button>
+          <button id="cfgSalvar" type="button">SALVAR</button>
+        </span>
+      </div>
+    </div>
+  </div>
+ 
   <script>
-    const books = {
-      free: [
-        { title:'Guia de Leitura Bíblica', author:'Palavra & Série', cover:'LEITURA BÍBLICA', description:'Orientações introdutórias para observar passagem, contexto, estrutura e aplicação responsável.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'ESTUDO GUIADO' },
-        { title:'Introdução ao Estudo Bíblico', author:'Palavra & Série', cover:'ESTUDO BÍBLICO', description:'Material de orientação para organizar uma pesquisa bíblica pessoal.', contentType:'ESTUDO BÍBLICO', audience:'JOVENS', depth:'BÁSICO', format:'MATERIAL DIDÁTICO' },
-        { title:'Glossário de Termos Bíblicos', author:'Palavra & Série', cover:'GLOSSÁRIO', description:'Vocabulário inicial para acompanhar a leitura e a investigação do texto.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO' }
-      ],
-      pro: [
-        { title:'Caderno de Grego do Novo Testamento', author:'Palavra & Série', cover:'GREGO DO NT', description:'Material de apoio para texto grego, morfologia, sintaxe e leitura do SBLGNT.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO' },
-        { title:'Caderno de Hebraico do Antigo Testamento', author:'Palavra & Série', cover:'HEBRAICO DO AT', description:'Material de apoio para texto hebraico, formas, léxico e leitura do OSHB.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO' },
-        { title:'Manual da Matriz Canónica', author:'Palavra & Série', cover:'MATRIZ CANÓNICA', description:'Guia dos módulos, fontes prioritárias e regras de investigação da plataforma.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO' }
-      ],
-      own: [
-        { title:'Além da Régua', author:'A. F. Santos', cover:'ALÉM DA RÉGUA', description:'Livro do autor. A capa pode ser divulgada na estante; o conteúdo permanece fechado nesta etapa.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO' },
-        { title:'Você Não é um Acidente', author:'A. F. Santos', cover:'VOCÊ NÃO É UM ACIDENTE', description:'Devocional de 30 dias para redescobrir o seu valor em Deus.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO' }
-      ],
-      external: [
-        { title:'Matthew Henry — Commentary on the Whole Bible', author:'Matthew Henry', cover:'COMENTÁRIO', description:'Comentário cristão clássico disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', url:'https://www.ccel.org/ccel/henry/mhc' },
-        { title:'The Pilgrim’s Progress', author:'John Bunyan', cover:'PEREGRINO', description:'Alegoria cristã clássica disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', url:'https://www.ccel.org/ccel/bunyan/pilgrim' },
-        { title:'Institutes of the Christian Religion', author:'John Calvin', cover:'INSTITUTAS', description:'Obra clássica da Reforma disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', url:'https://www.ccel.org/ccel/calvin/institutes' }
-      ]
+(function(){
+  "use strict";
+  /* ====================================================================
+     ESTANTE — arquitetura
+     1) Catálogo fixo (seed): materiais da plataforma, abaixo.
+     2) Livros do autor: guardados no navegador (IndexedDB "ps_estante_db"),
+        enviados pelo Diagramador (botão ENVIAR PARA A ESTANTE).
+     3) Acesso: GRÁTIS ou PAGO (pro / master / doctus). O plano do leitor
+        vem da tabela profiles (Supabase) — a mesma da plataforma.
+     ==================================================================== */
+  var GENEROS = [
+    {n:1, nome:"Textos breves", tipos:["Microtextos","Pensamentos e frases comentadas","Mensagens e notas","Reflexões curtas","Meditações","Cartas breves"]},
+    {n:2, nome:"Artigos e ensaios", tipos:["Artigos informativos","Artigos de opinião","Ensaios literários","Ensaios filosóficos","Estudos temáticos","Resenhas e críticas"]},
+    {n:3, nome:"Literatura e poesia", tipos:["Poemas","Prosa poética","Contos e microcontos","Crônicas","Fábulas e parábolas","Romances e novelas","Peças teatrais e roteiros"]},
+    {n:4, nome:"Devocionais e espiritualidade", tipos:["Devocionais diários","Meditações bíblicas","Orações e mensagens de fé","Estudos bíblicos","Sermões e esboços","Testemunhos","Planos de leitura","Estudos teológicos"]},
+    {n:5, nome:"Estudos e educação", tipos:["Apostilas","Cadernos de estudo","Lições e exercícios","Resumos didáticos","Pesquisas e trabalhos acadêmicos","Estudos de caso"]},
+    {n:6, nome:"Dicionários e glossários", tipos:["Mini glossários","Glossários temáticos","Vocabulários especializados","Dicionários de termos","Dicionários de idiomas","Dicionários técnicos","Léxicos e concordâncias"]},
+    {n:7, nome:"Enciclopédias e referências", tipos:["Enciclopédias","Compêndios","Atlas e cronologias","Biografias de referência","Catálogos e repertórios","Índices e bibliografias"]},
+    {n:8, nome:"Guias e manuais", tipos:["Guias práticos","Manuais de instrução","Tutoriais escritos","Procedimentos e checklists","Modelos de documentos","Cadernos de ferramentas"]},
+    {n:9, nome:"Livros e e-books", tipos:["Livros curtos","Livros digitais completos","Biografias e autobiografias","Livros técnicos","Coletâneas e antologias","Livros por capítulos"]},
+    {n:10, nome:"Coleções e periódicos", tipos:["Séries de textos","Revistas digitais","Boletins e informativos","Coleções temáticas","Livros em fascículos","Anais e atas de eventos"]}
+  ];
+  var NIVEL = {free:0, pro:1, master:2, doctus:3};
+  var ROTULO = {free:"GRÁTIS", pro:"PRO", master:"MASTER", doctus:"DOCTUS"};
+  function nomeTipo(cod){ var p = String(cod || "").split("."), g = GENEROS[Number(p[0]) - 1]; return g ? (g.tipos[Number(p[1]) - 1] || "") : ""; }
+  function nomeGenero(cod){ var g = GENEROS[Number(String(cod || "").split(".")[0]) - 1]; return g ? g.nome : ""; }
+ 
+  /* ---------- catálogo fixo (seed) ---------- */
+  var SEED = {
+    free: [
+      { title:'Guia de Leitura Bíblica', author:'Palavra & Série', cover:'LEITURA BÍBLICA', description:'Orientações introdutórias para observar passagem, contexto, estrutura e aplicação responsável.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'ESTUDO GUIADO', genero:'4.4' },
+      { title:'Introdução ao Estudo Bíblico', author:'Palavra & Série', cover:'ESTUDO BÍBLICO', description:'Material de orientação para organizar uma pesquisa bíblica pessoal.', contentType:'ESTUDO BÍBLICO', audience:'JOVENS', depth:'BÁSICO', format:'MATERIAL DIDÁTICO', genero:'4.4' },
+      { title:'Glossário de Termos Bíblicos', author:'Palavra & Série', cover:'GLOSSÁRIO', description:'Vocabulário inicial para acompanhar a leitura e a investigação do texto.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'6.2' }
+    ],
+    pro: [
+      { title:'Caderno de Grego do Novo Testamento', author:'Palavra & Série', cover:'GREGO DO NT', description:'Material de apoio para texto grego, morfologia, sintaxe e leitura do SBLGNT.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'5.2' },
+      { title:'Caderno de Hebraico do Antigo Testamento', author:'Palavra & Série', cover:'HEBRAICO DO AT', description:'Material de apoio para texto hebraico, formas, léxico e leitura do OSHB.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'5.2' },
+      { title:'Manual da Matriz Canónica', author:'Palavra & Série', cover:'MATRIZ CANÓNICA', description:'Guia dos módulos, fontes prioritárias e regras de investigação da plataforma.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'8.1' }
+    ],
+    own: [
+      { title:'Além da Régua', author:'A. F. Santos', cover:'ALÉM DA RÉGUA', description:'Livro do autor. A capa pode ser divulgada na estante; o conteúdo permanece fechado nesta etapa.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.2' },
+      { title:'Você Não é um Acidente', author:'A. F. Santos', cover:'VOCÊ NÃO É UM ACIDENTE', description:'Devocional de 30 dias para redescobrir o seu valor em Deus.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.1' }
+    ],
+    external: [
+      { title:'Matthew Henry — Commentary on the Whole Bible', author:'Matthew Henry', cover:'COMENTÁRIO', description:'Comentário cristão clássico disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'7.1', url:'https://www.ccel.org/ccel/henry/mhc' },
+      { title:'The Pilgrim’s Progress', author:'John Bunyan', cover:'PEREGRINO', description:'Alegoria cristã clássica disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'3.6', url:'https://www.ccel.org/ccel/bunyan/pilgrim' },
+      { title:'Institutes of the Christian Religion', author:'John Calvin', cover:'INSTITUTAS', description:'Obra clássica da Reforma disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'9.4', url:'https://www.ccel.org/ccel/calvin/institutes' }
+    ]
+  };
+  var SEED_ACESSO = {free:"free", pro:"pro", own:"own", external:"free"};
+ 
+  /* ---------- banco local compartilhado com o Diagramador ---------- */
+  var DBN = "ps_estante_db";
+  function abrirDB(){
+    return new Promise(function(ok, er){
+      if(!window.indexedDB){ er(new Error("sem indexedDB")); return; }
+      var r = indexedDB.open(DBN, 1);
+      r.onupgradeneeded = function(){
+        var d = r.result;
+        if(!d.objectStoreNames.contains("livros")) d.createObjectStore("livros", {keyPath:"id"});
+        if(!d.objectStoreNames.contains("conteudo")) d.createObjectStore("conteudo", {keyPath:"id"});
+      };
+      r.onsuccess = function(){ ok(r.result); };
+      r.onerror = function(){ er(r.error); };
+    });
+  }
+  function dbAll(store){
+    return abrirDB().then(function(db){ return new Promise(function(ok, er){
+      var q = db.transaction(store, "readonly").objectStore(store).getAll();
+      q.onsuccess = function(){ ok(q.result || []); }; q.onerror = function(){ er(q.error); };
+    }); });
+  }
+  function dbGet(store, id){
+    return abrirDB().then(function(db){ return new Promise(function(ok, er){
+      var q = db.transaction(store, "readonly").objectStore(store).get(id);
+      q.onsuccess = function(){ ok(q.result); }; q.onerror = function(){ er(q.error); };
+    }); });
+  }
+  function dbPut(store, obj){
+    return abrirDB().then(function(db){ return new Promise(function(ok, er){
+      var t = db.transaction(store, "readwrite"); t.objectStore(store).put(obj);
+      t.oncomplete = function(){ ok(); }; t.onerror = function(){ er(t.error); };
+    }); });
+  }
+  function dbDel(store, id){
+    return abrirDB().then(function(db){ return new Promise(function(ok, er){
+      var t = db.transaction(store, "readwrite"); t.objectStore(store).delete(id);
+      t.oncomplete = function(){ ok(); }; t.onerror = function(){ er(t.error); };
+    }); });
+  }
+ 
+  /* ---------- plano do leitor (Supabase / profiles) ---------- */
+  var planoNivel = 0, planoNome = "free";
+  function carregarPlano(){
+    try{
+      var cli = window.supabase.createClient("https://qmhdbuxomozdczgvpvcc.supabase.co", "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8");
+      cli.auth.getSession().then(function(res){
+        var s = res && res.data && res.data.session; if(!s) return null;
+        return cli.from("profiles").select("plano").eq("id", s.user.id).maybeSingle();
+      }).then(function(r){
+        var p = r && r.data && r.data.plano ? String(r.data.plano).toLowerCase() : "free";
+        planoNome = NIVEL[p] != null ? p : "free"; planoNivel = NIVEL[planoNome];
+        render();
+      }).catch(function(){});
+    }catch(e){}
+  }
+ 
+  /* ---------- estado e utilidades ---------- */
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  var section = "free", genero = 0, tipoSel = null, meus = [];
+ 
+  function doDb(m){
+    return {
+      origem:"db", id:m.id, title:m.titulo, author:m.autor || "", cover:m.titulo, capa:m.capa || "",
+      description:m.descricao || "", contentType: m.tipo === "4.1" ? "DEVOCIONAL" : "", audience:"", depth:"", format:"LIVRO",
+      genero:m.tipo, acesso:m.acesso || "free", preco:m.preco || "", url:m.url || "", paginas:m.paginas || 0
     };
+  }
+  function itensDaSecao(){
+    if(section === "external") return SEED.external.map(function(b){ return Object.assign({origem:"seed", acesso:"free"}, b); });
+    var base = (SEED[section] || []).map(function(b){ return Object.assign({origem:"seed", acesso:SEED_ACESSO[section]}, b); });
+    var db = meus.map(doDb).filter(function(b){
+      if(section === "own") return true;
+      if(section === "free") return b.acesso === "free";
+      return b.acesso !== "free";
+    });
+    return db.concat(base);
+  }
+  function ehPago(b){ return b.acesso && b.acesso !== "free" && b.acesso !== "own"; }
+  function podeLer(b){
+    if(b.origem !== "db") return true;
+    if(section === "own") return true;               /* o autor sempre lê os próprios livros */
+    if(b.acesso === "free") return true;
+    return planoNivel >= (NIVEL[b.acesso] || 0);
+  }
  
-    let section = 'free';
-    const $ = (id) => document.getElementById(id);
+  function filtrosBase(){
+    var q = $("search").value.trim().toLowerCase();
+    var f = { contentType:$("contentType").value, audience:$("audience").value, depth:$("depth").value, format:$("format").value };
+    var ac = $("access").value;
+    return itensDaSecao()
+      .filter(function(b){ return Object.keys(f).every(function(k){ return !f[k] || b[k] === f[k]; }); })
+      .filter(function(b){ return !q || (b.title + " " + b.author + " " + b.description).toLowerCase().indexOf(q) > -1; })
+      .filter(function(b){ return !ac || (ac === "free" ? !ehPago(b) : ehPago(b)); });
+  }
  
-    function render() {
-      const query = $('search').value.trim().toLowerCase();
-      const filters = { contentType:$('contentType').value, audience:$('audience').value, depth:$('depth').value, format:$('format').value };
+  function desenharNav(base){
+    var cont = {}, contT = {};
+    base.forEach(function(b){
+      var g = Number(String(b.genero || "").split(".")[0]) || 0;
+      cont[g] = (cont[g] || 0) + 1; contT[b.genero] = (contT[b.genero] || 0) + 1;
+    });
+    var h = '<button type="button" class="gn' + (!genero ? ' on' : '') + '" data-g="0"><b>TODOS</b><i>' + base.length + '</i></button>';
+    GENEROS.forEach(function(g){
+      h += '<button type="button" class="gn' + (genero === g.n ? ' on' : '') + (cont[g.n] ? '' : ' vazio') + '" data-g="' + g.n + '"><b>' + g.n + '</b> ' + esc(g.nome) + '<i>' + (cont[g.n] || 0) + '</i></button>';
+    });
+    $("gnGeneros").innerHTML = h;
+    var row = $("gnTipos");
+    if(genero){
+      var g = GENEROS[genero - 1], t = '<button type="button" class="gn' + (!tipoSel ? ' on' : '') + '" data-t="">TODOS OS TIPOS</button>';
+      g.tipos.forEach(function(nome, i){
+        var cod = genero + "." + (i + 1), n = contT[cod] || 0;
+        t += '<button type="button" class="gn' + (tipoSel === cod ? ' on' : '') + (n ? '' : ' vazio') + '" data-t="' + cod + '"><b>' + cod + '</b> ' + esc(nome) + '<i>' + n + '</i></button>';
+      });
+      row.innerHTML = t; row.hidden = false;
+    } else { row.innerHTML = ""; row.hidden = true; }
+  }
  
-      const list = (books[section] || [])
-        .filter(book => Object.entries(filters).every(([key, value]) => !value || book[key] === value))
-        .filter(book => !query || `${book.title} ${book.author} ${book.description}`.toLowerCase().includes(query));
- 
-      $('catalog').innerHTML = list.map(book => `
-        <article class="book">
-          <div class="cover">${book.cover}</div>
-          <h2>${book.title}</h2>
-          <p class="author">${book.author}</p>
-          <p class="description">${book.description}</p>
-          ${book.url ? `<a href="${book.url}" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA OFICIAL ↗</a>` : ''}
-        </article>
-      `).join('');
- 
-      $('empty').style.display = list.length ? 'none' : 'block';
+  function cartao(b){
+    var pago = ehPago(b), lock = !podeLer(b);
+    var capa = b.capa
+      ? '<div class="cover img"><img alt="Capa de ' + esc(b.title) + '" src="' + b.capa + '"></div>'
+      : '<div class="cover">' + esc(b.cover) + '</div>';
+    var selo = b.acesso === "own" ? '<span class="badge b-own">DO AUTOR</span>'
+      : (pago ? '<span class="badge b-paid">' + (lock ? '🔒 ' : '') + ROTULO[b.acesso] + '</span>' : '<span class="badge b-free">GRÁTIS</span>');
+    var gen = b.genero ? '<span class="gen">' + esc(b.genero) + ' · ' + esc(nomeTipo(b.genero) || nomeGenero(b.genero)) + '</span>' : '';
+    var preco = (pago && b.preco) ? '<span class="price">' + esc(b.preco) + '</span>' : '';
+    var acts = "";
+    if(b.origem === "db"){
+      if(!lock) acts += '<button type="button" data-act="ler" data-id="' + esc(b.id) + '">LER AGORA</button>';
+      else {
+        if(b.url) acts += '<a class="btn" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">COMPRAR</a>';
+        acts += '<button type="button" class="sec" data-act="ler" data-id="' + esc(b.id) + '" disabled>🔒 PLANO ' + ROTULO[b.acesso] + '</button>';
+      }
+      acts += '<button type="button" class="sec" data-act="cfg" data-id="' + esc(b.id) + '">AJUSTAR</button>';
+    } else if(b.url){
+      acts += '<a class="btn" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA OFICIAL ↗</a>';
     }
+    var pg = b.paginas ? ' · ' + b.paginas + ' págs.' : '';
+    return '<article class="book' + (lock ? ' lock' : '') + '">' + capa +
+      '<div class="book-top">' + selo + gen + preco + '</div>' +
+      '<h2>' + esc(b.title) + '</h2><p class="author">' + esc(b.author) + esc(pg) + '</p>' +
+      '<p class="description">' + esc(b.description) + '</p>' +
+      (lock ? '<p class="lockmsg">Conteúdo pago: disponível a partir do plano ' + ROTULO[b.acesso] + (b.url ? ' ou por compra avulsa.' : '.') + '</p>' : '') +
+      (acts ? '<div class="acts">' + acts + '</div>' : '') + '</article>';
+  }
  
-    document.querySelectorAll('.shelf-tab').forEach(tab => tab.addEventListener('click', () => {
-      section = tab.dataset.section;
-      document.querySelectorAll('.shelf-tab').forEach(item => item.classList.toggle('active', item === tab));
+  function render(){
+    var base = filtrosBase();
+    desenharNav(base);
+    var lista = base.filter(function(b){
+      if(!genero) return true;
+      var g = Number(String(b.genero || "").split(".")[0]) || 0;
+      if(g !== genero) return false;
+      return !tipoSel || b.genero === tipoSel;
+    });
+    $("catalog").innerHTML = lista.map(cartao).join("");
+    var vazio = $("empty");
+    vazio.textContent = (section === "own" && !meus.length && !lista.length)
+      ? "Nenhum livro enviado ainda. No Diagramador, escolha 4.1 ou 9.6 e clique em ENVIAR PARA A ESTANTE."
+      : "Nenhum item corresponde aos filtros selecionados.";
+    vazio.style.display = lista.length ? "none" : "block";
+  }
+ 
+  function recarregar(){
+    return dbAll("livros").then(function(l){
+      meus = l.sort(function(a, b){ return (b.atualizado || 0) - (a.atualizado || 0); });
       render();
-    }));
+    }).catch(function(){ meus = []; render(); });
+  }
  
-    ['search','contentType','audience','depth','format'].forEach(id => $(id).addEventListener('input', render));
-
-       
+  /* ---------- leitor ---------- */
+  function ler(id){
+    var m = meus.filter(function(x){ return x.id === id; })[0]; if(!m) return;
+    dbGet("conteudo", id).then(function(c){
+      if(!c || !c.html){ alert("O conteúdo deste livro não foi encontrado neste navegador. Envie-o novamente pelo Diagramador."); return; }
+      $("rTitulo").textContent = m.titulo;
+      $("rInfo").textContent = (m.paginas ? m.paginas + " páginas · " : "") + (nomeTipo(m.tipo) || "");
+      $("rFrame").srcdoc = c.html;
+      $("reader").classList.add("on"); document.body.style.overflow = "hidden";
+    }).catch(function(){ alert("Não foi possível abrir o livro."); });
+  }
+  function fecharLeitor(){ $("reader").classList.remove("on"); $("rFrame").srcdoc = ""; document.body.style.overflow = ""; }
+  $("rFechar").addEventListener("click", fecharLeitor);
+  $("rPdf").addEventListener("click", function(){
+    try{ var w = $("rFrame").contentWindow; w.focus(); w.print(); }catch(e){ alert("Não foi possível abrir a janela de impressão."); }
+  });
+ 
+  /* ---------- ajustes do livro (acesso, preço, link) ---------- */
+  var cfgId = null;
+  function abrirCfg(id){
+    var m = meus.filter(function(x){ return x.id === id; })[0]; if(!m) return;
+    cfgId = id;
+    $("cfgSub").textContent = (m.tipo ? m.tipo + " · " + nomeTipo(m.tipo) : "") + (m.paginas ? " · " + m.paginas + " páginas" : "");
+    $("cfgTitulo").value = m.titulo || ""; $("cfgAcesso").value = m.acesso || "free";
+    $("cfgPreco").value = m.preco || ""; $("cfgUrl").value = m.url || ""; $("cfgDesc").value = m.descricao || "";
+    $("cfgBox").classList.add("on");
+  }
+  function fecharCfg(){ $("cfgBox").classList.remove("on"); cfgId = null; }
+  $("cfgCancelar").addEventListener("click", fecharCfg);
+  $("cfgSalvar").addEventListener("click", function(){
+    var m = meus.filter(function(x){ return x.id === cfgId; })[0]; if(!m) return;
+    var t = $("cfgTitulo").value.trim(); if(!t){ alert("Escreva o título do livro."); return; }
+    var novo = Object.assign({}, m, {titulo:t, acesso:$("cfgAcesso").value, preco:$("cfgPreco").value.trim(), url:$("cfgUrl").value.trim(), descricao:$("cfgDesc").value.trim(), atualizado:Date.now()});
+    dbPut("livros", novo).then(function(){ fecharCfg(); return recarregar(); }).catch(function(){ alert("Não foi possível salvar."); });
+  });
+  $("cfgRemover").addEventListener("click", function(){
+    var m = meus.filter(function(x){ return x.id === cfgId; })[0]; if(!m) return;
+    if(!confirm("Remover “" + m.titulo + "” da estante?\n\nO livro continua no Diagramador; só sai daqui. Você poderá enviá-lo de novo.")) return;
+    Promise.all([dbDel("livros", m.id), dbDel("conteudo", m.id)]).then(function(){ fecharCfg(); return recarregar(); }).catch(function(){ alert("Não foi possível remover."); });
+  });
+ 
+  /* ---------- eventos ---------- */
+  $("catalog").addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("button[data-act]"); if(!b || b.disabled) return;
+    if(b.dataset.act === "ler") ler(b.dataset.id);
+    if(b.dataset.act === "cfg") abrirCfg(b.dataset.id);
+  });
+  $("shelfNav").addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("button.gn"); if(!b) return;
+    if(b.dataset.g != null){ genero = Number(b.dataset.g) || 0; tipoSel = null; }
+    else if(b.dataset.t != null){ tipoSel = b.dataset.t || null; }
     render();
+  });
+  document.querySelectorAll(".shelf-tab").forEach(function(tab){
+    tab.addEventListener("click", function(){
+      section = tab.dataset.section;
+      document.querySelectorAll(".shelf-tab").forEach(function(item){ item.classList.toggle("active", item === tab); });
+      render();
+    });
+  });
+  ["search","contentType","audience","depth","format","access"].forEach(function(id){ $(id).addEventListener("input", render); });
+  document.addEventListener("keydown", function(ev){ if(ev.key === "Escape"){ if($("cfgBox").classList.contains("on")) fecharCfg(); else if($("reader").classList.contains("on")) fecharLeitor(); } });
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) recarregar(); });
+  window.addEventListener("focus", recarregar);
+ 
+  render();
+  recarregar();
+  carregarPlano();
+})();
   </script>
   <script>
 (function(){
@@ -733,4 +1071,5 @@ Estante · HTML
 </body>
 </html>
  
-
+ 
+ 
