@@ -6511,7 +6511,22 @@ body.dg-livro-vivo .dgp-nota{display:none}
     #esFilme .es-cena{border:1px solid var(--paper-line);border-radius:7px;padding:12px;display:flex;flex-direction:column;gap:8px;background:#fffdf6}
     #esFilme .es-cena h4{margin:0;font:600 15px Georgia,serif;color:var(--ink)}
     #esFilme .es-filme-aviso{margin:0;padding:10px 12px;border-left:3px solid var(--brass);background:var(--brass-wash);font:13px/1.5 "Segoe UI",Arial,sans-serif}
-    @media(max-width:700px){#esModos,#esFilme .es-filme-grid,#esPublicacao .es-publicacao-grid{grid-template-columns:1fr}}
+    #esModos{grid-template-columns:repeat(2,minmax(0,1fr))}
+    #esCriacaoExtra{border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);padding:18px;margin:0 0 14px;display:none;gap:14px}
+    #esCriacaoExtra.ativo{display:flex;flex-direction:column}
+    #esCriacaoExtra .es-extra-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    #esCriacaoExtra label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+    #esCriacaoExtra input,#esCriacaoExtra select,#esCriacaoExtra textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+    #esCriacaoExtra textarea{min-height:90px;resize:vertical}
+    #esCriacaoExtra .es-extra-aviso{margin:0;padding:10px 12px;border-left:3px solid var(--brass);background:var(--brass-wash);font:13px/1.5 "Segoe UI",Arial,sans-serif}
+    #esEditorLinha{border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);padding:16px;margin:0 0 14px;display:none}
+    #esEditorLinha.ativo{display:block}
+    #esEditorLinha .es-faixa{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;margin:9px 0}
+    #esEditorLinha .es-faixa-trechos{display:flex;gap:5px;min-height:28px}
+    #esEditorLinha .es-trecho{border-radius:4px;padding:6px 8px;background:var(--brass-wash);border:1px solid var(--paper-line);font-size:11px;flex:1;min-width:0}
+    #esEditorLinha .es-trecho.audio{background:#dbeafe}
+    #esEditorLinha .es-trecho.legenda{background:#dcfce7}
+    @media(max-width:700px){#esModos,#esFilme .es-filme-grid,#esPublicacao .es-publicacao-grid,#esCriacaoExtra .es-extra-grid{grid-template-columns:1fr}#esEditorLinha .es-faixa{grid-template-columns:1fr;gap:4px}}
   `;
   document.head.appendChild(modoStyle);
   var passosOriginais = painel.querySelector('.es-passos');
@@ -6521,8 +6536,10 @@ body.dg-livro-vivo .dgp-nota{display:none}
   tipoRapido.innerHTML = '<label for="esTipoRapidoSelect">O que você deseja criar? <select id="esTipoRapidoSelect"><option>Salmo ou oração</option><option>História bíblica curta</option><option>Testemunho pessoal</option><option>Mensagem ou reflexão</option><option>Devocional</option></select></label><p class="es-nota">Escolha o conteúdo e siga as etapas de texto, voz, imagens, prévia e exportação.</p>';
   var modos = document.createElement('div');
   modos.id = 'esModos';
-  modos.innerHTML = '<button type="button" class="es-modo" data-modo="redes" aria-pressed="true"><span aria-hidden="true">▶</span><span><strong>Vídeos para redes sociais</strong><small>Salmos, orações e reflexões com voz, música, imagens e legendas.</small></span></button>' +
-    '<button type="button" class="es-modo" data-modo="filme" aria-pressed="false"><span aria-hidden="true">🎬</span><span><strong>Filmes de histórias bíblicas</strong><small>Roteiro dividido em cenas, personagens, narração e sequência visual.</small></span></button>';
+  modos.innerHTML = '<button type="button" class="es-modo" data-modo="redes" aria-pressed="true"><span aria-hidden="true">▶</span><span><strong>Vídeos e mensagens bíblicas</strong><small>Salmos, orações, testemunhos e reflexões com voz, música, imagens e legendas.</small></span></button>' +
+    '<button type="button" class="es-modo" data-modo="filme" aria-pressed="false"><span aria-hidden="true">🎬</span><span><strong>Filmes de histórias bíblicas</strong><small>Roteiro dividido em cenas, personagens, diálogos e sequência visual.</small></span></button>' +
+    '<button type="button" class="es-modo" data-modo="musica" aria-pressed="false"><span aria-hidden="true">♫</span><span><strong>Louvores e letras com IA</strong><small>Letra original, estilo musical, voz cantada e vídeo com letras na tela.</small></span></button>' +
+    '<button type="button" class="es-modo" data-modo="cortes" aria-pressed="false"><span aria-hidden="true">✂</span><span><strong>Cortes para TikTok e Reels</strong><small>Selecionar trechos de vídeos próprios ou autorizados, legendar e adaptar ao vertical.</small></span></button>';
   painel.insertBefore(modos, painel.firstChild);
   painel.insertBefore(tipoRapido, modos);
   var filme = document.createElement('section');
@@ -6542,6 +6559,14 @@ body.dg-livro-vivo .dgp-nota{display:none}
   publicacao.id = 'esPublicacao';
   publicacao.innerHTML = '<h3>Destino do projeto</h3><p class="es-nota">Defina como o conteúdo deverá aparecer na página de exibição. Esta etapa organiza a publicação; não envia nem publica arquivos ainda.</p><div class="es-publicacao-grid"><label>Título para exibição<input id="esPubTitulo" placeholder="Título do vídeo ou filme"></label><label>Página de destino<select id="esPubDestino"><option>Biblioteca de vídeos bíblicos</option><option>Filmes e histórias bíblicas</option><option>Salmos, orações e testemunhos</option><option>Outra página do site</option></select></label><label>Estilo da capa<select id="esPubCapa"><option>Capa cinematográfica com botão assistir</option><option>Capa ilustrada</option><option>Capa com título e passagem bíblica</option></select></label><label>Visibilidade<select id="esPubVisibilidade"><option>Rascunho — não publicado</option><option>Pronto para publicar</option></select></label></div><label style="display:flex;flex-direction:column;gap:5px;margin-top:12px;font:700 12px Segoe UI,Arial,sans-serif;color:var(--ink-soft)">Descrição para a página<textarea id="esPubDescricao" rows="3" placeholder="Resumo que aparecerá junto ao vídeo"></textarea></label><p id="esPubStatus" class="es-filme-aviso" role="status">A estrutura da página de destino está definida. Exportação e publicação serão conectadas após a integração do Worker.</p>';
   filme.insertAdjacentElement('afterend', publicacao);
+  var extra = document.createElement('section'); extra.id='esCriacaoExtra'; extra.setAttribute('aria-live','polite');
+  extra.innerHTML = '<h3 id="esExtraTitulo">Criação musical com IA</h3><p class="es-nota" id="esExtraIntro">Prepare a ideia e as preferências da produção. A geração real será conectada depois ao serviço compatível.</p>' +
+    '<div id="esExtraMusica"><div class="es-extra-grid"><label>Tema ou mensagem da canção<input id="esMusTema" placeholder="Ex.: confiança em Deus nos dias difíceis"></label><label>Referência bíblica (opcional)<input id="esMusReferencia" placeholder="Ex.: Salmo 23"></label><label>Estilo musical<select id="esMusEstilo"><option>Adoração suave</option><option>Louvor contemporâneo</option><option>Gospel acústico</option><option>Coral épico</option><option>Instrumental contemplativo</option></select></label><label>Voz desejada<select id="esMusVoz"><option>Voz feminina</option><option>Voz masculina</option><option>Dueto</option><option>Coral</option><option>Somente instrumental</option></select></label><label>Clima da música<select id="esMusClima"><option>Esperançoso</option><option>Contemplativo</option><option>Triunfante</option><option>Emocionante</option><option>Sereno</option></select></label><label>Vídeo da música<select id="esMusVideo"><option>Letra sincronizada na tela</option><option>Cenas cinematográficas</option><option>Imagens contemplativas</option><option>Vídeo vertical para redes</option></select></label></div><label>Ideia para a letra<textarea id="esMusLetraIdeia" placeholder="Descreva a mensagem, imagens e palavras que deseja transmitir."></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="esMusGerarLetra">PREPARAR PEDIDO DE LETRA COM IA</button><button type="button" class="at-btn" id="esMusSalvar">GUARDAR PLANO MUSICAL</button></div><p class="es-extra-aviso" id="esMusStatus" role="status">A letra, a música cantada e o áudio ainda não serão gerados nesta etapa; o serviço será ligado posteriormente.</p></div>' +
+    '<div id="esExtraCortes" hidden><div class="es-extra-grid"><label>Vídeo de origem<input id="esCorteArquivo" type="file" accept="video/*"></label><label>Formato de saída<select id="esCorteFormato"><option>Vertical 9:16 — TikTok, Reels e Shorts</option><option>Quadrado 1:1</option><option>Horizontal 16:9</option></select></label><label>Início do trecho (segundos)<input id="esCorteInicio" type="number" min="0" value="0"></label><label>Fim do trecho (segundos)<input id="esCorteFim" type="number" min="1" value="30"></label><label>Estilo de legenda<select id="esCorteLegenda"><option>Legendas automáticas destacadas</option><option>Legenda discreta</option><option>Palavras-chave em destaque</option><option>Sem legendas</option></select></label><label>Música de fundo<select id="esCorteMusica"><option>Manter áudio original</option><option>Adicionar música autorizada</option><option>Reduzir áudio original e adicionar música</option></select></label></div><label>Instrução para encontrar o melhor trecho<textarea id="esCorteInstrucao" placeholder="Ex.: encontrar a parte mais inspiradora da mensagem, com começo claro e conclusão."></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="esCortePreparar">PREPARAR CORTE</button><button type="button" class="at-btn" id="esCorteSalvar">GUARDAR PLANO DE CORTE</button></div><p class="es-extra-aviso" id="esCorteStatus" role="status">Escolha um vídeo próprio ou autorizado. A edição, detecção de trechos e renderização serão conectadas depois.</p><video id="esCorteVideoPreview" controls playsinline style="display:none;width:min(100%,420px);max-height:480px;background:#101b2c;border-radius:8px"></video></div>';
+  filme.insertAdjacentElement('afterend',extra);
+  var editor = document.createElement('section'); editor.id='esEditorLinha';
+  editor.innerHTML='<h3>Montagem da produção</h3><p class="es-nota">Prévia conceitual da linha do tempo. Quando o editor estiver conectado, será possível ajustar e sincronizar cada faixa.</p><div class="es-faixa"><strong>Cenas / vídeo</strong><div class="es-faixa-trechos"><span class="es-trecho">Abertura</span><span class="es-trecho">Mensagem</span><span class="es-trecho">Conclusão</span></div></div><div class="es-faixa"><strong>Narração / voz</strong><div class="es-faixa-trechos"><span class="es-trecho audio">Narração</span><span class="es-trecho audio">Pausas</span></div></div><div class="es-faixa"><strong>Música</strong><div class="es-faixa-trechos"><span class="es-trecho audio">Trilha de fundo</span></div></div><div class="es-faixa"><strong>Legendas</strong><div class="es-faixa-trechos"><span class="es-trecho legenda">Versículos e texto sincronizado</span></div></div><label style="display:flex;flex-direction:column;gap:5px;margin-top:12px">Observações de edição<textarea id="esEditorNotas" rows="2" placeholder="Cortes, transições, ritmo, legendas e ajustes desejados"></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="at-btn" id="esEditorSalvar">GUARDAR NOTAS DE EDIÇÃO</button><span class="es-nota" id="esEditorStatus" role="status">A linha do tempo é uma estrutura visual; a renderização será ligada depois.</span></div>';
+  publicacao.insertAdjacentElement('afterend',editor);
   var cenas = document.getElementById('esFilmeCenas');
   var numeroCena = 0;
   function adicionarCena(titulo, descricao){
@@ -6553,19 +6578,30 @@ body.dg-livro-vivo .dgp-nota{display:none}
   }
   function renumerarCenas(){numeroCena=0;Array.prototype.forEach.call(cenas.children,function(card){numeroCena++;card.querySelector('h4').textContent='Cena '+numeroCena;});}
   function mudarModo(modo){
-    var redes = modo === 'redes';
-    modos.querySelector('[data-modo="redes"]').setAttribute('aria-pressed',String(redes));
-    modos.querySelector('[data-modo="filme"]').setAttribute('aria-pressed',String(!redes));
-    /* Mantém cada fluxo visualmente separado: os controles rápidos e as etapas
-       não aparecem junto do planejador de filmes bíblicos. */
+    var redes = modo === 'redes', ehFilme = modo === 'filme', ehMusica = modo === 'musica', ehCortes = modo === 'cortes';
+    modos.querySelectorAll('[data-modo]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.modo===modo));});
     tipoRapido.hidden = !redes;
     passosOriginais.hidden = !redes;
     caixasOriginais.forEach(function(c){c.hidden = redes ? c.dataset.passo !== '1' : true;});
-    filme.classList.toggle('ativo',!redes);
+    filme.classList.toggle('ativo',ehFilme);
+    publicacao.style.display = 'block';
+    extra.classList.toggle('ativo',ehMusica||ehCortes);
+    document.getElementById('esExtraMusica').hidden = !ehMusica;
+    document.getElementById('esExtraCortes').hidden = !ehCortes;
+    document.getElementById('esExtraTitulo').textContent = ehCortes ? 'Editor de cortes para TikTok e Reels' : 'Criação de louvores e letras com IA';
+    document.getElementById('esExtraIntro').textContent = ehCortes ? 'Importe um vídeo próprio ou autorizado, indique o trecho e prepare as opções de edição.' : 'Defina tema, referência, estilo e formato. A geração de letra e áudio depende da integração de IA.';
+    editor.classList.toggle('ativo',!ehFilme);
     if(redes){var caixaAtiva=painel.querySelector('.es-box[data-passo="1"]');if(caixaAtiva)caixaAtiva.hidden=false;}
-    painel.setAttribute('data-modo-ativo', redes ? 'redes' : 'filme');
+    painel.setAttribute('data-modo-ativo',modo);
   }
   modos.addEventListener('click',function(ev){var b=ev.target.closest('[data-modo]');if(b)mudarModo(b.dataset.modo);});
+  document.getElementById('esMusGerarLetra').addEventListener('click',function(){document.getElementById('esMusStatus').textContent='Pedido preparado com as preferências atuais. A geração da letra por IA ainda depende de conectar um serviço; nenhum áudio foi gerado.';});
+  document.getElementById('esMusSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_plano_musical',JSON.stringify({tema:document.getElementById('esMusTema').value,referencia:document.getElementById('esMusReferencia').value,estilo:document.getElementById('esMusEstilo').value,voz:document.getElementById('esMusVoz').value,clima:document.getElementById('esMusClima').value,video:document.getElementById('esMusVideo').value,ideia:document.getElementById('esMusLetraIdeia').value}));document.getElementById('esMusStatus').textContent='Plano musical guardado neste navegador. A música ainda não foi gerada.';}catch(e){document.getElementById('esMusStatus').textContent='Não foi possível guardar neste navegador.';}});
+  document.getElementById('esCorteArquivo').addEventListener('change',function(){var f=this.files&&this.files[0],v=document.getElementById('esCorteVideoPreview');if(!f){v.style.display='none';return;}if(v.dataset.url)URL.revokeObjectURL(v.dataset.url);v.dataset.url=URL.createObjectURL(f);v.src=v.dataset.url;v.style.display='block';document.getElementById('esCorteStatus').textContent='Vídeo carregado para pré-visualização local. O arquivo ainda não foi enviado nem editado.';});
+  document.getElementById('esCortePreparar').addEventListener('click',function(){var ini=Number(document.getElementById('esCorteInicio').value),fim=Number(document.getElementById('esCorteFim').value);if(fim<=ini){document.getElementById('esCorteStatus').textContent='O fim do trecho precisa ser maior que o início.';return;}var v=document.getElementById('esCorteVideoPreview');if(v.src){try{v.currentTime=ini;}catch(e){} }document.getElementById('esCorteStatus').textContent='Trecho definido de '+ini+'s a '+fim+'s. O corte final, legendas e exportação dependem do editor de vídeo que será conectado.';});
+  document.getElementById('esCorteSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_plano_corte',JSON.stringify({arquivo:(document.getElementById('esCorteArquivo').files[0]||{}).name||'',formato:document.getElementById('esCorteFormato').value,inicio:document.getElementById('esCorteInicio').value,fim:document.getElementById('esCorteFim').value,legenda:document.getElementById('esCorteLegenda').value,musica:document.getElementById('esCorteMusica').value,instrucao:document.getElementById('esCorteInstrucao').value}));document.getElementById('esCorteStatus').textContent='Plano de corte guardado. O vídeo em si não é armazenado no rascunho local.';}catch(e){document.getElementById('esCorteStatus').textContent='Não foi possível guardar o plano neste navegador.';}});
+  document.getElementById('esEditorSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_notas_edicao',document.getElementById('esEditorNotas').value);document.getElementById('esEditorStatus').textContent='Notas de edição guardadas neste navegador.';}catch(e){document.getElementById('esEditorStatus').textContent='Não foi possível guardar as notas.';}});
+  try{document.getElementById('esEditorNotas').value=localStorage.getItem('ps_estudio_notas_edicao')||'';}catch(e){}
   document.getElementById('esFilmeAddCena').addEventListener('click',function(){adicionarCena();});
   document.getElementById('esFilmeVoltar').addEventListener('click',function(){mudarModo('redes');});
   document.getElementById('esFilmeSalvarPlano').addEventListener('click',function(){
@@ -6591,6 +6627,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   adicionarCena('Apresentação da história','Apresente o contexto bíblico e os personagens principais.');
   adicionarCena('O conflito','Mostre o desafio central da narrativa.');
   adicionarCena('Desfecho e mensagem','Conclua a história e destaque a mensagem espiritual.');
+  mudarModo('redes');
 
   /* ---------- abrir/fechar ---------- */
   btn.addEventListener("click", function(){
