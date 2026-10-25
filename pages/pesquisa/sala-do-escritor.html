@@ -6492,6 +6492,10 @@ body.dg-livro-vivo .dgp-nota{display:none}
   /* ---------- seletor estrutural dos modos de produção (sem Worker) ---------- */
   var modoStyle = document.createElement("style");
   modoStyle.textContent = `
+    #esTipoRapido,#esPublicacao{border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);padding:16px;margin:0 0 14px}
+    #esTipoRapido label,#esPublicacao label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+    #esTipoRapido select,#esPublicacao input,#esPublicacao select,#esPublicacao textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+    #esPublicacao .es-publicacao-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     #esModos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 14px}
     #esModos .es-modo{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:16px;border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);cursor:pointer}
     #esModos .es-modo[aria-pressed="true"]{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
@@ -6507,16 +6511,20 @@ body.dg-livro-vivo .dgp-nota{display:none}
     #esFilme .es-cena{border:1px solid var(--paper-line);border-radius:7px;padding:12px;display:flex;flex-direction:column;gap:8px;background:#fffdf6}
     #esFilme .es-cena h4{margin:0;font:600 15px Georgia,serif;color:var(--ink)}
     #esFilme .es-filme-aviso{margin:0;padding:10px 12px;border-left:3px solid var(--brass);background:var(--brass-wash);font:13px/1.5 "Segoe UI",Arial,sans-serif}
-    @media(max-width:700px){#esModos,#esFilme .es-filme-grid{grid-template-columns:1fr}}
+    @media(max-width:700px){#esModos,#esFilme .es-filme-grid,#esPublicacao .es-publicacao-grid{grid-template-columns:1fr}}
   `;
   document.head.appendChild(modoStyle);
   var passosOriginais = painel.querySelector('.es-passos');
   var caixasOriginais = Array.prototype.slice.call(painel.querySelectorAll('.es-box'));
+  var tipoRapido = document.createElement('section');
+  tipoRapido.id = 'esTipoRapido';
+  tipoRapido.innerHTML = '<label for="esTipoRapidoSelect">O que você deseja criar? <select id="esTipoRapidoSelect"><option>Salmo ou oração</option><option>História bíblica curta</option><option>Testemunho pessoal</option><option>Mensagem ou reflexão</option><option>Devocional</option></select></label><p class="es-nota">Escolha o conteúdo e siga as etapas de texto, voz, imagens, prévia e exportação.</p>';
   var modos = document.createElement('div');
   modos.id = 'esModos';
   modos.innerHTML = '<button type="button" class="es-modo" data-modo="redes" aria-pressed="true"><span aria-hidden="true">▶</span><span><strong>Vídeos para redes sociais</strong><small>Salmos, orações e reflexões com voz, música, imagens e legendas.</small></span></button>' +
     '<button type="button" class="es-modo" data-modo="filme" aria-pressed="false"><span aria-hidden="true">🎬</span><span><strong>Filmes de histórias bíblicas</strong><small>Roteiro dividido em cenas, personagens, narração e sequência visual.</small></span></button>';
   painel.insertBefore(modos, painel.firstChild);
+  painel.insertBefore(tipoRapido, modos);
   var filme = document.createElement('section');
   filme.id = 'esFilme';
   filme.setAttribute('aria-labelledby','esFilmeTitulo');
@@ -6530,6 +6538,10 @@ body.dg-livro-vivo .dgp-nota{display:none}
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn" id="esFilmeSalvarPlano">GUARDAR PLANO NESTA TELA</button><button type="button" class="at-btn" id="esFilmeVoltar">VOLTAR AOS VÍDEOS PARA REDES</button></div>' +
     '<p id="esFilmeMsg" class="es-filme-aviso" role="status">Planejamento local: nenhuma geração ou exportação foi iniciada.</p>';
   passosOriginais.insertAdjacentElement('afterend', filme);
+  var publicacao = document.createElement('section');
+  publicacao.id = 'esPublicacao';
+  publicacao.innerHTML = '<h3>Destino do projeto</h3><p class="es-nota">Defina como o conteúdo deverá aparecer na página de exibição. Esta etapa organiza a publicação; não envia nem publica arquivos ainda.</p><div class="es-publicacao-grid"><label>Título para exibição<input id="esPubTitulo" placeholder="Título do vídeo ou filme"></label><label>Página de destino<select id="esPubDestino"><option>Biblioteca de vídeos bíblicos</option><option>Filmes e histórias bíblicas</option><option>Salmos, orações e testemunhos</option><option>Outra página do site</option></select></label><label>Estilo da capa<select id="esPubCapa"><option>Capa cinematográfica com botão assistir</option><option>Capa ilustrada</option><option>Capa com título e passagem bíblica</option></select></label><label>Visibilidade<select id="esPubVisibilidade"><option>Rascunho — não publicado</option><option>Pronto para publicar</option></select></label></div><label style="display:flex;flex-direction:column;gap:5px;margin-top:12px;font:700 12px Segoe UI,Arial,sans-serif;color:var(--ink-soft)">Descrição para a página<textarea id="esPubDescricao" rows="3" placeholder="Resumo que aparecerá junto ao vídeo"></textarea></label><p id="esPubStatus" class="es-filme-aviso" role="status">A estrutura da página de destino está definida. Exportação e publicação serão conectadas após a integração do Worker.</p>';
+  filme.insertAdjacentElement('afterend', publicacao);
   var cenas = document.getElementById('esFilmeCenas');
   var numeroCena = 0;
   function adicionarCena(titulo, descricao){
@@ -6552,7 +6564,8 @@ body.dg-livro-vivo .dgp-nota{display:none}
   modos.addEventListener('click',function(ev){var b=ev.target.closest('[data-modo]');if(b)mudarModo(b.dataset.modo);});
   document.getElementById('esFilmeAddCena').addEventListener('click',function(){adicionarCena();});
   document.getElementById('esFilmeVoltar').addEventListener('click',function(){mudarModo('redes');});
-  document.getElementById('esFilmeSalvarPlano').addEventListener('click',function(){document.getElementById('esFilmeMsg').textContent='Plano mantido nesta tela enquanto ela estiver aberta. Ainda não há salvamento permanente nem geração conectada.';});
+  document.getElementById('esFilmeSalvarPlano').addEventListener('click',function(){var titulo=document.getElementById('esFilmeHistoria').value.trim();if(titulo&&!document.getElementById('esPubTitulo').value.trim())document.getElementById('esPubTitulo').value=titulo;document.getElementById('esFilmeMsg').textContent='Plano organizado nesta tela. O salvamento permanente, a geração de cenas e a exportação serão ligados na etapa do Worker.';document.getElementById('esPubStatus').textContent='Destino preparado para: '+(document.getElementById('esPubTitulo').value.trim()||'projeto sem título')+'. Ainda não publicado.';});
+  document.getElementById('esTipoRapidoSelect').addEventListener('change',function(){var campo=document.getElementById('esTitulo');if(campo&&!campo.value.trim())campo.value=this.value;});
   adicionarCena('Apresentação da história','Apresente o contexto bíblico e os personagens principais.');
   adicionarCena('O conflito','Mostre o desafio central da narrativa.');
   adicionarCena('Desfecho e mensagem','Conclua a história e destaque a mensagem espiritual.');
