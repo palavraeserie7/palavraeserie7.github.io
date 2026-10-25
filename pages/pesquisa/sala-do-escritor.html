@@ -6590,7 +6590,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
     document.getElementById('esExtraCortes').hidden = !ehCortes;
     document.getElementById('esExtraTitulo').textContent = ehCortes ? 'Editor de cortes para TikTok e Reels' : 'Criação de louvores e letras com IA';
     document.getElementById('esExtraIntro').textContent = ehCortes ? 'Importe um vídeo próprio ou autorizado, indique o trecho e prepare as opções de edição.' : 'Defina tema, referência, estilo e formato. A geração de letra e áudio depende da integração de IA.';
-    editor.classList.toggle('ativo',!ehFilme);
+    editor.classList.add('ativo');
     if(redes){var caixaAtiva=painel.querySelector('.es-box[data-passo="1"]');if(caixaAtiva)caixaAtiva.hidden=false;}
     painel.setAttribute('data-modo-ativo',modo);
   }
@@ -6628,6 +6628,77 @@ body.dg-livro-vivo .dgp-nota{display:none}
   adicionarCena('O conflito','Mostre o desafio central da narrativa.');
   adicionarCena('Desfecho e mensagem','Conclua a história e destaque a mensagem espiritual.');
   mudarModo('redes');
+
+  /* ---------- fluxo integrado do projeto: rascunho comum e navegação ---------- */
+  var fluxoBox = document.createElement('section');
+  fluxoBox.id = 'esFluxoProjeto';
+  fluxoBox.style.cssText = 'border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);padding:14px;margin:0 0 14px;color:var(--ink)';
+  fluxoBox.innerHTML = '<h3 style="margin:0 0 6px">Fluxo do projeto</h3><p class="es-nota" style="margin:0 0 10px">Salve o rascunho completo neste navegador e avance entre criação, montagem e publicação. A geração por IA e a renderização ainda dependem do Worker.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn" id="esFluxoSalvar">SALVAR PROJETO COMPLETO</button><button type="button" class="at-btn" id="esFluxoMontagem">IR PARA MONTAGEM</button><button type="button" class="at-btn" id="esFluxoPublicacao">IR PARA PUBLICAÇÃO</button><button type="button" class="at-btn" id="esFluxoBaixar">BAIXAR RASCUNHO JSON</button></div><p id="esFluxoStatus" class="es-filme-aviso" role="status" style="margin:10px 0 0">Rascunho local ainda não salvo.</p>';
+  modos.insertAdjacentElement('afterend', fluxoBox);
+
+  function esColetarProjeto(){
+    var campos = {};
+    Array.prototype.forEach.call(painel.querySelectorAll('input,select,textarea'), function(el){
+      if(!el.id || el.type === 'file' || el.type === 'button' || el.type === 'submit') return;
+      if(el.type === 'checkbox' || el.type === 'radio') campos[el.id] = el.checked;
+      else campos[el.id] = el.value;
+    });
+    return {
+      versao: 1,
+      atualizadoEm: new Date().toISOString(),
+      modo: painel.getAttribute('data-modo-ativo') || 'redes',
+      campos: campos,
+      planoFilme: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_filme')||'null');}catch(e){return null;} })(),
+      planoMusical: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_musical')||'null');}catch(e){return null;} })(),
+      planoCorte: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_corte')||'null');}catch(e){return null;} })(),
+      notasEdicao: (function(){ try{return localStorage.getItem('ps_estudio_notas_edicao')||'';}catch(e){return '';} })()
+    };
+  }
+  function esSalvarProjeto(silencioso){
+    try{
+      localStorage.setItem('ps_estudio_projeto_completo', JSON.stringify(esColetarProjeto()));
+      var st=document.getElementById('esFluxoStatus');
+      if(st) st.textContent = silencioso ? 'Alterações recentes guardadas neste navegador.' : 'Projeto completo guardado neste navegador. Nenhum arquivo foi enviado ao servidor.';
+      return true;
+    }catch(e){
+      var st2=document.getElementById('esFluxoStatus');
+      if(st2) st2.textContent='Não foi possível guardar o projeto neste navegador. Verifique o armazenamento disponível.';
+      return false;
+    }
+  }
+  function esRestaurarProjeto(){
+    try{
+      var p=JSON.parse(localStorage.getItem('ps_estudio_projeto_completo')||'null');
+      if(!p || !p.campos) return;
+      Object.keys(p.campos).forEach(function(id){
+        var el=document.getElementById(id); if(!el || el.type==='file') return;
+        if(el.type==='checkbox' || el.type==='radio') el.checked=!!p.campos[id];
+        else if(p.campos[id] != null) el.value=p.campos[id];
+      });
+      if(p.modo && modos.querySelector('[data-modo="'+p.modo+'"]')) mudarModo(p.modo);
+      var st=document.getElementById('esFluxoStatus');
+      if(st) st.textContent='Rascunho completo recuperado deste navegador. Arquivos de vídeo selecionados precisam ser escolhidos novamente.';
+    }catch(e){}
+  }
+  document.getElementById('esFluxoSalvar').addEventListener('click',function(){esSalvarProjeto(false);});
+  document.getElementById('esFluxoMontagem').addEventListener('click',function(){
+    esSalvarProjeto(true); editor.classList.add('ativo'); editor.scrollIntoView({behavior:'smooth',block:'start'});
+    document.getElementById('esEditorNotas').focus({preventScroll:true});
+  });
+  document.getElementById('esFluxoPublicacao').addEventListener('click',function(){
+    esSalvarProjeto(true); publicacao.scrollIntoView({behavior:'smooth',block:'start'});
+    var t=document.getElementById('esPubTitulo'); if(t) t.focus({preventScroll:true});
+  });
+  document.getElementById('esFluxoBaixar').addEventListener('click',function(){
+    var data=JSON.stringify(esColetarProjeto(),null,2);
+    var blob=new Blob([data],{type:'application/json'}); var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download='palavra-e-serie-rascunho.json'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    document.getElementById('esFluxoStatus').textContent='Arquivo JSON do rascunho preparado para download. Ele contém os campos do projeto, não o vídeo final.';
+  });
+  painel.addEventListener('input',function(ev){if(ev.target && ev.target.type!=='file') esSalvarProjeto(true);});
+  painel.addEventListener('change',function(ev){if(ev.target && ev.target.type!=='file') esSalvarProjeto(true);});
+  esRestaurarProjeto();
 
   /* ---------- abrir/fechar ---------- */
   btn.addEventListener("click", function(){
