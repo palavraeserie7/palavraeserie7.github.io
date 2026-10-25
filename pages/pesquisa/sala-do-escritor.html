@@ -7171,6 +7171,244 @@ st.versoes.unshift({
 </script>
 <!-- ===== FIM: ÁREA 1 — LIGAR A IA ===== -->
 
+<!-- ===== INÍCIO: ESTÚDIO FASE 1 — LAYOUT UNIFICADO + RENDERIZAÇÃO REAL =====
+     COLE este bloco logo ANTES de </body>, depois de "ÁREA 1 — LIGAR A IA". Não apague nada. -->
+<style>
+/* um só seletor de tipo: os cartões do passo 1 */
+#esTipoRapido{display:none!important}
+/* os quatro passos valem para todos os modos */
+#esPainel .es-passos{display:flex!important;gap:0;margin:16px 0!important;border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:var(--paper-card)}
+#esPainel .es-passos .at-btn{flex:1;height:46px;border:0;border-radius:0;border-right:1px solid var(--paper-line);background:transparent;color:var(--ink-soft)}
+#esPainel .es-passos .at-btn:last-child{border-right:0}
+#esPainel .es-passos .at-btn.on{background:var(--brass);color:#fffdf6}
+/* cada bloco só aparece no seu passo */
+#esPainel:not([data-passo-ativo="1"]) #esFilme,
+#esPainel:not([data-passo-ativo="1"]) #esCriacaoExtra{display:none!important}
+#esPainel:not([data-passo-ativo="3"]) #esEditorLinha{display:none!important}
+#esPainel:not([data-passo-ativo="4"]) #esPublicacao{display:none!important}
+/* progresso e resultado */
+.f1-card{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;padding:16px;display:flex;flex-direction:column;gap:12px}
+.f1-card[hidden]{display:none!important}
+.f1-barra{height:8px;border-radius:4px;background:var(--paper-line);overflow:hidden}
+.f1-barra i{display:block;height:100%;width:0;background:var(--brass);transition:width .2s}
+.f1-card video{width:100%;max-width:360px;max-height:70vh;border-radius:8px;background:#111;align-self:center}
+.f1-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.f1-info{font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.f1-info.erro{color:#a14747}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel");
+  if(!painel || !$("esMsg4")) return;
+  var URL_VOZ = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/voz";
+ 
+  /* ---------- 1. layout: passos para todos os modos, blocos no lugar certo ---------- */
+  var passoAtual = 1;
+  function mostrar(n){
+    passoAtual = n;
+    painel.setAttribute("data-passo-ativo", String(n));
+    painel.querySelectorAll(".es-box[data-passo]").forEach(function(b){ b.hidden = b.dataset.passo !== String(n); });
+    painel.querySelectorAll(".es-passos .at-btn").forEach(function(b){ b.classList.toggle("on", b.dataset.p === String(n)); });
+  }
+  painel.querySelector(".es-passos").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-p]"); if(b) mostrar(Number(b.dataset.p));
+  });
+  $("esModos").addEventListener("click", function(){ setTimeout(function(){ mostrar(passoAtual); }, 0); });
+  var box3 = painel.querySelector('.es-box[data-passo="3"]'), box4 = painel.querySelector('.es-box[data-passo="4"]');
+  box3.insertAdjacentElement("afterend", $("esEditorLinha"));
+  box4.insertAdjacentElement("afterend", $("esPublicacao"));
+  mostrar(1);
+ 
+  /* voz profissional (o Worker traduz o código em uma voz real) */
+  var sel = document.createElement("label");
+  sel.className = "es-campo";
+  sel.innerHTML = 'Voz profissional<select id="f1Voz" class="at-sel"><option value="f1">Feminina, suave</option><option value="m1">Masculina, grave</option><option value="n1">Narrador, solene</option></select>';
+  $("esVoz").parentElement.insertAdjacentElement("beforebegin", sel);
+ 
+  /* música enviada: guarda o arquivo (o código original zera o campo) */
+  var musica = null;
+  painel.addEventListener("change", function(ev){
+    if(ev.target.id === "esMusArq" && ev.target.files && ev.target.files[0]) musica = ev.target.files[0];
+    if(ev.target.id === "esMusica" && !ev.target.value) musica = null;
+  }, true);
+ 
+  /* ---------- 2. resultado ---------- */
+  var res = document.createElement("div");
+  res.className = "f1-card"; res.hidden = true;
+  res.innerHTML = '<div class="f1-info" id="f1Info"></div><div class="f1-barra"><i id="f1Prog"></i></div>' +
+    '<video id="f1Video" controls playsinline hidden></video>' +
+    '<div class="f1-linha"><a id="f1Baixar" class="at-btn gold" hidden style="display:none;text-decoration:none;line-height:38px">BAIXAR ARQUIVO</a></div>';
+  $("esMsg4").insertAdjacentElement("afterend", res);
+  var urlAtual = null;
+  function info(t, erro, p){
+    res.hidden = false;
+    $("f1Info").textContent = t; $("f1Info").className = "f1-info" + (erro ? " erro" : "");
+    if(p != null) $("f1Prog").style.width = Math.round(p * 100) + "%";
+  }
+  function entregar(blob, nome, video){
+    if(urlAtual) URL.revokeObjectURL(urlAtual);
+    urlAtual = URL.createObjectURL(blob);
+    var a = $("f1Baixar"); a.href = urlAtual; a.download = nome; a.hidden = false; a.style.display = "inline-block";
+    var v = $("f1Video");
+    v.hidden = !video; if(video) v.src = urlAtual;
+    $("f1Prog").style.width = "100%";
+  }
+ 
+  /* ---------- 3. modelo único de projeto: texto ou cenas viram cenas de vídeo ---------- */
+  function cenasDoTexto(t){
+    var fr = (t.replace(/\n+/g, " ").match(/[^.!?…]+[.!?…]*/g) || [t]).map(function(s){ return s.trim(); }).filter(Boolean);
+    var out = [], buf = "";
+    fr.forEach(function(f){
+      if(buf && (buf + " " + f).length > 140){ out.push(buf); buf = f; } else buf = buf ? buf + " " + f : f;
+    });
+    if(buf) out.push(buf);
+    return out;
+  }
+  function montarProjeto(det){
+    var texto = det.texto.trim(), cenas = [];
+    if(painel.getAttribute("data-modo-ativo") === "filme"){
+      Array.prototype.forEach.call(document.querySelectorAll("#esFilmeCenas .es-cena"), function(c){
+        var d = c.querySelector(".es-cena-desc").value.trim() || c.querySelector(".es-cena-titulo").value.trim();
+        if(d) cenas.push(d);
+      });
+    }
+    if(!cenas.length) cenas = cenasDoTexto(texto);
+    var imgs = Array.prototype.map.call(document.querySelectorAll("#esFotos img"), function(i){ return i.src; });
+    return {titulo: det.titulo, cenas: cenas, imagens: imgs, fala: texto || cenas.join(" ")};
+  }
+ 
+  /* ---------- 4. voz real (rota /api/voz do Worker) ---------- */
+  async function pedirVoz(texto, det){
+    var s = (await supabaseClient.auth.getSession()).data.session;
+    if(!s) throw new Error("Sessão encerrada. Entre de novo.");
+    var r = await fetch(URL_VOZ, {method: "POST",
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + s.access_token},
+      body: JSON.stringify({texto: texto, voz: $("f1Voz").value, velocidade: det.velocidade})});
+    if(!r.ok){
+      var j = await r.json().catch(function(){ return {}; });
+      throw new Error(j.error || "A rota /api/voz ainda não está disponível (erro " + r.status + ").");
+    }
+    if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
+    return r.blob();
+  }
+ 
+  /* ---------- 5. renderização no navegador (canvas + MediaRecorder) ---------- */
+  var TAM = {f916: [720, 1280], f11: [720, 720], f169: [1280, 720]};
+  function carregarImg(src){
+    return new Promise(function(ok){ var i = new Image(); i.onload = function(){ ok(i); }; i.onerror = function(){ ok(null); }; i.src = src; });
+  }
+  function quebrar(g, texto, larg){
+    var pal = texto.split(/\s+/), lin = [], at = "";
+    pal.forEach(function(p){
+      var t = at ? at + " " + p : p;
+      if(g.measureText(t).width > larg && at){ lin.push(at); at = p; } else at = t;
+    });
+    if(at) lin.push(at);
+    return lin;
+  }
+  function desenhar(g, W, H, proj, imgs, cena, p, tit){
+    var img = imgs.length ? imgs[cena.i % imgs.length] : null;
+    g.fillStyle = "#0b1428"; g.fillRect(0, 0, W, H);
+    if(img){
+      var z = 1 + 0.08 * p, r = Math.max(W / img.width, H / img.height) * z, w = img.width * r, h = img.height * r;
+      g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+    }else{
+      var gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, "#17243a"); gr.addColorStop(1, "#7c5f26");
+      g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    }
+    var sh = g.createLinearGradient(0, H * 0.35, 0, H); sh.addColorStop(0, "rgba(0,0,0,0)"); sh.addColorStop(1, "rgba(0,0,0,.78)");
+    g.fillStyle = sh; g.fillRect(0, 0, W, H);
+    var alfa = Math.min(1, p * cena.dur / 0.4, (1 - p) * cena.dur / 0.4);
+    g.globalAlpha = Math.max(0, alfa);
+    g.fillStyle = "#fff"; g.textAlign = "center"; g.shadowColor = "rgba(0,0,0,.8)"; g.shadowBlur = 12;
+    var fs = Math.round(Math.min(W, H) * (W > H ? 0.06 : 0.055));
+    g.font = "600 " + fs + "px Georgia, serif";
+    var lin = quebrar(g, cena.texto, W * 0.82), y = H - H * 0.1 - (lin.length - 1) * fs * 1.4;
+    lin.forEach(function(l, k){ g.fillText(l, W / 2, y + k * fs * 1.4); });
+    if(tit && cena.i === 0){
+      g.font = "600 " + Math.round(fs * 0.6) + "px Georgia, serif"; g.fillStyle = "#f1d58a";
+      g.fillText(tit, W / 2, H * 0.09);
+    }
+    g.globalAlpha = 1; g.shadowBlur = 0;
+  }
+  async function renderizar(det){
+    var ac = new (window.AudioContext || window.webkitAudioContext)();   /* criado no clique, para o navegador liberar o áudio */
+    var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0], H = dims[1];
+    info("Gerando a voz…", false, 0.03);
+    var buf = null, aviso = "";
+    try{
+      var vb = await pedirVoz(proj.fala, det);
+      buf = await ac.decodeAudioData(await vb.arrayBuffer());
+    }catch(e){ aviso = " Sem voz: " + (e.message || "falhou") + " O vídeo sai só com texto e música."; }
+ 
+    var palavras = proj.fala.split(/\s+/).length;
+    var total = (buf ? buf.duration : palavras / 130 * 60 / (det.velocidade || 1)) + 0.8;
+    var soma = proj.cenas.reduce(function(a, c){ return a + c.length; }, 0), t0 = 0;
+    var cenas = proj.cenas.map(function(txt, i){
+      var d = (total - 0.8) * txt.length / soma; var o = {i: i, texto: txt, ini: t0, dur: d}; t0 += d; return o;
+    });
+    info("Carregando imagens…", false, 0.08);
+    var imgs = (await Promise.all(proj.imagens.map(carregarImg))).filter(Boolean);
+ 
+    var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    var g = cv.getContext("2d"), dest = ac.createMediaStreamDestination();
+    if(buf){ var sv = ac.createBufferSource(); sv.buffer = buf; sv.connect(dest); sv.start(); }
+    if(musica){
+      try{
+        var mb = await ac.decodeAudioData(await musica.arrayBuffer());
+        var sm = ac.createBufferSource(), gn = ac.createGain();
+        sm.buffer = mb; sm.loop = true; gn.gain.value = det.volumeMusica / 100;
+        sm.connect(gn); gn.connect(dest); sm.start();
+      }catch(e){ aviso += " A música não pôde ser lida."; }
+    }
+    var tipos = ["video/mp4;codecs=avc1,mp4a.40.2", "video/webm;codecs=vp9,opus", "video/webm"];
+    var mime = tipos.filter(function(t){ return window.MediaRecorder && MediaRecorder.isTypeSupported(t); })[0];
+    if(!mime){ info("Este navegador não grava vídeo. Use o Chrome ou o Edge atualizado.", true); ac.close(); return; }
+    var fluxo = new MediaStream(cv.captureStream(30).getVideoTracks().concat(dest.stream.getAudioTracks()));
+    var rec = new MediaRecorder(fluxo, {mimeType: mime, videoBitsPerSecond: 4500000}), pedacos = [];
+    rec.ondataavailable = function(e){ if(e.data.size) pedacos.push(e.data); };
+    var fim = new Promise(function(ok){ rec.onstop = ok; });
+    rec.start(500);
+    var ini = performance.now();
+    await new Promise(function(ok){
+      (function quadro(){
+        var t = (performance.now() - ini) / 1000;
+        var c = cenas.filter(function(x){ return t >= x.ini; }).pop() || cenas[0];
+        desenhar(g, W, H, proj, imgs, c, Math.min(1, Math.max(0, (t - c.ini) / c.dur)), proj.titulo);
+        info("Gravando o vídeo… mantenha esta aba aberta e visível." + aviso, false, 0.1 + 0.88 * Math.min(1, t / total));
+        if(t >= total){ ok(); return; }
+        requestAnimationFrame(quadro);
+      })();
+    });
+    rec.stop(); await fim; ac.close();
+    var tipoArq = mime.indexOf("mp4") > -1 ? "mp4" : "webm";
+    entregar(new Blob(pedacos, {type: mime.split(";")[0]}), "palavra-e-serie." + tipoArq, true);
+    info("Vídeo pronto (" + tipoArq.toUpperCase() + ", " + W + "×" + H + ")." + (tipoArq === "webm" ? " Este navegador gravou em WebM; para MP4 use o Chrome atualizado." : "") + aviso, !!aviso && !buf);
+  }
+  async function exportarAudio(det){
+    info("Gerando a voz…", false, 0.2);
+    var vb = await pedirVoz(montarProjeto(det).fala, det);
+    var ext = /mpeg|mp3/.test(vb.type) ? "mp3" : (vb.type.split("/")[1] || "audio").split(";")[0];
+    entregar(vb, "palavra-e-serie." + ext, false);
+    info("Áudio pronto (" + ext.toUpperCase() + ").");
+  }
+ 
+  /* ---------- 6. ligação com o botão EXPORTAR ---------- */
+  document.addEventListener("estudio:exportar", function(ev){
+    var d = ev.detail; d.tratado = true;
+    $("esMsg4").textContent = "";
+    var busy = painel.querySelectorAll("[data-exp]");
+    busy.forEach(function(b){ b.disabled = true; });
+    var tarefa = d.tipoArquivo === "mp3" ? exportarAudio(d) : renderizar(d);
+    tarefa.catch(function(e){ console.error(e); info(e.message || "Não foi possível exportar agora.", true); })
+      .then(function(){ busy.forEach(function(b){ b.disabled = false; }); });
+  });
+})();
+</script>
+<!-- ===== FIM: ESTÚDIO FASE 1 ===== -->
+
+
 </body>
 </html>
  
