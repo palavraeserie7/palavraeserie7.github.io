@@ -6323,10 +6323,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
 })();
 </script>
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
- Claude
-
-
-Bloco livros capitulos · HTML
+ 
 <!-- ===== INÍCIO: LIVROS POR CAPÍTULOS (9.6) =====
      Cole este bloco logo ANTES da última tag </body> (depois dos outros blocos). Não apague nada. -->
 <style>
@@ -6366,7 +6363,10 @@ body.lc-ativo #dgPadFooter,body.lc-ativo #dgLivroMenuBtn,body.lc-ativo #dgLivroA
 #lcImgBox{margin:0 0 10px;padding:12px 14px;border:1px solid var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);color:var(--ink,#2a2217)}
 #lcImgBox .lci-tit{margin:0 0 4px;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.04em}
 #lcImgBox .lci-nota{margin:0 0 10px;font:13px/1.45 "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
-#lcImgBox .lci-col{display:flex;gap:10px;align-items:flex-start}
+#lcImgBox .lci-cols{display:flex;flex-wrap:wrap;gap:14px}
+#lcImgBox .lci-col{flex:1 1 230px;display:flex;gap:10px;align-items:flex-start}
+#lcImgBox button[disabled]{opacity:.45;cursor:not-allowed}
+#lc-editor .dg-saida[disabled]{display:none!important}
 #lcImgBox .lci-mini{flex:0 0 74px;height:105px;display:flex;align-items:center;justify-content:center;text-align:center;border:1px dashed var(--brass,#a07d33);border-radius:4px;background:#fff center/cover no-repeat;color:var(--ink-soft,#6b5f48);font:11px "Segoe UI",Arial,sans-serif}
 #lcImgBox .lci-dir{display:flex;flex-direction:column;gap:6px;min-width:0}
 #lcImgBox .lci-dir b{font:700 13px "Segoe UI",Arial,sans-serif}
@@ -6401,7 +6401,7 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
 <div id="lc-editor" class="dg-editor" role="dialog" aria-modal="false" aria-labelledby="lcEtitulo">
   <div class="dg-editor-box">
     <button id="lcEfechar" class="dg-x" type="button" aria-label="Fechar">&times;</button>
-    <div class="dg-ehead"><h3 id="lcEtitulo"></h3></div>
+    <div class="dg-ehead"><h3 id="lcEtitulo"></h3><div class="dg-saidas" id="lcSaidas"></div></div>
     <p class="dg-edesc" id="lcEdesc"></p>
     <div class="dg-titulo-box lc-hide" id="lcTituloBox">
       <label id="lcTituloLbl" for="lcTituloInp">Título desta parte</label>
@@ -6518,7 +6518,7 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
   /* ---------- as partes do livro (lista fixa; o JSON confirma e completa) ---------- */
   var GRUPOS = [
     {g:"Antes do texto", itens:[
-      ["L01","Capa","Título e subtítulo; a imagem da capa é opcional."],
+      ["L01","Capa","Título, subtítulo, autor e editora."],
       ["L02","Falsa folha de rosto","Só o título do livro (opcional)."],
       ["L03","Folha de rosto","Título, subtítulo, autor e editora."],
       ["L04","Direitos autorais","Copyright e direitos de reprodução."],
@@ -7167,7 +7167,14 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
   function edAberto(){ return ed.classList.contains("aberto"); }
   function fxAberto(){ return fx.classList.contains("aberto"); }
   function botao(){ return document.querySelector('#dgTiposBox [data-tipo="9.6"]'); }
-  function container(){ return document.querySelector("#dgArea .dg-miolo"); }
+  function container(){
+    var b = botao(); if(!b) return null;
+    var cartao = document.querySelector("#dgExts .dg-ext");
+    if(!cartao) return null;
+    var c = b.parentElement;
+    while(c && !c.contains(cartao)) c = c.parentElement;
+    return c;
+  }
  
   function marca(cod){
     var inf = info(cod);
@@ -7220,12 +7227,14 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
     c.style.marginLeft = ""; c.style.marginRight = ""; c.style.maxWidth = "";
   }
   function posicionarEditor(){
-    var c = container(), W, Lf, Tp = 84, H = Math.max(300, window.innerHeight - 84 - 90);
-    if(c && window.innerWidth >= 1000 && listaAberta()){
-      var rc = c.getBoundingClientRect(), rl = lista.getBoundingClientRect();
+    var c = container(), ex = document.getElementById("dgExts"), W, Lf, Tp, H;
+    if(c && ex && window.innerWidth >= 1000 && listaAberta()){
+      var rc = c.getBoundingClientRect(), re = ex.getBoundingClientRect(), rl = lista.getBoundingClientRect();
+      Tp = re.bottom + 16; H = Math.max(300, window.innerHeight - Tp - 90);
       Lf = rc.left; W = Math.max(300, rl.left - 24 - rc.left);
     } else {
       W = Math.min(820, window.innerWidth - 24); Lf = Math.max(12, (window.innerWidth - W) / 2);
+      Tp = 84; H = Math.max(300, window.innerHeight - 84 - 90);
     }
     [ed, fx].forEach(function(el){
       el.style.left = Lf + "px"; el.style.top = Tp + "px"; el.style.width = W + "px"; el.style.height = H + "px";
@@ -7361,6 +7370,7 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
     else if(AVISOS[atual] && (inf.tipo === "auto" || inf.tipo === "rep" || inf.tipo === "img")) msg = AVISOS[atual];
     else if(inf.tipo === "fixo" && !fixoPronto(atual)) msg = "Faltam o nome do autor ou da editora, ou o texto. Clique em ALTERAR DADOS DO AUTOR E DA EDITORA e preencha.";
     else if(inf.tipo === "fixo") msg = "Texto preenchido automaticamente. Para mudar, use ALTERAR DADOS DO AUTOR E DA EDITORA.";
+    else if(atual === "L01") msg = "Autor e editora entram automaticamente (" + getFixo("autor_nome") + " · " + getFixo("editora_nome") + "). Digite só o título e o subtítulo.";
     else if(DICAS[atual]) msg = DICAS[atual];
     elAviso.textContent = msg;
     elAviso.classList.toggle("lc-hide", !msg);
@@ -7381,6 +7391,10 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
     atual = cod;
     L("lcEtitulo").textContent = it[0] + " — " + it[1];
     L("lcEdesc").textContent = it[2];
+    try{
+      var sd = normas && normas.saidas && normas.saidas[normas.saida_principal];
+      L("lcSaidas").innerHTML = '<span>SAÍDA:</span><button type="button" class="dg-saida" aria-pressed="true" title="Saída principal">● ' + esc(sd ? sd.nome : "PDF Digital A5") + '<small>ATIVA</small></button>';
+    }catch(e){}
     txt.value = "";
     elStatus.textContent = "";
     if(ehCap(cod)){
@@ -7528,24 +7542,26 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
  
   /* ---------- imagens da capa e da contracapa ---------- */
   var LARG = 1240, QUAL = 0.85, RAZAO = 148 / 210;
-  var NOMEIMG = {capa: "capa (frente)", contracapa: "contracapa (fim do livro)"};
-  function chaveImg(){ return atual === "L01" ? "capa" : (atual === "L21" ? "contracapa" : null); }
+  var NOMEIMG = {capa: "capa (frente)", contracapa: "contracapa (verso)"};
+  function chavesImg(){ return atual === "L01" ? ["capa", "contracapa"] : (atual === "L21" ? ["contracapa"] : []); }
   function desenharImg(){
-    var k = chaveImg();
-    boxImg.classList.toggle("lc-hide", !k);
-    if(!k){ boxImg.innerHTML = ""; return; }
-    var v = imagens()[k], tem = !!(v && v.d);
-    boxImg.innerHTML =
-      '<p class="lci-tit">IMAGEM DA ' + NOMEIMG[k].toUpperCase() + ' (feita no Canva)</p>' +
+    var ks = chavesImg();
+    boxImg.classList.toggle("lc-hide", !ks.length);
+    if(!ks.length){ boxImg.innerHTML = ""; return; }
+    var h = '<p class="lci-tit">' + (ks.length > 1 ? 'IMAGENS DA CAPA' : 'IMAGEM DA CONTRACAPA') + ' (feitas no Canva)</p>' +
       '<p class="lci-nota">Use PNG ou JPG no tamanho A5 (148 × 210 mm). A imagem ocupa a página inteira, sem margens.' +
-      (k === "capa" ? ' Continue digitando o título e o subtítulo abaixo: eles são usados na folha de rosto e no cabeçalho.' : '') + '</p>' +
-      '<div class="lci-col"><div class="lci-mini"' + (tem ? ' style="background-image:url(\'' + v.d + '\')"' : '') + '>' + (tem ? '' : 'sem imagem') + '</div>' +
-      '<div class="lci-dir"><b>' + NOMEIMG[k].charAt(0).toUpperCase() + NOMEIMG[k].slice(1) + '</b>' +
-      '<div class="lci-info">' + (tem ? (v.w + ' × ' + v.h + ' px · ' + Math.round(v.d.length * 0.75 / 1024) + ' KB' + (v.aviso ? ' · ' + esc(v.aviso) : '')) :
-        (k === "capa" ? 'Sem imagem: o livro usa uma capa de texto.' : 'Sem imagem: o livro termina sem contracapa.')) + '</div>' +
-      '<div class="lci-bt"><button type="button" class="at-btn" data-acao="escolher">ESCOLHER IMAGEM</button>' +
-      '<button type="button" class="at-btn" data-acao="remover"' + (tem ? '' : ' disabled') + '>REMOVER</button></div>' +
-      '<input type="file" accept="image/png,image/jpeg,image/webp" class="lc-hide" id="lcImgArq"></div></div>';
+      (ks.length > 1 ? ' Continue digitando o título e o subtítulo abaixo: eles são usados na folha de rosto e no cabeçalho.' : '') + '</p><div class="lci-cols">';
+    ks.forEach(function(k){
+      var v = imagens()[k], tem = !!(v && v.d);
+      h += '<div class="lci-col"><div class="lci-mini"' + (tem ? ' style="background-image:url(\'' + v.d + '\')"' : '') + '>' + (tem ? '' : 'sem imagem') + '</div>' +
+        '<div class="lci-dir"><b>' + NOMEIMG[k].charAt(0).toUpperCase() + NOMEIMG[k].slice(1) + '</b>' +
+        '<div class="lci-info">' + (tem ? (v.w + ' × ' + v.h + ' px · ' + Math.round(v.d.length * 0.75 / 1024) + ' KB' + (v.aviso ? ' · ' + esc(v.aviso) : '')) :
+          (k === "capa" ? 'Sem imagem: o livro usa uma capa de texto.' : 'Sem imagem: o livro termina sem contracapa.')) + '</div>' +
+        '<div class="lci-bt"><button type="button" class="at-btn" data-k="' + k + '" data-acao="escolher">ESCOLHER IMAGEM</button>' +
+        '<button type="button" class="at-btn" data-k="' + k + '" data-acao="remover"' + (tem ? '' : ' disabled') + '>REMOVER</button></div>' +
+        '<input type="file" accept="image/png,image/jpeg,image/webp" class="lc-hide" id="lcImgArq_' + k + '"></div></div>';
+    });
+    boxImg.innerHTML = h + '</div>';
   }
   function processarImg(k, file){
     if(!file) return;
@@ -7571,8 +7587,8 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
   }
   boxImg.addEventListener("click", function(ev){
     var b = ev.target.closest && ev.target.closest("button"); if(!b) return;
-    var k = chaveImg(); if(!k) return;
-    if(b.dataset.acao === "escolher"){ var f = L("lcImgArq"); if(f) f.click(); return; }
+    var k = b.dataset.k; if(!k) return;
+    if(b.dataset.acao === "escolher"){ var f = L("lcImgArq_" + k); if(f) f.click(); return; }
     if(b.dataset.acao === "remover"){
       if(!confirm("Remover a imagem da " + NOMEIMG[k] + "?")) return;
       var im = imagens(); delete im[k]; gravar(K_IMG, im);
@@ -7580,9 +7596,9 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
     }
   });
   boxImg.addEventListener("change", function(ev){
-    var inp = ev.target; if(!inp || inp.id !== "lcImgArq") return;
-    var k = chaveImg(), f = inp.files && inp.files[0];
-    if(f && k){
+    var inp = ev.target; if(!inp || !/^lcImgArq_/.test(inp.id || "")) return;
+    var k = inp.id.replace("lcImgArq_", ""), f = inp.files && inp.files[0];
+    if(f && NOMEIMG[k]){
       var im = imagens();
       if(im[k] && im[k].d && !confirm("Já existe uma imagem da " + NOMEIMG[k] + ". Substituir pela nova?")){ inp.value = ""; return; }
       processarImg(k, f);
