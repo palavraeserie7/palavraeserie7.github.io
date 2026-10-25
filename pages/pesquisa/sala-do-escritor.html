@@ -7782,6 +7782,215 @@ body.lc-livro-vivo #lcPrevia .lcp-nota{display:none}
 </script>
 <!-- ===== FIM: LIVROS POR CAPÍTULOS (9.6) ===== -->
 
+<!-- ===== INÍCIO: ENVIAR PARA A ESTANTE ===== -->
+<style>
+#estEnviarBtn[hidden]{display:none!important}
+#estDlg{display:none;position:fixed;inset:0;z-index:100100;background:rgba(20,16,8,.55);align-items:center;justify-content:center;padding:16px}
+#estDlg.on{display:flex}
+#estDlg .eb{width:min(540px,100%);max-height:92vh;overflow:auto;padding:20px 22px;border:2px solid var(--brass,#a07d33);border-radius:10px;background:var(--paper-card,#fffdf6);color:var(--ink,#2a2217);font-family:Georgia,"Times New Roman",serif;box-shadow:0 12px 30px rgba(30,22,10,.35)}
+#estDlg h3{margin:0 0 2px;font:600 20px Georgia,serif}
+#estDlg .sub{margin:0 0 12px;color:var(--ink-soft,#6b5f48);font:13px/1.45 "Segoe UI",Arial,sans-serif}
+#estDlg .via{display:flex;gap:12px;align-items:flex-start;margin:0 0 12px;padding:10px 12px;border:1px dashed var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);font:12.5px/1.45 "Segoe UI",Arial,sans-serif}
+#estDlg .via img{width:56px;height:80px;object-fit:cover;border:1px solid #c9b88f;border-radius:3px;background:#fff}
+#estDlg label{display:grid;gap:4px;margin:0 0 10px;font:700 11px "Segoe UI",Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft,#6b5f48)}
+#estDlg input,#estDlg select,#estDlg textarea{width:100%;box-sizing:border-box;padding:8px 9px;border:1px solid var(--paper-line,#e3d8bd);border-radius:6px;background:#fff;color:var(--ink,#2a2217);font:14px "Segoe UI",Arial,sans-serif;text-transform:none;letter-spacing:0;font-weight:400}
+#estDlg textarea{min-height:64px;resize:vertical}
+#estDlg .bt{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:12px}
+#estDlg .st{margin:8px 0 0;min-height:18px;font:13px "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
+#estDlg .st a{color:var(--brass-deep,#7d5f1e);font-weight:700}
+#estEspera{display:none;position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:100110;padding:10px 16px;border:2px solid var(--brass,#a07d33);border-radius:8px;background:var(--paper-card,#fffdf6);color:var(--ink,#2a2217);font:600 13px "Segoe UI",Arial,sans-serif;box-shadow:0 8px 20px rgba(30,22,10,.3)}
+#estEspera.on{display:block}
+</style>
+ 
+<div id="estEspera" role="status">Preparando o livro para enviar…</div>
+<div id="estDlg" role="dialog" aria-modal="true" aria-labelledby="estTit">
+  <div class="eb">
+    <h3 id="estTit">Enviar para a estante</h3>
+    <p class="sub" id="estSub"></p>
+    <div class="via"><img id="estCapa" alt="" hidden><div id="estResumo"></div></div>
+    <label>Título do livro<input id="estTitulo" type="text"></label>
+    <label>Autor<input id="estAutor" type="text"></label>
+    <label>Acesso na estante
+      <select id="estAcesso">
+        <option value="free">GRÁTIS — qualquer leitor</option>
+        <option value="pro">PAGO — plano PRO ou superior</option>
+        <option value="master">PAGO — plano MASTER ou superior</option>
+        <option value="doctus">PAGO — plano DOCTUS</option>
+      </select>
+    </label>
+    <label>Preço (opcional, só para mostrar)<input id="estPreco" type="text" placeholder="Ex.: R$ 19,90"></label>
+    <label>Link de compra (opcional)<input id="estUrl" type="url" placeholder="https://..."></label>
+    <label>Descrição curta<textarea id="estDesc" placeholder="Duas ou três linhas sobre o livro."></textarea></label>
+    <p class="st" id="estSt" role="status"></p>
+    <div class="bt">
+      <button id="estCancelar" class="at-btn" type="button">CANCELAR</button>
+      <button id="estEnviar" class="at-btn gold" type="button">ENVIAR PARA A ESTANTE</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+(function(){
+  "use strict";
+  var DBN = "ps_estante_db";
+  var NOMES = {"4.1":"Devocionais diários", "9.6":"Livros por capítulos"};
+  var GEN = {"4.1":"4 Devocionais e espiritualidade", "9.6":"9 Livros e e-books"};
+  var $ = function(id){ return document.getElementById(id); };
+  function ler(k){ try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } }
+  function esc(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+ 
+  /* qual livro está aberto no Diagramador: 9.6 ou 4.1 */
+  function ativo(){
+    if(document.body.classList.contains("lc-ativo") && $("lcAbrir")){
+      return {tipo:"9.6", abrir:"lcAbrir", frame:"lcFrame", info:"lcpInfo", imgs:"ps_lc_imagens", partes:"ps_lc_partes", capa:"L01"};
+    }
+    var r = $("dgResumo"), tx = r ? r.textContent : "";
+    if(/\b4\.1\b/.test(tx) && $("dgLivroAbrir")){
+      return {tipo:"4.1", abrir:"dgLivroAbrir", frame:"dgpFrame", info:"dgpInfo", imgs:"ps_diagramador_imagens", partes:"ps_diagramador_partes", capa:"D01"};
+    }
+    return null;
+  }
+ 
+  /* botão no rodapé do Diagramador, antes de LIMPAR ESCOLHA */
+  var btn = document.createElement("button");
+  btn.id = "estEnviarBtn"; btn.type = "button"; btn.className = "at-btn"; btn.textContent = "ENVIAR PARA A ESTANTE"; btn.hidden = true;
+  var ref = $("dgLimpar");
+  if(ref) ref.insertAdjacentElement("beforebegin", btn); else document.body.appendChild(btn);
+  setInterval(function(){
+    var tela = $("dgTela");
+    btn.hidden = !(tela && !tela.hidden && ativo());
+  }, 600);
+ 
+  /* banco compartilhado com a Estante */
+  function abrirDB(){
+    return new Promise(function(ok, er){
+      if(!window.indexedDB){ er(new Error("sem indexedDB")); return; }
+      var r = indexedDB.open(DBN, 1);
+      r.onupgradeneeded = function(){
+        var d = r.result;
+        if(!d.objectStoreNames.contains("livros")) d.createObjectStore("livros", {keyPath:"id"});
+        if(!d.objectStoreNames.contains("conteudo")) d.createObjectStore("conteudo", {keyPath:"id"});
+      };
+      r.onsuccess = function(){ ok(r.result); }; r.onerror = function(){ er(r.error); };
+    });
+  }
+  function todos(){
+    return abrirDB().then(function(db){ return new Promise(function(ok, er){
+      var q = db.transaction("livros", "readonly").objectStore("livros").getAll();
+      q.onsuccess = function(){ ok(q.result || []); }; q.onerror = function(){ er(q.error); };
+    }); });
+  }
+  function gravar(meta, html){
+    return abrirDB().then(function(db){ return new Promise(function(ok, er){
+      var t = db.transaction(["livros", "conteudo"], "readwrite");
+      t.objectStore("livros").put(meta); t.objectStore("conteudo").put({id: meta.id, html: html});
+      t.oncomplete = function(){ ok(); }; t.onerror = function(){ er(t.error); }; t.onabort = function(){ er(t.error); };
+    }); });
+  }
+ 
+  /* miniatura da capa (pequena, só para o cartão da estante) */
+  function miniatura(src){
+    return new Promise(function(ok){
+      if(!src){ ok(""); return; }
+      var im = new Image();
+      im.onload = function(){
+        var w = 360, h = Math.round(im.naturalHeight * w / im.naturalWidth);
+        var c = document.createElement("canvas"); c.width = w; c.height = h;
+        var g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, w, h); g.drawImage(im, 0, 0, w, h);
+        try{ ok(c.toDataURL("image/jpeg", 0.8)); }catch(e){ ok(""); }
+      };
+      im.onerror = function(){ ok(""); }; im.src = src;
+    });
+  }
+  function fixo(k){ var f = ler("ps_diagramador_fixos"); return typeof f[k] === "string" ? f[k] : ""; }
+ 
+  var A = null, HTMLLIVRO = "", PAGS = 0, CAPA = "";
+  function espera(on){ $("estEspera").classList.toggle("on", !!on); }
+ 
+  /* espera o livro ficar pronto na prévia (abre o livro se precisar) */
+  function prepararLivro(a){
+    return new Promise(function(ok, er){
+      var fr = $(a.frame), info = $(a.info);
+      $(a.abrir).click();
+      var t0 = Date.now();
+      (function ver(){
+        var sd = fr && fr.srcdoc ? fr.srcdoc : "", tx = info ? info.textContent : "";
+        var m = /Total:\s*(\d+)/.exec(tx);
+        if(sd.length > 500 && m && Date.now() - t0 > 700){ ok({html: sd, pags: Number(m[1])}); return; }
+        if(Date.now() - t0 > 20000){ er(new Error("tempo")); return; }
+        setTimeout(ver, 250);
+      })();
+    });
+  }
+ 
+  btn.addEventListener("click", function(){
+    var a = ativo();
+    if(!a){ alert("Escolha 4.1 Devocionais diários ou 9.6 Livros por capítulos para enviar."); return; }
+    A = a; espera(true);
+    prepararLivro(a).then(function(r){
+      HTMLLIVRO = r.html; PAGS = r.pags;
+      var im = ler(a.imgs), capa = im.capa && im.capa.d ? im.capa.d : "";
+      return miniatura(capa).then(function(th){ CAPA = th; });
+    }).then(function(){
+      espera(false);
+      var parte = ler(a.partes)[a.capa], tit = typeof parte === "string" ? parte.split(/\r?\n/)[0].trim() : "";
+      $("estSub").textContent = GEN[a.tipo] + "  ›  " + a.tipo + " " + NOMES[a.tipo];
+      $("estTitulo").value = tit; $("estAutor").value = fixo("autor_nome") || "";
+      $("estAcesso").value = "free"; $("estPreco").value = ""; $("estUrl").value = ""; $("estDesc").value = "";
+      $("estResumo").innerHTML = "<b>" + PAGS + " páginas</b><br>" + (CAPA ? "Capa em imagem incluída." : "Sem imagem de capa (a estante usa uma capa de texto).") +
+        "<br><span style='color:#6b5f48'>O livro será enviado como está agora, para leitura.</span>";
+      var ci = $("estCapa"); if(CAPA){ ci.src = CAPA; ci.hidden = false; } else { ci.hidden = true; ci.removeAttribute("src"); }
+      $("estSt").textContent = ""; $("estEnviar").disabled = false;
+      $("estDlg").classList.add("on");
+      if(!$("estAutor").value){
+        fetch("tipografia-devocional-a5.json", {cache:"no-cache"}).then(function(r){ return r.json(); }).then(function(j){
+          var c = j && j.conteudo_fixo && j.conteudo_fixo.campos; if(c && c.autor_nome && !$("estAutor").value) $("estAutor").value = c.autor_nome;
+        }).catch(function(){});
+      }
+      if(!tit) setTimeout(function(){ $("estTitulo").focus(); }, 50);
+    }).catch(function(){
+      espera(false);
+      alert("Não foi possível preparar o livro. Confira se o livro abre em ABRIR LIVRO (precisa de internet para paginar) e tente de novo.");
+    });
+  });
+ 
+  function fechar(){ $("estDlg").classList.remove("on"); A = null; HTMLLIVRO = ""; }
+  $("estCancelar").addEventListener("click", fechar);
+  document.addEventListener("keydown", function(ev){ if(ev.key === "Escape" && $("estDlg").classList.contains("on")) fechar(); });
+ 
+  $("estEnviar").addEventListener("click", function(){
+    if(!A || !HTMLLIVRO) return;
+    var titulo = $("estTitulo").value.trim();
+    if(!titulo){ alert("Escreva o título do livro."); $("estTitulo").focus(); return; }
+    var acesso = $("estAcesso").value, tipo = A.tipo;
+    todos().then(function(lista){
+      var igual = lista.filter(function(m){ return m.tipo === tipo && String(m.titulo).toLowerCase() === titulo.toLowerCase(); })[0];
+      if(igual && !confirm("Já existe “" + igual.titulo + "” na estante (" + tipo + ").\n\nSUBSTITUIR pelo livro de agora? O acesso e o preço serão atualizados.")) return null;
+      if(!confirm("Enviar “" + titulo + "” para a estante?\n\nPrateleira: " + tipo + " " + NOMES[tipo] + "\nAcesso: " + $("estAcesso").selectedOptions[0].textContent + "\nPáginas: " + PAGS)) return null;
+      var agora = Date.now();
+      var meta = {
+        id: igual ? igual.id : "lv-" + agora.toString(36) + "-" + Math.random().toString(36).slice(2, 7),
+        titulo: titulo, autor: $("estAutor").value.trim(), tipo: tipo, acesso: acesso,
+        preco: $("estPreco").value.trim(), url: $("estUrl").value.trim(), descricao: $("estDesc").value.trim(),
+        capa: CAPA, paginas: PAGS, criado: igual ? igual.criado : agora, atualizado: agora, origem: "diagramador"
+      };
+      return gravar(meta, HTMLLIVRO).then(function(){ return true; });
+    }).then(function(feito){
+      if(!feito) return;
+      $("estSt").innerHTML = "✓ Livro enviado. <a href=\"estante.html\" target=\"_blank\" rel=\"noopener\">Abrir a Estante ↗</a> (aba MEUS LIVROS).";
+      $("estEnviar").disabled = true;
+      setTimeout(function(){ HTMLLIVRO = ""; }, 0);
+    }).catch(function(e){
+      $("estSt").textContent = "Não foi possível guardar o livro no navegador (pouco espaço ou modo privado). Tente novamente.";
+    });
+  });
+})();
+</script>
+<!-- ===== FIM: ENVIAR PARA A ESTANTE ===== -->
+ 
+
+
+
                                                      <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
  
