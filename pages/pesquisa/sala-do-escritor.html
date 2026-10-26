@@ -7813,6 +7813,10 @@ st.versoes.unshift({
     .observe(painel, {attributes:true, attributeFilter:["data-fase"]});
  
   /* ---------- início: carrega a biblioteca e aproveita o rascunho antigo ---------- */
+  /* a tela começa limpa: o rascunho antigo do "Fluxo do projeto" não preenche mais os campos;
+     o conteúdo só volta pela biblioteca (ABRIR) */
+  mudo = true;
+  try{ zerar(); }finally{ mudo = false; }
   lista = ler();
   if(!lista.length){
     try{
@@ -7820,17 +7824,18 @@ st.versoes.unshift({
       if(o && o.campos && String(o.campos.esTexto || "").trim()){
         var p0 = {id:novoId(), nome:String(o.campos.esTitulo || "").trim() || "Rascunho anterior", tipo:o.modo || "redes",
           criado:Date.now(), atualizado:Date.now(), dados:{modo:o.modo || "redes", campos:o.campos, cenas:null, destinos:null, tipoTexto:null}};
-        lista.push(p0); atual = p0.id; $("e1Nome").value = p0.nome; gravar();
-        msg("Seu rascunho anterior foi guardado como projeto.");
+        lista.push(p0); gravar();
+        msg("Seu rascunho anterior foi guardado como projeto. Clique em ABRIR para continuar.");
       }
     }catch(e){}
   }
-  limparVazios(atual);
-  if(atual && !achar(atual)) atual = null;
+  limparVazios(null);
   desenhar();
 })();
 </script>
 <!-- ===== FIM: ESTÚDIO ETAPA 1 — PROJETOS ===== -->
+
+
 
 </body>
 </html>
