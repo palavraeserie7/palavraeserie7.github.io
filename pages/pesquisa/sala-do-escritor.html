@@ -7835,7 +7835,150 @@ st.versoes.unshift({
 </script>
 <!-- ===== FIM: ESTÚDIO ETAPA 1 — PROJETOS ===== -->
 
+<!-- ===== INÍCIO: TIPO DE TEXTO MANUAL (BÍBLIA OU COLAR) ===== -->
+<style>
+#esPainel .f3-ia, #esPainel [data-ia], #esPainel .a1-res{display:none!important}
+.f3-guia{border:1px dashed var(--brass);border-radius:8px;background:#fffdf6;color:var(--ink);padding:14px;margin:0 0 12px;display:flex;flex-direction:column;gap:10px}
+.f3-guia p{margin:0;font:14px/1.5 "Segoe UI",Arial,sans-serif}
+.f3-guia strong{font:600 16px Georgia,serif}
+.f3-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.f3-linha label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.f3-linha select,.f3-linha input{padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+.f3-linha input{width:90px}
+.f3-guia[hidden],.f3-linha[hidden]{display:none!important}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel");
+  if(!painel || !$("esTipos") || !$("esTexto")) return;
+  var txt = $("esTexto");
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim(); };
 
+  /* 1. IA desligada */
+  function esconderIA(){
+    painel.querySelectorAll("button").forEach(function(b){
+      var t = b.textContent.trim().toUpperCase();
+      if(b.hasAttribute("data-ia") || /COM IA$/.test(t) || t === "AUMENTAR A DURAÇÃO" || t === "ADAPTAR O TOM" || t.indexOf("REESCREVER") === 0)
+        b.classList.add("f3-ia");
+    });
+  }
+  document.addEventListener("estudio:ia", function(ev){ ev.stopImmediatePropagation(); ev.detail.tratado = true; }, true);
+  esconderIA();
+  painel.addEventListener("click", function(){ setTimeout(esconderIA, 0); });
+
+  function msg(t, erro){ var m = $("esMsg1"); if(!m) return; m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); }
+  function pôr(t){ txt.value = t; txt.dispatchEvent(new Event("input", {bubbles:true})); }
+
+  /* 2. painel de orientação */
+  var guia = document.createElement("section");
+  guia.className = "f3-guia"; guia.id = "f3Guia";
+  guia.innerHTML =
+    '<strong id="f3Tit"></strong><p id="f3Dica"></p>' +
+    '<div class="f3-linha" id="f3Biblia" hidden>' +
+      '<label>Livro<select id="f3Livro"></select></label>' +
+      '<label>Capítulo<select id="f3Cap"></select></label>' +
+      '<label>Do versículo (opcional)<input id="f3De" type="number" min="1"></label>' +
+      '<label>Até o versículo<input id="f3Ate" type="number" min="1"></label>' +
+      '<button type="button" class="at-btn gold" id="f3Trazer">TRAZER DA BÍBLIA</button>' +
+    '</div>' +
+    '<div class="f3-linha" id="f3Colar" hidden>' +
+      '<button type="button" class="at-btn gold" id="f3ColarBtn">COLAR DA ÁREA DE TRANSFERÊNCIA</button>' +
+    '</div>';
+  $("esTitulo").insertAdjacentElement("beforebegin", guia);
+
+  var MODOS = {
+    "Salmo": {t:"Salmo: selecione na Bíblia", d:"Escolha o capítulo do Salmo (e, se quiser, os versículos) e clique em TRAZER DA BÍBLIA.", biblia:true, travaSalmos:true, ph:"O salmo escolhido aparece aqui."},
+    "Texto espiritual original": {t:"Texto espiritual original: selecione na Bíblia", d:"Escolha o livro, o capítulo e os versículos e clique em TRAZER DA BÍBLIA.", biblia:true, ph:"A passagem escolhida aparece aqui."},
+    "Oração": {t:"Oração: copie e cole", d:"Copie a oração de qualquer lugar e cole aqui (Ctrl+V) ou use o botão abaixo.", colar:true, ph:"Cole aqui a oração."},
+    "Mensagem de Deus": {t:"Mensagem de Deus: copie e cole", d:"Copie a mensagem de qualquer lugar e cole aqui (Ctrl+V) ou use o botão abaixo.", colar:true, ph:"Cole aqui a mensagem."},
+    "Reflexão bíblica": {t:"Reflexão bíblica: copie e cole", d:"Copie a reflexão de qualquer lugar e cole aqui (Ctrl+V) ou use o botão abaixo.", colar:true, ph:"Cole aqui a reflexão."}
+  };
+
+  /* 3. seletor de Bíblia: livro, capítulo, versículos */
+  var iSalmos = -1;
+  function livros(){
+    var s = $("f3Livro");
+    if(s.options.length || typeof BOOKS === "undefined") return;
+    BOOKS.forEach(function(b, i){
+      var o = document.createElement("option"); o.value = i; o.textContent = b[1]; s.appendChild(o);
+      if(norm(b[1]) === "salmos") iSalmos = i;
+    });
+  }
+  async function capitulos(){
+    var s = $("f3Cap"), idx = Number($("f3Livro").value);
+    s.innerHTML = '<option>Carregando…</option>';
+    try{
+      await loadPortuguese();
+      var n = portugueseBible[idx].chapters.length;
+      s.innerHTML = "";
+      for(var i = 1; i <= n; i++){ var o = document.createElement("option"); o.value = i; o.textContent = i; s.appendChild(o); }
+      limitesVersiculos();
+    }catch(e){ s.innerHTML = '<option value="1">1</option>'; }
+  }
+  function limitesVersiculos(){
+    try{
+      var v = portugueseBible[Number($("f3Livro").value)].chapters[Number($("f3Cap").value) - 1].length;
+      $("f3De").max = v; $("f3Ate").max = v;
+      $("f3De").placeholder = "1"; $("f3Ate").placeholder = String(v);
+    }catch(e){}
+  }
+  $("f3Livro").addEventListener("change", function(){ $("f3De").value = ""; $("f3Ate").value = ""; capitulos(); });
+  $("f3Cap").addEventListener("change", function(){ $("f3De").value = ""; $("f3Ate").value = ""; limitesVersiculos(); });
+
+  function atualizar(){
+    var b = document.querySelector('#esTipos [aria-pressed="true"]');
+    var m = b ? MODOS[b.dataset.t] : null;
+    if(!m){ guia.hidden = true; return; }
+    guia.hidden = false;
+    $("f3Tit").textContent = m.t; $("f3Dica").textContent = m.d;
+    $("f3Biblia").hidden = !m.biblia; $("f3Colar").hidden = !m.colar;
+    txt.placeholder = m.ph;
+    if(m.biblia){
+      livros();
+      var s = $("f3Livro");
+      if(m.travaSalmos && iSalmos > -1){
+        if(Number(s.value) !== iSalmos || !s.disabled){ s.value = iSalmos; capitulos(); }
+        s.disabled = true;
+      }else{
+        var estavaTravado = s.disabled; s.disabled = false;
+        if(!$("f3Cap").options.length || estavaTravado) capitulos();
+      }
+    }
+  }
+  $("esTipos").addEventListener("click", function(ev){
+    if(!ev.target.closest("[data-t]")) return;
+    setTimeout(function(){ atualizar(); txt.focus({preventScroll:true}); }, 0);
+  });
+  new MutationObserver(atualizar).observe($("esTipos"), {subtree:true, attributes:true, attributeFilter:["aria-pressed"], childList:true});
+
+  /* 4. trazer da Bíblia: reaproveita o BUSCAR PASSAGEM que já existe */
+  $("f3Trazer").addEventListener("click", function(){
+    var nome = $("f3Livro").options[$("f3Livro").selectedIndex];
+    var cap = $("f3Cap").value, de = $("f3De").value.trim(), ate = $("f3Ate").value.trim();
+    if(!nome || !cap){ msg("Escolha o livro e o capítulo.", true); return; }
+    var ref = nome.textContent + " " + cap + (de ? ":" + de + (ate ? "-" + ate : "") : "");
+    $("esAssunto").value = ref;
+    var b = $("a1Buscar");
+    if(!b){ msg("A busca de passagem não está disponível.", true); return; }
+    b.click();
+  });
+
+  /* 5. colar */
+  $("f3ColarBtn").addEventListener("click", function(){
+    if(!navigator.clipboard || !navigator.clipboard.readText){ msg("Clique na caixa do texto e use Ctrl+V.", true); txt.focus(); return; }
+    navigator.clipboard.readText().then(function(c){
+      c = (c || "").trim();
+      if(!c){ msg("A área de transferência está vazia.", true); return; }
+      if(txt.value.trim() && !window.confirm("Substituir o texto atual pelo que você copiou?")) return;
+      pôr(c); msg("Texto colado.");
+    }).catch(function(){ msg("O navegador não deixou ler a área de transferência. Clique na caixa e use Ctrl+V.", true); txt.focus(); });
+  });
+
+  atualizar();
+})();
+</script>
+<!-- ===== FIM: TIPO DE TEXTO MANUAL (BÍBLIA OU COLAR) ===== -->
 
 </body>
 </html>
