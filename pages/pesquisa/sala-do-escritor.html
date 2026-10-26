@@ -7537,6 +7537,278 @@ st.versoes.unshift({
 </script>
 <!-- ===== FIM: ESTÚDIO FASE 2 ===== -->
 
+<!-- ===== INÍCIO: ESTÚDIO ETAPA 1 — PROJETOS (BIBLIOTECA "MEUS PROJETOS") =====-->
+<style>
+#e1Biblioteca{margin:14px 0;border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink)}
+#esPainel[data-fase="escolha"] > details#e1Biblioteca{display:block!important}
+#e1Biblioteca > summary{cursor:pointer;padding:14px 18px;font:600 18px Georgia,"Times New Roman",serif;list-style:none}
+#e1Biblioteca > summary::-webkit-details-marker{display:none}
+#e1Biblioteca > summary::after{content:"▾";float:right;color:var(--brass-deep);transition:transform .2s}
+#e1Biblioteca:not([open]) > summary::after{transform:rotate(-90deg)}
+#e1Biblioteca .e1-corpo{padding:0 18px 18px;display:flex;flex-direction:column;gap:12px}
+#e1Biblioteca .e1-atual{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+#e1Biblioteca label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#e1Biblioteca .e1-atual label{flex:1 1 240px}
+#e1Biblioteca input,#e1Biblioteca select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#e1Biblioteca .e1-botoes{display:flex;gap:8px;flex-wrap:wrap}
+#e1Biblioteca .e1-filtro{max-width:260px}
+#e1Biblioteca .e1-msg{margin:0;min-height:1.3em;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#e1Biblioteca .e1-msg.erro{color:#a14747}
+#e1Biblioteca .e1-lista{display:flex;flex-direction:column;gap:8px}
+#e1Biblioteca .e1-item{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--paper-line);border-radius:7px;background:#fffdf6}
+#e1Biblioteca .e1-item.atual{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
+#e1Biblioteca .e1-info{flex:1 1 220px;min-width:0}
+#e1Biblioteca .e1-info strong{display:block;font:600 16px Georgia,serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#e1Biblioteca .e1-info small{font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#e1Biblioteca .e1-acoes{display:flex;gap:6px;flex-wrap:wrap}
+#e1Biblioteca .e1-vazio{margin:0;font:13.5px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel");
+  if(!painel || !$("f2Escolha") || !$("f2Barra") || !$("esTexto")) return;
+ 
+  var CHAVE = "ps_projetos_v1";
+  var NOMES = {redes:"Vídeos e mensagens", filme:"Filmes bíblicos", musica:"Louvores e letras", cortes:"Cortes"};
+  var CENAS_PADRAO = [
+    {titulo:"Apresentação da história", descricao:"Apresente o contexto bíblico e os personagens principais."},
+    {titulo:"O conflito", descricao:"Mostre o desafio central da narrativa."},
+    {titulo:"Desfecho e mensagem", descricao:"Conclua a história e destaque a mensagem espiritual."}
+  ];
+  var lista = [], atual = null, mudo = false, abrindo = false, timer = null;
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+ 
+  /* ---------- interface ---------- */
+  var sec = document.createElement("details");
+  sec.id = "e1Biblioteca"; sec.open = true;
+  sec.innerHTML =
+    '<summary><span id="e1Resumo">Meus projetos</span></summary>' +
+    '<div class="e1-corpo">' +
+      '<div class="e1-atual">' +
+        '<label>Projeto atual<input id="e1Nome" type="text" placeholder="Nome do projeto (opcional)"></label>' +
+        '<div class="e1-botoes">' +
+          '<button type="button" class="at-btn gold" id="e1Salvar">SALVAR PROJETO</button>' +
+          '<button type="button" class="at-btn" id="e1Novo">NOVO PROJETO</button>' +
+        '</div>' +
+      '</div>' +
+      '<p class="e1-msg" id="e1Msg" role="status"></p>' +
+      '<label class="e1-filtro">Mostrar<select id="e1Filtro"><option value="">Todos os tipos</option>' +
+        Object.keys(NOMES).map(function(k){ return '<option value="'+k+'">'+NOMES[k]+'</option>'; }).join("") +
+      '</select></label>' +
+      '<div id="e1Lista" class="e1-lista"></div>' +
+    '</div>';
+  $("f2Barra").insertAdjacentElement("afterend", sec);
+ 
+  function msg(t, erro){ var m = $("e1Msg"); m.textContent = t || ""; m.className = "e1-msg" + (erro ? " erro" : ""); }
+ 
+  /* ---------- armazenamento ---------- */
+  function ler(){
+    try{ var o = JSON.parse(localStorage.getItem(CHAVE) || "null"); return o && Array.isArray(o.lista) ? o.lista : []; }
+    catch(e){ return []; }
+  }
+  function gravar(){
+    try{ localStorage.setItem(CHAVE, JSON.stringify({versao:1, lista:lista})); return true; }
+    catch(e){ msg("Não foi possível guardar neste navegador. Verifique o armazenamento disponível.", true); return false; }
+  }
+  function achar(id){ for(var i = 0; i < lista.length; i++){ if(lista[i].id === id) return lista[i]; } return null; }
+  function novoId(){ return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+ 
+  /* ---------- foto do projeto (o que é guardado) ---------- */
+  function campos(){
+    return Array.prototype.filter.call(painel.querySelectorAll("input,select,textarea"), function(el){
+      return el.id && el.type !== "file" && el.type !== "button" && !el.closest("#e1Biblioteca");
+    });
+  }
+  function snapshot(){
+    var c = {};
+    campos().forEach(function(el){ c[el.id] = (el.type === "checkbox" || el.type === "radio") ? el.checked : el.value; });
+    var cenas = Array.prototype.map.call(document.querySelectorAll("#esFilmeCenas .es-cena"), function(x){
+      return {titulo:x.querySelector(".es-cena-titulo").value, descricao:x.querySelector(".es-cena-desc").value};
+    });
+    var destinos = Array.prototype.map.call(document.querySelectorAll("#esDest input:checked"), function(i){ return i.value; });
+    var tt = document.querySelector('#esTipos [aria-pressed="true"]');
+    return {modo: painel.getAttribute("data-modo-ativo") || "redes", campos:c, cenas:cenas, destinos:destinos, tipoTexto: tt ? tt.dataset.t : null};
+  }
+  function autoNome(d){
+    var c = d.campos || {};
+    return (c.esTitulo || "").trim() || (c.esFilmeHistoria || "").trim() || (c.esMusTema || "").trim() || "Projeto sem título";
+  }
+ 
+  /* ---------- zerar e aplicar ---------- */
+  function trocarCenas(arr){
+    Array.prototype.forEach.call(document.querySelectorAll("#esFilmeCenas .es-cena-remover"), function(b){ b.click(); });
+    var add = $("esFilmeAddCena");
+    arr.forEach(function(){ add.click(); });
+    var cards = document.querySelectorAll("#esFilmeCenas .es-cena");
+    arr.forEach(function(c, i){
+      if(!cards[i]) return;
+      cards[i].querySelector(".es-cena-titulo").value = c.titulo || "";
+      cards[i].querySelector(".es-cena-desc").value = c.descricao || "";
+    });
+  }
+  function zerar(){
+    campos().forEach(function(el){
+      if(el.tagName === "SELECT"){ Array.prototype.forEach.call(el.options, function(o){ o.selected = o.defaultSelected; }); }
+      else if(el.type === "checkbox" || el.type === "radio"){ el.checked = el.defaultChecked; }
+      else el.value = el.defaultValue;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("#esDest input"), function(i){ i.checked = true; });
+    trocarCenas(CENAS_PADRAO);
+    var b; while((b = document.querySelector("#esFotos [data-f]"))) b.click();      /* imagens não são guardadas */
+    var m = $("esMusica");
+    if(m && m.value){ m.value = ""; m.dispatchEvent(new Event("change", {bubbles:true})); }
+    var t0 = document.querySelector("#esTipos [data-t]"); if(t0) t0.click();
+    $("esTexto").dispatchEvent(new Event("input", {bubbles:true}));
+  }
+  function aplicar(d){
+    zerar();
+    var c = d.campos || {};
+    Object.keys(c).forEach(function(id){
+      if(id === "esMusica") return;                                                 /* arquivo de música não é guardado */
+      var el = $(id);
+      if(!el || el.type === "file" || el.closest("#e1Biblioteca")) return;
+      if(el.type === "checkbox" || el.type === "radio") el.checked = !!c[id];
+      else if(c[id] != null) el.value = c[id];
+    });
+    $("esTexto").dispatchEvent(new Event("input", {bubbles:true}));
+    if(Array.isArray(d.destinos)){
+      Array.prototype.forEach.call(document.querySelectorAll("#esDest input"), function(i){ i.checked = d.destinos.indexOf(i.value) > -1; });
+    }
+    if(Array.isArray(d.cenas)) trocarCenas(d.cenas);
+    if(d.tipoTexto){
+      Array.prototype.forEach.call(document.querySelectorAll("#esTipos [data-t]"), function(b){ if(b.dataset.t === d.tipoTexto) b.click(); });
+    }
+  }
+ 
+  /* ---------- operações ---------- */
+  function salvar(){
+    if(!atual) return;
+    var p = achar(atual); if(!p) return;
+    var d = snapshot(), n = $("e1Nome").value.trim();
+    p.dados = d; p.tipo = d.modo; p.nome = n || autoNome(d); p.atualizado = Date.now();
+    if(gravar()) desenhar();
+  }
+  function criar(){
+    var d = snapshot(), n = $("e1Nome").value.trim();
+    var p = {id:novoId(), nome:n || autoNome(d), tipo:d.modo, criado:Date.now(), atualizado:Date.now(), dados:d};
+    lista.unshift(p); atual = p.id;
+    gravar(); desenhar(); return p;
+  }
+  function descarregar(){ if(timer){ clearTimeout(timer); timer = null; salvar(); } }
+  function agendar(){
+    if(mudo || !atual) return;
+    clearTimeout(timer);
+    timer = setTimeout(function(){ timer = null; salvar(); }, 700);
+  }
+  function abrir(id){
+    var p = achar(id); if(!p) return;
+    descarregar();
+    mudo = true; abrindo = true;
+    try{
+      var card = document.querySelector('#f2Escolha [data-m="' + p.tipo + '"]');
+      if(card) card.click();
+      aplicar(p.dados || {});
+      atual = p.id; $("e1Nome").value = p.nome;
+    }finally{ mudo = false; abrindo = false; }
+    desenhar();
+    msg("Projeto \u201C" + p.nome + "\u201D aberto. Imagens e música enviadas precisam ser escolhidas de novo.");
+  }
+  function duplicar(id){
+    var p = achar(id); if(!p) return;
+    var c = JSON.parse(JSON.stringify(p));
+    c.id = novoId(); c.nome = p.nome + " (cópia)"; c.criado = c.atualizado = Date.now();
+    lista.unshift(c); gravar(); desenhar(); msg("Cópia criada.");
+  }
+  function excluir(id){
+    var p = achar(id); if(!p) return;
+    if(!window.confirm("Excluir o projeto \u201C" + p.nome + "\u201D? Não dá para desfazer.")) return;
+    lista = lista.filter(function(x){ return x.id !== id; });
+    if(atual === id){ atual = null; $("e1Nome").value = ""; }
+    gravar(); desenhar(); msg("Projeto excluído.");
+  }
+  function temConteudo(){ return !!($("esTexto").value.trim() || $("esTitulo").value.trim()); }
+ 
+  /* ---------- lista ---------- */
+  function desenhar(){
+    var f = $("e1Filtro").value;
+    var itens = lista.filter(function(p){ return !f || p.tipo === f; })
+      .sort(function(a, b){ return b.atualizado - a.atualizado; });
+    $("e1Resumo").textContent = "Meus projetos (" + lista.length + ")";
+    $("e1Lista").innerHTML = itens.length ? itens.map(function(p){
+      var quando = new Date(p.atualizado).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"});
+      return '<div class="e1-item' + (p.id === atual ? ' atual' : '') + '">' +
+        '<div class="e1-info"><strong>' + esc(p.nome) + '</strong><small>' + esc(NOMES[p.tipo] || p.tipo) + ' · ' + esc(quando) + (p.id === atual ? ' · em edição' : '') + '</small></div>' +
+        '<div class="e1-acoes">' +
+          '<button type="button" class="at-btn" data-e1="abrir" data-id="' + esc(p.id) + '">ABRIR</button>' +
+          '<button type="button" class="at-btn" data-e1="duplicar" data-id="' + esc(p.id) + '">DUPLICAR</button>' +
+          '<button type="button" class="at-btn" data-e1="excluir" data-id="' + esc(p.id) + '">EXCLUIR</button>' +
+        '</div></div>';
+    }).join("") : '<p class="e1-vazio">' + (lista.length ? "Nenhum projeto deste tipo." : "Nenhum projeto ainda. Escolha um tipo acima e comece a criar: o projeto é guardado automaticamente.") + '</p>';
+  }
+ 
+  /* ---------- eventos ---------- */
+  $("e1Lista").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-e1]"); if(!b) return;
+    if(b.dataset.e1 === "abrir") abrir(b.dataset.id);
+    else if(b.dataset.e1 === "duplicar") duplicar(b.dataset.id);
+    else excluir(b.dataset.id);
+  });
+  $("e1Filtro").addEventListener("change", desenhar);
+  $("e1Nome").addEventListener("input", agendar);
+  $("e1Salvar").addEventListener("click", function(){
+    if(!atual) criar(); else { clearTimeout(timer); timer = null; salvar(); }
+    msg("Projeto guardado neste navegador.");
+  });
+  $("e1Novo").addEventListener("click", function(){
+    descarregar();
+    if(!atual && temConteudo() && !window.confirm("O texto atual não está em nenhum projeto guardado. Começar um novo mesmo assim?")) return;
+    mudo = true;
+    try{ zerar(); }finally{ mudo = false; }
+    atual = null; $("e1Nome").value = "";
+    desenhar();
+    $("f2Trocar").click();
+    msg("Novo projeto. Escolha o tipo para começar.");
+  });
+ 
+  /* ao escolher um cartão: cria o projeto (ou atualiza o tipo do atual) */
+  $("f2Escolha").addEventListener("click", function(ev){
+    if(abrindo || !ev.target.closest("[data-m]")) return;
+    if(!atual){ criar(); msg("Projeto criado. Ele é guardado automaticamente enquanto você trabalha."); }
+    else salvar();
+  });
+ 
+  /* gravação automática */
+  function ignora(ev){ return !ev.target || ev.target.type === "file" || (ev.target.closest && ev.target.closest("#e1Biblioteca")); }
+  painel.addEventListener("input", function(ev){ if(!ignora(ev)) agendar(); });
+  painel.addEventListener("change", function(ev){ if(!ignora(ev)) agendar(); });
+  painel.addEventListener("click", function(ev){
+    if(ev.target.closest && ev.target.closest("#esFilmeAddCena,.es-cena-remover,[data-t]")) agendar();
+  });
+  window.addEventListener("beforeunload", descarregar);
+ 
+  /* a lista fica aberta na escolha e recolhida dentro do caminho */
+  new MutationObserver(function(){ sec.open = painel.getAttribute("data-fase") === "escolha"; })
+    .observe(painel, {attributes:true, attributeFilter:["data-fase"]});
+ 
+  /* ---------- início: carrega a biblioteca e aproveita o rascunho antigo ---------- */
+  lista = ler();
+  if(!lista.length){
+    try{
+      var o = JSON.parse(localStorage.getItem("ps_estudio_projeto_completo") || "null");
+      if(o && o.campos && String(o.campos.esTexto || "").trim()){
+        var p0 = {id:novoId(), nome:String(o.campos.esTitulo || "").trim() || "Rascunho anterior", tipo:o.modo || "redes",
+          criado:Date.now(), atualizado:Date.now(), dados:{modo:o.modo || "redes", campos:o.campos, cenas:null, destinos:null, tipoTexto:null}};
+        lista.push(p0); atual = p0.id; $("e1Nome").value = p0.nome; gravar();
+        msg("Seu rascunho anterior foi guardado como projeto.");
+      }
+    }catch(e){}
+  }
+  desenhar();
+})();
+</script>
+<!-- ===== FIM: ESTÚDIO ETAPA 1 — PROJETOS ===== -->
+ 
 
 </body>
 </html>
