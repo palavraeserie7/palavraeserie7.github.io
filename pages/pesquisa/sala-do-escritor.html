@@ -8395,6 +8395,58 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: BIBLIOTECA SONORA — ARQUIVOS DO COMPUTADOR ===== -->
+ <!-- ===== INÍCIO: VOLUME DA VOZ E PORCENTAGENS (PASSO 2) ===== -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), volMus = $("esVolMus");
+  if(!painel || !volMus) return;
+  var labelMus = volMus.closest("label");
+  if(!labelMus) return;
+
+  /* controle novo: volume da voz (começa em 60%) */
+  var labelVoz = document.createElement("label");
+  labelVoz.className = "es-campo";
+  labelVoz.innerHTML = 'Volume da voz<input id="f5VolVoz" type="range" min="0" max="100" value="60">';
+  labelMus.insertAdjacentElement("afterend", labelVoz);
+  var volVoz = $("f5VolVoz");
+
+  /* porcentagem nos dois controles */
+  function rotulo(input, nome){
+    var l = input.closest("label");
+    if(l && l.firstChild && l.firstChild.nodeType === 3) l.firstChild.nodeValue = nome + ": " + input.value + "%";
+  }
+  function atualizar(){ rotulo(volMus, "Volume da música"); rotulo(volVoz, "Volume da voz"); }
+  painel.addEventListener("input", atualizar);
+  painel.addEventListener("click", function(){ setTimeout(atualizar, 0); });
+  atualizar();
+
+  /* prévia: a voz do navegador passa a respeitar o volume da voz */
+  if(window.speechSynthesis){
+    var falar = speechSynthesis.speak.bind(speechSynthesis);
+    speechSynthesis.speak = function(u){
+      try{ u.volume = Number(volVoz.value) / 100; }catch(e){}
+      return falar(u);
+    };
+  }
+
+  /* vídeo MP4: a voz do arquivo final passa por um controle de volume */
+  if(window.AudioBufferSourceNode && window.MediaStreamAudioDestinationNode){
+    var conectar = AudioBufferSourceNode.prototype.connect;
+    AudioBufferSourceNode.prototype.connect = function(destino){
+      if(destino instanceof MediaStreamAudioDestinationNode){
+        var g = this.context.createGain();
+        g.gain.value = Number(volVoz.value) / 100;
+        conectar.call(this, g);
+        g.connect(destino);
+        return destino;
+      }
+      return conectar.apply(this, arguments);
+    };
+  }
+})();
+</script>
+<!-- ===== FIM: VOLUME DA VOZ E PORCENTAGENS (PASSO 2) ===== -->
 </body>
 </html>
  
