@@ -6327,13 +6327,12 @@ body.dg-livro-vivo .dgp-nota{display:none}
 
                                                      <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
-          
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
 <style>
 /* ---------- base ---------- */
 #esPainel{width:100%}
 .es-box[hidden]{display:none!important}
-.es-box{width:100%;min-height:calc(100vh - 300px);box-sizing:border-box;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink);padding:18px;display:flex;flex-direction:column;gap:14px}
+.es-box{width:100%;min-height:0;box-sizing:border-box;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink);padding:18px;display:flex;flex-direction:column;gap:14px}
 @media(max-width:800px){.es-box{min-height:auto}}
 .es-box h3{margin:0;font:600 20px Georgia,"Times New Roman",serif}
 .es-nota{margin:0;color:var(--ink-soft);font:13.5px/1.5 "Segoe UI",Arial,sans-serif}
@@ -6628,7 +6627,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
         '<div class="es-grupo es-grande"><label class="es-campo" for="esAssunto">Assunto ou passagem (opcional)</label><div class="es-par"><input id="esAssunto" class="at-in" type="text" placeholder="Ex.: Salmo 91, confiança em tempos difíceis"><button type="button" class="at-btn" id="esBuscar">BUSCAR PASSAGEM</button><button type="button" class="at-btn gold" data-ia="criar">CRIAR COM IA</button></div></div>' +
       '</div>' +
       '<input id="esTitulo" class="at-in" type="text" placeholder="Título (opcional)" style="font:600 20px Georgia,serif;height:46px">' +
-      '<textarea id="esTexto" class="es-texto" placeholder="Escreva aqui, ou use os botões de IA abaixo."></textarea>' +
+      '<textarea id="esTexto" class="es-texto" placeholder="Escreva aqui, ou escreva o assunto acima e clique em CRIAR COM IA."></textarea>' +
       '<div class="at-row"><span id="esConta" class="es-msg" style="flex:1"></span></div>' +
       '<div class="at-row"><button type="button" class="at-btn" data-ia="reescrever">REESCREVER</button><button type="button" class="at-btn" id="esNumeros">TIRAR NÚMEROS DOS VERSÍCULOS</button><button type="button" class="at-btn" id="esPuxar">PUXAR TEXTO DO ATELIÊ</button></div>' +
       '<div class="at-row"><button type="button" class="at-btn" id="esOuvirTexto">OUVIR</button><button type="button" class="at-btn" id="esPararTexto">PARAR</button><button type="button" class="at-btn" id="esDesfazer" disabled>DESFAZER</button><button type="button" class="at-btn" id="esGuardar">GUARDAR VERSÃO</button><button type="button" class="at-btn" id="esLimpar">LIMPAR</button></div>' +
@@ -6639,16 +6638,20 @@ body.dg-livro-vivo .dgp-nota{display:none}
  
     /* ----- passo 2 ----- */
     '<div class="es-box" data-passo="2" hidden><h3>Voz, música e imagens</h3>' +
-      '<div class="at-row">' +
-        '<label class="es-campo">Voz profissional (para o arquivo)<select id="f1Voz" class="at-sel"><option value="f1">Feminina, suave</option><option value="m1">Masculina, grave</option><option value="n1">Narrador, solene</option></select></label>' +
-        '<label class="es-campo">Voz do navegador (só para ouvir)<select id="esVoz" class="at-sel"></select></label>' +
-        '<label class="es-campo">Velocidade<select id="esVel" class="at-sel"><option value="0.85">Lenta</option><option value="1" selected>Normal</option><option value="1.15">Rápida</option></select></label>' +
-        '<label class="es-campo">Formato do vídeo<select id="esFormato" class="at-sel"><option value="f916">Vertical 9:16 (TikTok, Reels, Shorts)</option><option value="f11">Quadrado 1:1 (Feed)</option><option value="f169">Horizontal 16:9 (YouTube)</option></select></label></div>' +
+      '<div class="es-controles">' +
+        '<div class="es-grupo"><label class="es-campo" for="f1Voz">Voz profissional (para o arquivo)</label><div class="es-par"><select id="f1Voz" class="at-sel"><option value="f1">Feminina, suave</option><option value="m1">Masculina, grave</option><option value="n1">Narrador, solene</option></select></div></div>' +
+        '<div class="es-grupo"><label class="es-campo" for="esVoz">Voz do navegador (só para ouvir)</label><div class="es-par"><select id="esVoz" class="at-sel"></select><button type="button" class="at-btn" id="esTestarVoz">OUVIR</button><button type="button" class="at-btn" id="esPararVoz2">PARAR</button></div></div>' +
+        '<div class="es-grupo"><label class="es-campo" for="esVel">Velocidade</label><div class="es-par"><select id="esVel" class="at-sel"><option value="0.85">Lenta</option><option value="1" selected>Normal</option><option value="1.15">Rápida</option></select></div></div>' +
+        '<div class="es-grupo"><label class="es-campo" for="esFormato">Formato do vídeo</label><div class="es-par"><select id="esFormato" class="at-sel"><option value="f916">Vertical 9:16 (TikTok, Reels, Shorts)</option><option value="f11">Quadrado 1:1 (Feed)</option><option value="f169">Horizontal 16:9 (YouTube)</option></select></div></div>' +
+      '</div>' +
       '<p class="es-nota">A voz do navegador serve só para ouvir e testar. O arquivo final usa a voz profissional.</p>' +
-      '<div class="at-row"><label class="es-campo">Música de fundo<select id="esMusica" class="at-sel"><option value="">Sem música</option><option value="propria">Usar um arquivo meu…</option></select></label>' +
-        '<label class="es-campo">Volume da música<input id="esVolMus" type="range" min="0" max="100" value="25"></label><input id="esMusArq" type="file" accept="audio/*" hidden></div>' +
+      '<div class="es-controles">' +
+        '<div class="es-grupo"><label class="es-campo" for="esMusica">Música de fundo</label><div class="es-par"><select id="esMusica" class="at-sel"><option value="">Sem música</option><option value="propria">Usar um arquivo meu…</option></select><button type="button" class="at-btn" id="esEscolherMusica">ESCOLHER ARQUIVO</button></div></div>' +
+        '<div class="es-grupo"><label class="es-campo" for="esVolMus">Volume da música</label><div class="es-par"><input id="esVolMus" type="range" min="0" max="100" value="25"></div></div>' +
+        '<input id="esMusArq" type="file" accept="audio/*" hidden>' +
+      '</div>' +
       '<p class="es-nota">Use somente músicas e imagens que você tenha licença para publicar nas redes. Senão a rede pode bloquear ou remover o vídeo.</p>' +
-      '<div class="at-row"><button type="button" class="at-btn" id="esAddFoto">ADICIONAR IMAGENS DE FUNDO</button><input id="esFotoArq" type="file" accept="image/*" multiple hidden><span class="es-nota">As imagens não precisam ter relação com o que é dito.</span></div>' +
+      '<div class="es-controles"><div class="es-grupo"><span class="es-campo">Imagens de fundo</span><div class="es-par"><button type="button" class="at-btn" id="esAddFoto">ADICIONAR IMAGENS DE FUNDO</button><input id="esFotoArq" type="file" accept="image/*" multiple hidden><span class="es-nota" style="align-self:center">As imagens não precisam ter relação com o que é dito.</span></div></div></div>' +
       '<div class="es-fotos" id="esFotos"></div><div id="esMsg2" class="es-msg" role="status"></div></div>' +
  
     /* ----- passo 3 ----- */
@@ -7006,6 +7009,12 @@ body.dg-livro-vivo .dgp-nota{display:none}
     }).join("");
   }
   $("esAddFoto").addEventListener("click", function(){ $("esFotoArq").click(); });
+  $("esTestarVoz").addEventListener("click", function(){
+    if(!$("esTexto").value.trim()){ msg(2,"Escreva um texto no passo 1 para testar a voz.",true); return; }
+    $("esOuvirTexto").click();
+  });
+  $("esPararVoz2").addEventListener("click", function(){ if(window.speechSynthesis) speechSynthesis.cancel(); });
+  $("esEscolherMusica").addEventListener("click", function(){ $("esMusica").value = "propria"; $("esMusArq").click(); });
   $("esFotoArq").addEventListener("change", function(){
     Array.prototype.forEach.call(this.files, function(f){ fotos.push(URL.createObjectURL(f)); });
     this.value = ""; desenharFotos();
@@ -7434,6 +7443,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
 </script>
 <!-- ===== FIM: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
  
+
 
 </body>
 </html>
