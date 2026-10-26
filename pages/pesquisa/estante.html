@@ -908,7 +908,7 @@
  
   function filtrosBase(){
     var q = $("search").value.trim().toLowerCase();
-    var f = { contentType:("contentType").value,audience:("audience").value, depth:("depth").value,format:("format").value };
+    var f = { contentType:$("contentType").value, audience:$("audience").value, depth:$("depth").value, format:$("format").value };
     var ac = $("access").value;
     return itensDaSecao()
       .filter(function(b){ return Object.keys(f).every(function(k){ return !f[k] || b[k] === f[k]; }); })
@@ -1035,7 +1035,7 @@
   $("cfgSalvar").addEventListener("click", function(){
     var m = meus.filter(function(x){ return x.id === cfgId; })[0]; if(!m) return;
     var t = $("cfgTitulo").value.trim(); if(!t){ alert("Escreva o título do livro."); return; }
-    var novo = Object.assign({}, m, {titulo:t, acesso:("cfgAcesso").value,preco:("cfgPreco").value.trim(), url:("cfgUrl").value.trim(),descricao:("cfgDesc").value.trim(), atualizado:Date.now()});
+    var novo = Object.assign({}, m, {titulo:t, acesso:$("cfgAcesso").value, preco:$("cfgPreco").value.trim(), url:$("cfgUrl").value.trim(), descricao:$("cfgDesc").value.trim(), atualizado:Date.now()});
     dbPut("livros", novo).then(function(){ fecharCfg(); return recarregar(); }).catch(function(){ alert("Não foi possível salvar."); });
   });
   $("cfgRemover").addEventListener("click", function(){
@@ -1068,7 +1068,7 @@
     });
   });
   ["search","contentType","audience","depth","format","access"].forEach(function(id){ $(id).addEventListener("input", render); });
-  document.addEventListener("keydown", function(ev){ if(ev.key === "Escape"){ if(("cfgBox").classList.contains("on"))fecharCfg();elseif(("reader").classList.contains("on")) fecharLeitor(); } });
+  document.addEventListener("keydown", function(ev){ if(ev.key === "Escape"){ if($("cfgBox").classList.contains("on")) fecharCfg(); else if($("reader").classList.contains("on")) fecharLeitor(); } });
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) recarregar(); });
   window.addEventListener("focus", recarregar);
  
@@ -1131,5 +1131,3 @@
 </html>
  
  
-
-
