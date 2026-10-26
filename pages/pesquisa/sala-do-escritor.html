@@ -8576,6 +8576,483 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: FUNDOS EM MOVIMENTO (VÍDEOS DE FUNDO) ===== -->
+
+<!-- ===== INÍCIO: BIBLIOTECA DE MÍDIA POR REDE (ÁUDIOS, IMAGENS E VÍDEOS) ===== -->
+<style>
+#bsBiblioteca{display:none!important}
+#mbBiblioteca{display:flex;flex-direction:column;gap:10px;margin:8px 0}
+#mbBiblioteca [hidden]{display:none!important}
+#mbBiblioteca h4{margin:0;font:600 18px Georgia,"Times New Roman",serif;color:var(--ink)}
+#mbBiblioteca .mb-tipos{display:flex;gap:0;border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:var(--paper-card)}
+#mbBiblioteca .mb-tab{flex:1;height:44px;border:0;border-right:1px solid var(--paper-line);background:transparent;color:var(--ink-soft);cursor:pointer;font:700 13px "Segoe UI",Arial,sans-serif}
+#mbBiblioteca .mb-tab:last-child{border-right:0}
+#mbBiblioteca .mb-tab span{opacity:.75;font-weight:600}
+#mbBiblioteca .mb-tab.on{background:var(--brass);color:#fffdf6}
+#mbBiblioteca .mb-redes{display:flex;gap:8px;flex-wrap:wrap}
+#mbBiblioteca .mb-pill{padding:8px 14px;border:1px solid var(--paper-line);border-radius:20px;background:#fffdf6;color:var(--ink);cursor:pointer;font:600 13px "Segoe UI",Arial,sans-serif}
+#mbBiblioteca .mb-pill:hover{border-color:var(--brass)}
+#mbBiblioteca .mb-pill.on{background:var(--brass-wash);border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);color:var(--brass-deep)}
+#mbBiblioteca .mb-pill span{opacity:.7}
+#mbBiblioteca .mb-painel{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;color:var(--ink);padding:14px;display:flex;flex-direction:column;gap:12px}
+#mbBiblioteca .mb-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#mbBiblioteca .mb-filtros{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;align-items:end}
+#mbBiblioteca label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#mbBiblioteca label.mb-chk{flex-direction:row;align-items:center;gap:8px;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#mbBiblioteca input[type=search],#mbBiblioteca input[type=text],#mbBiblioteca select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#mbBiblioteca .mb-vol{max-width:260px}
+#mbBiblioteca .mb-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;max-height:620px;overflow:auto;padding-right:4px;align-items:start}
+#mbBiblioteca .mb-card{border:1px solid var(--paper-line);border-radius:7px;background:#fff;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+#mbBiblioteca .mb-card strong{font:600 15px Georgia,serif;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#mbBiblioteca .mb-card small{font:12.5px/1.45 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#mbBiblioteca .mb-card.sel{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
+#mbBiblioteca .mb-midia{width:100%;height:150px;object-fit:cover;border-radius:6px;background:#111}
+#mbBiblioteca .mb-ok{color:#2f6b3a!important;font-weight:700}
+#mbBiblioteca .mb-aviso{color:#a14747!important}
+#mbBiblioteca .mb-bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+#mbBiblioteca details summary{cursor:pointer;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#mbBiblioteca .mb-edit-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+#mbBiblioteca fieldset{border:1px solid var(--paper-line);border-radius:6px;padding:8px 10px;margin:0;display:flex;gap:6px 14px;flex-wrap:wrap}
+#mbBiblioteca fieldset legend{font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft);padding:0 4px}
+@media(max-width:600px){#mbBiblioteca .mb-tab{font-size:12px}}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), selMus = $("esMusica"), arqMus = $("esMusArq"), arqFoto = $("esFotoArq");
+  if(!painel || !selMus || !arqMus || !arqFoto) return;
+  var ancora = selMus.closest(".at-row");
+  if(!ancora) return;
+ 
+  /* ---------- dados fixos ---------- */
+  var REDES = [
+    {id:"tiktok",    nome:"TikTok",    fmt:"f916", fmtNome:"vertical 9:16",  dica:"vertical 9:16, até 10 min"},
+    {id:"instagram", nome:"Instagram", fmt:"f916", fmtNome:"vertical 9:16",  dica:"Reels vertical 9:16 ou Feed 1:1"},
+    {id:"facebook",  nome:"Facebook",  fmt:"f11",  fmtNome:"quadrado 1:1",   dica:"vertical, quadrado ou horizontal"},
+    {id:"youtube",   nome:"YouTube",   fmt:"f169", fmtNome:"horizontal 16:9",dica:"Shorts vertical ou vídeo horizontal 16:9"}
+  ];
+  var IDEAL = {tiktok:["vertical"], instagram:["vertical","quadrado"], facebook:["vertical","quadrado","horizontal"], youtube:["horizontal","vertical"]};
+  var TIPOS = {
+    audio:  {rot:"Áudios",           um:"áudios",           accept:"audio/*", dica:"Músicas, trilhas, ambientes e efeitos para o fundo da mensagem."},
+    imagem: {rot:"Imagens",          um:"imagens",          accept:"image/*", dica:"Imagens de fundo: paisagens, luz, céu, natureza e cenas de esperança."},
+    video:  {rot:"Vídeos de fundo",  um:"vídeos de fundo",  accept:"video/*", dica:"Vídeos curtos em movimento (nuvens, mar, amanhecer) para ficar atrás do texto."}
+  };
+  var CATS = ["Esperança e consolo","Paz e descanso","Fé e confiança em Deus","Oração e reflexão","Amanhecer e luz","Natureza e criação","Céu e nuvens","Mar, rios e chuva","Salmos e louvor","Superação e recomeço","Piano suave e contemplativo","Fundos discretos para narração","Aberturas e encerramentos","Transições","Efeitos sonoros"];
+ 
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
+  var fmt = function(s){ if(!isFinite(s) || s <= 0) return ""; var m = Math.floor(s/60), r = Math.round(s%60); if(r === 60){ m++; r = 0; } return m + ":" + (r < 10 ? "0" : "") + r; };
+  var tam = function(b){ return b ? (b/1048576).toFixed(1).replace(".", ",") + " MB" : ""; };
+  var redeObj = function(id){ for(var i = 0; i < REDES.length; i++){ if(REDES[i].id === id) return REDES[i]; } return null; };
+  var TODAS = REDES.map(function(r){ return r.id; });
+ 
+  var itens = [], carregado = false, semBanco = false;
+  var tipoAtual = "audio", redeAtual = "todas";
+  var escolhido = null, interno = false, tocando = null;
+  var player = new Audio(); player.volume = 0.8;
+ 
+  /* ---------- armazenamento (IndexedDB) ---------- */
+  var db = null;
+  function abrirDB(){
+    if(db) return Promise.resolve(db);
+    return new Promise(function(ok, no){
+      if(!window.indexedDB){ no(new Error("sem IndexedDB")); return; }
+      var r = indexedDB.open("ps_midia_v1", 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore("itens", {keyPath:"id"}); };
+      r.onsuccess = function(){ db = r.result; ok(db); };
+      r.onerror = function(){ no(r.error || new Error("falha ao abrir")); };
+    });
+  }
+  function tx(modo, fn){
+    return abrirDB().then(function(d){
+      return new Promise(function(ok, no){
+        var t = d.transaction("itens", modo), req = fn(t.objectStore("itens"));
+        t.oncomplete = function(){ ok(req && req.result); };
+        t.onerror = function(){ no(t.error); };
+        t.onabort = function(){ no(t.error || new Error("cancelado")); };
+      });
+    });
+  }
+  function gravarItem(it){
+    if(semBanco) return Promise.resolve();
+    var r = {}; Object.keys(it).forEach(function(k){ if(k.charAt(0) !== "_") r[k] = it[k]; });
+    return tx("readwrite", function(s){ return s.put(r); });
+  }
+ 
+  /* traz os áudios da antiga Biblioteca Sonora (uma vez só; a antiga não é apagada) */
+  function lerAntigos(){
+    return new Promise(function(ok){
+      try{ if(localStorage.getItem("ps_mb_migrado")){ ok(null); return; } }catch(e){}
+      if(!window.indexedDB){ ok(null); return; }
+      var r = indexedDB.open("ps_biblioteca_sonora");
+      r.onupgradeneeded = function(){ try{ r.transaction.abort(); }catch(e){} };
+      r.onerror = function(){ ok(null); };
+      r.onsuccess = function(){
+        var d = r.result;
+        if(!d.objectStoreNames.contains("audios")){ d.close(); ok(null); return; }
+        var q = d.transaction("audios", "readonly").objectStore("audios").getAll();
+        q.onsuccess = function(){ var l = (q.result || []).filter(function(x){ return x && x.blob; }); d.close(); ok(l); };
+        q.onerror = function(){ d.close(); ok(null); };
+      };
+    });
+  }
+  async function migrar(){
+    var antigos = await lerAntigos();
+    if(antigos === null) return;
+    for(var i = 0; i < antigos.length; i++){
+      var x = antigos[i];
+      var it = {id:"mig" + x.id, chave:"audio|" + (x.chave || x.id), tipo:"audio", redes:TODAS.slice(), nome:x.nome || (x.id + ".mp3"),
+        titulo:x.titulo || x.nome || "Sem título", mime:x.mime || "audio/mpeg", tamanho:x.tamanho || 0, formato:x.formato || "",
+        categoria:x.categoria || "", tags:x.tags || "", licenca:x.licenca || "", credito:x.credito || "",
+        duracao:x.duracao || 0, larg:0, alt:0, fav:!!x.fav, criado:x.criado || Date.now(), blob:x.blob};
+      try{ await gravarItem(it); }catch(e){ console.error(e); }
+    }
+    try{ localStorage.setItem("ps_mb_migrado", "1"); }catch(e){}
+  }
+  async function carregar(){
+    if(carregado) return; carregado = true;
+    try{
+      await migrar();
+      var todos = await tx("readonly", function(s){ return s.getAll(); });
+      itens = (todos || []).filter(function(r){ return r && r.blob; }).map(function(r){ if(!Array.isArray(r.redes)) r.redes = []; return r; })
+        .sort(function(a, b){ return (b.criado || 0) - (a.criado || 0); });
+    }catch(e){
+      console.error(e); semBanco = true;
+      msg("Este navegador não permite guardar a biblioteca. Os arquivos valerão só enquanto esta página estiver aberta.", true);
+    }
+    desenharTudo();
+  }
+ 
+  /* ---------- interface ---------- */
+  var wrap = document.createElement("div");
+  wrap.id = "mbBiblioteca";
+  wrap.innerHTML =
+    '<h4>Biblioteca de mídia por rede social</h4>' +
+    '<div class="mb-tipos" role="group" aria-label="Tipo de mídia"></div>' +
+    '<div class="mb-redes" role="group" aria-label="Rede social"></div>' +
+    '<div class="mb-painel">' +
+      '<p class="es-nota mb-nota"></p>' +
+      '<div class="mb-acoes">' +
+        '<button type="button" class="at-btn gold" data-mb="add"></button>' +
+        '<button type="button" class="at-btn" data-mb="ajustar" hidden></button>' +
+        '<button type="button" class="at-btn" data-mb="remover" hidden>REMOVER MÚSICA DO PROJETO</button>' +
+        '<input type="file" class="mb-arq" multiple hidden>' +
+      '</div>' +
+      '<p class="es-msg mb-msg" role="status"></p>' +
+      '<div class="mb-filtros">' +
+        '<label>Pesquisar<input type="search" class="mb-busca" placeholder="Nome, categoria, tags, licença…"></label>' +
+        '<label>Categoria<select class="mb-cat"><option value="">Todas</option></select></label>' +
+        '<label class="mb-chk"><input type="checkbox" class="mb-fav"> Só favoritos</label>' +
+      '</div>' +
+      '<div class="mb-vol" data-so="audio"><label>Volume da prévia<input type="range" class="mb-volume" min="0" max="100" value="80"></label></div>' +
+      '<div class="mb-lista"></div>' +
+      '<datalist id="mbCats">' + CATS.map(function(c){ return '<option value="' + esc(c) + '">'; }).join("") + '</datalist>' +
+    '</div>';
+  ancora.insertAdjacentElement("afterend", wrap);
+ 
+  var Q = function(sel){ return wrap.querySelector(sel); };
+  function msg(t, erro){ var m = Q(".mb-msg"); m.textContent = t || ""; m.className = "es-msg mb-msg" + (erro ? " erro" : ""); }
+  function achar(id){ for(var i = 0; i < itens.length; i++){ if(itens[i].id === id) return itens[i]; } return null; }
+  function url(it){ if(!it._url) it._url = URL.createObjectURL(it.blob); return it._url; }
+ 
+  function orient(it){
+    if(!it.larg || !it.alt) return "";
+    if(it.alt > it.larg * 1.2) return "vertical";
+    if(it.larg > it.alt * 1.2) return "horizontal";
+    return "quadrado";
+  }
+ 
+  function tabs(){
+    Q(".mb-tipos").innerHTML = Object.keys(TIPOS).map(function(k){
+      var n = itens.filter(function(i){ return i.tipo === k; }).length;
+      return '<button type="button" class="mb-tab' + (k === tipoAtual ? ' on' : '') + '" data-mb-tipo="' + k + '" aria-pressed="' + (k === tipoAtual) + '">' + TIPOS[k].rot + ' <span>(' + n + ')</span></button>';
+    }).join("");
+    var base = itens.filter(function(i){ return i.tipo === tipoAtual; });
+    var linhas = [{id:"todas", nome:"Todas as redes"}].concat(REDES);
+    Q(".mb-redes").innerHTML = linhas.map(function(r){
+      var n = r.id === "todas" ? base.length : base.filter(function(i){ return i.redes.indexOf(r.id) > -1; }).length;
+      return '<button type="button" class="mb-pill' + (r.id === redeAtual ? ' on' : '') + '" data-mb-rede="' + r.id + '" aria-pressed="' + (r.id === redeAtual) + '">' + esc(r.nome) + ' <span>(' + n + ')</span></button>';
+    }).join("");
+  }
+  function cabecalho(){
+    var T = TIPOS[tipoAtual], r = redeObj(redeAtual);
+    Q(".mb-nota").textContent = T.dica + (r ? " Para " + r.nome + ": " + r.dica + "." : " Escolha uma rede acima para ver só o material dela.") + " Os arquivos ficam guardados neste navegador; a licença é por sua conta.";
+    Q('[data-mb="add"]').textContent = "ADICIONAR " + T.um.toUpperCase() + (r ? " PARA " + r.nome.toUpperCase() : "");
+    var aj = Q('[data-mb="ajustar"]');
+    aj.hidden = !r;
+    if(r) aj.textContent = "AJUSTAR PROJETO PARA " + r.nome.toUpperCase() + " (" + r.fmtNome + ")";
+    Q('[data-mb="remover"]').hidden = !(tipoAtual === "audio" && escolhido && achar(escolhido));
+    Q(".mb-arq").accept = T.accept;
+    Q(".mb-vol").hidden = tipoAtual !== "audio";
+  }
+  function cats(){
+    var set = {}; itens.forEach(function(i){ if(i.tipo === tipoAtual && i.categoria) set[i.categoria] = 1; });
+    var sel = Q(".mb-cat"), v = sel.value;
+    sel.innerHTML = '<option value="">Todas</option>' + Object.keys(set).sort().map(function(c){ return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
+    sel.value = set[v] ? v : "";
+  }
+  function filtrar(){
+    var q = norm(Q(".mb-busca").value), cat = Q(".mb-cat").value, soFav = Q(".mb-fav").checked;
+    return itens.filter(function(it){
+      if(it.tipo !== tipoAtual) return false;
+      if(redeAtual !== "todas" && it.redes.indexOf(redeAtual) < 0) return false;
+      if(cat && it.categoria !== cat) return false;
+      if(soFav && !it.fav) return false;
+      if(q && norm([it.titulo, it.nome, it.categoria, it.tags, it.licenca].join(" ")).indexOf(q) < 0) return false;
+      return true;
+    });
+  }
+  function card(it){
+    var o = orient(it);
+    var meta = [it.categoria, it.tipo === "imagem" ? "" : fmt(it.duracao), o, it.formato, tam(it.tamanho)].filter(Boolean).join(" · ");
+    var nomesRedes = it.redes.length ? it.redes.map(function(id){ var r = redeObj(id); return r ? r.nome : id; }).join(", ") : "nenhuma rede marcada";
+    var rObj = redeObj(redeAtual);
+    var combina = rObj && o && IDEAL[rObj.id].indexOf(o) > -1 ? '<small class="mb-ok">✓ Formato combina com ' + esc(rObj.nome) + '</small>' : '';
+    var lic = "Licença: " + (it.licenca ? it.licenca : "não informada — confira antes de publicar");
+    var usando = it.tipo === "audio" && escolhido === it.id;
+    var midia = it.tipo === "imagem" ? '<img class="mb-midia" loading="lazy" alt="" src="' + url(it) + '">'
+              : it.tipo === "video" ? '<video class="mb-midia" controls preload="metadata" playsinline src="' + url(it) + '"></video>' : '';
+    var rotUsar = usando ? "EM USO" : (it.tipo === "audio" ? "USAR NO PROJETO" : it.tipo === "imagem" ? "USAR COMO FUNDO" : "USAR COMO FUNDO EM MOVIMENTO");
+    return '<article class="mb-card' + (usando ? ' sel' : '') + '">' + midia +
+      '<strong title="' + esc(it.titulo) + '">' + esc(it.titulo) + '</strong>' +
+      (meta ? '<small>' + esc(meta) + '</small>' : '') +
+      '<small>Redes: ' + esc(nomesRedes) + '</small>' + combina +
+      '<small>' + esc(lic) + '</small>' +
+      (it.tipo === "audio" && it.duracao > 300 ? '<small class="mb-aviso">Faixa longa: pode pesar na exportação. Prefira trechos de 1 a 3 minutos.</small>' : '') +
+      (it.tipo === "video" && it.tamanho > 80 * 1048576 ? '<small class="mb-aviso">Vídeo pesado: pode deixar a exportação lenta.</small>' : '') +
+      '<div class="mb-bt">' +
+        (it.tipo === "audio" ? '<button type="button" class="at-btn" data-mb="play" data-id="' + esc(it.id) + '">' + (tocando === it.id && !player.paused ? 'PAUSAR' : 'OUVIR') + '</button>' : '') +
+        '<button type="button" class="at-btn gold" data-mb="usar" data-id="' + esc(it.id) + '">' + rotUsar + '</button>' +
+        '<button type="button" class="at-btn" data-mb="fav" data-id="' + esc(it.id) + '">' + (it.fav ? '♥ FAVORITO' : '♡ FAVORITAR') + '</button>' +
+        (it.credito ? '<button type="button" class="at-btn" data-mb="credito" data-id="' + esc(it.id) + '">COPIAR CRÉDITO</button>' : '') +
+        '<button type="button" class="at-btn" data-mb="excluir" data-id="' + esc(it.id) + '">EXCLUIR</button>' +
+      '</div>' +
+      '<details><summary>EDITAR DADOS E REDES</summary><div class="mb-edit-grid">' +
+        '<fieldset><legend>Usar em</legend>' + REDES.map(function(r){
+          return '<label class="mb-chk"><input type="checkbox" data-rede="' + r.id + '" data-id="' + esc(it.id) + '"' + (it.redes.indexOf(r.id) > -1 ? ' checked' : '') + '> ' + esc(r.nome) + '</label>';
+        }).join("") + '</fieldset>' +
+        '<label>Título<input type="text" data-campo="titulo" data-id="' + esc(it.id) + '" value="' + esc(it.titulo) + '"></label>' +
+        '<label>Categoria<input type="text" list="mbCats" data-campo="categoria" data-id="' + esc(it.id) + '" value="' + esc(it.categoria) + '"></label>' +
+        '<label>Tags (separe por vírgula)<input type="text" data-campo="tags" data-id="' + esc(it.id) + '" value="' + esc(it.tags) + '"></label>' +
+        '<label>Licença<input type="text" data-campo="licenca" data-id="' + esc(it.id) + '" value="' + esc(it.licenca) + '" placeholder="Ex.: uso livre, crédito obrigatório"></label>' +
+        '<label>Texto de crédito<input type="text" data-campo="credito" data-id="' + esc(it.id) + '" value="' + esc(it.credito) + '" placeholder="Para colar na descrição do vídeo"></label>' +
+      '</div></details>' +
+    '</article>';
+  }
+  function lista(){
+    var el = Q(".mb-lista");
+    el.querySelectorAll("video").forEach(function(v){ try{ v.pause(); }catch(e){} });
+    var vis = filtrar();
+    if(!itens.some(function(i){ return i.tipo === tipoAtual; })){
+      el.innerHTML = '<p class="es-nota">Ainda não há ' + TIPOS[tipoAtual].um + ' aqui. Clique em ADICIONAR e escolha os arquivos do seu computador.</p>'; return;
+    }
+    el.innerHTML = vis.length ? vis.map(card).join("") : '<p class="es-nota">Nada encontrado' + (redeAtual !== "todas" ? ' para ' + redeObj(redeAtual).nome : '') + ' com esses filtros. Use ADICIONAR ou marque esta rede em EDITAR DADOS E REDES de outro arquivo.</p>';
+  }
+  function desenharTudo(){ tabs(); cabecalho(); cats(); lista(); }
+ 
+  /* ---------- ler dados do arquivo ---------- */
+  function lerMeta(tipo, blob){
+    return new Promise(function(ok){
+      var u = URL.createObjectURL(blob), fim = false, el;
+      function sair(v){ if(fim) return; fim = true; URL.revokeObjectURL(u); ok(v); }
+      setTimeout(function(){ sair(null); }, 10000);
+      if(tipo === "imagem"){
+        el = new Image();
+        el.onload = function(){ sair({duracao:0, larg:el.naturalWidth, alt:el.naturalHeight}); };
+        el.onerror = function(){ sair(null); };
+      }else{
+        el = document.createElement(tipo === "video" ? "video" : "audio");
+        el.preload = "metadata";
+        el.onloadedmetadata = function(){ sair({duracao:isFinite(el.duration) ? el.duration : 0, larg:el.videoWidth || 0, alt:el.videoHeight || 0}); };
+        el.onerror = function(){ sair(null); };
+      }
+      el.src = u;
+    });
+  }
+  async function adicionar(arquivos){
+    await carregar();
+    var tipo = tipoAtual, redes = redeAtual === "todas" ? TODAS.slice() : [redeAtual];
+    var novos = 0, repetidos = 0, ruins = [], falhou = false;
+    msg("Adicionando…");
+    for(var i = 0; i < arquivos.length; i++){
+      var f = arquivos[i];
+      var chave = tipo + "|" + f.name + "|" + f.size + "|" + f.lastModified;
+      var igual = itens.filter(function(x){ return x.chave === chave; })[0];
+      if(igual){
+        repetidos++;
+        redes.forEach(function(r){ if(igual.redes.indexOf(r) < 0) igual.redes.push(r); });
+        try{ await gravarItem(igual); }catch(e){}
+        continue;
+      }
+      var m = await lerMeta(tipo, f);
+      if(!m){ ruins.push(f.name); continue; }
+      var ext = (f.name.split(".").pop() || "").toUpperCase();
+      var it = {id:"m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), chave:chave, tipo:tipo, redes:redes.slice(),
+        nome:f.name, mime:f.type || "", tamanho:f.size, formato:ext.length <= 5 ? ext : "", blob:f,
+        titulo:f.name.replace(/\.[^.]+$/, ""), categoria:"", tags:"", licenca:"", credito:"",
+        duracao:m.duracao, larg:m.larg, alt:m.alt, fav:false, criado:Date.now() + i};
+      try{ await gravarItem(it); }catch(e){ console.error(e); falhou = true; }
+      itens.unshift(it); novos++;
+    }
+    desenharTudo();
+    var p = [];
+    if(novos) p.push(novos + " arquivo(s) adicionado(s)" + (redeAtual !== "todas" ? " para " + redeObj(redeAtual).nome : " para todas as redes") + ".");
+    if(repetidos) p.push(repetidos + " já estava(m) na biblioteca (rede incluída).");
+    if(ruins.length) p.push("Não consegui ler: " + ruins.join(", ") + ".");
+    if(falhou) p.push("Não deu para guardar tudo neste navegador (espaço insuficiente?). O que não coube vale só enquanto a página estiver aberta.");
+    msg(p.join(" ") || "Nada adicionado.", !!ruins.length || falhou);
+  }
+ 
+  /* ---------- prévia de áudio ---------- */
+  function atualizarPlay(){
+    Array.prototype.forEach.call(wrap.querySelectorAll('[data-mb="play"]'), function(b){
+      b.textContent = (tocando === b.dataset.id && !player.paused) ? "PAUSAR" : "OUVIR";
+    });
+  }
+  function parar(){ player.pause(); tocando = null; atualizarPlay(); }
+  function tocar(it){
+    if(tocando === it.id && !player.paused){ player.pause(); return; }
+    if(tocando !== it.id){ player.src = url(it); tocando = it.id; }
+    var p = player.play();
+    if(p && p.catch) p.catch(function(){ msg("Não foi possível tocar “" + it.titulo + "”.", true); });
+  }
+  player.addEventListener("play", atualizarPlay);
+  player.addEventListener("pause", atualizarPlay);
+  player.addEventListener("ended", function(){ tocando = null; atualizarPlay(); });
+ 
+  /* ---------- enviar ao projeto ---------- */
+  function arquivoDe(it){ return new File([it.blob], it.nome || (it.id + ".bin"), {type: it.mime || it.blob.type || ""}); }
+  function usar(it){
+    if(typeof DataTransfer === "undefined"){ msg("Este navegador não permite enviar ao projeto. Use o Chrome ou o Edge atualizado.", true); return; }
+    try{
+      var dt = new DataTransfer(); dt.items.add(arquivoDe(it));
+      if(it.tipo === "audio"){
+        parar();
+        interno = true;
+        try{
+          selMus.value = "propria";
+          arqMus.files = dt.files;
+          arqMus.dispatchEvent(new Event("change", {bubbles:true}));
+        }finally{ interno = false; }
+        escolhido = it.id; cabecalho(); lista();
+        msg("“" + it.titulo + "” está no projeto como música." + (it.credito ? " Esta faixa tem crédito: use COPIAR CRÉDITO e cole na descrição do vídeo." : ""));
+      }else if(it.tipo === "imagem"){
+        arqFoto.files = dt.files;
+        arqFoto.dispatchEvent(new Event("change", {bubbles:true}));
+        msg("“" + it.titulo + "” entrou nas imagens de fundo do projeto.");
+      }else{
+        var av = $("f6Arq");
+        if(!av){ msg("O bloco de vídeos de fundo não está na página.", true); return; }
+        av.files = dt.files;
+        av.dispatchEvent(new Event("change", {bubbles:true}));
+        msg("Preparando “" + it.titulo + "” como fundo em movimento…");
+      }
+    }catch(e){
+      console.error(e);
+      msg("Não foi possível usar “" + it.titulo + "”: " + (e.message || e) + ".", true);
+    }
+  }
+  function removerMusica(){
+    parar();
+    interno = true;
+    try{ selMus.value = ""; selMus.dispatchEvent(new Event("change", {bubbles:true})); }
+    finally{ interno = false; }
+    escolhido = null; cabecalho(); lista();
+    msg("Música removida do projeto.");
+  }
+  selMus.addEventListener("change", function(){ if(!interno && escolhido){ escolhido = null; cabecalho(); lista(); } });
+  arqMus.addEventListener("change", function(){ if(!interno && escolhido){ escolhido = null; cabecalho(); lista(); } });
+ 
+  /* ajusta formato do vídeo e marca só a rede escolhida na exportação */
+  function ajustar(){
+    var r = redeObj(redeAtual); if(!r) return;
+    var f = $("esFormato");
+    if(f){ f.value = r.fmt; f.dispatchEvent(new Event("change", {bubbles:true})); }
+    Array.prototype.forEach.call(document.querySelectorAll("#esDest input"), function(c){
+      c.checked = c.value === r.id;
+      c.dispatchEvent(new Event("change", {bubbles:true}));
+    });
+    msg("Projeto ajustado para " + r.nome + ": formato " + r.fmtNome + " e exportação só para " + r.nome + ".");
+  }
+ 
+  /* ---------- eventos ---------- */
+  wrap.addEventListener("click", function(ev){
+    var t = ev.target.closest("[data-mb-tipo]");
+    if(t){ parar(); tipoAtual = t.dataset.mbTipo; Q(".mb-busca").value = ""; Q(".mb-cat").value = ""; Q(".mb-fav").checked = false; msg(""); desenharTudo(); return; }
+    var r = ev.target.closest("[data-mb-rede]");
+    if(r){ parar(); redeAtual = r.dataset.mbRede; msg(""); desenharTudo(); return; }
+    var b = ev.target.closest("[data-mb]"); if(!b) return;
+    var a = b.dataset.mb;
+    if(a === "add"){ Q(".mb-arq").click(); return; }
+    if(a === "ajustar"){ ajustar(); return; }
+    if(a === "remover"){ removerMusica(); return; }
+    var it = achar(b.dataset.id); if(!it) return;
+    if(a === "play") tocar(it);
+    else if(a === "usar") usar(it);
+    else if(a === "fav"){
+      it.fav = !it.fav;
+      gravarItem(it).catch(function(){ msg("Não foi possível guardar o favorito neste navegador.", true); });
+      lista();
+    }else if(a === "credito"){
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(it.credito).then(
+          function(){ msg("Crédito copiado. Cole na descrição do vídeo."); },
+          function(){ msg("Não foi possível copiar. Crédito: " + it.credito, true); });
+      }else msg("Crédito: " + it.credito);
+    }else if(a === "excluir"){
+      if(!window.confirm("Excluir “" + it.titulo + "” da biblioteca? Não dá para desfazer.")) return;
+      if(tocando === it.id) parar();
+      if(escolhido === it.id) removerMusica();
+      if(it._url) URL.revokeObjectURL(it._url);
+      itens = itens.filter(function(x){ return x.id !== it.id; });
+      if(!semBanco) tx("readwrite", function(s){ return s.delete(it.id); }).catch(function(e){ console.error(e); });
+      desenharTudo(); msg("Arquivo excluído da biblioteca.");
+    }
+  });
+  Q(".mb-arq").addEventListener("change", function(){
+    var l = Array.prototype.slice.call(this.files || []);
+    this.value = "";
+    if(l.length) adicionar(l);
+  });
+ 
+  /* filtros e edição ficam só aqui: não disparam o salvamento automático dos projetos */
+  function aoMudar(ev){
+    ev.stopPropagation();
+    var t = ev.target;
+    if(t.classList.contains("mb-volume")){ player.volume = Number(t.value) / 100; return; }
+    if(t.dataset && t.dataset.rede && ev.type === "change"){
+      var x = achar(t.dataset.id); if(!x) return;
+      var k = x.redes.indexOf(t.dataset.rede);
+      if(t.checked && k < 0) x.redes.push(t.dataset.rede);
+      if(!t.checked && k > -1) x.redes.splice(k, 1);
+      gravarItem(x).catch(function(){ msg("Não foi possível guardar a alteração neste navegador.", true); });
+      tabs();
+      return;
+    }
+    if(t.dataset && t.dataset.campo && ev.type === "change"){
+      var y = achar(t.dataset.id); if(!y) return;
+      y[t.dataset.campo] = t.value.trim();
+      if(t.dataset.campo === "titulo" && !y.titulo) y.titulo = y.nome.replace(/\.[^.]+$/, "");
+      gravarItem(y).catch(function(){ msg("Não foi possível guardar a alteração neste navegador.", true); });
+      cats();
+      return;
+    }
+    if(t.matches(".mb-busca,.mb-cat,.mb-fav")) lista();
+  }
+  wrap.addEventListener("input", aoMudar);
+  wrap.addEventListener("change", aoMudar);
+ 
+  painel.addEventListener("click", function(ev){ if(ev.target.closest && ev.target.closest(".es-passos [data-p]")) parar(); });
+ 
+  desenharTudo();
+  carregar();
+})();
+</script>
+<!-- ===== FIM: BIBLIOTECA DE MÍDIA POR REDE (ÁUDIOS, IMAGENS E VÍDEOS) ===== -->
+ 
+
+
+
+
 </body>
 </html>
  
