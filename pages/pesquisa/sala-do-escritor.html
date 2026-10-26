@@ -7426,6 +7426,11 @@ st.versoes.unshift({
 .f2-card:hover .f2-eng,.f2-card:focus-visible .f2-eng{transform:rotate(90deg)}
 .f2-card strong{display:block;padding-right:40px;font:600 21px/1.25 Georgia,"Times New Roman",serif}
 .f2-card .f2-d{font:14px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.f2-selo{align-self:flex-start;padding:3px 10px;border-radius:12px;font:700 12px "Segoe UI",Arial,sans-serif;background:#e4efdf;color:#2f6b3a}
+.f2-selo.parcial{background:var(--brass-wash);color:var(--brass-deep)}
+.f2-selo.prep{background:#ece7da;color:var(--ink-soft)}
+#f2Aviso{flex:1 1 100%;margin:0;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#f2Aviso:empty{display:none}
 .f2-trilha{display:flex;flex-direction:column;gap:6px;margin:2px 0 0;padding:12px 0 0;border-top:1px solid var(--paper-line)}
 .f2-trilha span{display:flex;gap:10px;align-items:baseline;font:14px/1.4 "Segoe UI",Arial,sans-serif;color:var(--ink)}
 .f2-trilha b{flex:0 0 22px;height:22px;border-radius:50%;background:var(--brass-wash);color:var(--brass-deep);font:700 12px/22px "Segoe UI",Arial,sans-serif;text-align:center}
@@ -7453,17 +7458,23 @@ st.versoes.unshift({
   var MODOS = [
     {id:"redes", t:"Vídeos e mensagens bíblicas", d:"Salmos, orações, testemunhos e reflexões com voz, música e imagens.",
      p:["Escrever o texto","Escolher voz, música e imagens","Ver a prévia","Exportar vídeo ou áudio"],
-     r:["Criar","Voz, música e imagens","Prévia","Exportar"]},
+     r:["Criar","Voz, música e imagens","Prévia","Exportar"], e:"ok"},
     {id:"filme", t:"Filmes de histórias bíblicas", d:"Uma história contada em cenas, com narração e trilha.",
      p:["Montar o roteiro em cenas","Escolher voz, trilha e imagens","Revisar a montagem","Exportar e publicar"],
-     r:["Roteiro","Voz e imagens","Montagem","Exportar"]},
+     r:["Roteiro","Voz e imagens","Montagem","Exportar"], e:"parcial"},
     {id:"musica", t:"Louvores e letras com IA", d:"Letra original com estilo musical e vídeo com a letra na tela.",
      p:["Definir tema e estilo","Escolher voz e imagens","Ver a prévia com a letra","Exportar"],
-     r:["Letra e estilo","Voz e imagens","Prévia","Exportar"]},
+     r:["Letra e estilo","Voz e imagens","Prévia","Exportar"], e:"prep"},
     {id:"cortes", t:"Cortes para TikTok e Reels", d:"Trechos de vídeos próprios ou autorizados, legendados e na vertical.",
      p:["Enviar o vídeo e marcar o trecho","Escolher música e legendas","Revisar o corte","Exportar para as redes"],
-     r:["Vídeo e trecho","Música e legendas","Montagem","Exportar"]}
+     r:["Vídeo e trecho","Música e legendas","Montagem","Exportar"], e:"prep"}
   ];
+  var ESTADO = {
+    ok:{rot:"Disponível", aviso:""},
+    parcial:{rot:"Parcial", aviso:"Gera um vídeo simples a partir das cenas. Imagens e roteiro por IA ainda não estão ligados."},
+    prep:{rot:"Em preparação", aviso:"Você pode planejar e guardar o projeto, mas este tipo ainda não gera arquivo."}
+  };
+  var modoAtual = "redes";
  
   /* tela de escolha */
   var esc = document.createElement("section");
@@ -7472,7 +7483,7 @@ st.versoes.unshift({
     MODOS.map(function(m){
       return '<button type="button" class="f2-card" data-m="' + m.id + '">' +
         '<span class="f2-eng" aria-hidden="true">\u2699\uFE0E</span>' +
-        '<strong>' + m.t + '</strong><span class="f2-d">' + m.d + '</span>' +
+        '<span class="f2-selo ' + m.e + '">' + ESTADO[m.e].rot + '</span><strong>' + m.t + '</strong><span class="f2-d">' + m.d + '</span>' +
         '<span class="f2-trilha">' + m.p.map(function(x, i){ return '<span><b>' + (i + 1) + '</b>' + x + '</span>'; }).join("") + '</span>' +
         '<span class="f2-ir">Começar</span></button>';
     }).join("") + '</div>';
@@ -7481,6 +7492,8 @@ st.versoes.unshift({
   var barra = document.createElement("div");
   barra.id = "f2Barra";
   barra.innerHTML = '<div class="f2-quem"><small>Você está criando</small><strong id="f2Nome"></strong></div>' +
+    '<p id="f2Aviso"></p>' +
+    '<p id="f2Aviso"></p>' +
     '<button type="button" id="f2Trocar"><i aria-hidden="true">\u2699\uFE0E</i>TROCAR TIPO</button>';
  
   painel.insertBefore(barra, painel.firstChild);
@@ -7495,7 +7508,9 @@ st.versoes.unshift({
       b.textContent = (b.dataset.p + ". " + m.r[Number(b.dataset.p) - 1]).toUpperCase();
     });
     var p1 = painel.querySelector('.es-passos [data-p="1"]'); if(p1) p1.click();
+    modoAtual = id;
     $("f2Nome").textContent = m.t;
+    $("f2Aviso").textContent = ESTADO[m.e].aviso;
     painel.setAttribute("data-fase", "caminho");
     $("esToggle").scrollIntoView({behavior: "smooth", block: "start"});
   }
@@ -7507,6 +7522,17 @@ st.versoes.unshift({
     var c = ev.target.closest("[data-m]"); if(c) escolher(c.dataset.m);
   });
   $("f2Trocar").addEventListener("click", voltar);
+ 
+  /* exportar: tipos em preparação não geram arquivo (roda antes do código da Fase 1) */
+  document.addEventListener("estudio:exportar", function(ev){
+    var m = MODOS.filter(function(x){ return x.id === modoAtual; })[0];
+    if(!m || m.e !== "prep") return;
+    ev.stopImmediatePropagation();
+    ev.detail.tratado = true;
+    var msg = $("esMsg4");
+    msg.className = "es-msg erro";
+    msg.textContent = "\u201C" + m.t + "\u201D ainda não gera arquivo. Você pode guardar o projeto e voltar quando este tipo for liberado.";
+  }, true);
 })();
 </script>
 <!-- ===== FIM: ESTÚDIO FASE 2 ===== -->
