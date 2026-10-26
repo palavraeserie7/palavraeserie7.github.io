@@ -6327,16 +6327,15 @@ body.dg-livro-vivo .dgp-nota{display:none}
 
                                                      <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
- 
-<!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
-    
+                  <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
 <style>
-#esPainel .es-passos{display:flex;gap:8px;flex-wrap:wrap}
+/* ---------- base ---------- */
+#esPainel{width:100%}
 .es-box[hidden]{display:none!important}
-#esPainel .es-passos .at-btn.on{background:var(--brass);border-color:var(--brass);color:#fffdf6}
-.es-box{border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink);padding:18px;display:flex;flex-direction:column;gap:14px}
+.es-box{width:100%;min-height:calc(100vh - 300px);box-sizing:border-box;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink);padding:18px;display:flex;flex-direction:column;gap:14px}
+@media(max-width:800px){.es-box{min-height:auto}}
 .es-box h3{margin:0;font:600 20px Georgia,"Times New Roman",serif}
-.es-box p.es-nota{margin:0;color:var(--ink-soft);font:13.5px/1.5 "Segoe UI",Arial,sans-serif}
+.es-nota{margin:0;color:var(--ink-soft);font:13.5px/1.5 "Segoe UI",Arial,sans-serif}
 .es-box .at-sel,.es-box .at-in{background:#fffdf6;border-color:var(--paper-line);color:var(--ink)}
 .es-box .at-btn{background:#fffdf6;border-color:var(--paper-line);color:var(--ink)}
 .es-box .at-btn:hover:not(:disabled){background:var(--brass-wash);border-color:var(--brass)}
@@ -6366,22 +6365,111 @@ body.dg-livro-vivo .dgp-nota{display:none}
 .es-vers{display:flex;flex-direction:column;gap:6px}
 .es-vers div{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;font:14px Georgia,serif}
 .es-vers div span{flex:1}
- /* AJUSTE DO TAMANHO DO ESTÚDIO DE CRIAÇÃO */
-#esPainel {
-  width: 100%;
-}
-
-#esPainel .es-box {
-  width: 100%;
-  min-height: calc(100vh - 300px);
-  box-sizing: border-box;
-}
-
-@media (max-width: 800px) {
-  #esPainel .es-box {
-    min-height: auto;
-  }
-}
+ 
+/* ---------- passos (valem para todos os tipos) ---------- */
+#esPainel .es-passos{display:flex;gap:0;margin:16px 0;border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:var(--paper-card)}
+#esPainel .es-passos .at-btn{flex:1;height:46px;border:0;border-radius:0;border-right:1px solid var(--paper-line);background:transparent;color:var(--ink-soft)}
+#esPainel .es-passos .at-btn:last-child{border-right:0}
+#esPainel .es-passos .at-btn.on{background:var(--brass);color:#fffdf6}
+ 
+/* ---------- seções extras (planejamento do filme, louvores/cortes, montagem, publicação) ---------- */
+.es-secao{border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);padding:18px;margin:0 0 14px}
+.es-secao h3{margin:0;font:600 20px Georgia,"Times New Roman",serif}
+.es-secao label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.es-secao input,.es-secao select,.es-secao textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+.es-secao textarea{min-height:90px;resize:vertical}
+.es-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.es-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.es-aviso{margin:0;padding:10px 12px;border-left:3px solid var(--brass);background:var(--brass-wash);font:13px/1.5 "Segoe UI",Arial,sans-serif}
+#esFilme,#esExtra{flex-direction:column;gap:14px}
+#esFilme,#esExtra,#esEditorLinha,#esPublicacao{display:none}
+#esPainel[data-passo="1"][data-modo="filme"] #esFilme{display:flex}
+#esPainel[data-passo="1"][data-modo="musica"] #esExtra,
+#esPainel[data-passo="1"][data-modo="cortes"] #esExtra{display:flex}
+#esPainel[data-passo="3"] #esEditorLinha{display:block}
+#esPainel[data-passo="4"] #esPublicacao{display:block}
+.es-cenas{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.es-cena{border:1px solid var(--paper-line);border-radius:7px;padding:12px;display:flex;flex-direction:column;gap:8px;background:#fffdf6}
+.es-cena h4{margin:0;font:600 15px Georgia,serif;color:var(--ink)}
+.es-faixa{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;margin:9px 0}
+.es-faixa-trechos{display:flex;gap:5px;min-height:28px}
+.es-trecho{border-radius:4px;padding:6px 8px;background:var(--brass-wash);border:1px solid var(--paper-line);font-size:11px;flex:1;min-width:0}
+.es-trecho.audio{background:#dbeafe}
+.es-trecho.legenda{background:#dcfce7}
+@media(max-width:700px){.es-grid2{grid-template-columns:1fr}.es-faixa{grid-template-columns:1fr;gap:4px}}
+ 
+/* ---------- escolha do tipo ---------- */
+#esPainel[data-fase="escolha"] > :not(#esEscolha):not(#esBiblioteca){display:none!important}
+#esPainel[data-fase="caminho"] #esEscolha{display:none!important}
+#esEscolha{margin:14px 0 6px}
+#esEscolha h3{margin:0 0 4px;font:600 26px Georgia,"Times New Roman",serif;color:#f4eedd}
+#esEscolha > p{margin:0 0 16px;color:var(--muted);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+.es-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.es-card{position:relative;display:flex;flex-direction:column;gap:12px;text-align:left;padding:20px 22px;border:1px solid var(--paper-line);border-radius:10px;background:var(--paper-card);color:var(--ink);cursor:pointer;font-family:inherit;transition:border-color .15s,box-shadow .15s}
+.es-card:hover,.es-card:focus-visible{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass);outline:none}
+.es-eng{position:absolute;top:14px;right:16px;font:28px/1 "Segoe UI Symbol",Arial,sans-serif;color:var(--brass);transition:transform .5s}
+.es-card:hover .es-eng,.es-card:focus-visible .es-eng{transform:rotate(90deg)}
+.es-card strong{display:block;padding-right:40px;font:600 21px/1.25 Georgia,"Times New Roman",serif}
+.es-card .es-d{font:14px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.es-selo{align-self:flex-start;padding:3px 10px;border-radius:12px;font:700 12px "Segoe UI",Arial,sans-serif;background:#e4efdf;color:#2f6b3a}
+.es-selo.parcial{background:var(--brass-wash);color:var(--brass-deep)}
+.es-selo.prep{background:#ece7da;color:var(--ink-soft)}
+.es-trilha{display:flex;flex-direction:column;gap:6px;margin:2px 0 0;padding:12px 0 0;border-top:1px solid var(--paper-line)}
+.es-trilha span{display:flex;gap:10px;align-items:baseline;font:14px/1.4 "Segoe UI",Arial,sans-serif;color:var(--ink)}
+.es-trilha b{flex:0 0 22px;height:22px;border-radius:50%;background:var(--brass-wash);color:var(--brass-deep);font:700 12px/22px "Segoe UI",Arial,sans-serif;text-align:center}
+.es-ir{align-self:flex-end;font:700 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+@media(max-width:760px){.es-grade{grid-template-columns:1fr}}
+ 
+/* ---------- barra do caminho ---------- */
+#esBarra{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0 0;padding:12px 16px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink)}
+#esBarra .es-quem{flex:1 1 240px;min-width:0}
+#esBarra small{display:block;font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#esBarra strong{font:600 18px Georgia,"Times New Roman",serif}
+#esAviso{flex:1 1 100%;margin:0;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#esAviso:empty{display:none}
+#esTrocar{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--brass);border-radius:6px;background:#fffdf6;color:var(--brass-deep);cursor:pointer;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.8px}
+#esTrocar:hover{background:var(--brass-wash)}
+#esTrocar i{font:normal 20px/1 "Segoe UI Symbol",Arial,sans-serif;transition:transform .4s}
+#esTrocar:hover i{transform:rotate(90deg)}
+@media(prefers-reduced-motion:reduce){.es-eng,#esTrocar i{transition:none}}
+ 
+/* ---------- resultado da IA e arquivo exportado ---------- */
+.es-res{border:1px dashed var(--brass);border-radius:8px;background:#fffdf6;padding:14px;display:flex;flex-direction:column;gap:10px}
+.es-res[hidden]{display:none!important}
+.es-res strong{font:600 16px Georgia,serif;color:var(--ink)}
+.es-res textarea{width:100%;min-height:200px;box-sizing:border-box;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:16px/1.7 Georgia,serif;resize:vertical}
+.es-res-aviso{font:600 12.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+.es-saida{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;padding:16px;display:flex;flex-direction:column;gap:12px}
+.es-saida[hidden]{display:none!important}
+.es-barra{height:8px;border-radius:4px;background:var(--paper-line);overflow:hidden}
+.es-barra i{display:block;height:100%;width:0;background:var(--brass);transition:width .2s}
+.es-saida video{width:100%;max-width:360px;max-height:70vh;border-radius:8px;background:#111;align-self:center}
+.es-info{font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.es-info.erro{color:#a14747}
+ 
+/* ---------- Meus projetos ---------- */
+#esBiblioteca{margin:14px 0;border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink)}
+#esBiblioteca > summary{cursor:pointer;padding:14px 18px;font:600 18px Georgia,"Times New Roman",serif;list-style:none}
+#esBiblioteca > summary::-webkit-details-marker{display:none}
+#esBiblioteca > summary::after{content:"▾";float:right;color:var(--brass-deep);transition:transform .2s}
+#esBiblioteca:not([open]) > summary::after{transform:rotate(-90deg)}
+.bib-corpo{padding:0 18px 18px;display:flex;flex-direction:column;gap:12px}
+.bib-atual{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+#esBiblioteca label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.bib-atual label{flex:1 1 240px}
+#esBiblioteca input,#esBiblioteca select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+.bib-botoes{display:flex;gap:8px;flex-wrap:wrap}
+.bib-filtro{max-width:260px}
+.bib-msg{margin:0;min-height:1.3em;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+.bib-msg.erro{color:#a14747}
+.bib-lista{display:flex;flex-direction:column;gap:8px}
+.bib-item{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--paper-line);border-radius:7px;background:#fffdf6}
+.bib-item.atual{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
+.bib-info{flex:1 1 220px;min-width:0}
+.bib-info strong{display:block;font:600 16px Georgia,serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bib-info small{font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.bib-acoes{display:flex;gap:6px;flex-wrap:wrap}
+.bib-vazio{margin:0;font:13.5px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
 </style>
  
 <script>
@@ -6391,7 +6479,57 @@ body.dg-livro-vivo .dgp-nota{display:none}
   var ancora = $("ateliPainel");
   if(!ancora) return;
  
-  /* ---------- botão + painel (abaixo do Ateliê) ---------- */
+  /* ====================== CONFIGURAÇÃO ====================== */
+  var BASE = "https://yellow-lab-f4b2.palavraeserie.workers.dev";
+  var URL_ESCRITA = BASE + "/api/escrita";
+  var URL_VOZ = BASE + "/api/voz";
+  var CH_TEXTOS = "ps_estudio";          /* versões de texto */
+  var CH_PROJETOS = "ps_projetos_v1";    /* biblioteca "Meus projetos" */
+  var TIPOS = ["Salmo","Oração","Mensagem de Deus","Reflexão bíblica","Texto espiritual original"];
+  var NOMES_MODO = {redes:"Vídeos e mensagens", filme:"Filmes bíblicos", musica:"Louvores e letras", cortes:"Cortes"};
+  var NOMES_IA = {criar:"Criar com IA", reescrever:"Reescrever", aumentar:"Aumentar a duração", tom:"Adaptar o tom"};
+  var MODOS = [
+    {id:"redes", t:"Vídeos e mensagens bíblicas", d:"Salmos, orações, testemunhos e reflexões com voz, música e imagens.",
+     p:["Escrever o texto","Escolher voz, música e imagens","Ver a prévia","Exportar vídeo ou áudio"],
+     r:["Criar","Voz, música e imagens","Prévia","Exportar"], e:"ok"},
+    {id:"filme", t:"Filmes de histórias bíblicas", d:"Uma história contada em cenas, com narração e trilha.",
+     p:["Montar o roteiro em cenas","Escolher voz, trilha e imagens","Revisar a montagem","Exportar e publicar"],
+     r:["Roteiro","Voz e imagens","Montagem","Exportar"], e:"parcial"},
+    {id:"musica", t:"Louvores e letras com IA", d:"Letra original com estilo musical e vídeo com a letra na tela.",
+     p:["Definir tema e estilo","Escolher voz e imagens","Ver a prévia com a letra","Exportar"],
+     r:["Letra e estilo","Voz e imagens","Prévia","Exportar"], e:"prep"},
+    {id:"cortes", t:"Cortes para TikTok e Reels", d:"Trechos de vídeos próprios ou autorizados, legendados e na vertical.",
+     p:["Enviar o vídeo e marcar o trecho","Escolher música e legendas","Revisar o corte","Exportar para as redes"],
+     r:["Vídeo e trecho","Música e legendas","Montagem","Exportar"], e:"prep"}
+  ];
+  var ESTADO = {
+    ok:{rot:"Disponível", aviso:""},
+    parcial:{rot:"Parcial", aviso:"Gera um vídeo simples a partir das cenas. Imagens e roteiro por IA ainda não estão ligados."},
+    prep:{rot:"Em preparação", aviso:"Você pode planejar e guardar o projeto, mas este tipo ainda não gera arquivo."}
+  };
+  var CENAS_PADRAO = [
+    {titulo:"Apresentação da história", descricao:"Apresente o contexto bíblico e os personagens principais."},
+    {titulo:"O conflito", descricao:"Mostre o desafio central da narrativa."},
+    {titulo:"Desfecho e mensagem", descricao:"Conclua a história e destaque a mensagem espiritual."}
+  ];
+  var DESTINOS = [
+    ["tiktok","TikTok","vertical 9:16, até 10 min"],
+    ["instagram","Instagram","Reels vertical 9:16, Feed 1:1"],
+    ["facebook","Facebook","vertical, quadrado ou horizontal"],
+    ["youtube","YouTube","Shorts vertical ou vídeo horizontal 16:9"]
+  ];
+  var TAM = {f916:[720,1280], f11:[720,720], f169:[1280,720]};
+ 
+  /* ====================== ESTADO ====================== */
+  var modoAtual = "redes";
+  var st = {tipo:TIPOS[0], versoes:[]};
+  try{ var s0 = JSON.parse(localStorage.getItem(CH_TEXTOS)||"null"); if(s0){ st.tipo = s0.tipo || st.tipo; st.versoes = Array.isArray(s0.versoes)?s0.versoes:[]; } }catch(e){}
+  var fotos = [], musicaArq = null, musicaUrl = null, audio = null, tFoto = null, urlSaida = null;
+  var pilha = [];                                  /* desfazer */
+  var lista = [], atual = null, mudo = false, abrindo = false, timer = null;   /* projetos */
+  var numeroCena = 0;
+ 
+  /* ====================== BOTÃO + PAINEL ====================== */
   var btn = document.createElement("button");
   btn.id = "esToggle"; btn.type = "button"; btn.className = "panel-toggle";
   btn.setAttribute("aria-expanded","false"); btn.setAttribute("aria-controls","esPainel");
@@ -6403,331 +6541,208 @@ body.dg-livro-vivo .dgp-nota{display:none}
   ancora.insertAdjacentElement("afterend", painel);
   ancora.insertAdjacentElement("afterend", btn);
  
+  var cartoes = MODOS.map(function(m){
+    return '<button type="button" class="es-card" data-m="' + m.id + '">' +
+      '<span class="es-eng" aria-hidden="true">\u2699\uFE0E</span>' +
+      '<span class="es-selo ' + m.e + '">' + ESTADO[m.e].rot + '</span><strong>' + m.t + '</strong><span class="es-d">' + m.d + '</span>' +
+      '<span class="es-trilha">' + m.p.map(function(x,i){ return '<span><b>' + (i+1) + '</b>' + x + '</span>'; }).join("") + '</span>' +
+      '<span class="es-ir">Começar</span></button>';
+  }).join("");
+ 
   painel.innerHTML =
-    '<div class="es-passos" style="margin:14px 0">' +
+    /* ----- tela de escolha ----- */
+    '<section id="esEscolha"><h3>O que você quer criar?</h3><p>Escolha um tipo. Cada um abre o seu caminho, com os passos na ordem certa.</p><div class="es-grade">' + cartoes + '</div></section>' +
+ 
+    /* ----- barra do caminho ----- */
+    '<div id="esBarra"><div class="es-quem"><small>Você está criando</small><strong id="esNome"></strong></div>' +
+      '<p id="esAviso"></p>' +
+      '<button type="button" id="esTrocar"><i aria-hidden="true">\u2699\uFE0E</i>TROCAR TIPO</button></div>' +
+ 
+    /* ----- meus projetos ----- */
+    '<details id="esBiblioteca" open><summary><span id="esBibResumo">Meus projetos</span></summary><div class="bib-corpo">' +
+      '<div class="bib-atual"><label>Projeto atual<input id="esBibNome" type="text" placeholder="Nome do projeto (opcional)"></label>' +
+        '<div class="bib-botoes"><button type="button" class="at-btn gold" id="esBibSalvar">SALVAR PROJETO</button><button type="button" class="at-btn" id="esBibNovo">NOVO PROJETO</button></div></div>' +
+      '<p class="bib-msg" id="esBibMsg" role="status"></p>' +
+      '<label class="bib-filtro">Mostrar<select id="esBibFiltro"><option value="">Todos os tipos</option>' +
+        Object.keys(NOMES_MODO).map(function(k){ return '<option value="'+k+'">'+NOMES_MODO[k]+'</option>'; }).join("") + '</select></label>' +
+      '<div id="esBibLista" class="bib-lista"></div></div></details>' +
+ 
+    /* ----- os 4 passos ----- */
+    '<div class="es-passos">' +
       '<button type="button" class="at-btn on" data-p="1">1. CRIAR</button>' +
       '<button type="button" class="at-btn" data-p="2">2. VOZ, MÚSICA E IMAGENS</button>' +
       '<button type="button" class="at-btn" data-p="3">3. PRÉVIA</button>' +
-      '<button type="button" class="at-btn" data-p="4">4. EXPORTAR</button>' +
-    '</div>' +
+      '<button type="button" class="at-btn" data-p="4">4. EXPORTAR</button></div>' +
  
-    /* ===== PASSO 1 ===== */
-    '<div class="es-box" data-passo="1">' +
-      '<h3>O que você quer criar?</h3>' +
-      '<div class="es-cartoes" id="esTipos"></div>' +
+    /* ----- passo 1: planejamento do filme (só no tipo Filmes) ----- */
+    '<section class="es-secao" id="esFilme"><h3>Planejamento do filme bíblico</h3>' +
+      '<p class="es-nota">Estrutura de planejamento visual. A geração de roteiro e imagens por IA ainda não está ligada.</p>' +
+      '<div class="es-grid2"><label>História bíblica<input id="esFilmeHistoria" placeholder="Ex.: Davi e Golias"></label><label>Passagem bíblica<input id="esFilmePassagem" placeholder="Ex.: 1 Samuel 17"></label>' +
+        '<label>Estilo visual<select id="esFilmeEstilo"><option>Cinematográfico realista</option><option>Ilustração infantil</option><option>Animação 3D</option><option>Livro de histórias ilustrado</option></select></label>' +
+        '<label>Duração pretendida<select id="esFilmeDuracao"><option>1–3 minutos</option><option>3–5 minutos</option><option>5–10 minutos</option><option>Mais de 10 minutos</option></select></label></div>' +
+      '<label>Resumo da história<textarea id="esFilmeResumo" placeholder="Descreva a mensagem principal e os acontecimentos que deseja contar."></textarea></label>' +
+      '<div class="es-linha" style="justify-content:space-between"><h3 style="font-size:18px">Cenas do filme</h3><button type="button" class="at-btn gold" id="esFilmeAddCena">+ ADICIONAR CENA</button></div>' +
+      '<div id="esFilmeCenas" class="es-cenas"></div>' +
+      '<div class="es-grid2"><label>Voz e narração<select id="esFilmeVoz"><option>Narração principal</option><option>Narrador e diálogos</option><option>Somente diálogos</option></select></label>' +
+        '<label>Trilha sonora<select id="esFilmeMusica"><option>Trilha suave</option><option>Épica e cinematográfica</option><option>Infantil e leve</option><option>Sem música</option></select></label></div>' +
+      '<div class="es-linha"><button type="button" class="at-btn" id="esFilmeSalvarPlano">GUARDAR PLANO</button><button type="button" class="at-btn" id="esFilmeVoltar">VOLTAR AOS VÍDEOS PARA REDES</button></div>' +
+      '<p id="esFilmeMsg" class="es-aviso" role="status">Planejamento local: nenhuma geração ou exportação foi iniciada.</p></section>' +
+ 
+    /* ----- passo 1: louvores e cortes ----- */
+    '<section class="es-secao" id="esExtra" aria-live="polite"><h3 id="esExtraTitulo"></h3><p class="es-nota" id="esExtraIntro"></p>' +
+      '<div id="esExtraMusica"><div class="es-grid2">' +
+        '<label>Tema ou mensagem da canção<input id="esMusTema" placeholder="Ex.: confiança em Deus nos dias difíceis"></label>' +
+        '<label>Referência bíblica (opcional)<input id="esMusReferencia" placeholder="Ex.: Salmo 23"></label>' +
+        '<label>Estilo musical<select id="esMusEstilo"><option>Adoração suave</option><option>Louvor contemporâneo</option><option>Gospel acústico</option><option>Coral épico</option><option>Instrumental contemplativo</option></select></label>' +
+        '<label>Voz desejada<select id="esMusVoz"><option>Voz feminina</option><option>Voz masculina</option><option>Dueto</option><option>Coral</option><option>Somente instrumental</option></select></label>' +
+        '<label>Clima da música<select id="esMusClima"><option>Esperançoso</option><option>Contemplativo</option><option>Triunfante</option><option>Emocionante</option><option>Sereno</option></select></label>' +
+        '<label>Vídeo da música<select id="esMusVideo"><option>Letra sincronizada na tela</option><option>Cenas cinematográficas</option><option>Imagens contemplativas</option><option>Vídeo vertical para redes</option></select></label></div>' +
+        '<label style="margin-top:12px">Ideia para a letra<textarea id="esMusLetraIdeia" placeholder="Descreva a mensagem, imagens e palavras que deseja transmitir."></textarea></label>' +
+        '<div class="es-linha" style="margin-top:12px"><button type="button" class="at-btn gold" id="esMusGerarLetra">PREPARAR PEDIDO DE LETRA COM IA</button><button type="button" class="at-btn" id="esMusSalvar">GUARDAR PLANO MUSICAL</button></div>' +
+        '<p class="es-aviso" id="esMusStatus" role="status" style="margin-top:12px">A letra, a música cantada e o áudio ainda não serão gerados nesta etapa; o serviço será ligado posteriormente.</p></div>' +
+      '<div id="esExtraCortes" hidden><div class="es-grid2">' +
+        '<label>Vídeo de origem<input id="esCorteArquivo" type="file" accept="video/*"></label>' +
+        '<label>Formato de saída<select id="esCorteFormato"><option>Vertical 9:16 — TikTok, Reels e Shorts</option><option>Quadrado 1:1</option><option>Horizontal 16:9</option></select></label>' +
+        '<label>Início do trecho (segundos)<input id="esCorteInicio" type="number" min="0" value="0"></label>' +
+        '<label>Fim do trecho (segundos)<input id="esCorteFim" type="number" min="1" value="30"></label>' +
+        '<label>Estilo de legenda<select id="esCorteLegenda"><option>Legendas automáticas destacadas</option><option>Legenda discreta</option><option>Palavras-chave em destaque</option><option>Sem legendas</option></select></label>' +
+        '<label>Música de fundo<select id="esCorteMusica"><option>Manter áudio original</option><option>Adicionar música autorizada</option><option>Reduzir áudio original e adicionar música</option></select></label></div>' +
+        '<label style="margin-top:12px">Instrução para encontrar o melhor trecho<textarea id="esCorteInstrucao" placeholder="Ex.: encontrar a parte mais inspiradora da mensagem, com começo claro e conclusão."></textarea></label>' +
+        '<div class="es-linha" style="margin-top:12px"><button type="button" class="at-btn gold" id="esCortePreparar">PREPARAR CORTE</button><button type="button" class="at-btn" id="esCorteSalvar">GUARDAR PLANO DE CORTE</button></div>' +
+        '<p class="es-aviso" id="esCorteStatus" role="status" style="margin-top:12px">Escolha um vídeo próprio ou autorizado. A edição, detecção de trechos e renderização serão conectadas depois.</p>' +
+        '<video id="esCorteVideoPreview" controls playsinline style="display:none;width:min(100%,420px);max-height:480px;background:#101b2c;border-radius:8px"></video></div></section>' +
+ 
+    /* ----- passo 1: texto ----- */
+    '<div class="es-box" data-passo="1"><h3>Tipo de texto</h3><div class="es-cartoes" id="esTipos"></div>' +
       '<div class="at-row">' +
-        '<label class="es-campo">Tom da mensagem<select id="esTom" class="at-sel">' +
-          '<option>Acolhedor</option><option>Solene</option><option>Esperançoso</option><option>Firme</option><option>Poético</option></select></label>' +
-        '<label class="es-campo">Duração desejada<select id="esDur" class="at-sel">' +
-          '<option value="30">cerca de 30 segundos</option><option value="60" selected>cerca de 1 minuto</option>' +
-          '<option value="120">cerca de 2 minutos</option><option value="300">cerca de 5 minutos</option></select></label>' +
-        '<label class="es-campo es-grow" style="flex:1 1 220px">Assunto ou passagem (opcional)<input id="esAssunto" class="at-in" type="text" placeholder="Ex.: Salmo 91, confiança em tempos difíceis"></label>' +
-      '</div>' +
+        '<label class="es-campo">Tom da mensagem<select id="esTom" class="at-sel"><option>Acolhedor</option><option>Solene</option><option>Esperançoso</option><option>Firme</option><option>Poético</option></select></label>' +
+        '<label class="es-campo">Duração desejada<select id="esDur" class="at-sel"><option value="30">cerca de 30 segundos</option><option value="60" selected>cerca de 1 minuto</option><option value="120">cerca de 2 minutos</option><option value="300">cerca de 5 minutos</option></select></label>' +
+        '<label class="es-campo" style="flex:1 1 220px">Assunto ou passagem (opcional)<input id="esAssunto" class="at-in" type="text" placeholder="Ex.: Salmo 91, confiança em tempos difíceis"></label></div>' +
       '<input id="esTitulo" class="at-in" type="text" placeholder="Título (opcional)" style="font:600 20px Georgia,serif;height:46px">' +
       '<textarea id="esTexto" class="es-texto" placeholder="Escreva aqui, ou use os botões de IA abaixo."></textarea>' +
       '<div class="at-row"><span id="esConta" class="es-msg" style="flex:1"></span></div>' +
-      '<div class="at-row">' +
-        '<button type="button" class="at-btn gold" data-ia="criar">CRIAR COM IA</button>' +
-        '<button type="button" class="at-btn" data-ia="reescrever">REESCREVER</button>' +
-        '<button type="button" class="at-btn" data-ia="aumentar">AUMENTAR A DURAÇÃO</button>' +
-        '<button type="button" class="at-btn" data-ia="tom">ADAPTAR O TOM</button>' +
-      '</div>' +
-      '<div class="at-row">' +
-        '<button type="button" class="at-btn" id="esPuxar">PUXAR TEXTO DO ATELIÊ</button>' +
-        '<button type="button" class="at-btn" id="esGuardar">GUARDAR VERSÃO</button>' +
-        '<button type="button" class="at-btn" id="esLimpar">LIMPAR</button>' +
-      '</div>' +
+      '<div class="at-row"><button type="button" class="at-btn gold" data-ia="criar">CRIAR COM IA</button><button type="button" class="at-btn" data-ia="reescrever">REESCREVER</button><button type="button" class="at-btn" data-ia="aumentar">AUMENTAR A DURAÇÃO</button><button type="button" class="at-btn" data-ia="tom">ADAPTAR O TOM</button></div>' +
+      '<div class="at-row"><button type="button" class="at-btn" id="esPuxar">PUXAR TEXTO DO ATELIÊ</button><button type="button" class="at-btn" id="esBuscar">BUSCAR PASSAGEM</button><button type="button" class="at-btn" id="esNumeros">TIRAR NÚMEROS DOS VERSÍCULOS</button><button type="button" class="at-btn" id="esAjustar">AJUSTAR À DURAÇÃO</button></div>' +
+      '<div class="at-row"><button type="button" class="at-btn" id="esOuvirTexto">OUVIR</button><button type="button" class="at-btn" id="esPararTexto">PARAR</button><button type="button" class="at-btn" id="esDesfazer" disabled>DESFAZER</button><button type="button" class="at-btn" id="esGuardar">GUARDAR VERSÃO</button><button type="button" class="at-btn" id="esLimpar">LIMPAR</button></div>' +
+      '<div class="es-res" id="esResultadoIA" hidden><strong id="esResTit">Resultado</strong><div class="es-res-aviso" id="esResAviso"></div><textarea id="esResTxt" aria-label="Resultado"></textarea>' +
+        '<div class="at-row"><button type="button" class="at-btn gold" id="esResUsar">USAR ESTE TEXTO</button><button type="button" class="at-btn" id="esResDescartar">DESCARTAR</button></div></div>' +
       '<div id="esVersoesBox"><p class="es-nota">Versões guardadas (use para criar outras versões do mesmo texto):</p><div class="es-vers" id="esVers"></div></div>' +
-      '<div id="esMsg1" class="es-msg" role="status"></div>' +
-    '</div>' +
+      '<div id="esMsg1" class="es-msg" role="status"></div></div>' +
  
-    /* ===== PASSO 2 ===== */
-    '<div class="es-box" data-passo="2" hidden>' +
-      '<h3>Voz, música e imagens</h3>' +
+    /* ----- passo 2 ----- */
+    '<div class="es-box" data-passo="2" hidden><h3>Voz, música e imagens</h3>' +
       '<div class="at-row">' +
-        '<label class="es-campo">Voz<select id="esVoz" class="at-sel"></select></label>' +
+        '<label class="es-campo">Voz profissional (para o arquivo)<select id="f1Voz" class="at-sel"><option value="f1">Feminina, suave</option><option value="m1">Masculina, grave</option><option value="n1">Narrador, solene</option></select></label>' +
+        '<label class="es-campo">Voz do navegador (só para ouvir)<select id="esVoz" class="at-sel"></select></label>' +
         '<label class="es-campo">Velocidade<select id="esVel" class="at-sel"><option value="0.85">Lenta</option><option value="1" selected>Normal</option><option value="1.15">Rápida</option></select></label>' +
-        '<label class="es-campo">Formato do vídeo<select id="esFormato" class="at-sel"><option value="f916">Vertical 9:16 (TikTok, Reels, Shorts)</option><option value="f11">Quadrado 1:1 (Feed)</option><option value="f169">Horizontal 16:9 (YouTube)</option></select></label>' +
-      '</div>' +
-      '<p class="es-nota">As vozes desta lista vêm do seu navegador, são só para ouvir e testar. As vozes profissionais para gerar o arquivo entram quando ligarmos o serviço de voz.</p>' +
-      '<div class="at-row">' +
-        '<label class="es-campo">Música de fundo<select id="esMusica" class="at-sel"><option value="">Sem música</option><option value="propria">Usar um arquivo meu…</option></select></label>' +
-        '<label class="es-campo">Volume da música<input id="esVolMus" type="range" min="0" max="100" value="25"></label>' +
-        '<input id="esMusArq" type="file" accept="audio/*" hidden>' +
-      '</div>' +
+        '<label class="es-campo">Formato do vídeo<select id="esFormato" class="at-sel"><option value="f916">Vertical 9:16 (TikTok, Reels, Shorts)</option><option value="f11">Quadrado 1:1 (Feed)</option><option value="f169">Horizontal 16:9 (YouTube)</option></select></label></div>' +
+      '<p class="es-nota">A voz do navegador serve só para ouvir e testar. O arquivo final usa a voz profissional.</p>' +
+      '<div class="at-row"><label class="es-campo">Música de fundo<select id="esMusica" class="at-sel"><option value="">Sem música</option><option value="propria">Usar um arquivo meu…</option></select></label>' +
+        '<label class="es-campo">Volume da música<input id="esVolMus" type="range" min="0" max="100" value="25"></label><input id="esMusArq" type="file" accept="audio/*" hidden></div>' +
       '<p class="es-nota">Use somente músicas e imagens que você tenha licença para publicar nas redes. Senão a rede pode bloquear ou remover o vídeo.</p>' +
-      '<div class="at-row"><button type="button" class="at-btn" id="esAddFoto">ADICIONAR IMAGENS DE FUNDO</button><input id="esFotoArq" type="file" accept="image/*" multiple hidden>' +
-        '<span class="es-nota">As imagens não precisam ter relação com o que é dito.</span></div>' +
-      '<div class="es-fotos" id="esFotos"></div>' +
-      '<div id="esMsg2" class="es-msg" role="status"></div>' +
-    '</div>' +
+      '<div class="at-row"><button type="button" class="at-btn" id="esAddFoto">ADICIONAR IMAGENS DE FUNDO</button><input id="esFotoArq" type="file" accept="image/*" multiple hidden><span class="es-nota">As imagens não precisam ter relação com o que é dito.</span></div>' +
+      '<div class="es-fotos" id="esFotos"></div><div id="esMsg2" class="es-msg" role="status"></div></div>' +
  
-    /* ===== PASSO 3 ===== */
-    '<div class="es-box" data-passo="3" hidden>' +
-      '<h3>Prévia</h3>' +
-      '<div class="es-previa">' +
-        '<div class="es-tela f916" id="esTela"><div class="es-legenda" id="esLegenda">Sua mensagem aparece aqui.</div></div>' +
-        '<div style="display:flex;flex-direction:column;gap:12px">' +
-          '<div id="esResumo" class="es-nota"></div>' +
-          '<div class="at-row"><button type="button" class="at-btn gold" id="esOuvir">OUVIR NO NAVEGADOR</button><button type="button" class="at-btn" id="esParar">PARAR</button></div>' +
-          '<p class="es-nota">Esta prévia usa a voz do navegador e as imagens que você escolheu. O arquivo final (MP3/MP4) é gerado no passo seguinte, depois de ligarmos o Worker.</p>' +
-        '</div>' +
-      '</div>' +
-      '<div id="esMsg3" class="es-msg" role="status"></div>' +
-    '</div>' +
+    /* ----- passo 3 ----- */
+    '<div class="es-box" data-passo="3" hidden><h3>Prévia</h3><div class="es-previa">' +
+      '<div class="es-tela f916" id="esTela"><div class="es-legenda" id="esLegenda">Sua mensagem aparece aqui.</div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:12px"><div id="esResumo" class="es-nota"></div>' +
+        '<div class="at-row"><button type="button" class="at-btn gold" id="esOuvir">OUVIR NO NAVEGADOR</button><button type="button" class="at-btn" id="esParar">PARAR</button></div>' +
+        '<p class="es-nota">Esta prévia usa a voz do navegador e as imagens que você escolheu. O arquivo final (MP3/MP4) é gerado no passo Exportar, com a voz profissional.</p></div></div>' +
+      '<div id="esMsg3" class="es-msg" role="status"></div></div>' +
  
-    /* ===== PASSO 4 ===== */
-    '<div class="es-box" data-passo="4" hidden>' +
-      '<h3>Exportar</h3>' +
-      '<p class="es-nota">Marque onde vai publicar. O arquivo sai no formato certo para cada rede.</p>' +
+    /* ----- passo 3: montagem ----- */
+    '<section class="es-secao" id="esEditorLinha"><h3>Montagem da produção</h3>' +
+      '<p class="es-nota">Prévia conceitual da linha do tempo. Quando o editor estiver conectado, será possível ajustar e sincronizar cada faixa.</p>' +
+      '<div class="es-faixa"><strong>Cenas / vídeo</strong><div class="es-faixa-trechos"><span class="es-trecho">Abertura</span><span class="es-trecho">Mensagem</span><span class="es-trecho">Conclusão</span></div></div>' +
+      '<div class="es-faixa"><strong>Narração / voz</strong><div class="es-faixa-trechos"><span class="es-trecho audio">Narração</span><span class="es-trecho audio">Pausas</span></div></div>' +
+      '<div class="es-faixa"><strong>Música</strong><div class="es-faixa-trechos"><span class="es-trecho audio">Trilha de fundo</span></div></div>' +
+      '<div class="es-faixa"><strong>Legendas</strong><div class="es-faixa-trechos"><span class="es-trecho legenda">Versículos e texto sincronizado</span></div></div>' +
+      '<label style="margin-top:12px">Observações de edição<textarea id="esEditorNotas" rows="2" placeholder="Cortes, transições, ritmo, legendas e ajustes desejados"></textarea></label>' +
+      '<div class="es-linha" style="margin-top:10px"><button type="button" class="at-btn" id="esEditorSalvar">GUARDAR NOTAS DE EDIÇÃO</button><span class="es-nota" id="esEditorStatus" role="status">A linha do tempo é uma estrutura visual; a renderização será ligada depois.</span></div></section>' +
+ 
+    /* ----- passo 4 ----- */
+    '<div class="es-box" data-passo="4" hidden><h3>Exportar</h3><p class="es-nota">Marque onde vai publicar. O arquivo sai no formato certo para cada rede.</p>' +
       '<div class="es-dest" id="esDest"></div>' +
-      '<div class="at-row">' +
-        '<button type="button" class="at-btn gold" data-exp="mp3">EXPORTAR ÁUDIO (MP3)</button>' +
-        '<button type="button" class="at-btn gold" data-exp="mp4">EXPORTAR VÍDEO (MP4)</button>' +
-      '</div>' +
+      '<div class="at-row"><button type="button" class="at-btn gold" data-exp="mp3">EXPORTAR ÁUDIO (MP3)</button><button type="button" class="at-btn gold" data-exp="mp4">EXPORTAR VÍDEO (MP4)</button></div>' +
       '<p class="es-nota">A publicação direta nas redes depende das regras e permissões de cada uma e fica para uma etapa futura. Por enquanto você baixa o arquivo e publica.</p>' +
       '<div id="esMsg4" class="es-msg" role="status"></div>' +
-    '</div>';
+      '<div class="es-saida" id="esSaida" hidden><div class="es-info" id="esInfo"></div><div class="es-barra"><i id="esProg"></i></div>' +
+        '<video id="esVideoSaida" controls playsinline hidden></video>' +
+        '<div class="es-linha"><a id="esBaixar" class="at-btn gold" hidden style="display:none;text-decoration:none;line-height:38px">BAIXAR ARQUIVO</a></div></div></div>' +
  
-  /* ---------- seletor estrutural dos modos de produção (sem Worker) ---------- */
-  var modoStyle = document.createElement("style");
-  modoStyle.textContent = `
-    #esTipoRapido,#esPublicacao{border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);padding:16px;margin:0 0 14px}
-    #esTipoRapido label,#esPublicacao label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-    #esTipoRapido select,#esPublicacao input,#esPublicacao select,#esPublicacao textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
-    #esPublicacao .es-publicacao-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    #esModos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 14px}
-    #esModos .es-modo{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:16px;border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);cursor:pointer}
-    #esModos .es-modo[aria-pressed="true"]{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
-    #esModos .es-modo strong{display:block;font:600 17px Georgia,serif;margin-bottom:5px}
-    #esModos .es-modo small{display:block;font:13px/1.45 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-    #esFilme{display:none;border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);padding:18px;gap:14px}
-    #esFilme.ativo{display:flex;flex-direction:column}
-    #esFilme .es-filme-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    #esFilme .es-filme-campo{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-    #esFilme input,#esFilme select,#esFilme textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
-    #esFilme textarea{min-height:100px;resize:vertical}
-    #esFilme .es-cenas{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-    #esFilme .es-cena{border:1px solid var(--paper-line);border-radius:7px;padding:12px;display:flex;flex-direction:column;gap:8px;background:#fffdf6}
-    #esFilme .es-cena h4{margin:0;font:600 15px Georgia,serif;color:var(--ink)}
-    #esFilme .es-filme-aviso{margin:0;padding:10px 12px;border-left:3px solid var(--brass);background:var(--brass-wash);font:13px/1.5 "Segoe UI",Arial,sans-serif}
-    #esModos{grid-template-columns:repeat(2,minmax(0,1fr))}
-    #esCriacaoExtra{border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);padding:18px;margin:0 0 14px;display:none;gap:14px}
-    #esCriacaoExtra.ativo{display:flex;flex-direction:column}
-    #esCriacaoExtra .es-extra-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    #esCriacaoExtra label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-    #esCriacaoExtra input,#esCriacaoExtra select,#esCriacaoExtra textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
-    #esCriacaoExtra textarea{min-height:90px;resize:vertical}
-    #esCriacaoExtra .es-extra-aviso{margin:0;padding:10px 12px;border-left:3px solid var(--brass);background:var(--brass-wash);font:13px/1.5 "Segoe UI",Arial,sans-serif}
-    #esEditorLinha{border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink);padding:16px;margin:0 0 14px;display:none}
-    #esEditorLinha.ativo{display:block}
-    #esEditorLinha .es-faixa{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;margin:9px 0}
-    #esEditorLinha .es-faixa-trechos{display:flex;gap:5px;min-height:28px}
-    #esEditorLinha .es-trecho{border-radius:4px;padding:6px 8px;background:var(--brass-wash);border:1px solid var(--paper-line);font-size:11px;flex:1;min-width:0}
-    #esEditorLinha .es-trecho.audio{background:#dbeafe}
-    #esEditorLinha .es-trecho.legenda{background:#dcfce7}
-    @media(max-width:700px){#esModos,#esFilme .es-filme-grid,#esPublicacao .es-publicacao-grid,#esCriacaoExtra .es-extra-grid{grid-template-columns:1fr}#esEditorLinha .es-faixa{grid-template-columns:1fr;gap:4px}}
-  `;
-  document.head.appendChild(modoStyle);
-  var passosOriginais = painel.querySelector('.es-passos');
-  var caixasOriginais = Array.prototype.slice.call(painel.querySelectorAll('.es-box'));
-  var tipoRapido = document.createElement('section');
-  tipoRapido.id = 'esTipoRapido';
-  tipoRapido.innerHTML = '<label for="esTipoRapidoSelect">O que você deseja criar? <select id="esTipoRapidoSelect"><option>Salmo ou oração</option><option>História bíblica curta</option><option>Testemunho pessoal</option><option>Mensagem ou reflexão</option><option>Devocional</option></select></label><p class="es-nota">Escolha o conteúdo e siga as etapas de texto, voz, imagens, prévia e exportação.</p>';
-  var modos = document.createElement('div');
-  modos.id = 'esModos';
-  modos.innerHTML = '<button type="button" class="es-modo" data-modo="redes" aria-pressed="true"><span aria-hidden="true">▶</span><span><strong>Vídeos e mensagens bíblicas</strong><small>Salmos, orações, testemunhos e reflexões com voz, música, imagens e legendas.</small></span></button>' +
-    '<button type="button" class="es-modo" data-modo="filme" aria-pressed="false"><span aria-hidden="true">🎬</span><span><strong>Filmes de histórias bíblicas</strong><small>Roteiro dividido em cenas, personagens, diálogos e sequência visual.</small></span></button>' +
-    '<button type="button" class="es-modo" data-modo="musica" aria-pressed="false"><span aria-hidden="true">♫</span><span><strong>Louvores e letras com IA</strong><small>Letra original, estilo musical, voz cantada e vídeo com letras na tela.</small></span></button>' +
-    '<button type="button" class="es-modo" data-modo="cortes" aria-pressed="false"><span aria-hidden="true">✂</span><span><strong>Cortes para TikTok e Reels</strong><small>Selecionar trechos de vídeos próprios ou autorizados, legendar e adaptar ao vertical.</small></span></button>';
-  painel.insertBefore(modos, painel.firstChild);
-  painel.insertBefore(tipoRapido, modos);
-  var filme = document.createElement('section');
-  filme.id = 'esFilme';
-  filme.setAttribute('aria-labelledby','esFilmeTitulo');
-  filme.innerHTML = '<h3 id="esFilmeTitulo">Planejamento do filme bíblico</h3>' +
-    '<p class="es-nota">Estrutura de planejamento visual. A geração de roteiro, imagens, áudio e vídeo será conectada numa fase posterior; este painel ainda não envia dados ao Worker.</p>' +
-    '<div class="es-filme-grid"><label class="es-filme-campo">História bíblica<input id="esFilmeHistoria" placeholder="Ex.: Davi e Golias"></label><label class="es-filme-campo">Passagem bíblica<input id="esFilmePassagem" placeholder="Ex.: 1 Samuel 17"></label><label class="es-filme-campo">Estilo visual<select id="esFilmeEstilo"><option>Cinematográfico realista</option><option>Ilustração infantil</option><option>Animação 3D</option><option>Livro de histórias ilustrado</option></select></label><label class="es-filme-campo">Duração pretendida<select id="esFilmeDuracao"><option>1–3 minutos</option><option>3–5 minutos</option><option>5–10 minutos</option><option>Mais de 10 minutos</option></select></label></div>' +
-    '<label class="es-filme-campo">Resumo da história<textarea id="esFilmeResumo" placeholder="Descreva a mensagem principal e os acontecimentos que deseja contar."></textarea></label>' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="font-size:18px">Cenas do filme</h3><button type="button" class="at-btn gold" id="esFilmeAddCena">+ ADICIONAR CENA</button></div>' +
-    '<div id="esFilmeCenas" class="es-cenas"></div>' +
-    '<div class="es-filme-grid"><label class="es-filme-campo">Voz e narração<select id="esFilmeVoz"><option>Narração principal</option><option>Narrador e diálogos</option><option>Somente diálogos</option></select></label><label class="es-filme-campo">Trilha sonora<select id="esFilmeMusica"><option>Trilha suave</option><option>Épica e cinematográfica</option><option>Infantil e leve</option><option>Sem música</option></select></label></div>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn" id="esFilmeSalvarPlano">GUARDAR PLANO NESTA TELA</button><button type="button" class="at-btn" id="esFilmeVoltar">VOLTAR AOS VÍDEOS PARA REDES</button></div>' +
-    '<p id="esFilmeMsg" class="es-filme-aviso" role="status">Planejamento local: nenhuma geração ou exportação foi iniciada.</p>';
-  passosOriginais.insertAdjacentElement('afterend', filme);
-  var publicacao = document.createElement('section');
-  publicacao.id = 'esPublicacao';
-  publicacao.innerHTML = '<h3>Destino do projeto</h3><p class="es-nota">Defina como o conteúdo deverá aparecer na página de exibição. Esta etapa organiza a publicação; não envia nem publica arquivos ainda.</p><div class="es-publicacao-grid"><label>Título para exibição<input id="esPubTitulo" placeholder="Título do vídeo ou filme"></label><label>Página de destino<select id="esPubDestino"><option>Biblioteca de vídeos bíblicos</option><option>Filmes e histórias bíblicas</option><option>Salmos, orações e testemunhos</option><option>Outra página do site</option></select></label><label>Estilo da capa<select id="esPubCapa"><option>Capa cinematográfica com botão assistir</option><option>Capa ilustrada</option><option>Capa com título e passagem bíblica</option></select></label><label>Visibilidade<select id="esPubVisibilidade"><option>Rascunho — não publicado</option><option>Pronto para publicar</option></select></label></div><label style="display:flex;flex-direction:column;gap:5px;margin-top:12px;font:700 12px Segoe UI,Arial,sans-serif;color:var(--ink-soft)">Descrição para a página<textarea id="esPubDescricao" rows="3" placeholder="Resumo que aparecerá junto ao vídeo"></textarea></label><p id="esPubStatus" class="es-filme-aviso" role="status">A estrutura da página de destino está definida. Exportação e publicação serão conectadas após a integração do Worker.</p>';
-  filme.insertAdjacentElement('afterend', publicacao);
-  var extra = document.createElement('section'); extra.id='esCriacaoExtra'; extra.setAttribute('aria-live','polite');
-  extra.innerHTML = '<h3 id="esExtraTitulo">Criação musical com IA</h3><p class="es-nota" id="esExtraIntro">Prepare a ideia e as preferências da produção. A geração real será conectada depois ao serviço compatível.</p>' +
-    '<div id="esExtraMusica"><div class="es-extra-grid"><label>Tema ou mensagem da canção<input id="esMusTema" placeholder="Ex.: confiança em Deus nos dias difíceis"></label><label>Referência bíblica (opcional)<input id="esMusReferencia" placeholder="Ex.: Salmo 23"></label><label>Estilo musical<select id="esMusEstilo"><option>Adoração suave</option><option>Louvor contemporâneo</option><option>Gospel acústico</option><option>Coral épico</option><option>Instrumental contemplativo</option></select></label><label>Voz desejada<select id="esMusVoz"><option>Voz feminina</option><option>Voz masculina</option><option>Dueto</option><option>Coral</option><option>Somente instrumental</option></select></label><label>Clima da música<select id="esMusClima"><option>Esperançoso</option><option>Contemplativo</option><option>Triunfante</option><option>Emocionante</option><option>Sereno</option></select></label><label>Vídeo da música<select id="esMusVideo"><option>Letra sincronizada na tela</option><option>Cenas cinematográficas</option><option>Imagens contemplativas</option><option>Vídeo vertical para redes</option></select></label></div><label>Ideia para a letra<textarea id="esMusLetraIdeia" placeholder="Descreva a mensagem, imagens e palavras que deseja transmitir."></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="esMusGerarLetra">PREPARAR PEDIDO DE LETRA COM IA</button><button type="button" class="at-btn" id="esMusSalvar">GUARDAR PLANO MUSICAL</button></div><p class="es-extra-aviso" id="esMusStatus" role="status">A letra, a música cantada e o áudio ainda não serão gerados nesta etapa; o serviço será ligado posteriormente.</p></div>' +
-    '<div id="esExtraCortes" hidden><div class="es-extra-grid"><label>Vídeo de origem<input id="esCorteArquivo" type="file" accept="video/*"></label><label>Formato de saída<select id="esCorteFormato"><option>Vertical 9:16 — TikTok, Reels e Shorts</option><option>Quadrado 1:1</option><option>Horizontal 16:9</option></select></label><label>Início do trecho (segundos)<input id="esCorteInicio" type="number" min="0" value="0"></label><label>Fim do trecho (segundos)<input id="esCorteFim" type="number" min="1" value="30"></label><label>Estilo de legenda<select id="esCorteLegenda"><option>Legendas automáticas destacadas</option><option>Legenda discreta</option><option>Palavras-chave em destaque</option><option>Sem legendas</option></select></label><label>Música de fundo<select id="esCorteMusica"><option>Manter áudio original</option><option>Adicionar música autorizada</option><option>Reduzir áudio original e adicionar música</option></select></label></div><label>Instrução para encontrar o melhor trecho<textarea id="esCorteInstrucao" placeholder="Ex.: encontrar a parte mais inspiradora da mensagem, com começo claro e conclusão."></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="esCortePreparar">PREPARAR CORTE</button><button type="button" class="at-btn" id="esCorteSalvar">GUARDAR PLANO DE CORTE</button></div><p class="es-extra-aviso" id="esCorteStatus" role="status">Escolha um vídeo próprio ou autorizado. A edição, detecção de trechos e renderização serão conectadas depois.</p><video id="esCorteVideoPreview" controls playsinline style="display:none;width:min(100%,420px);max-height:480px;background:#101b2c;border-radius:8px"></video></div>';
-  filme.insertAdjacentElement('afterend',extra);
-  var editor = document.createElement('section'); editor.id='esEditorLinha';
-  editor.innerHTML='<h3>Montagem da produção</h3><p class="es-nota">Prévia conceitual da linha do tempo. Quando o editor estiver conectado, será possível ajustar e sincronizar cada faixa.</p><div class="es-faixa"><strong>Cenas / vídeo</strong><div class="es-faixa-trechos"><span class="es-trecho">Abertura</span><span class="es-trecho">Mensagem</span><span class="es-trecho">Conclusão</span></div></div><div class="es-faixa"><strong>Narração / voz</strong><div class="es-faixa-trechos"><span class="es-trecho audio">Narração</span><span class="es-trecho audio">Pausas</span></div></div><div class="es-faixa"><strong>Música</strong><div class="es-faixa-trechos"><span class="es-trecho audio">Trilha de fundo</span></div></div><div class="es-faixa"><strong>Legendas</strong><div class="es-faixa-trechos"><span class="es-trecho legenda">Versículos e texto sincronizado</span></div></div><label style="display:flex;flex-direction:column;gap:5px;margin-top:12px">Observações de edição<textarea id="esEditorNotas" rows="2" placeholder="Cortes, transições, ritmo, legendas e ajustes desejados"></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="at-btn" id="esEditorSalvar">GUARDAR NOTAS DE EDIÇÃO</button><span class="es-nota" id="esEditorStatus" role="status">A linha do tempo é uma estrutura visual; a renderização será ligada depois.</span></div>';
-  publicacao.insertAdjacentElement('afterend',editor);
-  var cenas = document.getElementById('esFilmeCenas');
-  var numeroCena = 0;
-  function adicionarCena(titulo, descricao){
-    numeroCena++;
-    var card = document.createElement('article'); card.className = 'es-cena';
-    card.innerHTML = '<h4>Cena '+numeroCena+'</h4><label class="es-filme-campo">Título da cena<input class="es-cena-titulo" value="'+(titulo||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" placeholder="Ex.: Davi aceita o desafio"></label><label class="es-filme-campo">Ação, fala ou imagem desejada<textarea class="es-cena-desc" placeholder="O que acontece nesta cena?">'+(descricao||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</textarea></label><button type="button" class="at-btn es-cena-remover">Remover cena</button>';
-    card.querySelector('.es-cena-remover').addEventListener('click',function(){card.remove();renumerarCenas();});
-    cenas.appendChild(card); renumerarCenas();
+    /* ----- passo 4: destino ----- */
+    '<section class="es-secao" id="esPublicacao"><h3>Destino do projeto</h3>' +
+      '<p class="es-nota">Defina como o conteúdo deverá aparecer na página de exibição. Esta etapa organiza a publicação; não envia nem publica arquivos ainda.</p>' +
+      '<div class="es-grid2" style="margin-top:12px"><label>Título para exibição<input id="esPubTitulo" placeholder="Título do vídeo ou filme"></label>' +
+        '<label>Página de destino<select id="esPubDestino"><option>Biblioteca de vídeos bíblicos</option><option>Filmes e histórias bíblicas</option><option>Salmos, orações e testemunhos</option><option>Outra página do site</option></select></label>' +
+        '<label>Estilo da capa<select id="esPubCapa"><option>Capa cinematográfica com botão assistir</option><option>Capa ilustrada</option><option>Capa com título e passagem bíblica</option></select></label>' +
+        '<label>Visibilidade<select id="esPubVisibilidade"><option>Rascunho — não publicado</option><option>Pronto para publicar</option></select></label></div>' +
+      '<label style="margin-top:12px">Descrição para a página<textarea id="esPubDescricao" rows="3" placeholder="Resumo que aparecerá junto ao vídeo"></textarea></label>' +
+      '<p id="esPubStatus" class="es-aviso" role="status" style="margin-top:12px">A estrutura da página de destino está definida. Exportação e publicação serão conectadas após a integração do Worker.</p></section>';
+ 
+  /* ====================== FUNÇÕES BÁSICAS ====================== */
+  function modoDe(id){ return MODOS.filter(function(x){ return x.id === id; })[0]; }
+  function gravarTextos(){ try{ localStorage.setItem(CH_TEXTOS, JSON.stringify(st)); }catch(e){} }
+  function msg(n, t, erro){ var el = $("esMsg"+n); el.textContent = t || ""; el.className = "es-msg" + (erro ? " erro" : ""); }
+ 
+  function setFase(f){
+    painel.setAttribute("data-fase", f);
+    $("esBiblioteca").open = (f === "escolha");      /* aberta na escolha, recolhida dentro do caminho */
   }
-  function renumerarCenas(){numeroCena=0;Array.prototype.forEach.call(cenas.children,function(card){numeroCena++;card.querySelector('h4').textContent='Cena '+numeroCena;});}
-  function mudarModo(modo){
-    var redes = modo === 'redes', ehFilme = modo === 'filme', ehMusica = modo === 'musica', ehCortes = modo === 'cortes';
-    modos.querySelectorAll('[data-modo]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.modo===modo));});
-    tipoRapido.hidden = !redes;
-    passosOriginais.hidden = !redes;
-    caixasOriginais.forEach(function(c){c.hidden = redes ? c.dataset.passo !== '1' : true;});
-    filme.classList.toggle('ativo',ehFilme);
-    publicacao.style.display = 'block';
-    extra.classList.toggle('ativo',ehMusica||ehCortes);
-    document.getElementById('esExtraMusica').hidden = !ehMusica;
-    document.getElementById('esExtraCortes').hidden = !ehCortes;
-    document.getElementById('esExtraTitulo').textContent = ehCortes ? 'Editor de cortes para TikTok e Reels' : 'Criação de louvores e letras com IA';
-    document.getElementById('esExtraIntro').textContent = ehCortes ? 'Importe um vídeo próprio ou autorizado, indique o trecho e prepare as opções de edição.' : 'Defina tema, referência, estilo e formato. A geração de letra e áudio depende da integração de IA.';
-    editor.classList.add('ativo');
-    if(redes){var caixaAtiva=painel.querySelector('.es-box[data-passo="1"]');if(caixaAtiva)caixaAtiva.hidden=false;}
-    painel.setAttribute('data-modo-ativo',modo);
+  function mostrar(n){
+    painel.setAttribute("data-passo", String(n));
+    painel.querySelectorAll(".es-box[data-passo]").forEach(function(b){ b.hidden = b.dataset.passo !== String(n); });
+    painel.querySelectorAll(".es-passos .at-btn").forEach(function(b){ b.classList.toggle("on", b.dataset.p === String(n)); });
+    if(n === 3) desenharPrevia(); else pararVoz();
   }
-  modos.addEventListener('click',function(ev){var b=ev.target.closest('[data-modo]');if(b)mudarModo(b.dataset.modo);});
-  document.getElementById('esMusGerarLetra').addEventListener('click',function(){document.getElementById('esMusStatus').textContent='Pedido preparado com as preferências atuais. A geração da letra por IA ainda depende de conectar um serviço; nenhum áudio foi gerado.';});
-  document.getElementById('esMusSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_plano_musical',JSON.stringify({tema:document.getElementById('esMusTema').value,referencia:document.getElementById('esMusReferencia').value,estilo:document.getElementById('esMusEstilo').value,voz:document.getElementById('esMusVoz').value,clima:document.getElementById('esMusClima').value,video:document.getElementById('esMusVideo').value,ideia:document.getElementById('esMusLetraIdeia').value}));document.getElementById('esMusStatus').textContent='Plano musical guardado neste navegador. A música ainda não foi gerada.';}catch(e){document.getElementById('esMusStatus').textContent='Não foi possível guardar neste navegador.';}});
-  document.getElementById('esCorteArquivo').addEventListener('change',function(){var f=this.files&&this.files[0],v=document.getElementById('esCorteVideoPreview');if(!f){v.style.display='none';return;}if(v.dataset.url)URL.revokeObjectURL(v.dataset.url);v.dataset.url=URL.createObjectURL(f);v.src=v.dataset.url;v.style.display='block';document.getElementById('esCorteStatus').textContent='Vídeo carregado para pré-visualização local. O arquivo ainda não foi enviado nem editado.';});
-  document.getElementById('esCortePreparar').addEventListener('click',function(){var ini=Number(document.getElementById('esCorteInicio').value),fim=Number(document.getElementById('esCorteFim').value);if(fim<=ini){document.getElementById('esCorteStatus').textContent='O fim do trecho precisa ser maior que o início.';return;}var v=document.getElementById('esCorteVideoPreview');if(v.src){try{v.currentTime=ini;}catch(e){} }document.getElementById('esCorteStatus').textContent='Trecho definido de '+ini+'s a '+fim+'s. O corte final, legendas e exportação dependem do editor de vídeo que será conectado.';});
-  document.getElementById('esCorteSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_plano_corte',JSON.stringify({arquivo:(document.getElementById('esCorteArquivo').files[0]||{}).name||'',formato:document.getElementById('esCorteFormato').value,inicio:document.getElementById('esCorteInicio').value,fim:document.getElementById('esCorteFim').value,legenda:document.getElementById('esCorteLegenda').value,musica:document.getElementById('esCorteMusica').value,instrucao:document.getElementById('esCorteInstrucao').value}));document.getElementById('esCorteStatus').textContent='Plano de corte guardado. O vídeo em si não é armazenado no rascunho local.';}catch(e){document.getElementById('esCorteStatus').textContent='Não foi possível guardar o plano neste navegador.';}});
-  document.getElementById('esEditorSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_notas_edicao',document.getElementById('esEditorNotas').value);document.getElementById('esEditorStatus').textContent='Notas de edição guardadas neste navegador.';}catch(e){document.getElementById('esEditorStatus').textContent='Não foi possível guardar as notas.';}});
-  try{document.getElementById('esEditorNotas').value=localStorage.getItem('ps_estudio_notas_edicao')||'';}catch(e){}
-  document.getElementById('esFilmeAddCena').addEventListener('click',function(){adicionarCena();});
-  document.getElementById('esFilmeVoltar').addEventListener('click',function(){mudarModo('redes');});
-  document.getElementById('esFilmeSalvarPlano').addEventListener('click',function(){
-    var titulo=document.getElementById('esFilmeHistoria').value.trim();
-    if(titulo&&!document.getElementById('esPubTitulo').value.trim())document.getElementById('esPubTitulo').value=titulo;
-    var plano={historia:document.getElementById('esFilmeHistoria').value,passagem:document.getElementById('esFilmePassagem').value,estilo:document.getElementById('esFilmeEstilo').value,duracao:document.getElementById('esFilmeDuracao').value,resumo:document.getElementById('esFilmeResumo').value,voz:document.getElementById('esFilmeVoz').value,musica:document.getElementById('esFilmeMusica').value,cenas:Array.prototype.map.call(cenas.children,function(card){return {titulo:card.querySelector('.es-cena-titulo').value,descricao:card.querySelector('.es-cena-desc').value};}),publicacao:{titulo:document.getElementById('esPubTitulo').value,destino:document.getElementById('esPubDestino').value,capa:document.getElementById('esPubCapa').value,visibilidade:document.getElementById('esPubVisibilidade').value,descricao:document.getElementById('esPubDescricao').value}};
-    try{localStorage.setItem('ps_estudio_plano_filme',JSON.stringify(plano));document.getElementById('esFilmeMsg').textContent='Plano guardado neste navegador. Ele ainda não foi enviado ao servidor nem publicado.';}
-    catch(e){document.getElementById('esFilmeMsg').textContent='Não foi possível guardar neste navegador. Os campos continuam nesta tela; tente novamente ou verifique as configurações do navegador.';}
-    document.getElementById('esPubStatus').textContent='Destino preparado para: '+(document.getElementById('esPubTitulo').value.trim()||'projeto sem título')+'. Ainda não publicado.';
-  });
-  /* Recupera o rascunho local, sem enviar dados ao Worker. */
-  try{
-    var planoGuardado=JSON.parse(localStorage.getItem('ps_estudio_plano_filme')||'null');
-    if(planoGuardado){
-      var mapaCampos={historia:'esFilmeHistoria',passagem:'esFilmePassagem',estilo:'esFilmeEstilo',duracao:'esFilmeDuracao',resumo:'esFilmeResumo',voz:'esFilmeVoz',musica:'esFilmeMusica'};
-      Object.keys(mapaCampos).forEach(function(k){if(planoGuardado[k]!=null)document.getElementById(mapaCampos[k]).value=planoGuardado[k];});
-      if(Array.isArray(planoGuardado.cenas)&&planoGuardado.cenas.length){cenas.innerHTML='';planoGuardado.cenas.forEach(function(c){adicionarCena(c.titulo,c.descricao);});}
-      if(planoGuardado.publicacao){var pm={titulo:'esPubTitulo',destino:'esPubDestino',capa:'esPubCapa',visibilidade:'esPubVisibilidade',descricao:'esPubDescricao'};Object.keys(pm).forEach(function(k){if(planoGuardado.publicacao[k]!=null)document.getElementById(pm[k]).value=planoGuardado.publicacao[k];});}
-      document.getElementById('esFilmeMsg').textContent='Rascunho local recuperado deste navegador. Ainda não enviado ao servidor.';
-    }
-  }catch(e){}
-  document.getElementById('esTipoRapidoSelect').addEventListener('change',function(){var campo=document.getElementById('esTitulo');if(campo&&!campo.value.trim())campo.value=this.value;});
-  adicionarCena('Apresentação da história','Apresente o contexto bíblico e os personagens principais.');
-  adicionarCena('O conflito','Mostre o desafio central da narrativa.');
-  adicionarCena('Desfecho e mensagem','Conclua a história e destaque a mensagem espiritual.');
-  mudarModo('redes');
-
-  /* ---------- fluxo integrado do projeto: rascunho comum e navegação ---------- */
-  var fluxoBox = document.createElement('section');
-  fluxoBox.id = 'esFluxoProjeto';
-  fluxoBox.style.cssText = 'border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);padding:14px;margin:0 0 14px;color:var(--ink)';
-  fluxoBox.innerHTML = '<h3 style="margin:0 0 6px">Fluxo do projeto</h3><p class="es-nota" style="margin:0 0 10px">Salve o rascunho completo neste navegador e avance entre criação, montagem e publicação. A geração por IA e a renderização ainda dependem do Worker.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn" id="esFluxoSalvar">SALVAR PROJETO COMPLETO</button><button type="button" class="at-btn" id="esFluxoMontagem">IR PARA MONTAGEM</button><button type="button" class="at-btn" id="esFluxoPublicacao">IR PARA PUBLICAÇÃO</button><button type="button" class="at-btn" id="esFluxoBaixar">BAIXAR RASCUNHO JSON</button></div><p id="esFluxoStatus" class="es-filme-aviso" role="status" style="margin:10px 0 0">Rascunho local ainda não salvo.</p>';
-  modos.insertAdjacentElement('afterend', fluxoBox);
-
-  function esColetarProjeto(){
-    var campos = {};
-    Array.prototype.forEach.call(painel.querySelectorAll('input,select,textarea'), function(el){
-      if(!el.id || el.type === 'file' || el.type === 'button' || el.type === 'submit') return;
-      if(el.type === 'checkbox' || el.type === 'radio') campos[el.id] = el.checked;
-      else campos[el.id] = el.value;
+  function aplicarModo(id){
+    var m = modoDe(id); if(!m) return;
+    modoAtual = id;
+    painel.setAttribute("data-modo", id);
+    $("esExtraMusica").hidden = id !== "musica";
+    $("esExtraCortes").hidden = id !== "cortes";
+    $("esExtraTitulo").textContent = id === "cortes" ? "Editor de cortes para TikTok e Reels" : "Criação de louvores e letras com IA";
+    $("esExtraIntro").textContent = id === "cortes"
+      ? "Importe um vídeo próprio ou autorizado, indique o trecho e prepare as opções de edição."
+      : "Defina tema, referência, estilo e formato. A geração de letra e áudio depende da integração de IA.";
+    painel.querySelectorAll(".es-passos [data-p]").forEach(function(b){
+      b.textContent = (b.dataset.p + ". " + m.r[Number(b.dataset.p) - 1]).toUpperCase();
     });
-    return {
-      versao: 1,
-      atualizadoEm: new Date().toISOString(),
-      modo: painel.getAttribute('data-modo-ativo') || 'redes',
-      campos: campos,
-      planoFilme: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_filme')||'null');}catch(e){return null;} })(),
-      planoMusical: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_musical')||'null');}catch(e){return null;} })(),
-      planoCorte: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_corte')||'null');}catch(e){return null;} })(),
-      notasEdicao: (function(){ try{return localStorage.getItem('ps_estudio_notas_edicao')||'';}catch(e){return '';} })()
-    };
   }
-  function esSalvarProjeto(silencioso){
-    try{
-      localStorage.setItem('ps_estudio_projeto_completo', JSON.stringify(esColetarProjeto()));
-      var st=document.getElementById('esFluxoStatus');
-      if(st) st.textContent = silencioso ? 'Alterações recentes guardadas neste navegador.' : 'Projeto completo guardado neste navegador. Nenhum arquivo foi enviado ao servidor.';
-      return true;
-    }catch(e){
-      var st2=document.getElementById('esFluxoStatus');
-      if(st2) st2.textContent='Não foi possível guardar o projeto neste navegador. Verifique o armazenamento disponível.';
-      return false;
+  function escolher(id){
+    var m = modoDe(id); if(!m) return;
+    aplicarModo(id);
+    mostrar(1);
+    $("esNome").textContent = m.t;
+    $("esAviso").textContent = ESTADO[m.e].aviso;
+    setFase("caminho");
+    btn.scrollIntoView({behavior:"smooth", block:"start"});
+    if(!abrindo){
+      if(!atual){ criar(); bibMsg("Projeto criado. Ele é guardado automaticamente enquanto você trabalha."); }
+      else salvar();
     }
   }
-  function esRestaurarProjeto(){
-    try{
-      var p=JSON.parse(localStorage.getItem('ps_estudio_projeto_completo')||'null');
-      if(!p || !p.campos) return;
-      Object.keys(p.campos).forEach(function(id){
-        var el=document.getElementById(id); if(!el || el.type==='file') return;
-        if(el.type==='checkbox' || el.type==='radio') el.checked=!!p.campos[id];
-        else if(p.campos[id] != null) el.value=p.campos[id];
-      });
-      if(p.modo && modos.querySelector('[data-modo="'+p.modo+'"]')) mudarModo(p.modo);
-      var st=document.getElementById('esFluxoStatus');
-      if(st) st.textContent='Rascunho completo recuperado deste navegador. Arquivos de vídeo selecionados precisam ser escolhidos novamente.';
-    }catch(e){}
+  function voltarEscolha(){
+    setFase("escolha");
+    btn.scrollIntoView({behavior:"smooth", block:"start"});
   }
-  document.getElementById('esFluxoSalvar').addEventListener('click',function(){esSalvarProjeto(false);});
-  document.getElementById('esFluxoMontagem').addEventListener('click',function(){
-    esSalvarProjeto(true); editor.classList.add('ativo'); editor.scrollIntoView({behavior:'smooth',block:'start'});
-    document.getElementById('esEditorNotas').focus({preventScroll:true});
-  });
-  document.getElementById('esFluxoPublicacao').addEventListener('click',function(){
-    esSalvarProjeto(true); publicacao.scrollIntoView({behavior:'smooth',block:'start'});
-    var t=document.getElementById('esPubTitulo'); if(t) t.focus({preventScroll:true});
-  });
-  document.getElementById('esFluxoBaixar').addEventListener('click',function(){
-    var data=JSON.stringify(esColetarProjeto(),null,2);
-    var blob=new Blob([data],{type:'application/json'}); var url=URL.createObjectURL(blob);
-    var a=document.createElement('a'); a.href=url; a.download='palavra-e-serie-rascunho.json'; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){URL.revokeObjectURL(url);},1000);
-    document.getElementById('esFluxoStatus').textContent='Arquivo JSON do rascunho preparado para download. Ele contém os campos do projeto, não o vídeo final.';
-  });
-  painel.addEventListener('input',function(ev){if(ev.target && ev.target.type!=='file') esSalvarProjeto(true);});
-  painel.addEventListener('change',function(ev){if(ev.target && ev.target.type!=='file') esSalvarProjeto(true);});
-  esRestaurarProjeto();
-
-  /* ---------- abrir/fechar ---------- */
+ 
   btn.addEventListener("click", function(){
     var abrir = painel.hidden;
     painel.hidden = !abrir;
     btn.setAttribute("aria-expanded", String(abrir));
     $("esToggleAcao").textContent = abrir ? "FECHAR" : "ABRIR";
   });
- 
-  /* ---------- passos ---------- */
-  function passo(n){
-    painel.querySelectorAll("[data-passo]").forEach(function(b){ b.hidden = b.dataset.passo !== String(n); });
-    painel.querySelectorAll(".es-passos .at-btn").forEach(function(b){ b.classList.toggle("on", b.dataset.p === String(n)); });
-    if(n === 3) desenharPrevia();
-    if(n !== 3) pararVoz();
-  }
   painel.querySelector(".es-passos").addEventListener("click", function(ev){
-    var b = ev.target.closest("[data-p]"); if(b) passo(Number(b.dataset.p));
+    var b = ev.target.closest("[data-p]"); if(b) mostrar(Number(b.dataset.p));
   });
+  $("esEscolha").addEventListener("click", function(ev){
+    var c = ev.target.closest("[data-m]"); if(c) escolher(c.dataset.m);
+  });
+  $("esTrocar").addEventListener("click", voltarEscolha);
  
-  /* ---------- estado e gravação (neste navegador) ---------- */
-  var CH = "ps_estudio";
-  var TIPOS = ["Salmo","Oração","Mensagem de Deus","Reflexão bíblica","Texto espiritual original"];
-  var st = {tipo:TIPOS[0], versoes:[]};
-  try{ var s = JSON.parse(localStorage.getItem(CH)||"null"); if(s){ st.tipo = s.tipo || st.tipo; st.versoes = Array.isArray(s.versoes)?s.versoes:[]; } }catch(e){}
-  function gravar(){ try{ localStorage.setItem(CH, JSON.stringify(st)); }catch(e){} }
-  function msg(n, t, erro){ var el = $("esMsg"+n); el.textContent = t || ""; el.className = "es-msg" + (erro ? " erro" : ""); }
- 
-  /* ---------- passo 1 ---------- */
+  /* ====================== PASSO 1: TEXTO ====================== */
   function tipos(){
     $("esTipos").innerHTML = TIPOS.map(function(t){
       return '<button type="button" class="es-cartao" data-t="'+esc(t)+'" aria-pressed="'+(t===st.tipo)+'">'+esc(t)+'</button>';
@@ -6735,7 +6750,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   }
   $("esTipos").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-t]"); if(!b) return;
-    st.tipo = b.dataset.t; gravar(); tipos();
+    st.tipo = b.dataset.t; gravarTextos(); tipos();
   });
   function contar(){
     var t = $("esTexto").value.trim(), p = t ? t.split(/\s+/).length : 0;
@@ -6744,6 +6759,17 @@ body.dg-livro-vivo .dgp-nota{display:none}
   }
   $("esTexto").addEventListener("input", contar);
  
+  /* desfazer: guarda o texto antes de cada troca */
+  function guardarAntes(){ pilha.push({t:$("esTexto").value, ti:$("esTitulo").value}); if(pilha.length > 20) pilha.shift(); $("esDesfazer").disabled = false; }
+  function colocar(t){ $("esTexto").value = t; $("esTexto").dispatchEvent(new Event("input", {bubbles:true})); }
+  $("esDesfazer").addEventListener("click", function(){
+    var u = pilha.pop(); if(!u) return;
+    colocar(u.t); $("esTitulo").value = u.ti;
+    $("esDesfazer").disabled = !pilha.length;
+    msg(1, "Texto anterior de volta.");
+  });
+ 
+  /* versões guardadas */
   function versoes(){
     $("esVers").innerHTML = st.versoes.length ? st.versoes.map(function(v,i){
       return '<div><span>'+esc(v.titulo || "Sem título")+' · '+esc(v.tipo)+'</span>' +
@@ -6754,62 +6780,218 @@ body.dg-livro-vivo .dgp-nota{display:none}
   $("esGuardar").addEventListener("click", function(){
     var t = $("esTexto").value.trim();
     if(!t){ msg(1,"Escreva algo antes de guardar.",true); return; }
-    
-st.versoes.unshift({
-  titulo:$("esTitulo").value.trim(),
-  tipo:st.tipo,
-  tom:$("esTom").value,
-  texto:t,
-  em:new Date().toISOString()
-});
-
-    gravar(); versoes(); msg(1,"Versão guardada.");
+    st.versoes.unshift({titulo:$("esTitulo").value.trim(), tipo:st.tipo, tom:$("esTom").value, texto:t, em:new Date().toISOString()});
+    gravarTextos(); versoes(); msg(1,"Versão guardada.");
   });
   $("esVers").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-v]"); if(!b) return;
     var v = st.versoes[Number(b.dataset.i)]; if(!v) return;
     if(b.dataset.v === "abrir"){
-      st.tipo = v.tipo; $("esTitulo").value = v.titulo; $("esTexto").value = v.texto; $("esTom").value = v.tom || "Acolhedor";
-      gravar(); tipos(); contar(); msg(1,"Versão aberta. Altere à vontade e guarde como nova versão.");
+      st.tipo = v.tipo; $("esTitulo").value = v.titulo; $("esTom").value = v.tom || "Acolhedor";
+      colocar(v.texto); gravarTextos(); tipos();
+      msg(1,"Versão aberta. Altere à vontade e guarde como nova versão.");
     }else if(window.confirm("Excluir esta versão? Não dá para desfazer.")){
-      st.versoes.splice(Number(b.dataset.i),1); gravar(); versoes();
+      st.versoes.splice(Number(b.dataset.i),1); gravarTextos(); versoes();
     }
   });
   $("esLimpar").addEventListener("click", function(){
     if($("esTexto").value.trim() && !window.confirm("Limpar o título e o texto desta tela?")) return;
-    $("esTitulo").value = ""; $("esTexto").value = ""; contar(); msg(1,"");
+    guardarAntes(); $("esTitulo").value = ""; colocar(""); msg(1,"Tela limpa. Se errou, clique em DESFAZER.");
   });
   $("esPuxar").addEventListener("click", function(){
     var t = $("atTexto"), ti = $("atTitulo");
     var txt = t ? t.value.replace(/^##\s*/gm,"").replace(/^>\s?/gm,"").trim() : "";
     if(!txt){ msg(1,"O texto do Ateliê está vazio.",true); return; }
     if($("esTexto").value.trim() && !window.confirm("Substituir o texto desta tela pelo do Ateliê?")) return;
-    $("esTexto").value=txt;if(ti&&ti.value&&!$("esTitulo").value) $("esTitulo").value = ti.value;
-    contar(); msg(1,"Texto do Ateliê trazido para cá.");
+    guardarAntes(); colocar(txt);
+    if(ti && ti.value && !$("esTitulo").value) $("esTitulo").value = ti.value;
+    msg(1,"Texto do Ateliê trazido para cá.");
   });
  
-  /* botões de IA: ficam prontos, mas só funcionam quando o Worker for ligado */
+  /* tirar números dos versículos */
+  $("esNumeros").addEventListener("click", function(){
+    var t = $("esTexto").value;
+    if(!t.trim()){ msg(1,"Não há texto.",true); return; }
+    var novo = t.split(/\r?\n/)
+      .filter(function(l){ return !/^\s*\d{1,3}\s*$/.test(l); })
+      .map(function(l){ return l.replace(/^\s*\d{1,3}[.)]?\s+(?=\D)/, ""); })
+      .join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    if(novo === t.trim()){ msg(1,"Não encontrei números para tirar."); return; }
+    guardarAntes(); colocar(novo);
+    msg(1,"Números tirados. Se não gostou, clique em DESFAZER.");
+  });
+ 
+  /* ouvir o texto na própria tela 1 */
+  $("esPararTexto").addEventListener("click", function(){ if(window.speechSynthesis) speechSynthesis.cancel(); });
+  $("esOuvirTexto").addEventListener("click", function(){
+    var t = $("esTexto").value.trim();
+    if(!t){ msg(1,"Escreva um texto para ouvir.",true); return; }
+    if(!window.speechSynthesis){ msg(1,"Este navegador não tem voz embutida.",true); return; }
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(t.replace(/^\s*\d{1,3}\s*$/gm, ""));
+    var nome = $("esVoz").value, v = speechSynthesis.getVoices().filter(function(x){ return x.name === nome; })[0];
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "pt-BR";
+    u.rate = Number($("esVel").value || 1);
+    speechSynthesis.speak(u);
+    msg(1,"Falando com a voz do navegador escolhida no passo 2.");
+  });
+ 
+  /* buscar passagem na Bíblia Almeida que a página já carrega */
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
+  $("esBuscar").addEventListener("click", async function(){
+    var entrada = $("esAssunto").value.trim();
+    var m = /^(.+?)\s+(\d+)(?::(\d+)(?:\s*[-–]\s*(\d+))?)?$/.exec(entrada);
+    if(!m){ msg(1,"Escreva a passagem no campo Assunto, assim: Salmos 91 ou João 3:16-18.",true); return; }
+    var nome = norm(m[1]), idx = -1, i;
+    for(i = 0; i < BOOKS.length; i++){ if(norm(BOOKS[i][1]) === nome){ idx = i; break; } }
+    if(idx < 0) for(i = 0; i < BOOKS.length; i++){ if(norm(BOOKS[i][1]).indexOf(nome) === 0 || nome.indexOf(norm(BOOKS[i][1]).slice(0,-1)) === 0){ idx = i; break; } }
+    if(idx < 0){ msg(1,"Não achei o livro \"" + m[1] + "\". Confira o nome (ex.: Salmos, Mateus, 1 João).",true); return; }
+    msg(1,"Buscando…");
+    try{
+      await loadPortuguese();
+      var cap = portugueseBible[idx].chapters[Number(m[2]) - 1];
+      if(!cap){ msg(1,"Esse capítulo não existe em " + BOOKS[idx][1] + ".",true); return; }
+      var de = m[3] ? Number(m[3]) : 1, ate = m[4] ? Number(m[4]) : (m[3] ? de : cap.length);
+      if(de < 1 || ate > cap.length || ate < de){ msg(1,"Esses versículos não existem. O capítulo tem " + cap.length + ".",true); return; }
+      var versos = cap.slice(de - 1, ate).map(function(v){ return v.trim(); });
+      var ref = BOOKS[idx][1] + " " + m[2] + (m[3] ? ":" + de + (ate > de ? "–" + ate : "") : "");
+      if($("esTexto").value.trim() && !window.confirm("Substituir o texto atual por " + ref + "?\n(Se errar, clique em DESFAZER.)")){ msg(1,""); return; }
+      guardarAntes(); colocar(versos.join("\n"));
+      if(!$("esTitulo").value.trim()) $("esTitulo").value = ref;
+      msg(1, ref + " trazido da Bíblia Almeida 1911, sem números.");
+    }catch(e){ console.error(e); msg(1,"Não foi possível carregar a Bíblia agora. Confira a internet.",true); }
+  });
+ 
+  /* ajustar à duração: corta no fim de uma frase */
+  $("esAjustar").addEventListener("click", function(){
+    var t = $("esTexto").value.trim();
+    if(!t){ msg(1,"Não há texto para ajustar.",true); return; }
+    var alvo = Math.round(Number($("esDur").value) / 60 * 130);
+    var palavras = t.split(/\s+/).length;
+    if(palavras <= alvo){ msg(1,"O texto tem " + palavras + " palavras e cabe no tempo escolhido (até " + alvo + "). Para deixar MAIOR, use AUMENTAR A DURAÇÃO."); return; }
+    var frases = t.match(/[^.!?…\n]+[.!?…]+["”’)]*\s*|[^.!?…\n]+$|\n+/g) || [t];
+    var saida = "", cont = 0;
+    for(var i = 0; i < frases.length; i++){
+      var n = frases[i].trim() ? frases[i].trim().split(/\s+/).length : 0;
+      if(cont + n > alvo && cont > 0) break;
+      saida += frases[i]; cont += n;
+    }
+    saida = saida.trim();
+    if(!window.confirm("O texto tem " + palavras + " palavras e o alvo é cerca de " + alvo + ".\nCortar no fim de uma frase, ficando com " + cont + " palavras?\n(Se errar, clique em DESFAZER.)")) return;
+    guardarAntes(); colocar(saida);
+    msg(1,"Texto cortado para " + cont + " palavras.");
+  });
+ 
+  /* ====================== IA (rota /api/escrita) ====================== */
+  function travarIA(sim){ painel.querySelectorAll("[data-ia]").forEach(function(b){ b.disabled = sim; }); }
+  function mostrarRes(tit, aviso, texto, podeUsar){
+    $("esResultadoIA").hidden = false;
+    $("esResTit").textContent = tit;
+    $("esResAviso").textContent = aviso;
+    $("esResTxt").value = texto;
+    $("esResUsar").disabled = !podeUsar;
+  }
+  async function pedirIA(det){
+    var nome = NOMES_IA[det.acao] || "IA";
+    mostrarRes(nome + " — trabalhando…", "", "", false);
+    travarIA(true);
+    var ctl = new AbortController();
+    var t = setTimeout(function(){ ctl.abort(); }, 70000);
+    try{
+      var sess = (await supabaseClient.auth.getSession()).data.session;
+      if(!sess) throw new Error("Sessão encerrada. Entre de novo.");
+      var r = await fetch(URL_ESCRITA, {
+        method:"POST", signal:ctl.signal,
+        headers:{"Content-Type":"application/json", "Authorization":"Bearer " + sess.access_token},
+        body:JSON.stringify({acao:det.acao, tipo:det.tipo, tom:det.tom, duracao:det.duracao, assunto:det.assunto, titulo:det.titulo, texto:det.texto})
+      });
+      var dados = await r.json().catch(function(){ return {}; });
+      if(!r.ok || !dados.ok) throw new Error(dados.error || "Não foi possível escrever agora.");
+      mostrarRes(nome + " — resultado", "Texto escrito pela IA. Leia e confira antes de usar.", dados.text || "", true);
+      $("esResultadoIA").scrollIntoView({block:"nearest", behavior:"smooth"});
+    }catch(e){
+      console.error(e);
+      mostrarRes(nome + " — não deu certo", e.name === "AbortError" ? "A IA demorou demais. Tente de novo." : (e.message || "Não foi possível escrever agora."), "", false);
+    }finally{
+      clearTimeout(t); travarIA(false);
+    }
+  }
   painel.addEventListener("click", function(ev){
     var b = ev.target.closest("[data-ia]"); if(!b) return;
-    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:$("esTom").value,duracao:Number($("esDur").value),
-      assunto:$("esAssunto").value.trim(),titulo:$("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
+    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:$("esTom").value, duracao:Number($("esDur").value),
+      assunto:$("esAssunto").value.trim(), titulo:$("esTitulo").value.trim(), texto:$("esTexto").value};
     if(det.acao !== "criar" && !det.texto.trim()){ msg(1,"Escreva ou crie um texto antes de usar esta opção.",true); return; }
-    document.dispatchEvent(new CustomEvent("estudio:ia", {detail:det}));
-    if(!det.tratado) msg(1,"A IA ainda não está ligada. Isso será feito no próximo passo, junto com o Worker.",true);
+    msg(1,"");
+    pedirIA(det);
+  });
+  $("esResUsar").addEventListener("click", function(){
+    guardarAntes(); colocar($("esResTxt").value);
+    $("esResultadoIA").hidden = true;
+    msg(1,"Texto trocado. Se não gostou, clique em DESFAZER.");
+  });
+  $("esResDescartar").addEventListener("click", function(){ $("esResultadoIA").hidden = true; });
+ 
+  /* ====================== FILME: CENAS ====================== */
+  var cenasBox = $("esFilmeCenas");
+  function renumerarCenas(){
+    numeroCena = 0;
+    Array.prototype.forEach.call(cenasBox.children, function(card){ numeroCena++; card.querySelector("h4").textContent = "Cena " + numeroCena; });
+  }
+  function adicionarCena(titulo, descricao){
+    var card = document.createElement("article"); card.className = "es-cena";
+    card.innerHTML = '<h4></h4><label>Título da cena<input class="es-cena-titulo" value="'+esc(titulo||"")+'" placeholder="Ex.: Davi aceita o desafio"></label>' +
+      '<label>Ação, fala ou imagem desejada<textarea class="es-cena-desc" placeholder="O que acontece nesta cena?">'+esc(descricao||"")+'</textarea></label>' +
+      '<button type="button" class="at-btn es-cena-remover">Remover cena</button>';
+    card.querySelector(".es-cena-remover").addEventListener("click", function(){ card.remove(); renumerarCenas(); });
+    cenasBox.appendChild(card); renumerarCenas();
+  }
+  function definirCenas(arr){
+    cenasBox.innerHTML = "";
+    arr.forEach(function(c){ adicionarCena(c.titulo, c.descricao); });
+  }
+  $("esFilmeAddCena").addEventListener("click", function(){ adicionarCena(); });
+  $("esFilmeVoltar").addEventListener("click", function(){ escolher("redes"); });
+  $("esFilmeSalvarPlano").addEventListener("click", function(){
+    var h = $("esFilmeHistoria").value.trim();
+    if(h && !$("esPubTitulo").value.trim()) $("esPubTitulo").value = h;
+    guardarProjeto();
+    $("esFilmeMsg").textContent = "Plano guardado no projeto, neste navegador. Ele ainda não foi enviado ao servidor nem publicado.";
+    $("esPubStatus").textContent = "Destino preparado para: " + ($("esPubTitulo").value.trim() || "projeto sem título") + ". Ainda não publicado.";
   });
  
-  /* ---------- passo 2: vozes, música, imagens ---------- */
+  /* ====================== LOUVORES, CORTES, MONTAGEM ====================== */
+  $("esMusGerarLetra").addEventListener("click", function(){
+    $("esMusStatus").textContent = "Pedido preparado com as preferências atuais. A geração da letra por IA ainda depende de conectar um serviço; nenhum áudio foi gerado.";
+  });
+  $("esMusSalvar").addEventListener("click", function(){ guardarProjeto(); $("esMusStatus").textContent = "Plano musical guardado no projeto, neste navegador. A música ainda não foi gerada."; });
+  $("esCorteArquivo").addEventListener("change", function(){
+    var f = this.files && this.files[0], v = $("esCorteVideoPreview");
+    if(!f){ v.style.display = "none"; return; }
+    if(v.dataset.url) URL.revokeObjectURL(v.dataset.url);
+    v.dataset.url = URL.createObjectURL(f); v.src = v.dataset.url; v.style.display = "block";
+    $("esCorteStatus").textContent = "Vídeo carregado para pré-visualização local. O arquivo ainda não foi enviado nem editado.";
+  });
+  $("esCortePreparar").addEventListener("click", function(){
+    var ini = Number($("esCorteInicio").value), fim = Number($("esCorteFim").value);
+    if(fim <= ini){ $("esCorteStatus").textContent = "O fim do trecho precisa ser maior que o início."; return; }
+    var v = $("esCorteVideoPreview");
+    if(v.src){ try{ v.currentTime = ini; }catch(e){} }
+    $("esCorteStatus").textContent = "Trecho definido de " + ini + "s a " + fim + "s. O corte final, legendas e exportação dependem do editor de vídeo que será conectado.";
+  });
+  $("esCorteSalvar").addEventListener("click", function(){ guardarProjeto(); $("esCorteStatus").textContent = "Plano de corte guardado no projeto. O vídeo em si não é armazenado."; });
+  $("esEditorSalvar").addEventListener("click", function(){ guardarProjeto(); $("esEditorStatus").textContent = "Notas de edição guardadas no projeto, neste navegador."; });
+ 
+  /* ====================== PASSO 2: VOZES, MÚSICA, IMAGENS ====================== */
   function vozes(){
     if(!window.speechSynthesis){ $("esVoz").innerHTML = '<option>Sem suporte neste navegador</option>'; return; }
     var lista = speechSynthesis.getVoices().filter(function(v){ return /^pt/i.test(v.lang); });
     if(!lista.length) lista = speechSynthesis.getVoices();
-    $("esVoz").innerHTML = lista.length ? lista.map(function(v,i){
+    $("esVoz").innerHTML = lista.length ? lista.map(function(v){
       return '<option value="'+esc(v.name)+'">'+esc(v.name)+' ('+esc(v.lang)+')</option>';
     }).join("") : '<option value="">Voz padrão do navegador</option>';
   }
   if(window.speechSynthesis){ vozes(); speechSynthesis.onvoiceschanged = vozes; }
  
-  var fotos = [], musicaUrl = null, audio = null;
   function desenharFotos(){
     $("esFotos").innerHTML = fotos.map(function(u,i){
       return '<div class="es-foto"><img src="'+u+'" alt=""><button type="button" data-f="'+i+'" aria-label="Remover imagem">×</button></div>';
@@ -6818,35 +7000,39 @@ st.versoes.unshift({
   $("esAddFoto").addEventListener("click", function(){ $("esFotoArq").click(); });
   $("esFotoArq").addEventListener("change", function(){
     Array.prototype.forEach.call(this.files, function(f){ fotos.push(URL.createObjectURL(f)); });
-    this.value = ""; desenharFotos(); msg(2, fotos.length + " imagem(ns) escolhida(s). Elas valem só enquanto esta página estiver aberta.");
+    this.value = ""; desenharFotos();
+    msg(2, fotos.length + " imagem(ns) escolhida(s). Elas valem só enquanto esta página estiver aberta.");
   });
   $("esFotos").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-f]"); if(!b) return;
     fotos.splice(Number(b.dataset.f),1); desenharFotos();
   });
-  $("esMusica").addEventListener("change", function(){ if(this.value === "propria") $("esMusArq").click(); else musicaUrl = null; });
+  $("esMusica").addEventListener("change", function(){
+    if(this.value === "propria") $("esMusArq").click(); else { musicaArq = null; musicaUrl = null; }
+  });
   $("esMusArq").addEventListener("change", function(){
     var f = this.files && this.files[0];
-    if(f){ musicaUrl = URL.createObjectURL(f); msg(2,"Música escolhida: " + f.name); }
-    else { $("esMusica").value = ""; }
+    if(f){ musicaArq = f; musicaUrl = URL.createObjectURL(f); msg(2,"Música escolhida: " + f.name); }
+    else { $("esMusica").value = ""; musicaArq = null; musicaUrl = null; }
     this.value = "";
   });
  
-  /* ---------- passo 3: prévia ---------- */
-  var tel = $("esTela"), leg = $("esLegenda"), tFoto = null;
+  /* ====================== PASSO 3: PRÉVIA ====================== */
+  var tela = $("esTela"), legenda = $("esLegenda");
   function desenharPrevia(){
-    tel.className = "es-tela " + $("esFormato").value;
-    tel.style.backgroundImage = fotos[0] ? 'url("'+fotos[0]+'")' : "";
-    leg.textContent = ($("esTitulo").value.trim() || $("esTexto").value.trim().split(/\n/)[0] || "Sua mensagem aparece aqui.").slice(0,140);
+    tela.className = "es-tela " + $("esFormato").value;
+    tela.style.backgroundImage = fotos[0] ? 'url("'+fotos[0]+'")' : "";
+    legenda.textContent = ($("esTitulo").value.trim() || $("esTexto").value.trim().split(/\n/)[0] || "Sua mensagem aparece aqui.").slice(0,140);
     var p = $("esTexto").value.trim() ? $("esTexto").value.trim().split(/\s+/).length : 0;
-    $("esResumo").innerHTML='<b>'+esc(st.tipo)+'</b>·tom'+esc($("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
-      fotos.length + ' imagem(ns) · ' + ($("esMusica").value ? 'com música' : 'sem música');
+    $("esResumo").innerHTML = '<b>'+esc(st.tipo)+'</b> · tom '+esc($("esTom").value).toLowerCase()+' · '+p+' palavras · '+
+      fotos.length+' imagem(ns) · '+($("esMusica").value ? 'com música' : 'sem música');
   }
   function pararVoz(){
     if(window.speechSynthesis) speechSynthesis.cancel();
     clearInterval(tFoto); if(audio){ audio.pause(); audio = null; }
   }
   $("esParar").addEventListener("click", function(){ pararVoz(); desenharPrevia(); });
+  $("esFormato").addEventListener("change", desenharPrevia);
   $("esOuvir").addEventListener("click", function(){
     var t = $("esTexto").value.trim();
     if(!t){ msg(3,"Escreva um texto no passo 1.",true); return; }
@@ -6862,402 +7048,35 @@ st.versoes.unshift({
       if(ev.name && ev.name !== "word") return;
       var acumulado = 0, k = 0;
       for(; k < frases.length; k++){ acumulado += frases[k].length; if(acumulado >= ev.charIndex) break; }
-      leg.textContent = (frases[Math.min(k, frases.length-1)] || "").trim();
+      legenda.textContent = (frases[Math.min(k, frases.length-1)] || "").trim();
     };
     u.onend = function(){ pararVoz(); desenharPrevia(); };
-    if(fotos.length > 1){ tFoto = setInterval(function(){ i = (i+1) % fotos.length; tel.style.backgroundImage = 'url("'+fotos[i]+'")'; }, 6000); }
+    if(fotos.length > 1){ tFoto = setInterval(function(){ i = (i+1) % fotos.length; tela.style.backgroundImage = 'url("'+fotos[i]+'")'; }, 6000); }
     if(musicaUrl && $("esMusica").value === "propria"){
       audio = new Audio(musicaUrl); audio.loop = true; audio.volume = Number($("esVolMus").value)/100; audio.play().catch(function(){});
     }
     speechSynthesis.speak(u);
   });
-  $("esFormato").addEventListener("change", desenharPrevia);
  
-  /* ---------- passo 4: exportar ---------- */
-  var DESTINOS = [
-    ["tiktok","TikTok","vertical 9:16, até 10 min"],
-    ["instagram","Instagram","Reels vertical 9:16, Feed 1:1"],
-    ["facebook","Facebook","vertical, quadrado ou horizontal"],
-    ["youtube","YouTube","Shorts vertical ou vídeo horizontal 16:9"]
-  ];
+  /* ====================== PASSO 4: EXPORTAR ====================== */
   $("esDest").innerHTML = DESTINOS.map(function(d){
     return '<label><input type="checkbox" value="'+d[0]+'" checked><span>'+d[1]+'<small>'+d[2]+'</small></span></label>';
   }).join("");
-  painel.addEventListener("click", function(ev){
-    var b = ev.target.closest("[data-exp]"); if(!b) return;
-    if(!$("esTexto").value.trim()){ msg(4,"Escreva um texto no passo 1 antes de exportar.",true); return; }
-    var det = {tipoArquivo:b.dataset.exp, destinos:Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; }),
-      formato:$("esFormato").value,voz:$("esVoz").value, velocidade:Number($("esVel").value),
-      musica:$("esMusica").value?"propria":"",volumeMusica:Number($("esVolMus").value),
-      imagens:fotos.length, titulo:$("esTitulo").value.trim(),texto:$("esTexto").value, tratado:false};
-    if(!det.destinos.length){ msg(4,"Marque pelo menos uma rede.",true); return; }
-    document.dispatchEvent(new CustomEvent("estudio:exportar", {detail:det}));
-    if(!det.tratado) msg(4,"A geração do arquivo ainda não está ligada. Entra no próximo passo, junto com o Worker.",true);
-  });
  
-  tipos(); versoes(); contar();
-})();
-</script>
-<!-- ===== FIM: ESTÚDIO DE CRIAÇÃO ===== -->
-
-
-
-<!-- ===== INÍCIO: ÁREA 1 — CRIAR FUNCIONANDO (modo demonstração, sem Worker) =====
-     COMO APLICAR: cole este bloco logo ANTES da última tag </body>,
-     DEPOIS do bloco "FIM: ESTÚDIO DE CRIAÇÃO". Não mexa em mais nada. -->
-<style>
-.a1-res{border:1px dashed var(--brass);border-radius:8px;background:#fffdf6;padding:14px;display:flex;flex-direction:column;gap:10px}
-.a1-res[hidden]{display:none!important}
-.a1-res strong{font:600 16px Georgia,serif;color:var(--ink)}
-.a1-res textarea{width:100%;min-height:200px;box-sizing:border-box;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:16px/1.7 Georgia,serif;resize:vertical}
-.a1-demo{font:600 12.5px "Segoe UI",Arial,sans-serif;color:#a14747}
-</style>
-<script>
-(function(){
-  var $ = function(id){ return document.getElementById(id); };
-  var painel = $("esPainel");
-  if(!painel || !$("esTexto")) return;
-  var txt = $("esTexto");
- 
-  /* ---------- novos botões (linha de baixo da área 1) ---------- */
-  var linha = $("esLimpar").parentElement;
-  function novo(id, rot){
-    var b = document.createElement("button");
-    b.type = "button"; b.id = id; b.className = "at-btn"; b.textContent = rot;
-    linha.appendChild(b); return b;
-  }
-  var bNum = novo("a1Numeros", "TIRAR NÚMEROS DOS VERSÍCULOS");
-  var bOuvir = novo("a1Ouvir", "OUVIR");
-  var bParar = novo("a1Parar", "PARAR");
-  var bDesf = novo("a1Desfazer", "DESFAZER");
-  bDesf.disabled = true;
- 
-  /* ---------- caixa de resultado (aparece depois de um botão de IA) ---------- */
-  var res = document.createElement("div");
-  res.className = "a1-res"; res.hidden = true;
-  res.innerHTML =
-    '<strong id="a1ResTit">Resultado</strong>' +
-    '<div class="a1-demo" id="a1Demo"></div>' +
-    '<textarea id="a1ResTxt" aria-label="Resultado"></textarea>' +
-    '<div class="at-row">' +
-      '<button type="button" class="at-btn gold" id="a1Usar">USAR ESTE TEXTO</button>' +
-      '<button type="button" class="at-btn" id="a1Descartar">DESCARTAR</button>' +
-    '</div>';
-  var ref = $("esVersoesBox");
-  ref.parentNode.insertBefore(res, ref);
- 
-  /* ---------- desfazer: guarda o texto antes de cada troca ---------- */
-  var pilha = [];
-  function guardar(){ pilha.push({t:txt.value, ti:$("esTitulo").value}); if(pilha.length > 20) pilha.shift(); bDesf.disabled = false; }
-  function pôr(t){ txt.value = t; txt.dispatchEvent(new Event("input", {bubbles:true})); }
-  bDesf.addEventListener("click", function(){
-    var u = pilha.pop(); if(!u) return;
-    pôr(u.t); $("esTitulo").value = u.ti;
-    bDesf.disabled = !pilha.length;
-    $("esMsg1").textContent = "Texto anterior de volta."; $("esMsg1").className = "es-msg";
-  });
- 
-  /* ---------- função REAL: tirar números dos versículos ---------- */
-  bNum.addEventListener("click", function(){
-    var t = txt.value;
-    if(!t.trim()){ $("esMsg1").textContent = "Não há texto."; $("esMsg1").className = "es-msg erro"; return; }
-    var novoT = t.split(/\r?\n/)
-      .filter(function(l){ return !/^\s*\d{1,3}\s*$/.test(l); })      /* linhas só com número */
-      .map(function(l){ return l.replace(/^\s*\d{1,3}[.)]?\s+(?=\D)/, ""); }) /* número no começo da linha */
-      .join("\n").replace(/\n{3,}/g, "\n\n").trim();
-    if(novoT === t.trim()){ $("esMsg1").textContent = "Não encontrei números para tirar."; $("esMsg1").className = "es-msg"; return; }
-    guardar(); pôr(novoT);
-    $("esMsg1").textContent = "Números tirados. Se não gostou, clique em DESFAZER."; $("esMsg1").className = "es-msg";
-  });
- 
-  /* ---------- função REAL: ouvir o texto aqui mesmo ---------- */
-  function parar(){ if(window.speechSynthesis) speechSynthesis.cancel(); }
-  bParar.addEventListener("click", parar);
-  bOuvir.addEventListener("click", function(){
-    var t = txt.value.trim();
-    if(!t){ $("esMsg1").textContent = "Escreva um texto para ouvir."; $("esMsg1").className = "es-msg erro"; return; }
-    if(!window.speechSynthesis){ $("esMsg1").textContent = "Este navegador não tem voz embutida."; $("esMsg1").className = "es-msg erro"; return; }
-    parar();
-    var u = new SpeechSynthesisUtterance(t.replace(/^\s*\d{1,3}\s*$/gm, ""));
-    var nome = $("esVoz") && $("esVoz").value;
-    var v = speechSynthesis.getVoices().filter(function(x){ return x.name === nome; })[0];
-    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "pt-BR";
-    u.rate = Number(($("esVel") && $("esVel").value) || 1);
-    speechSynthesis.speak(u);
-    $("esMsg1").textContent = "Falando com a voz escolhida no passo 2."; $("esMsg1").className = "es-msg";
-  });
- 
-  /* ---------- MODO DEMONSTRAÇÃO dos 4 botões de IA ----------
-     Mostra o caminho completo (pedir → esperar → ver resultado → usar/descartar/desfazer).
-     O texto devolvido é só de exemplo. Na etapa do Worker, só esta função é trocada. */
-  var NOMES = {criar:"Criar com IA", reescrever:"Reescrever", aumentar:"Aumentar a duração", tom:"Adaptar o tom"};
-  function demo(d){
-    var min = Math.round(d.duracao/60*10)/10;
-    var cab = d.tipo + " · tom " + d.tom.toLowerCase() + " · cerca de " + (d.duracao >= 60 ? min + " min" : d.duracao + " s");
-    if(d.acao === "criar"){
-      return "[exemplo] " + cab + (d.assunto ? "\nAssunto: " + d.assunto : "") +
-        "\n\nSenhor, neste momento eu me aquieto diante de Ti.\nTu conheces o meu caminho e sabes de que preciso.\nSustenta o meu coração e renova a minha esperança.\nAmém.";
-    }
-    var corpo = d.texto.trim();
-    if(d.acao === "reescrever") return "[exemplo: aqui voltaria o texto reescrito]\n\n" + corpo;
-    if(d.acao === "aumentar") return "[exemplo: aqui voltaria o texto ampliado para " + (d.duracao >= 60 ? min + " min" : d.duracao + " s") + "]\n\n" + corpo;
-    return "[exemplo: aqui voltaria o texto no tom " + d.tom.toLowerCase() + "]\n\n" + corpo;
-  }
- 
-  document.addEventListener("estudio:ia", function(ev){
-    var d = ev.detail; d.tratado = true;
-    var tit = $("a1ResTit"), caixa = $("a1ResTxt");
-    res.hidden = false; $("a1Usar").disabled = true;
-    tit.textContent = NOMES[d.acao] + " — trabalhando…";
-    $("a1Demo").textContent = ""; caixa.value = "";
-    $("esMsg1").textContent = "";
-    setTimeout(function(){
-      caixa.value = demo(d);
-      tit.textContent = NOMES[d.acao] + " — resultado";
-      $("a1Demo").textContent = "MODO DEMONSTRAÇÃO: este texto é só um exemplo. A IA de verdade entra quando ligarmos o Worker.";
-      $("a1Usar").disabled = false;
-      res.scrollIntoView({block:"nearest", behavior:"smooth"});
-    }, 900);
-  });
- 
-  $("a1Usar").addEventListener("click", function(){
-    guardar(); pôr($("a1ResTxt").value);
-    res.hidden = true;
-    $("esMsg1").textContent = "Texto trocado. Se não gostou, clique em DESFAZER."; $("esMsg1").className = "es-msg";
-  });
-  $("a1Descartar").addEventListener("click", function(){ res.hidden = true; });
-})();
-</script>
-<!-- ===== FIM: ÁREA 1 — CRIAR FUNCIONANDO ===== -->
-
-<!-- ===== INÍCIO: ÁREA 1 — BUSCAR PASSAGEM E AJUSTAR À DURAÇÃO (sem IA) ===== -->
-<script>
-(function(){
-  var $ = function(id){ return document.getElementById(id); };
-  var txt = $("esTexto"), linha = $("a1Desfazer") && $("a1Desfazer").parentElement;
-  if(!txt || !linha) return;
- 
-  function msg(t, erro){ $("esMsg1").textContent = t; $("esMsg1").className = "es-msg" + (erro ? " erro" : ""); }
-  function pôr(t){
-    txt.focus(); txt.select();
-    var ok = false;
-    try{ ok = document.execCommand("insertText", false, t); }catch(e){}
-    if(!ok) txt.value = t;
-    txt.dispatchEvent(new Event("input", {bubbles:true}));
-  }
-  function novo(id, rot){
-    var b = document.createElement("button");
-    b.type = "button"; b.id = id; b.className = "at-btn"; b.textContent = rot;
-    linha.appendChild(b); return b;
-  }
-  var bBuscar = novo("a1Buscar", "BUSCAR PASSAGEM");
-  var bAjustar = novo("a1Ajustar", "AJUSTAR À DURAÇÃO");
-  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
- 
-  /* ---------- BUSCAR PASSAGEM: usa a Bíblia Almeida que a página já carrega ---------- */
-  bBuscar.addEventListener("click", async function(){
-    var entrada = $("esAssunto").value.trim();
-    var m = /^(.+?)\s+(\d+)(?::(\d+)(?:\s*[-–]\s*(\d+))?)?$/.exec(entrada);
-    if(!m){ msg("Escreva a passagem no campo Assunto, assim: Salmos 91 ou João 3:16-18.", true); return; }
-    var nome = norm(m[1]), idx = -1, i;
-    for(i = 0; i < BOOKS.length; i++){ if(norm(BOOKS[i][1]) === nome){ idx = i; break; } }
-    if(idx < 0) for(i = 0; i < BOOKS.length; i++){ if(norm(BOOKS[i][1]).indexOf(nome) === 0 || nome.indexOf(norm(BOOKS[i][1]).slice(0,-1)) === 0){ idx = i; break; } }
-    if(idx < 0){ msg("Não achei o livro \"" + m[1] + "\". Confira o nome (ex.: Salmos, Mateus, 1 João).", true); return; }
-    msg("Buscando…");
-    try{
-      await loadPortuguese();
-      var cap = portugueseBible[idx].chapters[Number(m[2]) - 1];
-      if(!cap){ msg("Esse capítulo não existe em " + BOOKS[idx][1] + ".", true); return; }
-      var de = m[3] ? Number(m[3]) : 1, ate = m[4] ? Number(m[4]) : (m[3] ? de : cap.length);
-      if(de < 1 || ate > cap.length || ate < de){ msg("Esses versículos não existem. O capítulo tem " + cap.length + ".", true); return; }
-      var versos = cap.slice(de - 1, ate).map(function(v){ return v.trim(); });
-      var ref = BOOKS[idx][1] + " " + m[2] + (m[3] ? ":" + de + (ate > de ? "–" + ate : "") : "");
-      if(txt.value.trim() && !window.confirm("Substituir o texto atual por " + ref + "?\n(Se errar, Ctrl+Z na caixa do texto volta.)")){ msg(""); return; }
-      pôr(versos.join("\n"));
-      if(!$("esTitulo").value.trim()) $("esTitulo").value = ref;
-      msg(ref + " trazido da Bíblia Almeida 1911, sem números.");
-    }catch(e){ console.error(e); msg("Não foi possível carregar a Bíblia agora. Confira a internet.", true); }
-  });
- 
-  /* ---------- AJUSTAR À DURAÇÃO: corta no fim de uma frase para caber no tempo ---------- */
-  bAjustar.addEventListener("click", function(){
-    var t = txt.value.trim();
-    if(!t){ msg("Não há texto para ajustar.", true); return; }
-    var alvo = Math.round(Number($("esDur").value) / 60 * 130);        /* ~130 palavras por minuto */
-    var palavras = t.split(/\s+/).length;
-    if(palavras <= alvo){
-      msg("O texto tem " + palavras + " palavras e cabe no tempo escolhido (até " + alvo + "). Para deixar MAIOR, é preciso a IA.", false); return;
-    }
-    var frases = t.match(/[^.!?…\n]+[.!?…]+["”’)]*\s*|[^.!?…\n]+$|\n+/g) || [t];
-    var saida = "", cont = 0;
-    for(var i = 0; i < frases.length; i++){
-      var n = frases[i].trim() ? frases[i].trim().split(/\s+/).length : 0;
-      if(cont + n > alvo && cont > 0) break;
-      saida += frases[i]; cont += n;
-    }
-    saida = saida.trim();
-    if(!window.confirm("O texto tem " + palavras + " palavras e o alvo é cerca de " + alvo + ".\nCortar no fim de uma frase, ficando com " + cont + " palavras?\n(Se errar, Ctrl+Z na caixa do texto volta.)")) return;
-    pôr(saida);
-    msg("Texto cortado para " + cont + " palavras.");
-  });
-})();
-</script>
-<!-- ===== FIM: ÁREA 1 — BUSCAR PASSAGEM E AJUSTAR À DURAÇÃO ===== -->
-
-
-
-<!-- ===== INÍCIO: ÁREA 1 — LIGAR A IA (rota /api/escrita) ===== -->
-<script>
-(function(){
-  var $ = function(id){ return document.getElementById(id); };
-  if(!$("a1Usar") || !$("a1ResTxt")) return;
- 
-  var URL_ESCRITA = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/escrita";
-  var NOMES = {criar:"Criar com IA", reescrever:"Reescrever", aumentar:"Aumentar a duração", tom:"Adaptar o tom"};
-  var res = $("a1ResTit").parentElement;
- 
-  function travar(sim){
-    document.querySelectorAll("#esPainel [data-ia]").forEach(function(b){ b.disabled = sim; });
-  }
-  function erro(texto, tit){
-    res.hidden = false;
-    $("a1ResTit").textContent = tit;
-    $("a1Demo").textContent = texto;
-    $("a1ResTxt").value = "";
-    $("a1Usar").disabled = true;
-  }
- 
-  /* fase de captura + stopImmediatePropagation: impede o modo demonstração de rodar junto */
-  document.addEventListener("estudio:ia", async function(ev){
-    ev.stopImmediatePropagation();
-    var d = ev.detail; d.tratado = true;
-    var nome = NOMES[d.acao] || "IA";
- 
-    res.hidden = false;
-    $("a1Usar").disabled = true;
-    $("a1ResTit").textContent = nome + " — trabalhando…";
-    $("a1Demo").textContent = "";
-    $("a1ResTxt").value = "";
-    $("esMsg1").textContent = "";
-    travar(true);
- 
-    var ctl = new AbortController();
-    var t = setTimeout(function(){ ctl.abort(); }, 70000);
-    try{
-      var sess = (await supabaseClient.auth.getSession()).data.session;
-      if(!sess) throw new Error("Sessão encerrada. Entre de novo.");
-      var r = await fetch(URL_ESCRITA, {
-        method: "POST",
-        signal: ctl.signal,
-        headers: {"Content-Type":"application/json", "Authorization":"Bearer " + sess.access_token},
-        body: JSON.stringify({acao:d.acao, tipo:d.tipo, tom:d.tom, duracao:d.duracao, assunto:d.assunto, titulo:d.titulo, texto:d.texto})
-      });
-      var dados = await r.json().catch(function(){ return {}; });
-      if(!r.ok || !dados.ok) throw new Error(dados.error || "Não foi possível escrever agora.");
-      $("a1ResTxt").value = dados.text || "";
-      $("a1ResTit").textContent = nome + " — resultado";
-      $("a1Demo").textContent = "Texto escrito pela IA. Leia e confira antes de usar.";
-      $("a1Usar").disabled = false;
-      res.scrollIntoView({block:"nearest", behavior:"smooth"});
-    }catch(e){
-      console.error(e);
-      erro(e.name === "AbortError" ? "A IA demorou demais. Tente de novo." : (e.message || "Não foi possível escrever agora."), nome + " — não deu certo");
-    }finally{
-      clearTimeout(t);
-      travar(false);
-    }
-  }, true);
-})();
-</script>
-<!-- ===== FIM: ÁREA 1 — LIGAR A IA ===== -->
-
-<!-- ===== INÍCIO: ESTÚDIO FASE 1 — LAYOUT UNIFICADO + RENDERIZAÇÃO REAL =====
-     COLE este bloco logo ANTES de </body>, depois de "ÁREA 1 — LIGAR A IA". Não apague nada. -->
-<style>
-/* um só seletor de tipo: os cartões do passo 1 */
-#esTipoRapido{display:none!important}
-/* os quatro passos valem para todos os modos */
-#esPainel .es-passos{display:flex!important;gap:0;margin:16px 0!important;border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:var(--paper-card)}
-#esPainel .es-passos .at-btn{flex:1;height:46px;border:0;border-radius:0;border-right:1px solid var(--paper-line);background:transparent;color:var(--ink-soft)}
-#esPainel .es-passos .at-btn:last-child{border-right:0}
-#esPainel .es-passos .at-btn.on{background:var(--brass);color:#fffdf6}
-/* cada bloco só aparece no seu passo */
-#esPainel:not([data-passo-ativo="1"]) #esFilme,
-#esPainel:not([data-passo-ativo="1"]) #esCriacaoExtra{display:none!important}
-#esPainel:not([data-passo-ativo="3"]) #esEditorLinha{display:none!important}
-#esPainel:not([data-passo-ativo="4"]) #esPublicacao{display:none!important}
-/* progresso e resultado */
-.f1-card{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;padding:16px;display:flex;flex-direction:column;gap:12px}
-.f1-card[hidden]{display:none!important}
-.f1-barra{height:8px;border-radius:4px;background:var(--paper-line);overflow:hidden}
-.f1-barra i{display:block;height:100%;width:0;background:var(--brass);transition:width .2s}
-.f1-card video{width:100%;max-width:360px;max-height:70vh;border-radius:8px;background:#111;align-self:center}
-.f1-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.f1-info{font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-.f1-info.erro{color:#a14747}
-</style>
-<script>
-(function(){
-  var $ = function(id){ return document.getElementById(id); };
-  var painel = $("esPainel");
-  if(!painel || !$("esMsg4")) return;
-  var URL_VOZ = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/voz";
- 
-  /* ---------- 1. layout: passos para todos os modos, blocos no lugar certo ---------- */
-  var passoAtual = 1;
-  function mostrar(n){
-    passoAtual = n;
-    painel.setAttribute("data-passo-ativo", String(n));
-    painel.querySelectorAll(".es-box[data-passo]").forEach(function(b){ b.hidden = b.dataset.passo !== String(n); });
-    painel.querySelectorAll(".es-passos .at-btn").forEach(function(b){ b.classList.toggle("on", b.dataset.p === String(n)); });
-  }
-  painel.querySelector(".es-passos").addEventListener("click", function(ev){
-    var b = ev.target.closest("[data-p]"); if(b) mostrar(Number(b.dataset.p));
-  });
-  $("esModos").addEventListener("click", function(){ setTimeout(function(){ mostrar(passoAtual); }, 0); });
-  var box3 = painel.querySelector('.es-box[data-passo="3"]'), box4 = painel.querySelector('.es-box[data-passo="4"]');
-  box3.insertAdjacentElement("afterend", $("esEditorLinha"));
-  box4.insertAdjacentElement("afterend", $("esPublicacao"));
-  mostrar(1);
- 
-  /* voz profissional (o Worker traduz o código em uma voz real) */
-  var sel = document.createElement("label");
-  sel.className = "es-campo";
-  sel.innerHTML = 'Voz profissional<select id="f1Voz" class="at-sel"><option value="f1">Feminina, suave</option><option value="m1">Masculina, grave</option><option value="n1">Narrador, solene</option></select>';
-  $("esVoz").parentElement.insertAdjacentElement("beforebegin", sel);
- 
-  /* música enviada: guarda o arquivo (o código original zera o campo) */
-  var musica = null;
-  painel.addEventListener("change", function(ev){
-    if(ev.target.id === "esMusArq" && ev.target.files && ev.target.files[0]) musica = ev.target.files[0];
-    if(ev.target.id === "esMusica" && !ev.target.value) musica = null;
-  }, true);
- 
-  /* ---------- 2. resultado ---------- */
-  var res = document.createElement("div");
-  res.className = "f1-card"; res.hidden = true;
-  res.innerHTML = '<div class="f1-info" id="f1Info"></div><div class="f1-barra"><i id="f1Prog"></i></div>' +
-    '<video id="f1Video" controls playsinline hidden></video>' +
-    '<div class="f1-linha"><a id="f1Baixar" class="at-btn gold" hidden style="display:none;text-decoration:none;line-height:38px">BAIXAR ARQUIVO</a></div>';
-  $("esMsg4").insertAdjacentElement("afterend", res);
-  var urlAtual = null;
   function info(t, erro, p){
-    res.hidden = false;
-    $("f1Info").textContent = t; $("f1Info").className = "f1-info" + (erro ? " erro" : "");
-    if(p != null) $("f1Prog").style.width = Math.round(p * 100) + "%";
+    $("esSaida").hidden = false;
+    $("esInfo").textContent = t; $("esInfo").className = "es-info" + (erro ? " erro" : "");
+    if(p != null) $("esProg").style.width = Math.round(p * 100) + "%";
   }
   function entregar(blob, nome, video){
-    if(urlAtual) URL.revokeObjectURL(urlAtual);
-    urlAtual = URL.createObjectURL(blob);
-    var a = $("f1Baixar"); a.href = urlAtual; a.download = nome; a.hidden = false; a.style.display = "inline-block";
-    var v = $("f1Video");
-    v.hidden = !video; if(video) v.src = urlAtual;
-    $("f1Prog").style.width = "100%";
+    if(urlSaida) URL.revokeObjectURL(urlSaida);
+    urlSaida = URL.createObjectURL(blob);
+    var a = $("esBaixar"); a.href = urlSaida; a.download = nome; a.hidden = false; a.style.display = "inline-block";
+    var v = $("esVideoSaida"); v.hidden = !video; if(video) v.src = urlSaida;
+    $("esProg").style.width = "100%";
   }
- 
-  /* ---------- 3. modelo único de projeto: texto ou cenas viram cenas de vídeo ---------- */
   function cenasDoTexto(t){
-    var fr = (t.replace(/\n+/g, " ").match(/[^.!?…]+[.!?…]*/g) || [t]).map(function(s){ return s.trim(); }).filter(Boolean);
+    var fr = (t.replace(/\n+/g," ").match(/[^.!?…]+[.!?…]*/g) || [t]).map(function(s){ return s.trim(); }).filter(Boolean);
     var out = [], buf = "";
     fr.forEach(function(f){
       if(buf && (buf + " " + f).length > 140){ out.push(buf); buf = f; } else buf = buf ? buf + " " + f : f;
@@ -7267,24 +7086,21 @@ st.versoes.unshift({
   }
   function montarProjeto(det){
     var texto = det.texto.trim(), cenas = [];
-    if(painel.getAttribute("data-modo-ativo") === "filme"){
-      Array.prototype.forEach.call(document.querySelectorAll("#esFilmeCenas .es-cena"), function(c){
+    if(modoAtual === "filme"){
+      Array.prototype.forEach.call(cenasBox.querySelectorAll(".es-cena"), function(c){
         var d = c.querySelector(".es-cena-desc").value.trim() || c.querySelector(".es-cena-titulo").value.trim();
         if(d) cenas.push(d);
       });
     }
     if(!cenas.length) cenas = cenasDoTexto(texto);
-    var imgs = Array.prototype.map.call(document.querySelectorAll("#esFotos img"), function(i){ return i.src; });
-    return {titulo: det.titulo, cenas: cenas, imagens: imgs, fala: texto || cenas.join(" ")};
+    return {titulo:det.titulo, cenas:cenas, imagens:fotos.slice(), fala:texto || cenas.join(" ")};
   }
- 
-  /* ---------- 4. voz real (rota /api/voz do Worker) ---------- */
   async function pedirVoz(texto, det){
     var s = (await supabaseClient.auth.getSession()).data.session;
     if(!s) throw new Error("Sessão encerrada. Entre de novo.");
-    var r = await fetch(URL_VOZ, {method: "POST",
-      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + s.access_token},
-      body: JSON.stringify({texto: texto, voz: $("f1Voz").value, velocidade: det.velocidade})});
+    var r = await fetch(URL_VOZ, {method:"POST",
+      headers:{"Content-Type":"application/json", "Authorization":"Bearer " + s.access_token},
+      body:JSON.stringify({texto:texto, voz:$("f1Voz").value, velocidade:det.velocidade})});
     if(!r.ok){
       var j = await r.json().catch(function(){ return {}; });
       throw new Error(j.error || "A rota /api/voz ainda não está disponível (erro " + r.status + ").");
@@ -7292,9 +7108,6 @@ st.versoes.unshift({
     if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
     return r.blob();
   }
- 
-  /* ---------- 5. renderização no navegador (canvas + MediaRecorder) ---------- */
-  var TAM = {f916: [720, 1280], f11: [720, 720], f169: [1280, 720]};
   function carregarImg(src){
     return new Promise(function(ok){ var i = new Image(); i.onload = function(){ ok(i); }; i.onerror = function(){ ok(null); }; i.src = src; });
   }
@@ -7307,7 +7120,7 @@ st.versoes.unshift({
     if(at) lin.push(at);
     return lin;
   }
-  function desenhar(g, W, H, proj, imgs, cena, p, tit){
+  function desenharQuadro(g, W, H, imgs, cena, p, tit){
     var img = imgs.length ? imgs[cena.i % imgs.length] : null;
     g.fillStyle = "#0b1428"; g.fillRect(0, 0, W, H);
     if(img){
@@ -7346,7 +7159,7 @@ st.versoes.unshift({
     var total = (buf ? buf.duration : palavras / 130 * 60 / (det.velocidade || 1)) + 0.8;
     var soma = proj.cenas.reduce(function(a, c){ return a + c.length; }, 0), t0 = 0;
     var cenas = proj.cenas.map(function(txt, i){
-      var d = (total - 0.8) * txt.length / soma; var o = {i: i, texto: txt, ini: t0, dur: d}; t0 += d; return o;
+      var d = (total - 0.8) * txt.length / soma; var o = {i:i, texto:txt, ini:t0, dur:d}; t0 += d; return o;
     });
     info("Carregando imagens…", false, 0.08);
     var imgs = (await Promise.all(proj.imagens.map(carregarImg))).filter(Boolean);
@@ -7354,9 +7167,9 @@ st.versoes.unshift({
     var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
     var g = cv.getContext("2d"), dest = ac.createMediaStreamDestination();
     if(buf){ var sv = ac.createBufferSource(); sv.buffer = buf; sv.connect(dest); sv.start(); }
-    if(musica){
+    if(musicaArq){
       try{
-        var mb = await ac.decodeAudioData(await musica.arrayBuffer());
+        var mb = await ac.decodeAudioData(await musicaArq.arrayBuffer());
         var sm = ac.createBufferSource(), gn = ac.createGain();
         sm.buffer = mb; sm.loop = true; gn.gain.value = det.volumeMusica / 100;
         sm.connect(gn); gn.connect(dest); sm.start();
@@ -7366,7 +7179,7 @@ st.versoes.unshift({
     var mime = tipos.filter(function(t){ return window.MediaRecorder && MediaRecorder.isTypeSupported(t); })[0];
     if(!mime){ info("Este navegador não grava vídeo. Use o Chrome ou o Edge atualizado.", true); ac.close(); return; }
     var fluxo = new MediaStream(cv.captureStream(30).getVideoTracks().concat(dest.stream.getAudioTracks()));
-    var rec = new MediaRecorder(fluxo, {mimeType: mime, videoBitsPerSecond: 4500000}), pedacos = [];
+    var rec = new MediaRecorder(fluxo, {mimeType:mime, videoBitsPerSecond:4500000}), pedacos = [];
     rec.ondataavailable = function(e){ if(e.data.size) pedacos.push(e.data); };
     var fim = new Promise(function(ok){ rec.onstop = ok; });
     rec.start(500);
@@ -7375,7 +7188,7 @@ st.versoes.unshift({
       (function quadro(){
         var t = (performance.now() - ini) / 1000;
         var c = cenas.filter(function(x){ return t >= x.ini; }).pop() || cenas[0];
-        desenhar(g, W, H, proj, imgs, c, Math.min(1, Math.max(0, (t - c.ini) / c.dur)), proj.titulo);
+        desenharQuadro(g, W, H, imgs, c, Math.min(1, Math.max(0, (t - c.ini) / c.dur)), proj.titulo);
         info("Gravando o vídeo… mantenha esta aba aberta e visível." + aviso, false, 0.1 + 0.88 * Math.min(1, t / total));
         if(t >= total){ ok(); return; }
         requestAnimationFrame(quadro);
@@ -7383,7 +7196,7 @@ st.versoes.unshift({
     });
     rec.stop(); await fim; ac.close();
     var tipoArq = mime.indexOf("mp4") > -1 ? "mp4" : "webm";
-    entregar(new Blob(pedacos, {type: mime.split(";")[0]}), "palavra-e-serie." + tipoArq, true);
+    entregar(new Blob(pedacos, {type:mime.split(";")[0]}), "palavra-e-serie." + tipoArq, true);
     info("Vídeo pronto (" + tipoArq.toUpperCase() + ", " + W + "×" + H + ")." + (tipoArq === "webm" ? " Este navegador gravou em WebM; para MP4 use o Chrome atualizado." : "") + aviso, !!aviso && !buf);
   }
   async function exportarAudio(det){
@@ -7393,259 +7206,54 @@ st.versoes.unshift({
     entregar(vb, "palavra-e-serie." + ext, false);
     info("Áudio pronto (" + ext.toUpperCase() + ").");
   }
- 
-  /* ---------- 6. ligação com o botão EXPORTAR ---------- */
-  document.addEventListener("estudio:exportar", function(ev){
-    var d = ev.detail; d.tratado = true;
-    $("esMsg4").textContent = "";
-    var busy = painel.querySelectorAll("[data-exp]");
-    busy.forEach(function(b){ b.disabled = true; });
-    var tarefa = d.tipoArquivo === "mp3" ? exportarAudio(d) : renderizar(d);
-    tarefa.catch(function(e){ console.error(e); info(e.message || "Não foi possível exportar agora.", true); })
-      .then(function(){ busy.forEach(function(b){ b.disabled = false; }); });
+  painel.addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-exp]"); if(!b) return;
+    if(!$("esTexto").value.trim()){ msg(4,"Escreva um texto no passo 1 antes de exportar.",true); return; }
+    var destinos = Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; });
+    if(!destinos.length){ msg(4,"Marque pelo menos uma rede.",true); return; }
+    var m = modoDe(modoAtual);
+    if(m && m.e === "prep"){ msg(4,"\u201C" + m.t + "\u201D ainda não gera arquivo. Você pode guardar o projeto e voltar quando este tipo for liberado.",true); return; }
+    msg(4,"");
+    var det = {formato:$("esFormato").value, velocidade:Number($("esVel").value), volumeMusica:Number($("esVolMus").value),
+      titulo:$("esTitulo").value.trim(), texto:$("esTexto").value};
+    var botoes = painel.querySelectorAll("[data-exp]");
+    botoes.forEach(function(x){ x.disabled = true; });
+    (b.dataset.exp === "mp3" ? exportarAudio(det) : renderizar(det))
+      .catch(function(e){ console.error(e); info(e.message || "Não foi possível exportar agora.", true); })
+      .then(function(){ botoes.forEach(function(x){ x.disabled = false; }); });
   });
-})();
-</script>
-<!-- ===== FIM: ESTÚDIO FASE 1 ===== -->
-
-<!-- ===== INÍCIO: ESTÚDIO FASE 2 — ESCOLHA DO TIPO (ENGRENAGEM) E CAMINHO ===== -->
-<style>
-/* os cartões antigos de modo saem; entram os da tela de escolha */
-#esModos{display:none!important}
-/* fase "escolha": só a tela de escolha aparece */
-#esPainel[data-fase="escolha"] > *:not(#f2Escolha){display:none!important}
-#esPainel[data-fase="caminho"] #f2Escolha{display:none!important}
  
-#f2Escolha{margin:14px 0 6px}
-#f2Escolha h3{margin:0 0 4px;font:600 26px Georgia,"Times New Roman",serif;color:#f4eedd}
-#f2Escolha > p{margin:0 0 16px;color:var(--muted);font:14px/1.5 "Segoe UI",Arial,sans-serif}
-.f2-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.f2-card{position:relative;display:flex;flex-direction:column;gap:12px;text-align:left;padding:20px 22px;border:1px solid var(--paper-line);border-radius:10px;background:var(--paper-card);color:var(--ink);cursor:pointer;font-family:inherit;transition:border-color .15s,box-shadow .15s}
-.f2-card:hover,.f2-card:focus-visible{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass);outline:none}
-.f2-eng{position:absolute;top:14px;right:16px;font:28px/1 "Segoe UI Symbol",Arial,sans-serif;color:var(--brass);transition:transform .5s}
-.f2-card:hover .f2-eng,.f2-card:focus-visible .f2-eng{transform:rotate(90deg)}
-.f2-card strong{display:block;padding-right:40px;font:600 21px/1.25 Georgia,"Times New Roman",serif}
-.f2-card .f2-d{font:14px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-.f2-selo{align-self:flex-start;padding:3px 10px;border-radius:12px;font:700 12px "Segoe UI",Arial,sans-serif;background:#e4efdf;color:#2f6b3a}
-.f2-selo.parcial{background:var(--brass-wash);color:var(--brass-deep)}
-.f2-selo.prep{background:#ece7da;color:var(--ink-soft)}
-#f2Aviso{flex:1 1 100%;margin:0;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
-#f2Aviso:empty{display:none}
-.f2-trilha{display:flex;flex-direction:column;gap:6px;margin:2px 0 0;padding:12px 0 0;border-top:1px solid var(--paper-line)}
-.f2-trilha span{display:flex;gap:10px;align-items:baseline;font:14px/1.4 "Segoe UI",Arial,sans-serif;color:var(--ink)}
-.f2-trilha b{flex:0 0 22px;height:22px;border-radius:50%;background:var(--brass-wash);color:var(--brass-deep);font:700 12px/22px "Segoe UI",Arial,sans-serif;text-align:center}
-.f2-ir{align-self:flex-end;font:700 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
- 
-/* barra do caminho: mostra o que está sendo criado e leva de volta à escolha */
-#f2Barra{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0 0;padding:12px 16px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink)}
-#f2Barra .f2-quem{flex:1 1 240px;min-width:0}
-#f2Barra small{display:block;font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-#f2Barra strong{font:600 18px Georgia,"Times New Roman",serif}
-#f2Trocar{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--brass);border-radius:6px;background:#fffdf6;color:var(--brass-deep);cursor:pointer;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.8px}
-#f2Trocar:hover{background:var(--brass-wash)}
-#f2Trocar i{font:normal 20px/1 "Segoe UI Symbol",Arial,sans-serif;transition:transform .4s}
-#f2Trocar:hover i{transform:rotate(90deg)}
-@media(max-width:760px){.f2-grade{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.f2-eng,#f2Trocar i{transition:none}}
-</style>
-<script>
-(function(){
-  var $ = function(id){ return document.getElementById(id); };
-  var painel = $("esPainel");
-  if(!painel || !$("esModos")) return;
- 
-  /* o caminho de cada tipo: o que fazer em cada um dos 4 passos */
-  var MODOS = [
-    {id:"redes", t:"Vídeos e mensagens bíblicas", d:"Salmos, orações, testemunhos e reflexões com voz, música e imagens.",
-     p:["Escrever o texto","Escolher voz, música e imagens","Ver a prévia","Exportar vídeo ou áudio"],
-     r:["Criar","Voz, música e imagens","Prévia","Exportar"], e:"ok"},
-    {id:"filme", t:"Filmes de histórias bíblicas", d:"Uma história contada em cenas, com narração e trilha.",
-     p:["Montar o roteiro em cenas","Escolher voz, trilha e imagens","Revisar a montagem","Exportar e publicar"],
-     r:["Roteiro","Voz e imagens","Montagem","Exportar"], e:"parcial"},
-    {id:"musica", t:"Louvores e letras com IA", d:"Letra original com estilo musical e vídeo com a letra na tela.",
-     p:["Definir tema e estilo","Escolher voz e imagens","Ver a prévia com a letra","Exportar"],
-     r:["Letra e estilo","Voz e imagens","Prévia","Exportar"], e:"prep"},
-    {id:"cortes", t:"Cortes para TikTok e Reels", d:"Trechos de vídeos próprios ou autorizados, legendados e na vertical.",
-     p:["Enviar o vídeo e marcar o trecho","Escolher música e legendas","Revisar o corte","Exportar para as redes"],
-     r:["Vídeo e trecho","Música e legendas","Montagem","Exportar"], e:"prep"}
-  ];
-  var ESTADO = {
-    ok:{rot:"Disponível", aviso:""},
-    parcial:{rot:"Parcial", aviso:"Gera um vídeo simples a partir das cenas. Imagens e roteiro por IA ainda não estão ligados."},
-    prep:{rot:"Em preparação", aviso:"Você pode planejar e guardar o projeto, mas este tipo ainda não gera arquivo."}
-  };
-  var modoAtual = "redes";
- 
-  /* tela de escolha */
-  var esc = document.createElement("section");
-  esc.id = "f2Escolha";
-  esc.innerHTML = '<h3>O que você quer criar?</h3><p>Escolha um tipo. Cada um abre o seu caminho, com os passos na ordem certa.</p><div class="f2-grade">' +
-    MODOS.map(function(m){
-      return '<button type="button" class="f2-card" data-m="' + m.id + '">' +
-        '<span class="f2-eng" aria-hidden="true">\u2699\uFE0E</span>' +
-        '<span class="f2-selo ' + m.e + '">' + ESTADO[m.e].rot + '</span><strong>' + m.t + '</strong><span class="f2-d">' + m.d + '</span>' +
-        '<span class="f2-trilha">' + m.p.map(function(x, i){ return '<span><b>' + (i + 1) + '</b>' + x + '</span>'; }).join("") + '</span>' +
-        '<span class="f2-ir">Começar</span></button>';
-    }).join("") + '</div>';
- 
-  /* barra do caminho */
-  var barra = document.createElement("div");
-  barra.id = "f2Barra";
-  barra.innerHTML = '<div class="f2-quem"><small>Você está criando</small><strong id="f2Nome"></strong></div>' +
-    '<p id="f2Aviso"></p>' +
- 
-    '<button type="button" id="f2Trocar"><i aria-hidden="true">\u2699\uFE0E</i>TROCAR TIPO</button>';
- 
-  painel.insertBefore(barra, painel.firstChild);
-  painel.insertBefore(esc, painel.firstChild);
-  painel.setAttribute("data-fase", "escolha");
- 
-  function escolher(id){
-    var m = MODOS.filter(function(x){ return x.id === id; })[0]; if(!m) return;
-    var orig = document.querySelector('#esModos [data-modo="' + id + '"]');
-    if(orig) orig.click();                                   /* liga o modo que já existia */
-    painel.querySelectorAll(".es-passos [data-p]").forEach(function(b){
-      b.textContent = (b.dataset.p + ". " + m.r[Number(b.dataset.p) - 1]).toUpperCase();
-    });
-    var p1 = painel.querySelector('.es-passos [data-p="1"]'); if(p1) p1.click();
-    modoAtual = id;
-    $("f2Nome").textContent = m.t;
-    $("f2Aviso").textContent = ESTADO[m.e].aviso;
-    painel.setAttribute("data-fase", "caminho");
-    $("esToggle").scrollIntoView({behavior: "smooth", block: "start"});
-  }
-  function voltar(){
-    painel.setAttribute("data-fase", "escolha");
-    $("esToggle").scrollIntoView({behavior: "smooth", block: "start"});
-  }
-  esc.addEventListener("click", function(ev){
-    var c = ev.target.closest("[data-m]"); if(c) escolher(c.dataset.m);
-  });
-  $("f2Trocar").addEventListener("click", voltar);
- 
-  /* exportar: tipos em preparação não geram arquivo (roda antes do código da Fase 1) */
-  document.addEventListener("estudio:exportar", function(ev){
-    var m = MODOS.filter(function(x){ return x.id === modoAtual; })[0];
-    if(!m || m.e !== "prep") return;
-    ev.stopImmediatePropagation();
-    ev.detail.tratado = true;
-    var msg = $("esMsg4");
-    msg.className = "es-msg erro";
-    msg.textContent = "\u201C" + m.t + "\u201D ainda não gera arquivo. Você pode guardar o projeto e voltar quando este tipo for liberado.";
-  }, true);
-})();
-</script>
-<!-- ===== FIM: ESTÚDIO FASE 2 ===== -->
-
-<!-- ===== INÍCIO: ESTÚDIO ETAPA 1 — PROJETOS (BIBLIOTECA "MEUS PROJETOS") ===== -->
-<style>
-#e1Biblioteca{margin:14px 0;border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink)}
-#esPainel[data-fase="escolha"] > details#e1Biblioteca{display:block!important}
-#e1Biblioteca > summary{cursor:pointer;padding:14px 18px;font:600 18px Georgia,"Times New Roman",serif;list-style:none}
-#e1Biblioteca > summary::-webkit-details-marker{display:none}
-#e1Biblioteca > summary::after{content:"▾";float:right;color:var(--brass-deep);transition:transform .2s}
-#e1Biblioteca:not([open]) > summary::after{transform:rotate(-90deg)}
-#e1Biblioteca .e1-corpo{padding:0 18px 18px;display:flex;flex-direction:column;gap:12px}
-#e1Biblioteca .e1-atual{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
-#e1Biblioteca label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-#e1Biblioteca .e1-atual label{flex:1 1 240px}
-#e1Biblioteca input,#e1Biblioteca select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
-#e1Biblioteca .e1-botoes{display:flex;gap:8px;flex-wrap:wrap}
-#e1Biblioteca .e1-filtro{max-width:260px}
-#e1Biblioteca .e1-msg{margin:0;min-height:1.3em;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
-#e1Biblioteca .e1-msg.erro{color:#a14747}
-#e1Biblioteca .e1-lista{display:flex;flex-direction:column;gap:8px}
-#e1Biblioteca .e1-item{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--paper-line);border-radius:7px;background:#fffdf6}
-#e1Biblioteca .e1-item.atual{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
-#e1Biblioteca .e1-info{flex:1 1 220px;min-width:0}
-#e1Biblioteca .e1-info strong{display:block;font:600 16px Georgia,serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#e1Biblioteca .e1-info small{font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-#e1Biblioteca .e1-acoes{display:flex;gap:6px;flex-wrap:wrap}
-#e1Biblioteca .e1-vazio{margin:0;font:13.5px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-</style>
-<script>
-(function(){
-  var $ = function(id){ return document.getElementById(id); };
-  var painel = $("esPainel");
-  if(!painel || !$("f2Escolha") || !$("f2Barra") || !$("esTexto")) return;
- 
-  var CHAVE = "ps_projetos_v1";
-  var NOMES = {redes:"Vídeos e mensagens", filme:"Filmes bíblicos", musica:"Louvores e letras", cortes:"Cortes"};
-  var CENAS_PADRAO = [
-    {titulo:"Apresentação da história", descricao:"Apresente o contexto bíblico e os personagens principais."},
-    {titulo:"O conflito", descricao:"Mostre o desafio central da narrativa."},
-    {titulo:"Desfecho e mensagem", descricao:"Conclua a história e destaque a mensagem espiritual."}
-  ];
-  var lista = [], atual = null, mudo = false, abrindo = false, timer = null;
-  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
- 
-  /* ---------- interface ---------- */
-  var sec = document.createElement("details");
-  sec.id = "e1Biblioteca"; sec.open = true;
-  sec.innerHTML =
-    '<summary><span id="e1Resumo">Meus projetos</span></summary>' +
-    '<div class="e1-corpo">' +
-      '<div class="e1-atual">' +
-        '<label>Projeto atual<input id="e1Nome" type="text" placeholder="Nome do projeto (opcional)"></label>' +
-        '<div class="e1-botoes">' +
-          '<button type="button" class="at-btn gold" id="e1Salvar">SALVAR PROJETO</button>' +
-          '<button type="button" class="at-btn" id="e1Novo">NOVO PROJETO</button>' +
-        '</div>' +
-      '</div>' +
-      '<p class="e1-msg" id="e1Msg" role="status"></p>' +
-      '<label class="e1-filtro">Mostrar<select id="e1Filtro"><option value="">Todos os tipos</option>' +
-        Object.keys(NOMES).map(function(k){ return '<option value="'+k+'">'+NOMES[k]+'</option>'; }).join("") +
-      '</select></label>' +
-      '<div id="e1Lista" class="e1-lista"></div>' +
-    '</div>';
-  $("f2Barra").insertAdjacentElement("afterend", sec);
- 
-  function msg(t, erro){ var m = $("e1Msg"); m.textContent = t || ""; m.className = "e1-msg" + (erro ? " erro" : ""); }
- 
-  /* ---------- armazenamento ---------- */
-  function ler(){
-    try{ var o = JSON.parse(localStorage.getItem(CHAVE) || "null"); return o && Array.isArray(o.lista) ? o.lista : []; }
+  /* ====================== MEUS PROJETOS ====================== */
+  function bibMsg(t, erro){ var m = $("esBibMsg"); m.textContent = t || ""; m.className = "bib-msg" + (erro ? " erro" : ""); }
+  function lerProjetos(){
+    try{ var o = JSON.parse(localStorage.getItem(CH_PROJETOS) || "null"); return o && Array.isArray(o.lista) ? o.lista : []; }
     catch(e){ return []; }
   }
-  function gravar(){
-    try{ localStorage.setItem(CHAVE, JSON.stringify({versao:1, lista:lista})); return true; }
-    catch(e){ msg("Não foi possível guardar neste navegador. Verifique o armazenamento disponível.", true); return false; }
+  function gravarProjetos(){
+    try{ localStorage.setItem(CH_PROJETOS, JSON.stringify({versao:1, lista:lista})); return true; }
+    catch(e){ bibMsg("Não foi possível guardar neste navegador. Verifique o armazenamento disponível.", true); return false; }
   }
   function achar(id){ for(var i = 0; i < lista.length; i++){ if(lista[i].id === id) return lista[i]; } return null; }
   function novoId(){ return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
  
-  /* ---------- foto do projeto (o que é guardado) ---------- */
+  /* campos guardados: todo input/select/textarea com id (menos arquivos, biblioteca e resultado da IA) */
   function campos(){
     return Array.prototype.filter.call(painel.querySelectorAll("input,select,textarea"), function(el){
-      return el.id && el.type !== "file" && el.type !== "button" && !el.closest("#e1Biblioteca");
+      return el.id && el.type !== "file" && el.type !== "button" && !el.closest("#esBiblioteca,#esResultadoIA");
     });
   }
   function snapshot(){
     var c = {};
     campos().forEach(function(el){ c[el.id] = (el.type === "checkbox" || el.type === "radio") ? el.checked : el.value; });
-    var cenas = Array.prototype.map.call(document.querySelectorAll("#esFilmeCenas .es-cena"), function(x){
+    var cenas = Array.prototype.map.call(cenasBox.querySelectorAll(".es-cena"), function(x){
       return {titulo:x.querySelector(".es-cena-titulo").value, descricao:x.querySelector(".es-cena-desc").value};
     });
-    var destinos = Array.prototype.map.call(document.querySelectorAll("#esDest input:checked"), function(i){ return i.value; });
-    var tt = document.querySelector('#esTipos [aria-pressed="true"]');
-    return {modo: painel.getAttribute("data-modo-ativo") || "redes", campos:c, cenas:cenas, destinos:destinos, tipoTexto: tt ? tt.dataset.t : null};
+    var destinos = Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(i){ return i.value; });
+    return {modo:modoAtual, campos:c, cenas:cenas, destinos:destinos, tipoTexto:st.tipo};
   }
   function autoNome(d){
     var c = d.campos || {};
-    return (c.esTitulo || "").trim() || (c.esFilmeHistoria || "").trim() || (c.esMusTema || "").trim() || (NOMES[d.modo] || "Projeto") + " sem título";
-  }
- 
-  /* ---------- zerar e aplicar ---------- */
-  function trocarCenas(arr){
-    Array.prototype.forEach.call(document.querySelectorAll("#esFilmeCenas .es-cena-remover"), function(b){ b.click(); });
-    var add = $("esFilmeAddCena");
-    arr.forEach(function(){ add.click(); });
-    var cards = document.querySelectorAll("#esFilmeCenas .es-cena");
-    arr.forEach(function(c, i){
-      if(!cards[i]) return;
-      cards[i].querySelector(".es-cena-titulo").value = c.titulo || "";
-      cards[i].querySelector(".es-cena-desc").value = c.descricao || "";
-    });
+    return (c.esTitulo || "").trim() || (c.esFilmeHistoria || "").trim() || (c.esMusTema || "").trim() || (NOMES_MODO[d.modo] || "Projeto") + " sem título";
   }
   function zerar(){
     campos().forEach(function(el){
@@ -7653,47 +7261,47 @@ st.versoes.unshift({
       else if(el.type === "checkbox" || el.type === "radio"){ el.checked = el.defaultChecked; }
       else el.value = el.defaultValue;
     });
-    Array.prototype.forEach.call(document.querySelectorAll("#esDest input"), function(i){ i.checked = true; });
-    trocarCenas(CENAS_PADRAO);
-    var b; while((b = document.querySelector("#esFotos [data-f]"))) b.click();      /* imagens não são guardadas */
-    var m = $("esMusica");
-    if(m && m.value){ m.value = ""; m.dispatchEvent(new Event("change", {bubbles:true})); }
-    var t0 = document.querySelector("#esTipos [data-t]"); if(t0) t0.click();
+    Array.prototype.forEach.call($("esDest").querySelectorAll("input"), function(i){ i.checked = true; });
+    definirCenas(CENAS_PADRAO);
+    fotos = []; desenharFotos();                        /* imagens não são guardadas */
+    musicaArq = null; musicaUrl = null;                 /* música enviada também não */
+    pilha = []; $("esDesfazer").disabled = true;
+    $("esResultadoIA").hidden = true; $("esSaida").hidden = true;
+    st.tipo = TIPOS[0]; gravarTextos(); tipos();
     $("esTexto").dispatchEvent(new Event("input", {bubbles:true}));
   }
   function aplicar(d){
     zerar();
     var c = d.campos || {};
     Object.keys(c).forEach(function(id){
-      if(id === "esMusica") return;                                                 /* arquivo de música não é guardado */
+      if(id === "esMusica") return;                     /* o arquivo de música não é guardado */
       var el = $(id);
-      if(!el || el.type === "file" || el.closest("#e1Biblioteca")) return;
+      if(!el || el.type === "file" || el.closest("#esBiblioteca")) return;
       if(el.type === "checkbox" || el.type === "radio") el.checked = !!c[id];
       else if(c[id] != null) el.value = c[id];
     });
     $("esTexto").dispatchEvent(new Event("input", {bubbles:true}));
     if(Array.isArray(d.destinos)){
-      Array.prototype.forEach.call(document.querySelectorAll("#esDest input"), function(i){ i.checked = d.destinos.indexOf(i.value) > -1; });
+      Array.prototype.forEach.call($("esDest").querySelectorAll("input"), function(i){ i.checked = d.destinos.indexOf(i.value) > -1; });
     }
-    if(Array.isArray(d.cenas)) trocarCenas(d.cenas);
-    if(d.tipoTexto){
-      Array.prototype.forEach.call(document.querySelectorAll("#esTipos [data-t]"), function(b){ if(b.dataset.t === d.tipoTexto) b.click(); });
-    }
+    if(Array.isArray(d.cenas)) definirCenas(d.cenas);
+    if(d.tipoTexto){ st.tipo = d.tipoTexto; gravarTextos(); tipos(); }
   }
- 
-  /* ---------- operações ---------- */
   function salvar(){
     if(!atual) return;
     var p = achar(atual); if(!p) return;
-    var d = snapshot(), n = $("e1Nome").value.trim();
+    var d = snapshot(), n = $("esBibNome").value.trim();
     p.dados = d; p.tipo = d.modo; p.nome = n || autoNome(d); p.atualizado = Date.now();
-    if(gravar()) desenhar();
+    if(gravarProjetos()) desenhar();
   }
   function criar(){
-    var d = snapshot(), n = $("e1Nome").value.trim();
+    var d = snapshot(), n = $("esBibNome").value.trim();
     var p = {id:novoId(), nome:n || autoNome(d), tipo:d.modo, criado:Date.now(), atualizado:Date.now(), dados:d};
     lista.unshift(p); atual = p.id;
-    gravar(); desenhar(); return p;
+    gravarProjetos(); desenhar(); return p;
+  }
+  function guardarProjeto(){
+    if(!atual) criar(); else { clearTimeout(timer); timer = null; salvar(); }
   }
   function descarregar(){ if(timer){ clearTimeout(timer); timer = null; salvar(); } }
   function agendar(){
@@ -7707,26 +7315,25 @@ st.versoes.unshift({
     limparVazios(id);
     mudo = true; abrindo = true;
     try{
-      var card = document.querySelector('#f2Escolha [data-m="' + p.tipo + '"]');
-      if(card) card.click();
+      escolher(p.tipo);
       aplicar(p.dados || {});
-      atual = p.id; $("e1Nome").value = p.nome;
+      atual = p.id; $("esBibNome").value = p.nome;
     }finally{ mudo = false; abrindo = false; }
     desenhar();
-    msg("Projeto \u201C" + p.nome + "\u201D aberto. Imagens e música enviadas precisam ser escolhidas de novo.");
+    bibMsg("Projeto \u201C" + p.nome + "\u201D aberto. Imagens e música enviadas precisam ser escolhidas de novo.");
   }
   function duplicar(id){
     var p = achar(id); if(!p) return;
     var c = JSON.parse(JSON.stringify(p));
     c.id = novoId(); c.nome = p.nome + " (cópia)"; c.criado = c.atualizado = Date.now();
-    lista.unshift(c); gravar(); desenhar(); msg("Cópia criada.");
+    lista.unshift(c); gravarProjetos(); desenhar(); bibMsg("Cópia criada.");
   }
   function excluir(id){
     var p = achar(id); if(!p) return;
     if(!window.confirm("Excluir o projeto \u201C" + p.nome + "\u201D? Não dá para desfazer.")) return;
     lista = lista.filter(function(x){ return x.id !== id; });
-    if(atual === id){ atual = null; $("e1Nome").value = ""; }
-    gravar(); desenhar(); msg("Projeto excluído.");
+    if(atual === id){ atual = null; $("esBibNome").value = ""; }
+    gravarProjetos(); desenhar(); bibMsg("Projeto excluído.");
   }
   /* projeto vazio = nenhum campo de conteúdo preenchido e cenas iguais às padrão */
   function vazio(d){
@@ -7744,63 +7351,48 @@ st.versoes.unshift({
   function limparVazios(manter){
     var antes = lista.length;
     lista = lista.filter(function(p){ return p.id === manter || !vazio(p.dados); });
-    if(lista.length !== antes) gravar();
+    if(lista.length !== antes) gravarProjetos();
   }
   function temConteudo(){ return !!($("esTexto").value.trim() || $("esTitulo").value.trim()); }
- 
-  /* ---------- lista ---------- */
   function desenhar(){
-    var f = $("e1Filtro").value;
-    var itens = lista.filter(function(p){ return !f || p.tipo === f; })
-      .sort(function(a, b){ return b.atualizado - a.atualizado; });
-    $("e1Resumo").textContent = "Meus projetos (" + lista.length + ")";
-    $("e1Lista").innerHTML = itens.length ? itens.map(function(p){
+    var f = $("esBibFiltro").value;
+    var itens = lista.filter(function(p){ return !f || p.tipo === f; }).sort(function(a, b){ return b.atualizado - a.atualizado; });
+    $("esBibResumo").textContent = "Meus projetos (" + lista.length + ")";
+    $("esBibLista").innerHTML = itens.length ? itens.map(function(p){
       var quando = new Date(p.atualizado).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"});
-      return '<div class="e1-item' + (p.id === atual ? ' atual' : '') + '">' +
-        '<div class="e1-info"><strong>' + esc(p.nome) + '</strong><small>' + esc(NOMES[p.tipo] || p.tipo) + ' · ' + esc(quando) + (p.id === atual ? ' · em edição' : '') + '</small></div>' +
-        '<div class="e1-acoes">' +
-          '<button type="button" class="at-btn" data-e1="abrir" data-id="' + esc(p.id) + '">ABRIR</button>' +
-          '<button type="button" class="at-btn" data-e1="duplicar" data-id="' + esc(p.id) + '">DUPLICAR</button>' +
-          '<button type="button" class="at-btn" data-e1="excluir" data-id="' + esc(p.id) + '">EXCLUIR</button>' +
+      return '<div class="bib-item' + (p.id === atual ? ' atual' : '') + '">' +
+        '<div class="bib-info"><strong>' + esc(p.nome) + '</strong><small>' + esc(NOMES_MODO[p.tipo] || p.tipo) + ' · ' + esc(quando) + (p.id === atual ? ' · em edição' : '') + '</small></div>' +
+        '<div class="bib-acoes">' +
+          '<button type="button" class="at-btn" data-bib="abrir" data-id="' + esc(p.id) + '">ABRIR</button>' +
+          '<button type="button" class="at-btn" data-bib="duplicar" data-id="' + esc(p.id) + '">DUPLICAR</button>' +
+          '<button type="button" class="at-btn" data-bib="excluir" data-id="' + esc(p.id) + '">EXCLUIR</button>' +
         '</div></div>';
-    }).join("") : '<p class="e1-vazio">' + (lista.length ? "Nenhum projeto deste tipo." : "Nenhum projeto ainda. Escolha um tipo acima e comece a criar: o projeto é guardado automaticamente.") + '</p>';
+    }).join("") : '<p class="bib-vazio">' + (lista.length ? "Nenhum projeto deste tipo." : "Nenhum projeto ainda. Escolha um tipo acima e comece a criar: o projeto é guardado automaticamente.") + '</p>';
   }
- 
-  /* ---------- eventos ---------- */
-  $("e1Lista").addEventListener("click", function(ev){
-    var b = ev.target.closest("[data-e1]"); if(!b) return;
-    if(b.dataset.e1 === "abrir") abrir(b.dataset.id);
-    else if(b.dataset.e1 === "duplicar") duplicar(b.dataset.id);
+  $("esBibLista").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-bib]"); if(!b) return;
+    if(b.dataset.bib === "abrir") abrir(b.dataset.id);
+    else if(b.dataset.bib === "duplicar") duplicar(b.dataset.id);
     else excluir(b.dataset.id);
   });
-  $("e1Filtro").addEventListener("change", desenhar);
-  $("e1Nome").addEventListener("input", agendar);
-  $("e1Salvar").addEventListener("click", function(){
-    if(!atual) criar(); else { clearTimeout(timer); timer = null; salvar(); }
-    msg("Projeto guardado neste navegador.");
-  });
-  $("e1Novo").addEventListener("click", function(){
+  $("esBibFiltro").addEventListener("change", desenhar);
+  $("esBibNome").addEventListener("input", agendar);
+  $("esBibSalvar").addEventListener("click", function(){ guardarProjeto(); bibMsg("Projeto guardado neste navegador."); });
+  $("esBibNovo").addEventListener("click", function(){
     descarregar();
     limparVazios(null);
     if(atual && !achar(atual)) atual = null;
     if(!atual && temConteudo() && !window.confirm("O texto atual não está em nenhum projeto guardado. Começar um novo mesmo assim?")) return;
     mudo = true;
     try{ zerar(); }finally{ mudo = false; }
-    atual = null; $("e1Nome").value = "";
+    atual = null; $("esBibNome").value = "";
     desenhar();
-    $("f2Trocar").click();
-    msg("Novo projeto. Escolha o tipo para começar.");
-  });
- 
-  /* ao escolher um cartão: cria o projeto (ou atualiza o tipo do atual) */
-  $("f2Escolha").addEventListener("click", function(ev){
-    if(abrindo || !ev.target.closest("[data-m]")) return;
-    if(!atual){ criar(); msg("Projeto criado. Ele é guardado automaticamente enquanto você trabalha."); }
-    else salvar();
+    voltarEscolha();
+    bibMsg("Novo projeto. Escolha o tipo para começar.");
   });
  
   /* gravação automática */
-  function ignora(ev){ return !ev.target || ev.target.type === "file" || (ev.target.closest && ev.target.closest("#e1Biblioteca")); }
+  function ignora(ev){ return !ev.target || ev.target.type === "file" || (ev.target.closest && ev.target.closest("#esBiblioteca,#esResultadoIA")); }
   painel.addEventListener("input", function(ev){ if(!ignora(ev)) agendar(); });
   painel.addEventListener("change", function(ev){ if(!ignora(ev)) agendar(); });
   painel.addEventListener("click", function(ev){
@@ -7808,33 +7400,32 @@ st.versoes.unshift({
   });
   window.addEventListener("beforeunload", descarregar);
  
-  /* a lista fica aberta na escolha e recolhida dentro do caminho */
-  new MutationObserver(function(){ sec.open = painel.getAttribute("data-fase") === "escolha"; })
-    .observe(painel, {attributes:true, attributeFilter:["data-fase"]});
- 
-  /* ---------- início: carrega a biblioteca e aproveita o rascunho antigo ---------- */
-  /* a tela começa limpa: o rascunho antigo do "Fluxo do projeto" não preenche mais os campos;
-     o conteúdo só volta pela biblioteca (ABRIR) */
+  /* ====================== INÍCIO ====================== */
+  tipos(); versoes();
   mudo = true;
   try{ zerar(); }finally{ mudo = false; }
-  lista = ler();
-  if(!lista.length){
+  try{ $("esEditorNotas").value = localStorage.getItem("ps_estudio_notas_edicao") || ""; }catch(e){}   /* notas antigas, se existirem */
+  lista = lerProjetos();
+  if(!lista.length){                                   /* aproveita o rascunho da versão antiga, se houver */
     try{
       var o = JSON.parse(localStorage.getItem("ps_estudio_projeto_completo") || "null");
       if(o && o.campos && String(o.campos.esTexto || "").trim()){
-        var p0 = {id:novoId(), nome:String(o.campos.esTitulo || "").trim() || "Rascunho anterior", tipo:o.modo || "redes",
-          criado:Date.now(), atualizado:Date.now(), dados:{modo:o.modo || "redes", campos:o.campos, cenas:null, destinos:null, tipoTexto:null}};
-        lista.push(p0); gravar();
-        msg("Seu rascunho anterior foi guardado como projeto. Clique em ABRIR para continuar.");
+        lista.push({id:novoId(), nome:String(o.campos.esTitulo || "").trim() || "Rascunho anterior", tipo:o.modo || "redes",
+          criado:Date.now(), atualizado:Date.now(), dados:{modo:o.modo || "redes", campos:o.campos, cenas:null, destinos:null, tipoTexto:null}});
+        gravarProjetos();
+        bibMsg("Seu rascunho anterior foi guardado como projeto. Clique em ABRIR para continuar.");
       }
     }catch(e){}
   }
   limparVazios(null);
   desenhar();
+  aplicarModo("redes");
+  mostrar(1);
+  setFase("escolha");
 })();
 </script>
-<!-- ===== FIM: ESTÚDIO ETAPA 1 — PROJETOS ===== -->
-
+<!-- ===== FIM: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
+ 
 
 
 </body>
