@@ -7980,33 +7980,56 @@ st.versoes.unshift({
 </script>
 <!-- ===== FIM: TIPO DE TEXTO MANUAL (BÍBLIA OU COLAR) ===== -->
 <!-- ===== INÍCIO: PASSO 2 — OUVIR VOZ PROFISSIONAL ===== -->
+<style>
+.f4-box{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.f4-box.final{border:1.5px solid var(--brass)}
+.f4-tag{align-self:flex-start;padding:3px 10px;border-radius:6px;font:700 12px "Segoe UI",Arial,sans-serif;background:var(--brass-wash);color:var(--brass-deep)}
+.f4-box.teste .f4-tag{background:#ece7da;color:var(--ink-soft)}
+.f4-linha{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.f4-linha .at-btn{height:43px}
+.f4-msg{margin:0;min-height:1.4em}
+</style>
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel"), selVp = $("f1Voz");
-  if(!painel || !selVp || !$("esMsg2")) return;
+  if(!painel || !selVp || !$("esVoz")) return;
 
   var URL_VOZ = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/voz";
   var FRASE_PADRAO = "A paz do Senhor seja com você neste dia.";
 
-  /* nomes mais claros nos campos */
   var labelVp = selVp.closest("label");
-  if(labelVp && labelVp.firstChild) labelVp.firstChild.nodeValue = "Voz profissional (arquivo final)";
-  var labelVoz = $("esVoz") && $("esVoz").closest("label");
-  if(labelVoz && labelVoz.firstChild) labelVoz.firstChild.nodeValue = "Voz (só para testar no navegador)";
+  var labelVoz = $("esVoz").closest("label");
+  var linhaOriginal = labelVp.parentElement;
+  if(labelVp.firstChild) labelVp.firstChild.nodeValue = "Voz profissional";
+  if(labelVoz.firstChild) labelVoz.firstChild.nodeValue = "Voz do navegador";
 
-  /* nota mais clara */
-  var nota = painel.querySelector('.es-box[data-passo="2"] p.es-nota');
-  if(nota) nota.textContent = "A \"Voz profissional\" é a que vai no arquivo final (MP3 e MP4). Clique em OUVIR VOZ PROFISSIONAL para escutar uma amostra antes de decidir. A lista \"Voz\" vem do seu navegador e serve só para testar.";
+  /* quadro 1: voz do arquivo final */
+  var box1 = document.createElement("div");
+  box1.className = "f4-box final";
+  box1.innerHTML = '<span class="f4-tag">Voz do arquivo final (MP3 e MP4)</span><div class="f4-linha" id="f4Linha1"></div><p class="es-msg f4-msg" id="f4Msg" role="status"></p>';
+  /* quadro 2: voz só para testar */
+  var box2 = document.createElement("div");
+  box2.className = "f4-box teste";
+  box2.innerHTML = '<span class="f4-tag">Só para testar no navegador</span><div class="f4-linha" id="f4Linha2"></div>';
 
-  /* botão */
+  linhaOriginal.insertAdjacentElement("beforebegin", box2);
+  linhaOriginal.insertAdjacentElement("beforebegin", box1);
+
   var btn = document.createElement("button");
   btn.type = "button"; btn.id = "f4OuvirVp"; btn.className = "at-btn gold";
   btn.textContent = "OUVIR VOZ PROFISSIONAL";
-  labelVp.insertAdjacentElement("afterend", btn);
+
+  $("f4Linha1").appendChild(labelVp);
+  $("f4Linha1").appendChild(btn);
+  $("f4Linha2").appendChild(labelVoz);
+
+  /* nota curta */
+  var nota = painel.querySelector('.es-box[data-passo="2"] p.es-nota');
+  if(nota) nota.textContent = "Escolha a velocidade e o formato conforme o lugar onde vai publicar.";
 
   var audio = null, urlAudio = null;
-  function msg(t, erro){ var m = $("esMsg2"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); }
+  function msg(t, erro){ var m = $("f4Msg"); m.textContent = t || ""; m.className = "es-msg f4-msg" + (erro ? " erro" : ""); }
   function parar(){
     if(audio){ audio.pause(); audio = null; }
     if(urlAudio){ URL.revokeObjectURL(urlAudio); urlAudio = null; }
