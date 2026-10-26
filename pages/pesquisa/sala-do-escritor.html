@@ -8447,6 +8447,135 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: VOLUME DA VOZ E PORCENTAGENS (PASSO 2) ===== -->
+ <!-- ===== INÍCIO: FUNDOS EM MOVIMENTO (VÍDEOS DE FUNDO) ===== -->
+<style>
+#esTela{isolation:isolate}
+#esTela .f6-prev{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;background:#000}
+.es-foto.f6-video::after{content:"▶ vídeo";position:absolute;left:4px;bottom:4px;padding:1px 6px;border-radius:4px;background:rgba(0,0,0,.65);color:#fff;font:700 11px "Segoe UI",Arial,sans-serif}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), botaoFoto = $("esAddFoto"), arqFoto = $("esFotoArq"), tela = $("esTela"), galeria = $("esFotos");
+  if(!painel || !botaoFoto || !arqFoto || !tela || !galeria) return;
+
+  var mapa = {};      /* endereço da miniatura -> {url, video, nome} */
+  var usado = 0;
+
+  /* botão novo, ao lado de "Adicionar imagens de fundo" */
+  var btn = document.createElement("button");
+  btn.type = "button"; btn.id = "f6AddVideo"; btn.className = "at-btn"; btn.textContent = "ADICIONAR VÍDEOS DE FUNDO";
+  var ent = document.createElement("input");
+  ent.type = "file"; ent.id = "f6Arq"; ent.accept = "video/*"; ent.multiple = true; ent.hidden = true;
+  botaoFoto.insertAdjacentElement("afterend", btn);
+  btn.insertAdjacentElement("afterend", ent);
+
+  function msg(t, erro){ var m = $("esMsg2"); if(!m) return; m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); }
+
+  /* primeiro quadro do vídeo vira a miniatura (entra na lista de imagens) */
+  function miniatura(url){
+    return new Promise(function(ok, no){
+      var v = document.createElement("video");
+      v.muted = true; v.playsInline = true; v.preload = "auto";
+      var limite = setTimeout(function(){ no(new Error("tempo esgotado")); }, 15000);
+      v.onloadeddata = function(){ try{ v.currentTime = Math.min(0.1, (v.duration || 1) / 2); }catch(e){} };
+      v.onseeked = function(){
+        clearTimeout(limite);
+        var w = v.videoWidth, h = v.videoHeight;
+        if(!w || !h){ no(new Error("sem imagem")); return; }
+        var k = Math.min(1, 640 / Math.max(w, h));
+        var c = document.createElement("canvas");
+        c.width = Math.round(w * k); c.height = Math.round(h * k);
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(function(b){ b ? ok(b) : no(new Error("falha na miniatura")); }, "image/jpeg", 0.85);
+      };
+      v.onerror = function(){ clearTimeout(limite); no(new Error("formato não suportado")); };
+      v.src = url;
+    });
+  }
+
+  async function adicionar(lista){
+    var ok = 0, ruins = [];
+    msg("Preparando os vídeos…");
+    for(var i = 0; i < lista.length; i++){
+      var f = lista[i], url = URL.createObjectURL(f);
+      try{
+        var blob = await miniatura(url);
+        var antes = galeria.querySelectorAll("img").length;
+        var dt = new DataTransfer();
+        dt.items.add(new File([blob], "video-" + Date.now() + "-" + i + ".jpg", {type: "image/jpeg"}));
+        arqFoto.files = dt.files;
+        arqFoto.dispatchEvent(new Event("change", {bubbles: true}));
+        var imgs = galeria.querySelectorAll("img"), nova = imgs[imgs.length - 1];
+        if(!nova || imgs.length <= antes) throw new Error("não entrou na lista");
+        var v = document.createElement("video");
+        v.muted = true; v.loop = true; v.playsInline = true; v.preload = "auto"; v.src = url;
+        mapa[nova.src] = {url: url, video: v, nome: f.name};
+        ok++;
+      }catch(e){
+        console.error(e); URL.revokeObjectURL(url); ruins.push(f.name);
+      }
+    }
+    marcar();
+    var partes = [];
+    if(ok) partes.push(ok + " vídeo(s) de fundo adicionado(s). Aparecem com ▶ na lista e se movem na prévia e no MP4. Valem só enquanto esta página estiver aberta.");
+    if(ruins.length) partes.push("Não consegui usar: " + ruins.join(", ") + ".");
+    msg(partes.join(" "), !ok);
+  }
+  btn.addEventListener("click", function(){ ent.click(); });
+  ent.addEventListener("change", function(){
+    var lista = Array.prototype.slice.call(this.files || []);
+    this.value = "";
+    if(lista.length) adicionar(lista);
+  });
+
+  /* marca "▶ vídeo" nas miniaturas */
+  function marcar(){
+    Array.prototype.forEach.call(galeria.querySelectorAll("img"), function(i){
+      if(i.parentElement) i.parentElement.classList.toggle("f6-video", !!mapa[i.src]);
+    });
+  }
+  new MutationObserver(marcar).observe(galeria, {childList: true, subtree: true});
+
+  /* MP4: quando o gerador desenha a miniatura, desenhamos o vídeo no lugar */
+  var desenharOriginal = CanvasRenderingContext2D.prototype.drawImage;
+  CanvasRenderingContext2D.prototype.drawImage = function(img){
+    var item = (img instanceof HTMLImageElement) ? mapa[img.src] : null;
+    if(item){
+      usado = Date.now();
+      var v = item.video;
+      if(v.paused){ var p = v.play(); if(p && p.catch) p.catch(function(){}); }
+      if(v.readyState >= 2){
+        var a = Array.prototype.slice.call(arguments); a[0] = v;
+        try{ return desenharOriginal.apply(this, a); }catch(e){}
+      }
+    }
+    return desenharOriginal.apply(this, arguments);
+  };
+  setInterval(function(){
+    if(Date.now() - usado < 2000) return;
+    Object.keys(mapa).forEach(function(k){ var v = mapa[k].video; if(!v.paused) v.pause(); });
+  }, 1500);
+
+  /* prévia: o vídeo roda atrás da legenda quando o fundo atual é um vídeo */
+  var prev = document.createElement("video");
+  prev.className = "f6-prev"; prev.muted = true; prev.loop = true; prev.playsInline = true; prev.hidden = true;
+  tela.insertBefore(prev, tela.firstChild);
+  function atualizarPrevia(){
+    var m = /url\(["']?([^"')]+)["']?\)/.exec(tela.style.backgroundImage || "");
+    var item = m ? mapa[m[1]] : null;
+    if(item){
+      if(prev.dataset.url !== item.url){ prev.src = item.url; prev.dataset.url = item.url; }
+      prev.hidden = false;
+      var p = prev.play(); if(p && p.catch) p.catch(function(){});
+    }else{
+      prev.hidden = true; prev.pause();
+    }
+  }
+  new MutationObserver(atualizarPrevia).observe(tela, {attributes: true, attributeFilter: ["style"]});
+})();
+</script>
+<!-- ===== FIM: FUNDOS EM MOVIMENTO (VÍDEOS DE FUNDO) ===== -->
 </body>
 </html>
  
