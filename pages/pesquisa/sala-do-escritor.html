@@ -6326,8 +6326,8 @@ body.dg-livro-vivo .dgp-nota{display:none}
 
 
                                                      <!-- ==== ESTÚDIO ==== -->
-<!-- ====================================================================================================================== --> 
-                       <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
+<!-- ====================================================================================================================== -->                     
+                           <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) =====-->
 <style>
 /* ---------- base ---------- */
 #esPainel{width:100%}
@@ -6372,6 +6372,17 @@ body.dg-livro-vivo .dgp-nota{display:none}
 .es-grupo.es-grande{flex:1 1 440px}
 .es-par{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
 .es-par .at-in{flex:1 1 180px;min-width:0}
+ 
+.es-bloco{padding:16px 0 0;border-top:1px solid var(--paper-line)}
+.es-bloco:first-child{padding-top:0;border-top:0}
+.es-rot{margin:0 0 10px;font:700 11px "Segoe UI",Arial,sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--brass-deep)}
+.es-status{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 12px;min-height:1.4em}
+.es-ferr{display:flex;gap:18px 28px;flex-wrap:wrap;align-items:flex-end;padding-top:12px;border-top:1px dashed var(--paper-line)}
+.es-gp{display:flex;flex-direction:column;gap:5px}
+.es-gp-rot{font:700 11px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.es-gp.es-dir{margin-left:auto}
+.es-texto.es-ocupado{opacity:.55;cursor:progress}
+@media(max-width:700px){.es-gp.es-dir{margin-left:0}}
  
 /* ---------- passos (valem para todos os tipos) ---------- */
 #esPainel .es-passos{display:flex;gap:0;margin:16px 0;border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:var(--paper-card)}
@@ -6445,11 +6456,6 @@ body.dg-livro-vivo .dgp-nota{display:none}
 @media(prefers-reduced-motion:reduce){.es-eng,#esTrocar i{transition:none}}
  
 /* ---------- resultado da IA e arquivo exportado ---------- */
-.es-res{border:1px dashed var(--brass);border-radius:8px;background:#fffdf6;padding:14px;display:flex;flex-direction:column;gap:10px}
-.es-res[hidden]{display:none!important}
-.es-res strong{font:600 16px Georgia,serif;color:var(--ink)}
-.es-res textarea{width:100%;min-height:200px;box-sizing:border-box;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:16px/1.7 Georgia,serif;resize:vertical}
-.es-res-aviso{font:600 12.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
 .es-saida{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;padding:16px;display:flex;flex-direction:column;gap:12px}
 .es-saida[hidden]{display:none!important}
 .es-barra{height:8px;border-radius:4px;background:var(--paper-line);overflow:hidden}
@@ -6624,21 +6630,35 @@ body.dg-livro-vivo .dgp-nota{display:none}
         '<video id="esCorteVideoPreview" controls playsinline style="display:none;width:min(100%,420px);max-height:480px;background:#101b2c;border-radius:8px"></video></div></section>' +
  
     /* ----- passo 1: texto ----- */
-    '<div class="es-box" data-passo="1"><h3>Tipo de texto</h3><div class="es-cartoes" id="esTipos"></div>' +
-      '<div class="es-controles">' +
-        '<div class="es-grupo"><label class="es-campo" for="esTom">Tom da mensagem</label><div class="es-par"><select id="esTom" class="at-sel"><option>Acolhedor</option><option>Solene</option><option>Esperançoso</option><option>Firme</option><option>Poético</option></select><button type="button" class="at-btn" data-ia="tom">ADAPTAR O TOM</button></div></div>' +
-        '<div class="es-grupo"><label class="es-campo" for="esDur">Duração desejada</label><div class="es-par"><select id="esDur" class="at-sel"><option value="30">cerca de 30 segundos</option><option value="60" selected>cerca de 1 minuto</option><option value="120">cerca de 2 minutos</option><option value="300">cerca de 5 minutos</option></select><button type="button" class="at-btn" data-ia="aumentar">AUMENTAR A DURAÇÃO</button><button type="button" class="at-btn" id="esAjustar">AJUSTAR À DURAÇÃO</button></div></div>' +
-        '<div class="es-grupo es-grande"><label class="es-campo" for="esAssunto">Assunto ou passagem (opcional)</label><div class="es-par"><input id="esAssunto" class="at-in" type="text" placeholder="Ex.: Salmo 91, confiança em tempos difíceis"><button type="button" class="at-btn" id="esBuscar">BUSCAR PASSAGEM</button><button type="button" class="at-btn gold" data-ia="criar">CRIAR COM IA</button></div></div>' +
+    '<div class="es-box" data-passo="1">' +
+      '<div class="es-bloco"><div class="es-rot">Tipo de texto</div><div class="es-cartoes" id="esTipos"></div></div>' +
+ 
+      '<div class="es-bloco"><div class="es-rot">Ponto de partida</div>' +
+        '<div class="es-controles">' +
+          '<div class="es-grupo"><label class="es-campo" for="esTom">Tom da mensagem</label><div class="es-par"><select id="esTom" class="at-sel"><option>Acolhedor</option><option>Solene</option><option>Esperançoso</option><option>Firme</option><option>Poético</option></select><button type="button" class="at-btn" data-ia="tom">ADAPTAR O TOM</button></div></div>' +
+          '<div class="es-grupo"><label class="es-campo" for="esDur">Duração desejada</label><div class="es-par"><select id="esDur" class="at-sel"><option value="30">cerca de 30 segundos</option><option value="60" selected>cerca de 1 minuto</option><option value="120">cerca de 2 minutos</option><option value="300">cerca de 5 minutos</option></select><button type="button" class="at-btn" data-ia="aumentar">AUMENTAR A DURAÇÃO</button><button type="button" class="at-btn" id="esAjustar">AJUSTAR À DURAÇÃO</button></div></div>' +
+        '</div>' +
+        '<div class="es-controles" style="margin-top:12px">' +
+          '<div class="es-grupo es-grande"><label class="es-campo" for="esAssunto">Assunto ou passagem bíblica (opcional)</label><div class="es-par"><input id="esAssunto" class="at-in" type="text" placeholder="Ex.: Salmos 91, ou: confiança em tempos difíceis"><button type="button" class="at-btn" id="esBuscar">BUSCAR PASSAGEM</button><button type="button" class="at-btn gold" data-ia="criar">CRIAR COM IA</button></div></div>' +
+          '<div class="es-grupo"><span class="es-campo">Ou traga um texto pronto</span><div class="es-par"><button type="button" class="at-btn" id="esPuxar">PUXAR TEXTO DO ATELIÊ</button></div></div>' +
+        '</div>' +
+        '<p class="es-nota" style="margin-top:8px"><b>Buscar passagem</b> traz o texto da Bíblia, como <i>Salmos 23</i> ou <i>João 3:16-18</i>. <b>Criar com IA</b> escreve um texto novo sobre o assunto.</p>' +
       '</div>' +
-      '<input id="esTitulo" class="at-in" type="text" placeholder="Título (opcional)" style="font:600 20px Georgia,serif;height:46px">' +
-      '<textarea id="esTexto" class="es-texto" placeholder="Escreva aqui, ou escreva o assunto acima e clique em CRIAR COM IA."></textarea>' +
-      '<div class="at-row"><span id="esConta" class="es-msg" style="flex:1"></span></div>' +
-      '<div class="at-row"><button type="button" class="at-btn" data-ia="reescrever">REESCREVER</button><button type="button" class="at-btn" id="esNumeros">TIRAR NÚMEROS DOS VERSÍCULOS</button><button type="button" class="at-btn" id="esPuxar">PUXAR TEXTO DO ATELIÊ</button></div>' +
-      '<div class="at-row"><button type="button" class="at-btn" id="esOuvirTexto">OUVIR</button><button type="button" class="at-btn" id="esPararTexto">PARAR</button><button type="button" class="at-btn" id="esDesfazer" disabled>DESFAZER</button><button type="button" class="at-btn" id="esGuardar">GUARDAR VERSÃO</button><button type="button" class="at-btn" id="esLimpar">LIMPAR</button></div>' +
-      '<div class="es-res" id="esResultadoIA" hidden><strong id="esResTit">Resultado</strong><div class="es-res-aviso" id="esResAviso"></div><textarea id="esResTxt" aria-label="Resultado"></textarea>' +
-        '<div class="at-row"><button type="button" class="at-btn gold" id="esResUsar">USAR ESTE TEXTO</button><button type="button" class="at-btn" id="esResDescartar">DESCARTAR</button></div></div>' +
-      '<div id="esVersoesBox"><p class="es-nota">Versões guardadas (use para criar outras versões do mesmo texto):</p><div class="es-vers" id="esVers"></div></div>' +
-      '<div id="esMsg1" class="es-msg" role="status"></div></div>' +
+ 
+      '<div class="es-bloco"><div class="es-rot">Texto</div>' +
+        '<input id="esTitulo" class="at-in" type="text" placeholder="Título (opcional)" style="font:600 20px Georgia,serif;height:46px;margin-bottom:10px;width:100%;box-sizing:border-box">' +
+        '<textarea id="esTexto" class="es-texto" placeholder="Escreva aqui, busque uma passagem ou peça para a IA escrever."></textarea>' +
+        '<div class="es-status"><span id="esConta" class="es-msg"></span><span id="esMsg1" class="es-msg" role="status"></span></div>' +
+        '<div class="es-ferr">' +
+          '<div class="es-gp"><span class="es-gp-rot">Melhorar o texto</span><div class="es-par"><button type="button" class="at-btn" data-ia="reescrever">REESCREVER COM IA</button><button type="button" class="at-btn" id="esNumeros">TIRAR NÚMEROS DOS VERSÍCULOS</button></div></div>' +
+          '<div class="es-gp"><span class="es-gp-rot">Ouvir</span><div class="es-par"><button type="button" class="at-btn" id="esOuvirTexto">OUVIR</button><button type="button" class="at-btn" id="esPararTexto">PARAR</button></div></div>' +
+          '<div class="es-gp"><span class="es-gp-rot">Corrigir</span><div class="es-par"><button type="button" class="at-btn" id="esDesfazer" disabled>DESFAZER</button><button type="button" class="at-btn" id="esLimpar">LIMPAR</button></div></div>' +
+          '<div class="es-gp es-dir"><span class="es-gp-rot">Guardar</span><div class="es-par"><button type="button" class="at-btn gold" id="esGuardar">GUARDAR VERSÃO</button></div></div>' +
+        '</div>' +
+      '</div>' +
+ 
+      '<div class="es-bloco" id="esVersoesBox"><div class="es-rot">Versões guardadas</div><p class="es-nota" style="margin-bottom:8px">Use para criar outras versões do mesmo texto.</p><div class="es-vers" id="esVers"></div></div>' +
+    '</div>' +
  
     /* ----- passo 2 ----- */
     '<div class="es-box" data-passo="2" hidden><h3>Voz, música e imagens</h3>' +
@@ -6898,17 +6918,14 @@ body.dg-livro-vivo .dgp-nota{display:none}
   });
  
   /* ====================== IA (rota /api/escrita) ====================== */
-  function travarIA(sim){ painel.querySelectorAll("[data-ia]").forEach(function(b){ b.disabled = sim; }); }
-  function mostrarRes(tit, aviso, texto, podeUsar){
-    $("esResultadoIA").hidden = false;
-    $("esResTit").textContent = tit;
-    $("esResAviso").textContent = aviso;
-    $("esResTxt").value = texto;
-    $("esResUsar").disabled = !podeUsar;
+  function travarIA(sim){
+    painel.querySelectorAll("[data-ia]").forEach(function(b){ b.disabled = sim; });
+    $("esTexto").readOnly = sim;
+    $("esTexto").classList.toggle("es-ocupado", sim);
   }
   async function pedirIA(det){
     var nome = NOMES_IA[det.acao] || "IA";
-    mostrarRes(nome + " — trabalhando…", "", "", false);
+    msg(1, nome + ": a IA está escrevendo… aguarde, pode levar até um minuto.");
     travarIA(true);
     var ctl = new AbortController();
     var t = setTimeout(function(){ ctl.abort(); }, 70000);
@@ -6922,11 +6939,13 @@ body.dg-livro-vivo .dgp-nota{display:none}
       });
       var dados = await r.json().catch(function(){ return {}; });
       if(!r.ok || !dados.ok) throw new Error(dados.error || "Não foi possível escrever agora.");
-      mostrarRes(nome + " — resultado", "Texto escrito pela IA. Leia e confira antes de usar.", dados.text || "", true);
-      $("esResultadoIA").scrollIntoView({block:"nearest", behavior:"smooth"});
+      var novo = String(dados.text || "").trim();
+      if(!novo) throw new Error("A IA não devolveu texto. Tente de novo.");
+      guardarAntes(); colocar(novo);
+      msg(1, nome + " concluído. Leia e confira. Se não gostou, clique em DESFAZER.");
     }catch(e){
       console.error(e);
-      mostrarRes(nome + " — não deu certo", e.name === "AbortError" ? "A IA demorou demais. Tente de novo." : (e.message || "Não foi possível escrever agora."), "", false);
+      msg(1, e.name === "AbortError" ? "A IA demorou demais. Tente de novo." : (e.message || "Não foi possível escrever agora."), true);
     }finally{
       clearTimeout(t); travarIA(false);
     }
@@ -6939,12 +6958,6 @@ body.dg-livro-vivo .dgp-nota{display:none}
     msg(1,"");
     pedirIA(det);
   });
-  $("esResUsar").addEventListener("click", function(){
-    guardarAntes(); colocar($("esResTxt").value);
-    $("esResultadoIA").hidden = true;
-    msg(1,"Texto trocado. Se não gostou, clique em DESFAZER.");
-  });
-  $("esResDescartar").addEventListener("click", function(){ $("esResultadoIA").hidden = true; });
  
   /* ====================== FILME: CENAS ====================== */
   var cenasBox = $("esFilmeCenas");
@@ -7260,7 +7273,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   /* campos guardados: todo input/select/textarea com id (menos arquivos, biblioteca e resultado da IA) */
   function campos(){
     return Array.prototype.filter.call(painel.querySelectorAll("input,select,textarea"), function(el){
-      return el.id && el.type !== "file" && el.type !== "button" && !el.closest("#esBiblioteca,#esResultadoIA");
+      return el.id && el.type !== "file" && el.type !== "button" && !el.closest("#esBiblioteca");
     });
   }
   function snapshot(){
@@ -7287,7 +7300,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
     fotos = []; desenharFotos();                        /* imagens não são guardadas */
     musicaArq = null; musicaUrl = null;                 /* música enviada também não */
     pilha = []; $("esDesfazer").disabled = true;
-    $("esResultadoIA").hidden = true; $("esSaida").hidden = true;
+    $("esSaida").hidden = true;
     st.tipo = TIPOS[0]; gravarTextos(); tipos();
     $("esTexto").dispatchEvent(new Event("input", {bubbles:true}));
   }
@@ -7413,7 +7426,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   });
  
   /* gravação automática */
-  function ignora(ev){ return !ev.target || ev.target.type === "file" || (ev.target.closest && ev.target.closest("#esBiblioteca,#esResultadoIA")); }
+  function ignora(ev){ return !ev.target || ev.target.type === "file" || (ev.target.closest && ev.target.closest("#esBiblioteca")); }
   painel.addEventListener("input", function(ev){ if(!ignora(ev)) agendar(); });
   painel.addEventListener("change", function(ev){ if(!ignora(ev)) agendar(); });
   painel.addEventListener("click", function(ev){
