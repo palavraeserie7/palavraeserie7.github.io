@@ -6327,6 +6327,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
 
                                                      <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== -->                     
+                    
                            <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) =====-->
 <style>
 /* ---------- base ---------- */
@@ -7289,7 +7290,9 @@ body.dg-livro-vivo .dgp-nota{display:none}
     var c = d.campos || {};
     return (c.esTitulo || "").trim() || (c.esFilmeHistoria || "").trim() || (c.esMusTema || "").trim() || (NOMES_MODO[d.modo] || "Projeto") + " sem título";
   }
-  function zerar(){
+  function zerar(preservarTipo){
+    /* Na inicialização, preserve o tipo salvo; em "Novo projeto", volte ao tipo padrão. */
+    var tipoAnterior = st.tipo;
     campos().forEach(function(el){
       if(el.tagName === "SELECT"){ Array.prototype.forEach.call(el.options, function(o){ o.selected = o.defaultSelected; }); }
       else if(el.type === "checkbox" || el.type === "radio"){ el.checked = el.defaultChecked; }
@@ -7301,7 +7304,8 @@ body.dg-livro-vivo .dgp-nota{display:none}
     musicaArq = null; musicaUrl = null;                 /* música enviada também não */
     pilha = []; $("esDesfazer").disabled = true;
     $("esSaida").hidden = true;
-    st.tipo = TIPOS[0]; gravarTextos(); tipos();
+    st.tipo = preservarTipo && TIPOS.indexOf(tipoAnterior) !== -1 ? tipoAnterior : TIPOS[0];
+    gravarTextos(); tipos();
     $("esTexto").dispatchEvent(new Event("input", {bubbles:true}));
   }
   function aplicar(d){
@@ -7437,7 +7441,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   /* ====================== INÍCIO ====================== */
   tipos(); versoes();
   mudo = true;
-  try{ zerar(); }finally{ mudo = false; }
+  try{ zerar(true); }finally{ mudo = false; }
   try{ $("esEditorNotas").value = localStorage.getItem("ps_estudio_notas_edicao") || ""; }catch(e){}   /* notas antigas, se existirem */
   lista = lerProjetos();
   if(!lista.length){                                   /* aproveita o rascunho da versão antiga, se houver */
@@ -7458,7 +7462,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   setFase("escolha");
 })();
 </script>
-<!-- ===== FIM: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
+<!-- ===== FIM: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->                         
  
 
 
