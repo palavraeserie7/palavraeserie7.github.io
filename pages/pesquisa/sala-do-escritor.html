@@ -7408,6 +7408,108 @@ st.versoes.unshift({
 </script>
 <!-- ===== FIM: ESTÚDIO FASE 1 ===== -->
 
+<!-- ===== INÍCIO: ESTÚDIO FASE 2 — ESCOLHA DO TIPO (ENGRENAGEM) E CAMINHO ===== -->
+<style>
+/* os cartões antigos de modo saem; entram os da tela de escolha */
+#esModos{display:none!important}
+/* fase "escolha": só a tela de escolha aparece */
+#esPainel[data-fase="escolha"] > *:not(#f2Escolha){display:none!important}
+#esPainel[data-fase="caminho"] #f2Escolha{display:none!important}
+ 
+#f2Escolha{margin:14px 0 6px}
+#f2Escolha h3{margin:0 0 4px;font:600 26px Georgia,"Times New Roman",serif;color:#f4eedd}
+#f2Escolha > p{margin:0 0 16px;color:var(--muted);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+.f2-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.f2-card{position:relative;display:flex;flex-direction:column;gap:12px;text-align:left;padding:20px 22px;border:1px solid var(--paper-line);border-radius:10px;background:var(--paper-card);color:var(--ink);cursor:pointer;font-family:inherit;transition:border-color .15s,box-shadow .15s}
+.f2-card:hover,.f2-card:focus-visible{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass);outline:none}
+.f2-eng{position:absolute;top:14px;right:16px;font:28px/1 "Segoe UI Symbol",Arial,sans-serif;color:var(--brass);transition:transform .5s}
+.f2-card:hover .f2-eng,.f2-card:focus-visible .f2-eng{transform:rotate(90deg)}
+.f2-card strong{display:block;padding-right:40px;font:600 21px/1.25 Georgia,"Times New Roman",serif}
+.f2-card .f2-d{font:14px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+.f2-trilha{display:flex;flex-direction:column;gap:6px;margin:2px 0 0;padding:12px 0 0;border-top:1px solid var(--paper-line)}
+.f2-trilha span{display:flex;gap:10px;align-items:baseline;font:14px/1.4 "Segoe UI",Arial,sans-serif;color:var(--ink)}
+.f2-trilha b{flex:0 0 22px;height:22px;border-radius:50%;background:var(--brass-wash);color:var(--brass-deep);font:700 12px/22px "Segoe UI",Arial,sans-serif;text-align:center}
+.f2-ir{align-self:flex-end;font:700 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+ 
+/* barra do caminho: mostra o que está sendo criado e leva de volta à escolha */
+#f2Barra{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0 0;padding:12px 16px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink)}
+#f2Barra .f2-quem{flex:1 1 240px;min-width:0}
+#f2Barra small{display:block;font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#f2Barra strong{font:600 18px Georgia,"Times New Roman",serif}
+#f2Trocar{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--brass);border-radius:6px;background:#fffdf6;color:var(--brass-deep);cursor:pointer;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.8px}
+#f2Trocar:hover{background:var(--brass-wash)}
+#f2Trocar i{font:normal 20px/1 "Segoe UI Symbol",Arial,sans-serif;transition:transform .4s}
+#f2Trocar:hover i{transform:rotate(90deg)}
+@media(max-width:760px){.f2-grade{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.f2-eng,#f2Trocar i{transition:none}}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel");
+  if(!painel || !$("esModos")) return;
+ 
+  /* o caminho de cada tipo: o que fazer em cada um dos 4 passos */
+  var MODOS = [
+    {id:"redes", t:"Vídeos e mensagens bíblicas", d:"Salmos, orações, testemunhos e reflexões com voz, música e imagens.",
+     p:["Escrever o texto","Escolher voz, música e imagens","Ver a prévia","Exportar vídeo ou áudio"],
+     r:["Criar","Voz, música e imagens","Prévia","Exportar"]},
+    {id:"filme", t:"Filmes de histórias bíblicas", d:"Uma história contada em cenas, com narração e trilha.",
+     p:["Montar o roteiro em cenas","Escolher voz, trilha e imagens","Revisar a montagem","Exportar e publicar"],
+     r:["Roteiro","Voz e imagens","Montagem","Exportar"]},
+    {id:"musica", t:"Louvores e letras com IA", d:"Letra original com estilo musical e vídeo com a letra na tela.",
+     p:["Definir tema e estilo","Escolher voz e imagens","Ver a prévia com a letra","Exportar"],
+     r:["Letra e estilo","Voz e imagens","Prévia","Exportar"]},
+    {id:"cortes", t:"Cortes para TikTok e Reels", d:"Trechos de vídeos próprios ou autorizados, legendados e na vertical.",
+     p:["Enviar o vídeo e marcar o trecho","Escolher música e legendas","Revisar o corte","Exportar para as redes"],
+     r:["Vídeo e trecho","Música e legendas","Montagem","Exportar"]}
+  ];
+ 
+  /* tela de escolha */
+  var esc = document.createElement("section");
+  esc.id = "f2Escolha";
+  esc.innerHTML = '<h3>O que você quer criar?</h3><p>Escolha um tipo. Cada um abre o seu caminho, com os passos na ordem certa.</p><div class="f2-grade">' +
+    MODOS.map(function(m){
+      return '<button type="button" class="f2-card" data-m="' + m.id + '">' +
+        '<span class="f2-eng" aria-hidden="true">\u2699\uFE0E</span>' +
+        '<strong>' + m.t + '</strong><span class="f2-d">' + m.d + '</span>' +
+        '<span class="f2-trilha">' + m.p.map(function(x, i){ return '<span><b>' + (i + 1) + '</b>' + x + '</span>'; }).join("") + '</span>' +
+        '<span class="f2-ir">Começar</span></button>';
+    }).join("") + '</div>';
+ 
+  /* barra do caminho */
+  var barra = document.createElement("div");
+  barra.id = "f2Barra";
+  barra.innerHTML = '<div class="f2-quem"><small>Você está criando</small><strong id="f2Nome"></strong></div>' +
+    '<button type="button" id="f2Trocar"><i aria-hidden="true">\u2699\uFE0E</i>TROCAR TIPO</button>';
+ 
+  painel.insertBefore(barra, painel.firstChild);
+  painel.insertBefore(esc, painel.firstChild);
+  painel.setAttribute("data-fase", "escolha");
+ 
+  function escolher(id){
+    var m = MODOS.filter(function(x){ return x.id === id; })[0]; if(!m) return;
+    var orig = document.querySelector('#esModos [data-modo="' + id + '"]');
+    if(orig) orig.click();                                   /* liga o modo que já existia */
+    painel.querySelectorAll(".es-passos [data-p]").forEach(function(b){
+      b.textContent = (b.dataset.p + ". " + m.r[Number(b.dataset.p) - 1]).toUpperCase();
+    });
+    var p1 = painel.querySelector('.es-passos [data-p="1"]'); if(p1) p1.click();
+    $("f2Nome").textContent = m.t;
+    painel.setAttribute("data-fase", "caminho");
+    $("esToggle").scrollIntoView({behavior: "smooth", block: "start"});
+  }
+  function voltar(){
+    painel.setAttribute("data-fase", "escolha");
+    $("esToggle").scrollIntoView({behavior: "smooth", block: "start"});
+  }
+  esc.addEventListener("click", function(ev){
+    var c = ev.target.closest("[data-m]"); if(c) escolher(c.dataset.m);
+  });
+  $("f2Trocar").addEventListener("click", voltar);
+})();
+</script>
+<!-- ===== FIM: ESTÚDIO FASE 2 ===== -->
 
 </body>
 </html>
