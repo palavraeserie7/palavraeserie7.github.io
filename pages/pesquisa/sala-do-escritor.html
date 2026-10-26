@@ -7979,7 +7979,73 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: TIPO DE TEXTO MANUAL (BÍBLIA OU COLAR) ===== -->
+<!-- ===== INÍCIO: PASSO 2 — OUVIR VOZ PROFISSIONAL ===== -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), selVp = $("f1Voz");
+  if(!painel || !selVp || !$("esMsg2")) return;
 
+  var URL_VOZ = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/voz";
+  var FRASE_PADRAO = "A paz do Senhor seja com você neste dia.";
+
+  /* nomes mais claros nos campos */
+  var labelVp = selVp.closest("label");
+  if(labelVp && labelVp.firstChild) labelVp.firstChild.nodeValue = "Voz profissional (arquivo final)";
+  var labelVoz = $("esVoz") && $("esVoz").closest("label");
+  if(labelVoz && labelVoz.firstChild) labelVoz.firstChild.nodeValue = "Voz (só para testar no navegador)";
+
+  /* nota mais clara */
+  var nota = painel.querySelector('.es-box[data-passo="2"] p.es-nota');
+  if(nota) nota.textContent = "A \"Voz profissional\" é a que vai no arquivo final (MP3 e MP4). Clique em OUVIR VOZ PROFISSIONAL para escutar uma amostra antes de decidir. A lista \"Voz\" vem do seu navegador e serve só para testar.";
+
+  /* botão */
+  var btn = document.createElement("button");
+  btn.type = "button"; btn.id = "f4OuvirVp"; btn.className = "at-btn gold";
+  btn.textContent = "OUVIR VOZ PROFISSIONAL";
+  labelVp.insertAdjacentElement("afterend", btn);
+
+  var audio = null, urlAudio = null;
+  function msg(t, erro){ var m = $("esMsg2"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); }
+  function parar(){
+    if(audio){ audio.pause(); audio = null; }
+    if(urlAudio){ URL.revokeObjectURL(urlAudio); urlAudio = null; }
+  }
+
+  btn.addEventListener("click", async function(){
+    parar();
+    var texto = ($("esTexto") && $("esTexto").value.trim()) || FRASE_PADRAO;
+    texto = texto.replace(/\s+/g, " ").slice(0, 150);
+    btn.disabled = true;
+    msg("Gerando a amostra da voz…");
+    try{
+      var s = (await supabaseClient.auth.getSession()).data.session;
+      if(!s) throw new Error("Sessão encerrada. Entre de novo.");
+      var r = await fetch(URL_VOZ, {
+        method: "POST",
+        headers: {"Content-Type":"application/json", "Authorization":"Bearer " + s.access_token},
+        body: JSON.stringify({texto: texto, voz: selVp.value, velocidade: Number($("esVel").value)})
+      });
+      if(!r.ok){
+        var j = await r.json().catch(function(){ return {}; });
+        throw new Error(j.error || "A voz profissional ainda não respondeu (erro " + r.status + ").");
+      }
+      if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
+      urlAudio = URL.createObjectURL(await r.blob());
+      audio = new Audio(urlAudio);
+      audio.onended = function(){ msg("Fim da amostra. Troque a voz e ouça de novo, se quiser."); };
+      await audio.play();
+      msg("Tocando a amostra da voz profissional.");
+    }catch(e){
+      console.error(e);
+      msg(e.message || "Não foi possível gerar a amostra agora.", true);
+    }finally{
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+<!-- ===== FIM: PASSO 2 — OUVIR VOZ PROFISSIONAL ===== -->
 </body>
 </html>
  
