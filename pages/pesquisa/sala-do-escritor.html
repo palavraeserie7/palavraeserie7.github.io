@@ -9048,10 +9048,203 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: BIBLIOTECA DE MÍDIA POR REDE (ÁUDIOS, IMAGENS E VÍDEOS) ===== -->
+
+<!-- ===== INÍCIO: BIBLIOTECA — OBJETIVO DO VÍDEO + SELEÇÃO + TAMANHO AUTOMÁTICO ===== -->
+<style>
+#mbBiblioteca .mb2-obj{border:1px solid var(--brass);border-radius:8px;background:#fffdf6;padding:14px;display:flex;flex-direction:column;gap:10px}
+#mbBiblioteca .mb2-obj strong{font:600 16px Georgia,serif;color:var(--ink)}
+#mbBiblioteca .mb2-passos{margin:0;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#mbBiblioteca .mb2-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+#mbBiblioteca .mb2-btn{text-align:left;padding:12px 14px;border:1px solid var(--paper-line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer;font:600 16px Georgia,serif;display:flex;flex-direction:column;gap:3px}
+#mbBiblioteca .mb2-btn small{font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#mbBiblioteca .mb2-btn:hover{border-color:var(--brass)}
+#mbBiblioteca .mb2-btn[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+#mbBiblioteca .mb2-btn[aria-pressed="true"] small{color:#fffdf6}
+#mbBiblioteca .mb2-barra{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;border:1px solid var(--paper-line);border-radius:8px;background:var(--brass-wash);position:sticky;top:0;z-index:2}
+#mbBiblioteca .mb2-cont{flex:1 1 180px;font:700 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#mbBiblioteca label.mb2-sel{flex-direction:row;align-items:center;gap:8px;font:700 12.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep);cursor:pointer}
+#mbBiblioteca label.mb2-sel input{width:18px;height:18px;margin:0}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var wrap = $("mbBiblioteca"), painel = $("esPainel"), arqFoto = $("esFotoArq");
+  if(!wrap || !painel || !arqFoto) return;
+  var Q = function(s){ return wrap.querySelector(s); };
  
-
-
-
+  var OBJ = [
+    {id:"tiktok",    nome:"TikTok",    det:"vertical 9:16 · 1080×1920"},
+    {id:"instagram", nome:"Instagram", det:"Reels vertical 9:16 · 1080×1920"},
+    {id:"facebook",  nome:"Facebook",  det:"quadrado 1:1 · 1080×1080"},
+    {id:"youtube",   nome:"YouTube",   det:"horizontal 16:9 · 1920×1080"}
+  ];
+  var ALVO = {f916:[1080,1920], f11:[1080,1080], f169:[1920,1080]};
+  var selecionados = {}, ocupado = false;
+ 
+  function alvo(){ var f = $("esFormato"); return ALVO[f && f.value] || ALVO.f916; }
+  function msg(t, erro){ var m = Q(".mb-msg"); if(!m) return; m.textContent = t || ""; m.className = "es-msg mb-msg" + (erro ? " erro" : ""); }
+ 
+  /* ---------- 1. objetivo do vídeo ---------- */
+  var obj = document.createElement("div");
+  obj.className = "mb2-obj";
+  obj.innerHTML = '<strong>Meu vídeo é para:</strong>' +
+    '<p class="mb2-passos">1) Escolha a rede. 2) Marque os arquivos da biblioteca. 3) Clique em USAR SELECIONADOS. O formato do vídeo e a rede de exportação são ajustados sozinhos, e as imagens grandes são reduzidas para o tamanho certo.</p>' +
+    '<div class="mb2-grade">' +
+      OBJ.map(function(o){ return '<button type="button" class="mb2-btn" data-obj="' + o.id + '" aria-pressed="false">' + o.nome + '<small>' + o.det + '</small></button>'; }).join("") +
+      '<button type="button" class="mb2-btn" data-obj="todas" aria-pressed="false">Ver tudo<small>sem escolher rede</small></button>' +
+    '</div>';
+  Q(".mb-tipos").insertAdjacentElement("beforebegin", obj);
+ 
+  /* ---------- 2. barra de seleção ---------- */
+  var barra = document.createElement("div");
+  barra.className = "mb2-barra";
+  barra.innerHTML = '<span class="mb2-cont"></span>' +
+    '<button type="button" class="at-btn gold" data-mb2="usar" disabled>USAR SELECIONADOS</button>' +
+    '<button type="button" class="at-btn" data-mb2="limpar">LIMPAR SELEÇÃO</button>' +
+    '<button type="button" class="at-btn" data-mb2="previa">IR PARA A PRÉVIA</button>';
+  Q(".mb-lista").insertAdjacentElement("beforebegin", barra);
+ 
+  function contar(){
+    var n = Q(".mb-lista").querySelectorAll("[data-sel]:checked").length;
+    barra.querySelector(".mb2-cont").textContent = n ? n + " selecionado(s) nesta lista" : "Marque os arquivos que quer usar (1 música, e quantas imagens ou vídeos quiser).";
+    barra.querySelector('[data-mb2="usar"]').disabled = !n || ocupado;
+  }
+  function marcar(){
+    Array.prototype.forEach.call(Q(".mb-lista").querySelectorAll(".mb-card"), function(c){
+      if(c.querySelector(".mb2-sel")) return;
+      var b = c.querySelector("[data-id]"); if(!b) return;
+      var l = document.createElement("label"); l.className = "mb2-sel";
+      l.innerHTML = '<input type="checkbox" data-sel="' + b.dataset.id + '"> Selecionar';
+      if(selecionados[b.dataset.id]) l.firstChild.checked = true;
+      c.insertBefore(l, c.firstChild);
+    });
+    contar();
+  }
+  new MutationObserver(marcar).observe(Q(".mb-lista"), {childList:true});
+  marcar();
+ 
+  /* ---------- 3. tamanho automático ---------- */
+  function ext(tipo){
+    var s = (tipo.split("/")[1] || "bin").split(";")[0];
+    return {jpeg:"jpg", quicktime:"mov", "x-matroska":"mkv", mpeg:"mp3"}[s] || s;
+  }
+  function adaptarImagem(blob, nome){
+    return new Promise(function(ok){
+      var u = URL.createObjectURL(blob), im = new Image();
+      var original = function(){ URL.revokeObjectURL(u); ok(new File([blob], nome + "." + ext(blob.type), {type:blob.type})); };
+      im.onload = function(){
+        var a = alvo(), k = Math.max(a[0] / im.naturalWidth, a[1] / im.naturalHeight);
+        if(k >= 1){ original(); return; }                       /* já é pequena: não mexe */
+        var c = document.createElement("canvas");
+        c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        c.toBlob(function(b){
+          URL.revokeObjectURL(u);
+          ok(b ? new File([b], nome + ".jpg", {type:"image/jpeg"}) : new File([blob], nome + "." + ext(blob.type), {type:blob.type}));
+        }, "image/jpeg", 0.88);
+      };
+      im.onerror = original;
+      im.src = u;
+    });
+  }
+  async function pegar(card, el){
+    var b = await (await fetch(el.src)).blob();
+    return {blob:b, nome:(card.querySelector("strong").textContent || "midia").trim().replace(/[\\\/:*?"<>|]/g, "-")};
+  }
+ 
+  /* ---------- 4. usar um ou vários cartões ---------- */
+  async function usarCards(cards){
+    ocupado = true; contar();
+    var imgs = [], vids = [], aud = null;
+    cards.forEach(function(c){
+      if(c.querySelector("img.mb-midia")) imgs.push(c);
+      else if(c.querySelector("video.mb-midia")) vids.push(c);
+      else aud = c;
+    });
+    var partes = [];
+    try{
+      msg("Preparando os arquivos…");
+      if(aud){ aud.querySelector('[data-mb="usar"]').click(); partes.push("1 música"); }
+      if(imgs.length){
+        var fi = [];
+        for(var i = 0; i < imgs.length; i++){ var p = await pegar(imgs[i], imgs[i].querySelector("img.mb-midia")); fi.push(await adaptarImagem(p.blob, p.nome)); }
+        var d1 = new DataTransfer(); fi.forEach(function(f){ d1.items.add(f); });
+        arqFoto.files = d1.files; arqFoto.dispatchEvent(new Event("change", {bubbles:true}));
+        partes.push(imgs.length + " imagem(ns) já no tamanho certo");
+      }
+      if(vids.length){
+        var av = $("f6Arq");
+        if(!av) throw new Error("O bloco de vídeos de fundo não está na página.");
+        var d2 = new DataTransfer();
+        for(var j = 0; j < vids.length; j++){ var q = await pegar(vids[j], vids[j].querySelector("video.mb-midia")); d2.items.add(new File([q.blob], q.nome + "." + ext(q.blob.type), {type:q.blob.type})); }
+        av.files = d2.files; av.dispatchEvent(new Event("change", {bubbles:true}));
+        partes.push(vids.length + " vídeo(s) de fundo");
+      }
+      msg("No projeto: " + partes.join(", ") + ". Pode ir para a PRÉVIA.");
+    }catch(e){
+      console.error(e); msg("Não foi possível usar a seleção: " + (e.message || e), true);
+    }finally{
+      ocupado = false; contar();
+    }
+  }
+ 
+  /* ---------- 5. eventos (fase de captura, antes do código da biblioteca) ---------- */
+  wrap.addEventListener("click", function(ev){
+    var t = ev.target;
+    var o = t.closest("[data-obj]");
+    if(o){
+      var id = o.dataset.obj;
+      Array.prototype.forEach.call(wrap.querySelectorAll("[data-obj]"), function(b){ b.setAttribute("aria-pressed", String(b === o)); });
+      var pill = Q('[data-mb-rede="' + id + '"]'); if(pill) pill.click();
+      if(id !== "todas"){ var aj = Q('[data-mb="ajustar"]'); if(aj) aj.click(); }
+      selecionados = {}; marcar();
+      var info = OBJ.filter(function(x){ return x.id === id; })[0];
+      msg(info ? "Objetivo: vídeo para " + info.nome + " (" + info.det + "). Formato e exportação já ajustados. Marque os arquivos e clique em USAR SELECIONADOS." : "Mostrando todas as redes.");
+      return;
+    }
+    if(t.closest("[data-mb-tipo],[data-mb-rede]")){ selecionados = {}; return; }
+    var m2 = t.closest("[data-mb2]");
+    if(m2){
+      var a = m2.dataset.mb2;
+      if(a === "usar"){
+        var cards = [];
+        Q(".mb-lista").querySelectorAll("[data-sel]:checked").forEach(function(i){ cards.push(i.closest(".mb-card")); });
+        if(cards.length && !ocupado) usarCards(cards);
+      }else if(a === "limpar"){
+        selecionados = {};
+        Q(".mb-lista").querySelectorAll("[data-sel]").forEach(function(i){ i.checked = false; });
+        contar();
+      }else if(a === "previa"){
+        var p3 = painel.querySelector('.es-passos [data-p="3"]'); if(p3) p3.click();
+      }
+      return;
+    }
+    /* imagem usada com um clique: também passa pela otimização de tamanho */
+    var u = t.closest('[data-mb="usar"]');
+    if(u){
+      var card = u.closest(".mb-card");
+      if(card && card.querySelector("img.mb-midia")){ ev.stopPropagation(); if(!ocupado) usarCards([card]); }
+    }
+  }, true);
+ 
+  wrap.addEventListener("change", function(ev){
+    var t = ev.target;
+    if(!t.dataset || t.dataset.sel === undefined) return;
+    var card = t.closest(".mb-card"), ehAudio = card && !card.querySelector(".mb-midia");
+    if(t.checked){
+      selecionados[t.dataset.sel] = true;
+      if(ehAudio){            /* só uma música por projeto */
+        Q(".mb-lista").querySelectorAll("[data-sel]:checked").forEach(function(o){
+          var c = o.closest(".mb-card");
+          if(o !== t && c && !c.querySelector(".mb-midia")){ o.checked = false; delete selecionados[o.dataset.sel]; }
+        });
+      }
+    }else delete selecionados[t.dataset.sel];
+    contar();
+  });
+})();
+</script>
+<!-- ===== FIM: BIBLIOTECA — OBJETIVO DO VÍDEO + SELEÇÃO + TAMANHO AUTOMÁTICO ===== -->
 
 </body>
 </html>
