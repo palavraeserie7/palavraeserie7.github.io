@@ -8069,6 +8069,332 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: PASSO 2 — OUVIR VOZ PROFISSIONAL ===== -->
+ <!-- ===== INÍCIO: BIBLIOTECA SONORA — ARQUIVOS DO COMPUTADOR ===== -->
+<style>
+#bsBiblioteca{display:flex;flex-direction:column;gap:12px;margin:4px 0}
+#bsBiblioteca [hidden]{display:none!important}
+#bsBiblioteca .bs-topo{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#bsBiblioteca .bs-atual{flex:1 1 220px;font:600 13.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#bsBiblioteca .bs-painel{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;color:var(--ink);padding:14px;display:flex;flex-direction:column;gap:12px}
+#bsBiblioteca .bs-filtros{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;align-items:end}
+#bsBiblioteca label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#bsBiblioteca label.bs-chk{flex-direction:row;align-items:center;gap:8px;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#bsBiblioteca input[type=search],#bsBiblioteca input[type=text],#bsBiblioteca select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#bsBiblioteca .bs-vol{max-width:260px}
+#bsBiblioteca .bs-lista{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto;padding-right:4px}
+#bsBiblioteca .bs-card{border:1px solid var(--paper-line);border-radius:7px;background:#fff;padding:12px;display:flex;flex-direction:column;gap:6px}
+#bsBiblioteca .bs-card.sel{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
+#bsBiblioteca .bs-cab{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#bsBiblioteca .bs-cab strong{font:600 16px Georgia,serif;color:var(--ink)}
+#bsBiblioteca .bs-card small{font:12.5px/1.45 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#bsBiblioteca .bs-st{padding:2px 10px;border-radius:12px;font:700 11.5px "Segoe UI",Arial,sans-serif;background:#e4efdf;color:#2f6b3a}
+#bsBiblioteca .bs-aviso{color:#a14747!important}
+#bsBiblioteca .bs-acoes{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+#bsBiblioteca details.bs-edit{margin-top:4px}
+#bsBiblioteca details.bs-edit summary{cursor:pointer;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#bsBiblioteca .bs-edit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:10px}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), selMus = $("esMusica"), arq = $("esMusArq");
+  if(!painel || !selMus || !arq) return;
+  var linhaMus = selMus.closest(".at-row");
+  if(!linhaMus) return;
+
+  var TIPOS = {musica:"Música", efeito:"Efeito sonoro", ambiente:"Ambiente natural", trilha:"Trilha cinematográfica", louvor:"Louvor instrumental"};
+  var CATS = ["Piano suave e contemplativo","Música instrumental cristã","Oração, meditação e reflexão","Esperança, consolo e encorajamento","Chuva, rios, mar e cachoeiras","Florestas, pássaros e vento","Fundos discretos para narração",
+    "Passos na areia, terra e pedra","Vento no deserto e tempestades","Água, rios, poços e recipientes","Animais e rebanhos","Multidões, mercados e aldeias","Portas, madeira, tecidos, fogo e objetos","Ambientes históricos e efeitos cinematográficos","Trilhas de tensão, emoção, vitória e contemplação",
+    "Worship contemporâneo","Gospel acústico","Piano e violão","Instrumentais para oração","Corais e arranjos orquestrais","Hinos e estilos contemplativos",
+    "Aberturas e encerramentos","Transições","Impactos sonoros","Trilhas inspiracionais curtas"];
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
+  var fmt = function(s){ if(!isFinite(s) || s <= 0) return ""; var m = Math.floor(s/60), r = Math.round(s%60); if(r === 60){ m++; r = 0; } return m + ":" + (r < 10 ? "0" : "") + r; };
+  var tam = function(b){ return b ? (b/1048576).toFixed(1).replace(".", ",") + " MB" : ""; };
+
+  var itens = [], escolhido = null, carregado = false, interno = false, tocando = null, semBanco = false;
+  var player = new Audio(); player.volume = 0.8;
+
+  /* ---------- armazenamento neste navegador (IndexedDB) ---------- */
+  var db = null;
+  function abrirDB(){
+    if(db) return Promise.resolve(db);
+    return new Promise(function(ok, no){
+      if(!window.indexedDB){ no(new Error("sem IndexedDB")); return; }
+      var r = indexedDB.open("ps_biblioteca_sonora", 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore("audios", {keyPath:"id"}); };
+      r.onsuccess = function(){ db = r.result; ok(db); };
+      r.onerror = function(){ no(r.error || new Error("falha ao abrir")); };
+    });
+  }
+  function tx(modo, fn){
+    return abrirDB().then(function(d){
+      return new Promise(function(ok, no){
+        var t = d.transaction("audios", modo), req = fn(t.objectStore("audios"));
+        t.oncomplete = function(){ ok(req && req.result); };
+        t.onerror = function(){ no(t.error); };
+        t.onabort = function(){ no(t.error || new Error("cancelado")); };
+      });
+    });
+  }
+  function gravarItem(it){
+    if(semBanco) return Promise.resolve();
+    var r = {}; Object.keys(it).forEach(function(k){ if(k.charAt(0) !== "_") r[k] = it[k]; });
+    return tx("readwrite", function(s){ return s.put(r); });
+  }
+
+  /* ---------- interface ---------- */
+  var wrap = document.createElement("div");
+  wrap.id = "bsBiblioteca";
+  wrap.innerHTML =
+    '<div class="bs-topo">' +
+      '<button type="button" class="at-btn gold" id="bsAdd">ADICIONAR ÁUDIOS</button>' +
+      '<button type="button" class="at-btn" id="bsVer">VER BIBLIOTECA SONORA</button>' +
+      '<span class="bs-atual" id="bsAtual">Nenhuma faixa da biblioteca selecionada.</span>' +
+      '<button type="button" class="at-btn" id="bsRemover" hidden>REMOVER MÚSICA DO PROJETO</button>' +
+      '<input type="file" id="bsArq" accept="audio/*" multiple hidden>' +
+    '</div>' +
+    '<p class="es-msg" id="bsMsg" role="status"></p>' +
+    '<div class="bs-painel" id="bsPainel" hidden>' +
+      '<p class="es-nota">Escolha áudios do seu computador. Eles ficam guardados neste navegador. A licença é por sua conta: preencha em EDITAR DADOS o que souber de cada faixa e confira antes de publicar.</p>' +
+      '<div class="bs-filtros">' +
+        '<label>Pesquisar<input type="search" class="bs-busca" placeholder="Nome, categoria, tags, licença…"></label>' +
+        '<label>Tipo<select class="bs-tipo"><option value="">Todos</option>' +
+          Object.keys(TIPOS).map(function(k){ return '<option value="' + k + '">' + TIPOS[k] + '</option>'; }).join("") + '</select></label>' +
+        '<label>Categoria<select class="bs-cat"><option value="">Todas</option></select></label>' +
+        '<label class="bs-chk"><input type="checkbox" class="bs-fav"> Só favoritos</label>' +
+      '</div>' +
+      '<div class="bs-vol"><label>Volume da prévia<input type="range" class="bs-volume" min="0" max="100" value="80"></label></div>' +
+      '<div class="bs-lista" id="bsLista"></div>' +
+      '<datalist id="bsCats">' + CATS.map(function(c){ return '<option value="' + esc(c) + '">'; }).join("") + '</datalist>' +
+    '</div>';
+  linhaMus.insertAdjacentElement("afterend", wrap);
+
+  function msg(t, erro){ var m = $("bsMsg"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); }
+  function achar(id){ for(var i = 0; i < itens.length; i++){ if(itens[i].id === id) return itens[i]; } return null; }
+  function url(it){ if(!it._url) it._url = URL.createObjectURL(it.blob); return it._url; }
+  function atualizarVer(){ $("bsVer").textContent = ($("bsPainel").hidden ? "VER" : "FECHAR") + " BIBLIOTECA SONORA (" + itens.length + ")"; }
+
+  /* ---------- carregar o que já foi guardado ---------- */
+  async function carregar(){
+    if(carregado) return; carregado = true;
+    try{
+      var todos = await tx("readonly", function(s){ return s.getAll(); });
+      itens = (todos || []).filter(function(r){ return r && r.blob; }).sort(function(a, b){ return (b.criado || 0) - (a.criado || 0); });
+    }catch(e){
+      console.error(e); semBanco = true;
+      msg("Este navegador não permite guardar a biblioteca. Os áudios valerão só enquanto esta página estiver aberta.", true);
+    }
+    cats(); render(); atualizarVer();
+  }
+  function cats(){
+    var set = {}; itens.forEach(function(i){ if(i.categoria) set[i.categoria] = 1; });
+    var sel = wrap.querySelector(".bs-cat"), v = sel.value;
+    sel.innerHTML = '<option value="">Todas</option>' + Object.keys(set).sort().map(function(c){ return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
+    sel.value = set[v] ? v : "";
+  }
+
+  /* ---------- adicionar arquivos ---------- */
+  function lerDuracao(blob){
+    return new Promise(function(ok){
+      var a = new Audio(), u = URL.createObjectURL(blob), fim = false;
+      function sair(v){ if(fim) return; fim = true; URL.revokeObjectURL(u); ok(v); }
+      a.preload = "metadata";
+      a.onloadedmetadata = function(){ sair(isFinite(a.duration) ? a.duration : 0); };
+      a.onerror = function(){ sair(-1); };
+      setTimeout(function(){ sair(-1); }, 8000);
+      a.src = u;
+    });
+  }
+  async function adicionar(arquivos){
+    await carregar();
+    var novos = 0, repetidos = 0, ruins = [], falhaGravar = false;
+    msg("Adicionando…");
+    for(var i = 0; i < arquivos.length; i++){
+      var f = arquivos[i];
+      var chave = f.name + "|" + f.size + "|" + f.lastModified;
+      if(itens.some(function(x){ return x.chave === chave; })){ repetidos++; continue; }
+      var d = await lerDuracao(f);
+      if(d < 0){ ruins.push(f.name); continue; }
+      var ext = (f.name.split(".").pop() || "").toUpperCase();
+      var it = {id:"a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), chave:chave, nome:f.name,
+        mime:f.type || "audio/mpeg", tamanho:f.size, formato:ext.length <= 5 ? ext : "", blob:f,
+        titulo:f.name.replace(/\.[^.]+$/, ""), tipo:"", categoria:"", tags:"", licenca:"", credito:"",
+        duracao:d, fav:false, criado:Date.now() + i};
+      try{ await gravarItem(it); }catch(e){ console.error(e); falhaGravar = true; }
+      itens.unshift(it); novos++;
+    }
+    cats(); render(); atualizarVer();
+    var p = $("bsPainel"); if(p.hidden){ p.hidden = false; atualizarVer(); }
+    var partes = [];
+    if(novos) partes.push(novos + " áudio(s) adicionado(s).");
+    if(repetidos) partes.push(repetidos + " já estava(m) na biblioteca.");
+    if(ruins.length) partes.push("Não consegui ler: " + ruins.join(", ") + ".");
+    if(falhaGravar) partes.push("Não deu para guardar tudo neste navegador (espaço insuficiente?). O que não coube vale só enquanto a página estiver aberta.");
+    msg(partes.join(" ") || "Nenhum áudio adicionado.", !!ruins.length || falhaGravar);
+  }
+
+  /* ---------- lista ---------- */
+  function filtrar(){
+    var q = norm(wrap.querySelector(".bs-busca").value), tipo = wrap.querySelector(".bs-tipo").value,
+        cat = wrap.querySelector(".bs-cat").value, soFav = wrap.querySelector(".bs-fav").checked;
+    return itens.filter(function(it){
+      if(tipo && it.tipo !== tipo) return false;
+      if(cat && it.categoria !== cat) return false;
+      if(soFav && !it.fav) return false;
+      if(q && norm([it.titulo, it.nome, TIPOS[it.tipo] || "", it.categoria, it.tags, it.licenca].join(" ")).indexOf(q) < 0) return false;
+      return true;
+    });
+  }
+  function card(it){
+    var meta = [TIPOS[it.tipo] || "", it.categoria, fmt(it.duracao), it.formato, tam(it.tamanho)].filter(Boolean).join(" · ");
+    var lic = "Licença: " + (it.licenca ? it.licenca : "não informada — confira antes de publicar");
+    return '<article class="bs-card' + (escolhido === it.id ? ' sel' : '') + '">' +
+      '<div class="bs-cab"><strong>' + esc(it.titulo) + '</strong><span class="bs-st">Disponível</span></div>' +
+      (meta ? '<small>' + esc(meta) + '</small>' : '') +
+      '<small>' + esc(lic) + '</small>' +
+      (it.duracao > 300 ? '<small class="bs-aviso">Faixa longa: pode pesar na exportação do vídeo. Prefira trechos de 1 a 3 minutos.</small>' : '') +
+      '<div class="bs-acoes">' +
+        '<button type="button" class="at-btn" data-bs="play" data-id="' + esc(it.id) + '">' + (tocando === it.id && !player.paused ? 'PAUSAR' : 'OUVIR') + '</button>' +
+        '<button type="button" class="at-btn gold" data-bs="usar" data-id="' + esc(it.id) + '">' + (escolhido === it.id ? 'EM USO' : 'USAR NO PROJETO') + '</button>' +
+        '<button type="button" class="at-btn" data-bs="fav" data-id="' + esc(it.id) + '">' + (it.fav ? '♥ FAVORITO' : '♡ FAVORITAR') + '</button>' +
+        (it.credito ? '<button type="button" class="at-btn" data-bs="credito" data-id="' + esc(it.id) + '">COPIAR CRÉDITO</button>' : '') +
+        '<button type="button" class="at-btn" data-bs="excluir" data-id="' + esc(it.id) + '">EXCLUIR</button>' +
+      '</div>' +
+      '<details class="bs-edit"><summary>EDITAR DADOS</summary><div class="bs-edit-grid">' +
+        '<label>Título<input type="text" data-campo="titulo" data-id="' + esc(it.id) + '" value="' + esc(it.titulo) + '"></label>' +
+        '<label>Tipo<select data-campo="tipo" data-id="' + esc(it.id) + '"><option value="">—</option>' +
+          Object.keys(TIPOS).map(function(k){ return '<option value="' + k + '"' + (it.tipo === k ? ' selected' : '') + '>' + TIPOS[k] + '</option>'; }).join("") + '</select></label>' +
+        '<label>Categoria<input type="text" list="bsCats" data-campo="categoria" data-id="' + esc(it.id) + '" value="' + esc(it.categoria) + '"></label>' +
+        '<label>Tags (separe por vírgula)<input type="text" data-campo="tags" data-id="' + esc(it.id) + '" value="' + esc(it.tags) + '"></label>' +
+        '<label>Licença<input type="text" data-campo="licenca" data-id="' + esc(it.id) + '" value="' + esc(it.licenca) + '" placeholder="Ex.: uso livre, crédito obrigatório"></label>' +
+        '<label>Texto de crédito<input type="text" data-campo="credito" data-id="' + esc(it.id) + '" value="' + esc(it.credito) + '" placeholder="Para colar na descrição do vídeo"></label>' +
+      '</div></details>' +
+    '</article>';
+  }
+  function render(){
+    var lista = $("bsLista");
+    if(!itens.length){ lista.innerHTML = '<p class="es-nota">A biblioteca está vazia. Clique em ADICIONAR ÁUDIOS e escolha os arquivos do seu computador.</p>'; return; }
+    var vis = filtrar();
+    lista.innerHTML = vis.length ? vis.map(card).join("") : '<p class="es-nota">Nenhum áudio encontrado com esses filtros.</p>';
+  }
+  function botoesPlay(){
+    Array.prototype.forEach.call($("bsLista").querySelectorAll('[data-bs="play"]'), function(b){
+      b.textContent = (tocando === b.dataset.id && !player.paused) ? "PAUSAR" : "OUVIR";
+    });
+  }
+
+  /* ---------- prévia ---------- */
+  function parar(){ player.pause(); tocando = null; botoesPlay(); }
+  function tocar(it){
+    if(tocando === it.id && !player.paused){ player.pause(); return; }
+    if(tocando !== it.id){ player.src = url(it); tocando = it.id; }
+    var p = player.play();
+    if(p && p.catch) p.catch(function(){ msg("Não foi possível tocar “" + it.titulo + "”.", true); });
+  }
+  player.addEventListener("play", botoesPlay);
+  player.addEventListener("pause", botoesPlay);
+  player.addEventListener("ended", function(){ tocando = null; botoesPlay(); });
+  player.addEventListener("error", function(){ if(tocando){ var it = achar(tocando); tocando = null; botoesPlay(); msg("Não foi possível tocar “" + (it ? it.titulo : "") + "”.", true); } });
+
+  /* ---------- enviar ao projeto (mesmo caminho de "Usar um arquivo meu") ---------- */
+  function atualizarAtual(){
+    var it = escolhido && achar(escolhido);
+    $("bsAtual").textContent = it ? "Música do projeto: " + it.titulo : "Nenhuma faixa da biblioteca selecionada.";
+    $("bsRemover").hidden = !it;
+  }
+  function usar(it){
+    parar();
+    if(typeof DataTransfer === "undefined"){ msg("Este navegador não permite enviar a faixa ao projeto. Use o Chrome ou o Edge atualizado.", true); return; }
+    try{
+      var f = new File([it.blob], it.nome || (it.id + ".mp3"), {type: it.mime || "audio/mpeg"});
+      var dt = new DataTransfer(); dt.items.add(f);
+      interno = true;
+      try{
+        selMus.value = "propria";
+        arq.files = dt.files;
+        arq.dispatchEvent(new Event("change", {bubbles:true}));
+      }finally{ interno = false; }
+      escolhido = it.id; atualizarAtual(); render();
+      msg("“" + it.titulo + "” está no projeto." + (it.credito ? " Esta faixa tem crédito: use COPIAR CRÉDITO e cole na descrição do vídeo." : ""));
+    }catch(e){
+      console.error(e);
+      msg("Não foi possível usar “" + it.titulo + "”: " + (e.message || e) + ".", true);
+    }
+  }
+  function removerDoProjeto(){
+    parar();
+    interno = true;
+    try{ selMus.value = ""; selMus.dispatchEvent(new Event("change", {bubbles:true})); }
+    finally{ interno = false; }
+    escolhido = null; atualizarAtual(); render();
+  }
+  selMus.addEventListener("change", function(){ if(!interno && escolhido){ escolhido = null; atualizarAtual(); render(); } });
+  arq.addEventListener("change", function(){ if(!interno && escolhido){ escolhido = null; atualizarAtual(); render(); } });
+
+  /* ---------- eventos ---------- */
+  $("bsAdd").addEventListener("click", function(){ $("bsArq").click(); });
+  $("bsArq").addEventListener("change", function(){
+    var lista = Array.prototype.slice.call(this.files || []);
+    this.value = "";
+    if(lista.length) adicionar(lista);
+  });
+  $("bsVer").addEventListener("click", async function(){
+    var p = $("bsPainel"); p.hidden = !p.hidden;
+    if(p.hidden){ parar(); atualizarVer(); return; }
+    await carregar(); render(); atualizarVer();
+  });
+  $("bsRemover").addEventListener("click", function(){ removerDoProjeto(); msg("Música removida do projeto."); });
+  $("bsLista").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-bs]"); if(!b) return;
+    var it = achar(b.dataset.id); if(!it) return;
+    var acao = b.dataset.bs;
+    if(acao === "play") tocar(it);
+    else if(acao === "usar") usar(it);
+    else if(acao === "fav"){
+      it.fav = !it.fav;
+      gravarItem(it).catch(function(){ msg("Não foi possível guardar o favorito neste navegador.", true); });
+      render();
+    }else if(acao === "credito"){
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(it.credito).then(
+          function(){ msg("Crédito copiado. Cole na descrição do vídeo."); },
+          function(){ msg("Não foi possível copiar. Crédito: " + it.credito, true); });
+      }else msg("Crédito: " + it.credito);
+    }else if(acao === "excluir"){
+      if(!window.confirm("Excluir “" + it.titulo + "” da biblioteca? Não dá para desfazer.")) return;
+      if(tocando === it.id) parar();
+      if(escolhido === it.id) removerDoProjeto();
+      if(it._url) URL.revokeObjectURL(it._url);
+      itens = itens.filter(function(x){ return x.id !== it.id; });
+      if(!semBanco) tx("readwrite", function(s){ return s.delete(it.id); }).catch(function(e){ console.error(e); });
+      cats(); render(); atualizarVer(); msg("Áudio excluído da biblioteca.");
+    }
+  });
+  /* filtros, volume e edição ficam só aqui: não disparam o salvamento automático dos projetos */
+  function aoMudar(ev){
+    ev.stopPropagation();
+    var t = ev.target;
+    if(t.classList.contains("bs-volume")){ player.volume = Number(t.value) / 100; return; }
+    if(t.dataset && t.dataset.campo && ev.type === "change"){
+      var it = achar(t.dataset.id); if(!it) return;
+      it[t.dataset.campo] = t.value.trim();
+      if(t.dataset.campo === "titulo" && !it.titulo) it.titulo = it.nome.replace(/\.[^.]+$/, "");
+      gravarItem(it).catch(function(){ msg("Não foi possível guardar a alteração neste navegador.", true); });
+      cats();
+      if(escolhido === it.id) atualizarAtual();
+      return;
+    }
+    if(t.matches(".bs-busca,.bs-tipo,.bs-cat,.bs-fav")) render();
+  }
+  wrap.addEventListener("input", aoMudar);
+  wrap.addEventListener("change", aoMudar);
+
+  painel.addEventListener("click", function(ev){ if(ev.target.closest && ev.target.closest(".es-passos [data-p]")) parar(); });
+  atualizarVer();
+})();
+</script>
+<!-- ===== FIM: BIBLIOTECA SONORA — ARQUIVOS DO COMPUTADOR ===== -->
 </body>
 </html>
  
