@@ -7537,7 +7537,7 @@ st.versoes.unshift({
 </script>
 <!-- ===== FIM: ESTÚDIO FASE 2 ===== -->
 
-<!-- ===== INÍCIO: ESTÚDIO ETAPA 1 — PROJETOS (BIBLIOTECA "MEUS PROJETOS") =====-->
+<!-- ===== INÍCIO: ESTÚDIO ETAPA 1 — PROJETOS (BIBLIOTECA "MEUS PROJETOS") ===== -->
 <style>
 #e1Biblioteca{margin:14px 0;border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink)}
 #esPainel[data-fase="escolha"] > details#e1Biblioteca{display:block!important}
@@ -7632,7 +7632,7 @@ st.versoes.unshift({
   }
   function autoNome(d){
     var c = d.campos || {};
-    return (c.esTitulo || "").trim() || (c.esFilmeHistoria || "").trim() || (c.esMusTema || "").trim() || "Projeto sem título";
+    return (c.esTitulo || "").trim() || (c.esFilmeHistoria || "").trim() || (c.esMusTema || "").trim() || (NOMES[d.modo] || "Projeto") + " sem título";
   }
  
   /* ---------- zerar e aplicar ---------- */
@@ -7704,6 +7704,7 @@ st.versoes.unshift({
   function abrir(id){
     var p = achar(id); if(!p) return;
     descarregar();
+    limparVazios(id);
     mudo = true; abrindo = true;
     try{
       var card = document.querySelector('#f2Escolha [data-m="' + p.tipo + '"]');
@@ -7726,6 +7727,24 @@ st.versoes.unshift({
     lista = lista.filter(function(x){ return x.id !== id; });
     if(atual === id){ atual = null; $("e1Nome").value = ""; }
     gravar(); desenhar(); msg("Projeto excluído.");
+  }
+  /* projeto vazio = nenhum campo de conteúdo preenchido e cenas iguais às padrão */
+  function vazio(d){
+    if(!d || !d.campos) return false;
+    var chaves = ["esTexto","esTitulo","esAssunto","esFilmeHistoria","esFilmePassagem","esFilmeResumo","esMusTema","esMusReferencia","esMusLetraIdeia","esCorteInstrucao","esPubTitulo","esPubDescricao"];
+    for(var i = 0; i < chaves.length; i++){ if(String(d.campos[chaves[i]] || "").trim()) return false; }
+    if(Array.isArray(d.cenas) && d.cenas.length){
+      var igual = d.cenas.length === CENAS_PADRAO.length && d.cenas.every(function(x, k){
+        return x.titulo === CENAS_PADRAO[k].titulo && x.descricao === CENAS_PADRAO[k].descricao;
+      });
+      if(!igual) return false;
+    }
+    return true;
+  }
+  function limparVazios(manter){
+    var antes = lista.length;
+    lista = lista.filter(function(p){ return p.id === manter || !vazio(p.dados); });
+    if(lista.length !== antes) gravar();
   }
   function temConteudo(){ return !!($("esTexto").value.trim() || $("esTitulo").value.trim()); }
  
@@ -7762,6 +7781,8 @@ st.versoes.unshift({
   });
   $("e1Novo").addEventListener("click", function(){
     descarregar();
+    limparVazios(null);
+    if(atual && !achar(atual)) atual = null;
     if(!atual && temConteudo() && !window.confirm("O texto atual não está em nenhum projeto guardado. Começar um novo mesmo assim?")) return;
     mudo = true;
     try{ zerar(); }finally{ mudo = false; }
@@ -7804,11 +7825,12 @@ st.versoes.unshift({
       }
     }catch(e){}
   }
+  limparVazios(atual);
+  if(atual && !achar(atual)) atual = null;
   desenhar();
 })();
 </script>
 <!-- ===== FIM: ESTÚDIO ETAPA 1 — PROJETOS ===== -->
- 
 
 </body>
 </html>
