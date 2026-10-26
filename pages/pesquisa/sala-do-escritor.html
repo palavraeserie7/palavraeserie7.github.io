@@ -6327,7 +6327,8 @@ body.dg-livro-vivo .dgp-nota{display:none}
 
                                                      <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
-                  <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
+          
+<!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
 <style>
 /* ---------- base ---------- */
 #esPainel{width:100%}
@@ -6365,6 +6366,13 @@ body.dg-livro-vivo .dgp-nota{display:none}
 .es-vers{display:flex;flex-direction:column;gap:6px}
 .es-vers div{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;font:14px Georgia,serif}
 .es-vers div span{flex:1}
+ 
+/* ---------- controles do passo 1: botão ao lado do campo que ele usa ---------- */
+.es-controles{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.es-grupo{display:flex;flex-direction:column;gap:5px;flex:0 1 auto}
+.es-grupo.es-grande{flex:1 1 440px}
+.es-par{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
+.es-par .at-in{flex:1 1 180px;min-width:0}
  
 /* ---------- passos (valem para todos os tipos) ---------- */
 #esPainel .es-passos{display:flex;gap:0;margin:16px 0;border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:var(--paper-card)}
@@ -6614,15 +6622,15 @@ body.dg-livro-vivo .dgp-nota{display:none}
  
     /* ----- passo 1: texto ----- */
     '<div class="es-box" data-passo="1"><h3>Tipo de texto</h3><div class="es-cartoes" id="esTipos"></div>' +
-      '<div class="at-row">' +
-        '<label class="es-campo">Tom da mensagem<select id="esTom" class="at-sel"><option>Acolhedor</option><option>Solene</option><option>Esperançoso</option><option>Firme</option><option>Poético</option></select></label>' +
-        '<label class="es-campo">Duração desejada<select id="esDur" class="at-sel"><option value="30">cerca de 30 segundos</option><option value="60" selected>cerca de 1 minuto</option><option value="120">cerca de 2 minutos</option><option value="300">cerca de 5 minutos</option></select></label>' +
-        '<label class="es-campo" style="flex:1 1 220px">Assunto ou passagem (opcional)<input id="esAssunto" class="at-in" type="text" placeholder="Ex.: Salmo 91, confiança em tempos difíceis"></label></div>' +
+      '<div class="es-controles">' +
+        '<div class="es-grupo"><label class="es-campo" for="esTom">Tom da mensagem</label><div class="es-par"><select id="esTom" class="at-sel"><option>Acolhedor</option><option>Solene</option><option>Esperançoso</option><option>Firme</option><option>Poético</option></select><button type="button" class="at-btn" data-ia="tom">ADAPTAR O TOM</button></div></div>' +
+        '<div class="es-grupo"><label class="es-campo" for="esDur">Duração desejada</label><div class="es-par"><select id="esDur" class="at-sel"><option value="30">cerca de 30 segundos</option><option value="60" selected>cerca de 1 minuto</option><option value="120">cerca de 2 minutos</option><option value="300">cerca de 5 minutos</option></select><button type="button" class="at-btn" data-ia="aumentar">AUMENTAR A DURAÇÃO</button><button type="button" class="at-btn" id="esAjustar">AJUSTAR À DURAÇÃO</button></div></div>' +
+        '<div class="es-grupo es-grande"><label class="es-campo" for="esAssunto">Assunto ou passagem (opcional)</label><div class="es-par"><input id="esAssunto" class="at-in" type="text" placeholder="Ex.: Salmo 91, confiança em tempos difíceis"><button type="button" class="at-btn" id="esBuscar">BUSCAR PASSAGEM</button><button type="button" class="at-btn gold" data-ia="criar">CRIAR COM IA</button></div></div>' +
+      '</div>' +
       '<input id="esTitulo" class="at-in" type="text" placeholder="Título (opcional)" style="font:600 20px Georgia,serif;height:46px">' +
       '<textarea id="esTexto" class="es-texto" placeholder="Escreva aqui, ou use os botões de IA abaixo."></textarea>' +
       '<div class="at-row"><span id="esConta" class="es-msg" style="flex:1"></span></div>' +
-      '<div class="at-row"><button type="button" class="at-btn gold" data-ia="criar">CRIAR COM IA</button><button type="button" class="at-btn" data-ia="reescrever">REESCREVER</button><button type="button" class="at-btn" data-ia="aumentar">AUMENTAR A DURAÇÃO</button><button type="button" class="at-btn" data-ia="tom">ADAPTAR O TOM</button></div>' +
-      '<div class="at-row"><button type="button" class="at-btn" id="esPuxar">PUXAR TEXTO DO ATELIÊ</button><button type="button" class="at-btn" id="esBuscar">BUSCAR PASSAGEM</button><button type="button" class="at-btn" id="esNumeros">TIRAR NÚMEROS DOS VERSÍCULOS</button><button type="button" class="at-btn" id="esAjustar">AJUSTAR À DURAÇÃO</button></div>' +
+      '<div class="at-row"><button type="button" class="at-btn" data-ia="reescrever">REESCREVER</button><button type="button" class="at-btn" id="esNumeros">TIRAR NÚMEROS DOS VERSÍCULOS</button><button type="button" class="at-btn" id="esPuxar">PUXAR TEXTO DO ATELIÊ</button></div>' +
       '<div class="at-row"><button type="button" class="at-btn" id="esOuvirTexto">OUVIR</button><button type="button" class="at-btn" id="esPararTexto">PARAR</button><button type="button" class="at-btn" id="esDesfazer" disabled>DESFAZER</button><button type="button" class="at-btn" id="esGuardar">GUARDAR VERSÃO</button><button type="button" class="at-btn" id="esLimpar">LIMPAR</button></div>' +
       '<div class="es-res" id="esResultadoIA" hidden><strong id="esResTit">Resultado</strong><div class="es-res-aviso" id="esResAviso"></div><textarea id="esResTxt" aria-label="Resultado"></textarea>' +
         '<div class="at-row"><button type="button" class="at-btn gold" id="esResUsar">USAR ESTE TEXTO</button><button type="button" class="at-btn" id="esResDescartar">DESCARTAR</button></div></div>' +
@@ -7426,7 +7434,6 @@ body.dg-livro-vivo .dgp-nota{display:none}
 </script>
 <!-- ===== FIM: ESTÚDIO DE CRIAÇÃO (BLOCO ÚNICO CONSOLIDADO) ===== -->
  
-
 
 </body>
 </html>
