@@ -2,63 +2,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<!-- ====================================================================
-    BLOQUEIO DE ACESSO     ==================================================================== -->
-<style>
- html{visibility:hidden}
- #gateManutencao{
-   display:none;
-   position:fixed; inset:0; z-index:99999;
-   background:#f5f1e8; color:#2b2925;
-   font-family:Georgia,"Times New Roman",serif;
-   align-items:center; justify-content:center; text-align:center;
-   padding:24px;
- }
- #gateManutencao.visivel{display:flex}
- #gateManutencao .caixa{max-width:420px}
- #gateManutencao h1{font-size:22px;margin:0 0 10px}
- #gateManutencao p{color:#777067;margin:0 0 20px;font-size:15px;line-height:1.5}
- #gateManutencao a{
-   display:inline-block;border:1px solid #7b5b35;background:#7b5b35;color:#fff;
-   padding:10px 18px;border-radius:9px;text-decoration:none;font-size:14px;
- }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-(function(){
- var GATE_SUPABASE_URL = "https://qmhdbuxomozdczgvpvcc.supabase.co";
- var GATE_SUPABASE_ANON_KEY = "sb_publishable_5jVrL8dyVBg0YOfo_q4ppA_yLMOjTz8";
- var gateClient = window.supabase.createClient(GATE_SUPABASE_URL, GATE_SUPABASE_ANON_KEY);
- 
- function mostrarManutencao(){
-   document.documentElement.style.visibility = "visible";
-   document.addEventListener("DOMContentLoaded", function(){
-     var overlay = document.createElement("div");
-     overlay.id = "gateManutencao";
-     overlay.className = "visivel";
-     overlay.innerHTML =
-       '<div class="caixa">' +
-         '<h1>Página em manutenção</h1>' +
-         '<p>Esta página ainda está sendo preparada e não está disponível no momento.</p>' +
-         '<a href="entrada.html">Fazer login</a>' +
-       '</div>';
-     document.body.appendChild(overlay);
-     document.body.style.overflow = "hidden";
-   });
- }
- 
- gateClient.auth.getSession().then(function(res){
-   if (res.data && res.data.session) {
-     document.documentElement.style.visibility = "visible";
-   } else {
-     mostrarManutencao();
-   }
- }).catch(function(){
-   mostrarManutencao();
- });
-})();
-</script>
-<!-- ==================================================================== -->
+<!-- Bloqueio de acesso removido para permitir abertura local do HTML. -->
  
  
  
@@ -570,6 +514,50 @@
     #cfgBox .linha button.sec{background:transparent;color:var(--muted)}
     #cfgBox .linha button.danger{background:#a14747;border-color:#a14747}
     .aviso-fase{margin:0 0 14px;padding:10px 12px;border:1px dashed #b99b61;border-radius:8px;background:#fbf4e1;color:#6b5a38;font-size:11.5px;line-height:1.5}
+ 
+    /* ---------- Refinamento visual: vitrine de livraria ---------- */
+    main{padding:34px 40px}
+    .paper{padding:30px 30px 26px;border-radius:12px}
+    .eyebrow{letter-spacing:2px}
+    h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(28px,4vw,42px);letter-spacing:.4px}
+    .intro{max-width:760px;color:#6b5f48;font-size:14.5px}
+    .shelf-tabs{gap:6px;margin:6px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+    .shelf-tab{padding:10px 16px;border-radius:999px}
+    .shelf-nav{padding:6px 0 8px;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;margin-bottom:14px}
+    .shelf-nav-title{display:none}
+    .gn-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+    .gn{flex:0 0 auto;border-radius:999px;white-space:nowrap;padding:7px 12px}
+    .gn-row + .gn-row{border-top:0;padding-top:0;margin-top:6px}
+    .shelf-toolbar{grid-template-columns:minmax(220px,2fr) minmax(130px,.7fr) auto;align-items:end;border-radius:12px}
+    .shelf-toolbar label.adv{display:none}
+    .shelf-toolbar.open{grid-template-columns:minmax(220px,2fr) minmax(130px,.7fr) auto repeat(4,minmax(120px,1fr))}
+    .shelf-toolbar.open label.adv{display:grid;grid-column:auto}
+    .more-btn{height:38px;padding:0 14px;border:1px solid #cdbfaa;border-radius:6px;background:#fffaf0;color:var(--muted);font-size:10.5px;font-weight:900;letter-spacing:.4px;cursor:pointer}
+    @media(max-width:1050px){.shelf-toolbar,.shelf-toolbar.open{grid-template-columns:1fr 1fr}.shelf-toolbar.open label.adv{grid-column:auto}}
+    @media(max-width:700px){main{padding:12px 9px 28px}.paper{padding:16px 12px}.shelf-toolbar,.shelf-toolbar.open{grid-template-columns:1fr}}
+    .catalog{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:22px 20px;align-items:start}
+    .book{padding:0;min-height:0;border:0;border-radius:10px;background:transparent;transition:transform .15s}
+    .book:hover{transform:translateY(-3px)}
+    .cover3{position:relative;aspect-ratio:2/3;border-radius:6px 10px 10px 6px;overflow:hidden;box-shadow:0 10px 22px rgba(40,30,15,.28),inset 6px 0 8px -4px rgba(0,0,0,.35);display:flex}
+    .cover3.img{background:#e9dfc9}
+    .cover3 img{display:block;width:100%;height:100%;object-fit:cover}
+    .cover3 .mold{margin:12px;flex:1;border:1.5px solid;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:14px 10px;text-align:center}
+    .cover3 .mold b{font:700 15px/1.25 Georgia,"Times New Roman",serif;letter-spacing:.6px;text-transform:uppercase}
+    .cover3 .mold small{font:600 9.5px "Segoe UI",sans-serif;letter-spacing:1.2px;text-transform:uppercase;opacity:.85}
+    .ribbon{position:absolute;top:10px;right:0;padding:4px 10px 4px 12px;border-radius:4px 0 0 4px;font:900 9.5px "Segoe UI",sans-serif;letter-spacing:.8px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+    .ribbon.free{background:#1f8f4e;color:#fff}
+    .ribbon.paid{background:#b8892d;color:#fff}
+    .ribbon.ref{background:#4a5d7a;color:#fff}
+    .book.lock .cover3{filter:saturate(.7)}
+    .binfo{padding:12px 2px 0}
+    .binfo .gen{display:block;margin-bottom:4px}
+    .book h2{font:700 15px/1.3 Georgia,"Times New Roman",serif;margin:0 0 3px}
+    .book .author{margin:0 0 6px;text-transform:none;font-size:11.5px;font-weight:600;letter-spacing:0;color:#8a7a5e}
+    .book .description{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5}
+    .bfoot{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .bfoot .price{margin:0;font-size:13px;font-weight:900;color:#7b5b1a}
+    .bfoot .acts{margin-top:0}
+    .shelf-empty{padding:34px 20px;font-size:13px;line-height:1.6}
   </style>
 </head>
  
@@ -581,11 +569,13 @@
         <span class="side-brand-sub">Estante</span>
       </div>
  
-     
+           <nav class="side-menu" aria-label="Menu da plataforma">
+        <a class="side-item" href="index.html"><span class="side-icon">🔎</span>PESQUISA</a>
+        <a class="side-item active" href="estante.html"><span class="side-icon">📚</span>ESTANTE</a>
+        <a class="side-item" href="sala-do-escritor.html"><span class="side-icon">✍️</span>SALA DO ESCRITOR</a>
+      </nav>
  
-      <p class="side-footer-note">
-        Módulo público: leitura independente da Sala do Escritor.
-      </p>
+    
     </aside>
  
     <div class="content-area">
@@ -596,21 +586,16 @@
  
       <main>
         <section class="paper" aria-labelledby="page-title">
-          <p class="eyebrow">MÓDULO PÚBLICO · ESTANTE</p>
- 
+        
           <h1 id="page-title">MINHA ESTANTE</h1>
  
-          <p class="intro">
-            Catálogo organizado por gênero, com conteúdos gratuitos e pagos (PRO, MASTER e DOCTUS),
-            livros do autor e referências externas autorizadas. Os livros do autor chegam
-            pelo Diagramador (botão ENVIAR PARA A ESTANTE).
-          </p>
+         <p class="intro">Leituras para fortalecer a fé e aprofundar o estudo da Palavra.</p>
  
           <div class="shelf-tabs" role="tablist" aria-label="Seções da estante">
-            <button class="shelf-tab active" type="button" data-section="free">FREE</button>
+            <button class="shelf-tab" type="button" data-section="free">FREE</button>
             <button class="shelf-tab" type="button" data-section="pro">PRO</button>
             <button class="shelf-tab" type="button" data-section="own">MEUS LIVROS</button>
-            <button class="shelf-tab" type="button" data-section="external">REFERÊNCIAS EXTERNAS</button>
+           <button class="shelf-tab active" type="button" data-section="external">REFERÊNCIAS EXTERNAS</button>
           </div>
  
           <div class="shelf-nav" id="shelfNav" aria-label="Prateleiras por gênero">
@@ -624,7 +609,7 @@
               PESQUISAR
               <input id="search" type="search" placeholder="Título, autor ou descrição" aria-label="Pesquisar no catálogo">
             </label>
-            <label>
+            <label class="adv">
               TIPO
               <select id="contentType" aria-label="Tipo de conteúdo">
                 <option value="">TODOS</option>
@@ -636,7 +621,7 @@
                 <option>INFANTIL</option>
               </select>
             </label>
-            <label>
+            <label class="adv">
               PÚBLICO
               <select id="audience" aria-label="Público">
                 <option value="">TODOS</option>
@@ -646,7 +631,7 @@
                 <option>ACADÉMICOS</option>
               </select>
             </label>
-            <label>
+            <label class="adv">
               NÍVEL
               <select id="depth" aria-label="Profundidade">
                 <option value="">TODOS</option>
@@ -656,7 +641,7 @@
                 <option>ESPECIALIZADO</option>
               </select>
             </label>
-            <label>
+            <label class="adv">
               FORMATO
               <select id="format" aria-label="Formato">
                 <option value="">TODOS</option>
@@ -674,12 +659,13 @@
                 <option value="paid">PAGO</option>
               </select>
             </label>
+            <button type="button" class="more-btn" id="moreBtn" aria-expanded="false">MAIS FILTROS ▾</button>
           </div>
- 
+          
           <div id="catalog" class="catalog" aria-live="polite"></div>
           <div id="empty" class="shelf-empty">Nenhum item corresponde aos filtros selecionados.</div>
  
-          <p class="maintenance">
+         <p class="maintenance" hidden>
             <strong>Manutenção:</strong> este arquivo pode ser salvo como
             <code>estante.html</code> em uma pasta própria. Alterações aqui não
             modificam o MÉTODO TÉCNICO DE PESQUISA, Sermões ou Ponte Infantil.
@@ -755,24 +741,81 @@
  
   /* ---------- catálogo fixo (seed) ---------- */
   var SEED = {
-    free: [
-      { title:'Guia de Leitura Bíblica', author:'Palavra & Série', cover:'LEITURA BÍBLICA', description:'Orientações introdutórias para observar passagem, contexto, estrutura e aplicação responsável.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'ESTUDO GUIADO', genero:'4.4' },
-      { title:'Introdução ao Estudo Bíblico', author:'Palavra & Série', cover:'ESTUDO BÍBLICO', description:'Material de orientação para organizar uma pesquisa bíblica pessoal.', contentType:'ESTUDO BÍBLICO', audience:'JOVENS', depth:'BÁSICO', format:'MATERIAL DIDÁTICO', genero:'4.4' },
-      { title:'Glossário de Termos Bíblicos', author:'Palavra & Série', cover:'GLOSSÁRIO', description:'Vocabulário inicial para acompanhar a leitura e a investigação do texto.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'6.2' }
-    ],
-    pro: [
-      { title:'Caderno de Grego do Novo Testamento', author:'Palavra & Série', cover:'GREGO DO NT', description:'Material de apoio para texto grego, morfologia, sintaxe e leitura do SBLGNT.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'5.2' },
-      { title:'Caderno de Hebraico do Antigo Testamento', author:'Palavra & Série', cover:'HEBRAICO DO AT', description:'Material de apoio para texto hebraico, formas, léxico e leitura do OSHB.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'5.2' },
-      { title:'Manual da Matriz Canónica', author:'Palavra & Série', cover:'MATRIZ CANÓNICA', description:'Guia dos módulos, fontes prioritárias e regras de investigação da plataforma.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'8.1' }
-    ],
-    own: [
-      { title:'Além da Régua', author:'A. F. Santos', cover:'ALÉM DA RÉGUA', description:'Livro do autor. A capa pode ser divulgada na estante; o conteúdo permanece fechado nesta etapa.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.2' },
-      { title:'Você Não é um Acidente', author:'A. F. Santos', cover:'VOCÊ NÃO É UM ACIDENTE', description:'Devocional de 30 dias para redescobrir o seu valor em Deus.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.1' }
-    ],
+    free: [],
+    pro: [],
+    own: [],
     external: [
       { title:'Matthew Henry — Commentary on the Whole Bible', author:'Matthew Henry', cover:'COMENTÁRIO', description:'Comentário cristão clássico disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'7.1', url:'https://www.ccel.org/ccel/henry/mhc' },
       { title:'The Pilgrim’s Progress', author:'John Bunyan', cover:'PEREGRINO', description:'Alegoria cristã clássica disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'3.6', url:'https://www.ccel.org/ccel/bunyan/pilgrim' },
-      { title:'Institutes of the Christian Religion', author:'John Calvin', cover:'INSTITUTAS', description:'Obra clássica da Reforma disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'9.4', url:'https://www.ccel.org/ccel/calvin/institutes' }
+      { title:'Institutes of the Christian Religion', author:'John Calvin', cover:'INSTITUTAS', description:'Obra clássica da Reforma disponível na página oficial do CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ACADÉMICOS', depth:'ESPECIALIZADO', format:'LIVRO', genero:'9.4', url:'https://www.ccel.org/ccel/calvin/institutes' },
+            { title:'Confessions', author:'Santo Agostinho', cover:'CONFISSÕES', description:'Autobiografia espiritual de Agostinho, um dos grandes clássicos da fé cristã, no CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.3', url:'https://www.ccel.org/ccel/augustine/confessions' },
+      { title:'Morning and Evening', author:'C. H. Spurgeon', cover:'MANHÃ E NOITE', description:'Devocional clássico com uma leitura para a manhã e outra para a noite de cada dia, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'4.1', url:'https://www.ccel.org/ccel/spurgeon/morneve.html' },
+      { title:'The Imitation of Christ', author:'Thomas à Kempis', cover:'IMITAÇÃO', description:'Clássico devocional da vida cristã, em tradução para o inglês moderno, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.3', url:'https://www.ccel.org/ccel/kempis/imitation.html' },
+            { title:'Easton’s Bible Dictionary', author:'M. G. Easton', cover:'DICIONÁRIO BÍBLICO', description:'Dicionário bíblico clássico com milhares de verbetes sobre pessoas, lugares, costumes e doutrinas. Em inglês, no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'6.4', url:'https://ccel.org/ccel/easton/ebd2' },
+      { title:'Smith’s Bible Dictionary', author:'William Smith', cover:'DICIONÁRIO BÍBLICO', description:'Dicionário bíblico em ordem alfabética, com nomes, lugares, objetos e termos da Bíblia. Em inglês, no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'6.4', url:'https://www.ccel.org/ccel/smith_w/bibledict.html' },
+      { title:'Commentary on the Whole Bible', author:'Jamieson, Fausset e Brown', cover:'COMENTÁRIO BÍBLICO', description:'Comentário clássico que percorre a Bíblia inteira, de Gênesis a Apocalipse. Em inglês, no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.4', url:'https://ccel.org/ccel/jamieson/jfb' },
+      { title:'Calvin’s Commentaries', author:'João Calvino', cover:'COMENTÁRIOS DE CALVINO', description:'Comentários de Calvino sobre livros do Antigo e do Novo Testamento. Em inglês, no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'4.4', url:'https://ccel.org/ccel/calvin/commentaries' },
+      { title:'History of the Christian Church, vol. 1', author:'Philip Schaff', cover:'HISTÓRIA DA IGREJA', description:'O cristianismo apostólico, dos anos 1 a 100. Em inglês, no CCEL.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'7.2', url:'https://ccel.org/ccel/schaff/hcc1' },
+      { title:'History of the Christian Church, vol. 2', author:'Philip Schaff', cover:'HISTÓRIA DA IGREJA II', description:'O cristianismo antes de Niceia, dos anos 100 a 325. Em inglês, no CCEL.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'7.2', url:'https://ccel.org/ccel/schaff/hcc2' },
+      { title:'History of the Christian Church, vol. 3', author:'Philip Schaff', cover:'HISTÓRIA DA IGREJA III', description:'O cristianismo de Niceia ao ano 600. Em inglês, no CCEL.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'7.2', url:'https://www.ccel.org/ccel/schaff/hcc3' },
+      { title:'Blue Letter Bible', author:'Blue Letter Bible', cover:'CONCORDÂNCIA', description:'Bíblia online com concordância Strong, léxicos e comentários para estudo no original. Em inglês.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'6.7', url:'https://www.blueletterbible.org' },
+      { title:'STEP Bible', author:'Tyndale House, Cambridge', cover:'ESTUDO NO ORIGINAL', description:'Ferramentas gratuitas de estudo bíblico com texto original e léxicos, criadas em Cambridge. Em inglês.', contentType:'ESTUDO BÍBLICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'6.7', url:'https://www.stepbible.org' },
+      { title:'Bíblia Almeida Revista e Corrigida', author:'João Ferreira de Almeida', cover:'BÍBLIA ARC', description:'Tradução clássica da Bíblia em português (ARC, 2009), para ler online no Bible Gateway.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'9.2', url:'https://www.biblegateway.com/versions/Almeida-Revista-e-Corrigida-2009-ARC/' },
+      { title:'Bíblia em português: várias traduções', author:'Bible.com', cover:'BÍBLIAS EM PORTUGUÊS', description:'Escolha entre as traduções em português, como ARA, ARC, NAA e NVI, e leia online.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'9.2', url:'https://bible.com/languages/por' },
+           { title:'John Wesley’s Notes on the Bible', author:'John Wesley', cover:'NOTAS DE WESLEY', description:'Notas concisas e pastorais sobre o Novo Testamento, com apoio no texto grego. Em inglês, no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.4', url:'https://ccel.org/ccel/wesley/notes' },
+      { title:'Foxe’s Book of Martyrs', author:'John Foxe', cover:'LIVRO DOS MÁRTIRES', description:'Relatos históricos de cristãos perseguidos e martirizados pela fé. Em inglês, no CCEL.', contentType:'LIVRO ACADÉMICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'7.4', url:'https://ccel.org/ccel/foxe/martyrs' },
+      { title:'Bible Hub — comentários bíblicos', author:'Bible Hub', cover:'COMENTÁRIOS', description:'Mais de 50 comentários gratuitos, consultados por passagem. Entre eles estão Barnes, Clarke, Gill e Jamieson-Fausset-Brown. Em inglês.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'MATERIAL DIDÁTICO', genero:'4.4', url:'https://biblehub.com/commentaries/' },
+      { title:'Free Bible Commentary', author:'FreeBibleCommentary.org', cover:'COMENTÁRIO GRATUITO', description:'Comentários bíblicos gratuitos, disponíveis em 25 idiomas, para estudar livro por livro.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'MATERIAL DIDÁTICO', genero:'4.4', url:'https://freebiblecommentary.org/' },
+      { title:'BibliaPlus — comentários clássicos', author:'BibliaPlus', cover:'COMENTÁRIOS CLÁSSICOS', description:'Comentários clássicos gratuitos, sem cadastro, de autores como Matthew Henry, Calvino, Clarke, Barnes, Gill e Spurgeon. Em inglês.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'MATERIAL DIDÁTICO', genero:'4.4', url:'https://www.bibliaplus.org/en/commentaries' },
+      { title:'Bible Odyssey', author:'Society of Biblical Literature', cover:'ARTIGOS DE ESPECIALISTAS', description:'Artigos gratuitos de especialistas sobre livros, personagens, lugares e história da Bíblia. Em inglês.', contentType:'ESTUDO BÍBLICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'7.1', url:'https://www.bibleodyssey.org/' },
+      { title:'NET Bible', author:'Biblical Studies Press', cover:'NOTAS DOS TRADUTORES', description:'Bíblia online com mais de 60 mil notas dos tradutores sobre o texto original, variantes e escolhas de tradução. Em inglês.', contentType:'ESTUDO BÍBLICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'MATERIAL DIDÁTICO', genero:'4.4', url:'https://netbible.org/' },
+      { title:'BibleProject em português', author:'BibleProject', cover:'VÍDEOS EM PORTUGUÊS', description:'Vídeos animados gratuitos em português que apresentam livros, temas e a história da Bíblia como uma narrativa só.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'BÁSICO', format:'MATERIAL DIDÁTICO', genero:'4.4', url:'https://bibleproject.com/portugues/' },
+      { title:'Against Heresies', author:'Irineu de Lião', cover:'CONTRA AS HERESIAS', description:'Obra do século II em defesa da fé transmitida pelos apóstolos contra as heresias gnósticas. Em inglês, no CCEL (começa pelo livro I).', contentType:'LIVRO TEOLÓGICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'4.8', url:'https://ccel.org/ccel/irenaeus/against_heresies_i' },
+      { title:'The City of God, vol. 1', author:'Santo Agostinho', cover:'CIDADE DE DEUS', description:'A grande obra de Agostinho sobre as duas cidades e o sentido da história. Em inglês (tradução de Marcus Dods), no Projeto Gutenberg.', contentType:'LIVRO TEOLÓGICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'4.8', url:'https://gutenberg.org/ebooks/45304' },
+      { title:'Church History', author:'Eusébio de Cesareia', cover:'HISTÓRIA DA IGREJA', description:'A primeira grande história da Igreja, do cristianismo primitivo até a época de Constantino. Em inglês, na Bibliothek der Kirchenväter.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'7.2', url:'https://bkv.unifr.ch/works/cpg-3495/versions/the-church-history-of-eusebius' },
+           { title:'The Practice of the Presence of God', author:'Irmão Lourenço', cover:'PRESENÇA DE DEUS', description:'Conversas e cartas de um monge carmelita sobre viver na presença de Deus no dia a dia. Em inglês, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'4.3', url:'https://www.ccel.org/ccel/lawrence/practice.html' },
+      { title:'Holiness', author:'J. C. Ryle', cover:'SANTIDADE', description:'Clássico pastoral sobre a natureza da santidade, seus obstáculos e suas raízes. Em inglês, no CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.8', url:'https://www.ccel.org/ccel/ryle/holiness.html' },
+      { title:'With Christ in the School of Prayer', author:'Andrew Murray', cover:'ESCOLA DE ORAÇÃO', description:'Lições sobre a oração a partir dos ensinos de Jesus, com foco na intercessão. Em inglês, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'4.3', url:'https://www.ccel.org/ccel/murray/prayer.html' },
+      { title:'Power Through Prayer', author:'E. M. Bounds', cover:'PODER PELA ORAÇÃO', description:'Chamado a uma vida de oração, com atenção especial à oração do pregador. Em inglês, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.3', url:'https://www.ccel.org/ccel/bounds/power' },
+      { title:'A Serious Call to a Devout and Holy Life', author:'William Law', cover:'CHAMADO À DEVOÇÃO', description:'Clássico de 1729 que desafia o cristão a viver toda a vida dedicada a Deus. Em inglês, no CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.8', url:'https://ccel.org/ccel/law/serious_call' },
+     { title:'The Christian’s Secret of a Happy Life', author:'Hannah W. Smith', cover:'Vida Feliz', description:'Clássico da vida cristã sobre confiança e entrega a Deus, de 1875. Em inglês, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'4.3', url:'https://ccel.org/ccel/smith_hw/secret.html' },
+{ title:'Faith’s Checkbook', author:'C. H. Spurgeon', cover:'Cheque da Fé', description:'Uma promessa bíblica para cada dia do ano, com breve meditação de Spurgeon. Em inglês, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'4.1', url:'https://www.ccel.org/ccel/spurgeon/checkbook.html' },
+{ title:'The True Vine', author:'Andrew Murray', cover:'A Videira', description:'Trinta e uma meditações sobre João 15, a videira e os ramos. Em inglês, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'4.1', url:'https://ccel.org/ccel/murray/true_vine.html' },
+{ title:'All of Grace', author:'C. H. Spurgeon', cover:'Só Graça', description:'Apresentação simples da salvação pela graça, ótima para quem está começando. Em inglês, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'4.3', url:'https://ccel.org/ccel/spurgeon/grace' },
+{ title:'The Greatest Thing in the World', author:'Henry Drummond', cover:'O Maior Amor', description:'Famoso discurso sobre o amor, a partir de 1 Coríntios 13, com outros discursos do autor. Em inglês, no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'4.3', url:'https://www.ccel.org/ccel/drummond/greatest.html' },
+     { title:'Sermons on Several Occasions', author:'John Wesley', cover:'Sermões de Wesley', description:'Coleção de 141 sermões do fundador do metodismo, sobre salvação e vida cristã. Em inglês, no CCEL.', contentType:'SERMÃO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.3', url:'https://ccel.org/ccel/wesley/sermons.html' },
+{ title:'Selected Sermons of George Whitefield', author:'George Whitefield', cover:'Sermões de Whitefield', description:'Cinquenta e nove sermões do grande pregador do Grande Despertamento. Em inglês, no CCEL.', contentType:'SERMÃO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.3', url:'https://www.ccel.org/ccel/whitefield/sermons' },
+{ title:'Sinners in the Hands of an Angry God', author:'Jonathan Edwards', cover:'Sermão de Enfield', description:'O sermão mais famoso de Edwards, pregado em 1741 durante o Grande Despertamento. Em inglês, no CCEL.', contentType:'SERMÃO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.3', url:'https://ccel.org/ccel/edwards/sermons.sinners.html' },
+{ title:'Lectures to My Students', author:'C. H. Spurgeon', cover:'Para Pregadores', description:'Palestras práticas de Spurgeon a seus alunos de pastorado sobre pregação e ministério. Em inglês, no Monergism.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.4', url:'https://www.monergism.com/lectures-my-students' },
+{ title:'A Treatise on the Preparation and Delivery of Sermons', author:'John A. Broadus', cover:'Arte de Pregar', description:'Clássico de 1870 sobre como preparar e pregar sermões. Em inglês, na biblioteca digital do Seminário de Princeton.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'AVANÇADO', format:'LIVRO', genero:'9.4', url:'https://commons.ptsem.edu/id/treatiseonprepar00broa' },
+     { title:'Grace Abounding to the Chief of Sinners', author:'John Bunyan', cover:'Graça Abundante', description:'Autobiografia espiritual de Bunyan, escrita na prisão, sobre sua conversão e suas lutas de fé. Em inglês, no CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.3', url:'https://www.ccel.org/ccel/bunyan/grace.html' },
+{ title:'Hudson Taylor’s Spiritual Secret', author:'Howard Taylor', cover:'Segredo de Taylor', description:'Biografia do pioneiro das missões na China, escrita por seu filho e sua nora. Em inglês, no CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'BÁSICO', format:'LIVRO', genero:'9.3', url:'https://ccel.org/ccel/taylor_h/secret' },
+{ title:'The Life of Rev. David Brainerd', author:'Jonathan Edwards', cover:'David Brainerd', description:'Vida e diário do missionário entre os indígenas americanos, organizados por Jonathan Edwards. Em inglês, no Projeto Gutenberg.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.3', url:'https://gutenberg.org/cache/epub/65066/pg65066-images.html' },
+{ title:'Missionary Travels and Researches in South Africa', author:'David Livingstone', cover:'Missão na África', description:'Relato do missionário e explorador sobre dezesseis anos de viagens pelo interior da África. Em inglês, no Projeto Gutenberg.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.3', url:'https://www.gutenberg.org/ebooks/1039' },
+     { title:'On the Incarnation of the Word', author:'Atanásio', cover:'Encarnação do Verbo', description:'Clássico do século IV que explica por que Deus se fez homem em Cristo. Em inglês, no CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.8', url:'https://www.ccel.org/ccel/athanasius/incarnation.html' },
+{ title:'On Christian Doctrine', author:'Santo Agostinho', cover:'Doutrina Cristã', description:'Guia de Agostinho para ler, interpretar e ensinar as Escrituras. Em inglês, no CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'AVANÇADO', format:'LIVRO', genero:'4.8', url:'https://ccel.org/ccel/augustine/doctrine.html' },
+{ title:'Treasury of David, vol. 1', author:'C. H. Spurgeon', cover:'Tesouro de Davi I', description:'Comentário devocional de Spurgeon sobre os Salmos 1 a 26. Em inglês, no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.4', url:'https://www.ccel.org/ccel/spurgeon/treasury1.html' },
+{ title:'Treasury of David, vol. 2', author:'C. H. Spurgeon', cover:'Tesouro de Davi II', description:'Comentário devocional de Spurgeon sobre os Salmos 27 a 57. Em inglês, no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.4', url:'https://ccel.org/ccel/spurgeon/treasury2.html' },
+{ title:'The Life and Times of Jesus the Messiah', author:'Alfred Edersheim', cover:'VIDA DE JESUS', description:'Estudo clássico da vida de Jesus que explora o contexto histórico, cultural e religioso do mundo judaico. Em inglês, gratuito no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'4.4', url:'https://www.ccel.org/ccel/edersheim/lifetimes' },
+{ title:'Torrey’s New Topical Textbook', author:'R. A. Torrey', cover:'ESTUDO TEMÁTICO', description:'Manual de pesquisa bíblica com 628 temas e mais de 20 mil referências das Escrituras. Em inglês, gratuito no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'AVANÇADO', format:'LIVRO', genero:'6.7', url:'https://www.ccel.org/ccel/torrey/ttt' },
+{ title:'Introduction to the Devout Life', author:'Francis de Sales', cover:'VIDA DEVOTA', description:'Clássico sobre devoção, oração e prática da vida cristã cotidiana. Representa a tradição espiritual católica histórica. Em inglês, gratuito no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.3', url:'https://www.ccel.org/ccel/desales/devout_life' },
+{ title:'The Life of Adoniram Judson', author:'Edward Judson', cover:'ADONIRAM JUDSON', description:'Biografia do missionário Adoniram Judson, com sua trajetória de conversão, vocação e trabalho missionário na Birmânia. Em inglês, gratuito no Projeto Gutenberg.', contentType:'LIVRO ACADÉMICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.3', url:'https://www.gutenberg.org/ebooks/70894' },
+{ title:'Mary Slessor of Calabar: Pioneer Missionary', author:'W. P. Livingstone', cover:'MARY SLESSOR', description:'Biografia da missionária Mary Slessor, conhecida por seu trabalho em Calabar, na África Ocidental. Em inglês, gratuita no Projeto Gutenberg.', contentType:'LIVRO ACADÉMICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.3', url:'https://www.gutenberg.org/ebooks/8906' },  
+{ title:'The Imitation of Christ', author:'Thomas à Kempis', cover:'IMITE A CRISTO', description:'Clássico de meditações sobre humildade, oração e a busca de uma vida semelhante à de Jesus. Em inglês, gratuito no CCEL.', contentType:'DEVOCIONAL', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'4.3', url:'https://ccel.org/ccel/kempis/imitation/imitation' },
+{ title:'The Christian in Complete Armour', author:'William Gurnall', cover:'ARMADURA DE DEUS', description:'Estudo clássico de Efésios 6:10–18 sobre a armadura de Deus e a perseverança espiritual. Em inglês, gratuito no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'AVANÇADO', format:'LIVRO', genero:'4.4', url:'https://ccel.org/ccel/gurnall/armour/armour' },
+{ title:'The Saints’ Everlasting Rest', author:'Richard Baxter', cover:'O DESCANSO ETERNO', description:'Reflexão teológica sobre a esperança eterna, o céu e a vida cristã à luz da promessa do descanso em Deus. Em inglês, gratuito no CCEL.', contentType:'LIVRO TEOLÓGICO', audience:'ADULTOS', depth:'AVANÇADO', format:'LIVRO', genero:'4.8', url:'https://www.ccel.org/ccel/baxter/saints_rest.html' },
+{ title:'Grace Abounding to the Chief of Sinners', author:'John Bunyan', cover:'GRAÇA ABUNDANTE', description:'Autobiografia espiritual de John Bunyan sobre conversão, luta interior e confiança na graça de Deus. Em inglês, gratuito no CCEL.', contentType:'LIVRO ACADÉMICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'9.3', url:'https://ccel.org/ccel/bunyan/grace.html' },
+{ title:'Training of the Twelve', author:'A. B. Bruce', cover:'FORMAÇÃO DOS DOZE', description:'Estudo sobre como Jesus formou os doze discípulos, com aplicações para liderança, serviço e discipulado cristão. Em inglês, gratuito no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'AVANÇADO', format:'LIVRO', genero:'4.4', url:'https://www.ccel.org/ccel/bruce/twelve' },    
+{ title:'Bible Atlas: A Manual of Biblical Geography and History', author:'Jesse Lyman Hurlbut', cover:'ATLAS BÍBLICO', description:'Atlas clássico de geografia e história bíblica, com mapas e informações sobre lugares e acontecimentos das Escrituras. Em inglês, gratuito no Projeto Gutenberg.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'7.2', url:'https://www.gutenberg.org/ebooks/41140' },    
+{ title:'History of the Christian Church, Vol. 1', author:'Philip Schaff', cover:'HISTÓRIA DA IGREJA', description:'Estudo histórico do cristianismo primitivo e da Igreja apostólica, do ano 1 ao ano 100. Obra clássica do século XIX. Em inglês, gratuita na Nicaea Library.', contentType:'LIVRO ACADÉMICO', audience:'ACADÉMICOS', depth:'AVANÇADO', format:'LIVRO', genero:'7.2', url:'https://nicaealibrary.com/works/hcc1' },    
+{ title:'Smith’s Bible Dictionary', author:'William Smith', cover:'DICIONÁRIO BÍBLICO', description:'Dicionário clássico com definições de nomes, lugares, conceitos e termos das Escrituras, organizado alfabeticamente. Obra histórica do século XIX. Em inglês, gratuita no CCEL.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'LIVRO', genero:'6.4', url:'https://www.ccel.org/ccel/smith_w/bibledict' },    
+{ title:'The Places of the Bible — Scriptoria', author:'Scriptoria Digital', cover:'ATLAS BÍBLICO INTERATIVO', description:'Atlas interativo com lugares bíblicos, regiões, rotas e mapas históricos para apoiar a pesquisa das Escrituras. Em inglês, gratuito. Mapas disponíveis sob licença CC BY 4.0, com atribuição.', contentType:'ESTUDO BÍBLICO', audience:'ADULTOS', depth:'INTERMEDIÁRIO', format:'MATERIAL DIDÁTICO', genero:'7.2', url:'https://scriptoria.digital/en/atlas' }
+
+
+
+
+  
+  
     ]
   };
   var SEED_ACESSO = {free:"free", pro:"pro", own:"own", external:"free"};
@@ -836,7 +879,7 @@
   /* ---------- estado e utilidades ---------- */
   var $ = function(id){ return document.getElementById(id); };
   function esc(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-  var section = "free", genero = 0, tipoSel = null, meus = [];
+  var section = "external", genero = 0, tipoSel = null, meus = [];
  
   function doDb(m){
     return {
@@ -865,7 +908,7 @@
  
   function filtrosBase(){
     var q = $("search").value.trim().toLowerCase();
-    var f = { contentType:$("contentType").value, audience:$("audience").value, depth:$("depth").value, format:$("format").value };
+    var f = { contentType:("contentType").value,audience:("audience").value, depth:("depth").value,format:("format").value };
     var ac = $("access").value;
     return itensDaSecao()
       .filter(function(b){ return Object.keys(f).every(function(k){ return !f[k] || b[k] === f[k]; }); })
@@ -881,6 +924,7 @@
     });
     var h = '<button type="button" class="gn' + (!genero ? ' on' : '') + '" data-g="0"><b>TODOS</b><i>' + base.length + '</i></button>';
     GENEROS.forEach(function(g){
+    if(!cont[g.n] && genero !== g.n) return;
       h += '<button type="button" class="gn' + (genero === g.n ? ' on' : '') + (cont[g.n] ? '' : ' vazio') + '" data-g="' + g.n + '"><b>' + g.n + '</b> ' + esc(g.nome) + '<i>' + (cont[g.n] || 0) + '</i></button>';
     });
     $("gnGeneros").innerHTML = h;
@@ -889,19 +933,25 @@
       var g = GENEROS[genero - 1], t = '<button type="button" class="gn' + (!tipoSel ? ' on' : '') + '" data-t="">TODOS OS TIPOS</button>';
       g.tipos.forEach(function(nome, i){
         var cod = genero + "." + (i + 1), n = contT[cod] || 0;
+        if(!n && tipoSel !== cod) return;
         t += '<button type="button" class="gn' + (tipoSel === cod ? ' on' : '') + (n ? '' : ' vazio') + '" data-t="' + cod + '"><b>' + cod + '</b> ' + esc(nome) + '<i>' + n + '</i></button>';
       });
       row.innerHTML = t; row.hidden = false;
     } else { row.innerHTML = ""; row.hidden = true; }
   }
  
+  var TONS = [["#16213d","#c9a24a"],["#2b1f17","#d4b072"],["#1d3a33","#d9c27a"],["#3a1e2a","#d8b36a"],["#26324a","#cfae63"],["#2f2a22","#c7a15a"]];
+  function tom(s){ var h = 0; String(s).split("").forEach(function(c){ h = (h * 31 + c.charCodeAt(0)) >>> 0; }); return TONS[h % TONS.length]; }
   function cartao(b){
     var pago = ehPago(b), lock = !podeLer(b);
-    var capa = b.capa
-      ? '<div class="cover img"><img alt="Capa de ' + esc(b.title) + '" src="' + b.capa + '"></div>'
-      : '<div class="cover">' + esc(b.cover) + '</div>';
-    var selo = b.acesso === "own" ? '<span class="badge b-own">DO AUTOR</span>'
-      : (pago ? '<span class="badge b-paid">' + (lock ? '🔒 ' : '') + ROTULO[b.acesso] + '</span>' : '<span class="badge b-free">GRÁTIS</span>');
+  var fita = b.origem === "seed" ? '<span class="ribbon ref">REFERÊNCIA</span>' : (b.acesso === "own" ? '' : (pago ? '<span class="ribbon paid">' + (lock ? '🔒 ' : '') + ROTULO[b.acesso] + '</span>' : '<span class="ribbon free">GRÁTIS</span>'));
+    var capa;
+    if(b.capa){
+      capa = '<div class="cover3 img"><img alt="Capa de ' + esc(b.title) + '" src="' + b.capa + '">' + fita + '</div>';
+    } else {
+      var c = tom(b.title);
+      capa = '<div class="cover3" style="background:' + c[0] + ';color:' + c[1] + '"><div class="mold" style="border-color:' + c[1] + '"><b>' + esc(b.cover || b.title) + '</b><small>' + esc(b.author) + '</small></div>' + fita + '</div>';
+    }
     var gen = b.genero ? '<span class="gen">' + esc(b.genero) + ' · ' + esc(nomeTipo(b.genero) || nomeGenero(b.genero)) + '</span>' : '';
     var preco = (pago && b.preco) ? '<span class="price">' + esc(b.preco) + '</span>' : '';
     var acts = "";
@@ -909,19 +959,18 @@
       if(!lock) acts += '<button type="button" data-act="ler" data-id="' + esc(b.id) + '">LER AGORA</button>';
       else {
         if(b.url) acts += '<a class="btn" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">COMPRAR</a>';
-        acts += '<button type="button" class="sec" data-act="ler" data-id="' + esc(b.id) + '" disabled>🔒 PLANO ' + ROTULO[b.acesso] + '</button>';
+        else acts += '<button type="button" class="sec" disabled>🔒 PLANO ' + ROTULO[b.acesso] + '</button>';
       }
-      acts += '<button type="button" class="sec" data-act="cfg" data-id="' + esc(b.id) + '">AJUSTAR</button>';
+      acts += '<button type="button" class="sec" data-act="cfg" data-id="' + esc(b.id) + '" title="Ajustar acesso, preço e descrição">AJUSTAR</button>';
     } else if(b.url){
-      acts += '<a class="btn" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA OFICIAL ↗</a>';
+      acts += '<a class="btn" href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer">ABRIR REFERÊNCIA ↗</a>';
     }
-    var pg = b.paginas ? ' · ' + b.paginas + ' págs.' : '';
+    var pg = b.paginas ? b.paginas + ' páginas' : '';
     return '<article class="book' + (lock ? ' lock' : '') + '">' + capa +
-      '<div class="book-top">' + selo + gen + preco + '</div>' +
-      '<h2>' + esc(b.title) + '</h2><p class="author">' + esc(b.author) + esc(pg) + '</p>' +
-      '<p class="description">' + esc(b.description) + '</p>' +
-      (lock ? '<p class="lockmsg">Conteúdo pago: disponível a partir do plano ' + ROTULO[b.acesso] + (b.url ? ' ou por compra avulsa.' : '.') + '</p>' : '') +
-      (acts ? '<div class="acts">' + acts + '</div>' : '') + '</article>';
+      '<div class="binfo">' + gen + '<h2>' + esc(b.title) + '</h2>' +
+      '<p class="author">' + esc(b.author) + (b.author && pg ? ' · ' : '') + esc(pg) + '</p>' +
+      (b.description ? '<p class="description">' + esc(b.description) + '</p>' : '') +
+      '<div class="bfoot">' + preco + (acts ? '<div class="acts">' + acts + '</div>' : '') + '</div></div></article>';
   }
  
   function render(){
@@ -935,10 +984,16 @@
     });
     $("catalog").innerHTML = lista.map(cartao).join("");
     var vazio = $("empty");
-    vazio.textContent = (section === "own" && !meus.length && !lista.length)
-      ? "Nenhum livro enviado ainda. No Diagramador, escolha 4.1 ou 9.6 e clique em ENVIAR PARA A ESTANTE."
-      : "Nenhum item corresponde aos filtros selecionados.";
+       var MSG = {
+      free: "Novos livros em breve.",
+      pro: "Novos livros em breve.",
+      own: "Novos livros em breve.",
+      external: "Nenhuma referência com esses filtros."
+    };
+    var filtrando = $("search").value.trim() || $("access").value || genero || $("contentType").value || $("audience").value || $("depth").value || $("format").value;
+    vazio.textContent = filtrando ? "Nenhum livro corresponde aos filtros selecionados." : MSG[section];
     vazio.style.display = lista.length ? "none" : "block";
+   
   }
  
   function recarregar(){
@@ -980,7 +1035,7 @@
   $("cfgSalvar").addEventListener("click", function(){
     var m = meus.filter(function(x){ return x.id === cfgId; })[0]; if(!m) return;
     var t = $("cfgTitulo").value.trim(); if(!t){ alert("Escreva o título do livro."); return; }
-    var novo = Object.assign({}, m, {titulo:t, acesso:$("cfgAcesso").value, preco:$("cfgPreco").value.trim(), url:$("cfgUrl").value.trim(), descricao:$("cfgDesc").value.trim(), atualizado:Date.now()});
+    var novo = Object.assign({}, m, {titulo:t, acesso:("cfgAcesso").value,preco:("cfgPreco").value.trim(), url:("cfgUrl").value.trim(),descricao:("cfgDesc").value.trim(), atualizado:Date.now()});
     dbPut("livros", novo).then(function(){ fecharCfg(); return recarregar(); }).catch(function(){ alert("Não foi possível salvar."); });
   });
   $("cfgRemover").addEventListener("click", function(){
@@ -1001,6 +1056,10 @@
     else if(b.dataset.t != null){ tipoSel = b.dataset.t || null; }
     render();
   });
+  $("moreBtn").addEventListener("click", function(){
+    var tb = document.querySelector(".shelf-toolbar"), on = !tb.classList.contains("open");
+    tb.classList.toggle("open", on); this.setAttribute("aria-expanded", on); this.textContent = on ? "MENOS FILTROS ▴" : "MAIS FILTROS ▾";
+  });
   document.querySelectorAll(".shelf-tab").forEach(function(tab){
     tab.addEventListener("click", function(){
       section = tab.dataset.section;
@@ -1009,7 +1068,7 @@
     });
   });
   ["search","contentType","audience","depth","format","access"].forEach(function(id){ $(id).addEventListener("input", render); });
-  document.addEventListener("keydown", function(ev){ if(ev.key === "Escape"){ if($("cfgBox").classList.contains("on")) fecharCfg(); else if($("reader").classList.contains("on")) fecharLeitor(); } });
+  document.addEventListener("keydown", function(ev){ if(ev.key === "Escape"){ if(("cfgBox").classList.contains("on"))fecharCfg();elseif(("reader").classList.contains("on")) fecharLeitor(); } });
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) recarregar(); });
   window.addEventListener("focus", recarregar);
  
@@ -1072,4 +1131,5 @@
 </html>
  
  
- 
+
+
