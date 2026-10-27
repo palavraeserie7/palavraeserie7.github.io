@@ -9617,6 +9617,73 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: EXPORTAR SEM ESCOLHER REDE DE NOVO ===== -->
+ <!-- ===== INÍCIO: RESUMO DO VÍDEO NO PASSO EXPORTAR ===== -->
+<style>
+#exResumo .ex-lista{display:block}
+#exResumo .ex-lista b{color:var(--brass-deep)}
+#exResumo .ex-lista span{display:block;margin:2px 0;font-weight:600}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), alvo = $("exTexto"), botao = $("exTrocar");
+  if(!painel || !alvo || !botao) return;
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+  var FORMATOS = {f916:"Vertical 9:16", f11:"Quadrado 1:1", f169:"Horizontal 16:9"};
+
+  botao.textContent = "VOLTAR E AJUSTAR";
+
+  function montar(){
+    var t = $("esTexto").value.trim();
+    var palavras = t ? t.split(/\s+/).length : 0;
+    var titulo = $("esTitulo").value.trim();
+
+    var v = $("f1Voz");
+    var voz = v && v.options[v.selectedIndex] ? v.options[v.selectedIndex].textContent : "—";
+
+    var musica = "sem música";
+    if($("esMusica").value){
+      var c = document.querySelector("#mbBiblioteca .mb-card.sel strong");
+      musica = (c ? c.textContent.trim() : "música escolhida") + " (volume " + $("esVolMus").value + "%)";
+    }
+
+    var fotos = $("esFotos").querySelectorAll(".es-foto");
+    var nVideos = $("esFotos").querySelectorAll(".es-foto.f6-video").length;
+    var nImagens = fotos.length - nVideos;
+
+    var rede = document.querySelector("#rdTrabalho .rd-btn[aria-pressed='true']");
+    var f = $("esFormato");
+    var formato = (FORMATOS[f && f.value] || "") + (rede ? " — " + rede.dataset.n : "");
+
+    var linhas = [
+      ["Texto", palavras + " palavras" + (titulo ? ", título “" + titulo + "”" : "")],
+      ["Voz", voz + " (volume " + $("f5VolVoz").value + "%)"],
+      ["Música", musica],
+      ["Imagens de fundo", String(nImagens)],
+      ["Vídeos de fundo", String(nVideos)],
+      ["Formato", formato]
+    ];
+    return '<span class="ex-lista"><span><b>Seu vídeo está assim:</b></span>' +
+      linhas.map(function(l){ return '<span>' + l[0] + ': ' + esc(l[1]) + '</span>'; }).join("") + '</span>';
+  }
+
+  function atualizar(){
+    /* o código antigo reescreve este quadro com texto simples; aqui colocamos o resumo por cima */
+    if(alvo.querySelector(".ex-lista")) return;
+    alvo.innerHTML = montar();
+  }
+  new MutationObserver(atualizar).observe(alvo, {childList:true, characterData:true, subtree:true});
+
+  /* sempre que abrir o passo 4, refaz o resumo do zero */
+  painel.addEventListener("click", function(ev){
+    if(ev.target.closest && ev.target.closest('.es-passos [data-p="4"]')){
+      setTimeout(function(){ alvo.innerHTML = montar(); }, 30);
+    }
+  });
+  alvo.innerHTML = montar();
+})();
+</script>
+<!-- ===== FIM: RESUMO DO VÍDEO NO PASSO EXPORTAR ===== -->
  
 </body>
 </html>
