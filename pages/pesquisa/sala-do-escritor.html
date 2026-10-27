@@ -9306,6 +9306,58 @@ st.versoes.unshift({
 .f4-box.teste{display:none!important}
 </style>
 <!-- ===== FIM: ESCONDER VOZ DO NAVEGADOR ===== -->
+ <!-- ===== INÍCIO: BIBLIOTECA ABRE PELO CAMPO MÚSICA DE FUNDO ===== -->
+<style>
+#mbBiblioteca.mb-fechada{display:none!important}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), sel = $("esMusica"), wrap = $("mbBiblioteca");
+  if(!painel || !sel || !wrap) return;
+
+  /* a biblioteca começa fechada */
+  wrap.classList.add("mb-fechada");
+  if(sel.options[1]) sel.options[1].textContent = "Escolher na biblioteca…";
+
+  /* botão para fechar, logo abaixo do título da biblioteca */
+  var fechar = document.createElement("button");
+  fechar.type = "button"; fechar.className = "at-btn"; fechar.textContent = "FECHAR BIBLIOTECA";
+  fechar.style.alignSelf = "flex-start";
+  var titulo = wrap.querySelector("h4");
+  if(titulo) titulo.insertAdjacentElement("afterend", fechar); else wrap.insertBefore(fechar, wrap.firstChild);
+
+  function abrir(){
+    wrap.classList.remove("mb-fechada");
+    var aba = wrap.querySelector('[data-mb-tipo="audio"]');
+    if(aba) aba.click();
+    wrap.scrollIntoView({behavior:"smooth", block:"start"});
+    var m = wrap.querySelector(".mb-msg");
+    if(m){
+      m.textContent = "Escolha a música: marque SELECIONAR e clique em USAR SELECIONADOS (ou em USAR NO PROJETO).";
+      m.className = "es-msg mb-msg";
+    }
+  }
+  function fecharBib(){
+    /* se alguma música estiver tocando na prévia, pausa */
+    wrap.querySelectorAll('[data-mb="play"]').forEach(function(b){
+      if(b.textContent.trim() === "PAUSAR") b.click();
+    });
+    wrap.classList.add("mb-fechada");
+    sel.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+  fechar.addEventListener("click", fecharBib);
+
+  /* só quando é você quem escolhe a opção (e não o próprio sistema) */
+  painel.addEventListener("change", function(ev){
+    if(ev.target.id !== "esMusica" || !ev.isTrusted || ev.target.value !== "propria") return;
+    ev.stopPropagation();
+    ev.target.value = "";
+    abrir();
+  }, true);
+})();
+</script>
+<!-- ===== FIM: BIBLIOTECA ABRE PELO CAMPO MÚSICA DE FUNDO ===== -->
 </body>
 </html>
  
