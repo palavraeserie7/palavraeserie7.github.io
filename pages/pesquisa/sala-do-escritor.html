@@ -9453,6 +9453,36 @@ st.versoes.unshift({
 #mbBiblioteca .mb2-obj{display:none!important}
 </style>
 <!-- ===== FIM: ESCONDER "MEU VÍDEO É PARA" ===== -->
+ <!-- ===== INÍCIO: BIBLIOTECA SÓ DE MÚSICAS ===== -->
+<style>
+#mbBiblioteca.mb-so-audio .mb-tipos,
+#mbBiblioteca.mb-so-audio .mb-redes{display:none!important}
+</style>
+<script>
+(function(){
+  var wrap = document.getElementById("mbBiblioteca");
+  if(!wrap) return;
+  wrap.classList.add("mb-so-audio");
+
+  /* título */
+  var h = wrap.querySelector("h4");
+  if(h) h.textContent = "Biblioteca de músicas";
+
+  /* garante aba Áudios e "todas as redes" (sem filtro escondido) */
+  var aba = wrap.querySelector('[data-mb-tipo="audio"]'); if(aba) aba.click();
+  var todas = wrap.querySelector('[data-mb-rede="todas"]'); if(todas) todas.click();
+
+  /* texto de ajuda sem a parte de "escolha uma rede" */
+  var nota = wrap.querySelector(".mb-nota");
+  var TEXTO = "Músicas, trilhas, ambientes e efeitos para o fundo da mensagem. Os arquivos ficam guardados neste navegador; a licença é por sua conta.";
+  function ajustarNota(){ if(nota && nota.textContent !== TEXTO) nota.textContent = TEXTO; }
+  if(nota){
+    new MutationObserver(ajustarNota).observe(nota, {childList:true, characterData:true, subtree:true});
+    ajustarNota();
+  }
+})();
+</script>
+<!-- ===== FIM: BIBLIOTECA SÓ DE MÚSICAS ===== -->
 </body>
 </html>
  
