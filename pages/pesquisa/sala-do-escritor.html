@@ -9684,6 +9684,38 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: RESUMO DO VÍDEO NO PASSO EXPORTAR ===== -->
+ <!-- ===== INÍCIO: EXPLICAÇÃO EMBAIXO DOS BOTÕES MP3 E MP4 ===== -->
+<style>
+.ex-op{display:flex;flex-direction:column;gap:6px;flex:1 1 260px;max-width:360px}
+.ex-op .at-btn{align-self:flex-start}
+.ex-op p{margin:0;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+</style>
+<script>
+(function(){
+  var painel = document.getElementById("esPainel");
+  if(!painel) return;
+  var box4 = painel.querySelector('.es-box[data-passo="4"]');
+  if(!box4) return;
+
+  var NOTAS = {
+    mp3: "Só a voz, sem imagem e sem música. É rápido: bom para testar a voz, para podcast ou WhatsApp. O volume da voz não vale aqui.",
+    mp4: "Vídeo completo, com imagens, legenda, voz e música. Leva o tempo do próprio vídeo: mantenha esta aba aberta até terminar."
+  };
+
+  Array.prototype.forEach.call(box4.querySelectorAll("[data-exp]"), function(b){
+    if(b.parentElement && b.parentElement.classList.contains("ex-op")) return;
+    var texto = NOTAS[b.dataset.exp]; if(!texto) return;
+    var caixa = document.createElement("div");
+    caixa.className = "ex-op";
+    b.insertAdjacentElement("beforebegin", caixa);
+    caixa.appendChild(b);
+    var p = document.createElement("p");
+    p.textContent = texto;
+    caixa.appendChild(p);
+  });
+})();
+</script>
+<!-- ===== FIM: EXPLICAÇÃO EMBAIXO DOS BOTÕES MP3 E MP4 ===== -->
  
 </body>
 </html>
