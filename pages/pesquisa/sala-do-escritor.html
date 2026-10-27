@@ -9374,6 +9374,80 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: NOMES DOS FORMATOS DE VÍDEO ===== -->
+ <!-- ===== INÍCIO: LISTA DE REDES — TRABALHO DO MOMENTO ===== -->
+<style>
+#rdTrabalho{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;padding:14px;display:flex;flex-direction:column;gap:12px}
+#rdTrabalho h4{margin:0;font:600 17px Georgia,serif;color:var(--ink)}
+#rdTrabalho .rd-grupo{display:flex;flex-direction:column;gap:6px}
+#rdTrabalho .rd-grupo > span{font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#rdTrabalho .rd-lista{display:flex;gap:8px;flex-wrap:wrap}
+#rdTrabalho .rd-btn{padding:9px 14px;border:1px solid var(--paper-line);border-radius:20px;background:#fff;color:var(--ink);cursor:pointer;font:600 13.5px "Segoe UI",Arial,sans-serif}
+#rdTrabalho .rd-btn:hover{border-color:var(--brass)}
+#rdTrabalho .rd-btn[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+#rdTrabalho .rd-atual{margin:0;font:600 13.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), fmt = $("esFormato");
+  if(!painel || !fmt) return;
+  var fl = fmt.closest("label"); if(!fl || !fl.parentElement) return;
+
+  /* cada rede: [código, nome na tela, rede marcada na exportação ("" = nenhuma específica)] */
+  var GRUPOS = [
+    {f:"f916", t:"Vertical 9:16", r:[["tiktok","TikTok","tiktok"],["reels-ig","Instagram Reels","instagram"],["reels-fb","Facebook Reels","facebook"],["shorts","YouTube Shorts","youtube"],["kwai","Kwai",""],["zap","Status do WhatsApp",""]]},
+    {f:"f11",  t:"Quadrado 1:1",  r:[["feed-ig","Instagram Feed","instagram"],["feed-fb","Facebook Feed","facebook"],["linkedin","LinkedIn",""]]},
+    {f:"f169", t:"Horizontal 16:9", r:[["yt","YouTube","youtube"],["fb-h","Facebook (vídeo horizontal)","facebook"]]}
+  ];
+  var NOME_FMT = {}; GRUPOS.forEach(function(g){ NOME_FMT[g.f] = g.t; });
+
+  var sec = document.createElement("section");
+  sec.id = "rdTrabalho";
+  sec.innerHTML = '<h4>Para qual rede é o trabalho de agora?</h4>' +
+    GRUPOS.map(function(g){
+      return '<div class="rd-grupo"><span>' + g.t + '</span><div class="rd-lista">' +
+        g.r.map(function(r){ return '<button type="button" class="rd-btn" data-f="' + g.f + '" data-d="' + r[2] + '" data-n="' + r[1] + '" aria-pressed="false">' + r[1] + '</button>'; }).join("") +
+      '</div></div>';
+    }).join("") + '<p class="rd-atual" id="rdAtual"></p>';
+  fl.parentElement.insertAdjacentElement("beforebegin", sec);
+  fl.style.display = "none";           /* o campo antigo continua existindo, só fica escondido */
+
+  var interno = false;
+  function texto(btn){
+    $("rdAtual").textContent = btn
+      ? "Trabalho atual: " + btn.dataset.n + " — formato " + NOME_FMT[btn.dataset.f] + "."
+      : "Nenhuma rede escolhida. Formato atual: " + (NOME_FMT[fmt.value] || fmt.value) + ".";
+  }
+  function limpar(){ Array.prototype.forEach.call(sec.querySelectorAll(".rd-btn"), function(b){ b.setAttribute("aria-pressed", "false"); }); }
+
+  sec.addEventListener("click", function(ev){
+    var b = ev.target.closest(".rd-btn"); if(!b) return;
+    limpar(); b.setAttribute("aria-pressed", "true");
+    interno = true;
+    try{
+      fmt.value = b.dataset.f;
+      fmt.dispatchEvent(new Event("change", {bubbles:true}));
+    }finally{ interno = false; }
+    if(b.dataset.d){                                  /* marca só a rede escolhida na exportação */
+      Array.prototype.forEach.call(document.querySelectorAll("#esDest input"), function(c){
+        c.checked = c.value === b.dataset.d;
+        c.dispatchEvent(new Event("change", {bubbles:true}));
+      });
+    }
+    texto(b);
+  });
+
+  /* se o formato for trocado por outro lugar (ex.: biblioteca), a lista acompanha */
+  fmt.addEventListener("change", function(){
+    if(interno) return;
+    var sel = sec.querySelector('.rd-btn[aria-pressed="true"]');
+    if(sel && sel.dataset.f !== fmt.value){ limpar(); sel = null; }
+    texto(sel);
+  });
+  texto(null);
+})();
+</script>
+<!-- ===== FIM: LISTA DE REDES — TRABALHO DO MOMENTO ===== -->
 </body>
 </html>
  
