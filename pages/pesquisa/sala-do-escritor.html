@@ -9507,6 +9507,57 @@ st.versoes.unshift({
 #esFluxoProjeto{display:none!important}
 </style>
 <!-- ===== FIM: ESCONDER FLUXO DO PROJETO ===== -->
+ <!-- ===== INÍCIO: PRÉVIA MAIS CLARA ===== -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), resumo = $("esResumo"), ouvir = $("esOuvir");
+  if(!painel || !resumo || !ouvir) return;
+
+  var FORMATOS = {f916:"Vertical 9:16", f11:"Quadrado 1:1", f169:"Horizontal 16:9"};
+
+  /* 1. texto explicativo atualizado */
+  var nota = painel.querySelector('.es-box[data-passo="3"] .es-previa p.es-nota');
+  if(nota) nota.textContent = "A prévia usa a voz do navegador, só para conferir o texto, as imagens e o tempo. O MP3 e o MP4 saem com a voz profissional: para ouvi-la, use OUVIR VOZ PROFISSIONAL no passo 2.";
+
+  /* 2. resumo curto (reescreve sempre que o código antigo mexer nele) */
+  function montar(){
+    var t = $("esTexto").value.trim();
+    var palavras = t ? t.split(/\s+/).length : 0;
+    var imgs = $("esFotos").querySelectorAll("img").length;
+    var rede = painel.querySelector("#rdTrabalho .rd-btn[aria-pressed='true']");
+    var f = $("esFormato");
+    var partes = [];
+    if(rede) partes.push(rede.dataset.n);
+    partes.push(palavras + " palavras");
+    partes.push(imgs + " imagem(ns)");
+    partes.push($("esMusica").value ? "com música" : "sem música");
+    partes.push(FORMATOS[f && f.value] || "");
+    return partes.filter(Boolean).join(" · ");
+  }
+  function atualizar(){
+    var novo = montar();
+    if(resumo.textContent !== novo) resumo.textContent = novo;
+  }
+  new MutationObserver(atualizar).observe(resumo, {childList:true, characterData:true, subtree:true});
+  painel.addEventListener("click", function(ev){
+    if(ev.target.closest && ev.target.closest('.es-passos [data-p="3"]')) setTimeout(atualizar, 0);
+  });
+  atualizar();
+
+  /* 3. botão para seguir */
+  var seguir = document.createElement("button");
+  seguir.type = "button"; seguir.id = "pvIrExportar"; seguir.className = "at-btn";
+  seguir.textContent = "IR PARA EXPORTAR";
+  var parar = $("esParar");
+  (parar || ouvir).insertAdjacentElement("afterend", seguir);
+  seguir.addEventListener("click", function(){
+    var p4 = painel.querySelector('.es-passos [data-p="4"]');
+    if(p4) p4.click();
+  });
+})();
+</script>
+<!-- ===== FIM: PRÉVIA MAIS CLARA ===== -->
 </body>
 </html>
  
