@@ -9245,7 +9245,62 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: BIBLIOTECA — OBJETIVO DO VÍDEO + SELEÇÃO + TAMANHO AUTOMÁTICO ===== -->
+<!-- ===== INÍCIO: CORREÇÃO — EXPORTAR, RESUMO DA PRÉVIA E PUXAR TEXTO ===== -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel");
+  if(!painel || !$("esTexto") || !$("esDest")) return;
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  function msg(n, t, erro){ var el = $("esMsg" + n); if(!el) return; el.textContent = t || ""; el.className = "es-msg" + (erro ? " erro" : ""); }
 
+  /* 1. EXPORTAR: monta o pedido corretamente e dispara a geração do arquivo */
+  painel.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("[data-exp]"); if(!b) return;
+    ev.stopPropagation();
+    if(!$("esTexto").value.trim()){ msg(4, "Escreva um texto no passo 1 antes de exportar.", true); return; }
+    var det = {
+      tipoArquivo: b.dataset.exp,
+      destinos: Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; }),
+      formato: $("esFormato").value, voz: $("esVoz").value, velocidade: Number($("esVel").value),
+      musica: $("esMusica").value ? "propria" : "", volumeMusica: Number($("esVolMus").value),
+      imagens: $("esFotos").querySelectorAll("img").length, titulo: $("esTitulo").value.trim(), texto: $("esTexto").value, tratado: false
+    };
+    if(!det.destinos.length){ msg(4, "Marque pelo menos uma rede.", true); return; }
+    document.dispatchEvent(new CustomEvent("estudio:exportar", {detail: det}));
+    if(!det.tratado) msg(4, "A geração do arquivo não está ligada.", true);
+  }, true);
+
+  /* 2. Resumo na prévia */
+  function resumo(){
+    var el = $("esResumo"); if(!el) return;
+    var t = $("esTexto").value.trim(), p = t ? t.split(/\s+/).length : 0;
+    var tipo = document.querySelector('#esTipos [aria-pressed="true"]');
+    var f = $("esFormato"), fNome = f && f.options[f.selectedIndex] ? f.options[f.selectedIndex].textContent : "";
+    el.innerHTML = '<b>' + esc(tipo ? tipo.dataset.t : "") + '</b> · tom ' + esc($("esTom").value.toLowerCase()) + ' · ' + p + ' palavras · ' +
+      $("esFotos").querySelectorAll("img").length + ' imagem(ns) · ' + ($("esMusica").value ? "com música" : "sem música") + ' · ' + esc(fNome);
+  }
+  painel.addEventListener("click", function(ev){
+    if(ev.target.closest && ev.target.closest('.es-passos [data-p="3"]')) setTimeout(resumo, 0);
+  });
+  $("esFormato").addEventListener("change", function(){ setTimeout(resumo, 0); });
+
+  /* 3. Puxar texto do Ateliê */
+  painel.addEventListener("click", function(ev){
+    if(!(ev.target.closest && ev.target.closest("#esPuxar"))) return;
+    ev.stopPropagation();
+    var t = $("atTexto"), ti = $("atTitulo");
+    var txt = t ? t.value.replace(/^##\s*/gm, "").replace(/^>\s?/gm, "").trim() : "";
+    if(!txt){ msg(1, "O texto do Ateliê está vazio.", true); return; }
+    if($("esTexto").value.trim() && !window.confirm("Substituir o texto desta tela pelo do Ateliê?")) return;
+    $("esTexto").value = txt;
+    if(ti && ti.value && !$("esTitulo").value) $("esTitulo").value = ti.value;
+    $("esTexto").dispatchEvent(new Event("input", {bubbles: true}));
+    msg(1, "Texto do Ateliê trazido para cá.");
+  }, true);
+})();
+</script>
+<!-- ===== FIM: CORREÇÃO — EXPORTAR, RESUMO DA PRÉVIA E PUXAR TEXTO ===== -->
 </body>
 </html>
  
