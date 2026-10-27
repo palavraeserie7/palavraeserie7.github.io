@@ -9483,6 +9483,25 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: BIBLIOTECA SÓ DE MÚSICAS ===== -->
+ <!-- ===== INÍCIO: ENXUGAR BIBLIOTECA DE MÚSICAS ===== -->
+<style>
+#mbBiblioteca .mb-nota,
+#mbBiblioteca [data-mb="add"],
+#mbBiblioteca .mb-filtros{display:none!important}
+</style>
+<script>
+(function(){
+  var wrap = document.getElementById("mbBiblioteca");
+  if(!wrap) return;
+  var m = wrap.querySelector(".mb-msg");
+  if(!m) return;
+  /* apaga só a frase de instrução; os avisos de verdade (música no projeto, erros) continuam aparecendo */
+  function limpar(){ if(m.textContent.indexOf("Escolha a música: marque SELECIONAR") === 0) m.textContent = ""; }
+  new MutationObserver(limpar).observe(m, {childList:true, characterData:true, subtree:true});
+  limpar();
+})();
+</script>
+<!-- ===== FIM: ENXUGAR BIBLIOTECA DE MÚSICAS ===== -->
 </body>
 </html>
  
