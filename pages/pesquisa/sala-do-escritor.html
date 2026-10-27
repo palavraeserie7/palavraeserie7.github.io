@@ -9558,6 +9558,66 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: PRÉVIA MAIS CLARA ===== -->
+ <!-- ===== INÍCIO: EXPORTAR SEM ESCOLHER REDE DE NOVO ===== -->
+<style>
+#esDest{display:none!important}
+#exResumo{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--brass);border-radius:8px;background:var(--brass-wash)}
+#exResumo p{margin:0;flex:1 1 260px;font:600 14.5px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink)}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), dest = $("esDest"), fmt = $("esFormato");
+  if(!painel || !dest || !fmt) return;
+  var box4 = painel.querySelector('.es-box[data-passo="4"]');
+  if(!box4) return;
+
+  var FORMATOS = {f916:"Vertical 9:16", f11:"Quadrado 1:1", f169:"Horizontal 16:9"};
+
+  /* frase antiga de "marque onde vai publicar" sai de cena */
+  var antiga = box4.querySelector("p.es-nota");
+  if(antiga) antiga.style.display = "none";
+
+  /* linha de resumo no lugar das caixinhas */
+  var resumo = document.createElement("div");
+  resumo.id = "exResumo";
+  resumo.innerHTML = '<p id="exTexto"></p><button type="button" class="at-btn" id="exTrocar">TROCAR REDE</button>';
+  dest.insertAdjacentElement("beforebegin", resumo);
+
+  /* garante que sempre haja uma rede marcada por trás (o sistema exige) */
+  function garantir(){
+    var inputs = dest.querySelectorAll("input");
+    if(!dest.querySelector("input:checked")) Array.prototype.forEach.call(inputs, function(i){ i.checked = true; });
+  }
+  function atualizar(){
+    garantir();
+    var rede = document.querySelector("#rdTrabalho .rd-btn[aria-pressed='true']");
+    var nomeFmt = FORMATOS[fmt.value] || fmt.value;
+    $("exTexto").textContent = rede
+      ? "Vídeo para " + rede.dataset.n + " — formato " + nomeFmt + "."
+      : "Nenhuma rede escolhida no passo 2. O vídeo sai no formato " + nomeFmt + ".";
+  }
+
+  painel.addEventListener("click", function(ev){
+    var t = ev.target;
+    if(t.closest && (t.closest('.es-passos [data-p="4"]') || t.closest("#rdTrabalho .rd-btn"))) setTimeout(atualizar, 0);
+  });
+  fmt.addEventListener("change", function(){ setTimeout(atualizar, 0); });
+
+  $("exTrocar").addEventListener("click", function(){
+    var p2 = painel.querySelector('.es-passos [data-p="2"]');
+    if(p2) p2.click();
+    setTimeout(function(){
+      var r = $("rdTrabalho");
+      if(r) r.scrollIntoView({behavior:"smooth", block:"start"});
+    }, 50);
+  });
+
+  atualizar();
+})();
+</script>
+<!-- ===== FIM: EXPORTAR SEM ESCOLHER REDE DE NOVO ===== -->
+ 
 </body>
 </html>
  
