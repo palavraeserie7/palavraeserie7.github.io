@@ -9716,6 +9716,35 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: EXPLICAÇÃO EMBAIXO DOS BOTÕES MP3 E MP4 ===== -->
+ <!-- ===== INÍCIO: CORREÇÃO DOS CAPÍTULOS ===== -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var livro = $("f3Livro"), cap = $("f3Cap");
+  if(!livro || !cap) return;
+
+  async function preencher(){
+    var idx = Number(livro.value);
+    cap.innerHTML = '<option value="">…</option>';
+    try{
+      await loadPortuguese();
+      var n = portugueseBible[idx].chapters.length;
+      var h = "";
+      for(var i = 1; i <= n; i++) h += '<option value="' + i + '">' + i + '</option>';
+      cap.innerHTML = h;
+      cap.dispatchEvent(new Event("change", {bubbles:true}));
+    }catch(e){
+      console.error("Capítulos:", e);
+      cap.innerHTML = '<option value="1">1</option>';
+    }
+  }
+  livro.addEventListener("change", preencher);
+  new MutationObserver(function(){ if(!cap.options.length || !cap.value) preencher(); })
+    .observe(cap, {childList:true});
+  setTimeout(function(){ if(!cap.value) preencher(); }, 800);
+})();
+</script>
+<!-- ===== FIM: CORREÇÃO DOS CAPÍTULOS ===== -->
  
 </body>
 </html>
