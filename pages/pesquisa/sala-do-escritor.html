@@ -9716,7 +9716,198 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: EXPLICAÇÃO EMBAIXO DOS BOTÕES MP3 E MP4 ===== -->
- 
+ <!-- ===== INÍCIO: PAINEL PUBLICAR NAS REDES (PASSO EXPORTAR) ===== -->
+<style>
+#rsGrade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px;align-items:start;margin-top:14px}
+#rsGrade > .f1-card{margin:0}
+#rsPainel{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;color:var(--ink);padding:16px;display:flex;flex-direction:column;gap:10px}
+#rsPainel h4{margin:0;font:600 18px Georgia,serif}
+#rsPainel .rs-abas{display:flex;gap:6px;flex-wrap:wrap}
+#rsPainel .rs-aba{padding:8px 12px;border:1px solid var(--paper-line);border-radius:20px;background:#fff;color:var(--ink);cursor:pointer;font:600 13px "Segoe UI",Arial,sans-serif}
+#rsPainel .rs-aba:hover{border-color:var(--brass)}
+#rsPainel .rs-aba[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#fffdf6}
+#rsPainel label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#rsPainel input,#rsPainel textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+#rsPainel textarea{min-height:160px;resize:vertical}
+#rsPainel .rs-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#rsPainel .rs-cont{font:600 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#rsPainel .rs-cont.estouro{color:#a14747}
+#rsPainel .rs-aviso{margin:0;padding:8px 10px;border-left:3px solid #a14747;background:#f6e9e9;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:#7a2f2f}
+#rsPainel .rs-nota{margin:0;padding:8px 10px;border-left:3px solid var(--brass);background:var(--brass-wash);font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#rsPainel .rs-lista{margin:0;padding-left:18px;font:13px/1.6 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#rsPainel a.at-btn{text-decoration:none;display:inline-flex;align-items:center;height:40px;padding:0 14px}
+#rsPainel .rs-msg{margin:0;min-height:1.3em;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#rsPainel [hidden]{display:none!important}
+@media(max-width:900px){#rsGrade{grid-template-columns:1fr}}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), info = $("f1Info");
+  if(!painel || !info || !info.parentElement) return;
+  var res = info.parentElement;
+  var SITE = "https://palavraeserie7.github.io";   /* só a página pública, nunca a Sala do Escritor */
+
+  /* limites e regras podem mudar: confira nas próprias redes de tempos em tempos */
+  var REDES = [
+    {id:"tiktok", nome:"TikTok", fmt:"f916", fmtNome:"vertical 9:16", titulo:false, max:2200, bio:true,
+     link:"https://www.tiktok.com/tiktokstudio/upload", rotLink:"ABRIR ENVIO DO TIKTOK",
+     tags:"#Salmos #PalavraDeDeus #Fé #Oração #Bíblia",
+     passos:["Baixe o MP4 e abra o envio do TikTok.","Arraste o arquivo e cole a legenda.","O link do site não é clicável na legenda: deixe-o na <b>bio do perfil</b>.","Publique."]},
+    {id:"instagram", nome:"Instagram", fmt:"f916", fmtNome:"vertical 9:16 (Reels)", titulo:false, max:2200, bio:true,
+     link:"https://www.instagram.com/", rotLink:"ABRIR INSTAGRAM",
+     tags:"#Salmos #PalavraDeDeus #Fé #Oração #Bíblia #Reflexão",
+     passos:["Baixe o MP4. No Instagram, clique em <b>Criar (+)</b> e escolha <b>Reel</b>.","Envie o arquivo e cole a legenda.","O link não é clicável na legenda: deixe o site na <b>bio do perfil</b>.","Publique."]},
+    {id:"facebook", nome:"Facebook", fmt:"f916", fmtNome:"vertical 9:16 (Reels) ou 16:9", titulo:false, max:5000, bio:false,
+     link:"https://business.facebook.com/latest/composer", rotLink:"ABRIR META BUSINESS SUITE",
+     tags:"#Salmos #PalavraDeDeus #Fé #Oração",
+     passos:["Baixe o MP4 e abra a Meta Business Suite (ou a sua Página).","Escolha <b>Reel</b> (vertical) ou <b>Vídeo</b> (horizontal).","Envie o arquivo, cole o texto e publique pela <b>Página</b>, não pelo perfil pessoal."]},
+    {id:"youtube", nome:"YouTube", fmt:"f169", fmtNome:"horizontal 16:9 (ou vertical para Shorts)", titulo:true, max:5000, tituloMax:100, bio:false,
+     link:"https://www.youtube.com/upload", rotLink:"ABRIR ENVIO DO YOUTUBE", link2:"https://studio.youtube.com", rotLink2:"YOUTUBE STUDIO",
+     tags:"#Salmos #PalavraDeDeus #Bíblia #Oração #Fé",
+     passos:["Baixe o MP4 e abra o envio do YouTube.","Arraste o arquivo e cole título e descrição.","Marque: <b>Não, não é conteúdo para crianças</b>.","Escolha a playlist (Salmos, Orações ou Reflexões) e publique."]},
+    {id:"kwai", nome:"Kwai", fmt:"f916", fmtNome:"vertical 9:16", titulo:false, max:500, bio:true,
+     link:"https://www.kwai.com/", rotLink:"ABRIR KWAI",
+     tags:"#Salmos #PalavraDeDeus #Fé",
+     passos:["O envio é feito principalmente pelo <b>aplicativo no celular</b>.","Passe o MP4 para o celular, publique e cole a legenda.","Deixe o link do site na bio."]},
+    {id:"whatsapp", nome:"WhatsApp", fmt:"f916", fmtNome:"vertical 9:16 (Status)", titulo:false, max:700, bio:false,
+     link:"https://web.whatsapp.com/", rotLink:"ABRIR WHATSAPP WEB",
+     tags:"",
+     passos:["Passe o MP4 para o celular ou abra o WhatsApp Web.","Em <b>Status</b>, adicione o vídeo e cole o texto.","Vídeos de Status são curtos: se o seu for longo, divida em partes."]},
+    {id:"linkedin", nome:"LinkedIn", fmt:"f11", fmtNome:"quadrado 1:1 ou horizontal 16:9", titulo:false, max:3000, bio:false,
+     link:"https://www.linkedin.com/feed/", rotLink:"ABRIR LINKEDIN",
+     tags:"#PalavraDeDeus #Fé #Bíblia",
+     passos:["Baixe o MP4 e, no LinkedIn, clique em <b>Começar publicação</b> e depois no ícone de vídeo.","Envie o arquivo, cole o texto e publique."]}
+  ];
+  var porId = {}; REDES.forEach(function(r){ porId[r.id] = r; });
+  var estado = {}; REDES.forEach(function(r){ estado[r.id] = {tit:"", desc:"", edTit:false, edDesc:false}; });
+  var atual = "youtube";
+
+  /* grade: vídeo pronto à esquerda, painel das redes à direita */
+  var grade = document.createElement("div");
+  grade.id = "rsGrade";
+  res.insertAdjacentElement("beforebegin", grade);
+  grade.appendChild(res);
+
+  var sec = document.createElement("section");
+  sec.id = "rsPainel";
+  sec.innerHTML =
+    '<h4>Publicar nas redes</h4>' +
+    '<div class="rs-abas" role="group" aria-label="Rede social">' +
+      REDES.map(function(r){ return '<button type="button" class="rs-aba" data-rs="' + r.id + '" aria-pressed="false">' + r.nome + '</button>'; }).join("") +
+    '</div>' +
+    '<p class="rs-aviso" id="rsAviso" hidden></p>' +
+    '<label id="rsLabTit">Título do vídeo<input id="rsTitulo" type="text"></label>' +
+    '<label>Legenda / descrição<textarea id="rsDesc"></textarea></label>' +
+    '<span class="rs-cont" id="rsCont"></span>' +
+    '<div class="rs-linha">' +
+      '<button type="button" class="at-btn" id="rsCopTit">COPIAR TÍTULO</button>' +
+      '<button type="button" class="at-btn" id="rsCopDesc">COPIAR LEGENDA</button>' +
+      '<button type="button" class="at-btn" id="rsRefazer">REFAZER TEXTOS</button>' +
+    '</div>' +
+    '<div class="rs-linha" id="rsLinks"></div>' +
+    '<p class="rs-msg" id="rsMsg" role="status"></p>' +
+    '<p class="rs-nota" id="rsNota" hidden></p>' +
+    '<ol class="rs-lista" id="rsPassos"></ol>';
+  grade.appendChild(sec);
+
+  function msg(t){ $("rsMsg").textContent = t || ""; }
+  function musica(){
+    var c = document.querySelector("#mbBiblioteca .mb-card.sel strong");
+    return c ? c.textContent.trim() : "";
+  }
+  function tituloProjeto(){ return $("esTitulo").value.trim(); }
+
+  /* texto padrão de cada rede */
+  function gerar(r){
+    var t = tituloProjeto(), m = musica(), d = "";
+    if(t && !r.titulo) d += t + "\n\n";
+    if(r.titulo && t) d += t + "\n\n";
+    if(r.bio) d += "📖 Estudos e pesquisas bíblicas na plataforma Palavra e Série: link na bio.\n\n";
+    else d += "📖 Aprofunde-se: pesquisas bíblicas, estudos e livros cristãos na plataforma Palavra e Série:\n" + SITE + "\n\n";
+    d += r.id === "whatsapp" ? "🙏 Compartilhe esta Palavra com quem precisa.\n\n" : "🙏 Siga para receber a Palavra toda semana.\n\n";
+    if(m) d += "Música: " + m + "\n\n";
+    if(r.tags) d += r.tags;
+    return d.trim();
+  }
+  function tituloPadrao(r){ var t = tituloProjeto(); return t ? t + " | Palavra e Série" : ""; }
+
+  function preencher(forcar){
+    var r = porId[atual], e = estado[atual];
+    if(forcar || !e.edTit) e.tit = tituloPadrao(r);
+    if(forcar || !e.edDesc) e.desc = gerar(r);
+    if(forcar){ e.edTit = false; e.edDesc = false; }
+    $("rsTitulo").value = e.tit; $("rsDesc").value = e.desc;
+    contar();
+  }
+  function contar(){
+    var r = porId[atual], n = $("rsDesc").value.length, c = $("rsCont");
+    c.textContent = n + " / " + r.max + " caracteres" + (r.titulo ? " · título " + $("rsTitulo").value.length + " / " + r.tituloMax : "");
+    c.className = "rs-cont" + ((n > r.max || (r.titulo && $("rsTitulo").value.length > r.tituloMax)) ? " estouro" : "");
+  }
+  function avisoFormato(){
+    var r = porId[atual], f = $("esFormato") && $("esFormato").value, av = $("rsAviso");
+    var ideal = {tiktok:["f916"], instagram:["f916","f11"], facebook:["f916","f11","f169"], youtube:["f169","f916"], kwai:["f916"], whatsapp:["f916"], linkedin:["f11","f169"]}[r.id];
+    if(f && ideal.indexOf(f) < 0){
+      av.hidden = false;
+      av.textContent = "Atenção: o vídeo está em outro formato. Para " + r.nome + " o ideal é " + r.fmtNome + ". Volte ao passo 2, escolha a rede de trabalho e exporte de novo.";
+    }else av.hidden = true;
+  }
+  function mostrar(id){
+    atual = id; var r = porId[id];
+    Array.prototype.forEach.call(sec.querySelectorAll(".rs-aba"), function(b){ b.setAttribute("aria-pressed", String(b.dataset.rs === id)); });
+    $("rsLabTit").hidden = !r.titulo; $("rsCopTit").hidden = !r.titulo;
+    $("rsCopDesc").textContent = r.titulo ? "COPIAR DESCRIÇÃO" : "COPIAR LEGENDA";
+    $("rsLinks").innerHTML = '<a class="at-btn gold" href="' + r.link + '" target="_blank" rel="noopener">' + r.rotLink + '</a>' +
+      (r.link2 ? '<a class="at-btn" href="' + r.link2 + '" target="_blank" rel="noopener">' + r.rotLink2 + '</a>' : '');
+    var nota = $("rsNota");
+    nota.hidden = !r.bio;
+    if(r.bio) nota.textContent = "Nesta rede o link não é clicável na legenda. Coloque " + SITE.replace("https://", "") + " na bio do perfil.";
+    $("rsPassos").innerHTML = r.passos.map(function(p){ return "<li>" + p + "</li>"; }).join("");
+    msg(""); preencher(false); avisoFormato();
+  }
+
+  /* eventos */
+  sec.addEventListener("click", function(ev){
+    var b = ev.target.closest(".rs-aba"); if(b) mostrar(b.dataset.rs);
+  });
+  $("rsTitulo").addEventListener("input", function(){ estado[atual].tit = this.value; estado[atual].edTit = true; contar(); });
+  $("rsDesc").addEventListener("input", function(){ estado[atual].desc = this.value; estado[atual].edDesc = true; contar(); });
+  function copiar(texto, ok){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(texto).then(function(){ msg(ok); }, function(){ msg("Não foi possível copiar. Selecione o texto e use Ctrl+C."); });
+    }else msg("Selecione o texto e use Ctrl+C.");
+  }
+  $("rsCopTit").addEventListener("click", function(){ copiar($("rsTitulo").value, "Título copiado."); });
+  $("rsCopDesc").addEventListener("click", function(){ copiar($("rsDesc").value, "Texto copiado."); });
+  $("rsRefazer").addEventListener("click", function(){
+    if((estado[atual].edTit || estado[atual].edDesc) && !window.confirm("Descartar suas edições e refazer os textos desta rede?")) return;
+    preencher(true); msg("Textos refeitos.");
+  });
+
+  /* escolhe a aba pela rede marcada no passo 2 */
+  function redeDoTrabalho(){
+    var b = document.querySelector("#rdTrabalho .rd-btn[aria-pressed='true']");
+    if(!b) return null;
+    var n = (b.dataset.n || "").toLowerCase();
+    var ordem = ["tiktok","instagram","facebook","youtube","kwai","whatsapp","linkedin"];
+    for(var i = 0; i < ordem.length; i++){ if(n.indexOf(ordem[i]) > -1) return ordem[i]; }
+    return null;
+  }
+  painel.addEventListener("click", function(ev){
+    if(ev.target.closest && ev.target.closest('.es-passos [data-p="4"]')){
+      setTimeout(function(){
+        var r = redeDoTrabalho();
+        mostrar(r || atual);
+      }, 60);
+    }
+  });
+  if($("esFormato")) $("esFormato").addEventListener("change", function(){ setTimeout(avisoFormato, 0); });
+
+  mostrar(redeDoTrabalho() || "youtube");
+})();
+</script>
+<!-- ===== FIM: PAINEL PUBLICAR NAS REDES ===== -->
 </body>
 </html>
  
