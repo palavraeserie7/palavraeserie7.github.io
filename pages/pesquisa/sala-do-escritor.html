@@ -1,4 +1,6 @@
-                                                                                        
+
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7849,7 +7851,7 @@ st.versoes.unshift({
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel");
-  if(!painel || !$("esTipos") || !$("esTexto")) return;
+  if(!painel || !("esTipos")||!("esTexto")) return;
   var txt = $("esTexto");
   var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim(); };
 
@@ -7904,7 +7906,7 @@ st.versoes.unshift({
     });
   }
   async function capitulos(){
-    var s = $("f3Cap"), idx = Number($("f3Livro").value);
+    var s = ("f3Cap"),idx=Number(("f3Livro").value);
     s.innerHTML = '<option>Carregando…</option>';
     try{
       await loadPortuguese();
@@ -7916,7 +7918,7 @@ st.versoes.unshift({
   }
   function limitesVersiculos(){
     try{
-      var v = portugueseBible[Number($("f3Livro").value)].chapters[Number($("f3Cap").value) - 1].length;
+      var v = portugueseBible[Number(("f3Livro").value)].chapters[Number(("f3Cap").value) - 1].length;
       $("f3De").max = v; $("f3Ate").max = v;
       $("f3De").placeholder = "1"; $("f3Ate").placeholder = String(v);
     }catch(e){}
@@ -7952,7 +7954,7 @@ st.versoes.unshift({
 
   /* 4. trazer da Bíblia: reaproveita o BUSCAR PASSAGEM que já existe */
   $("f3Trazer").addEventListener("click", function(){
-    var nome = $("f3Livro").options[$("f3Livro").selectedIndex];
+    var nome = ("f3Livro").options[("f3Livro").selectedIndex];
     var cap = $("f3Cap").value, de = $("f3De").value.trim(), ate = $("f3Ate").value.trim();
     if(!nome || !cap){ msg("Escolha o livro e o capítulo.", true); return; }
     var ref = nome.textContent + " " + cap + (de ? ":" + de + (ate ? "-" + ate : "") : "");
@@ -8171,7 +8173,7 @@ st.versoes.unshift({
   function msg(t, erro){ var m = $("bsMsg"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); }
   function achar(id){ for(var i = 0; i < itens.length; i++){ if(itens[i].id === id) return itens[i]; } return null; }
   function url(it){ if(!it._url) it._url = URL.createObjectURL(it.blob); return it._url; }
-  function atualizarVer(){ $("bsVer").textContent = ($("bsPainel").hidden ? "VER" : "FECHAR") + " BIBLIOTECA SONORA (" + itens.length + ")"; }
+  function atualizarVer(){ ("bsVer").textContent=(("bsPainel").hidden ? "VER" : "FECHAR") + " BIBLIOTECA SONORA (" + itens.length + ")"; }
 
   /* ---------- carregar o que já foi guardado ---------- */
   async function carregar(){
@@ -8560,7 +8562,7 @@ st.versoes.unshift({
   prev.className = "f6-prev"; prev.muted = true; prev.loop = true; prev.playsInline = true; prev.hidden = true;
   tela.insertBefore(prev, tela.firstChild);
   function atualizarPrevia(){
-    var m = /url\(["']?([^"')]+)["']?\)/.exec(tela.style.backgroundImage || "");
+    var m = /url["']?(["')]+)["']?/.exec(tela.style.backgroundImage || "");
     var item = m ? mapa[m[1]] : null;
     if(item){
       if(prev.dataset.url !== item.url){ prev.src = item.url; prev.dataset.url = item.url; }
@@ -9248,7 +9250,7 @@ st.versoes.unshift({
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel");
-  if(!painel || !$("esTexto") || !$("esDest")) return;
+  if(!painel || !("esTexto")||!("esDest")) return;
   var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
   function msg(n, t, erro){ var el = $("esMsg" + n); if(!el) return; el.textContent = t || ""; el.className = "es-msg" + (erro ? " erro" : ""); }
 
@@ -9260,8 +9262,8 @@ st.versoes.unshift({
     var det = {
       tipoArquivo: b.dataset.exp,
       destinos: Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; }),
-      formato: $("esFormato").value, voz: $("esVoz").value, velocidade: Number($("esVel").value),
-      musica: $("esMusica").value ? "propria" : "", volumeMusica: Number($("esVolMus").value),
+      formato: $("esFormato").value, voz: ("esVoz").value,velocidade:Number(("esVel").value),
+      musica: ("esMusica").value?"propria":"",volumeMusica:Number(("esVolMus").value),
       imagens: $("esFotos").querySelectorAll("img").length, titulo: $("esTitulo").value.trim(), texto: $("esTexto").value, tratado: false
     };
     if(!det.destinos.length){ msg(4, "Marque pelo menos uma rede.", true); return; }
@@ -9276,7 +9278,7 @@ st.versoes.unshift({
     var tipo = document.querySelector('#esTipos [aria-pressed="true"]');
     var f = $("esFormato"), fNome = f && f.options[f.selectedIndex] ? f.options[f.selectedIndex].textContent : "";
     el.innerHTML = '<b>' + esc(tipo ? tipo.dataset.t : "") + '</b> · tom ' + esc($("esTom").value.toLowerCase()) + ' · ' + p + ' palavras · ' +
-      $("esFotos").querySelectorAll("img").length + ' imagem(ns) · ' + ($("esMusica").value ? "com música" : "sem música") + ' · ' + esc(fNome);
+      ("esFotos").querySelectorAll("img").length+'imagem(ns)·'+(("esMusica").value ? "com música" : "sem música") + ' · ' + esc(fNome);
   }
   painel.addEventListener("click", function(ev){
     if(ev.target.closest && ev.target.closest('.es-passos [data-p="3"]')) setTimeout(resumo, 0);
@@ -9714,26 +9716,6 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: EXPLICAÇÃO EMBAIXO DOS BOTÕES MP3 E MP4 ===== -->
- <!-- ===== INÍCIO: CARTÃO "VÍDEOS E MENSAGENS BÍBLICAS" ATUALIZADO ===== -->
-<script>
-(function(){
-  var card = document.querySelector('#f2Escolha [data-m="redes"]');
-  if(!card) return;
-  var d = card.querySelector(".f2-d");
-  if(d) d.textContent = "Salmos, orações e reflexões em vídeo ou áudio: texto da Bíblia ou colado, voz profissional, música e fundos, prontos para as redes.";
-  var tr = card.querySelector(".f2-trilha");
-  if(tr){
-    var passos = [
-      "Trazer o texto da Bíblia ou colar o seu",
-      "Escolher voz profissional, rede, música e fundos",
-      "Conferir na prévia",
-      "Conferir a ficha e exportar MP3 ou MP4"
-    ];
-    tr.innerHTML = passos.map(function(x, i){ return '<span><b>' + (i + 1) + '</b>' + x + '</span>'; }).join("");
-  }
-})();
-</script>
-<!-- ===== FIM: CARTÃO "VÍDEOS E MENSAGENS BÍBLICAS" ATUALIZADO ===== -->
  
 </body>
 </html>
@@ -9742,5 +9724,6 @@ st.versoes.unshift({
  
  
  
+
 
 
