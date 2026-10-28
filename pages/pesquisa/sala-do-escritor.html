@@ -9745,7 +9745,42 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: CORREÇÃO DOS CAPÍTULOS ===== -->
- 
+ <!-- ===== INÍCIO: SALMO IGUAL AOS OUTROS (COPIAR E COLAR) ===== -->
+<style>
+#f3Biblia{display:none!important}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var guia = $("f3Guia"), tit = $("f3Tit"), dica = $("f3Dica"), txt = $("esTexto");
+  var colar = $("f3Colar"), tipos = $("esTipos");
+  if(!guia || !tit || !dica || !txt || !colar || !tipos) return;
+
+  var ALVOS = {
+    "Salmo": {t:"Salmo: copie e cole", d:"Copie o salmo de qualquer lugar e cole aqui (Ctrl+V) ou use o botão abaixo.", ph:"Cole aqui o salmo."},
+    "Texto espiritual original": {t:"Texto espiritual original: copie e cole", d:"Copie o texto de qualquer lugar e cole aqui (Ctrl+V) ou use o botão abaixo.", ph:"Cole aqui o texto."}
+  };
+
+  function ajustar(){
+    var b = tipos.querySelector('[aria-pressed="true"]');
+    var m = b ? ALVOS[b.dataset.t] : null;
+    if(!m) return;
+    tit.textContent = m.t;
+    dica.textContent = m.d;
+    txt.placeholder = m.ph;
+    colar.hidden = false;
+  }
+
+  /* roda depois do código antigo, toda vez que o tipo muda */
+  new MutationObserver(function(){ setTimeout(ajustar, 0); })
+    .observe(tipos, {subtree:true, attributes:true, attributeFilter:["aria-pressed"], childList:true});
+  new MutationObserver(function(){ setTimeout(ajustar, 0); })
+    .observe(tit, {childList:true, characterData:true, subtree:true});
+  tipos.addEventListener("click", function(){ setTimeout(ajustar, 20); });
+  ajustar();
+})();
+</script>
+<!-- ===== FIM: SALMO IGUAL AOS OUTROS ===== -->
 </body>
 </html>
  
