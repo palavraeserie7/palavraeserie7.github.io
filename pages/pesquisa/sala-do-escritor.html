@@ -6902,9 +6902,7 @@ st.versoes.unshift({
 
 
 
-<!-- ===== INÍCIO: ÁREA 1 — CRIAR FUNCIONANDO (modo demonstração, sem Worker) =====
-     COMO APLICAR: cole este bloco logo ANTES da última tag </body>,
-     DEPOIS do bloco "FIM: ESTÚDIO DE CRIAÇÃO". Não mexa em mais nada. -->
+<!-- ===== INÍCIO: ÁREA 1 — CRIAR FUNCIONANDO (modo demonstração, sem Worker) ===== -->
 <style>
 .a1-res{border:1px dashed var(--brass);border-radius:8px;background:#fffdf6;padding:14px;display:flex;flex-direction:column;gap:10px}
 .a1-res[hidden]{display:none!important}
@@ -9781,7 +9779,34 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: SALMO IGUAL AOS OUTROS ===== -->
-
+<!-- ===== INÍCIO: BIBLIOTECA DE IMAGENS E VÍDEOS (ABAS VISÍVEIS) ===== -->
+<style>
+#mbBiblioteca .mb-redes{display:none!important}
+#mbBiblioteca .mb-acoes [data-mb="add"]{display:inline-block!important}
+#mbBiblioteca .mb-filtros{display:grid!important}
+</style>
+<script>
+(function(){
+  var wrap = document.getElementById("mbBiblioteca");
+  if(!wrap) return;
+  wrap.classList.remove("mb-so-audio");
+  var h = wrap.querySelector("h4");
+  if(h) h.textContent = "Biblioteca de músicas, imagens e vídeos";
+  function abrir(tipo){
+    wrap.classList.remove("mb-fechada");
+    var aba = wrap.querySelector('[data-mb-tipo="' + tipo + '"]');
+    if(aba) aba.click();
+    wrap.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  document.addEventListener("click", function(ev){
+    var t = ev.target.closest && ev.target.closest("#esAddFoto,#f6AddVideo");
+    if(!t) return;
+    ev.stopPropagation(); ev.preventDefault();
+    abrir(t.id === "esAddFoto" ? "imagem" : "video");
+  }, true);
+})();
+</script>
+<!-- ===== FIM: BIBLIOTECA DE IMAGENS E VÍDEOS (ABAS VISÍVEIS) ===== -->
 
 
 </body>
