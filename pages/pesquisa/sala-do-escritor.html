@@ -6328,7 +6328,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
 
                                                      <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
- <!-- ====================================================================================================================== --> 
+<!-- ====================================================================================================================== --> 
  
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
     
@@ -9927,6 +9927,67 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: BIBLIOTECA DE IMAGENS E VÍDEOS (ABAS VISÍVEIS) ===== -->
+<!-- ===== LIMPEZA DO FLUXO MUSICAL: manter somente o projeto Louvor > MusicXML > MuseScore > Áudio > Vídeo ===== -->
+<style>
+/* O Ateliê geral não faz parte do fluxo musical. É ocultado somente enquanto Louvores estiver ativo. */
+body.es-musica-ativa #ateliPainel { display:none !important; }
+/* Campos antigos que pertenciam ao formulário musical anterior, não ao novo fluxo. */
+#esExtraMusica .es-musica-legado-oculto { display:none !important; }
+</style>
+<script>
+(function(){
+  function iniciar(){
+    var painel = document.getElementById('esPainel');
+    if(!painel) return;
+
+    function aplicarLimpeza(){
+      var musical = painel.getAttribute('data-modo-ativo') === 'musica';
+      document.body.classList.toggle('es-musica-ativa', musical);
+
+      var atelie = document.getElementById('ateliPainel');
+      if(atelie) atelie.hidden = musical;
+
+      var video = document.getElementById('esMusVideo');
+      if(video && video.closest('label')) video.closest('label').classList.add('es-musica-legado-oculto');
+
+      var ideia = document.getElementById('esMusLetraIdeia');
+      if(ideia && ideia.closest('label')) ideia.closest('label').classList.add('es-musica-legado-oculto');
+
+      var guardarPlanoAntigo = document.getElementById('esMusSalvar');
+      if(guardarPlanoAntigo) guardarPlanoAntigo.classList.add('es-musica-legado-oculto');
+
+      var statusAntigo = document.getElementById('esMusStatus');
+      if(statusAntigo) statusAntigo.classList.add('es-musica-legado-oculto');
+
+      var botaoLetra = document.getElementById('esMusGerarLetra');
+      if(botaoLetra) botaoLetra.textContent = 'PREPARAR PEDIDO DA LETRA COM IA';
+
+      var titulo = document.getElementById('esExtraTitulo');
+      var intro = document.getElementById('esExtraIntro');
+      if(musical && titulo) titulo.textContent = 'Estúdio de composição de louvores';
+      if(musical && intro) intro.textContent = 'Crie a letra e a composição nesta plataforma. Baixe a partitura MusicXML, abra no MuseScore, exporte o áudio e traga-o de volta para sua biblioteca de vídeos.';
+    }
+
+    aplicarLimpeza();
+    new MutationObserver(aplicarLimpeza).observe(painel, {
+      attributes:true,
+      attributeFilter:['data-modo-ativo']
+    });
+
+    painel.addEventListener('click', function(ev){
+      if(ev.target.closest && ev.target.closest('[data-modo]')){
+        setTimeout(aplicarLimpeza, 0);
+        setTimeout(aplicarLimpeza, 80);
+      }
+    });
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);
+  else iniciar();
+})();
+</script>
+<!-- ===== FIM DA LIMPEZA DO FLUXO MUSICAL ===== -->
+
 
 
 
