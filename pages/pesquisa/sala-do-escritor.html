@@ -6328,6 +6328,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
 
                                                      <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
+ <!-- ====================================================================================================================== --> 
  
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
     
@@ -6539,7 +6540,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   modos.id = 'esModos';
   modos.innerHTML = '<button type="button" class="es-modo" data-modo="redes" aria-pressed="true"><span aria-hidden="true">▶</span><span><strong>Vídeos e mensagens bíblicas</strong><small>Salmos, orações, testemunhos e reflexões com voz, música, imagens e legendas.</small></span></button>' +
     '<button type="button" class="es-modo" data-modo="filme" aria-pressed="false"><span aria-hidden="true">🎬</span><span><strong>Filmes de histórias bíblicas</strong><small>Roteiro dividido em cenas, personagens, diálogos e sequência visual.</small></span></button>' +
-    '<button type="button" class="es-modo" data-modo="musica" aria-pressed="false"><span aria-hidden="true">♫</span><span><strong>Louvores e letras com IA</strong><small>Letra original, estilo musical, voz cantada e vídeo com letras na tela.</small></span></button>' +
+    '<button type="button" class="es-modo" data-modo="musica" aria-pressed="false"><span aria-hidden="true">♫</span><span><strong>Louvores e letras com IA</strong><small>Criar letra e composição, gerar partitura MusicXML e levar ao MuseScore para produzir o áudio.</small></span></button>' +
     '<button type="button" class="es-modo" data-modo="cortes" aria-pressed="false"><span aria-hidden="true">✂</span><span><strong>Cortes para TikTok e Reels</strong><small>Selecionar trechos de vídeos próprios ou autorizados, legendar e adaptar ao vertical.</small></span></button>';
   painel.insertBefore(modos, painel.firstChild);
   painel.insertBefore(tipoRapido, modos);
@@ -6564,6 +6565,33 @@ body.dg-livro-vivo .dgp-nota{display:none}
   extra.innerHTML = '<h3 id="esExtraTitulo">Criação musical com IA</h3><p class="es-nota" id="esExtraIntro">Prepare a ideia e as preferências da produção. A geração real será conectada depois ao serviço compatível.</p>' +
     '<div id="esExtraMusica"><div class="es-extra-grid"><label>Tema ou mensagem da canção<input id="esMusTema" placeholder="Ex.: confiança em Deus nos dias difíceis"></label><label>Referência bíblica (opcional)<input id="esMusReferencia" placeholder="Ex.: Salmo 23"></label><label>Estilo musical<select id="esMusEstilo"><option>Adoração suave</option><option>Louvor contemporâneo</option><option>Gospel acústico</option><option>Coral épico</option><option>Instrumental contemplativo</option></select></label><label>Voz desejada<select id="esMusVoz"><option>Voz feminina</option><option>Voz masculina</option><option>Dueto</option><option>Coral</option><option>Somente instrumental</option></select></label><label>Clima da música<select id="esMusClima"><option>Esperançoso</option><option>Contemplativo</option><option>Triunfante</option><option>Emocionante</option><option>Sereno</option></select></label><label>Vídeo da música<select id="esMusVideo"><option>Letra sincronizada na tela</option><option>Cenas cinematográficas</option><option>Imagens contemplativas</option><option>Vídeo vertical para redes</option></select></label></div><label>Ideia para a letra<textarea id="esMusLetraIdeia" placeholder="Descreva a mensagem, imagens e palavras que deseja transmitir."></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="esMusGerarLetra">PREPARAR PEDIDO DE LETRA COM IA</button><button type="button" class="at-btn" id="esMusSalvar">GUARDAR PLANO MUSICAL</button></div><p class="es-extra-aviso" id="esMusStatus" role="status">A letra, a música cantada e o áudio ainda não serão gerados nesta etapa; o serviço será ligado posteriormente.</p></div>' +
     '<div id="esExtraCortes" hidden><div class="es-extra-grid"><label>Vídeo de origem<input id="esCorteArquivo" type="file" accept="video/*"></label><label>Formato de saída<select id="esCorteFormato"><option>Vertical 9:16 — TikTok, Reels e Shorts</option><option>Quadrado 1:1</option><option>Horizontal 16:9</option></select></label><label>Início do trecho (segundos)<input id="esCorteInicio" type="number" min="0" value="0"></label><label>Fim do trecho (segundos)<input id="esCorteFim" type="number" min="1" value="30"></label><label>Estilo de legenda<select id="esCorteLegenda"><option>Legendas automáticas destacadas</option><option>Legenda discreta</option><option>Palavras-chave em destaque</option><option>Sem legendas</option></select></label><label>Música de fundo<select id="esCorteMusica"><option>Manter áudio original</option><option>Adicionar música autorizada</option><option>Reduzir áudio original e adicionar música</option></select></label></div><label>Instrução para encontrar o melhor trecho<textarea id="esCorteInstrucao" placeholder="Ex.: encontrar a parte mais inspiradora da mensagem, com começo claro e conclusão."></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="esCortePreparar">PREPARAR CORTE</button><button type="button" class="at-btn" id="esCorteSalvar">GUARDAR PLANO DE CORTE</button></div><p class="es-extra-aviso" id="esCorteStatus" role="status">Escolha um vídeo próprio ou autorizado. A edição, detecção de trechos e renderização serão conectadas depois.</p><video id="esCorteVideoPreview" controls playsinline style="display:none;width:min(100%,420px);max-height:480px;background:#101b2c;border-radius:8px"></video></div>';
+
+  /* ===== MÓDULO MUSICAL: PARTITURA MusicXML + retorno de áudio ===== */
+  extra.innerHTML +=
+    '<section id="esMusFluxo" class="pt-bloco" aria-labelledby="esMusFluxoTitulo">' +
+      '<h4 id="esMusFluxoTitulo">Partitura e produção no MuseScore</h4>' +
+      '<p class="es-extra-aviso">Fluxo: a IA da plataforma prepara a composição estruturada; esta área converte os dados musicais em MusicXML para abrir no MuseScore. O MuseScore gera o áudio, que você poderá trazer de volta para esta tela.</p>' +
+      '<label>Letra final do louvor<textarea id="esMusLetraFinal" placeholder="Cole ou escreva aqui a letra aprovada, com estrofes e refrão."></textarea></label>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<button type="button" class="at-btn gold" id="esMusPrepararPedido">PREPARAR PEDIDO DE COMPOSIÇÃO PARA IA</button>' +
+        '<button type="button" class="at-btn" id="esMusCopiarPedido">COPIAR PEDIDO</button>' +
+      '</div>' +
+      '<label>Pedido musical para a IA<textarea id="esMusPedidoIA" rows="7" readonly placeholder="Clique em preparar pedido."></textarea></label>' +
+      '<p class="es-extra-aviso">A conexão automática com o serviço de IA depende do Worker/API da plataforma. Até essa integração ser ligada, copie o pedido para o serviço de IA utilizado e cole a resposta estruturada abaixo.</p>' +
+      '<label>Dados estruturados da composição (JSON)<textarea id="esMusDadosPartitura" rows="10" placeholder=\'Cole o JSON retornado pela IA. Exemplo: {"title":"Meu Louvor","composer":"Sala do Escritor","key":"G","timeSignature":"4/4","tempo":72,"parts":[{"name":"Piano","clef":"G","measures":[{"notes":[{"pitch":"G4","duration":"quarter"},{"pitch":"B4","duration":"quarter"},{"pitch":"D5","duration":"half"}]}]}]}\'></textarea></label>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<button type="button" class="at-btn gold" id="esMusGerarXML">GERAR E BAIXAR MusicXML</button>' +
+        '<button type="button" class="at-btn" id="esMusSalvarProjeto">GUARDAR PROJETO MUSICAL</button>' +
+      '</div>' +
+      '<p id="esMusXmlStatus" class="es-extra-aviso" role="status">Aguardando os dados da composição. O MusicXML será gerado após validar notas, compassos e durações.</p>' +
+      '<div style="border-top:1px solid var(--paper-line);padding-top:12px;display:flex;flex-direction:column;gap:10px">' +
+        '<h5>Trazer o áudio do MuseScore para a plataforma</h5>' +
+        '<label>Arquivo de áudio exportado no MuseScore (MP3, WAV ou OGG)<input id="esMusAudioArquivo" type="file" accept="audio/mpeg,audio/wav,audio/ogg,audio/mp4,.mp3,.wav,.ogg,.m4a"></label>' +
+        '<audio id="esMusAudioPreview" controls style="display:none;width:100%"></audio>' +
+        '<p id="esMusAudioStatus" class="es-extra-aviso" role="status">Depois de exportar o áudio no MuseScore, selecione-o aqui para ouvir e preparar o envio à biblioteca de mídia.</p>' +
+      '</div>' +
+    '</section>';
+
   filme.insertAdjacentElement('afterend',extra);
   var editor = document.createElement('section'); editor.id='esEditorLinha';
   editor.innerHTML='<h3>Montagem da produção</h3><p class="es-nota">Prévia conceitual da linha do tempo. Quando o editor estiver conectado, será possível ajustar e sincronizar cada faixa.</p><div class="es-faixa"><strong>Cenas / vídeo</strong><div class="es-faixa-trechos"><span class="es-trecho">Abertura</span><span class="es-trecho">Mensagem</span><span class="es-trecho">Conclusão</span></div></div><div class="es-faixa"><strong>Narração / voz</strong><div class="es-faixa-trechos"><span class="es-trecho audio">Narração</span><span class="es-trecho audio">Pausas</span></div></div><div class="es-faixa"><strong>Música</strong><div class="es-faixa-trechos"><span class="es-trecho audio">Trilha de fundo</span></div></div><div class="es-faixa"><strong>Legendas</strong><div class="es-faixa-trechos"><span class="es-trecho legenda">Versículos e texto sincronizado</span></div></div><label style="display:flex;flex-direction:column;gap:5px;margin-top:12px">Observações de edição<textarea id="esEditorNotas" rows="2" placeholder="Cortes, transições, ritmo, legendas e ajustes desejados"></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="at-btn" id="esEditorSalvar">GUARDAR NOTAS DE EDIÇÃO</button><span class="es-nota" id="esEditorStatus" role="status">A linha do tempo é uma estrutura visual; a renderização será ligada depois.</span></div>';
@@ -6590,13 +6618,103 @@ body.dg-livro-vivo .dgp-nota{display:none}
     document.getElementById('esExtraMusica').hidden = !ehMusica;
     document.getElementById('esExtraCortes').hidden = !ehCortes;
     document.getElementById('esExtraTitulo').textContent = ehCortes ? 'Editor de cortes para TikTok e Reels' : 'Criação de louvores e letras com IA';
-    document.getElementById('esExtraIntro').textContent = ehCortes ? 'Importe um vídeo próprio ou autorizado, indique o trecho e prepare as opções de edição.' : 'Defina tema, referência, estilo e formato. A geração de letra e áudio depende da integração de IA.';
+    document.getElementById('esExtraIntro').textContent = ehCortes ? 'Importe um vídeo próprio ou autorizado, indique o trecho e prepare as opções de edição.' : 'Crie a letra e prepare a composição. A partitura MusicXML será aberta no MuseScore; o áudio final volta para a biblioteca.';
     editor.classList.add('ativo');
     if(redes){var caixaAtiva=painel.querySelector('.es-box[data-passo="1"]');if(caixaAtiva)caixaAtiva.hidden=false;}
     painel.setAttribute('data-modo-ativo',modo);
   }
   modos.addEventListener('click',function(ev){var b=ev.target.closest('[data-modo]');if(b)mudarModo(b.dataset.modo);});
-  document.getElementById('esMusGerarLetra').addEventListener('click',function(){document.getElementById('esMusStatus').textContent='Pedido preparado com as preferências atuais. A geração da letra por IA ainda depende de conectar um serviço; nenhum áudio foi gerado.';});
+  document.getElementById('esMusGerarLetra').textContent='PREPARAR PEDIDO DE LETRA COM IA';
+  document.getElementById('esMusGerarLetra').addEventListener('click',function(){
+    var tema=document.getElementById('esMusTema').value.trim();
+    var ideia=document.getElementById('esMusLetraIdeia').value.trim();
+    var pedido='Crie uma letra ORIGINAL de louvor em português brasileiro. Tema: '+(tema||'fé e esperança')+'. Referência bíblica: '+(document.getElementById('esMusReferencia').value.trim()||'não especificada')+'. Estilo: '+document.getElementById('esMusEstilo').value+'. Voz: '+document.getElementById('esMusVoz').value+'. Clima: '+document.getElementById('esMusClima').value+'. Ideia: '+(ideia||'desenvolva uma mensagem bíblica coerente')+'. Entregue título, estrutura (introdução, estrofes, refrão, ponte e final quando adequado) e letra completa. Não imite artista nem reproduza letras existentes.';
+    var campo=document.getElementById('esMusLetraFinal');
+    document.getElementById('esMusPedidoIA').value=pedido;
+    document.getElementById('esMusStatus').textContent='Pedido de letra preparado. A IA ainda precisa estar conectada ao serviço da plataforma ou receber o pedido manualmente.';
+    if(campo && !campo.value.trim()) campo.value='';
+  });
+  document.getElementById('esMusPrepararPedido').addEventListener('click',function(){
+    var letra=document.getElementById('esMusLetraFinal').value.trim();
+    if(!letra){document.getElementById('esMusXmlStatus').textContent='Primeiro escreva ou cole a letra aprovada do louvor.';return;}
+    var pedido=[
+      'Transforme a letra abaixo em uma composição musical ORIGINAL e em dados estruturados para gerar MusicXML.',
+      'Título: '+(document.getElementById('esMusTema').value.trim()||'Louvor original'),
+      'Referência bíblica: '+(document.getElementById('esMusReferencia').value.trim()||'não informada'),
+      'Estilo: '+document.getElementById('esMusEstilo').value+'; voz: '+document.getElementById('esMusVoz').value+'; clima: '+document.getElementById('esMusClima').value+'.',
+      'Preferências musicais: tonalidade Sol maior, compasso 4/4, andamento 72 BPM, piano e cordas como base. Ajuste se musicalmente necessário.',
+      'Retorne SOMENTE JSON válido, sem markdown, neste formato: {"title":"Título","composer":"Sala do Escritor","key":"G","timeSignature":"4/4","tempo":72,"parts":[{"name":"Piano","clef":"G","measures":[{"notes":[{"pitch":"G4","duration":"quarter"},{"pitch":"B4","duration":"quarter"},{"pitch":"D5","duration":"half"}]}]}]}.',
+      'Cada instrumento deve ter measures (lista de compassos); cada compasso deve ter notes (lista de notas/pausas); pitch usa C4, F#5, Bb3 ou REST; duration aceita whole, half, quarter, eighth, 16th. A soma das durações de cada compasso deve corresponder exatamente à fórmula de compasso. Inclua instrumentos e melodias compatíveis com suas extensões. Para voz, coloque a melodia em uma pauta vocal. Não inclua áudio nem invente um arquivo.',
+      'LETRA:\n'+letra
+    ].join('\n\n');
+    document.getElementById('esMusPedidoIA').value=pedido;
+    document.getElementById('esMusXmlStatus').textContent='Pedido de composição pronto. Envie-o ao serviço de IA conectado ou copie-o e cole a resposta JSON no campo de dados estruturados.';
+  });
+  document.getElementById('esMusCopiarPedido').addEventListener('click',function(){
+    var el=document.getElementById('esMusPedidoIA');
+    if(!el.value.trim()){document.getElementById('esMusXmlStatus').textContent='Prepare primeiro o pedido de composição.';return;}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(el.value).then(function(){document.getElementById('esMusXmlStatus').textContent='Pedido copiado.';},function(){el.focus();el.select();document.execCommand('copy');document.getElementById('esMusXmlStatus').textContent='Pedido selecionado/copiadado. Se necessário, use Ctrl+C.';});}
+    else{el.focus();el.select();document.execCommand('copy');document.getElementById('esMusXmlStatus').textContent='Pedido selecionado/copiadado. Se necessário, use Ctrl+C.';}
+  });
+  function xmlEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');}
+  function gerarMusicXML(d){
+    if(!d||!Array.isArray(d.parts)||!d.parts.length)throw new Error('O JSON precisa conter uma lista parts com pelo menos um instrumento.');
+    var ts=String(d.timeSignature||'4/4').match(/^(\d+)\/(\d+)$/);
+    if(!ts)throw new Error('Fórmula de compasso inválida. Use, por exemplo, 4/4 ou 6/8.');
+    var beats=Number(ts[1])*4/Number(ts[2]), divisions=4;
+    var dur={whole:16,half:8,quarter:4,eighth:2,'16th':1};
+    var type={whole:'whole',half:'half',quarter:'quarter',eighth:'eighth','16th':'16th'};
+    var keyMap={'C':0,'G':1,'D':2,'A':3,'E':4,'B':5,'F#':6,'C#':7,'F':-1,'Bb':-2,'Eb':-3,'Ab':-4,'Db':-5,'Gb':-6,'Cb':-7};
+    var key=String(d.key||'C'), fifths=keyMap.hasOwnProperty(key)?keyMap[key]:0;
+    var xml='<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">\n<score-partwise version="4.0"><work><work-title>'+xmlEsc(d.title||'Composição sem título')+'</work-title></work><identification><creator type="composer">'+xmlEsc(d.composer||'Sala do Escritor')+'</creator><encoding><software>Sala do Escritor</software></encoding></identification><part-list>';
+    d.parts.forEach(function(p,i){if(!p.name||!Array.isArray(p.measures)||!p.measures.length)throw new Error('Cada instrumento precisa de nome e lista de compassos.');xml+='<score-part id="P'+(i+1)+'"><part-name>'+xmlEsc(p.name)+'</part-name></score-part>';});
+    xml+='</part-list>';
+    d.parts.forEach(function(p,i){
+      xml+='<part id="P'+(i+1)+'">';
+      p.measures.forEach(function(m,mi){
+        if(!m||!Array.isArray(m.notes)||!m.notes.length)throw new Error('O compasso '+(mi+1)+' de '+p.name+' está vazio.');
+        var total=0,body='';
+        m.notes.forEach(function(n){
+          var dv=dur[n.duration];if(!dv)throw new Error('Duração inválida em '+p.name+', compasso '+(mi+1)+'. Use whole, half, quarter, eighth ou 16th.');
+          total+=dv;
+          var pitch=String(n.pitch||'').trim(), rest=/^REST$/i.test(pitch);
+          if(rest){body+='<note><rest/><duration>'+dv+'</duration><type>'+type[n.duration]+'</type></note>';return;}
+          var pm=pitch.match(/^([A-G])([#b]?)(-?\d+)$/);
+          if(!pm)throw new Error('Nota inválida: '+pitch+'. Use formato como C4, F#5 ou Bb3; para pausa use REST.');
+          body+='<note><pitch><step>'+pm[1]+'</step>'+(pm[2]?'<alter>'+(pm[2]==='#'?'1':'-1')+'</alter>':'')+'<octave>'+pm[3]+'</octave></pitch><duration>'+dv+'</duration><type>'+type[n.duration]+'</type></note>';
+        });
+        if(total!==beats*divisions)throw new Error('Duração incorreta em '+p.name+', compasso '+(mi+1)+': esperado '+(beats)+' tempos, recebido '+(total/divisions)+'.');
+        var attrs=mi===0?'<attributes><divisions>'+divisions+'</divisions><key><fifths>'+fifths+'</fifths></key><time><beats>'+ts[1]+'</beats><beat-type>'+ts[2]+'</beat-type></time><clef><sign>'+((p.clef||'G')==='F'?'F':(p.clef||'G')==='C'?'C':'G')+'</sign><line>'+((p.clef||'G')==='F'?4:(p.clef||'G')==='C'?3:2)+'</line></clef></attributes>':'';
+        xml+='<measure number="'+(mi+1)+'">'+attrs+body+'</measure>';
+      });
+      xml+='</part>';
+    });
+    return xml+'</score-partwise>';
+  }
+  document.getElementById('esMusGerarXML').addEventListener('click',function(){
+    try{
+      var dados=JSON.parse(document.getElementById('esMusDadosPartitura').value);
+      var xml=gerarMusicXML(dados),blob=new Blob([xml],{type:'application/vnd.recordare.musicxml+xml'});
+      var url=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=url;a.download=(String(dados.title||'louvor').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9_-]+/gi,'_').replace(/^_+|_+$/g,'')||'louvor')+'.musicxml';
+      document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);
+      document.getElementById('esMusXmlStatus').textContent='MusicXML gerado e baixado. Abra o arquivo no MuseScore e confira a partitura e a sonoridade.';
+    }catch(e){document.getElementById('esMusXmlStatus').textContent='Não foi possível gerar a partitura: '+e.message;}
+  });
+  document.getElementById('esMusSalvarProjeto').addEventListener('click',function(){
+    try{
+      var projeto={tema:document.getElementById('esMusTema').value,referencia:document.getElementById('esMusReferencia').value,estilo:document.getElementById('esMusEstilo').value,voz:document.getElementById('esMusVoz').value,clima:document.getElementById('esMusClima').value,letra:document.getElementById('esMusLetraFinal').value,pedido:document.getElementById('esMusPedidoIA').value,dadosPartitura:document.getElementById('esMusDadosPartitura').value,atualizadoEm:new Date().toISOString()};
+      localStorage.setItem('ps_estudio_projeto_louvor',JSON.stringify(projeto));
+      document.getElementById('esMusXmlStatus').textContent='Projeto musical guardado neste navegador. O arquivo de áudio precisa ser selecionado novamente quando voltar.';
+    }catch(e){document.getElementById('esMusXmlStatus').textContent='Não foi possível guardar o projeto. Verifique o espaço disponível no navegador.';}
+  });
+  document.getElementById('esMusAudioArquivo').addEventListener('change',function(){
+    var f=this.files&&this.files[0],audio=document.getElementById('esMusAudioPreview');
+    if(!f){audio.style.display='none';return;}
+    if(audio.dataset.url)URL.revokeObjectURL(audio.dataset.url);
+    audio.dataset.url=URL.createObjectURL(f);audio.src=audio.dataset.url;audio.style.display='block';
+    document.getElementById('esMusAudioStatus').textContent='Áudio carregado para pré-escuta: '+f.name+'. Ele está apenas no navegador; para armazená-lo permanentemente, é necessária a integração de upload com a biblioteca/servidor da plataforma.';
+  });
   document.getElementById('esMusSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_plano_musical',JSON.stringify({tema:document.getElementById('esMusTema').value,referencia:document.getElementById('esMusReferencia').value,estilo:document.getElementById('esMusEstilo').value,voz:document.getElementById('esMusVoz').value,clima:document.getElementById('esMusClima').value,video:document.getElementById('esMusVideo').value,ideia:document.getElementById('esMusLetraIdeia').value}));document.getElementById('esMusStatus').textContent='Plano musical guardado neste navegador. A música ainda não foi gerada.';}catch(e){document.getElementById('esMusStatus').textContent='Não foi possível guardar neste navegador.';}});
   document.getElementById('esCorteArquivo').addEventListener('change',function(){var f=this.files&&this.files[0],v=document.getElementById('esCorteVideoPreview');if(!f){v.style.display='none';return;}if(v.dataset.url)URL.revokeObjectURL(v.dataset.url);v.dataset.url=URL.createObjectURL(f);v.src=v.dataset.url;v.style.display='block';document.getElementById('esCorteStatus').textContent='Vídeo carregado para pré-visualização local. O arquivo ainda não foi enviado nem editado.';});
   document.getElementById('esCortePreparar').addEventListener('click',function(){var ini=Number(document.getElementById('esCorteInicio').value),fim=Number(document.getElementById('esCorteFim').value);if(fim<=ini){document.getElementById('esCorteStatus').textContent='O fim do trecho precisa ser maior que o início.';return;}var v=document.getElementById('esCorteVideoPreview');if(v.src){try{v.currentTime=ini;}catch(e){} }document.getElementById('esCorteStatus').textContent='Trecho definido de '+ini+'s a '+fim+'s. O corte final, legendas e exportação dependem do editor de vídeo que será conectado.';});
@@ -7461,9 +7579,9 @@ st.versoes.unshift({
     {id:"filme", t:"Filmes de histórias bíblicas", d:"Uma história contada em cenas, com narração e trilha.",
      p:["Montar o roteiro em cenas","Escolher voz, trilha e imagens","Revisar a montagem","Exportar e publicar"],
      r:["Roteiro","Voz e imagens","Montagem","Exportar"], e:"parcial"},
-    {id:"musica", t:"Louvores e letras com IA", d:"Letra original com estilo musical e vídeo com a letra na tela.",
-     p:["Definir tema e estilo","Escolher voz e imagens","Ver a prévia com a letra","Exportar"],
-     r:["Letra e estilo","Voz e imagens","Prévia","Exportar"], e:"prep"},
+    {id:"musica", t:"Louvores e letras com IA", d:"Criar o louvor, gerar MusicXML, produzir o áudio no MuseScore e importar para a biblioteca.",
+     p:["Criar letra e composição","Gerar partitura MusicXML","Abrir e produzir áudio no MuseScore","Importar áudio e preparar vídeo"],
+     r:["Letra e composição","Partitura MusicXML","MuseScore e áudio","Biblioteca e vídeo"], e:"musical"},
     {id:"cortes", t:"Cortes para TikTok e Reels", d:"Trechos de vídeos próprios ou autorizados, legendados e na vertical.",
      p:["Enviar o vídeo e marcar o trecho","Escolher música e legendas","Revisar o corte","Exportar para as redes"],
      r:["Vídeo e trecho","Música e legendas","Montagem","Exportar"], e:"prep"}
@@ -7471,7 +7589,8 @@ st.versoes.unshift({
   var ESTADO = {
     ok:{rot:"Disponível", aviso:""},
     parcial:{rot:"Parcial", aviso:"Gera um vídeo simples a partir das cenas. Imagens e roteiro por IA ainda não estão ligados."},
-    prep:{rot:"Em preparação", aviso:"Você pode planejar e guardar o projeto, mas este tipo ainda não gera arquivo."}
+    prep:{rot:"Em preparação", aviso:"Você pode planejar e guardar o projeto, mas este tipo ainda não gera arquivo."},
+    musical:{rot:"Parcial", aviso:"O módulo gera arquivo MusicXML a partir de dados estruturados. A geração automática pela IA e o envio permanente do áudio dependem da integração com o serviço e a biblioteca da plataforma."}
   };
   var modoAtual = "redes";
  
@@ -9808,6 +9927,7 @@ st.versoes.unshift({
 })();
 </script>
 <!-- ===== FIM: BIBLIOTECA DE IMAGENS E VÍDEOS (ABAS VISÍVEIS) ===== -->
+
 
 
 </body>
