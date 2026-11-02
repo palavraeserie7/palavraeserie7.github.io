@@ -6626,15 +6626,39 @@ passosOriginais.insertAdjacentElement('afterend', publicacao);
 }
 
   modos.addEventListener('click',function(ev){var b=ev.target.closest('[data-modo]');if(b)mudarModo(b.dataset.modo);});
-  document.getElementById('esMusGerarLetra').addEventListener('click',function(){document.getElementById('esMusStatus').textContent='Pedido preparado com as preferências atuais. A geração da letra por IA ainda depende de conectar um serviço; nenhum áudio foi gerado.';});
-  document.getElementById('esMusSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_plano_musical',JSON.stringify({tema:document.getElementById('esMusTema').value,referencia:document.getElementById('esMusReferencia').value,estilo:document.getElementById('esMusEstilo').value,voz:document.getElementById('esMusVoz').value,clima:document.getElementById('esMusClima').value,video:document.getElementById('esMusVideo').value,ideia:document.getElementById('esMusLetraIdeia').value}));document.getElementById('esMusStatus').textContent='Plano musical guardado neste navegador. A música ainda não foi gerada.';}catch(e){document.getElementById('esMusStatus').textContent='Não foi possível guardar neste navegador.';}});
-  document.getElementById('esCorteArquivo').addEventListener('change',function(){var f=this.files&&this.files[0],v=document.getElementById('esCorteVideoPreview');if(!f){v.style.display='none';return;}if(v.dataset.url)URL.revokeObjectURL(v.dataset.url);v.dataset.url=URL.createObjectURL(f);v.src=v.dataset.url;v.style.display='block';document.getElementById('esCorteStatus').textContent='Vídeo carregado para pré-visualização local. O arquivo ainda não foi enviado nem editado.';});
-  document.getElementById('esCortePreparar').addEventListener('click',function(){var ini=Number(document.getElementById('esCorteInicio').value),fim=Number(document.getElementById('esCorteFim').value);if(fim<=ini){document.getElementById('esCorteStatus').textContent='O fim do trecho precisa ser maior que o início.';return;}var v=document.getElementById('esCorteVideoPreview');if(v.src){try{v.currentTime=ini;}catch(e){} }document.getElementById('esCorteStatus').textContent='Trecho definido de '+ini+'s a '+fim+'s. O corte final, legendas e exportação dependem do editor de vídeo que será conectado.';});
-  document.getElementById('esCorteSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_plano_corte',JSON.stringify({arquivo:(document.getElementById('esCorteArquivo').files[0]||{}).name||'',formato:document.getElementById('esCorteFormato').value,inicio:document.getElementById('esCorteInicio').value,fim:document.getElementById('esCorteFim').value,legenda:document.getElementById('esCorteLegenda').value,musica:document.getElementById('esCorteMusica').value,instrucao:document.getElementById('esCorteInstrucao').value}));document.getElementById('esCorteStatus').textContent='Plano de corte guardado. O vídeo em si não é armazenado no rascunho local.';}catch(e){document.getElementById('esCorteStatus').textContent='Não foi possível guardar o plano neste navegador.';}});
-  document.getElementById('esEditorSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_notas_edicao',document.getElementById('esEditorNotas').value);document.getElementById('esEditorStatus').textContent='Notas de edição guardadas neste navegador.';}catch(e){document.getElementById('esEditorStatus').textContent='Não foi possível guardar as notas.';}});
-  try{document.getElementById('esEditorNotas').value=localStorage.getItem('ps_estudio_notas_edicao')||'';}catch(e){}
-  document.getElementById('esFilmeAddCena').addEventListener('click',function(){adicionarCena();});
-  document.getElementById('esFilmeVoltar').addEventListener('click',function(){mudarModo('redes');});
+ document.getElementById('esEditorSalvar').addEventListener('click',function(){
+  try{
+    localStorage.setItem(
+      'ps_estudio_notas_edicao',
+      document.getElementById('esEditorNotas').value
+    );
+
+    document.getElementById('esEditorStatus').textContent =
+      'Notas de edição guardadas neste navegador.';
+  }catch(e){
+    document.getElementById('esEditorStatus').textContent =
+      'Não foi possível guardar as notas.';
+  }
+});
+
+try{
+  document.getElementById('esEditorNotas').value =
+    localStorage.getItem('ps_estudio_notas_edicao') || '';
+}catch(e){}
+
+document.getElementById('esTipoRapidoSelect').addEventListener(
+  'change',
+  function(){
+    var campo = document.getElementById('esTitulo');
+
+    if(campo && !campo.value.trim()){
+      campo.value = this.value;
+    }
+  }
+);
+
+mudarModo('redes');
+});
   document.getElementById('esFilmeSalvarPlano').addEventListener('click',function(){
     var titulo=document.getElementById('esFilmeHistoria').value.trim();
     if(titulo&&!document.getElementById('esPubTitulo').value.trim())document.getElementById('esPubTitulo').value=titulo;
