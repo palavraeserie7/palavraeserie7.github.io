@@ -6594,22 +6594,37 @@ passosOriginais.insertAdjacentElement('afterend', publicacao);
   }
   function renumerarCenas(){numeroCena=0;Array.prototype.forEach.call(cenas.children,function(card){numeroCena++;card.querySelector('h4').textContent='Cena '+numeroCena;});}
   function mudarModo(modo){
-    var redes = modo === 'redes', ehFilme = modo === 'filme', ehMusica = modo === 'musica', ehCortes = modo === 'cortes';
-    modos.querySelectorAll('[data-modo]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.modo===modo));});
-    tipoRapido.hidden = !redes;
-    passosOriginais.hidden = !redes;
-    caixasOriginais.forEach(function(c){c.hidden = redes ? c.dataset.passo !== '1' : true;});
-    filme.classList.toggle('ativo',ehFilme);
-    publicacao.style.display = 'block';
-    extra.classList.toggle('ativo',ehMusica||ehCortes);
-    document.getElementById('esExtraMusica').hidden = !ehMusica;
-    document.getElementById('esExtraCortes').hidden = !ehCortes;
-    document.getElementById('esExtraTitulo').textContent = ehCortes ? 'Editor de cortes para TikTok e Reels' : 'Criação de louvores e letras com IA';
-    document.getElementById('esExtraIntro').textContent = ehCortes ? 'Importe um vídeo próprio ou autorizado, indique o trecho e prepare as opções de edição.' : 'Defina tema, referência, estilo e formato. A geração de letra e áudio depende da integração de IA.';
-    editor.classList.add('ativo');
-    if(redes){var caixaAtiva=painel.querySelector('.es-box[data-passo="1"]');if(caixaAtiva)caixaAtiva.hidden=false;}
-    painel.setAttribute('data-modo-ativo',modo);
+  var redes = modo === 'redes';
+
+  modos.querySelectorAll('[data-modo]').forEach(function(b){
+    b.setAttribute(
+      'aria-pressed',
+      String(b.dataset.modo === 'redes')
+    );
+  });
+
+  tipoRapido.hidden = !redes;
+  passosOriginais.hidden = !redes;
+
+  caixasOriginais.forEach(function(c){
+    c.hidden = redes ? c.dataset.passo !== '1' : true;
+  });
+
+  publicacao.style.display = 'block';
+  editor.classList.add('ativo');
+
+  if(redes){
+    var caixaAtiva =
+      painel.querySelector('.es-box[data-passo="1"]');
+
+    if(caixaAtiva){
+      caixaAtiva.hidden = false;
+    }
   }
+
+  painel.setAttribute('data-modo-ativo','redes');
+}
+
   modos.addEventListener('click',function(ev){var b=ev.target.closest('[data-modo]');if(b)mudarModo(b.dataset.modo);});
   document.getElementById('esMusGerarLetra').addEventListener('click',function(){document.getElementById('esMusStatus').textContent='Pedido preparado com as preferências atuais. A geração da letra por IA ainda depende de conectar um serviço; nenhum áudio foi gerado.';});
   document.getElementById('esMusSalvar').addEventListener('click',function(){try{localStorage.setItem('ps_estudio_plano_musical',JSON.stringify({tema:document.getElementById('esMusTema').value,referencia:document.getElementById('esMusReferencia').value,estilo:document.getElementById('esMusEstilo').value,voz:document.getElementById('esMusVoz').value,clima:document.getElementById('esMusClima').value,video:document.getElementById('esMusVideo').value,ideia:document.getElementById('esMusLetraIdeia').value}));document.getElementById('esMusStatus').textContent='Plano musical guardado neste navegador. A música ainda não foi gerada.';}catch(e){document.getElementById('esMusStatus').textContent='Não foi possível guardar neste navegador.';}});
