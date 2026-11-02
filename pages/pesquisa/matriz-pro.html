@@ -3056,7 +3056,16 @@ function colorirRelatorio(el) {
   });
 }
 // <<<<<<<<<< FIM — COLORIR CLASSIFICAÇÃO DO RELATÓRIO <<<<<<<<<<
+const SUF_PALAVRA = " Se o usuário informar uma palavra específica, concentre a análise nessa palavra, dentro do versículo informado; se não informar, analise a passagem como um todo.";
+
 function aplicarReferencia(template, ref) {
+  // palavra informada = formato "palavra (Livro 1:1)"
+  const temPalavra = /^[^()\d]+\s\([^()]*\d[^()]*\)$/.test(ref);
+  template = template.split(SUF_PALAVRA).join(
+    temPalavra
+      ? " Concentre a análise na palavra indicada antes dos parênteses, dentro do versículo que aparece entre parênteses."
+      : ""
+  );
   const r = template
     .replace(/\{PASSAGEM\}/g, ref)
     .replace(/\{OBJETO\}/g, ref)
