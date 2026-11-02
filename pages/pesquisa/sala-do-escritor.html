@@ -6390,6 +6390,25 @@ body.dg-livro-vivo .dgp-nota{display:none}
   var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
   var ancora = $("ateliPainel");
   if(!ancora) return;
+  /* ---------- botão + painel (abaixo do Ateliê) ---------- */
+  var btn = document.createElement("button");
+  btn.id = "esToggle"; btn.type = "button"; btn.className = "panel-toggle";
+  btn.setAttribute("aria-expanded","false"); btn.setAttribute("aria-controls","esPainel");
+  btn.innerHTML = '<span><span class="panel-toggle-title">Estúdio de criação</span>' +
+    '<span class="panel-toggle-sub">Escreva uma mensagem espiritual, dê voz, música e imagens, e exporte para as redes.</span></span>' +
+    '<span id="esToggleAcao" class="panel-toggle-action">ABRIR</span>';
+  var painel = document.createElement("div");
+  painel.id = "esPainel"; painel.hidden = true;
+  ancora.insertAdjacentElement("afterend", painel);
+  ancora.insertAdjacentElement("afterend", btn);
+ 
+  painel.innerHTML =
+    '<div class="es-passos" style="margin:14px 0">' +
+      '<button type="button" class="at-btn on" data-p="1">1. CRIAR</button>' +
+      '<button type="button" class="at-btn" data-p="2">2. VOZ, MÚSICA E IMAGENS</button>' +
+      '<button type="button" class="at-btn" data-p="3">3. PRÉVIA</button>' +
+      '<button type="button" class="at-btn" data-p="4">4. EXPORTAR</button>' +
+    '</div>' +
 
 
 
