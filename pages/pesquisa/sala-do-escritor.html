@@ -6549,23 +6549,36 @@ modos.innerHTML =
 painel.insertBefore(modos, painel.firstChild);
 painel.insertBefore(tipoRapido, modos);
 
-  var filme = document.createElement('section');
-  filme.id = 'esFilme';
-  filme.setAttribute('aria-labelledby','esFilmeTitulo');
-  filme.innerHTML = '<h3 id="esFilmeTitulo">Planejamento do filme bíblico</h3>' +
-    '<p class="es-nota">Estrutura de planejamento visual. A geração de roteiro, imagens, áudio e vídeo será conectada numa fase posterior; este painel ainda não envia dados ao Worker.</p>' +
-    '<div class="es-filme-grid"><label class="es-filme-campo">História bíblica<input id="esFilmeHistoria" placeholder="Ex.: Davi e Golias"></label><label class="es-filme-campo">Passagem bíblica<input id="esFilmePassagem" placeholder="Ex.: 1 Samuel 17"></label><label class="es-filme-campo">Estilo visual<select id="esFilmeEstilo"><option>Cinematográfico realista</option><option>Ilustração infantil</option><option>Animação 3D</option><option>Livro de histórias ilustrado</option></select></label><label class="es-filme-campo">Duração pretendida<select id="esFilmeDuracao"><option>1–3 minutos</option><option>3–5 minutos</option><option>5–10 minutos</option><option>Mais de 10 minutos</option></select></label></div>' +
-    '<label class="es-filme-campo">Resumo da história<textarea id="esFilmeResumo" placeholder="Descreva a mensagem principal e os acontecimentos que deseja contar."></textarea></label>' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="font-size:18px">Cenas do filme</h3><button type="button" class="at-btn gold" id="esFilmeAddCena">+ ADICIONAR CENA</button></div>' +
-    '<div id="esFilmeCenas" class="es-cenas"></div>' +
-    '<div class="es-filme-grid"><label class="es-filme-campo">Voz e narração<select id="esFilmeVoz"><option>Narração principal</option><option>Narrador e diálogos</option><option>Somente diálogos</option></select></label><label class="es-filme-campo">Trilha sonora<select id="esFilmeMusica"><option>Trilha suave</option><option>Épica e cinematográfica</option><option>Infantil e leve</option><option>Sem música</option></select></label></div>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn" id="esFilmeSalvarPlano">GUARDAR PLANO NESTA TELA</button><button type="button" class="at-btn" id="esFilmeVoltar">VOLTAR AOS VÍDEOS PARA REDES</button></div>' +
-    '<p id="esFilmeMsg" class="es-filme-aviso" role="status">Planejamento local: nenhuma geração ou exportação foi iniciada.</p>';
-  passosOriginais.insertAdjacentElement('afterend', filme);
   var publicacao = document.createElement('section');
-  publicacao.id = 'esPublicacao';
-  publicacao.innerHTML = '<h3>Destino do projeto</h3><p class="es-nota">Defina como o conteúdo deverá aparecer na página de exibição. Esta etapa organiza a publicação; não envia nem publica arquivos ainda.</p><div class="es-publicacao-grid"><label>Título para exibição<input id="esPubTitulo" placeholder="Título do vídeo ou filme"></label><label>Página de destino<select id="esPubDestino"><option>Biblioteca de vídeos bíblicos</option><option>Filmes e histórias bíblicas</option><option>Salmos, orações e testemunhos</option><option>Outra página do site</option></select></label><label>Estilo da capa<select id="esPubCapa"><option>Capa cinematográfica com botão assistir</option><option>Capa ilustrada</option><option>Capa com título e passagem bíblica</option></select></label><label>Visibilidade<select id="esPubVisibilidade"><option>Rascunho — não publicado</option><option>Pronto para publicar</option></select></label></div><label style="display:flex;flex-direction:column;gap:5px;margin-top:12px;font:700 12px Segoe UI,Arial,sans-serif;color:var(--ink-soft)">Descrição para a página<textarea id="esPubDescricao" rows="3" placeholder="Resumo que aparecerá junto ao vídeo"></textarea></label><p id="esPubStatus" class="es-filme-aviso" role="status">A estrutura da página de destino está definida. Exportação e publicação serão conectadas após a integração do Worker.</p>';
-  filme.insertAdjacentElement('afterend', publicacao);
+
+publicacao.id = 'esPublicacao';
+
+publicacao.innerHTML =
+  '<h3>Destino do projeto</h3>' +
+  '<p class="es-nota">Defina como o conteúdo deverá aparecer na página de exibição. Esta etapa organiza a publicação; não envia nem publica arquivos ainda.</p>' +
+  '<div class="es-publicacao-grid">' +
+    '<label>Título para exibição<input id="esPubTitulo" placeholder="Título do vídeo"></label>' +
+    '<label>Página de destino<select id="esPubDestino">' +
+      '<option>Biblioteca de vídeos bíblicos</option>' +
+      '<option>Salmos, orações e testemunhos</option>' +
+      '<option>Outra página do site</option>' +
+    '</select></label>' +
+    '<label>Estilo da capa<select id="esPubCapa">' +
+      '<option>Capa com título e passagem bíblica</option>' +
+      '<option>Capa ilustrada</option>' +
+    '</select></label>' +
+    '<label>Visibilidade<select id="esPubVisibilidade">' +
+      '<option>Rascunho — não publicado</option>' +
+      '<option>Pronto para publicar</option>' +
+    '</select></label>' +
+  '</div>' +
+  '<label style="display:flex;flex-direction:column;gap:5px;margin-top:12px;font:700 12px Segoe UI,Arial,sans-serif;color:var(--ink-soft)">' +
+    'Descrição para a página<textarea id="esPubDescricao" rows="3" placeholder="Resumo que aparecerá junto ao vídeo"></textarea>' +
+  '</label>' +
+  '<p id="esPubStatus" class="es-filme-aviso" role="status">A estrutura da página de destino está definida.</p>';
+
+passosOriginais.insertAdjacentElement('afterend', publicacao);
+
   var extra = document.createElement('section'); extra.id='esCriacaoExtra'; extra.setAttribute('aria-live','polite');
   extra.innerHTML = '<h3 id="esExtraTitulo">Criação musical com IA</h3><p class="es-nota" id="esExtraIntro">Prepare a ideia e as preferências da produção. A geração real será conectada depois ao serviço compatível.</p>' +
     '<div id="esExtraMusica"><div class="es-extra-grid"><label>Tema ou mensagem da canção<input id="esMusTema" placeholder="Ex.: confiança em Deus nos dias difíceis"></label><label>Referência bíblica (opcional)<input id="esMusReferencia" placeholder="Ex.: Salmo 23"></label><label>Estilo musical<select id="esMusEstilo"><option>Adoração suave</option><option>Louvor contemporâneo</option><option>Gospel acústico</option><option>Coral épico</option><option>Instrumental contemplativo</option></select></label><label>Voz desejada<select id="esMusVoz"><option>Voz feminina</option><option>Voz masculina</option><option>Dueto</option><option>Coral</option><option>Somente instrumental</option></select></label><label>Clima da música<select id="esMusClima"><option>Esperançoso</option><option>Contemplativo</option><option>Triunfante</option><option>Emocionante</option><option>Sereno</option></select></label><label>Vídeo da música<select id="esMusVideo"><option>Letra sincronizada na tela</option><option>Cenas cinematográficas</option><option>Imagens contemplativas</option><option>Vídeo vertical para redes</option></select></label></div><label>Ideia para a letra<textarea id="esMusLetraIdeia" placeholder="Descreva a mensagem, imagens e palavras que deseja transmitir."></textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="esMusGerarLetra">PREPARAR PEDIDO DE LETRA COM IA</button><button type="button" class="at-btn" id="esMusSalvar">GUARDAR PLANO MUSICAL</button></div><p class="es-extra-aviso" id="esMusStatus" role="status">A letra, a música cantada e o áudio ainda não serão gerados nesta etapa; o serviço será ligado posteriormente.</p></div>' +
