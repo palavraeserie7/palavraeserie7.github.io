@@ -6692,23 +6692,43 @@ mudarModo('redes');
   modos.insertAdjacentElement('afterend', fluxoBox);
 
   function esColetarProjeto(){
-    var campos = {};
-    Array.prototype.forEach.call(painel.querySelectorAll('input,select,textarea'), function(el){
-      if(!el.id || el.type === 'file' || el.type === 'button' || el.type === 'submit') return;
-      if(el.type === 'checkbox' || el.type === 'radio') campos[el.id] = el.checked;
-      else campos[el.id] = el.value;
-    });
-    return {
-      versao: 1,
-      atualizadoEm: new Date().toISOString(),
-      modo: painel.getAttribute('data-modo-ativo') || 'redes',
-      campos: campos,
-      planoFilme: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_filme')||'null');}catch(e){return null;} })(),
-      planoMusical: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_musical')||'null');}catch(e){return null;} })(),
-      planoCorte: (function(){ try{return JSON.parse(localStorage.getItem('ps_estudio_plano_corte')||'null');}catch(e){return null;} })(),
-      notasEdicao: (function(){ try{return localStorage.getItem('ps_estudio_notas_edicao')||'';}catch(e){return '';} })()
-    };
-  }
+  var campos = {};
+
+  Array.prototype.forEach.call(
+    painel.querySelectorAll('input,select,textarea'),
+    function(el){
+      if(
+        !el.id ||
+        el.type === 'file' ||
+        el.type === 'button' ||
+        el.type === 'submit'
+      ){
+        return;
+      }
+
+      if(el.type === 'checkbox' || el.type === 'radio'){
+        campos[el.id] = el.checked;
+      }else{
+        campos[el.id] = el.value;
+      }
+    }
+  );
+
+  return {
+    versao: 1,
+    atualizadoEm: new Date().toISOString(),
+    modo: 'redes',
+    campos: campos,
+    notasEdicao: (function(){
+      try{
+        return localStorage.getItem('ps_estudio_notas_edicao') || '';
+      }catch(e){
+        return '';
+      }
+    })()
+  };
+}
+
   function esSalvarProjeto(silencioso){
     try{
       localStorage.setItem('ps_estudio_projeto_completo', JSON.stringify(esColetarProjeto()));
