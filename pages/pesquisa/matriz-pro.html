@@ -1665,8 +1665,23 @@ function stepIsAllowed(stepCode, userPlan) {
 function getStepLevel(stepCode) {
   return MATRIX_LEVELS[stepCode] || "DOCTUS";
 }
- 
+
+function atualizarBotoesConta() {
+  const logado = !!currentUserEmail;
+  const entrar = document.getElementById("entrar-link");
+  const sair = document.getElementById("sair-button");
+  if (entrar) entrar.style.display = logado ? "none" : "inline-block";
+  if (sair) sair.style.display = logado ? "inline-block" : "none";
+}
+
+async function sairDaConta() {
+  try { await supabaseClient.auth.signOut(); } catch (e) {}
+  currentUserPlan = "FREE";
+  currentUserEmail = "";
+  location.reload();
+}   
 function updatePlanBadge() {
+  atualizarBotoesConta();
   const badge = document.getElementById("plan-badge");
   if (badge) {
    badge.textContent = levelTagText(currentUserPlan) + " · " + levelName(currentUserPlan);
