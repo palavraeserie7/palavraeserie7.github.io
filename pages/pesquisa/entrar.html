@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar | Palavra & Série</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{--bg:#0a1628;--card:#12203a;--line:#22365a;--txt:#e6edf7;--mut:#8fa3c2;--verde:#1fd66b}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.5;padding:16px}
+  .box{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px}
+  h1{font-size:22px;margin:0 0 6px}
+  p{color:var(--mut);margin:0 0 18px;font-size:14px}
+  input{width:100%;padding:12px;border-radius:8px;border:1px solid var(--line);background:#0a1628;color:var(--txt);font-size:16px;margin-bottom:12px}
+  button,.btn{display:block;width:100%;text-align:center;text-decoration:none;border:0;cursor:pointer;font-weight:700;font-size:15px;padding:12px;border-radius:10px;background:var(--verde);color:#04210f;margin-top:8px}
+  .sec{background:transparent;color:var(--txt);border:1px solid var(--line)}
+  .email{background:#0a1628;border:1px dashed var(--verde);border-radius:8px;padding:12px;text-align:center;font-weight:700;word-break:break-all;color:var(--txt);margin-bottom:8px}
+  .erro{color:#ff8a8a;font-size:14px;margin-top:10px}
+  a.voltar{display:block;text-align:center;margin-top:16px;color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<div class="box" id="box">
+  <h1>Carregando…</h1>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ===== PREENCHA SOMENTE ESTA LINHA =====
+  const SUPABASE_ANON_KEY = 'COLE_AQUI_A_CHAVE_ANON';
+  // =======================================
+  const SUPABASE_URL = 'https://qmhdbuxomozdczgvpvcc.supabase.co';
+  const CHECKOUT = {
+    pro: 'https://pay.kiwify.com.br/Vjp7c9i',
+    master: 'https://pay.kiwify.com.br/Fx0qlhm',
+    doctus: 'https://pay.kiwify.com.br/RAOCHCE'
+  };
+  const NOMES = { pro: 'Formação', master: 'Aprofundamento', doctus: 'Especialização' };
+
+  const box = document.getElementById('box');
+  const plano = new URLSearchParams(location.search).get('plano');
+  const querAssinar = Object.prototype.hasOwnProperty.call(CHECKOUT, plano);
+  let jaPronto = false;
+
+  function el(tag, props, text) {
+    const e = document.createElement(tag);
+    if (props) Object.assign(e, props);
+    if (text) e.textContent = text;
+    return e;
+  }
+  function limpar() { while (box.firstChild) box.removeChild(box.firstChild); }
+  function voltar() {
+    const a = el('a', { href: 'planos.html', className: 'voltar' }, '← Ver os planos');
+    box.appendChild(a);
+  }
+
+  if (!window.supabase || SUPABASE_ANON_KEY.indexOf('COLE_AQUI') === 0) {
+    limpar();
+    box.appendChild(el('h1', null, 'Falta configurar'));
+    box.appendChild(el('p', null, 'A chave do Supabase ainda não foi colada neste arquivo.'));
+  } else {
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function mostrarForm() {
+      limpar();
+      box.appendChild(el('h1', null, querAssinar ? 'Entre para assinar ' + NOMES[plano] : 'Entrar ou criar conta'));
+      box.appendChild(el('p', null, 'Digite seu e-mail. Enviamos um link para você entrar, sem senha. Se ainda não tem conta, ela é criada na hora.'));
+      const input = el('input', { type: 'email', placeholder: 'seu@email.com', autocomplete: 'email' });
+      const botao = el('button', { type: 'button' }, 'Receber link de acesso');
+      const erro = el('div', { className: 'erro' });
+      botao.onclick = async function () {
+        const email = input.value.trim();
+        if (!email || email.indexOf('@') < 1) { erro.textContent = 'Digite um e-mail válido.'; return; }
+        botao.disabled = true; erro.textContent = '';
+        const destino = location.origin + location.pathname + (querAssinar ? '?plano=' + plano : '');
+        const r = await sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: destino } });
+        botao.disabled = false;
+        if (r.error) { erro.textContent = 'Não foi possível enviar: ' + r.error.message; return; }
+        limpar();
+        box.appendChild(el('h1', null, 'Verifique seu e-mail'));
+        box.appendChild(el('p', null, 'Enviamos um link para ' + email + '. Abra o e-mail e clique no link para continuar. Se não chegar, olhe a caixa de spam.'));
+        voltar();
+      };
+      box.appendChild(input); box.appendChild(botao); box.appendChild(erro); voltar();
+    }
+
+    function pronto(user) {
+      if (jaPronto) return;
+      jaPronto = true;
+      if (!querAssinar) { location.href = 'matriz-pro.html'; return; }
+      limpar();
+      box.appendChild(el('h1', null, 'Conta pronta'));
+      box.appendChild(el('p', null, 'Para o plano ' + NOMES[plano] + ' ser liberado, use exatamente este e-mail no pagamento:'));
+      box.appendChild(el('div', { className: 'email' }, user.email));
+      const copiar = el('button', { type: 'button', className: 'sec' }, 'Copiar e-mail');
+      copiar.onclick = function () {
+        if (navigator.clipboard) navigator.clipboard.writeText(user.email);
+        copiar.textContent = 'E-mail copiado';
+      };
+      const pagar = el('a', { className: 'btn', href: CHECKOUT[plano] + '?email=' + encodeURIComponent(user.email) }, 'Ir para o pagamento');
+      box.appendChild(copiar); box.appendChild(pagar); voltar();
+    }
+
+    sb.auth.onAuthStateChange(function (evento, sessao) {
+      if (sessao && sessao.user && evento === 'SIGNED_IN') pronto(sessao.user);
+    });
+    sb.auth.getSession().then(function (r) {
+      const s = r.data && r.data.session;
+      if (s) pronto(s.user); else if (!location.hash.includes('access_token')) mostrarForm();
+    });
+  }
+</script>
+</body>
+</html>
