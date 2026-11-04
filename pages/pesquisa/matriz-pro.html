@@ -4093,10 +4093,13 @@ async function submitRevisor() {
 
    
 
-  const guidance = tema
+let guidance = tema
     ? { name: tema, sources: "Selecionar fontes reconhecidas adequadas ao tema.", rule: "Aplicar a regra normativa do módulo/tema informado, quando identificável." }
     : getCanonicalGuidance();
- 
+ const obra = obterObra();
+if (obra) {
+  guidance = { name: obra.nome, sources: obra.nome, rule: obra.escopo };
+}
   report.textContent = "REVISÃO EM ANDAMENTO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
   submitBtn.disabled = true;
   submitBtn.textContent = "REVISANDO...";
@@ -4119,8 +4122,8 @@ async function submitRevisor() {
         sources: guidance.sources,
         rule: guidance.rule
       },
-      question: comparisonPrompt(referencia, conteudo, guidance),
-      topic: subetapaInput || tema || "REVISOR TEOLÓGICO",
+      question: comparisonPrompt(referencia, conteudo, guidance) + (obra ? blocoRevisor(obra, referencia) : ""),
+      reviewerWork: obra ? { id: obra.id, nome: obra.nome, ponto: pontoDeConsulta(obra) } : null,      topic: subetapaInput || tema || "REVISOR TEOLÓGICO",
       module: tema || "REVISOR TEOLÓGICO",
       discipline: "MÉTODO TÉCNICO DE PESQUISA"
     };
