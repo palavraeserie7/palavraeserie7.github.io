@@ -1431,13 +1431,30 @@ main {
       <input id="revisor-subetapa" type="text" readonly placeholder="Ex.: 06.14 — Síntese exegética (deixe vazio se não se aplicar)" style="padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;">
     </div>
  
-        <div style="display:none;flex-direction:column;gap:6px;margin-bottom:12px;">
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">REFERÊNCIA DE COMPARAÇÃO</label>
       <small style="color:#91a4bd;font-size:9px;">Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere fontes reconhecidas.</small>
       <textarea id="revisor-referencia" placeholder="Cole uma referência de comparação ou deixe vazio..." style="min-height:110px;resize:vertical;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;"></textarea>
     </div>
  
-    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+    <div id="rev-obra-box" style="margin:0 0 12px;padding:14px;border:1px solid #263754;border-radius:8px;background:#0d172b;">
+  <div style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;margin-bottom:8px;">REVISOR — OBRA DA BIBLIOTECA</div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+    <div class="bible-field">
+      <label for="rev-obra">OBRA</label>
+      <select id="rev-obra" onchange="atualizarRevisor()"></select>
+    </div>
+    <div class="bible-field" id="rev-secao-field" style="display:none;">
+      <label for="rev-secao">CAPÍTULO / SEÇÃO</label>
+      <select id="rev-secao"></select>
+    </div>
+    <div class="bible-field" id="rev-entrada-field" style="display:none;">
+      <label id="rev-entrada-label" for="rev-entrada">ENTRADA</label>
+      <input id="rev-entrada" type="text">
+    </div>
+  </div>
+  <div id="rev-info" style="margin-top:10px;color:#91a4bd;font-size:11px;line-height:1.55;"></div>
+</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">RESPOSTA DA MESA A SER REVISADA</label>
      <small style="color:#91a4bd;font-size:9px;">Resposta gerada na Mesa de Análise para a etapa acima.</small>
       <textarea id="revisor-conteudo" readonly placeholder="Cole aqui o conteúdo..." style="min-height:180px;resize:vertical;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;"></textarea>
@@ -4052,7 +4069,8 @@ function openRevisor(origin) {
   }
  
   document.getElementById("revisor-report").textContent = "O relatório de auditoria aparecerá aqui depois da revisão.";
-  overlay.style.display = "flex";
+   iniciarRevisores();
+   overlay.style.display = "flex";
 }
  
 function closeRevisor() {
@@ -4145,6 +4163,7 @@ async function submitRevisor() {
     }
  
      report.textContent = limparMarkdown(extractAuditReport(data));
+   if (obra) report.textContent += rodapeRevisor(obra, referencia);
    // >>>>>>>>>> INÍCIO — CHAMADA DAS CORES >>>>>>>>>>
    colorirRelatorio(report);
    // <<<<<<<<<< FIM — CHAMADA DAS CORES <<<<<<<<<<
@@ -4998,7 +5017,101 @@ function usarBiblia() {
   toggleBiblia();
   questionInput.focus();
 }
+/* ===== BIBLIOTECA DE REVISORES ===== */
+const BIBLIOTECA_REVISORES = [
+  {
+    id: "bdb",
+    nome: "BDB — Brown-Driver-Briggs (léxico hebraico)",
+    confere: "O sentido atribuído às palavras hebraicas.",
+    entrada: { rotulo: "PALAVRA HEBRAICA (verbete)", placeholder: "ex.: חֶסֶד, hesed ou a raiz" },
+    secoes: null,
+    escopo: "Auditar SOMENTE os sentidos, as raízes e os usos das palavras hebraicas do estudo, conforme o verbete do BDB.",
+    naoCobre: "gramática e sintaxe, contexto histórico, teologia, texto grego e a interpretação da passagem como um todo."
+  }
+];
 
+function iniciarRevisores() {
+  const sel = document.getElementById("rev-obra");
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— automático (matriz do módulo) —</option>';
+  BIBLIOTECA_REVISORES.forEach(function (o) {
+    const op = document.createElement("option");
+    op.value = o.id;
+    op.textContent = o.nome;
+    sel.appendChild(op);
+  });
+  atualizarRevisor();
+}
+
+function obterObra() {
+  const id = document.getElementById("rev-obra").value;
+  return BIBLIOTECA_REVISORES.find(function (o) { return o.id === id; }) || null;
+}
+
+function atualizarRevisor() {
+  const o = obterObra();
+  const info = document.getElementById("rev-info");
+  const campoSecao = document.getElementById("rev-secao-field");
+  const campoEntrada = document.getElementById("rev-entrada-field");
+
+  campoSecao.style.display = "none";
+  campoEntrada.style.display = "none";
+
+  if (!o) {
+    info.textContent = "Sem obra escolhida: a IA usa as fontes sugeridas para o módulo.";
+    return;
+  }
+
+  info.textContent = "Esta obra confere: " + o.confere + " Não cobre: " + o.naoCobre;
+
+  if (o.secoes) {
+    const s = document.getElementById("rev-secao");
+    s.innerHTML = "";
+    o.secoes.forEach(function (t) {
+      const op = document.createElement("option");
+      op.value = t; op.textContent = t;
+      s.appendChild(op);
+    });
+    campoSecao.style.display = "flex";
+  }
+  if (o.entrada) {
+    document.getElementById("rev-entrada-label").textContent = o.entrada.rotulo;
+    document.getElementById("rev-entrada").placeholder = o.entrada.placeholder || "";
+    campoEntrada.style.display = "flex";
+  }
+}
+
+function pontoDeConsulta(o) {
+  const partes = [];
+  if (o.secoes) partes.push(document.getElementById("rev-secao").value);
+  if (o.entrada) partes.push(document.getElementById("rev-entrada").value.trim());
+  return partes.filter(Boolean).join(" — ");
+}
+
+function blocoRevisor(o, trecho) {
+  return `
+
+REVISOR ESCOLHIDO PELO USUÁRIO (prevalece sobre as fontes sugeridas acima):
+OBRA: ${o.nome}
+PONTO DE CONSULTA: ${pontoDeConsulta(o) || "não especificado"}
+ESCOPO: ${o.escopo}
+NÃO AUDITAR: ${o.naoCobre}
+BASE DA REVISÃO: ${trecho
+    ? "O usuário colou um trecho da obra (campo REFERÊNCIA). Audite contra esse trecho e cite-o."
+    : "Nenhum trecho foi colado. A revisão se baseia no conhecimento geral da obra, não em consulta ao texto. Não invente página, citação literal ou localização; use \"localização não confirmada\"."}
+`;
+}
+
+function rodapeRevisor(o, trecho) {
+  return "\n\n────────────────────────\nREVISOR: " + o.nome +
+    "\nPONTO DE CONSULTA: " + (pontoDeConsulta(o) || "não especificado") +
+    "\nNÃO COBERTO POR ESTE REVISOR: " + o.naoCobre +
+    "\nBASE: " + (trecho
+      ? "revisão feita contra o trecho colado pelo usuário."
+      : "conhecimento geral da obra, sem consulta ao texto. Confira citações e páginas na obra antes de publicar.");
+}
+
+iniciarRevisores();
 iniciarBiblia();
  /* =====================================================
    INICIALIZAÇÃO
