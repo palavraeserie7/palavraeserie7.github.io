@@ -1431,30 +1431,13 @@ main {
       <input id="revisor-subetapa" type="text" readonly placeholder="Ex.: 06.14 — Síntese exegética (deixe vazio se não se aplicar)" style="padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;">
     </div>
  
-        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+        <div style="display:none;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">REFERÊNCIA DE COMPARAÇÃO</label>
       <small style="color:#91a4bd;font-size:9px;">Cole aqui a obra, pesquisa ou conteúdo-base. Se ficar vazio, o Worker sugere fontes reconhecidas.</small>
       <textarea id="revisor-referencia" placeholder="Cole uma referência de comparação ou deixe vazio..." style="min-height:110px;resize:vertical;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;"></textarea>
     </div>
  
-    <div id="rev-obra-box" style="margin:0 0 12px;padding:14px;border:1px solid #263754;border-radius:8px;background:#0d172b;">
-  <div style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;margin-bottom:8px;">REVISOR — OBRA DA BIBLIOTECA</div>
-  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-    <div class="bible-field">
-      <label for="rev-obra">OBRA</label>
-      <select id="rev-obra" onchange="atualizarRevisor()"></select>
-    </div>
-    <div class="bible-field" id="rev-secao-field" style="display:none;">
-      <label for="rev-secao">CAPÍTULO / SEÇÃO</label>
-      <select id="rev-secao"></select>
-    </div>
-    <div class="bible-field" id="rev-entrada-field" style="display:none;">
-      <label id="rev-entrada-label" for="rev-entrada">ENTRADA</label>
-      <input id="rev-entrada" type="text">
-    </div>
-  </div>
-  <div id="rev-info" style="margin-top:10px;color:#91a4bd;font-size:11px;line-height:1.55;"></div>
-</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">RESPOSTA DA MESA A SER REVISADA</label>
      <small style="color:#91a4bd;font-size:9px;">Resposta gerada na Mesa de Análise para a etapa acima.</small>
       <textarea id="revisor-conteudo" readonly placeholder="Cole aqui o conteúdo..." style="min-height:180px;resize:vertical;padding:10px 12px;border:1px solid #344762;border-radius:6px;background:#0d172b;color:#dbe7f5;font:inherit;font-size:12px;"></textarea>
@@ -4069,8 +4052,7 @@ function openRevisor(origin) {
   }
  
   document.getElementById("revisor-report").textContent = "O relatório de auditoria aparecerá aqui depois da revisão.";
-   iniciarRevisores();
-   overlay.style.display = "flex";
+  overlay.style.display = "flex";
 }
  
 function closeRevisor() {
@@ -4093,13 +4075,10 @@ async function submitRevisor() {
 
    
 
-let guidance = tema
+  const guidance = tema
     ? { name: tema, sources: "Selecionar fontes reconhecidas adequadas ao tema.", rule: "Aplicar a regra normativa do módulo/tema informado, quando identificável." }
     : getCanonicalGuidance();
- const obra = obterObra();
-if (obra) {
-  guidance = { name: obra.nome, sources: obra.nome, rule: obra.escopo };
-}
+ 
   report.textContent = "REVISÃO EM ANDAMENTO\n\nIdentificando afirmações, conferindo concordâncias e divergências e registrando as fontes...";
   submitBtn.disabled = true;
   submitBtn.textContent = "REVISANDO...";
@@ -4122,8 +4101,8 @@ if (obra) {
         sources: guidance.sources,
         rule: guidance.rule
       },
-      question: comparisonPrompt(referencia, conteudo, guidance) + (obra ? blocoRevisor(obra, referencia) : ""),
-      reviewerWork: obra ? { id: obra.id, nome: obra.nome, ponto: pontoDeConsulta(obra) } : null,      topic: subetapaInput || tema || "REVISOR TEOLÓGICO",
+      question: comparisonPrompt(referencia, conteudo, guidance),
+      topic: subetapaInput || tema || "REVISOR TEOLÓGICO",
       module: tema || "REVISOR TEOLÓGICO",
       discipline: "MÉTODO TÉCNICO DE PESQUISA"
     };
@@ -4166,7 +4145,6 @@ if (obra) {
     }
  
      report.textContent = limparMarkdown(extractAuditReport(data));
-   if (obra) report.textContent += rodapeRevisor(obra, referencia);
    // >>>>>>>>>> INÍCIO — CHAMADA DAS CORES >>>>>>>>>>
    colorirRelatorio(report);
    // <<<<<<<<<< FIM — CHAMADA DAS CORES <<<<<<<<<<
@@ -5020,183 +4998,7 @@ function usarBiblia() {
   toggleBiblia();
   questionInput.focus();
 }
-/* ===== BIBLIOTECA DE REVISORES ===== */
-const CAMADAS_REVISOR = [
-  { cod: "01", nome: "Texto bíblico",
-    tema: "o texto bíblico (leitura, forma textual, edição e tradição textual citadas)",
-    naoCobre: "gramática, léxico, exegese, contexto histórico e teologia.",
-    obras: ["NA28", "SBLGNT", "BHS", "BHQ (onde já publicada)", "Septuaginta (Rahlfs-Hanhart / Göttingen)", "Textus Receptus (Scrivener)", "Texto Majoritário (Robinson-Pierpont)", "Manuscritos do Mar Morto", "Vulgata e versões antigas"] },
-  { cod: "02", nome: "Crítica textual",
-    tema: "variantes, manuscritos, testemunhos e a escolha entre leituras",
-    naoCobre: "exegese, teologia, contexto histórico e léxico.",
-    obras: ["Metzger, A Textual Commentary on the Greek New Testament", "Metzger, The Text of the New Testament", "Metzger, The Early Versions of the New Testament", "Parker, An Introduction to the New Testament Manuscripts and Their Texts", "Emanuel Tov, Textual Criticism of the Hebrew Bible", "Editio Critica Maior (INTF)", "NA28, BHS/BHQ e Septuaginta (aparatos)"] },
-  { cod: "03", nome: "Gramática e sintaxe",
-    tema: "morfologia, sintaxe, tempo, aspecto, voz, modo e construções gramaticais",
-    naoCobre: "sentido de palavras (léxico), contexto histórico, teologia e interpretação geral da passagem.",
-    obras: ["Wallace", "BDF", "Robertson", "Porter", "Fanning, Verbal Aspect in New Testament Greek (contraponto a Porter; registrar divergências)", "Waltke & O’Connor", "Joüon-Muraoka", "Gesenius-Kautzsch-Cowley (Hebrew Grammar)", "Bases morfológicas: MorphGNT, OpenGNT, Macula, OSHB"] },
-  { cod: "04", nome: "Léxico",
-    tema: "sentido, uso e campo semântico das palavras hebraicas, aramaicas e gregas",
-    naoCobre: "gramática e sintaxe, contexto histórico, teologia e a interpretação da passagem como um todo.",
-    obras: ["BDAG (NT)", "Louw-Nida (NT)", "LSJ (NT)", "HALOT (AT)", "DCH (AT)", "BDB (AT)", "Muraoka (LXX)", "Lust-Eynikel-Hauspie (LXX)"] },
-  { cod: "05", nome: "Léxico teológico",
-    tema: "o desenvolvimento teológico de conceitos e termos-chave",
-    naoCobre: "gramática, crítica textual, contexto histórico detalhado e a exegese da passagem.",
-    obras: ["TDNT (NT)", "NIDNTTE (NT)", "TDOT (AT)", "NIDOTTE (AT)"] },
-  { cod: "06", nome: "Exegese",
-    tema: "exegese da passagem (estrutura, argumento, contexto literário, gênero e intenção comunicativa)",
-    naoCobre: "léxico detalhado, crítica textual, teologia sistemática e aplicação prática.",
-    obras: ["BECNT (NT)", "NIGTC (NT)", "NICNT (NT)", "Pillar (NT)", "WBC (NT e AT)", "NICOT (AT)", "Baker (AT)", "AOTC (AT)", "Hermeneia (complementar)", "ICC (complementar)", "Anchor Yale Bible (complementar)"] },
-  { cod: "07", nome: "Contexto histórico-cultural",
-    tema: "contexto histórico, social, religioso, geográfico e cultural da passagem",
-    naoCobre: "gramática, léxico, crítica textual e teologia.",
-    obras: ["Zondervan Encyclopedia of the Bible", "IVP Bible Background Commentary", "New Bible Dictionary", "Zondervan Atlas", "Manners and Customs", "ANET e COS", "Manuscritos do Mar Morto", "Charlesworth (pseudepígrafos)", "Josefo e Fílon", "Mishná, Talmude e Targumim", "Autores greco-romanos (Tácito, Suetônio, Plínio, o Jovem)"] },
-  { cod: "08", nome: "Hermenêutica e controle de erros",
-    tema: "método interpretativo e erros como anacronismo, eisegese, falácia lexical, descontextualização, alegorização e generalização",
-    naoCobre: "o conteúdo detalhado do léxico, da gramática e do contexto histórico.",
-    obras: ["Osborne", "Carson, Exegetical Fallacies", "Carson & Moo", "Dillard & Longman", "Fee & Stuart", "Barr, The Semantics of Biblical Language"] },
-  { cod: "09", nome: "Teologia bíblica",
-    tema: "a trajetória do tema no cânon, a história da redenção, promessa e cumprimento",
-    naoCobre: "gramática, léxico, crítica textual e teologia sistemática.",
-    obras: ["Beale, A New Testament Biblical Theology", "Vos", "Goldsworthy", "Schreiner, The King in His Beauty"] },
-  { cod: "10", nome: "Uso do AT no NT",
-    tema: "citações, alusões e ecos do AT no NT, uso da LXX e releituras cristológicas",
-    naoCobre: "teologia sistemática, aplicação prática e contexto histórico geral.",
-    obras: ["Beale & Carson (principal)", "Hays, Echoes of Scripture in the Letters of Paul", "Auxiliares: NA28, BHS/BHQ, Septuaginta, BDAG, HALOT, NIDNTTE, NIDOTTE, TDNT, TDOT"] },
-  { cod: "11", nome: "Teologia sistemática",
-    tema: "formulações doutrinárias e a coerência da doutrina",
-    naoCobre: "o significado exegético da passagem, léxico, gramática e crítica textual.",
-    obras: ["Grudem", "Berkhof", "Frame", "Evangelical Dictionary of Theology", "Contrapontos: Erickson, Pannenberg, Oden, Catecismo da Igreja Católica"] },
-  { cod: "12", nome: "Comparação de interpretações",
-    tema: "as interpretações concorrentes, seus argumentos, pressupostos e grau de consenso",
-    naoCobre: "fatos textuais, léxicos ou gramaticais isolados (esses pertencem às camadas 01 a 11).",
-    obras: ["Sem fonte própria: reconsulta as camadas 01–11, 13, 14 e a camada de apoio"] },
-  { cod: "13", nome: "Gênero literário e estrutura",
-    tema: "gênero literário, estrutura e forma da passagem",
-    naoCobre: "léxico, gramática, crítica textual e teologia.",
-    obras: ["Fee & Stuart", "Alter", "Longman", "Black & Dockery"] },
-  { cod: "14", nome: "História da interpretação",
-    tema: "como a passagem foi interpretada pela Igreja ao longo da história",
-    naoCobre: "o significado original da passagem, léxico, gramática e crítica textual.",
-    obras: ["Ancient Christian Commentary on Scripture (ACCS)", "Reformation Commentary on Scripture (RCS)", "ANF, NPNF", "Calvino e Lutero"] },
-  { cod: "15", nome: "Aplicação (opcional)",
-    tema: "a aplicação prática da passagem",
-    naoCobre: "léxico, gramática, crítica textual e contexto histórico.",
-    obras: ["Fee & Stuart", "Hendricks & Hendricks", "Doriani"] },
-  { cod: "AP", nome: "Camada de apoio — literatura acadêmica periódica",
-    tema: "o estado atual do debate acadêmico sobre a passagem ou o tema",
-    naoCobre: "qualquer assunto que o artigo citado não trate.",
-    extra: " REGRAS: fonte protegida (o acesso costuma exigir assinatura). Citação obrigatória: autor, título do artigo, periódico, ano, volume e páginas. Se não for possível confirmar o artigo, declarar NÃO VERIFICADO em vez de inferir.",
-    obras: ["Journal of Biblical Literature (JBL)", "Novum Testamentum", "Vetus Testamentum", "Journal for the Study of the New Testament (JSNT)", "Bulletin for Biblical Research (BBR) — perfil evangélico, para equilibrar"] }
-];
 
-const BIBLIOTECA_REVISORES = [];
-CAMADAS_REVISOR.forEach(function (c) {
-  c.obras.forEach(function (obra, i) {
-    BIBLIOTECA_REVISORES.push({
-      id: c.cod + "-" + (i + 1),
-      grupo: c.cod + " · " + c.nome,
-      nome: obra,
-      confere: c.tema + ".",
-      entrada: null,
-      secoes: null,
-      escopo: "Auditar cada afirmação da explicação da Mesa que trate de " + c.tema + ", conforme a obra escolhida. Apontar o que estiver incorreto ou sem base. Afirmações de outros assuntos devem ser listadas como NÃO COBERTAS, sem receber classificação." + (c.extra || ""),
-      naoCobre: c.naoCobre
-    });
-  });
-});
-
-function iniciarRevisores() {
-  const sel = document.getElementById("rev-obra");
-  if (!sel) return;
-  const atual = sel.value;
-  sel.innerHTML = '<option value="">— automático (matriz do módulo) —</option>';
-  let grupoAtual = "";
-  let og = null;
-  BIBLIOTECA_REVISORES.forEach(function (o) {
-    if (o.grupo !== grupoAtual) {
-      og = document.createElement("optgroup");
-      og.label = o.grupo;
-      sel.appendChild(og);
-      grupoAtual = o.grupo;
-    }
-    const op = document.createElement("option");
-    op.value = o.id;
-    op.textContent = o.nome;
-    og.appendChild(op);
-  });
-  if (atual) sel.value = atual;
-  atualizarRevisor();
-}
-
-function obterObra() {
-  const id = document.getElementById("rev-obra").value;
-  return BIBLIOTECA_REVISORES.find(function (o) { return o.id === id; }) || null;
-}
-
-function atualizarRevisor() {
-  const o = obterObra();
-  const info = document.getElementById("rev-info");
-  const campoSecao = document.getElementById("rev-secao-field");
-  const campoEntrada = document.getElementById("rev-entrada-field");
-
-  campoSecao.style.display = "none";
-  campoEntrada.style.display = "none";
-
-  if (!o) {
-    info.textContent = "Sem obra escolhida: a IA usa as fontes sugeridas para o módulo.";
-    return;
-  }
-
-  info.textContent = "Esta obra confere: " + o.confere + " Não cobre: " + o.naoCobre;
-
-  if (o.secoes) {
-    const s = document.getElementById("rev-secao");
-    s.innerHTML = "";
-    o.secoes.forEach(function (t) {
-      const op = document.createElement("option");
-      op.value = t; op.textContent = t;
-      s.appendChild(op);
-    });
-    campoSecao.style.display = "flex";
-  }
-  if (o.entrada) {
-    document.getElementById("rev-entrada-label").textContent = o.entrada.rotulo;
-    document.getElementById("rev-entrada").placeholder = o.entrada.placeholder || "";
-    campoEntrada.style.display = "flex";
-  }
-}
-
-function pontoDeConsulta(o) {
-  const partes = [];
-  if (o.secoes) partes.push(document.getElementById("rev-secao").value);
-  if (o.entrada) partes.push(document.getElementById("rev-entrada").value.trim());
-  return partes.filter(Boolean).join(" — ");
-}
-
-function blocoRevisor(o, trecho) {
-  return `
-
-REVISOR ESCOLHIDO PELO USUÁRIO (prevalece sobre as fontes sugeridas acima):
-OBRA: ${o.nome}
-PONTO DE CONSULTA: ${pontoDeConsulta(o) || "não especificado"}
-ESCOPO: ${o.escopo}
-NÃO AUDITAR: ${o.naoCobre}
-BASE DA REVISÃO: ${trecho
-    ? "O usuário colou um trecho da obra (campo REFERÊNCIA). Audite contra esse trecho e cite-o."
-    : "Nenhum trecho foi colado. A revisão se baseia no conhecimento geral da obra, não em consulta ao texto. Não invente página, citação literal ou localização; use \"localização não confirmada\"."}
-`;
-}
-
-function rodapeRevisor(o, trecho) {
-  return "\n\n────────────────────────\nREVISOR: " + o.nome +
-    "\nPONTO DE CONSULTA: " + (pontoDeConsulta(o) || "não especificado") +
-    "\nNÃO COBERTO POR ESTE REVISOR: " + o.naoCobre +
-    "\nBASE: " + (trecho
-      ? "revisão feita contra o trecho colado pelo usuário."
-      : "conhecimento geral da obra, sem consulta ao texto. Confira citações e páginas na obra antes de publicar.");
-}
-
-iniciarRevisores();
 iniciarBiblia();
  /* =====================================================
    INICIALIZAÇÃO
@@ -5258,6 +5060,7 @@ renderModules();
 </body>
 </html>
  
+
 
 
 
