@@ -1411,10 +1411,14 @@ main {
           PESQUISAR → ANALISAR → REVISAR → CONSOLIDAR. O Revisor é uma segunda camada de pesquisa: audita metodológica e teologicamente o conteúdo, não é um corretor de texto.
         </p>
       </div>
-      <button type="button" onclick="closeRevisor()" style="border:1px solid #35506d;border-radius:5px;padding:7px 10px;background:transparent;color:#dbe7f5;font-weight:900;cursor:pointer;">FECHAR</button>
+     <div style="display:flex;gap:8px;">
+  <button type="button" onclick="toggleBibliotecaRev()" style="border:1px solid #35506d;border-radius:5px;padding:7px 10px;background:transparent;color:#dbe7f5;font-weight:900;cursor:pointer;">📚 BIBLIOTECA</button>
+  <button type="button" onclick="closeRevisor()" style="border:1px solid #35506d;border-radius:5px;padding:7px 10px;background:transparent;color:#dbe7f5;font-weight:900;cursor:pointer;">FECHAR</button>
+</div>
     </div>
  
     <div id="revisor-origin-note" style="margin:14px 0;padding:10px 12px;border-left:3px solid #20d66b;background:#0d172b;color:#b9c7d8;font-size:11px;"></div>
+     <div id="rev-biblioteca" style="display:none;margin:0 0 14px;padding:14px 16px;border:1px solid #263754;border-radius:8px;background:#0d172b;max-height:45vh;overflow:auto;"></div>
  
     <div style="display:none;flex-direction:column;gap:6px;margin-bottom:12px;">
       <label style="color:#18bfff;font-size:10px;font-weight:900;letter-spacing:.7px;">TEMA / ASSUNTO</label>
@@ -4050,7 +4054,49 @@ function openRevisor(origin) {
   document.getElementById("revisor-report").textContent = "O relatório de auditoria aparecerá aqui depois da revisão.";
   overlay.style.display = "flex";
 }
- 
+
+const BIBLIOTECA_TEOLOGICA = [
+  ["01 · Texto bíblico", ["NA28", "SBLGNT", "BHS", "BHQ (onde já publicada)", "Septuaginta (Rahlfs-Hanhart / Göttingen)", "Textus Receptus (Scrivener)", "Texto Majoritário (Robinson-Pierpont)", "Manuscritos do Mar Morto", "Vulgata e versões antigas"]],
+  ["02 · Crítica textual", ["Metzger, A Textual Commentary on the Greek New Testament", "Metzger, The Text of the New Testament", "Metzger, The Early Versions of the New Testament", "Parker, An Introduction to the New Testament Manuscripts and Their Texts", "Emanuel Tov, Textual Criticism of the Hebrew Bible", "Editio Critica Maior (INTF)", "NA28, BHS/BHQ e Septuaginta (aparatos)"]],
+  ["03 · Gramática e sintaxe", ["Wallace", "BDF", "Robertson", "Porter", "Fanning, Verbal Aspect in New Testament Greek (contraponto a Porter)", "Waltke & O’Connor", "Joüon-Muraoka", "Gesenius-Kautzsch-Cowley (Hebrew Grammar)", "Bases morfológicas: MorphGNT, OpenGNT, Macula, OSHB"]],
+  ["04 · Léxico", ["NT: BDAG, Louw-Nida, LSJ", "AT: HALOT, DCH, BDB", "LXX: Muraoka, Lust-Eynikel-Hauspie"]],
+  ["05 · Léxico teológico", ["NT: TDNT, NIDNTTE", "AT: TDOT, NIDOTTE"]],
+  ["06 · Exegese", ["NT: BECNT, NIGTC, NICNT, Pillar, WBC", "AT: NICOT, WBC, Baker, AOTC", "Complementares: Hermeneia, ICC, Anchor Yale Bible"]],
+  ["07 · Contexto histórico-cultural", ["Zondervan Encyclopedia of the Bible", "IVP Bible Background Commentary", "New Bible Dictionary", "Zondervan Atlas", "Manners and Customs", "ANET e COS", "Manuscritos do Mar Morto", "Charlesworth (pseudepígrafos)", "Josefo e Fílon", "Mishná, Talmude e Targumim", "Autores greco-romanos (Tácito, Suetônio, Plínio, o Jovem)"]],
+  ["08 · Hermenêutica e controle de erros", ["Osborne", "Carson, Exegetical Fallacies", "Carson & Moo", "Dillard & Longman", "Fee & Stuart", "Barr, The Semantics of Biblical Language"]],
+  ["09 · Teologia bíblica", ["Beale, A New Testament Biblical Theology", "Vos", "Goldsworthy", "Schreiner, The King in His Beauty"]],
+  ["10 · Uso do AT no NT", ["Beale & Carson (principal)", "Hays, Echoes of Scripture in the Letters of Paul", "Auxiliares: NA28, BHS/BHQ, Septuaginta, BDAG, HALOT, NIDNTTE, NIDOTTE, TDNT, TDOT"]],
+  ["11 · Teologia sistemática", ["Grudem", "Berkhof", "Frame", "Evangelical Dictionary of Theology", "Contrapontos: Erickson, Pannenberg, Oden, Catecismo da Igreja Católica"]],
+  ["12 · Comparação de interpretações", ["Sem fonte própria: reconsulta as camadas 01–11, 13, 14 e a camada de apoio"]],
+  ["13 · Gênero literário e estrutura", ["Fee & Stuart", "Alter", "Longman", "Black & Dockery"]],
+  ["14 · História da interpretação", ["Ancient Christian Commentary on Scripture (ACCS)", "Reformation Commentary on Scripture (RCS)", "ANF, NPNF", "Calvino e Lutero"]],
+  ["15 · Aplicação (opcional)", ["Fee & Stuart", "Hendricks & Hendricks", "Doriani"]],
+  ["Camada de apoio · Literatura acadêmica periódica", ["Journal of Biblical Literature (JBL)", "Novum Testamentum", "Vetus Testamentum", "Journal for the Study of the New Testament (JSNT)", "Bulletin for Biblical Research (BBR), de perfil evangélico, para equilibrar", "Regras: fonte protegida; citação obrigatória (autor, título do artigo, periódico, ano, volume e páginas); se não confirmar o artigo, declarar “não verificado”."]]
+];
+
+function toggleBibliotecaRev() {
+  const box = document.getElementById("rev-biblioteca");
+  if (!box) return;
+  if (box.style.display === "block") { box.style.display = "none"; return; }
+  if (!box.dataset.pronto) {
+    const intro = document.createElement("div");
+    intro.style.cssText = "margin-bottom:12px;color:#91a4bd;font-size:11px;line-height:1.5;";
+    intro.textContent = "BIBLIOTECA TEOLÓGICA — obras de referência da plataforma, por camada. Esta lista é apenas informativa: ainda não alimenta a revisão.";
+    box.appendChild(intro);
+    BIBLIOTECA_TEOLOGICA.forEach(function (c) {
+      const t = document.createElement("div");
+      t.style.cssText = "margin-top:10px;color:#18bfff;font-size:11px;font-weight:900;letter-spacing:.5px;";
+      t.textContent = c[0];
+      const l = document.createElement("div");
+      l.style.cssText = "margin-top:3px;color:#dbe7f5;font-size:12px;line-height:1.6;white-space:pre-line;";
+      l.textContent = c[1].map(function (o) { return "• " + o; }).join("\n");
+      box.appendChild(t);
+      box.appendChild(l);
+    });
+    box.dataset.pronto = "1";
+  }
+  box.style.display = "block";
+}   
 function closeRevisor() {
   const overlay = document.getElementById("revisor-overlay");
   if (overlay) overlay.style.display = "none";
