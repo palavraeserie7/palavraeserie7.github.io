@@ -5021,28 +5021,110 @@ function usarBiblia() {
   questionInput.focus();
 }
 /* ===== BIBLIOTECA DE REVISORES ===== */
-const BIBLIOTECA_REVISORES = [
-  {
-    id: "bdb",
-    nome: "BDB — Brown-Driver-Briggs (léxico hebraico)",
-    confere: "O sentido atribuído às palavras hebraicas.",
-    entrada: { rotulo: "PALAVRA HEBRAICA (verbete)", placeholder: "ex.: חֶסֶד, hesed ou a raiz" },
-    secoes: null,
-    escopo: "Auditar SOMENTE os sentidos, as raízes e os usos das palavras hebraicas do estudo, conforme o verbete do BDB.",
-    naoCobre: "gramática e sintaxe, contexto histórico, teologia, texto grego e a interpretação da passagem como um todo."
-  }
+const CAMADAS_REVISOR = [
+  { cod: "01", nome: "Texto bíblico",
+    tema: "o texto bíblico (leitura, forma textual, edição e tradição textual citadas)",
+    naoCobre: "gramática, léxico, exegese, contexto histórico e teologia.",
+    obras: ["NA28", "SBLGNT", "BHS", "BHQ (onde já publicada)", "Septuaginta (Rahlfs-Hanhart / Göttingen)", "Textus Receptus (Scrivener)", "Texto Majoritário (Robinson-Pierpont)", "Manuscritos do Mar Morto", "Vulgata e versões antigas"] },
+  { cod: "02", nome: "Crítica textual",
+    tema: "variantes, manuscritos, testemunhos e a escolha entre leituras",
+    naoCobre: "exegese, teologia, contexto histórico e léxico.",
+    obras: ["Metzger, A Textual Commentary on the Greek New Testament", "Metzger, The Text of the New Testament", "Metzger, The Early Versions of the New Testament", "Parker, An Introduction to the New Testament Manuscripts and Their Texts", "Emanuel Tov, Textual Criticism of the Hebrew Bible", "Editio Critica Maior (INTF)", "NA28, BHS/BHQ e Septuaginta (aparatos)"] },
+  { cod: "03", nome: "Gramática e sintaxe",
+    tema: "morfologia, sintaxe, tempo, aspecto, voz, modo e construções gramaticais",
+    naoCobre: "sentido de palavras (léxico), contexto histórico, teologia e interpretação geral da passagem.",
+    obras: ["Wallace", "BDF", "Robertson", "Porter", "Fanning, Verbal Aspect in New Testament Greek (contraponto a Porter; registrar divergências)", "Waltke & O’Connor", "Joüon-Muraoka", "Gesenius-Kautzsch-Cowley (Hebrew Grammar)", "Bases morfológicas: MorphGNT, OpenGNT, Macula, OSHB"] },
+  { cod: "04", nome: "Léxico",
+    tema: "sentido, uso e campo semântico das palavras hebraicas, aramaicas e gregas",
+    naoCobre: "gramática e sintaxe, contexto histórico, teologia e a interpretação da passagem como um todo.",
+    obras: ["BDAG (NT)", "Louw-Nida (NT)", "LSJ (NT)", "HALOT (AT)", "DCH (AT)", "BDB (AT)", "Muraoka (LXX)", "Lust-Eynikel-Hauspie (LXX)"] },
+  { cod: "05", nome: "Léxico teológico",
+    tema: "o desenvolvimento teológico de conceitos e termos-chave",
+    naoCobre: "gramática, crítica textual, contexto histórico detalhado e a exegese da passagem.",
+    obras: ["TDNT (NT)", "NIDNTTE (NT)", "TDOT (AT)", "NIDOTTE (AT)"] },
+  { cod: "06", nome: "Exegese",
+    tema: "exegese da passagem (estrutura, argumento, contexto literário, gênero e intenção comunicativa)",
+    naoCobre: "léxico detalhado, crítica textual, teologia sistemática e aplicação prática.",
+    obras: ["BECNT (NT)", "NIGTC (NT)", "NICNT (NT)", "Pillar (NT)", "WBC (NT e AT)", "NICOT (AT)", "Baker (AT)", "AOTC (AT)", "Hermeneia (complementar)", "ICC (complementar)", "Anchor Yale Bible (complementar)"] },
+  { cod: "07", nome: "Contexto histórico-cultural",
+    tema: "contexto histórico, social, religioso, geográfico e cultural da passagem",
+    naoCobre: "gramática, léxico, crítica textual e teologia.",
+    obras: ["Zondervan Encyclopedia of the Bible", "IVP Bible Background Commentary", "New Bible Dictionary", "Zondervan Atlas", "Manners and Customs", "ANET e COS", "Manuscritos do Mar Morto", "Charlesworth (pseudepígrafos)", "Josefo e Fílon", "Mishná, Talmude e Targumim", "Autores greco-romanos (Tácito, Suetônio, Plínio, o Jovem)"] },
+  { cod: "08", nome: "Hermenêutica e controle de erros",
+    tema: "método interpretativo e erros como anacronismo, eisegese, falácia lexical, descontextualização, alegorização e generalização",
+    naoCobre: "o conteúdo detalhado do léxico, da gramática e do contexto histórico.",
+    obras: ["Osborne", "Carson, Exegetical Fallacies", "Carson & Moo", "Dillard & Longman", "Fee & Stuart", "Barr, The Semantics of Biblical Language"] },
+  { cod: "09", nome: "Teologia bíblica",
+    tema: "a trajetória do tema no cânon, a história da redenção, promessa e cumprimento",
+    naoCobre: "gramática, léxico, crítica textual e teologia sistemática.",
+    obras: ["Beale, A New Testament Biblical Theology", "Vos", "Goldsworthy", "Schreiner, The King in His Beauty"] },
+  { cod: "10", nome: "Uso do AT no NT",
+    tema: "citações, alusões e ecos do AT no NT, uso da LXX e releituras cristológicas",
+    naoCobre: "teologia sistemática, aplicação prática e contexto histórico geral.",
+    obras: ["Beale & Carson (principal)", "Hays, Echoes of Scripture in the Letters of Paul", "Auxiliares: NA28, BHS/BHQ, Septuaginta, BDAG, HALOT, NIDNTTE, NIDOTTE, TDNT, TDOT"] },
+  { cod: "11", nome: "Teologia sistemática",
+    tema: "formulações doutrinárias e a coerência da doutrina",
+    naoCobre: "o significado exegético da passagem, léxico, gramática e crítica textual.",
+    obras: ["Grudem", "Berkhof", "Frame", "Evangelical Dictionary of Theology", "Contrapontos: Erickson, Pannenberg, Oden, Catecismo da Igreja Católica"] },
+  { cod: "12", nome: "Comparação de interpretações",
+    tema: "as interpretações concorrentes, seus argumentos, pressupostos e grau de consenso",
+    naoCobre: "fatos textuais, léxicos ou gramaticais isolados (esses pertencem às camadas 01 a 11).",
+    obras: ["Sem fonte própria: reconsulta as camadas 01–11, 13, 14 e a camada de apoio"] },
+  { cod: "13", nome: "Gênero literário e estrutura",
+    tema: "gênero literário, estrutura e forma da passagem",
+    naoCobre: "léxico, gramática, crítica textual e teologia.",
+    obras: ["Fee & Stuart", "Alter", "Longman", "Black & Dockery"] },
+  { cod: "14", nome: "História da interpretação",
+    tema: "como a passagem foi interpretada pela Igreja ao longo da história",
+    naoCobre: "o significado original da passagem, léxico, gramática e crítica textual.",
+    obras: ["Ancient Christian Commentary on Scripture (ACCS)", "Reformation Commentary on Scripture (RCS)", "ANF, NPNF", "Calvino e Lutero"] },
+  { cod: "15", nome: "Aplicação (opcional)",
+    tema: "a aplicação prática da passagem",
+    naoCobre: "léxico, gramática, crítica textual e contexto histórico.",
+    obras: ["Fee & Stuart", "Hendricks & Hendricks", "Doriani"] },
+  { cod: "AP", nome: "Camada de apoio — literatura acadêmica periódica",
+    tema: "o estado atual do debate acadêmico sobre a passagem ou o tema",
+    naoCobre: "qualquer assunto que o artigo citado não trate.",
+    extra: " REGRAS: fonte protegida (o acesso costuma exigir assinatura). Citação obrigatória: autor, título do artigo, periódico, ano, volume e páginas. Se não for possível confirmar o artigo, declarar NÃO VERIFICADO em vez de inferir.",
+    obras: ["Journal of Biblical Literature (JBL)", "Novum Testamentum", "Vetus Testamentum", "Journal for the Study of the New Testament (JSNT)", "Bulletin for Biblical Research (BBR) — perfil evangélico, para equilibrar"] }
 ];
+
+const BIBLIOTECA_REVISORES = [];
+CAMADAS_REVISOR.forEach(function (c) {
+  c.obras.forEach(function (obra, i) {
+    BIBLIOTECA_REVISORES.push({
+      id: c.cod + "-" + (i + 1),
+      grupo: c.cod + " · " + c.nome,
+      nome: obra,
+      confere: c.tema + ".",
+      entrada: null,
+      secoes: null,
+      escopo: "Auditar cada afirmação da explicação da Mesa que trate de " + c.tema + ", conforme a obra escolhida. Apontar o que estiver incorreto ou sem base. Afirmações de outros assuntos devem ser listadas como NÃO COBERTAS, sem receber classificação." + (c.extra || ""),
+      naoCobre: c.naoCobre
+    });
+  });
+});
 
 function iniciarRevisores() {
   const sel = document.getElementById("rev-obra");
   if (!sel) return;
+  const atual = sel.value;
   sel.innerHTML = '<option value="">— automático (matriz do módulo) —</option>';
+  let grupoAtual = "";
+  let og = null;
   BIBLIOTECA_REVISORES.forEach(function (o) {
+    if (o.grupo !== grupoAtual) {
+      og = document.createElement("optgroup");
+      og.label = o.grupo;
+      sel.appendChild(og);
+      grupoAtual = o.grupo;
+    }
     const op = document.createElement("option");
     op.value = o.id;
     op.textContent = o.nome;
-    sel.appendChild(op);
+    og.appendChild(op);
   });
+  if (atual) sel.value = atual;
   atualizarRevisor();
 }
 
