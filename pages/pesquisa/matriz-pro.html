@@ -3111,7 +3111,34 @@ function extractStepCode(stepName) {
   return match ? match[0] : "";
 }
 
- 
+/* Diretrizes metodológicas vêm da BIBLIOTECA_TEOLOGICA (3º elemento de cada camada).
+   Camada sem 3º elemento = diretriz metodológica ausente. */
+
+function getCanonicalModuleCode() {
+  const candidate = String(activeStep || activeModule || "");
+  const match = candidate.match(/^\s*(\d{2})/);
+  return match ? match[1] : "";
+}
+
+function getCamadaPorCodigo(code) {
+  if (!code) return null;
+  return BIBLIOTECA_TEOLOGICA.find(function (c) {
+    return c[0].indexOf(code + " ") === 0;
+  }) || null;
+}
+
+function getCanonicalGuidance() {
+  const camada = getCamadaPorCodigo(getCanonicalModuleCode());
+  const d = camada && camada[2];
+  if (d) {
+    return { name: d.nome, sources: d.fontes, rule: d.regra };
+  }
+  return {
+    name: "MATRIZ CANÔNICA",
+    sources: "Selecione uma subetapa para receber a sugestão de fontes prioritárias.",
+    rule: "A conclusão deve ser proporcional às evidências e nenhuma fonte ou localização deve ser inventada."
+  };
+} 
  
 function renderCanonicalGuidance() {
   const guidance = getCanonicalGuidance();
