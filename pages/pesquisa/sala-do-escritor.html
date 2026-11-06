@@ -6887,9 +6887,15 @@ st.versoes.unshift({
     var b = ev.target.closest("[data-exp]"); if(!b) return;
     if(!$("esTexto").value.trim()){ msg(4,"Escreva um texto no passo 1 antes de exportar.",true); return; }
     var det = {tipoArquivo:b.dataset.exp, destinos:Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; }),
-      formato:("esFormato").value,voz:("esVoz").value, velocidade:Number($("esVel").value),
-      musica:("esMusica").value?"propria":"",volumeMusica:Number(("esVolMus").value),
-      imagens:fotos.length, titulo:("esTitulo").value.trim(),texto:("esTexto").value, tratado:false};
+      formato: $("esFormato").value,
+voz: $("esVoz").value,
+velocidade: Number($("esVel").value),
+musica: $("esMusica").value ? "propria" : "",
+volumeMusica: Number($("esVolMus").value),
+imagens: fotos.length,
+titulo: $("esTitulo").value.trim(),
+texto: $("esTexto").value
+, tratado:false};
     if(!det.destinos.length){ msg(4,"Marque pelo menos uma rede.",true); return; }
     document.dispatchEvent(new CustomEvent("estudio:exportar", {detail:det}));
     if(!det.tratado) msg(4,"A geração do arquivo ainda não está ligada. Entra no próximo passo, junto com o Worker.",true);
@@ -7331,8 +7337,14 @@ st.versoes.unshift({
     g.globalAlpha = 1; g.shadowBlur = 0;
   }
   async function renderizar(det){
-    var ac = new (window.AudioContext || window.webkitAudioContext)();   /* criado no clique, para o navegador liberar o áudio */
-    var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0], H = dims[1];
+    var ac = new (window.AudioContext || window.webkitAudioContext)();   /* criado no clique */
+
+if (ac.state === "suspended") {
+  await ac.resume();
+}
+
+var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0], H = dims[1];
+
     info("Gerando a voz…", false, 0.03);
     var buf = null, aviso = "";
     try{
@@ -9248,7 +9260,8 @@ st.versoes.unshift({
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel");
-  if(!painel || !("esTexto")||!("esDest")) return;
+  if(!painel || !$("esTexto") || !$("esDest")) return;
+
   var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
   function msg(n, t, erro){ var el = $("esMsg" + n); if(!el) return; el.textContent = t || ""; el.className = "es-msg" + (erro ? " erro" : ""); }
 
@@ -9260,9 +9273,15 @@ st.versoes.unshift({
     var det = {
       tipoArquivo: b.dataset.exp,
       destinos: Array.prototype.map.call($("esDest").querySelectorAll("input:checked"), function(c){ return c.value; }),
-      formato: $("esFormato").value, voz: ("esVoz").value,velocidade:Number(("esVel").value),
-      musica: ("esMusica").value?"propria":"",volumeMusica:Number(("esVolMus").value),
-      imagens: $("esFotos").querySelectorAll("img").length, titulo: $("esTitulo").value.trim(), texto: $("esTexto").value, tratado: false
+      formato: $("esFormato").value,
+voz: $("esVoz").value,
+velocidade: Number($("esVel").value),
+musica: $("esMusica").value ? "propria" : "",
+volumeMusica: Number($("esVolMus").value),
+imagens: $("esFotos").querySelectorAll("img").length,
+titulo: $("esTitulo").value.trim(),
+texto: $("esTexto").value
+, tratado: false
     };
     if(!det.destinos.length){ msg(4, "Marque pelo menos uma rede.", true); return; }
     document.dispatchEvent(new CustomEvent("estudio:exportar", {detail: det}));
