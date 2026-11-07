@@ -9826,6 +9826,438 @@ texto: $("esTexto").value
 })();
 </script>
 <!-- ===== FIM: BIBLIOTECA DE IMAGENS E VÍDEOS (ABAS VISÍVEIS) ===== -->
+<!-- ===== INÍCIO: DESTACAR ORTOGRAFIA ANTIGA + CONFERÊNCIA COM VERSÃO PARALELA =====
+     APAGUE o bloco anterior "DESTACAR ORTOGRAFIA ANTIGA NO TEXTO" e COLE este no mesmo lugar
+     (final da seção do Estúdio, depois de "FIM: BIBLIOTECA DE IMAGENS E VÍDEOS (ABAS VISÍVEIS)"). -->
+<style>
+#ortWrap{position:relative;background:#fff;border-radius:8px}
+#ortWrap > #esTexto{display:block;position:relative;z-index:1;background:transparent!important}
+#ortMirror{position:absolute;top:0;left:0;right:0;bottom:0;margin:0;z-index:0;overflow:hidden;box-sizing:border-box;
+  border-style:solid;border-color:transparent;white-space:pre-wrap;overflow-wrap:break-word;word-wrap:break-word;color:transparent;pointer-events:none}
+#ortMirror .ort-mk{color:transparent;background:none;text-decoration:underline wavy #d93025;text-decoration-thickness:1.5px;text-underline-offset:3px}
+#ortMirror .ort-mk.au{text-decoration-color:#1a73e8}
+#ortPop{position:absolute;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:4px;max-width:300px;padding:6px 8px;background:#fff;border:1px solid #dadce0;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);font:16px "Segoe UI",Arial,sans-serif}
+#ortPop[hidden]{display:none!important}
+#ortPop button{border:0;background:transparent;cursor:pointer;color:#202124;font:inherit;padding:6px 10px;border-radius:6px}
+#ortPop button:hover{background:#f1f3f4}
+#ortPop .ort-sug{font-size:18px;font-weight:600}
+#ortPop .ort-sec{font-size:13px;color:#5f6368}
+#ortPop .ort-x{font-size:18px;color:#5f6368}
+#ortPop .ort-nota{flex:1 1 100%;padding:0 10px 2px;font-size:12px;color:#5f6368}
+#ortPop .ort-nota.ok{color:#188038;font-weight:600}
+#ortBarra{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#ortBarra .es-nota{margin:0;flex:1 1 260px}
+#ortBarra small{flex:1 1 100%;font:12.5px/1.4 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#ortBarra .r{color:#d93025;font-weight:700}
+#ortBarra .b{color:#1a73e8;font-weight:700}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var ta = $("esTexto");
+  if(!ta || $("ortWrap")) return;
+
+  /* ---------- VERSÕES MODERNAS USADAS PARA CONFERIR (formato: livros -> chapters -> versículos) ----------
+     Cada versão tenta os endereços em ordem. Se algum não existir, troque aqui.
+     Para usar também a NVI, acrescente um item com nome "NVI" e o arquivo nvi.json. */
+  var VERSOES = [
+    {nome:"ACF", urls:[
+      "https://cdn.jsdelivr.net/gh/thiagobodruk/biblia@master/json/acf.json",
+      "https://raw.githubusercontent.com/thiagobodruk/biblia/master/json/acf.json",
+      "https://cdn.jsdelivr.net/gh/thiagobodruk/biblia@main/json/acf.json",
+      "https://raw.githubusercontent.com/thiagobodruk/biblia/main/json/acf.json"]},
+    {nome:"AA", urls:[
+      "https://cdn.jsdelivr.net/gh/thiagobodruk/biblia@master/json/aa.json",
+      "https://raw.githubusercontent.com/thiagobodruk/biblia/master/json/aa.json",
+      "https://cdn.jsdelivr.net/gh/thiagobodruk/biblia@main/json/aa.json",
+      "https://raw.githubusercontent.com/thiagobodruk/biblia/main/json/aa.json"]}
+  ];
+
+  /* ---------- dicionário próprio (reserva e prioridade): grafia antiga -> atual ---------- */
+  var D = {
+    "elle":"ele","elles":"eles","ella":"ela","ellas":"elas","êle":"ele","êles":"eles",
+    "aquelle":"aquele","aquelles":"aqueles","aquella":"aquela","aquellas":"aquelas","aquillo":"aquilo",
+    "êste":"este","êsse":"esse","dêle":"dele","dêles":"deles","nêle":"nele","nêles":"neles","dêsse":"desse","dêste":"deste","nêsse":"nesse","nêste":"neste",
+    "d'elle":"dele","d'elles":"deles","d'ella":"dela","d'ellas":"delas",
+    "n'elle":"nele","n'elles":"neles","n'ella":"nela","n'ellas":"nelas",
+    "d'aquelle":"daquele","d'aquella":"daquela","d'aquillo":"daquilo",
+    "teem":"têm","vêem":"veem","ha":"há","vae":"vai","sae":"sai","cae":"cai",
+    "ouvio":"ouviu","sahio":"saiu","cahio":"caiu","creou":"criou","crear":"criar",
+    "pozeram":"puseram","pôz":"pôs","quiz":"quis","quizer":"quiser","quizeste":"quiseste",
+    "vêr":"ver","crêr":"crer","lêr":"ler","sêr":"ser","êrro":"erro","heis":"haveis",
+    "tambem":"também","alem":"além","porem":"porém","ninguem":"ninguém","ahi":"aí","alli":"ali","apoz":"após",
+    "comtudo":"contudo","comtigo":"contigo","comsigo":"consigo",
+    "cousa":"coisa","cousas":"coisas","hontem":"ontem","mez":"mês",
+    "tôda":"toda","tôdo":"todo","tôdas":"todas","tôdos":"todos","mêdo":"medo","sêde":"sede","fôrça":"força","vôz":"voz",
+    "pae":"pai","paes":"pais","saude":"saúde","benção":"bênção","bençãos":"bênçãos","senhôr":"senhor","salvadôr":"salvador","amôr":"amor",
+    "gloria":"glória","glorias":"glórias","victoria":"vitória","historia":"história","memoria":"memória",
+    "misericordia":"misericórdia","sacrificio":"sacrifício","sacrificios":"sacrifícios",
+    "adversario":"adversário","adversarios":"adversários","contrario":"contrário","necessario":"necessário",
+    "sabio":"sábio","sabios":"sábios","exercito":"exército","exercitos":"exércitos",
+    "impio":"ímpio","impios":"ímpios","impia":"ímpia","impias":"ímpias","idolo":"ídolo","idolos":"ídolos",
+    "fructo":"fruto","fructos":"frutos","acção":"ação","acções":"ações","afflicção":"aflição","affligido":"afligido","effeito":"efeito",
+    "ceo":"céu","ceos":"céus","dôr":"dor","côr":"cor","omnipotente":"onipotente",
+    "espirito":"espírito","sanctuario":"santuário",
+    "deos":"Deus","jehovah":"Jeová","christo":"Cristo","propheta":"profeta","prophetas":"profetas","prophecia":"profecia",
+    "phariseus":"fariseus","pharisêos":"fariseus","pharaó":"faraó","egypto":"Egito","egypcios":"egípcios",
+    "abrahão":"Abraão","moysés":"Moisés","moyses":"Moisés","isaac":"Isaque","ephraim":"Efraim",
+    "jerusalem":"Jerusalém","bethlehem":"Belém","nazareth":"Nazaré","babylonia":"Babilônia",
+    "psalmo":"salmo","psalmos":"salmos","psalmista":"salmista",
+    "escriptura":"escritura","escripturas":"Escrituras","escripto":"escrito","escriptos":"escritos","scripturas":"Escrituras",
+    "thesouro":"tesouro","thesouros":"tesouros","throno":"trono","thronos":"tronos","orphão":"órfão","orphãos":"órfãos"
+  };
+  var AUDIO = {"selah":"Selá"};   /* palavras que a voz lê mal (azul) */
+  var GERAIS = [[/sanct/g,"sant"],[/Sanct/g,"Sant"],[/ph/g,"f"],[/Ph/g,"F"],[/th/g,"t"],[/Th/g,"T"],[/(?<=\p{L})y(?=\p{L})/gu,"i"]];
+  var GERAIS_MIN = [[/sanct/g,"sant"],[/ph/g,"f"],[/th/g,"t"],[/(?<=\p{L})y(?=\p{L})/gu,"i"]];
+
+  var L = "\\p{L}";
+  var reP = "(?<!" + L + ")(" + L + "+(?:['\\u2019]" + L + "+)?)(?!" + L + ")";
+  var reW = /\p{L}+/gu;
+  var tem = function(o, k){ return Object.prototype.hasOwnProperty.call(o, k); };
+  var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+  var strip = function(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); };
+  var norm = function(s){ return strip(s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); };
+  var chave = function(p){ return p.toLowerCase().replace(/\u2019/g, "'"); };
+  var maiuscula = function(p){ return p[0] !== p[0].toLowerCase(); };
+
+  function caixa(orig, novo){
+    if(novo[0] !== novo[0].toLowerCase()) return novo;
+    if(orig.length > 1 && orig === orig.toUpperCase()) return novo.toUpperCase();
+    if(maiuscula(orig)) return novo[0].toUpperCase() + novo.slice(1);
+    return novo;
+  }
+
+  /* palavras ignoradas pelo usuário (guardadas neste navegador) */
+  var ignorar = {};
+  try{ JSON.parse(localStorage.getItem("ps_ort_ignorar") || "[]").forEach(function(w){ ignorar[w] = 1; }); }catch(e){}
+  function guardarIgnorar(){ try{ localStorage.setItem("ps_ort_ignorar", JSON.stringify(Object.keys(ignorar))); }catch(e){} }
+
+  /* ---------- versões paralelas: vocabulário e versículos ---------- */
+  var estado = "nada";           /* nada | carregando | ok | falhou */
+  var modernas = [];             /* [{nome, livros}] */
+  var freq = null, porLetra = null, idxVersos = null;
+  var cacheV = {}, vizMemo = {};
+
+  async function baixar(urls){
+    var c = null;
+    try{ c = window.caches ? await caches.open("ps_biblias_v1") : null; }catch(e){}
+    for(var i = 0; i < urls.length; i++){
+      try{
+        var r = c ? await c.match(urls[i]) : null;
+        if(!r){
+          r = await fetch(urls[i]);
+          if(!r.ok) throw new Error("erro " + r.status);
+          if(c){ try{ await c.put(urls[i], r.clone()); }catch(e){} }
+        }
+        var j = JSON.parse((await r.text()).replace(/^\uFEFF/, ""));
+        if(Array.isArray(j) && j.length >= 60) return j;
+      }catch(e){ console.warn("Versão paralela não carregou:", urls[i], e); }
+    }
+    return null;
+  }
+  var pausa = function(){ return new Promise(function(ok){ setTimeout(ok, 0); }); };
+
+  async function carregar(){
+    estado = "carregando"; info();
+    try{
+      if(typeof portugueseBible === "undefined" || !portugueseBible){ if(typeof loadPortuguese === "function") await loadPortuguese(); }
+    }catch(e){ console.warn(e); }
+    var lista = [];
+    for(var v = 0; v < VERSOES.length; v++){
+      var j = await baixar(VERSOES[v].urls);
+      if(j) lista.push({nome: VERSOES[v].nome, livros: j});
+    }
+    if(!lista.length){ estado = "falhou"; info(); return; }
+    modernas = lista;
+
+    freq = new Map();
+    for(var a = 0; a < lista.length; a++){
+      var livros = lista[a].livros;
+      for(var b = 0; b < livros.length; b++){
+        (livros[b].chapters || []).forEach(function(cap){
+          (cap || []).forEach(function(vs){
+            (String(vs).match(reW) || []).forEach(function(w){ w = w.toLowerCase(); freq.set(w, (freq.get(w) || 0) + 1); });
+          });
+        });
+        if(b % 6 === 5) await pausa();
+      }
+    }
+    porLetra = {};
+    freq.forEach(function(f, w){
+      if(f < 2 || w.length < 2) return;
+      var s = strip(w), l0 = s[0];
+      (porLetra[l0] = porLetra[l0] || []).push({w: w, s: s, f: f});
+    });
+
+    /* índice dos versículos da Bíblia do site (para achar o mesmo versículo nas versões modernas) */
+    try{
+      if(typeof portugueseBible !== "undefined" && portugueseBible){
+        idxVersos = {cheio: {}, pref: {}};
+        portugueseBible.forEach(function(liv, bi){
+          (liv.chapters || []).forEach(function(cap, ci){
+            (cap || []).forEach(function(vs, vi){
+              var n = norm(String(vs)); if(n.length < 12) return;
+              var k = bi + "|" + ci + "|" + vi;
+              if(!idxVersos.cheio[n]) idxVersos.cheio[n] = k;
+              var p = n.slice(0, 40); if(!idxVersos.pref[p]) idxVersos.pref[p] = k;
+            });
+          });
+        });
+      }
+    }catch(e){ console.warn("Índice de versículos:", e); idxVersos = null; }
+
+    estado = "ok"; desenhar();
+  }
+
+  function versoDaLinha(lin){
+    if(!idxVersos || !modernas.length) return null;
+    var n = norm(lin); if(n.length < 12) return null;
+    var key = idxVersos.cheio[n] || idxVersos.pref[n.slice(0, 40)];
+    if(!key) return null;
+    if(cacheV[key]) return cacheV[key];
+    var p = key.split("|"), m = new Map();
+    modernas.forEach(function(v){
+      var liv = v.livros[p[0]], cap = liv && liv.chapters && liv.chapters[p[1]], txt = cap && cap[p[2]];
+      if(!txt) return;
+      (String(txt).match(reW) || []).forEach(function(w){
+        w = w.toLowerCase();
+        var atual = m.get(w);
+        if(!atual) m.set(w, v.nome); else if(atual.split(", ").indexOf(v.nome) < 0) m.set(w, atual + ", " + v.nome);
+      });
+    });
+    cacheV[key] = m; return m;
+  }
+
+  /* ---------- distância entre palavras ---------- */
+  function dist(a, b){
+    if(a === b) return 0;
+    var la = a.length, lb = b.length;
+    if(Math.abs(la - lb) > 3) return 9;
+    var prev = new Array(lb + 1), cur = new Array(lb + 1), i, j;
+    for(j = 0; j <= lb; j++) prev[j] = j;
+    for(i = 1; i <= la; i++){
+      cur[0] = i;
+      for(j = 1; j <= lb; j++){
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1));
+      }
+      var t = prev; prev = cur; cur = t;
+    }
+    return prev[lb];
+  }
+  var lim = function(s){ return s.length <= 4 ? 1 : (s.length <= 7 ? 2 : 3); };
+  function geraisMin(k){ GERAIS_MIN.forEach(function(r){ k = k.replace(r[0], r[1]); }); return k; }
+
+  /* palavras parecidas no vocabulário moderno (uma vez por palavra) */
+  function vizinhos(k){
+    if(vizMemo[k]) return vizMemo[k];
+    var alvo = strip(k), pre = strip(geraisMin(k)), l = lim(alvo), res = [], letras = {};
+    letras[alvo[0]] = 1; letras[pre[0]] = 1;
+    Object.keys(letras).forEach(function(l0){
+      (porLetra[l0] || []).forEach(function(c){
+        if(Math.abs(c.s.length - alvo.length) > l + 1) return;
+        var d = Math.min(dist(alvo, c.s), dist(pre, c.s));
+        if(d <= l) res.push({w: c.w, d: d});
+      });
+    });
+    res.sort(function(a, b){ return a.d - b.d || (freq.get(b.w) || 0) - (freq.get(a.w) || 0); });
+    return (vizMemo[k] = res.slice(0, 8));
+  }
+
+  /* ---------- sugestão: dicionário e regras, depois conferência com as versões modernas ---------- */
+  function sugestaoLocal(p, k){
+    if(tem(D, k)) return D[k] !== k ? caixa(p, D[k]) : null;
+    var n = p;
+    GERAIS.forEach(function(r){ n = n.replace(r[0], r[1]); });
+    return n !== p ? n : null;
+  }
+  function existe(w, comMaiuscula){ return (freq.get(w) || 0) >= (comMaiuscula ? 1 : 2); }
+
+  function avaliar(p, ver){
+    var k = chave(p);
+    if(ignorar[k]) return null;
+    if(tem(AUDIO, k)) return {s: caixa(p, AUDIO[k]), t: "au"};
+    var base = sugestaoLocal(p, k);
+    if(estado !== "ok" || !freq){                              /* sem versão paralela: só o dicionário */
+      return base ? {s: base, t: "ort", c: ""} : null;
+    }
+    if(k.indexOf("'") > -1) return base ? {s: base, t: "ort", c: ""} : null;
+    if(p.length < 3 && !base) return null;
+
+    /* a regra só vale se o resultado existir nas versões modernas (evita mexer em palavra de origem própria) */
+    if(base && !existe(chave(base), maiuscula(base))) base = null;
+
+    var conflito = !!(base && ver && ver.has(chave(base)) && !ver.has(k));
+    if((ver && ver.has(k)) || (existe(k, maiuscula(p)) && !conflito)) return null;     /* palavra moderna: não marca */
+
+    var l = lim(strip(k)), cand = {}, melhor = null, melhorS = 99;
+    vizinhos(k).forEach(function(c){ cand[c.w] = c.d; });
+    if(base) cand[chave(base)] = 0;
+    if(ver){
+      ver.forEach(function(_, w){
+        if(w.length < 3) return;
+        var d = Math.min(dist(strip(k), strip(w)), dist(strip(geraisMin(k)), strip(w)));
+        if(d <= l && (cand[w] === undefined || d < cand[w])) cand[w] = d;
+      });
+    }
+    Object.keys(cand).forEach(function(w){
+      if(w === k) return;
+      var s = cand[w] - (ver && ver.has(w) ? 1.5 : 0) - (base && w === chave(base) ? 1 : 0) - 0.1 * Math.log10(freq.get(w) || 1);
+      if(s < melhorS){ melhorS = s; melhor = w; }
+    });
+    if(!melhor) return null;
+    return {s: caixa(p, melhor), t: "ort", c: ver && ver.has(melhor) ? ver.get(melhor) : ""};
+  }
+
+  function analisar(t){
+    var out = [], off = 0;
+    t.split("\n").forEach(function(lin){
+      var ver = versoDaLinha(lin), re = new RegExp(reP, "gu"), m;
+      while((m = re.exec(lin))){
+        var r = avaliar(m[0], ver);
+        if(r) out.push({a: off + m.index, b: off + m.index + m[0].length, o: m[0], s: r.s, t: r.t, c: r.c || ""});
+      }
+      off += lin.length + 1;
+    });
+    return out;
+  }
+
+  /* ---------- camada de destaque por trás da caixa de texto ---------- */
+  var wrap = document.createElement("div"); wrap.id = "ortWrap";
+  var mirror = document.createElement("div"); mirror.id = "ortMirror"; mirror.setAttribute("aria-hidden", "true");
+  ta.parentNode.insertBefore(wrap, ta);
+  wrap.appendChild(mirror); wrap.appendChild(ta);
+  ta.spellcheck = false;
+
+  var barra = document.createElement("div"); barra.id = "ortBarra";
+  barra.innerHTML = '<button type="button" class="at-btn" id="ortToggle">ORTOGRAFIA: LIGADA</button>' +
+    '<button type="button" class="at-btn" id="ortTodas">ACEITAR TODAS AS SUGESTÕES</button>' +
+    '<span class="es-nota" id="ortInfo"></span>' +
+    '<small><span class="r">Vermelho</span>: grafia antiga, conferida com versões modernas. <span class="b">Azul</span>: a voz pode ler mal (ex.: Selah). Clique na palavra sublinhada para ver a sugestão.</small>';
+  wrap.insertAdjacentElement("afterend", barra);
+
+  var pop = document.createElement("div"); pop.id = "ortPop"; pop.hidden = true; wrap.appendChild(pop);
+
+  var itens = [], ligado = true, ultimo = null, atual = -1, timer = null;
+
+  function sync(){
+    var cs = getComputedStyle(ta), s = mirror.style;
+    ["fontFamily","fontSize","fontWeight","fontStyle","lineHeight","letterSpacing","wordSpacing","textAlign","textIndent","textTransform","tabSize","paddingTop","paddingLeft","paddingBottom"].forEach(function(k){ s[k] = cs[k]; });
+    s.borderTopWidth = cs.borderTopWidth; s.borderBottomWidth = cs.borderBottomWidth;
+    s.borderLeftWidth = cs.borderLeftWidth; s.borderRightWidth = cs.borderRightWidth;
+    var sb = ta.offsetWidth - ta.clientWidth - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
+    s.paddingRight = (parseFloat(cs.paddingRight) + Math.max(0, sb || 0)) + "px";
+    mirror.scrollTop = ta.scrollTop;
+  }
+
+  function info(){
+    var o = itens.filter(function(i){ return i.t === "ort"; }).length, a = itens.length - o;
+    var conf = itens.filter(function(i){ return i.t === "ort" && i.c; }).length;
+    var nomes = modernas.map(function(v){ return v.nome; }).join(" e ");
+    var t;
+    if(!ligado) t = "Verificação desligada.";
+    else if(estado === "carregando") t = "Carregando versões modernas para conferir…";
+    else {
+      t = !itens.length ? "Nenhuma palavra antiga encontrada." : o + " palavra(s) em grafia antiga" + (a ? " e " + a + " para o áudio" : "") + (estado === "ok" && o ? " (" + conf + " confirmada(s) no mesmo versículo)" : "") + ".";
+      if(estado === "ok") t += " Conferido com " + nomes + ".";
+      if(estado === "falhou") t += " Não consegui carregar as versões modernas: usando só o dicionário.";
+    }
+    $("ortInfo").textContent = t;
+    $("ortTodas").disabled = !ligado || !o;
+  }
+
+  function desenhar(){
+    var t = ta.value;
+    if(ligado && estado === "nada" && t.trim()) carregar();
+    itens = ligado ? analisar(t) : [];
+    var h = "", p = 0;
+    itens.forEach(function(it, i){
+      h += esc(t.slice(p, it.a)) + '<span class="ort-mk' + (it.t === "au" ? " au" : "") + '" data-i="' + i + '">' + esc(it.o) + '</span>';
+      p = it.b;
+    });
+    mirror.innerHTML = h + esc(t.slice(p)) + "\n";
+    ultimo = t; sync(); info();
+  }
+
+  /* ---------- trocar texto (mantém o Ctrl+Z da caixa) ---------- */
+  function trocar(a, b, novo){
+    var st = ta.scrollTop;
+    ta.focus({preventScroll: true}); ta.setSelectionRange(a, b);
+    var ok = false;
+    try{ ok = document.execCommand("insertText", false, novo); }catch(e){}
+    if(!ok){ ta.setRangeText(novo, a, b, "end"); ta.dispatchEvent(new Event("input", {bubbles: true})); }
+    ta.scrollTop = st;
+  }
+
+  /* ---------- balãozinho de sugestão ---------- */
+  function fechar(){ pop.hidden = true; atual = -1; }
+  function abrir(i){
+    var it = itens[i], span = mirror.querySelector('[data-i="' + i + '"]');
+    if(!it || !span) return;
+    atual = i;
+    var nota = it.t === "au" ? "Pode soar estranho no áudio."
+      : it.c ? "✓ Confere com " + it.c + " neste versículo."
+      : estado === "ok" ? "Palavra moderna parecida (sem o mesmo versículo para comparar)." : "Do dicionário (sem conferência).";
+    pop.innerHTML = '<button type="button" class="ort-sug" data-a="ok" title="Trocar pela sugestão">' + esc(it.s) + '</button>' +
+      (it.t === "au" ? '<button type="button" class="ort-sec" data-a="tirar" title="Apagar do texto">Tirar</button>' : '') +
+      '<button type="button" class="ort-x" data-a="ign" title="Ignorar esta palavra">✕</button>' +
+      '<span class="ort-nota' + (it.c ? " ok" : "") + '">' + esc(nota) + '</span>';
+    pop.hidden = false;
+    var r = span.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+    var left = Math.max(0, Math.min(r.left - w.left, wrap.clientWidth - pop.offsetWidth - 4));
+    pop.style.left = left + "px";
+    pop.style.top = (r.bottom - w.top + 4) + "px";
+  }
+  pop.addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-a]"); if(!b || atual < 0) return;
+    var it = itens[atual], t = ta.value, acao = b.dataset.a;
+    fechar();
+    if(acao === "ok") trocar(it.a, it.b, it.s);
+    else if(acao === "ign"){ ignorar[chave(it.o)] = 1; guardarIgnorar(); desenhar(); }
+    else if(acao === "tirar"){
+      var a = it.a, e = it.b;
+      if(t[a - 1] === "(" && t[e] === ")"){ a--; e++; }
+      while(a > 0 && /[ \t]/.test(t[a - 1])) a--;
+      trocar(a, e, "");
+    }
+  });
+
+  /* ---------- eventos ---------- */
+  ta.addEventListener("click", function(){
+    if(!ligado) return;
+    if(ta.value !== ultimo) desenhar();
+    if(ta.selectionStart !== ta.selectionEnd){ fechar(); return; }
+    var p = ta.selectionStart;
+    for(var i = 0; i < itens.length; i++){ if(itens[i].a <= p && p <= itens[i].b){ abrir(i); return; } }
+    fechar();
+  });
+  ta.addEventListener("input", function(){ fechar(); clearTimeout(timer); timer = setTimeout(desenhar, 250); });
+  ta.addEventListener("scroll", function(){ mirror.scrollTop = ta.scrollTop; fechar(); });
+  ta.addEventListener("keydown", function(ev){ if(ev.key === "Escape") fechar(); });
+  document.addEventListener("mousedown", function(ev){ if(!pop.contains(ev.target) && ev.target !== ta) fechar(); });
+  window.addEventListener("resize", sync);
+  if(window.ResizeObserver) new ResizeObserver(sync).observe(ta);
+  setInterval(function(){ if(ta.value !== ultimo && pop.hidden) desenhar(); }, 500);
+
+  $("ortToggle").addEventListener("click", function(){
+    ligado = !ligado; this.textContent = "ORTOGRAFIA: " + (ligado ? "LIGADA" : "DESLIGADA");
+    fechar(); desenhar();
+  });
+  $("ortTodas").addEventListener("click", function(){
+    if(ta.value !== ultimo) desenhar();
+    var n = ta.value, st = ta.scrollTop;
+    itens.filter(function(i){ return i.t === "ort"; }).reverse().forEach(function(it){ n = n.slice(0, it.a) + it.s + n.slice(it.b); });
+    if(n === ta.value) return;
+    fechar(); ta.focus({preventScroll: true}); ta.select();
+    var ok = false;
+    try{ ok = document.execCommand("insertText", false, n); }catch(e){}
+    if(!ok){ ta.value = n; ta.dispatchEvent(new Event("input", {bubbles: true})); }
+    ta.scrollTop = st;
+  });
+
+  desenhar();
+})();
+</script>
+<!-- ===== FIM: DESTACAR ORTOGRAFIA ANTIGA + CONFERÊNCIA COM VERSÃO PARALELA ===== -->
 
 
 </body>
