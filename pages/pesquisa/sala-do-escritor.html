@@ -9826,9 +9826,7 @@ texto: $("esTexto").value
 })();
 </script>
 <!-- ===== FIM: BIBLIOTECA DE IMAGENS E VÍDEOS (ABAS VISÍVEIS) ===== -->
-<!-- ===== INÍCIO: DESTACAR ORTOGRAFIA ANTIGA + CONFERÊNCIA COM VERSÃO PARALELA =====
-     APAGUE o bloco anterior "DESTACAR ORTOGRAFIA ANTIGA NO TEXTO" e COLE este no mesmo lugar
-     (final da seção do Estúdio, depois de "FIM: BIBLIOTECA DE IMAGENS E VÍDEOS (ABAS VISÍVEIS)"). -->
+<!-- ===== INÍCIO: DESTACAR ORTOGRAFIA ANTIGA + CONFERÊNCIA COM VERSÃO PARALELA ===== -->
 <style>
 #ortWrap{position:relative;background:#fff;border-radius:8px}
 #ortWrap > #esTexto{display:block;position:relative;z-index:1;background:transparent!important}
@@ -10258,6 +10256,135 @@ texto: $("esTexto").value
 })();
 </script>
 <!-- ===== FIM: DESTACAR ORTOGRAFIA ANTIGA + CONFERÊNCIA COM VERSÃO PARALELA ===== -->
+
+<!-- ===== INÍCIO: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
+<style>
+#tfNota{margin:6px 0 0;font:600 13.5px/1.5 "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#tfNota small{display:block;margin-top:2px;font:12.5px/1.4 "Segoe UI",Arial,sans-serif;color:var(--ink-soft);font-weight:400}
+#tfNota.acima{color:#a14747}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var vel = $("esVel"), ta = $("esTexto"), dur = $("esDur"), conta = $("esConta"), tom = $("esTom");
+  if(!vel || !ta || !dur) return;
+ 
+  /* ---------- definições (valem para todo o Estúdio) ----------
+     Velocidade Normal = 130 palavras por minuto (o mesmo valor que o Estúdio já usa).
+     Meta de duração   = quanto tempo a fala deve durar (campo "Duração desejada").
+     Tempo estimado    = palavras ÷ 130 × 60 ÷ velocidade. */
+  var BASE = 130;
+  var NOMES = {"0.85": "Lenta", "1": "Normal", "1.15": "Rápida"};
+  var antigo = $("velNota"); if(antigo) antigo.remove();      /* tira a frase do bloco anterior, se ainda existir */
+ 
+  /* 1. o campo Tom não tem efeito sem a IA: fica escondido (o valor continua guardado nas versões) */
+  if(tom && tom.closest("label")) tom.closest("label").style.display = "none";
+ 
+  /* 2. rótulos e dicas */
+  Array.prototype.forEach.call(vel.options, function(o){
+    var v = Number(o.value), nome = NOMES[o.value];
+    if(!nome || isNaN(v)) return;
+    o.textContent = nome + " — " + String(v).replace(".", ",") + "× (cerca de " + (Math.round(BASE * v / 5) * 5) + " palavras por minuto)";
+  });
+  vel.title = "Ritmo da voz no OUVIR, no MP3 e no MP4. Normal equivale a cerca de 130 palavras por minuto.";
+  dur.title = "Meta de duração da fala. É comparada com o tempo estimado do texto e usada pelo botão AJUSTAR À DURAÇÃO.";
+ 
+  var velAtual = function(){ return Number(vel.value) || 1; };
+  var meta = function(){ return Number(dur.value) || 60; };
+  var nomeVel = function(){ return NOMES[vel.value] || ""; };
+  var textoMeta = function(){ var o = dur.options[dur.selectedIndex]; return o ? o.textContent : ""; };
+  function palavras(){ var t = ta.value.trim(); return t ? t.split(/\s+/).length : 0; }
+  function fmt(s){
+    s = Math.round(s);
+    if(s < 60) return s + " s";
+    var m = Math.floor(s / 60), r = s % 60;
+    return m + " min" + (r ? " " + r + " s" : "");
+  }
+ 
+  /* 3. situação do texto em relação à meta */
+  function situacao(){
+    var p = palavras(), est = p / BASE * 60 / velAtual(), T = meta();
+    if(!p) return {p: 0, est: 0, estado: "vazio", frase: ""};
+    if(est > T * 1.1) return {p: p, est: est, estado: "acima", frase: "⚠ " + fmt(est - T) + " acima da meta: use AJUSTAR À DURAÇÃO ou escolha uma voz mais rápida."};
+    if(est < T * 0.6) return {p: p, est: est, estado: "abaixo", frase: "Abaixo da meta: tudo bem se o vídeo puder ser mais curto."};
+    return {p: p, est: est, estado: "dentro", frase: "✓ Dentro da meta."};
+  }
+ 
+  /* 4. contador do passo 1 (passa a considerar a velocidade escolhida) */
+  function aplicarConta(){
+    if(!conta) return;
+    var s = situacao();
+    var novo = s.p + " palavras · fala de cerca de " + fmt(s.est) + " (velocidade " + nomeVel().toLowerCase() + ")" +
+      (s.p ? " · meta: " + textoMeta() + " — " + s.frase : "");
+    if(conta.textContent !== novo) conta.textContent = novo;
+    conta.style.color = s.estado === "acima" ? "#a14747" : "";
+  }
+  if(conta) new MutationObserver(aplicarConta).observe(conta, {childList: true, characterData: true, subtree: true});
+ 
+  /* 5. frase do passo 2, logo abaixo da velocidade */
+  var nota = document.createElement("p");
+  nota.id = "tfNota"; nota.setAttribute("aria-live", "polite");
+  var linha = vel.closest(".at-row") || vel.closest("label").parentElement;
+  linha.insertAdjacentElement("afterend", nota);
+  function aplicarNota(){
+    var s = situacao(), v = velAtual();
+    nota.className = s.estado === "acima" ? "acima" : "";
+    nota.innerHTML = (s.p
+      ? "Com o texto atual (" + s.p + " palavras), a fala dura cerca de " + fmt(s.est) + " na velocidade " + nomeVel().toLowerCase() + " (" + (Math.round(BASE * v / 5) * 5) + " palavras por minuto)."
+      : "Escreva ou cole o texto no passo 1 para ver quanto tempo a fala vai durar.") +
+      "<small>" + (s.p ? "Meta do passo 1: " + textoMeta() + ". " + s.frase + " " : "") + "É uma estimativa: o tempo real depende da voz escolhida.</small>";
+  }
+ 
+  var ultimo = "";
+  function atualizar(){
+    var chave = ta.value.length + "|" + palavras() + "|" + vel.value + "|" + dur.value;
+    if(chave === ultimo && conta && conta.textContent) { aplicarConta(); return; }
+    ultimo = chave; aplicarConta(); aplicarNota();
+  }
+  vel.addEventListener("change", atualizar);
+  dur.addEventListener("change", atualizar);
+  ta.addEventListener("input", atualizar);
+  setInterval(atualizar, 700);          /* pega mudanças feitas por outros botões */
+  atualizar();
+ 
+  /* 6. AJUSTAR À DURAÇÃO: passa a usar a meta e a velocidade escolhidas */
+  function msg(t, erro){ var m = $("esMsg1"); if(!m) return; m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); }
+  function pôr(t){
+    ta.focus({preventScroll: true}); ta.select();
+    var ok = false;
+    try{ ok = document.execCommand("insertText", false, t); }catch(e){}
+    if(!ok){ ta.value = t; ta.dispatchEvent(new Event("input", {bubbles: true})); }
+  }
+  function ajustar(){
+    var t = ta.value.trim();
+    if(!t){ msg("Não há texto para ajustar.", true); return; }
+    var alvo = Math.round(meta() / 60 * BASE * velAtual()), p = palavras();
+    if(p <= alvo){
+      msg("O texto tem " + p + " palavras e cabe na meta (" + textoMeta() + ", velocidade " + nomeVel().toLowerCase() + ": até " + alvo + " palavras). Este botão só encurta; para aumentar, escreva mais.");
+      return;
+    }
+    var frases = t.match(/[^.!?…\n]+[.!?…]+["”’)]*\s*|[^.!?…\n]+$|\n+/g) || [t];
+    var saida = "", cont = 0;
+    for(var i = 0; i < frases.length; i++){
+      var n = frases[i].trim() ? frases[i].trim().split(/\s+/).length : 0;
+      if(cont + n > alvo && cont > 0) break;
+      saida += frases[i]; cont += n;
+    }
+    saida = saida.trim();
+    if(!window.confirm("O texto tem " + p + " palavras e a meta (" + textoMeta() + ", velocidade " + nomeVel().toLowerCase() + ") comporta cerca de " + alvo + ".\nCortar no fim de uma frase, ficando com " + cont + " palavras?\n(Se errar, Ctrl+Z na caixa do texto volta.)")) return;
+    pôr(saida);
+    msg("Texto cortado para " + cont + " palavras (cerca de " + fmt(cont / BASE * 60 / velAtual()) + ").");
+  }
+  document.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("#a1Ajustar"); if(!b) return;
+    ev.stopImmediatePropagation(); ev.stopPropagation(); ev.preventDefault();
+    ajustar();
+  }, true);
+  var bAj = $("a1Ajustar");
+  if(bAj) bAj.title = "Corta o texto no fim de uma frase para caber na meta de duração, na velocidade escolhida no passo 2.";
+})();
+</script>
+<!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
 
 
 </body>
