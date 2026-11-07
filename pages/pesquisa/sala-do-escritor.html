@@ -9260,7 +9260,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel");
-  if(!painel || !$("esTexto") || !$("esDest")) return;
+  if(!painel || !("esTexto")||!("esDest")) return;
 
   var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
   function msg(n, t, erro){ var el = $("esMsg" + n); if(!el) return; el.textContent = t || ""; el.className = "es-msg" + (erro ? " erro" : ""); }
@@ -10385,89 +10385,6 @@ texto: $("esTexto").value
 })();
 </script>
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
-<!-- ===== INÍCIO: EXPLICAÇÃO REFLEXIVA (bloco independente, não altera nada) ===== -->
-<style>
-.er-card{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;padding:16px;margin-top:16px;display:flex;flex-direction:column;gap:10px}
-.er-card h4{margin:0;font:700 17px Georgia,serif;color:var(--ink)}
-.er-card p{margin:0;font:13px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-.er-card textarea{box-sizing:border-box;width:100%;min-height:320px;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:16px/1.6 Georgia,serif}
-.er-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.er-msg{font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-.er-msg.erro{color:#a14747}
-</style>
-<script>
-(function(){
-  var $ = function(id){ return document.getElementById(id); };
-  var painel = $("esPainel"), txt = $("esTexto");
-  if(!painel || !txt) return;
-  var box1 = painel.querySelector('.es-box[data-passo="1"]');
-  if(!box1) return;
-  var URL_ER = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/escrita";
-
-  var card = document.createElement("div");
-  card.className = "er-card";
-  card.innerHTML = '<h4>Explicação reflexiva</h4>' +
-    '<p>Gera, a partir do texto bíblico acima, uma explicação como a de um pai, pastor, amigo ou sábio ensinando. O texto da Bíblia acima não é alterado.</p>' +
-    '<div class="er-linha">' +
-      '<button type="button" class="at-btn gold" id="erGerar">GERAR EXPLICAÇÃO</button>' +
-      '<button type="button" class="at-btn" id="erUsar" disabled>USAR COMO TEXTO DO VÍDEO</button>' +
-      '<button type="button" class="at-btn" id="erCopiar" disabled>COPIAR</button>' +
-      '<span class="er-msg" id="erMsg"></span>' +
-    '</div>' +
-    '<textarea id="erTxt" placeholder="A explicação aparece aqui. Você pode editar antes de usar." hidden></textarea>';
-  box1.appendChild(card);
-
-  var gerar = $("erGerar"), usar = $("erUsar"), copiar = $("erCopiar"), area = $("erTxt"), msg = $("erMsg");
-  function aviso(t, erro){ msg.textContent = t || ""; msg.className = "er-msg" + (erro ? " erro" : ""); }
-
-  gerar.addEventListener("click", async function(){
-    var base = txt.value.trim();
-    var ref = ($("esAssunto") ? $("esAssunto").value.trim() : "");
-    if(!base && !ref){ aviso("Coloque o texto bíblico acima ou escreva a passagem (ex.: Salmos 1).", true); return; }
-    gerar.disabled = true; usar.disabled = true; copiar.disabled = true;
-    aviso("Escrevendo a explicação… pode levar até 1 minuto.");
-    var ctl = new AbortController();
-    var t = setTimeout(function(){ ctl.abort(); }, 120000);
-    try{
-      var sess = (await supabaseClient.auth.getSession()).data.session;
-      if(!sess) throw new Error("Sessão encerrada. Entre de novo.");
-      var r = await fetch(URL_ER, {
-        method: "POST",
-        signal: ctl.signal,
-        headers: {"Content-Type":"application/json", "Authorization":"Bearer " + sess.access_token},
-        body: JSON.stringify({acao:"criar", tipo:"Explicação bíblica", modelo:"explicacao", tom:"Acolhedor", duracao:300,
-          assunto:ref, titulo:($("esTitulo") ? $("esTitulo").value.trim() : ""), texto:base})
-      });
-      var d = await r.json().catch(function(){ return {}; });
-      if(!r.ok || !d.ok) throw new Error(d.error || "Não foi possível escrever agora.");
-      area.value = d.text || "";
-      area.hidden = false;
-      usar.disabled = false; copiar.disabled = false;
-      aviso("Pronto. Leia e confira antes de usar.");
-    }catch(e){
-      console.error(e);
-      aviso(e.name === "AbortError" ? "A IA demorou demais. Tente de novo." : (e.message || "Não foi possível escrever agora."), true);
-    }finally{
-      clearTimeout(t);
-      gerar.disabled = false;
-    }
-  });
-
-  usar.addEventListener("click", function(){
-    if(!area.value.trim()) return;
-    if(!confirm("Isso troca o texto da caixa acima pela explicação. Se quiser manter o Salmo, clique antes em GUARDAR VERSÃO. Continuar?")) return;
-    txt.value = area.value;
-    txt.dispatchEvent(new Event("input", {bubbles:true}));
-    aviso("Texto do vídeo trocado pela explicação.");
-  });
-
-  copiar.addEventListener("click", function(){
-    if(!area.value.trim()) return;
-    navigator.clipboard.writeText(area.value).then(function(){ aviso("Copiado."); }, function(){ area.select(); aviso("Selecione e use Ctrl+C.", true); });
-  });
-})();
-</script>
-<!-- ===== FIM: EXPLICAÇÃO REFLEXIVA ===== -->
 
 
 </body>
@@ -10477,4 +10394,5 @@ texto: $("esTexto").value
  
  
  
+
 
