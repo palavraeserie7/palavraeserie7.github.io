@@ -7398,11 +7398,21 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
         sm.connect(gn); gn.connect(dest); sm.start();
       }catch(e){ aviso += " A música não pôde ser lida."; }
     }
-    var tipos = ["video/mp4;codecs=avc1,mp4a.40.2", "video/webm;codecs=vp9,opus", "video/webm"];
+   var tipos = [
+  "video/webm;codecs=vp9,opus",
+  "video/webm;codecs=vp8,opus",
+  "video/webm"
+];
+
     var mime = tipos.filter(function(t){ return window.MediaRecorder && MediaRecorder.isTypeSupported(t); })[0];
     if(!mime){ info("Este navegador não grava vídeo. Use o Chrome ou o Edge atualizado.", true); ac.close(); return; }
     var fluxo = new MediaStream(cv.captureStream(30).getVideoTracks().concat(dest.stream.getAudioTracks()));
-    var rec = new MediaRecorder(fluxo, {mimeType: mime, videoBitsPerSecond: 8000000}), pedacos = [];
+   var rec = new MediaRecorder(fluxo, {
+  mimeType: mime,
+  videoBitsPerSecond: 8000000,
+  audioBitsPerSecond: 192000
+});
+
     rec.ondataavailable = function(e){ if(e.data.size) pedacos.push(e.data); };
     var fim = new Promise(function(ok){ rec.onstop = ok; });
     rec.start(500);
