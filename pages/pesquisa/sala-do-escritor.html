@@ -7348,8 +7348,24 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
     info("Gerando a voz…", false, 0.03);
     var buf = null, aviso = "";
     try{
-      var vb = await pedirVoz(proj.fala, det);
-      buf = await ac.decodeAudioData(await vb.arrayBuffer());
+     var partesFala = [], atualP = "";
+(proj.fala.match(/[^.!?…]+[.!?…]*\s*/g) || [proj.fala]).forEach(function(fr){
+  if(atualP && (atualP + fr).length > 500){ partesFala.push(atualP); atualP = fr; } else atualP += fr;
+});
+if(atualP.trim()) partesFala.push(atualP);
+var bufs = [], totalAmostras = 0;
+for(var k = 0; k < partesFala.length; k++){
+  info("Gerando a voz… parte " + (k + 1) + " de " + partesFala.length, false, 0.03 + 0.05 * k / partesFala.length);
+  var vb = await pedirVoz(partesFala[k].trim(), det);
+  var bk = await ac.decodeAudioData(await vb.arrayBuffer());
+  bufs.push(bk); totalAmostras += bk.length;
+}
+buf = ac.createBuffer(bufs[0].numberOfChannels, totalAmostras, bufs[0].sampleRate);
+var pos = 0;
+bufs.forEach(function(b){
+  for(var c = 0; c < buf.numberOfChannels; c++) buf.getChannelData(c).set(b.getChannelData(Math.min(c, b.numberOfChannels - 1)), pos);
+  pos += b.length;
+});
     }catch(e){ aviso = " Sem voz: " + (e.message || "falhou") + " O vídeo sai só com texto e música."; }
  
     var palavras = proj.fala.split(/\s+/).length;
