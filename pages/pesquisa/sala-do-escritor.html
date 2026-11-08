@@ -6784,15 +6784,28 @@ st.versoes.unshift({
     var txt = t ? t.value.replace(/^##\s*/gm,"").replace(/^>\s?/gm,"").trim() : "";
     if(!txt){ msg(1,"O texto do Ateliê está vazio.",true); return; }
     if($("esTexto").value.trim() && !window.confirm("Substituir o texto desta tela pelo do Ateliê?")) return;
-    ("esTexto").value=txt;if(ti&&ti.value&&!("esTitulo").value) $("esTitulo").value = ti.value;
+    $("esTexto").value = txt;
+if(ti && ti.value && !$("esTitulo").value) {
+  $("esTitulo").value = ti.value;
+}
+
     contar(); msg(1,"Texto do Ateliê trazido para cá.");
   });
  
   /* botões de IA: ficam prontos, mas só funcionam quando o Worker for ligado */
   painel.addEventListener("click", function(ev){
     var b = ev.target.closest("[data-ia]"); if(!b) return;
-    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:("esTom").value,duracao:Number(("esDur").value),
-      assunto:("esAssunto").value.trim(),titulo:("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
+  var det = {
+  acao: b.dataset.ia,
+  tipo: st.tipo,
+  tom: $("esTom").value,
+  duracao: Number($("esDur").value),
+  assunto: $("esAssunto").value.trim(),
+  titulo: $("esTitulo").value.trim(),
+  texto: $("esTexto").value,
+  tratado: false
+};
+
     if(det.acao !== "criar" && !det.texto.trim()){ msg(1,"Escreva ou crie um texto antes de usar esta opção.",true); return; }
     document.dispatchEvent(new CustomEvent("estudio:ia", {detail:det}));
     if(!det.tratado) msg(1,"A IA ainda não está ligada. Isso será feito no próximo passo, junto com o Worker.",true);
@@ -6839,7 +6852,8 @@ st.versoes.unshift({
     tel.style.backgroundImage = fotos[0] ? 'url("'+fotos[0]+'")' : "";
     leg.textContent = ($("esTitulo").value.trim() || $("esTexto").value.trim().split(/\n/)[0] || "Sua mensagem aparece aqui.").slice(0,140);
     var p = $("esTexto").value.trim() ? $("esTexto").value.trim().split(/\s+/).length : 0;
-    ("esResumo").innerHTML='<b>'+esc(st.tipo)+'</b>·tom'+esc(("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
+   $("esResumo").innerHTML =
+'<b>'+esc(st.tipo)+'</b>·tom'+esc(("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
       fotos.length + ' imagem(ns) · ' + ($("esMusica").value ? 'com música' : 'sem música');
   }
   function pararVoz(){
@@ -7347,10 +7361,22 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
 
     info("Gerando a voz…", false, 0.03);
     var buf = null, aviso = "";
-    try{
-      var vb = await pedirVoz(proj.fala, det);
-      buf = await ac.decodeAudioData(await vb.arrayBuffer());
-    }catch(e){ aviso = " Sem voz: " + (e.message || "falhou") + " O vídeo sai só com texto e música."; }
+   try {
+  var vb = await pedirVoz(proj.fala, det);
+
+  if (!vb || !vb.size) {
+    throw new Error("A API retornou um áudio vazio.");
+  }
+
+  buf = await ac.decodeAudioData(await vb.arrayBuffer());
+
+} catch(e) {
+  throw new Error(
+    "A narração não foi gerada. Verifique o Worker /api/voz. " +
+    (e.message || "Erro desconhecido")
+  );
+}
+
  
     var palavras = proj.fala.split(/\s+/).length;
     var total = (buf ? buf.duration : palavras / 130 * 60 / (det.velocidade || 1)) + 0.8;
