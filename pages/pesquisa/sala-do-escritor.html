@@ -6784,28 +6784,15 @@ st.versoes.unshift({
     var txt = t ? t.value.replace(/^##\s*/gm,"").replace(/^>\s?/gm,"").trim() : "";
     if(!txt){ msg(1,"O texto do Ateliê está vazio.",true); return; }
     if($("esTexto").value.trim() && !window.confirm("Substituir o texto desta tela pelo do Ateliê?")) return;
-    $("esTexto").value = txt;
-if(ti && ti.value && !$("esTitulo").value) {
-  $("esTitulo").value = ti.value;
-}
-
+    ("esTexto").value=txt;if(ti&&ti.value&&!("esTitulo").value) $("esTitulo").value = ti.value;
     contar(); msg(1,"Texto do Ateliê trazido para cá.");
   });
  
   /* botões de IA: ficam prontos, mas só funcionam quando o Worker for ligado */
   painel.addEventListener("click", function(ev){
     var b = ev.target.closest("[data-ia]"); if(!b) return;
-  var det = {
-  acao: b.dataset.ia,
-  tipo: st.tipo,
-  tom: $("esTom").value,
-  duracao: Number($("esDur").value),
-  assunto: $("esAssunto").value.trim(),
-  titulo: $("esTitulo").value.trim(),
-  texto: $("esTexto").value,
-  tratado: false
-};
-
+    var det = {acao:b.dataset.ia, tipo:st.tipo, tom:("esTom").value,duracao:Number(("esDur").value),
+      assunto:("esAssunto").value.trim(),titulo:("esTitulo").value.trim(), texto:$("esTexto").value, tratado:false};
     if(det.acao !== "criar" && !det.texto.trim()){ msg(1,"Escreva ou crie um texto antes de usar esta opção.",true); return; }
     document.dispatchEvent(new CustomEvent("estudio:ia", {detail:det}));
     if(!det.tratado) msg(1,"A IA ainda não está ligada. Isso será feito no próximo passo, junto com o Worker.",true);
@@ -6852,8 +6839,7 @@ if(ti && ti.value && !$("esTitulo").value) {
     tel.style.backgroundImage = fotos[0] ? 'url("'+fotos[0]+'")' : "";
     leg.textContent = ($("esTitulo").value.trim() || $("esTexto").value.trim().split(/\n/)[0] || "Sua mensagem aparece aqui.").slice(0,140);
     var p = $("esTexto").value.trim() ? $("esTexto").value.trim().split(/\s+/).length : 0;
-   $("esResumo").innerHTML =
-'<b>'+esc(st.tipo)+'</b>·tom'+esc(("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
+    ("esResumo").innerHTML='<b>'+esc(st.tipo)+'</b>·tom'+esc(("esTom").value).toLowerCase() + ' · ' + p + ' palavras · ' +
       fotos.length + ' imagem(ns) · ' + ($("esMusica").value ? 'com música' : 'sem música');
   }
   function pararVoz(){
@@ -7361,22 +7347,10 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
 
     info("Gerando a voz…", false, 0.03);
     var buf = null, aviso = "";
-   try {
-  var vb = await pedirVoz(proj.fala, det);
-
-  if (!vb || !vb.size) {
-    throw new Error("A API retornou um áudio vazio.");
-  }
-
-  buf = await ac.decodeAudioData(await vb.arrayBuffer());
-
-} catch(e) {
-  throw new Error(
-    "A narração não foi gerada. Verifique o Worker /api/voz. " +
-    (e.message || "Erro desconhecido")
-  );
-}
-
+    try{
+      var vb = await pedirVoz(proj.fala, det);
+      buf = await ac.decodeAudioData(await vb.arrayBuffer());
+    }catch(e){ aviso = " Sem voz: " + (e.message || "falhou") + " O vídeo sai só com texto e música."; }
  
     var palavras = proj.fala.split(/\s+/).length;
     var total = (buf ? buf.duration : palavras / 130 * 60 / (det.velocidade || 1)) + 0.8;
@@ -7398,21 +7372,11 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
         sm.connect(gn); gn.connect(dest); sm.start();
       }catch(e){ aviso += " A música não pôde ser lida."; }
     }
-   var tipos = [
-  "video/webm;codecs=vp9,opus",
-  "video/webm;codecs=vp8,opus",
-  "video/webm"
-];
-
+    var tipos = ["video/mp4;codecs=avc1,mp4a.40.2", "video/webm;codecs=vp9,opus", "video/webm"];
     var mime = tipos.filter(function(t){ return window.MediaRecorder && MediaRecorder.isTypeSupported(t); })[0];
     if(!mime){ info("Este navegador não grava vídeo. Use o Chrome ou o Edge atualizado.", true); ac.close(); return; }
     var fluxo = new MediaStream(cv.captureStream(30).getVideoTracks().concat(dest.stream.getAudioTracks()));
-   var rec = new MediaRecorder(fluxo, {
-  mimeType: mime,
-  videoBitsPerSecond: 8000000,
-  audioBitsPerSecond: 192000
-});
-
+    var rec = new MediaRecorder(fluxo, {mimeType: mime, videoBitsPerSecond: 8000000}), pedacos = [];
     rec.ondataavailable = function(e){ if(e.data.size) pedacos.push(e.data); };
     var fim = new Promise(function(ok){ rec.onstop = ok; });
     rec.start(500);
@@ -9331,8 +9295,7 @@ texto: $("esTexto").value
     var tipo = document.querySelector('#esTipos [aria-pressed="true"]');
     var f = $("esFormato"), fNome = f && f.options[f.selectedIndex] ? f.options[f.selectedIndex].textContent : "";
     el.innerHTML = '<b>' + esc(tipo ? tipo.dataset.t : "") + '</b> · tom ' + esc($("esTom").value.toLowerCase()) + ' · ' + p + ' palavras · ' +
-      $("esFotos").querySelectorAll("img").length
-+'imagem(ns)·'+(("esMusica").value ? "com música" : "sem música") + ' · ' + esc(fNome);
+      ("esFotos").querySelectorAll("img").length+'imagem(ns)·'+(("esMusica").value ? "com música" : "sem música") + ' · ' + esc(fNome);
   }
   painel.addEventListener("click", function(ev){
     if(ev.target.closest && ev.target.closest('.es-passos [data-p="3"]')) setTimeout(resumo, 0);
