@@ -10795,19 +10795,279 @@ texto: $("esTexto").value
     ABAS.map(function(a, i){ return painelHtml(a, i === 0); }).join("") +
     '<div class="pc-linha"><button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><span class="es-nota" data-pc-sujo hidden>● alterações ainda não guardadas</span></div>' +
     '<p class="es-msg" id="pcMsg" role="status"></p>';
-  var MODULOS_BIB = [
-    {nome:"Fundamentos Musicais", assuntos:["Notas e alturas musicais","Acústica e fundamentos matemáticos","Frequências e proporções","Intervalos simples e compostos","Classificação e inversão de intervalos","Consonâncias e dissonâncias","Escalas e modos","Armaduras e tonalidades","Graus da escala"]},
-    {nome:"Harmonia", assuntos:["Formação de acordes","Tríades e tétrades","Acordes com extensões e alterações","Inversões e baixos alternativos","Funções harmônicas","Acordes diatônicos e não diatônicos","Dominantes secundárias","Acordes emprestados","Cadências e resoluções","Modulações","Relações tonais e modais"]},
-    {nome:"Melodia", assuntos:["Movimento ascendente e descendente","Movimento conjunto e disjunto","Saltos melódicos","Compensação de saltos","Contorno melódico","Notas reais e notas estranhas ao acorde","Notas de passagem e bordaduras","Apogiaturas e antecipações","Retardos e suspensões","Notas de escape","Cromatismos e ornamentações","Tessitura e extensão melódica"]},
-    {nome:"Contraponto e Condução de Vozes", assuntos:["Movimento paralelo","Movimento contrário","Movimento oblíquo","Movimento direto","Condução independente das vozes","Quintas e oitavas paralelas","Quintas e oitavas ocultas","Cruzamento de vozes","Sobreposição de registros","Preparação e resolução de dissonâncias","Notas comuns entre acordes","Contraponto de primeira à quinta espécie"]},
-    {nome:"Harmonia Vocal — SATB", assuntos:["Soprano","Contralto","Tenor","Baixo","Extensão e tessitura vocal","Regiões de dificuldade","Espaçamento entre vozes","Cruzamento e sobreposição","Dobramento de notas","Condução harmônica","Resolução de sensíveis","Tratamento de dissonâncias","Limites de execução vocal"]},
-    {nome:"Harmonia Instrumental e Instrumentos", assuntos:["Cordas","Madeiras","Metais","Percussão","Teclas","Instrumentos populares e tradicionais","Extensão e tessitura instrumental","Claves e transposições","Afinações","Regiões expressivas e de dificuldade","Técnicas e articulações","Limitações de execução","Dobramentos e distribuição instrumental"]},
-    {nome:"Ritmo", assuntos:["Fórmulas de compasso","Métrica simples","Métrica composta","Métrica irregular","Figuras rítmicas e pausas","Subdivisões binárias e ternárias","Acentuação métrica","Síncopes e contratempos","Quiálteras","Polirritmia","Ostinatos","Relações rítmicas entre instrumentos","Ritmos brasileiros e suas variações"]},
-    {nome:"Relações Musicais", assuntos:["Relações entre notas e intervalos","Relações entre escalas e tonalidades","Relações entre acordes e funções harmônicas","Relações entre melodia e harmonia","Relações entre melodia e ritmo","Relações entre baixo e harmonia","Relações entre vozes","Relações entre instrumentos","Compatibilidade entre elementos musicais"]},
-    {nome:"Perfis de Linguagem Musical", assuntos:["Contraponto renascentista","Harmonia tonal clássica","Romantismo","Escrita coral tradicional","Jazz","Música popular","Música brasileira","Música modal","Música contemporânea","Música experimental"]},
-    {nome:"Regras e Validação Musical", assuntos:["Cadastro de regras","Identificação e classificação","Critérios de aplicação","Condições de validade","Gravidade","Exceções","Restrições estilísticas","Justificativas musicais","Erros","Alertas","Licenças artísticas"]},
-    {nome:"Integração da Inteligência Musical", assuntos:["Integração melódica","Integração harmônica","Integração rítmica","Integração contrapontística","Integração vocal","Integração instrumental","Relações entre os sistemas","Coerência musical global"]}
-  ];
+ ```javascript
+var MODULOS_BIB = [
+    {
+        nome: "Fundamentos Musicais",
+        assuntos: [
+            "Notas e alturas musicais",
+            "Acústica e fundamentos matemáticos",
+            "Frequências e proporções",
+            "Intervalos simples e compostos",
+            "Classificação e inversão de intervalos",
+            "Consonâncias e dissonâncias",
+            "Escalas e modos",
+            "Armaduras e tonalidades",
+            "Graus da escala"
+        ]
+    },
+    {
+        nome: "Harmonia",
+        assuntos: [
+            "Formação de acordes",
+            "Tríades e tétrades",
+            "Acordes com extensões e alterações",
+            "Inversões e baixos alternativos",
+            "Funções harmônicas",
+            "Acordes diatônicos e não diatônicos",
+            "Dominantes secundárias",
+            "Acordes emprestados",
+            "Cadências e resoluções",
+            "Modulações",
+            "Relações tonais e modais"
+        ]
+    },
+    {
+        nome: "Melodia",
+        assuntos: [
+            "Movimento ascendente e descendente",
+            "Movimento conjunto e disjunto",
+            "Saltos melódicos",
+            "Compensação de saltos",
+            "Contorno melódico",
+            "Notas reais e notas estranhas ao acorde",
+            "Notas de passagem e bordaduras",
+            "Apogiaturas e antecipações",
+            "Retardos e suspensões",
+            "Notas de escape",
+            "Cromatismos e ornamentações",
+            "Tessitura e extensão melódica"
+        ]
+    },
+    {
+        nome: "Contraponto e Condução de Vozes",
+        assuntos: [
+            "Movimento paralelo",
+            "Movimento contrário",
+            "Movimento oblíquo",
+            "Movimento direto",
+            "Condução independente das vozes",
+            "Quintas e oitavas paralelas",
+            "Quintas e oitavas ocultas",
+            "Cruzamento de vozes",
+            "Sobreposição de registros",
+            "Preparação e resolução de dissonâncias",
+            "Notas comuns entre acordes",
+            "Contraponto de primeira à quinta espécie"
+        ]
+    },
+    {
+        nome: "Harmonia Vocal — SATB",
+        assuntos: [
+            "Soprano",
+            "Contralto",
+            "Tenor",
+            "Baixo",
+            "Extensão e tessitura vocal",
+            "Regiões de dificuldade",
+            "Espaçamento entre vozes",
+            "Cruzamento e sobreposição",
+            "Dobramento de notas",
+            "Condução harmônica",
+            "Resolução de sensíveis",
+            "Tratamento de dissonâncias",
+            "Limites de execução vocal"
+        ]
+    },
+    {
+        nome: "Harmonia Instrumental e Instrumentos",
+        assuntos: [
+            "Cordas",
+            "Madeiras",
+            "Metais",
+            "Percussão",
+            "Teclas",
+            "Instrumentos populares e tradicionais",
+            "Extensão e tessitura instrumental",
+            "Claves e transposições",
+            "Afinações",
+            "Regiões expressivas e de dificuldade",
+            "Técnicas e articulações",
+            "Limitações de execução",
+            "Dobramentos e distribuição instrumental"
+        ]
+    },
+    {
+        nome: "Ritmo",
+        assuntos: [
+            "Fórmulas de compasso",
+            "Métrica simples",
+            "Métrica composta",
+            "Métrica irregular",
+            "Figuras rítmicas e pausas",
+            "Subdivisões binárias e ternárias",
+            "Acentuação métrica",
+            "Síncopes e contratempos",
+            "Quiálteras",
+            "Polirritmia",
+            "Ostinatos",
+            "Relações rítmicas entre instrumentos",
+            "Ritmos brasileiros e suas variações"
+        ]
+    },
+    {
+        nome: "Relações Musicais",
+        assuntos: [
+            "Relações entre notas e intervalos",
+            "Relações entre escalas e tonalidades",
+            "Relações entre acordes e funções harmônicas",
+            "Relações entre melodia e harmonia",
+            "Relações entre melodia e ritmo",
+            "Relações entre baixo e harmonia",
+            "Relações entre vozes",
+            "Relações entre instrumentos",
+            "Compatibilidade entre elementos musicais"
+        ]
+    },
+    {
+        nome: "Perfis de Linguagem Musical",
+        assuntos: [
+            "Contraponto renascentista",
+            "Harmonia tonal clássica",
+            "Romantismo",
+            "Escrita coral tradicional",
+            "Jazz",
+            "Música popular",
+            "Música brasileira",
+            "Música modal",
+            "Música contemporânea",
+            "Música experimental"
+        ]
+    },
+    {
+        nome: "Regras e Validação Musical",
+        assuntos: [
+            "Cadastro de regras",
+            "Identificação e classificação",
+            "Critérios de aplicação",
+            "Condições de validade",
+            "Gravidade",
+            "Exceções",
+            "Restrições estilísticas",
+            "Justificativas musicais",
+            "Erros",
+            "Alertas",
+            "Licenças artísticas"
+        ]
+    },
+    {
+        nome: "Integração da Inteligência Musical",
+        assuntos: [
+            "Integração melódica",
+            "Integração harmônica",
+            "Integração rítmica",
+            "Integração contrapontística",
+            "Integração vocal",
+            "Integração instrumental",
+            "Relações entre os sistemas",
+            "Coerência musical global"
+        ]
+    },
+    {
+        nome: "Forma e Estrutura Musical",
+        assuntos: [
+            "Frases e semifrases",
+            "Motivos e temas",
+            "Períodos musicais",
+            "Seções e subseções",
+            "Introdução, desenvolvimento e conclusão",
+            "Formas binária e ternária",
+            "Rondó",
+            "Tema com variações",
+            "Forma-sonata",
+            "Outras formas históricas",
+            "Repetição, contraste e transformação temática",
+            "Coerência e proporção estrutural"
+        ]
+    },
+    {
+        nome: "Textura e Organização Musical",
+        assuntos: [
+            "Monofonia",
+            "Homofonia",
+            "Polifonia",
+            "Heterofonia",
+            "Melodia acompanhada",
+            "Densidade musical",
+            "Independência e dependência entre vozes",
+            "Distribuição de funções musicais",
+            "Equilíbrio entre planos sonoros"
+        ]
+    },
+    {
+        nome: "Expressão, Dinâmica e Articulação",
+        assuntos: [
+            "Intensidade e dinâmica",
+            "Crescendo e diminuendo",
+            "Acentos e acentuação expressiva",
+            "Legato, staccato e tenuto",
+            "Fraseado",
+            "Respiração musical",
+            "Agógica e rubato",
+            "Caráter e intenção expressiva",
+            "Relação entre expressão e estilo"
+        ]
+    },
+    {
+        nome: "Notação e Representação Musical",
+        assuntos: [
+            "Pauta e claves",
+            "Notas e valores na partitura",
+            "Armaduras e acidentes",
+            "Ligaduras e articulações",
+            "Indicações de andamento",
+            "Indicações de dinâmica",
+            "Notação de acordes e cifras",
+            "Escrita para instrumentos transpositores",
+            "Representação de compassos e ritmos",
+            "Leitura e validação de partituras",
+            "Representação simbólica das informações musicais"
+        ]
+    },
+    {
+        nome: "Acústica, Timbre e Sistemas de Afinação",
+        assuntos: [
+            "Série harmônica",
+            "Harmônicos e parciais",
+            "Timbre",
+            "Intensidade e amplitude",
+            "Altura e frequência",
+            "Temperamentos musicais",
+            "Afinação justa e temperamento igual",
+            "Sistemas de afinação históricos e culturais",
+            "Microtonalidade",
+            "Batimentos e consonância acústica"
+        ]
+    },
+    {
+        nome: "Análise e Interpretação Musical",
+        assuntos: [
+            "Identificação de elementos musicais",
+            "Análise melódica",
+            "Análise harmônica",
+            "Análise rítmica",
+            "Análise contrapontística",
+            "Análise formal e estrutural",
+            "Análise de textura",
+            "Análise estilística",
+            "Identificação de padrões musicais",
+            "Coerência entre elementos da obra",
+            "Interpretação de intenções musicais",
+            "Justificativa das decisões musicais"
+        ]
+    }
+];
+```
   var bibView = document.createElement("section");
   bibView.className = "pc-biblioteca-view";
   bibView.setAttribute("data-biblioteca-view", "");
