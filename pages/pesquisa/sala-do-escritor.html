@@ -10386,6 +10386,245 @@ texto: $("esTexto").value
 </script>
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
 
+<!-- ===== INÍCIO: ESTÚDIO — PEÇAS INSTRUMENTAIS (ESTRUTURA DE MENUS) ===== -->
+<style>
+#esPainel[data-fase="pecas"] > *:not(#pcEstrutura){display:none!important}
+#pcEstrutura{display:none;flex-direction:column;gap:14px;margin:14px 0}
+#esPainel[data-fase="pecas"] > #pcEstrutura{display:flex!important}
+#pcEstrutura .pc-topo{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 16px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink)}
+#pcEstrutura .pc-topo > div{flex:1 1 240px}
+#pcEstrutura .pc-topo small{display:block;font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#pcEstrutura .pc-topo strong{font:600 18px Georgia,"Times New Roman",serif}
+#pcEstrutura .pc-abas{display:flex;border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:var(--paper-card)}
+#pcEstrutura .pc-abas button{flex:1;min-height:46px;padding:0 8px;border:0;border-right:1px solid var(--paper-line);background:transparent;color:var(--ink-soft);cursor:pointer;font:700 12.5px "Segoe UI",Arial,sans-serif}
+#pcEstrutura .pc-abas button:last-child{border-right:0}
+#pcEstrutura .pc-abas button[aria-selected="true"]{background:var(--brass);color:#fffdf6}
+#pcEstrutura .pc-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#pcEstrutura label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#pcEstrutura input[type=text],#pcEstrutura input[type=number],#pcEstrutura select,#pcEstrutura textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#pcEstrutura fieldset{margin:0;padding:10px 12px;border:1px solid var(--paper-line);border-radius:6px;display:flex;gap:8px 16px;flex-wrap:wrap}
+#pcEstrutura fieldset legend{padding:0 4px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#pcEstrutura label.pc-chk{flex-direction:row;align-items:center;gap:8px;font:600 14px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#pcEstrutura .pc-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#pcEstrutura .pc-secoes{display:flex;flex-direction:column;gap:8px}
+#pcEstrutura .pc-secao{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:8px;align-items:end}
+#pcEstrutura .pc-estado{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+#pcEstrutura .pc-estado li{display:flex;gap:10px;align-items:center;font:14px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#pcEstrutura .pc-selo{padding:2px 10px;border-radius:12px;font:700 12px "Segoe UI",Arial,sans-serif;background:#e4efdf;color:#2f6b3a}
+#pcEstrutura .pc-selo.prep{background:#ece7da;color:var(--ink-soft)}
+#pcEstrutura pre{margin:0;max-height:260px;overflow:auto;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:12.5px/1.5 Consolas,monospace}
+@media(max-width:760px){#pcEstrutura .pc-grade{grid-template-columns:1fr}#pcEstrutura .pc-abas{flex-direction:column}#pcEstrutura .pc-abas button{border-right:0;border-bottom:1px solid var(--paper-line)}#pcEstrutura .pc-secao{grid-template-columns:1fr 100px auto}}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), grade = painel && painel.querySelector("#f2Escolha .f2-grade");
+  if(!painel || !grade || $("pcEstrutura")) return;
+ 
+  var CHAVE = "ps_pecas_plano";
+  var TONS = ["Dó","Dó#","Ré","Mib","Mi","Fá","Fá#","Sol","Láb","Lá","Sib","Si"];
+  var COMPASSOS = ["2/4","3/4","4/4","5/4","6/8","9/8","12/8","7/8"];
+  var INSTRUMENTOS = ["Piano","Violão","Violino","Viola","Violoncelo","Flauta","Oboé","Clarinete","Trompa","Harpa","Baixo","Bateria suave"];
+  var PRESETS = {
+    "Esperança (I – V – vi – IV)":"I – V – vi – IV",
+    "Contemplativo (I – vi – IV – V)":"I – vi – IV – V",
+    "Adoração (vi – IV – I – V)":"vi – IV – I – V",
+    "Hino clássico (I – IV – I – V – I)":"I – IV – I – V – I",
+    "Lamento (i – VI – III – VII)":"i – VI – III – VII"
+  };
+  var ABAS = [
+    ["base","1. Base musical"],["harmonia","2. Harmonia"],["forma","3. Forma e estilo"],
+    ["instr","4. Instrumentos"],["previa","5. Prévia"],["exportar","6. Exportar"]
+  ];
+  var ESTADO = [
+    ["Menus e plano da peça","ok","Disponível"],
+    ["Gerador de notas (melodia, baixo, acordes)","prep","Em preparação"],
+    ["Validador de compassos e extensões","prep","Em preparação"],
+    ["Prévia sonora no navegador","prep","Em preparação"],
+    ["Exportar MusicXML e MIDI","prep","Em preparação"],
+    ["MP3 e MP4 com a peça como trilha","prep","Em preparação"]
+  ];
+  var opt = function(l, sel){ return l.map(function(x){ return '<option' + (x === sel ? ' selected' : '') + '>' + x + '</option>'; }).join(""); };
+ 
+  /* ---------- 1. cartão novo na tela de escolha ---------- */
+  var card = document.createElement("button");
+  card.type = "button"; card.className = "f2-card"; card.setAttribute("data-pc-abrir", "1");
+  card.innerHTML = '<span class="f2-eng" aria-hidden="true">\u2699\uFE0E</span><span class="f2-selo prep">Em preparação</span>' +
+    '<strong>Peças instrumentais</strong>' +
+    '<span class="f2-d">Defina tonalidade, ritmo, harmonia e andamento. O Estúdio monta a peça e exporta para o MuseScore.</span>' +
+    '<span class="f2-trilha">' + ["Definir a base e a harmonia","Escolher forma e instrumentos","Ouvir a prévia","Exportar MusicXML ou MIDI"].map(function(x, i){ return '<span><b>' + (i + 1) + '</b>' + x + '</span>'; }).join("") + '</span>' +
+    '<span class="f2-ir">Começar</span>';
+  grade.appendChild(card);
+ 
+  /* ---------- 2. painel com os menus ---------- */
+  var sec = document.createElement("section");
+  sec.id = "pcEstrutura";
+  sec.innerHTML =
+    '<div class="pc-topo"><div><small>Você está criando</small><strong>Peças instrumentais</strong></div>' +
+      '<button type="button" class="at-btn" id="pcVoltar">TROCAR TIPO</button></div>' +
+    '<div class="pc-abas" role="tablist">' + ABAS.map(function(a, i){ return '<button type="button" role="tab" data-pc-aba="' + a[0] + '" aria-selected="' + (i === 0) + '">' + a[1] + '</button>'; }).join("") + '</div>' +
+ 
+    '<div class="es-box" data-pc-painel="base"><h3>Base musical</h3>' +
+      '<div class="pc-grade">' +
+        '<label>Título da peça<input type="text" id="pcTitulo" placeholder="Ex.: Aurora sobre o monte"></label>' +
+        '<label>Tonalidade<select id="pcTom">' + opt(TONS, "Ré") + '</select></label>' +
+        '<label>Modo<select id="pcModo"><option>Maior</option><option>Menor</option></select></label>' +
+        '<label>Fórmula de compasso<select id="pcCompasso">' + opt(COMPASSOS, "4/4") + '</select></label>' +
+        '<label>Andamento (batidas por minuto)<input type="number" id="pcBpm" min="30" max="220" value="72"></label>' +
+        '<label>Caráter do andamento<select id="pcCarater"><option>Adagio</option><option>Andante</option><option>Moderato</option><option>Allegretto</option><option>Allegro</option></select></label>' +
+        '<label>Número de compassos<input type="number" id="pcCompassos" min="4" max="256" value="32"></label>' +
+        '<label>Clima<select id="pcClima"><option>Contemplativo</option><option>Esperançoso</option><option>Solene</option><option>Triunfante</option><option>Sereno</option></select></label>' +
+      '</div></div>' +
+ 
+    '<div class="es-box" data-pc-painel="harmonia" hidden><h3>Harmonia</h3>' +
+      '<p class="es-nota">Escreva a progressão de acordes em graus (I, IV, V, vi) ou em cifras (D, Gm, A7), separados por traço. Cada acorde ocupa um compasso, salvo se você indicar outro valor mais adiante.</p>' +
+      '<label>Progressão<input type="text" id="pcProg" placeholder="Ex.: I – V – vi – IV"></label>' +
+      '<label>Modelos prontos<select id="pcPreset"><option value="">Escolher um modelo…</option>' + Object.keys(PRESETS).map(function(k){ return '<option>' + k + '</option>'; }).join("") + '</select></label>' +
+      '<label>Ritmo harmônico<select id="pcRitmoH"><option>Um acorde por compasso</option><option>Dois acordes por compasso</option><option>Um acorde a cada dois compassos</option></select></label>' +
+    '</div>' +
+ 
+    '<div class="es-box" data-pc-painel="forma" hidden><h3>Forma e estilo</h3>' +
+      '<div class="pc-grade">' +
+        '<label>Estilo<select id="pcEstilo"><option>Clássico</option><option>Hino</option><option>Adoração suave</option><option>Trilha cinematográfica</option><option>Jazz básico</option><option>Folk acústico</option></select></label>' +
+        '<label>Textura<select id="pcTextura"><option>Melodia com acompanhamento</option><option>Polifonia leve</option><option>Coral em blocos</option><option>Arpejos contínuos</option></select></label>' +
+      '</div>' +
+      '<p class="es-nota">Seções da peça e o tamanho de cada uma, em compassos.</p>' +
+      '<div class="pc-secoes" id="pcSecoes"></div>' +
+      '<div class="pc-linha"><button type="button" class="at-btn" id="pcAddSecao">+ ADICIONAR SEÇÃO</button><span class="es-nota" id="pcSoma"></span></div>' +
+    '</div>' +
+ 
+    '<div class="es-box" data-pc-painel="instr" hidden><h3>Instrumentos</h3>' +
+      '<fieldset><legend>Quem toca</legend>' + INSTRUMENTOS.map(function(n){ return '<label class="pc-chk"><input type="checkbox" data-pc-instr="' + n + '"' + (n === "Piano" ? ' checked' : '') + '> ' + n + '</label>'; }).join("") + '</fieldset>' +
+      '<label>Instrumento da melodia<select id="pcMelodia"></select></label>' +
+      '<p class="es-nota">A extensão de cada instrumento será conferida automaticamente quando o gerador for ligado.</p>' +
+    '</div>' +
+ 
+    '<div class="es-box" data-pc-painel="previa" hidden><h3>Prévia</h3>' +
+      '<p class="es-nota">A prévia sonora e a partitura simplificada ainda não estão ligadas. Abaixo está o plano que será enviado ao gerador.</p>' +
+      '<pre id="pcJson"></pre></div>' +
+ 
+    '<div class="es-box" data-pc-painel="exportar" hidden><h3>Exportar</h3>' +
+      '<p class="es-nota">Por enquanto você pode baixar o plano da peça. Os formatos musicais entram nas próximas etapas.</p>' +
+      '<div class="pc-linha">' +
+        '<button type="button" class="at-btn gold" id="pcBaixarPlano">BAIXAR PLANO (JSON)</button>' +
+        '<button type="button" class="at-btn" disabled>MUSICXML (para o MuseScore)</button>' +
+        '<button type="button" class="at-btn" disabled>MIDI</button>' +
+        '<button type="button" class="at-btn" disabled>MP3</button>' +
+        '<button type="button" class="at-btn" disabled>MP4</button>' +
+      '</div>' +
+      '<ul class="pc-estado">' + ESTADO.map(function(e){ return '<li><span class="pc-selo ' + e[1] + '">' + e[2] + '</span>' + e[0] + '</li>'; }).join("") + '</ul>' +
+    '</div>' +
+ 
+    '<div class="pc-linha"><button type="button" class="at-btn gold" id="pcSalvar">GUARDAR PLANO</button><span class="es-msg" id="pcMsg" role="status"></span></div>';
+  painel.appendChild(sec);
+ 
+  var msg = function(t, erro){ var m = $("pcMsg"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); };
+ 
+  /* ---------- 3. abas ---------- */
+  function aba(id){
+    sec.querySelectorAll("[data-pc-aba]").forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.pcAba === id)); });
+    sec.querySelectorAll("[data-pc-painel]").forEach(function(p){ p.hidden = p.dataset.pcPainel !== id; });
+    if(id === "previa") $("pcJson").textContent = JSON.stringify(plano(), null, 2);
+  }
+  sec.querySelector(".pc-abas").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-pc-aba]"); if(b) aba(b.dataset.pcAba);
+  });
+ 
+  /* ---------- 4. seções da forma ---------- */
+  function addSecao(nome, n){
+    var d = document.createElement("div"); d.className = "pc-secao";
+    d.innerHTML = '<label>Seção<input type="text" class="pc-sn" value="' + nome + '"></label>' +
+      '<label>Compassos<input type="number" class="pc-sc" min="1" max="64" value="' + n + '"></label>' +
+      '<button type="button" class="at-btn pc-rem">Remover</button>';
+    $("pcSecoes").appendChild(d); somar();
+  }
+  function somar(){
+    var t = 0; sec.querySelectorAll(".pc-sc").forEach(function(i){ t += Number(i.value) || 0; });
+    var alvo = Number($("pcCompassos").value) || 0;
+    $("pcSoma").textContent = "Soma das seções: " + t + " compassos" + (alvo && t !== alvo ? " (a Base musical pede " + alvo + ")." : ".");
+  }
+  $("pcAddSecao").addEventListener("click", function(){ addSecao("Nova seção", 8); });
+  $("pcSecoes").addEventListener("click", function(ev){ if(ev.target.closest(".pc-rem")){ ev.target.closest(".pc-secao").remove(); somar(); } });
+  $("pcSecoes").addEventListener("input", somar);
+  $("pcCompassos").addEventListener("input", somar);
+  [["Introdução",4],["A",8],["B",8],["A",8],["Final",4]].forEach(function(s){ addSecao(s[0], s[1]); });
+ 
+  /* ---------- 5. instrumentos e modelos de harmonia ---------- */
+  function instrumentos(){
+    var marcados = Array.prototype.map.call(sec.querySelectorAll("[data-pc-instr]:checked"), function(i){ return i.dataset.pcInstr; });
+    var m = $("pcMelodia"), atual = m.value;
+    m.innerHTML = marcados.length ? opt(marcados, marcados.indexOf(atual) > -1 ? atual : marcados[0]) : '<option value="">Marque ao menos um instrumento</option>';
+    return marcados;
+  }
+  sec.addEventListener("change", function(ev){ if(ev.target.matches("[data-pc-instr]")) instrumentos(); });
+  $("pcPreset").addEventListener("change", function(){ if(PRESETS[this.value]){ $("pcProg").value = PRESETS[this.value]; } });
+  instrumentos();
+ 
+  /* ---------- 6. plano, guardar e baixar ---------- */
+  function plano(){
+    return {
+      versao: 1, tipo: "peca-instrumental",
+      titulo: $("pcTitulo").value.trim(),
+      tonalidade: $("pcTom").value, modo: $("pcModo").value,
+      compasso: $("pcCompasso").value, andamento: Number($("pcBpm").value), carater: $("pcCarater").value,
+      compassos: Number($("pcCompassos").value), clima: $("pcClima").value,
+      harmonia: { progressao: $("pcProg").value.trim(), ritmoHarmonico: $("pcRitmoH").value },
+      estilo: $("pcEstilo").value, textura: $("pcTextura").value,
+      forma: Array.prototype.map.call(sec.querySelectorAll(".pc-secao"), function(s){ return {secao: s.querySelector(".pc-sn").value.trim(), compassos: Number(s.querySelector(".pc-sc").value) || 0}; }),
+      instrumentos: instrumentos(), melodia: $("pcMelodia").value
+    };
+  }
+  function aplicar(p){
+    var set = function(id, v){ if(v != null && $(id)) $(id).value = v; };
+    set("pcTitulo", p.titulo); set("pcTom", p.tonalidade); set("pcModo", p.modo); set("pcCompasso", p.compasso);
+    set("pcBpm", p.andamento); set("pcCarater", p.carater); set("pcCompassos", p.compassos); set("pcClima", p.clima);
+    if(p.harmonia){ set("pcProg", p.harmonia.progressao); set("pcRitmoH", p.harmonia.ritmoHarmonico); }
+    set("pcEstilo", p.estilo); set("pcTextura", p.textura);
+    if(Array.isArray(p.forma) && p.forma.length){ $("pcSecoes").innerHTML = ""; p.forma.forEach(function(s){ addSecao(s.secao, s.compassos); }); }
+    if(Array.isArray(p.instrumentos)){
+      sec.querySelectorAll("[data-pc-instr]").forEach(function(i){ i.checked = p.instrumentos.indexOf(i.dataset.pcInstr) > -1; });
+      instrumentos(); set("pcMelodia", p.melodia);
+    }
+    somar();
+  }
+  function validar(p){
+    if(!p.instrumentos.length) return "Marque ao menos um instrumento no menu 4.";
+    if(p.andamento < 30 || p.andamento > 220) return "O andamento deve ficar entre 30 e 220.";
+    return "";
+  }
+  $("pcSalvar").addEventListener("click", function(){
+    var p = plano(), e = validar(p);
+    if(e){ msg(e, true); return; }
+    try{ localStorage.setItem(CHAVE, JSON.stringify(p)); msg("Plano guardado neste navegador. Nenhuma música foi gerada."); }
+    catch(x){ msg("Não foi possível guardar neste navegador.", true); }
+  });
+  $("pcBaixarPlano").addEventListener("click", function(){
+    var blob = new Blob([JSON.stringify(plano(), null, 2)], {type: "application/json"}), u = URL.createObjectURL(blob);
+    var a = document.createElement("a"); a.href = u; a.download = "peca-instrumental-plano.json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
+    msg("Plano baixado.");
+  });
+  try{ var g = JSON.parse(localStorage.getItem(CHAVE) || "null"); if(g){ aplicar(g); msg("Plano anterior recuperado."); } }catch(e){}
+ 
+  /* ---------- 7. entrar e sair do modo ---------- */
+  card.addEventListener("click", function(){
+    painel.setAttribute("data-fase", "pecas");
+    aba("base");
+    $("esToggle").scrollIntoView({behavior: "smooth", block: "start"});
+  });
+  $("pcVoltar").addEventListener("click", function(){
+    painel.setAttribute("data-fase", "escolha");
+    $("esToggle").scrollIntoView({behavior: "smooth", block: "start"});
+  });
+})();
+</script>
+<!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (ESTRUTURA DE MENUS) ===== -->
+ 
+
+
+Claude terminou a resposta
+
 
 </body>
 </html>
