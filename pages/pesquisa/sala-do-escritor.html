@@ -10386,7 +10386,7 @@ texto: $("esTexto").value
 </script>
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
 
- <!-- ===================================================================================================================== --> 
+  <!-- ===================================================================================================================== --> 
 
  <!-- ===== INÍCIO: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3: FLUXO DE PRODUÇÃO EM 9 ETAPAS) ==== -->
 <style>
@@ -10435,6 +10435,20 @@ texto: $("esTexto").value
 #pcEstrutura .pc-biblioteca{display:flex;flex:0 1 250px;min-width:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;text-align:left;white-space:normal;line-height:1.25;padding:8px 14px}
 #pcEstrutura .pc-biblioteca strong{font:700 12px "Segoe UI",Arial,sans-serif}
 #pcEstrutura .pc-biblioteca small{font:12px "Segoe UI",Arial,sans-serif;opacity:.85}
+#pcEstrutura[data-biblioteca="aberta"] > :not(.pc-biblioteca-view){display:none!important}
+#pcEstrutura .pc-biblioteca-view{display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink)}
+#pcEstrutura .pc-biblioteca-view[hidden],#pcEstrutura .pc-biblioteca-view [hidden]{display:none!important}
+#pcEstrutura .pc-bib-cabecalho{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#pcEstrutura .pc-bib-cabecalho h2{margin:0;font:600 22px Georgia,"Times New Roman",serif;color:var(--ink)}
+#pcEstrutura .pc-bib-intro{margin:0;color:var(--ink-soft);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+#pcEstrutura .pc-bib-modulo{padding:8px 12px;border:1px solid var(--paper-line);border-radius:7px;background:#fffdf6}
+#pcEstrutura .pc-bib-modulo summary{font:700 15px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#pcEstrutura .pc-bib-assuntos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}
+#pcEstrutura .pc-bib-assunto{min-height:40px;text-align:left;white-space:normal}
+#pcEstrutura .pc-bib-consulta{padding:14px;border:1px solid var(--paper-line);border-radius:7px;background:#fffdf6}
+#pcEstrutura .pc-bib-consulta h3{margin:8px 0;font:600 20px Georgia,"Times New Roman",serif;color:var(--ink)}
+#pcEstrutura .pc-bib-breadcrumb{margin:0;color:var(--ink-soft);font:12px "Segoe UI",Arial,sans-serif}
+#pcEstrutura .pc-bib-aviso{padding:12px;border-left:3px solid var(--brass);background:var(--brass-wash);font:14px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink)}
 #pcEstrutura .pc-lib-corpo{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 #pcEstrutura .pc-item{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6}
 #pcEstrutura .pc-item.atual{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
@@ -10779,11 +10793,33 @@ texto: $("esTexto").value
       '<div class="pc-linha"><label style="flex:1 1 240px">Nome do plano<input type="text" data-pc-nome placeholder="Se ficar vazio, usa o título da peça"></label>' +
       '<button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><button type="button" class="at-btn" data-pc-lib-acao="novo">NOVO PLANO</button></div>' +
       '<div class="pc-lista" data-pc-lista></div></div></details>' +
-      '<button type="button" class="at-btn pc-biblioteca" aria-label="BIBLIOTECA MUSICAL — Arquitetura expansível"><strong>BIBLIOTECA MUSICAL</strong><small>Arquitetura expansível</small></button></div>' +
+      '<button type="button" class="at-btn pc-biblioteca" data-biblioteca-abrir aria-label="Abrir BIBLIOTECA MUSICAL — Arquitetura expansível"><strong>BIBLIOTECA MUSICAL</strong><small>Arquitetura expansível</small></button></div>' +
     '<div class="pc-abas" role="tablist" aria-label="Etapas da peça">' + ABAS.map(function(a, i){ return '<button type="button" role="tab" id="pcTab_' + a[0] + '" data-pc-aba="' + a[0] + '" aria-controls="pcPainel_' + a[0] + '" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '">' + a[1] + '</button>'; }).join("") + '</div>' +
     ABAS.map(function(a, i){ return painelHtml(a, i === 0); }).join("") +
     '<div class="pc-linha"><button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><span class="es-nota" data-pc-sujo hidden>● alterações ainda não guardadas</span></div>' +
     '<p class="es-msg" id="pcMsg" role="status"></p>';
+  var MODULOS_BIB = [
+    {nome:"Fundamentos Musicais", assuntos:["Notas e alturas musicais","Acústica e fundamentos matemáticos","Frequências e proporções","Intervalos simples e compostos","Classificação e inversão de intervalos","Consonâncias e dissonâncias","Escalas e modos","Armaduras e tonalidades","Graus da escala"]},
+    {nome:"Harmonia", assuntos:["Formação de acordes","Tríades e tétrades","Acordes com extensões e alterações","Inversões e baixos alternativos","Funções harmônicas","Acordes diatônicos e não diatônicos","Dominantes secundárias","Acordes emprestados","Cadências e resoluções","Modulações","Relações tonais e modais"]},
+    {nome:"Melodia", assuntos:["Movimento ascendente e descendente","Movimento conjunto e disjunto","Saltos melódicos","Compensação de saltos","Contorno melódico","Notas reais e notas estranhas ao acorde","Notas de passagem e bordaduras","Apogiaturas e antecipações","Retardos e suspensões","Notas de escape","Cromatismos e ornamentações","Tessitura e extensão melódica"]},
+    {nome:"Contraponto e Condução de Vozes", assuntos:["Movimento paralelo","Movimento contrário","Movimento oblíquo","Movimento direto","Condução independente das vozes","Quintas e oitavas paralelas","Quintas e oitavas ocultas","Cruzamento de vozes","Sobreposição de registros","Preparação e resolução de dissonâncias","Notas comuns entre acordes","Contraponto de primeira à quinta espécie"]},
+    {nome:"Harmonia Vocal — SATB", assuntos:["Soprano","Contralto","Tenor","Baixo","Extensão e tessitura vocal","Regiões de dificuldade","Espaçamento entre vozes","Cruzamento e sobreposição","Dobramento de notas","Condução harmônica","Resolução de sensíveis","Tratamento de dissonâncias","Limites de execução vocal"]},
+    {nome:"Harmonia Instrumental e Instrumentos", assuntos:["Cordas","Madeiras","Metais","Percussão","Teclas","Instrumentos populares e tradicionais","Extensão e tessitura instrumental","Claves e transposições","Afinações","Regiões expressivas e de dificuldade","Técnicas e articulações","Limitações de execução","Dobramentos e distribuição instrumental"]},
+    {nome:"Ritmo", assuntos:["Fórmulas de compasso","Métrica simples","Métrica composta","Métrica irregular","Figuras rítmicas e pausas","Subdivisões binárias e ternárias","Acentuação métrica","Síncopes e contratempos","Quiálteras","Polirritmia","Ostinatos","Relações rítmicas entre instrumentos","Ritmos brasileiros e suas variações"]},
+    {nome:"Relações Musicais", assuntos:["Relações entre notas e intervalos","Relações entre escalas e tonalidades","Relações entre acordes e funções harmônicas","Relações entre melodia e harmonia","Relações entre melodia e ritmo","Relações entre baixo e harmonia","Relações entre vozes","Relações entre instrumentos","Compatibilidade entre elementos musicais"]},
+    {nome:"Perfis de Linguagem Musical", assuntos:["Contraponto renascentista","Harmonia tonal clássica","Romantismo","Escrita coral tradicional","Jazz","Música popular","Música brasileira","Música modal","Música contemporânea","Música experimental"]},
+    {nome:"Regras e Validação Musical", assuntos:["Cadastro de regras","Identificação e classificação","Critérios de aplicação","Condições de validade","Gravidade","Exceções","Restrições estilísticas","Justificativas musicais","Erros","Alertas","Licenças artísticas"]},
+    {nome:"Integração da Inteligência Musical", assuntos:["Integração melódica","Integração harmônica","Integração rítmica","Integração contrapontística","Integração vocal","Integração instrumental","Relações entre os sistemas","Coerência musical global"]}
+  ];
+  var bibView = document.createElement("section");
+  bibView.className = "pc-biblioteca-view";
+  bibView.setAttribute("data-biblioteca-view", "");
+  bibView.hidden = true;
+  bibView.innerHTML = '<div class="pc-bib-cabecalho"><h2 tabindex="-1" data-bib-titulo>BIBLIOTECA MUSICAL</h2><button type="button" class="at-btn" data-bib-fechar>VOLTAR À CRIAÇÃO</button></div>' +
+    '<p class="pc-bib-intro">Arquitetura expansível — selecione um módulo para consultar os seus assuntos.</p>' +
+    '<div data-bib-indice>' + MODULOS_BIB.map(function(m, mi){ return '<details class="pc-bib-modulo"><summary>' + (mi + 1) + '. ' + m.nome + '</summary><div class="pc-bib-assuntos">' + m.assuntos.map(function(a, ai){ return '<button type="button" class="at-btn pc-bib-assunto" data-bib-modulo="' + mi + '" data-bib-assunto="' + ai + '">' + a + '</button>'; }).join("") + '</div></details>'; }).join("") + '</div>' +
+    '<article class="pc-bib-consulta" data-bib-consulta hidden><p class="pc-bib-breadcrumb" data-bib-caminho></p><h3 data-bib-assunto-titulo></h3><p class="pc-bib-aviso">Área de consulta preparada. O conteúdo explicativo e os dados executáveis deste assunto ainda não foram implementados.</p><button type="button" class="at-btn" data-bib-voltar>VOLTAR AOS MÓDULOS</button></article>';
+  sec.appendChild(bibView);
   painel.appendChild(sec);
   var Q = function(s){ return sec.querySelector(s); }, QA = function(s){ return sec.querySelectorAll(s); };
   var msg = function(t, erro){ var m = $("pcMsg"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); };
@@ -11088,6 +11124,26 @@ texto: $("esTexto").value
   /* ================= EVENTOS ================= */
   sec.addEventListener("click", function(ev){
     var t = ev.target, b;
+    if((b = t.closest("[data-biblioteca-abrir]"))){
+      sec.setAttribute("data-biblioteca", "aberta"); bibView.hidden = false;
+      bibView.querySelector("[data-bib-indice]").hidden = false;
+      bibView.querySelector("[data-bib-consulta]").hidden = true;
+      bibView.querySelector("[data-bib-titulo]").focus(); return;
+    }
+    if((b = t.closest("[data-bib-fechar]"))){ sec.removeAttribute("data-biblioteca"); Q("[data-biblioteca-abrir]").focus(); return; }
+    if((b = t.closest("[data-bib-assunto]"))){
+      var mi = Number(b.dataset.bibModulo), ai = Number(b.dataset.bibAssunto), modulo = MODULOS_BIB[mi], assunto = modulo && modulo.assuntos[ai];
+      if(!assunto) return;
+      bibView.querySelector("[data-bib-indice]").hidden = true;
+      bibView.querySelector("[data-bib-consulta]").hidden = false;
+      bibView.querySelector("[data-bib-caminho]").textContent = "Biblioteca Musical / " + (mi + 1) + ". " + modulo.nome;
+      bibView.querySelector("[data-bib-assunto-titulo]").textContent = assunto;
+      bibView.querySelector("[data-bib-assunto-titulo]").focus(); return;
+    }
+    if((b = t.closest("[data-bib-voltar]"))){
+      bibView.querySelector("[data-bib-consulta]").hidden = true;
+      bibView.querySelector("[data-bib-indice]").hidden = false; return;
+    }
     if((b = t.closest("[data-pc-aba]"))) return mostrarAba(b.dataset.pcAba);
     if((b = t.closest("[data-pc-ir]"))) return mostrarAba(b.dataset.pcIr, true);
     if((b = t.closest("[data-pc-lib-acao]"))) return acaoLib(b.dataset.pcLibAcao, b.dataset.pcId);
@@ -11146,7 +11202,7 @@ texto: $("esTexto").value
   if(lib.lista.length){ var rec = lib.lista.slice().sort(function(a, b){ return b.atualizado - a.atualizado; })[0]; abrir(rec.id, true); }
 })();
 </script>
-<!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->                                                           
+<!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->                                                         
 
  
 
