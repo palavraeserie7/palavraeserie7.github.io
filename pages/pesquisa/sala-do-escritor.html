@@ -10385,8 +10385,10 @@ texto: $("esTexto").value
 })();
 </script>
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
+                                                           
+ <!-- ===================================================================================================================== --> 
 
-<!-- ===== INÍCIO: ESTÚDIO — PEÇAS INSTRUMENTAIS (ESTRUTURA COMPLETA DE MENUS, V2) ===== -->
+ <!-- ===== INÍCIO: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3: FLUXO DE PRODUÇÃO EM 9 ETAPAS) ==== -->
 <style>
 #esPainel[data-fase="pecas"] > *:not(#pcEstrutura){display:none!important}
 #pcEstrutura{display:none;flex-direction:column;gap:14px;margin:14px 0}
@@ -10397,12 +10399,17 @@ texto: $("esTexto").value
 #pcEstrutura .pc-topo strong{font:600 18px Georgia,"Times New Roman",serif}
 #pcEstrutura .pc-abas{display:flex;flex-wrap:wrap;border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:var(--paper-card)}
 #pcEstrutura .pc-abas button{flex:1 1 110px;min-height:46px;padding:0 8px;border:0;border-right:1px solid var(--paper-line);border-bottom:1px solid var(--paper-line);background:transparent;color:var(--ink-soft);cursor:pointer;font:700 12.5px "Segoe UI",Arial,sans-serif}
+#pcEstrutura .pc-abas button:focus-visible{outline:2px solid var(--brass);outline-offset:-3px}
 #pcEstrutura .pc-abas button[aria-selected="true"]{background:var(--brass);color:#fffdf6}
+#pcEstrutura .pc-abas button[data-pend="grave"]::after{content:" ●";color:#c0392b}
+#pcEstrutura .pc-abas button[data-pend="aviso"]::after{content:" ●";color:#c98a1b}
 #pcEstrutura .pc-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#pcEstrutura .pc-cx{min-width:0}
+#pcEstrutura .pc-cx[hidden]{display:none!important}
 #pcEstrutura .pc-wide{grid-column:1/-1}
 #pcEstrutura h4{grid-column:1/-1;margin:10px 0 0;font:600 17px Georgia,"Times New Roman",serif;color:var(--ink)}
 #pcEstrutura label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-#pcEstrutura input[type=text],#pcEstrutura input[type=number],#pcEstrutura select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#pcEstrutura input[type=text],#pcEstrutura input[type=number],#pcEstrutura input[type=search],#pcEstrutura select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
 #pcEstrutura fieldset{margin:0;padding:10px 12px;border:1px solid var(--paper-line);border-radius:6px;min-width:0}
 #pcEstrutura fieldset legend{padding:0 4px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
 #pcEstrutura label.pc-chk{flex-direction:row;align-items:center;gap:8px;font:600 14px "Segoe UI",Arial,sans-serif;color:var(--ink)}
@@ -10410,14 +10417,25 @@ texto: $("esTexto").value
 #pcEstrutura details{border-top:1px solid var(--paper-line);padding:6px 0}
 #pcEstrutura details:first-of-type{border-top:0}
 #pcEstrutura summary{cursor:pointer;font:700 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
-#pcEstrutura .pc-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#pcEstrutura .pc-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
 #pcEstrutura .pc-secoes{grid-column:1/-1;display:flex;flex-direction:column;gap:8px}
 #pcEstrutura .pc-secao{display:grid;grid-template-columns:minmax(0,1fr) 100px 110px auto;gap:8px;align-items:end}
 #pcEstrutura .pc-estado{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
-#pcEstrutura .pc-estado li{display:flex;gap:10px;align-items:center;font:14px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#pcEstrutura .pc-estado li,#pcEstrutura .pc-pend li{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:14px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#pcEstrutura .pc-pend{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
 #pcEstrutura .pc-selo{padding:2px 10px;border-radius:12px;font:700 12px "Segoe UI",Arial,sans-serif;background:#e4efdf;color:#2f6b3a}
 #pcEstrutura .pc-selo.prep{background:#ece7da;color:var(--ink-soft)}
+#pcEstrutura .pc-selo.grave{background:#f6dcd8;color:#a14747}
+#pcEstrutura .pc-selo.aviso{background:#f7ead0;color:#8a5a0b}
 #pcEstrutura pre{margin:0;max-height:420px;overflow:auto;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:12.5px/1.5 Consolas,monospace}
+#pcEstrutura .pc-lib{border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink);padding:10px 14px}
+#pcEstrutura .pc-lib > summary{font:600 16px Georgia,serif;color:var(--ink)}
+#pcEstrutura .pc-lib-corpo{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+#pcEstrutura .pc-item{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6}
+#pcEstrutura .pc-item.atual{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
+#pcEstrutura .pc-item > div:first-child{flex:1 1 200px;min-width:0}
+#pcEstrutura .pc-item strong{display:block;font:600 15px Georgia,serif}
+#pcEstrutura .pc-item small{font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
 @media(max-width:760px){#pcEstrutura .pc-grade{grid-template-columns:1fr}#pcEstrutura .pc-secao{grid-template-columns:1fr 80px 90px auto}}
 </style>
 <script>
@@ -10425,19 +10443,22 @@ texto: $("esTexto").value
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel"), grade = painel && painel.querySelector("#f2Escolha .f2-grade");
   if(!painel || !grade || $("pcEstrutura")) return;
-  var CHAVE = "ps_pecas_plano";
+  var CHAVE_LIB = "ps_pecas_planos_v1", CHAVE_ANT = "ps_pecas_plano";
   var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); };
  
   /* ================= DADOS DOS MENUS =================
-     Marcas no fim do texto: " *" avançado, " ~" só reprodução. "Nome|info" mostra info entre parênteses. */
-  var TON = ["Dó","Dó#","Réb","Ré","Mib","Mi","Fá","Fá#","Solb","Sol","Láb","Lá","Sib","Si","Dób","Personalizada"];
+     Marcas no fim: " *" avançado, " ~" só reprodução. "Nome|info" mostra info entre parênteses.
+     "Nome@Cordas,Metais" liga a opção a famílias de instrumento (fica desativada se nenhum estiver marcado). */
+  var TON = ["Dó","Dó#","Réb","Ré","Ré#","Mib","Mi","Mi#","Fá","Fá#","Solb","Sol","Sol#","Láb","Lá","Lá#","Sib","Si","Dób","Personalizada"];
   var ESCALAS = {
     "Diatônicas":["Jônio (maior natural)","Dórico","Frígio","Lídio","Mixolídio","Eólio (menor natural)","Lócrio"],
     "Menores":["Menor harmônica","Menor melódica"],
     "Pentatônicas e blues":["Pentatônica maior","Pentatônica menor","Blues maior","Blues menor"],
     "Simétricas":["Cromática","Tons inteiros","Diminuta (tom–semitom)","Diminuta (semitom–tom)","Aumentada"],
-    "Derivadas":["Frígio dominante","Lídio dominante","Alterada *","Maior harmônica"],
-    "Cor e mistério":["Menor cigana *","Dupla harmônica (bizantina) *","Húngara menor *","Bebop maior *","Bebop dominante *","Hirajoshi *","In sen *"]
+    "Derivadas":["Frígio dominante","Lídio dominante","Alterada *","Maior harmônica","Menor napolitana *","Maior napolitana *"],
+    "Cor e mistério":["Menor cigana *","Dupla harmônica (bizantina) *","Húngara menor *","Persa *","Enigmática *","Hirajoshi *","In sen *"],
+    "Bebop":["Bebop maior *","Bebop dominante *","Bebop dórico *","Bebop melódico menor *"]
   };
   var COM_ARMADURA = ESCALAS["Diatônicas"].concat(["Pentatônica maior","Pentatônica menor"]);
   var ARMADURA = ["Automática (pela tônica e escala)","Sem armadura (acidentes escritos)"];
@@ -10451,19 +10472,41 @@ texto: $("esTexto").value
     "Irregulares":["5/4","5/8","7/8","8/8","10/8","11/8","13/8","15/8"],
     "Mudança de compasso":["Alternado (muda ao longo da peça)","Livre (sem compasso) *"]
   };
+  var AGRUP = {"5/4":["3+2","2+3"],"5/8":["3+2","2+3"],"7/8":["2+2+3","3+2+2","2+3+2"],"8/8":["3+3+2","2+3+3","3+2+3","2+2+2+2"],
+    "10/8":["3+2+2+3","2+3+2+3","3+3+2+2"],"11/8":["3+3+3+2","2+3+3+3","3+2+3+3"],"13/8":["3+3+3+2+2","2+2+3+3+3","3+2+3+2+3"],"15/8":["3+3+3+3+3","5+5+5","2+2+3+2+2+2+2"]};
   var PULSOS = ["Binário","Ternário","Quaternário","Composto","Alternado","Irregular","Livre *"];
+  var ACENTUACAO = ["Padrão do compasso","Sincopada","Deslocada (anacruse)","Livre"];
+  var SUBDIVISAO = ["Binária","Ternária","Quaternária (semicolcheias)","Mista"];
+  var POLIRRITMIA = ["Hemíola (3:2)","3 contra 2","4 contra 3","5 contra 4 *"];
+  var QUIALTERAS = ["Tercina","Quintina *","Sextina","Septina *","Duína (em compasso composto)"];
+  var OSTINATO = ["Rítmico no baixo","Rítmico na percussão","Harmônico em arpejo","Melódico curto"];
   var FIGURAS = ["Semibreve","Mínima","Semínima","Colcheia","Semicolcheia","Fusa","Semifusa"];
   var RITMOS = ["Pontuada","Duplamente pontuada","Tercina","Quiáltera *","Síncope","Contratempo","Ligadura rítmica","Swing ~"];
   var DENSIDADE = ["Baixa","Média","Alta"];
+  var AUTO = "Automático (pelo gênero)";
+  var PADROES = {
+    "Automático":[AUTO],
+    "Tradicionais":["Pulso regular (semínimas)","Marcha binária","Valsa (3/4)","Ritmo pontuado","Ostinato de colcheias","Alternado grave–agudo"],
+    "Brasileiros":["Samba","Bossa nova","Baião","Xote","Frevo","Maracatu","Choro"],
+    "Latinos":["Habanera","Tango","Bolero","Clave de son 3-2","Clave de son 2-3","Tresillo","Cha-cha-chá","Mambo","Salsa","Rumba","Dembow"],
+    "Clássicos":["Baixo de Alberti","Arpejo contínuo","Tremolo de cordas","Marcha militar","Minueto","Gavota","Sarabanda","Giga (6/8)"],
+    "Jazz":["Swing (tercina)","Shuffle","Walking bass","Charleston","Jazz valsa","Comping sincopado"],
+    "Populares":["Rock 4/4 (backbeat)","Balada 6/8","Pop (oito colcheias)","Funk (semicolcheias)","Reggae (one drop)","Country (boom-chick)","Gospel (shuffle lento)","Folk (dedilhado)"],
+    "Eletrônicos":["Four on the floor ~","Breakbeat ~","Arpejo sequenciado ~","Pulso minimalista"],
+    "Livres":["Declamado (guiado pelo texto)","Ritmo livre (sem pulso fixo) *","Aleatório controlado *","Pulsação irregular *"]
+  };
   var ANDAMENTOS = ["Grave|44 bpm","Largo|52 bpm","Adagissimo|56 bpm","Larghetto|63 bpm","Adagio|70 bpm","Andantino|80 bpm","Andante|92 bpm","Moderato|112 bpm","Allegretto|116 bpm","Allegro|132 bpm","Vivace|160 bpm","Presto|184 bpm","Prestissimo|208 bpm"];
   var VAR_AND = ["Accelerando","Ritardando","Rallentando","Rubato ~","A tempo","Mudança de andamento por seção"];
-  var ACORDES = ["Tríade maior","Tríade menor","Tríade diminuta","Tríade aumentada","Sétima","Nona","Décima primeira *","Décima terceira *","Suspensos (sus2, sus4)","Alterados *","Inversões"];
-  var CAMPOS = ["Maior","Menor natural","Menor harmônica","Modal"];
+  var ACORDES = ["Tríade maior","Tríade menor","Tríade diminuta","Tríade aumentada","Sexta (6)","Sexta e nona (6/9)","Sétima dominante (7)","Sétima maior (maj7)","Sétima menor (m7)","Meio diminuto (m7b5)","Diminuto (dim7)","Nona","Décima primeira *","Décima terceira *","Suspensos (sus2, sus4)","Alterados *","Inversões","Quartais *","Clusters *"];
+  var CAMPOS_HARMONICOS = ["Maior","Menor natural","Menor harmônica","Modal"];
   var CADENCIAS = ["Autêntica perfeita","Autêntica imperfeita","Plagal","Deceptiva","Meia cadência","Frígia"];
   var MODULACOES = ["Nenhuma","Para o tom relativo","Para a dominante","Para a subdominante","Para tom vizinho","Cromática *"];
   var REC_HARM = ["Empréstimos modais *","Dominantes secundárias *"];
   var CIFRAS = ["Brasileira (C7M, Cm7)","Americana (Cmaj7, Cm7)","Graus romanos"];
   var RITMO_H = ["Um acorde por compasso","Dois acordes por compasso","Um acorde a cada dois compassos"];
+  var ESPACAMENTO = ["Fechado","Aberto","Misto"];
+  var EXCECOES = ["Quintas paralelas","Oitavas paralelas","Cruzamento de vozes","Saltos maiores que uma oitava"];
+  var TIPOS_VOZES = ["Voz solo","Dueto","SA (vozes agudas)","TB (vozes graves)","SATB (coro misto)","SATB com solista"];
   var PROGRESSOES = {
     "Modelos originais":["Esperança|I – V – vi – IV","Contemplativo|I – vi – IV – V","Adoração|vi – IV – I – V","Hino clássico|I – IV – I – V – I","Lamento|i – VI – III – VII"],
     "Pop e rock":["Três acordes|I – IV – V – IV","Rock mixolídio|I – bVII – IV – I","Pop ascendente|I – iii – IV – V","Volta ao início|I – V – IV – I"],
@@ -10473,31 +10516,50 @@ texto: $("esTexto").value
     "Menor e cinematográfico":["Épico menor|i – VII – VI – VII","Dramático|i – iv – VII – III","Ascensão|i – VI – VII – i","Lamento clássico|i – iv – v – i","Andaluza|i – VII – VI – V"],
     "Brasileiro":["Choro|I – VI7 – ii – V7 – I"]
   };
-  var SECOES_NOMES = ["Introdução","Tema principal","Verso","Pré-refrão","Refrão","Ponte","Interlúdio","Solo","Desenvolvimento","Variação temática","Clímax","Reprise","Coda","A","B","C"];
+  var SECOES_NOMES = ["Introdução","Tema principal","Verso","Pré-refrão","Refrão","Ponte","Interlúdio","Solo","Desenvolvimento","Variação temática","Clímax","Reprise","Coda","Exposição","Transição","Episódio","Stretto","A","B","C"];
   var MODELOS_FORMA = [
     "A–B–A|A:8,B:8,A:8",
     "A–B–A–C–A (rondó)|A:8,B:8,A:8,C:8,A:8",
     "Introdução–A–B–A–Coda|Introdução:4,A:8,B:8,A:8,Coda:4",
     "Verso–Refrão–Verso–Refrão–Ponte–Refrão|Verso:8,Refrão:8,Verso:8,Refrão:8,Ponte:8,Refrão:8",
     "Tema–Variação–Desenvolvimento–Reprise|Tema principal:8,Variação temática:8,Desenvolvimento:12,Reprise:8",
-    "Introdução–Desenvolvimento–Clímax–Coda|Introdução:4,Desenvolvimento:12,Clímax:8,Coda:4"
+    "Introdução–Desenvolvimento–Clímax–Coda|Introdução:4,Desenvolvimento:12,Clímax:8,Coda:4",
+    "Forma sonata|Exposição:16,Desenvolvimento:16,Reprise:16,Coda:8",
+    "Rondó-sonata *|A:8,B:8,A:8,C:12,A:8,B:8,Coda:8",
+    "Tema com variações|Tema principal:8,Variação temática:8,Variação temática:8,Variação temática:8,Coda:4",
+    "Fuga *|Exposição:12,Episódio:8,Exposição:12,Stretto:8,Coda:4"
   ];
-  var FORMACOES = ["Instrumento solo","Dueto","Trio","Quarteto","Quinteto","Sexteto","Septeto","Octeto","Pequeno conjunto","Banda","Orquestra de câmara","Orquestra sinfônica","Big band","Grupo de percussão","Conjunto eletrônico"];
-  var INSTRUMENTOS = {
-    "Cordas":["Violino","Viola","Violoncelo","Contrabaixo","Harpa","Violão","Guitarra elétrica","Baixo elétrico","Bandolim","Cavaquinho","Viola caipira"],
-    "Madeiras":["Flautim","Flauta","Oboé","Clarinete","Fagote","Saxofone soprano","Saxofone alto","Saxofone tenor","Saxofone barítono"],
-    "Metais":["Trompa","Trompete","Trombone","Tuba"],
-    "Teclas":["Piano","Órgão","Cravo","Sintetizador","Acordeão"],
-    "Percussão":["Tímpanos","Marimba","Xilofone","Vibrafone","Pratos","Pandeiro","Cajón","Congas","Bongôs","Bateria suave"],
-    "Eletrônicos":["Pad ~","Lead ~","Bass synth ~","Arpeggiator ~"]
+  var FINALIDADES = ["Trilha para vídeo ou mensagem","Louvor instrumental","Peça para músico tocar","Estudo ou prática","Outra"];
+  var TIPOS_OBRA = {
+    "Peça de movimento único":["Miniatura (peça curta)","Prelúdio","Tocata","Noturno","Elegia","Rapsódia","Poema sinfônico","Hino instrumental","Trilha ou fundo musical"],
+    "Obra de vários movimentos":["Sonata","Suíte","Concerto","Sinfonia"]
   };
+  var FORMACOES = ["Instrumento solo","Dueto","Trio","Quarteto","Quinteto","Sexteto","Septeto","Octeto","Pequeno conjunto","Banda","Orquestra de câmara","Orquestra sinfônica","Big band","Grupo de percussão","Conjunto eletrônico"];
+  var VOCAIS = ["Voz solo (formação)","Dueto vocal","Coro a cappella","Coro com instrumentos","Solista com acompanhamento"];
+  var INSTRUMENTOS = {
+    "Cordas":["Violino","Viola","Violoncelo","Contrabaixo","Harpa","Violão","Guitarra elétrica","Baixo elétrico","Bandolim","Cavaquinho","Viola caipira","Ukulele","Banjo","Alaúde"],
+    "Madeiras":["Flautim","Flauta","Flauta alto","Flauta baixo","Flauta doce","Oboé","Corne inglês","Clarinete","Clarone","Fagote","Contrafagote","Saxofone soprano","Saxofone alto","Saxofone tenor","Saxofone barítono"],
+    "Metais":["Trompa","Trompete","Flugelhorn","Trombone","Eufônio","Tuba"],
+    "Teclas":["Piano","Piano elétrico","Órgão","Cravo","Celesta","Sintetizador","Acordeão"],
+    "Percussão":["Tímpanos","Marimba","Xilofone","Vibrafone","Glockenspiel","Sinos tubulares","Pratos","Triângulo","Caixa","Bumbo","Bateria suave","Pandeiro","Cajón","Congas","Bongôs","Agogô","Surdo","Tamborim","Cuíca","Zabumba","Reco-reco","Castanholas"],
+    "Eletrônicos":["Pad ~","Lead ~","Bass synth ~","Arpeggiator ~"],
+    "Vozes":["Soprano","Contralto","Tenor","Baixo (voz)","Coro misto","Voz solo"]
+  };
+  var BAIXOS = ["Contrabaixo","Baixo elétrico","Tuba","Contrafagote","Bass synth"];
+  var PAPEIS = ["Melodia","Contracanto","Harmonia","Baixo","Pedal","Percussão"];
   var TEXTURAS = ["Monofonia","Homofonia","Polifonia","Contraponto *","Melodia acompanhada","Coral em blocos","Arpejos","Ostinato","Pedal harmônico","Uníssono","Contramelodia"];
   var TECNICAS = ["Variação melódica","Sequência","Imitação","Cânone *","Fuga *","Desenvolvimento motívico","Pergunta e resposta","Crescimento progressivo","Repetição temática"];
   var CONTORNOS = ["Arco (sobe e desce)","Ascendente","Descendente","Ondulante","Estático"];
+  var MOVIMENTO = ["Predomínio de graus conjuntos","Saltos moderados","Misto"];
+  var EXT_MEL = ["Estreita (até uma oitava)","Média (até uma décima segunda)","Ampla (limite do instrumento)"];
+  var CULMINANCIA = ["Um ponto alto na peça","Um ponto alto em cada frase","Livre"];
+  var FRASES = ["4 + 4 compassos","2 + 2 compassos","8 + 8 compassos","Livre"];
+  var TEXTO_VOZ = ["Texto do passo 1 do Estúdio","Texto próprio (colar depois)","Sem letra (vocalise)"];
+  var SILABAS = ["Uma sílaba por nota","Melismas ocasionais","Melismas frequentes"];
   var DIN_INI = ["ppp","pp (pianissimo)","p (piano)","mp (mezzo piano)","mf (mezzo forte)","f (forte)","ff (fortissimo)","fff"];
   var DINAMICAS = ["ppp","pp (pianissimo)","p (piano)","mp (mezzo piano)","mf (mezzo forte)","f (forte)","ff (fortissimo)","fff","sfz (sforzando)","Crescendo","Diminuendo"];
-  var ARTICULACOES = ["Legato","Staccato","Tenuto","Marcato"];
-  var TEC_EXPR = ["Pizzicato","Tremolo","Vibrato ~","Glissando","Fermata"];
+  var ARTICULACOES = ["Legato","Staccato","Tenuto","Marcato","Portato","Spiccato@Cordas"];
+  var TEC_EXPR = ["Pizzicato@Cordas","Tremolo@Cordas,Percussão","Vibrato ~","Glissando@Cordas,Teclas,Metais,Percussão","Fermata","Sul ponticello@Cordas","Sul tasto@Cordas","Col legno@Cordas","Harmônicos@Cordas","Surdina (con sordino, mute)@Cordas,Metais","Flutter tongue@Madeiras,Metais"];
   var GENEROS = {
     "Erudito e clássico":["Barroco","Clássico","Romântico","Impressionista","Contemporâneo","Neoclássico"],
     "Orquestral e trilhas":["Orquestral","Trilha de ação","Trilha contemplativa","Documentário"],
@@ -10507,31 +10569,76 @@ texto: $("esTexto").value
     "Eletrônico e experimental":["Ambient ~","New Age ~","Synthwave ~","Trance ~","House ~","Techno ~","Minimalista","Experimental *"]
   };
   var CLIMAS = ["Contemplativo","Esperançoso","Solene","Triunfante","Sereno","Épico","Dramático","Emocional","Suspense","Aventura","Fantasia","Guerra"];
+  var PERFIS = ["Estrito (coral e contraponto)","Clássico (prática comum)","Livre (jazz e pop)"];
+  var RIGOR = ["Estrito","Moderado","Livre"];
+ 
+  /* ---------- utilitários de opção ---------- */
+  function lbl(x){
+    var s = String(x), tag = "", fam = "", info = "", m = / ([*~])$/.exec(s);
+    if(m){ tag = m[1]; s = s.slice(0, -2); }
+    var a = s.indexOf("@"); if(a > -1){ fam = s.slice(a + 1); s = s.slice(0, a); }
+    var i = s.indexOf("|"); if(i > -1){ info = s.slice(i + 1); s = s.slice(0, i); }
+    return {v:s, i:info, g:tag, f:fam};
+  }
+  function texto(k){ return k.v + (k.i ? " (" + k.i + ")" : "") + (k.g === "*" ? " — avançado" : k.g === "~" ? " — só reprodução" : ""); }
+  function opcoes(o, d){
+    var op = function(x){ var k = lbl(x); return '<option value="' + esc(k.v) + '"' + (k.v === d ? ' selected' : '') + '>' + esc(texto(k)) + '</option>'; };
+    if(Array.isArray(o)) return o.map(op).join("");
+    return Object.keys(o).map(function(g){ return '<optgroup label="' + esc(g) + '">' + o[g].map(op).join("") + '</optgroup>'; }).join("");
+  }
+  function caixas(o, d){
+    var it = function(x){ var k = lbl(x); return '<label class="pc-chk"' + (k.f ? ' data-fam="' + esc(k.f) + '"' : '') + '><input type="checkbox" data-pc-v="' + esc(k.v) + '"' + (d.indexOf(k.v) > -1 ? ' checked' : '') + '> ' + esc(texto(k)) + '</label>'; };
+    if(Array.isArray(o)) return '<div class="pc-itens">' + o.map(it).join("") + '</div>';
+    return Object.keys(o).map(function(g){ return '<details><summary>' + esc(g) + '</summary><div class="pc-itens">' + o[g].map(it).join("") + '</div></details>'; }).join("");
+  }
+  var FAM_DE = {};
+  Object.keys(INSTRUMENTOS).forEach(function(f){ INSTRUMENTOS[f].forEach(function(n){ FAM_DE[lbl(n).v] = f; }); });
+  var IRREGULARES = COMPASSOS["Irregulares"];
  
   /* ================= CAMPOS (caminho no JSON, rótulo, tipo, opções, valor inicial) ================= */
+  var ehVocal = function(v){ return VOCAIS.indexOf(v("orquestracao.formacao")) > -1 || v("orquestracao.instrumentos").some(function(n){ return FAM_DE[n] === "Vozes"; }); };
   function F(p, l, t, o, d, x){ var r = {p:p, l:l, t:t, o:o, d:d}; if(x){ for(var k in x) r[k] = x[k]; } return r; }
   var CAMPOS = [
     F("titulo","Título da peça","txt",null,"",{ph:"Ex.: Aurora sobre o monte"}),
+    F("projeto.finalidade","Finalidade da peça","sel",FINALIDADES,FINALIDADES[0]),
+    F("projeto.tipoObra","Tipo de obra","sel",TIPOS_OBRA,"Miniatura (peça curta)"),
+    F("estilo.generos","Gêneros e estilos","multi",GENEROS,["Clássico"]),
+    F("estilo.climas","Clima","multi",CLIMAS,["Contemplativo"]),
+    F("regras.perfil","Perfil de regras","sel",PERFIS,PERFIS[1]),
+    F("regras.rigorMelodia","Rigor da melodia","sel",RIGOR,"Moderado"),
+    F("regras.rigorHarmonia","Rigor da harmonia","sel",RIGOR,"Moderado"),
+    F("regras.rigorRitmo","Rigor do ritmo","sel",RIGOR,"Moderado"),
     F("base.tonica","Tônica","sel",TON,"Ré"),
-    F("base.tonicaPersonalizada","Tônica personalizada (se escolheu Personalizada)","txt",null,"",{ph:"Ex.: Ré# menor"}),
+    F("base.tonicaPersonalizada","Tônica personalizada","txt",null,"",{ph:"Ex.: Ré# menor",cond:function(v){ return v("base.tonica") === "Personalizada"; }}),
     F("base.escala","Escala ou modo","sel",ESCALAS,"Jônio (maior natural)"),
     F("base.armadura","Armadura de clave","sel",ARMADURA,ARMADURA[0]),
     F("base.clave","Clave","sel",CLAVES,CLAVES[0]),
     F("base.extensao","Extensão tonal","sel",["Uma oitava","Duas oitavas","Ampla (limite do instrumento)"],"Duas oitavas"),
+    F("base.a4","Altura de referência: A4 (Hz)","num",null,440,{min:400,max:480}),
     F("base.notaInicial","Nota inicial","sel",GRAUS,"Tônica"),
     F("base.notaFinal","Nota final","sel",GRAUS,"Tônica"),
-    F("base.a4","Altura de referência: A4 (Hz)","num",null,440,{min:400,max:480}),
     F("ritmo.compasso","Fórmula de compasso","sel",COMPASSOS,"4/4"),
-    F("ritmo.agrupamento","Agrupamento dos tempos (compassos irregulares)","txt",null,"",{ph:"Ex.: 2+2+3"}),
-    F("ritmo.pulso","Padrão de pulso","sel",PULSOS,"Quaternário"),
-    F("ritmo.densidade","Densidade de notas","sel",DENSIDADE,"Média"),
-    F("ritmo.figuras","Figuras permitidas","multi",FIGURAS,["Mínima","Semínima","Colcheia"]),
-    F("ritmo.recursos","Recursos rítmicos","multi",RITMOS,[]),
-    F("ritmo.pausas","Usar pausas de todas as durações","chk",null,true),
+    F("ritmo.agrupamento","Agrupamento dos tempos","sel",["Automático"],"Automático",{cond:function(v){ return IRREGULARES.indexOf(v("ritmo.compasso")) > -1; }}),
+    F("ritmo.agrupamentoPersonalizado","Agrupamento personalizado","txt",null,"",{ph:"Ex.: 2+2+3",cond:function(v){ return IRREGULARES.indexOf(v("ritmo.compasso")) > -1 && v("ritmo.agrupamento") === "Personalizado"; }}),
     F("andamento.indicacao","Indicação de andamento","sel",ANDAMENTOS,"Adagio"),
     F("andamento.bpm","Andamento (batidas por minuto)","num",null,72,{min:30,max:220}),
     F("andamento.variacoes","Variações de andamento","multi",VAR_AND,[]),
-    F("harmonia.campo","Campo harmônico","sel",CAMPOS,"Maior"),
+    F("compassos","Número total de compassos","num",null,32,{min:4,max:256}),
+    F("ritmo.padroes.melodia","Padrão rítmico da melodia","sel",PADROES,AUTO),
+    F("ritmo.padroes.acompanhamento","Padrão rítmico do acompanhamento","sel",PADROES,AUTO),
+    F("ritmo.padroes.baixo","Padrão rítmico do baixo","sel",PADROES,AUTO),
+    F("ritmo.padroes.percussao","Padrão rítmico da percussão","sel",PADROES,AUTO),
+    F("ritmo.pulso","Padrão de pulso","sel",PULSOS,"Quaternário"),
+    F("ritmo.acentuacao","Acentuação","sel",ACENTUACAO,ACENTUACAO[0]),
+    F("ritmo.subdivisao","Subdivisão predominante","sel",SUBDIVISAO,SUBDIVISAO[0]),
+    F("ritmo.densidade","Densidade de notas","sel",DENSIDADE,"Média"),
+    F("ritmo.polirritmia","Polirritmia","multi",POLIRRITMIA,[]),
+    F("ritmo.figuras","Figuras permitidas","multi",FIGURAS,["Mínima","Semínima","Colcheia"]),
+    F("ritmo.recursos","Recursos rítmicos","multi",RITMOS,[]),
+    F("ritmo.quialteras","Tipos de quiáltera","multi",QUIALTERAS,["Tercina"],{cond:function(v){ var r = v("ritmo.recursos"); return r.indexOf("Tercina") > -1 || r.indexOf("Quiáltera") > -1; }}),
+    F("ritmo.pausas","Usar pausas de todas as durações","chk",null,true),
+    F("ritmo.ostinatoPapel","Papel do ostinato","sel",OSTINATO,OSTINATO[0],{cond:function(v){ return v("textura.texturas").indexOf("Ostinato") > -1; }}),
+    F("harmonia.campo","Campo harmônico","sel",CAMPOS_HARMONICOS,"Maior"),
     F("harmonia.cifras","Notação das cifras","sel",CIFRAS,CIFRAS[0]),
     F("harmonia.acordes","Tipos de acorde","multi",ACORDES,["Tríade maior","Tríade menor"]),
     F("harmonia.cadencias","Cadências","multi",CADENCIAS,[]),
@@ -10539,283 +10646,503 @@ texto: $("esTexto").value
     F("harmonia.recursos","Recursos harmônicos","multi",REC_HARM,[]),
     F("harmonia.progressao","Progressão de acordes","txt",null,"",{ph:"Ex.: I – V – vi – IV",wide:1}),
     F("harmonia.ritmoHarmonico","Ritmo harmônico","sel",RITMO_H,RITMO_H[0]),
-    F("compassos","Número total de compassos","num",null,32,{min:4,max:256}),
-    F("orquestracao.formacao","Formação","sel",FORMACOES,"Instrumento solo"),
-    F("orquestracao.instrumentos","Instrumentos","multi",INSTRUMENTOS,["Piano"]),
-    F("orquestracao.melodia","Instrumento da melodia","sel",[],""),
+    F("harmonia.espacamento","Espaçamento dos acordes","sel",ESPACAMENTO,"Misto"),
+    F("harmonia.distanciaMax","Distância máxima entre vozes superiores (semitons)","num",null,12,{min:7,max:24}),
+    F("harmonia.conducao","Exceções permitidas na condução de vozes","multi",EXCECOES,[]),
+    F("harmonia.vozes","Tipo de vozes","sel",TIPOS_VOZES,"SATB (coro misto)",{cond:ehVocal}),
+    F("harmonia.extensaoSoprano","Extensão do soprano","txt",null,"C4–G5",{cond:ehVocal}),
+    F("harmonia.extensaoContralto","Extensão do contralto","txt",null,"G3–D5",{cond:ehVocal}),
+    F("harmonia.extensaoTenor","Extensão do tenor","txt",null,"C3–G4",{cond:ehVocal}),
+    F("harmonia.extensaoBaixo","Extensão do baixo","txt",null,"E2–C4",{cond:ehVocal}),
+    F("textura.contorno","Contorno melódico","sel",CONTORNOS,CONTORNOS[0]),
+    F("melodia.movimento","Movimento predominante","sel",MOVIMENTO,MOVIMENTO[0]),
+    F("melodia.extensao","Extensão da melodia","sel",EXT_MEL,EXT_MEL[1]),
+    F("melodia.culminancia","Ponto culminante","sel",CULMINANCIA,CULMINANCIA[0]),
+    F("melodia.frases","Simetria das frases","sel",FRASES,FRASES[0]),
+    F("melodia.motivo","Motivo (célula rítmica ou melódica)","txt",null,"",{ph:"Ex.: semínima, colcheia, colcheia, semínima",wide:1}),
     F("textura.texturas","Texturas","multi",TEXTURAS,["Melodia acompanhada"]),
     F("textura.tecnicas","Técnicas de composição","multi",TECNICAS,[]),
-    F("textura.contorno","Contorno melódico","sel",CONTORNOS,CONTORNOS[0]),
+    F("voz.texto","Fonte do texto cantado","sel",TEXTO_VOZ,TEXTO_VOZ[0],{cond:ehVocal}),
+    F("voz.silabas","Sílabas por nota","sel",SILABAS,SILABAS[0],{cond:ehVocal}),
+    F("voz.respiracao","Marcar respiração entre frases","chk",null,true,{cond:ehVocal}),
+    F("voz.tonica","Sílabas tônicas em tempos fortes","chk",null,true,{cond:ehVocal}),
+    F("voz.tessitura","Manter cada voz na região confortável","chk",null,true,{cond:ehVocal}),
+    F("orquestracao.formacao","Formação","sel",{"Instrumentais":FORMACOES,"Vocais e mistas":VOCAIS},"Instrumento solo"),
+    F("orquestracao.instrumentos","Instrumentos","multi",INSTRUMENTOS,["Piano"]),
+    F("orquestracao.melodia","Instrumento da melodia","sel",[],""),
     F("expressao.dinamicaInicial","Dinâmica inicial","sel",DIN_INI,"mf (mezzo forte)"),
     F("expressao.dinamicas","Dinâmicas e variações usadas","multi",DINAMICAS,["mp (mezzo piano)","mf (mezzo forte)"]),
     F("expressao.articulacoes","Articulações","multi",ARTICULACOES,["Legato"]),
-    F("expressao.tecnicas","Técnicas de execução","multi",TEC_EXPR,[]),
-    F("estilo.generos","Gêneros e estilos","multi",GENEROS,["Clássico"]),
-    F("estilo.climas","Clima","multi",CLIMAS,["Contemplativo"])
+    F("expressao.tecnicas","Técnicas de execução","multi",TEC_EXPR,[])
   ];
-  var POR_CAMINHO = {}; CAMPOS.forEach(function(f){ POR_CAMINHO[f.p] = f; });
+  var POR = {}; CAMPOS.forEach(function(f){ POR[f.p] = f; });
  
-  /* ================= ABAS ================= */
-  var LEGENDA = "Marcas nas opções: avançado = o gerador só vai usar numa fase posterior; só reprodução = não entra na partitura.";
+  /* ================= ETAPAS (abas) ================= */
+  var LEGENDA = "Marcas nas opções: avançado = o gerador só vai usar numa fase posterior; só reprodução = não entra na partitura. Campos condicionais aparecem quando fazem sentido.";
   var ABAS = [
-    ["musica","1. Música",[
-      {nota:LEGENDA},"titulo",
+    ["projeto","1. Projeto",[{nota:LEGENDA},"titulo","projeto.finalidade","projeto.tipoObra",
+      {h:"Estilo e clima"},"estilo.generos","estilo.climas",
+      {h:"Perfil de regras"},{nota:"O perfil decide o quanto o futuro maestro segue as leis de harmonia, melodia e ritmo. Estrito vale para coral e contraponto, livre para jazz e pop."},
+      "regras.perfil","regras.rigorMelodia","regras.rigorHarmonia","regras.rigorRitmo"]],
+    ["base","2. Base musical",[
       {h:"Tonalidade e escala"},"base.tonica","base.tonicaPersonalizada","base.escala",{id:"notaEscala"},
       "base.armadura","base.clave","base.extensao","base.a4","base.notaInicial","base.notaFinal",
-      {h:"Compasso e ritmo"},"ritmo.compasso","ritmo.agrupamento","ritmo.pulso","ritmo.densidade",
-      "ritmo.figuras","ritmo.recursos","ritmo.pausas",
-      {nota:"Cada gênero (samba, baião, frevo, bolero, tango…) terá um padrão rítmico próprio, ligado nas próximas etapas."},
+      {h:"Compasso"},"ritmo.compasso","ritmo.agrupamento","ritmo.agrupamentoPersonalizado",
       {h:"Andamento"},"andamento.indicacao","andamento.bpm","andamento.variacoes"]],
-    ["harmonia","2. Harmonia",[
-      "harmonia.campo","harmonia.cifras","harmonia.acordes","harmonia.cadencias","harmonia.modulacao","harmonia.recursos",
-      {h:"Progressão"},{id:"preset"},"harmonia.progressao","harmonia.ritmoHarmonico"]],
     ["forma","3. Forma",["compassos",{id:"modelos"},{id:"secoes"}]],
-    ["orq","4. Orquestração",[
-      "orquestracao.formacao","orquestracao.instrumentos",
-      {nota:"Saxofones, clarinete, trompete e trompa são instrumentos transpositores, e a percussão sem altura usa clave própria. O gerador vai tratar isso na etapa de exportação."},
-      "orquestracao.melodia",{h:"Texturas e técnicas"},"textura.texturas","textura.tecnicas","textura.contorno"]],
-    ["expr","5. Expressão",["expressao.dinamicaInicial","expressao.dinamicas","expressao.articulacoes","expressao.tecnicas"]],
-    ["estilo","6. Estilo",["estilo.generos","estilo.climas"]],
-    ["previa","7. Prévia",[]],
-    ["exportar","8. Exportar",[]]
+    ["ritmo","4. Ritmo",[
+      {h:"Padrão rítmico por papel"},{nota:"Cada padrão será escrito em notas na etapa do gerador. Por enquanto você só escolhe."},
+      "ritmo.padroes.melodia","ritmo.padroes.acompanhamento","ritmo.padroes.baixo","ritmo.padroes.percussao",
+      {h:"Pulso, acentuação e subdivisão"},"ritmo.pulso","ritmo.acentuacao","ritmo.subdivisao","ritmo.densidade",
+      "ritmo.polirritmia","ritmo.figuras","ritmo.recursos","ritmo.quialteras","ritmo.pausas","ritmo.ostinatoPapel"]],
+    ["harmonia","5. Harmonia",[
+      "harmonia.campo","harmonia.cifras","harmonia.acordes","harmonia.cadencias","harmonia.modulacao","harmonia.recursos",
+      {h:"Progressão"},{id:"preset"},"harmonia.progressao","harmonia.ritmoHarmonico",
+      {h:"Vozes e distâncias"},"harmonia.espacamento","harmonia.distanciaMax","harmonia.conducao",
+      "harmonia.vozes","harmonia.extensaoSoprano","harmonia.extensaoContralto","harmonia.extensaoTenor","harmonia.extensaoBaixo"]],
+    ["melodia","6. Melodia",[
+      {h:"Desenho da melodia"},"textura.contorno","melodia.movimento","melodia.extensao","melodia.culminancia","melodia.frases","melodia.motivo",
+      {h:"Texturas e técnicas"},"textura.texturas","textura.tecnicas",
+      {h:"Voz cantada"},"voz.texto","voz.silabas","voz.respiracao","voz.tonica","voz.tessitura"]],
+    ["orq","7. Orquestração",[
+      "orquestracao.formacao",{id:"buscaInstr"},"orquestracao.instrumentos",
+      {nota:"Saxofones, clarinete, trompete e trompa são instrumentos transpositores, e a percussão sem altura usa clave própria. O gerador tratará isso na etapa de exportação."},
+      "orquestracao.melodia",{h:"Papel de cada instrumento"},{id:"papeis"}]],
+    ["expr","8. Expressão",["expressao.dinamicaInicial","expressao.dinamicas","expressao.articulacoes","expressao.tecnicas",
+      {nota:"Técnicas ligadas a uma família (cordas, metais…) ficam ativas só quando há instrumento dessa família na aba Orquestração."}]],
+    ["revisao","9. Revisão e exportar",[{id:"revisao"}]]
   ];
   var ESTADO = [
-    ["Menus, escolhas e plano da peça (JSON)","ok","Disponível"],
+    ["Menus, escolhas, planos nomeados e plano JSON","ok","Disponível"],
     ["Gerador de notas (melodia, baixo, acordes)","prep","Em preparação"],
-    ["Biblioteca de padrões rítmicos por gênero","prep","Em preparação"],
-    ["Validador de compassos e extensões","prep","Em preparação"],
+    ["Biblioteca de padrões rítmicos escritos em notas","prep","Em preparação"],
+    ["Motor de regras (harmonia, melodia, ritmo) e validador","prep","Em preparação"],
     ["Prévia sonora no navegador","prep","Em preparação"],
     ["Exportar MusicXML e MIDI","prep","Em preparação"],
     ["MP3 e MP4 com a peça como trilha","prep","Em preparação"]
   ];
  
-  /* ================= MONTAGEM DOS CAMPOS ================= */
-  function lbl(x){
-    var s = String(x), tag = "", info = "", m = / ([*~])$/.exec(s);
-    if(m){ tag = m[1]; s = s.slice(0, -2); }
-    var i = s.indexOf("|"); if(i > -1){ info = s.slice(i + 1); s = s.slice(0, i); }
-    return {v:s, i:info, g:tag};
-  }
-  function texto(k){ return k.v + (k.i ? " (" + k.i + ")" : "") + (k.g === "*" ? " — avançado" : k.g === "~" ? " — só reprodução" : ""); }
-  var idDe = function(p){ return "pc_" + p.replace(/\./g, "_"); };
-  function opcoes(o, d){
-    var op = function(x){ var k = lbl(x); return '<option value="' + esc(k.v) + '"' + (k.v === d ? ' selected' : '') + '>' + esc(texto(k)) + '</option>'; };
-    if(Array.isArray(o)) return o.map(op).join("");
-    return Object.keys(o).map(function(g){ return '<optgroup label="' + esc(g) + '">' + o[g].map(op).join("") + '</optgroup>'; }).join("");
-  }
-  function caixas(o, d){
-    var it = function(x){ var k = lbl(x); return '<label class="pc-chk"><input type="checkbox" data-pc-v="' + esc(k.v) + '"' + (d.indexOf(k.v) > -1 ? ' checked' : '') + '> ' + esc(texto(k)) + '</label>'; };
-    if(Array.isArray(o)) return '<div class="pc-itens">' + o.map(it).join("") + '</div>';
-    return Object.keys(o).map(function(g){ return '<details><summary>' + esc(g) + '</summary><div class="pc-itens">' + o[g].map(it).join("") + '</div></details>'; }).join("");
-  }
+  /* ================= MONTAGEM ================= */
   function campoHtml(f){
-    var id = idDe(f.p), w = f.wide ? ' class="pc-wide"' : '';
-    if(f.t === "sel") return '<label>' + esc(f.l) + '<select id="' + id + '">' + opcoes(f.o, f.d) + '</select></label>';
-    if(f.t === "num") return '<label>' + esc(f.l) + '<input type="number" id="' + id + '" min="' + f.min + '" max="' + f.max + '" value="' + f.d + '"></label>';
-    if(f.t === "txt") return '<label' + w + '>' + esc(f.l) + '<input type="text" id="' + id + '" placeholder="' + esc(f.ph || "") + '"></label>';
-    if(f.t === "chk") return '<label class="pc-chk"><input type="checkbox" id="' + id + '"' + (f.d ? ' checked' : '') + '> ' + esc(f.l) + '</label>';
-    return '<fieldset class="pc-wide" data-pc-multi="' + f.p + '"><legend>' + esc(f.l) + '</legend>' + caixas(f.o, f.d) + '</fieldset>';
+    var w = (f.t === "multi" || f.wide) ? " pc-wide" : "", a = '<div class="pc-cx' + w + '" data-pc-c="' + f.p + '">', z = '</div>';
+    if(f.t === "sel") return a + '<label>' + esc(f.l) + '<select data-pc="' + f.p + '">' + opcoes(f.o, f.d) + '</select></label>' + z;
+    if(f.t === "num") return a + '<label>' + esc(f.l) + '<input type="number" data-pc="' + f.p + '" min="' + f.min + '" max="' + f.max + '" value="' + f.d + '"></label>' + z;
+    if(f.t === "txt") return a + '<label>' + esc(f.l) + '<input type="text" data-pc="' + f.p + '" placeholder="' + esc(f.ph || "") + '" value="' + esc(f.d || "") + '"></label>' + z;
+    if(f.t === "chk") return a + '<label class="pc-chk"><input type="checkbox" data-pc="' + f.p + '"' + (f.d ? ' checked' : '') + '> ' + esc(f.l) + '</label>' + z;
+    return a + '<fieldset data-pc-multi="' + f.p + '"><legend>' + esc(f.l) + '</legend>' + caixas(f.o, f.d) + '</fieldset>' + z;
   }
   var contaPre = 0; Object.keys(PROGRESSOES).forEach(function(g){ contaPre += PROGRESSOES[g].length; });
   var CUSTOM = {
-    notaEscala:'<p class="es-nota pc-wide" id="pcNotaEscala"></p><p class="es-nota pc-wide">Fá# e Solb (Dó# e Réb) soam igual: o gerador escolherá a grafia pela tonalidade. Escalas com microtons ficam fora desta versão.</p>',
-    preset:'<label class="pc-wide">Modelos de progressão (' + contaPre + ' prontos)<select id="pcPreset"><option value="">Escolher um modelo…</option>' +
+    notaEscala:'<p class="es-nota pc-wide" data-pc-notaescala></p><p class="es-nota pc-wide">Fá# e Solb (Dó# e Réb) soam igual: o gerador escolherá a grafia pela tonalidade. Escalas com microtons ficam fora desta versão.</p>',
+    preset:'<label class="pc-wide">Modelos de progressão (' + contaPre + ' prontos)<select data-pc-preset><option value="">Escolher um modelo…</option>' +
       Object.keys(PROGRESSOES).map(function(g){ return '<optgroup label="' + esc(g) + '">' + PROGRESSOES[g].map(function(x){ var p = x.split("|"); return '<option value="' + esc(p[1]) + '">' + esc(p[0] + " — " + p[1]) + '</option>'; }).join("") + '</optgroup>'; }).join("") + '</select></label>',
-    modelos:'<label class="pc-wide">Modelo de estrutura<select id="pcModelo"><option value="">Personalizada (manual)</option>' +
-      MODELOS_FORMA.map(function(x){ var p = x.split("|"); return '<option value="' + esc(p[1]) + '">' + esc(p[0]) + '</option>'; }).join("") + '</select></label>',
-    secoes:'<h4>Seções da peça</h4><p class="es-nota pc-wide">Cada seção tem um nome, o tamanho em compassos e, se quiser, um andamento próprio.</p><div class="pc-secoes" id="pcSecoes"></div>' +
-      '<div class="pc-linha pc-wide"><button type="button" class="at-btn" id="pcAddSecao">+ ADICIONAR SEÇÃO</button><span class="es-nota" id="pcSoma"></span></div>' +
-      '<datalist id="pcSecNomes">' + SECOES_NOMES.map(function(n){ return '<option value="' + esc(n) + '">'; }).join("") + '</datalist>'
-  };
-  function aba(a){
-    var h = '<div class="es-box" data-pc-painel="' + a[0] + '"' + (a[0] === "musica" ? '' : ' hidden') + '><h3>' + esc(a[1].replace(/^\d+\.\s*/, "")) + '</h3>';
-    if(a[0] === "previa") return h + '<p class="es-nota">Este é o plano completo que será enviado ao gerador. A prévia sonora e a partitura ainda não estão ligadas.</p><pre id="pcJson"></pre></div>';
-    if(a[0] === "exportar") return h + '<p class="es-nota">Por enquanto você pode baixar o plano da peça. Os formatos musicais entram nas próximas etapas.</p>' +
-      '<div class="pc-linha"><button type="button" class="at-btn gold" id="pcBaixarPlano">BAIXAR PLANO (JSON)</button>' +
+    modelos:'<label class="pc-wide">Modelo de estrutura<select data-pc-modelo><option value="">Personalizada (manual)</option>' +
+      MODELOS_FORMA.map(function(x){ var p = x.split("|"), k = lbl(p[0]); return '<option value="' + esc(p[1]) + '">' + esc(texto(k)) + '</option>'; }).join("") + '</select></label>',
+    secoes:'<h4>Seções da peça</h4><p class="es-nota pc-wide">Cada seção tem nome, tamanho em compassos e, se quiser, um andamento próprio.</p><div class="pc-secoes" data-pc-secoes></div>' +
+      '<div class="pc-linha pc-wide"><button type="button" class="at-btn" data-pc-addsecao>+ ADICIONAR SEÇÃO</button><span class="es-nota" data-pc-soma></span></div>' +
+      '<datalist id="pcSecNomes">' + SECOES_NOMES.map(function(n){ return '<option value="' + esc(n) + '">'; }).join("") + '</datalist>',
+    buscaInstr:'<div class="pc-linha pc-wide"><label style="flex:1 1 240px">Buscar instrumento<input type="search" data-pc-busca placeholder="Ex.: violino, saxofone, tamborim"></label><span class="es-nota" data-pc-conta></span></div>',
+    papeis:'<div class="pc-grade pc-wide" data-pc-papeis></div>',
+    revisao:'<h4>Pendências</h4><ul class="pc-pend pc-wide" data-pc-pend></ul><h4>Plano completo</h4><pre class="pc-wide" data-pc-json></pre>' +
+      '<h4>Exportar</h4><div class="pc-linha pc-wide"><button type="button" class="at-btn gold" data-pc-baixar>BAIXAR PLANO (JSON)</button>' +
       ["MUSICXML (para o MuseScore)","MIDI","MP3","MP4"].map(function(n){ return '<button type="button" class="at-btn" disabled>' + n + '</button>'; }).join("") + '</div>' +
-      '<ul class="pc-estado">' + ESTADO.map(function(e){ return '<li><span class="pc-selo ' + e[1] + '">' + e[2] + '</span>' + e[0] + '</li>'; }).join("") + '</ul></div>';
-    return h + '<div class="pc-grade">' + a[2].map(function(x){
-      if(typeof x === "string") return campoHtml(POR_CAMINHO[x]);
-      if(x.h) return '<h4>' + esc(x.h) + '</h4>';
-      if(x.nota) return '<p class="es-nota pc-wide">' + esc(x.nota) + '</p>';
-      return CUSTOM[x.id];
-    }).join("") + '</div></div>';
+      '<ul class="pc-estado pc-wide">' + ESTADO.map(function(e){ return '<li><span class="pc-selo ' + e[1] + '">' + e[2] + '</span>' + e[0] + '</li>'; }).join("") + '</ul>'
+  };
+  function painelHtml(a, primeira){
+    return '<div class="es-box" role="tabpanel" id="pcPainel_' + a[0] + '" aria-labelledby="pcTab_' + a[0] + '" data-pc-painel="' + a[0] + '"' + (primeira ? '' : ' hidden') + '><h3>' + esc(a[1].replace(/^\d+\.\s*/, "")) + '</h3><div class="pc-grade">' +
+      a[2].map(function(x){
+        if(typeof x === "string") return campoHtml(POR[x]);
+        if(x.h) return '<h4>' + esc(x.h) + '</h4>';
+        if(x.nota) return '<p class="es-nota pc-wide">' + esc(x.nota) + '</p>';
+        return CUSTOM[x.id];
+      }).join("") + '</div></div>';
   }
  
-  /* ================= CARTÃO NA TELA DE ESCOLHA ================= */
   var card = document.createElement("button");
   card.type = "button"; card.className = "f2-card";
   card.innerHTML = '<span class="f2-eng" aria-hidden="true">\u2699\uFE0E</span><span class="f2-selo prep">Em preparação</span>' +
     '<strong>Peças instrumentais</strong>' +
-    '<span class="f2-d">Defina tonalidade, ritmo, harmonia e andamento. O Estúdio monta a peça e exporta para o MuseScore.</span>' +
-    '<span class="f2-trilha">' + ["Definir música, harmonia e forma","Escolher formação, texturas e expressão","Ouvir a prévia","Exportar MusicXML ou MIDI"].map(function(x, i){ return '<span><b>' + (i + 1) + '</b>' + x + '</span>'; }).join("") + '</span>' +
+    '<span class="f2-d">Defina tonalidade, ritmo, harmonia, melodia e andamento. O Estúdio monta a peça e exporta para o MuseScore.</span>' +
+    '<span class="f2-trilha">' + ["Projeto, base musical e forma","Ritmo, harmonia e melodia","Orquestração e expressão","Revisar e exportar o plano"].map(function(x, i){ return '<span><b>' + (i + 1) + '</b>' + x + '</span>'; }).join("") + '</span>' +
     '<span class="f2-ir">Começar</span>';
   grade.appendChild(card);
  
   var sec = document.createElement("section");
   sec.id = "pcEstrutura";
-  sec.innerHTML = '<div class="pc-topo"><div><small>Você está criando</small><strong>Peças instrumentais</strong></div><button type="button" class="at-btn" id="pcVoltar">TROCAR TIPO</button></div>' +
-    '<div class="pc-abas" role="tablist">' + ABAS.map(function(a, i){ return '<button type="button" role="tab" data-pc-aba="' + a[0] + '" aria-selected="' + (i === 0) + '">' + a[1] + '</button>'; }).join("") + '</div>' +
-    ABAS.map(aba).join("") +
-    '<div class="pc-linha"><button type="button" class="at-btn gold" id="pcSalvar">GUARDAR PLANO</button><span class="es-msg" id="pcMsg" role="status"></span></div>';
+  sec.innerHTML = '<div class="pc-topo"><div><small>Você está criando</small><strong>Peças instrumentais</strong></div><button type="button" class="at-btn" data-pc-voltar>TROCAR TIPO</button></div>' +
+    '<details class="pc-lib" data-pc-lib open><summary data-pc-libresumo>Meus planos de peças</summary><div class="pc-lib-corpo">' +
+      '<div class="pc-linha"><label style="flex:1 1 240px">Nome do plano<input type="text" data-pc-nome placeholder="Se ficar vazio, usa o título da peça"></label>' +
+      '<button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><button type="button" class="at-btn" data-pc-lib-acao="novo">NOVO PLANO</button></div>' +
+      '<div class="pc-lista" data-pc-lista></div></div></details>' +
+    '<div class="pc-abas" role="tablist" aria-label="Etapas da peça">' + ABAS.map(function(a, i){ return '<button type="button" role="tab" id="pcTab_' + a[0] + '" data-pc-aba="' + a[0] + '" aria-controls="pcPainel_' + a[0] + '" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '">' + a[1] + '</button>'; }).join("") + '</div>' +
+    ABAS.map(function(a, i){ return painelHtml(a, i === 0); }).join("") +
+    '<div class="pc-linha"><button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><span class="es-nota" data-pc-sujo hidden>● alterações ainda não guardadas</span></div>' +
+    '<p class="es-msg" id="pcMsg" role="status"></p>';
   painel.appendChild(sec);
+  var Q = function(s){ return sec.querySelector(s); }, QA = function(s){ return sec.querySelectorAll(s); };
   var msg = function(t, erro){ var m = $("pcMsg"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); };
  
-  /* ================= ABAS, SEÇÕES E COMPORTAMENTOS ================= */
-  function mostrarAba(id){
-    sec.querySelectorAll("[data-pc-aba]").forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.pcAba === id)); });
-    sec.querySelectorAll("[data-pc-painel]").forEach(function(p){ p.hidden = p.dataset.pcPainel !== id; });
-    if(id === "previa") $("pcJson").textContent = JSON.stringify(plano(), null, 2);
+  /* ================= LEITURA E ESCRITA DOS CAMPOS ================= */
+  var ctl = function(p){ return Q('[data-pc="' + p + '"]'); };
+  function ler(f){
+    if(f.t === "multi") return Array.prototype.map.call(QA('[data-pc-multi="' + f.p + '"] input:checked:not(:disabled)'), function(i){ return i.dataset.pcV; });
+    var el = ctl(f.p);
+    if(f.t === "chk") return el.checked;
+    if(f.t === "num") return el.value === "" ? null : Number(el.value);
+    return el.value.trim();
   }
-  sec.querySelector(".pc-abas").addEventListener("click", function(ev){ var b = ev.target.closest("[data-pc-aba]"); if(b) mostrarAba(b.dataset.pcAba); });
+  var V = function(p){ return ler(POR[p]); };
+  var visivel = function(f){ return !f.cond || !!f.cond(V); };
+  function pôr(f, v){
+    if(v == null) return;
+    if(f.t === "multi"){
+      Array.prototype.forEach.call(QA('[data-pc-multi="' + f.p + '"] input'), function(i){ i.checked = v.indexOf(i.dataset.pcV) > -1; });
+      if(f.p === "orquestracao.instrumentos") instrumentos();
+      return;
+    }
+    var el = ctl(f.p);
+    if(f.t === "chk"){ el.checked = !!v; return; }
+    if(f.t === "sel"){
+      if(f.p === "ritmo.agrupamento" && v !== "Automático" && v !== "Personalizado" && !AGRUP[V("ritmo.compasso")] ){ return; }
+      if(Array.prototype.some.call(el.options, function(o){ return o.value === String(v); })) el.value = v;
+      if(f.p === "ritmo.compasso") opcoesAgrup();
+      return;
+    }
+    el.value = v;
+  }
+  function setCam(o, p, v){ var k = p.split("."), c = o; for(var i = 0; i < k.length - 1; i++){ c = c[k[i]] = c[k[i]] || {}; } c[k[k.length - 1]] = v; }
+  function getCam(o, p){ var k = p.split("."), c = o; for(var i = 0; i < k.length; i++){ if(c == null) return undefined; c = c[k[i]]; } return c; }
  
+  /* ---------- agrupamento rítmico ---------- */
+  function opcoesAgrup(){
+    var s = ctl("ritmo.agrupamento"), atual = s.value, lista = ["Automático"].concat(AGRUP[V("ritmo.compasso")] || [], ["Personalizado"]);
+    s.innerHTML = lista.map(function(x){ return '<option' + (x === atual ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join("");
+    if(lista.indexOf(atual) < 0) s.value = "Automático";
+  }
+  function erroAgrupamento(p){
+    var c = getCam(p, "ritmo.compasso"), g = getCam(p, "ritmo.agrupamento");
+    if(IRREGULARES.indexOf(c) < 0 || !g || g === "Automático") return "";
+    var t = g === "Personalizado" ? (getCam(p, "ritmo.agrupamentoPersonalizado") || "") : g;
+    if(!/^\d+(\+\d+)+$/.test(t)) return "Agrupamento inválido: use números separados por +, como 2+2+3.";
+    var soma = t.split("+").reduce(function(a, n){ return a + Number(n); }, 0), alvo = parseInt(c, 10);
+    return soma === alvo ? "" : "O agrupamento " + t + " soma " + soma + ", mas o compasso " + c + " pede " + alvo + ".";
+  }
+ 
+  /* ---------- seções da forma ---------- */
   function addSecao(nome, n, bpm){
     var d = document.createElement("div"); d.className = "pc-secao";
     d.innerHTML = '<label>Seção<input type="text" class="pc-sn" list="pcSecNomes" value="' + esc(nome) + '"></label>' +
       '<label>Compassos<input type="number" class="pc-sc" min="1" max="64" value="' + esc(n) + '"></label>' +
       '<label>Andamento<input type="number" class="pc-sb" min="30" max="220" placeholder="da peça" value="' + (bpm ? esc(bpm) : "") + '"></label>' +
       '<button type="button" class="at-btn pc-rem">Remover</button>';
-    $("pcSecoes").appendChild(d); somar();
+    Q("[data-pc-secoes]").appendChild(d); somar();
   }
   function secoes(){
-    return Array.prototype.map.call(sec.querySelectorAll(".pc-secao"), function(s){
+    return Array.prototype.map.call(QA(".pc-secao"), function(s){
       var b = s.querySelector(".pc-sb").value;
       return {secao:s.querySelector(".pc-sn").value.trim(), compassos:Number(s.querySelector(".pc-sc").value) || 0, andamento:b === "" ? null : Number(b)};
     });
   }
-  function somaSecoes(){ return secoes().reduce(function(a, s){ return a + s.compassos; }, 0); }
+  var somaSecoes = function(){ return secoes().reduce(function(a, s){ return a + s.compassos; }, 0); };
   function somar(){
-    var t = somaSecoes(), alvo = Number($(idDe("compassos")).value) || 0;
-    $("pcSoma").textContent = "Soma das seções: " + t + " compassos" + (alvo && t !== alvo ? " (o total da peça pede " + alvo + ")." : ".");
+    var t = somaSecoes(), alvo = V("compassos") || 0;
+    Q("[data-pc-soma]").textContent = "Soma das seções: " + t + " compassos" + (alvo && t !== alvo ? " (o total da peça pede " + alvo + ")." : ".");
   }
   function carregarModelo(txt){
-    $("pcSecoes").innerHTML = "";
+    Q("[data-pc-secoes]").innerHTML = "";
     txt.split(",").forEach(function(p){ var q = p.split(":"); addSecao(q[0], Number(q[1])); });
-    var t = somaSecoes(); $(idDe("compassos")).value = t; somar();
+    ctl("compassos").value = somaSecoes(); somar();
   }
-  $("pcAddSecao").addEventListener("click", function(){ addSecao("Nova seção", 8); $("pcModelo").value = ""; });
-  $("pcSecoes").addEventListener("click", function(ev){ if(ev.target.closest(".pc-rem")){ ev.target.closest(".pc-secao").remove(); $("pcModelo").value = ""; somar(); } });
-  $("pcSecoes").addEventListener("input", somar);
-  $("pcModelo").addEventListener("change", function(){ if(this.value) carregarModelo(this.value); });
-  $("pcPreset").addEventListener("change", function(){ if(this.value) $(idDe("harmonia.progressao")).value = this.value; });
  
-  function instrumentos(){
-    var q = sec.querySelector('[data-pc-multi="orquestracao.instrumentos"]');
-    var marcados = Array.prototype.map.call(q.querySelectorAll("input:checked"), function(i){ return i.dataset.pcV; });
-    var m = $(idDe("orquestracao.melodia")), atual = m.value;
-    m.innerHTML = marcados.length ? marcados.map(function(n){ return '<option' + (n === atual ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join("") : '<option value="">Marque ao menos um instrumento</option>';
-    return marcados;
+  /* ---------- instrumentos, papéis e técnicas por família ---------- */
+  var papeis = {};
+  var marcados = function(){ return V("orquestracao.instrumentos"); };
+  function papelPadrao(n, mel){
+    if(n === mel) return "Melodia";
+    if(FAM_DE[n] === "Percussão") return "Percussão";
+    return BAIXOS.indexOf(n) > -1 ? "Baixo" : "Harmonia";
   }
+  function renderPapeis(m){
+    var mel = ctl("orquestracao.melodia").value;
+    Q("[data-pc-papeis]").innerHTML = m.length ? m.map(function(n){
+      var a = papeis[n] || papelPadrao(n, mel);
+      return '<label>' + esc(n) + '<select data-pc-papel="' + esc(n) + '">' + PAPEIS.map(function(r){ return '<option' + (r === a ? ' selected' : '') + '>' + r + '</option>'; }).join("") + '</select></label>';
+    }).join("") : '<p class="es-nota pc-wide">Marque instrumentos para definir o papel de cada um.</p>';
+  }
+  function atualizarTecnicas(){
+    var fam = {}; marcados().forEach(function(n){ fam[FAM_DE[n]] = 1; });
+    QA("[data-fam]").forEach(function(l){
+      var need = l.dataset.fam.split(","), ok = need.some(function(f){ return fam[f]; });
+      l.querySelector("input").disabled = !ok; l.style.opacity = ok ? "" : ".5";
+      l.title = ok ? "" : "Disponível quando houver instrumento de: " + need.join(", ");
+    });
+  }
+  function instrumentos(){
+    var m = marcados(), s = ctl("orquestracao.melodia"), atual = s.value;
+    s.innerHTML = m.length ? m.map(function(n){ return '<option' + (n === atual ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join("") : '<option value="">Marque ao menos um instrumento</option>';
+    Q("[data-pc-conta]").textContent = m.length + " instrumento(s) marcado(s)";
+    renderPapeis(m); atualizarTecnicas();
+    return m;
+  }
+  function papeisAtuais(){
+    var o = {}; QA("[data-pc-papel]").forEach(function(s){ o[s.dataset.pcPapel] = s.value; }); return o;
+  }
+ 
+  /* ---------- avisos, condições e pendências ---------- */
   function notaEscala(){
-    var e = $(idDe("base.escala")).value;
-    $("pcNotaEscala").textContent = COM_ARMADURA.indexOf(e) > -1
+    Q("[data-pc-notaescala]").textContent = COM_ARMADURA.indexOf(V("base.escala")) > -1
       ? "Esta escala cabe numa armadura de clave."
       : "Esta escala usa acidentes escritos nas notas, e o MuseScore os mostra de forma menos limpa.";
   }
-  var BPM_AND = {}; ANDAMENTOS.forEach(function(x){ var k = lbl(x); BPM_AND[k.v] = parseInt(k.i, 10); });
-  sec.addEventListener("change", function(ev){
-    var t = ev.target;
-    if(t.closest && t.closest('[data-pc-multi="orquestracao.instrumentos"]')) instrumentos();
-    if(t.id === idDe("base.escala")) notaEscala();
-    if(t.id === idDe("andamento.indicacao") && BPM_AND[t.value]) $(idDe("andamento.bpm")).value = BPM_AND[t.value];
-  });
-  $(idDe("compassos")).addEventListener("input", somar);
- 
-  /* ================= PLANO: ler, aplicar, migrar, guardar, baixar ================= */
-  function setCam(o, p, v){ var k = p.split("."), c = o; for(var i = 0; i < k.length - 1; i++){ c = c[k[i]] = c[k[i]] || {}; } c[k[k.length - 1]] = v; }
-  function getCam(o, p){ var k = p.split("."), c = o; for(var i = 0; i < k.length; i++){ if(c == null) return undefined; c = c[k[i]]; } return c; }
-  function ler(f){
-    if(f.t === "multi") return Array.prototype.map.call(sec.querySelectorAll('[data-pc-multi="' + f.p + '"] input:checked'), function(i){ return i.dataset.pcV; });
-    var el = $(idDe(f.p));
-    if(f.t === "chk") return el.checked;
-    if(f.t === "num") return el.value === "" ? null : Number(el.value);
-    return el.value.trim ? el.value.trim() : el.value;
-  }
-  function pôr(f, v){
-    if(v == null) return;
-    if(f.t === "multi"){
-      Array.prototype.forEach.call(sec.querySelectorAll('[data-pc-multi="' + f.p + '"] input'), function(i){ i.checked = v.indexOf(i.dataset.pcV) > -1; });
-      if(f.p === "orquestracao.instrumentos") instrumentos();
-      return;
-    }
-    var el = $(idDe(f.p));
-    if(f.t === "chk"){ el.checked = !!v; return; }
-    if(f.t === "sel"){ if(Array.prototype.some.call(el.options, function(o){ return o.value === String(v); })) el.value = v; return; }
-    el.value = v;
-  }
+  function condicoes(){ CAMPOS.forEach(function(f){ if(f.cond){ var w = Q('[data-pc-c="' + f.p + '"]'); if(w) w.hidden = !visivel(f); } }); }
   function plano(){
-    var o = {versao:2, tipo:"peca-instrumental"};
-    CAMPOS.forEach(function(f){ setCam(o, f.p, ler(f)); });
-    o.formaModelo = $("pcModelo").selectedOptions[0] ? $("pcModelo").selectedOptions[0].textContent : "";
+    var o = {versao:3, tipo:"peca-instrumental"};
+    CAMPOS.forEach(function(f){ setCam(o, f.p, visivel(f) ? ler(f) : null); });
+    var sm = Q("[data-pc-modelo]");
+    o.formaModelo = sm.selectedOptions[0] ? sm.selectedOptions[0].textContent : "";
     o.forma = secoes();
+    o.orquestracao = o.orquestracao || {}; o.orquestracao.papeis = papeisAtuais();
     return o;
   }
+  function pendencias(p){
+    var r = [], add = function(a, t, g){ r.push({aba:a, t:t, g:!!g}); };
+    if(!p.titulo) add("projeto", "Dê um título à peça.");
+    if(!p.estilo.generos.length) add("projeto", "Escolha ao menos um gênero ou estilo.");
+    if(p.base.tonica === "Personalizada" && !p.base.tonicaPersonalizada) add("base", "Preencha a tônica personalizada.", 1);
+    if(p.andamento.bpm == null || p.andamento.bpm < 30 || p.andamento.bpm > 220) add("base", "O andamento deve ficar entre 30 e 220.", 1);
+    if(p.base.a4 == null || p.base.a4 < 400 || p.base.a4 > 480) add("base", "A altura de referência deve ficar entre 400 e 480 Hz.", 1);
+    var ea = erroAgrupamento(p); if(ea) add("base", ea, 1);
+    if(p.compassos == null || p.compassos < 4) add("forma", "O total de compassos deve ser de pelo menos 4.", 1);
+    if(!p.forma.length) add("forma", "Adicione ao menos uma seção.", 1);
+    else{
+      if(p.forma.some(function(s){ return !s.secao; })) add("forma", "Dê nome a todas as seções.", 1);
+      if(p.forma.some(function(s){ return s.compassos < 1; })) add("forma", "Toda seção precisa ter ao menos 1 compasso.", 1);
+      var soma = p.forma.reduce(function(a, s){ return a + s.compassos; }, 0);
+      if(p.compassos && soma !== p.compassos) add("forma", "As seções somam " + soma + " compassos, e o total da peça é " + p.compassos + ".");
+      if(p.forma.some(function(s){ return s.andamento != null && (s.andamento < 30 || s.andamento > 220); })) add("forma", "O andamento de uma seção está fora de 30 a 220.", 1);
+    }
+    if(!p.ritmo.figuras.length) add("ritmo", "Marque ao menos uma figura permitida.", 1);
+    if(!p.harmonia.progressao) add("harmonia", "Sem progressão de acordes: o motor decidirá sozinho.");
+    if(!p.orquestracao.instrumentos.length) add("orq", "Marque ao menos um instrumento.", 1);
+    return r;
+  }
+  function marcarAbas(){
+    var r = pendencias(plano());
+    ABAS.forEach(function(a){
+      var b = Q('[data-pc-aba="' + a[0] + '"]'), x = r.filter(function(i){ return i.aba === a[0]; });
+      if(!x.length) b.removeAttribute("data-pend"); else b.setAttribute("data-pend", x.some(function(i){ return i.g; }) ? "grave" : "aviso");
+    });
+    return r;
+  }
+  function renderRevisao(){
+    var p = plano(), r = marcarAbas(), nomes = {}; ABAS.forEach(function(a){ nomes[a[0]] = a[1].replace(/^\d+\.\s*/, ""); });
+    Q("[data-pc-pend]").innerHTML = r.length ? r.map(function(i){
+      return '<li><span class="pc-selo ' + (i.g ? 'grave' : 'aviso') + '">' + (i.g ? 'Corrigir' : 'Aviso') + '</span>' + esc(nomes[i.aba]) + ': ' + esc(i.t) + ' <button type="button" class="at-btn" data-pc-ir="' + i.aba + '">IR</button></li>';
+    }).join("") : '<li><span class="pc-selo">Tudo certo</span>Nenhuma pendência encontrada.</li>';
+    Q("[data-pc-json]").textContent = JSON.stringify(p, null, 2);
+  }
+ 
+  /* ---------- abas (com teclado) ---------- */
+  function mostrarAba(id, foco){
+    QA("[data-pc-aba]").forEach(function(b){ var s = b.dataset.pcAba === id; b.setAttribute("aria-selected", String(s)); b.tabIndex = s ? 0 : -1; if(s && foco) b.focus(); });
+    QA("[data-pc-painel]").forEach(function(p){ p.hidden = p.dataset.pcPainel !== id; });
+    if(id === "revisao") renderRevisao();
+  }
+  Q(".pc-abas").addEventListener("keydown", function(ev){
+    var ids = ABAS.map(function(a){ return a[0]; }), at = Q('[data-pc-aba][aria-selected="true"]').dataset.pcAba, i = ids.indexOf(at), n = -1;
+    if(ev.key === "ArrowRight") n = (i + 1) % ids.length; else if(ev.key === "ArrowLeft") n = (i + ids.length - 1) % ids.length;
+    else if(ev.key === "Home") n = 0; else if(ev.key === "End") n = ids.length - 1;
+    if(n > -1){ ev.preventDefault(); mostrarAba(ids[n], true); }
+  });
+ 
+  /* ================= PLANOS NOMEADOS (biblioteca deste módulo) ================= */
+  var lib = {lista:[], atual:null}, sujo = false, bloqueado = false;
+  var novoId = function(){ return "z" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); };
+  var achar = function(id){ for(var i = 0; i < lib.lista.length; i++){ if(lib.lista[i].id === id) return lib.lista[i]; } return null; };
+  function lerLib(){
+    var raw = null;
+    try{ raw = localStorage.getItem(CHAVE_LIB); }catch(e){ return {lista:[], atual:null}; }
+    if(!raw) return {lista:[], atual:null};
+    try{
+      var o = JSON.parse(raw); if(!o || !Array.isArray(o.lista)) throw new Error("formato");
+      return {lista:o.lista.filter(function(x){ return x && x.id && x.plano && typeof x.plano === "object"; }), atual:null};
+    }catch(e){
+      var ok = false; try{ localStorage.setItem(CHAVE_LIB + "_corrompido", raw); ok = true; }catch(x){}
+      bloqueado = !ok;
+      setTimeout(function(){ msg("A lista de planos guardados estava corrompida. " + (ok ? "Uma cópia de segurança foi mantida no navegador." : "Não foi possível guardar uma cópia, então novos salvamentos ficam bloqueados para não perder dados."), true); }, 0);
+      return {lista:[], atual:null};
+    }
+  }
+  function gravarLib(){
+    if(bloqueado){ msg("Salvamento bloqueado para proteger a lista corrompida. Baixe o plano em JSON.", true); return false; }
+    try{
+      var txt = JSON.stringify({versao:1, lista:lib.lista});
+      localStorage.setItem(CHAVE_LIB, txt);
+      var volta = JSON.parse(localStorage.getItem(CHAVE_LIB));
+      if(!volta || volta.lista.length !== lib.lista.length) throw new Error("conferência");
+      return true;
+    }catch(e){ msg("Não foi possível guardar neste navegador. O plano continua na tela: baixe o JSON para não perdê-lo.", true); return false; }
+  }
+  function renderLib(){
+    Q("[data-pc-libresumo]").textContent = "Meus planos de peças (" + lib.lista.length + ")";
+    Q("[data-pc-lista]").innerHTML = lib.lista.length ? lib.lista.slice().sort(function(a, b){ return b.atualizado - a.atualizado; }).map(function(e){
+      var q = new Date(e.atualizado).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"});
+      return '<div class="pc-item' + (e.id === lib.atual ? ' atual' : '') + '"><div><strong>' + esc(e.nome) + '</strong><small>' + esc(q) + (e.id === lib.atual ? ' · em edição' : '') + '</small></div>' +
+        '<button type="button" class="at-btn" data-pc-lib-acao="abrir" data-pc-id="' + esc(e.id) + '">ABRIR</button>' +
+        '<button type="button" class="at-btn" data-pc-lib-acao="duplicar" data-pc-id="' + esc(e.id) + '">DUPLICAR</button>' +
+        '<button type="button" class="at-btn" data-pc-lib-acao="excluir" data-pc-id="' + esc(e.id) + '">EXCLUIR</button></div>';
+    }).join("") : '<p class="es-nota">Nenhum plano guardado ainda. Preencha os menus e clique em SALVAR PLANO.</p>';
+  }
+  function marcarSujo(v){ sujo = v; Q("[data-pc-sujo]").hidden = !v; }
+ 
+  /* ---------- aplicar, migrar e reiniciar ---------- */
   function migrar(p){
-    if(p.versao >= 2) return p;
-    var textura = {"Melodia com acompanhamento":"Melodia acompanhada","Polifonia leve":"Polifonia","Coral em blocos":"Coral em blocos","Arpejos contínuos":"Arpejos"};
-    var estilo = {"Jazz básico":"Jazz","Folk acústico":"Folk","Trilha cinematográfica":"Orquestral"};
-    var h = p.harmonia || {};
-    return {versao:2, titulo:p.titulo, compassos:p.compassos,
-      base:{tonica:p.tonalidade, escala:p.modo === "Menor" ? "Eólio (menor natural)" : "Jônio (maior natural)"},
-      ritmo:{compasso:p.compasso}, andamento:{bpm:p.andamento, indicacao:p.carater},
-      harmonia:{progressao:h.progressao, ritmoHarmonico:h.ritmoHarmonico},
-      textura:{texturas:p.textura ? [textura[p.textura] || p.textura] : null},
-      estilo:{generos:p.estilo ? [estilo[p.estilo] || p.estilo] : null, climas:p.clima ? [p.clima] : null},
-      orquestracao:{instrumentos:p.instrumentos, melodia:p.melodia}, forma:p.forma};
+    if(!p || typeof p !== "object") return null;
+    if(p.versao >= 3) return p;
+    if(!(p.versao >= 2)){
+      var tx = {"Melodia com acompanhamento":"Melodia acompanhada","Polifonia leve":"Polifonia","Arpejos contínuos":"Arpejos"};
+      var es = {"Jazz básico":"Jazz","Folk acústico":"Folk","Trilha cinematográfico":"Orquestral","Trilha cinematográfica":"Orquestral"};
+      var h = p.harmonia || {};
+      p = {versao:2, titulo:p.titulo, compassos:p.compassos,
+        base:{tonica:p.tonalidade, escala:p.modo === "Menor" ? "Eólio (menor natural)" : "Jônio (maior natural)"},
+        ritmo:{compasso:p.compasso}, andamento:{bpm:p.andamento, indicacao:p.carater},
+        harmonia:{progressao:h.progressao, ritmoHarmonico:h.ritmoHarmonico},
+        textura:{texturas:p.textura ? [tx[p.textura] || p.textura] : null},
+        estilo:{generos:p.estilo ? [es[p.estilo] || p.estilo] : null, climas:p.clima ? [p.clima] : null},
+        orquestracao:{instrumentos:p.instrumentos, melodia:p.melodia}, forma:p.forma};
+    }
+    var c = JSON.parse(JSON.stringify(p)); c.versao = 3;
+    if(c.harmonia && Array.isArray(c.harmonia.acordes)) c.harmonia.acordes = c.harmonia.acordes.map(function(a){ return a === "Sétima" ? "Sétima dominante (7)" : a; });
+    if(c.ritmo){
+      var g = c.ritmo.agrupamento;
+      if(typeof g === "string" && g.trim()){ c.ritmo.agrupamentoPersonalizado = g.trim(); c.ritmo.agrupamento = "Personalizado"; }
+      else c.ritmo.agrupamento = "Automático";
+    }
+    return c;
   }
   function aplicar(p0){
-    var p = migrar(p0);
-    CAMPOS.forEach(function(f){ pôr(f, getCam(p, f.p)); });
+    var p = migrar(p0); if(!p) return false;
+    CAMPOS.forEach(function(f){ try{ pôr(f, getCam(p, f.p)); }catch(e){ console.warn("Campo ignorado:", f.p, e); } });
     if(Array.isArray(p.forma) && p.forma.length){
-      $("pcSecoes").innerHTML = "";
-      p.forma.forEach(function(s){ addSecao(s.secao, s.compassos, s.andamento); });
+      Q("[data-pc-secoes]").innerHTML = "";
+      p.forma.forEach(function(s){ if(s && typeof s === "object") addSecao(s.secao || "", Number(s.compassos) || 1, s.andamento); });
     }
-    notaEscala(); somar();
+    var sm = Q("[data-pc-modelo]"); sm.value = "";
+    if(p.formaModelo) Array.prototype.forEach.call(sm.options, function(o){ if(o.textContent === p.formaModelo) sm.value = o.value; });
+    papeis = (getCam(p, "orquestracao.papeis") && typeof p.orquestracao.papeis === "object") ? JSON.parse(JSON.stringify(p.orquestracao.papeis)) : {};
+    instrumentos(); condicoes(); notaEscala(); somar(); marcarAbas();
+    return true;
   }
-  function validar(p){
-    if(!p.orquestracao.instrumentos.length) return "Marque ao menos um instrumento na aba Orquestração.";
-    if(p.andamento.bpm == null || p.andamento.bpm < 30 || p.andamento.bpm > 220) return "O andamento deve ficar entre 30 e 220.";
-    if(p.base.a4 == null || p.base.a4 < 400 || p.base.a4 > 480) return "A altura de referência deve ficar entre 400 e 480 Hz.";
-    if(p.base.tonica === "Personalizada" && !p.base.tonicaPersonalizada) return "Preencha a tônica personalizada.";
-    return "";
+  function reiniciar(){
+    CAMPOS.forEach(function(f){ pôr(f, f.d); });
+    opcoesAgrup(); ctl("ritmo.agrupamento").value = "Automático";
+    papeis = {}; carregarModelo(MODELOS_FORMA[2].split("|")[1]); ctl("compassos").value = 32;
+    Q("[data-pc-modelo]").value = MODELOS_FORMA[2].split("|")[1];
+    Q("[data-pc-nome]").value = "";
+    instrumentos(); condicoes(); notaEscala(); somar(); marcarAbas();
   }
-  $("pcSalvar").addEventListener("click", function(){
-    var p = plano(), e = validar(p);
-    if(e){ msg(e, true); return; }
-    try{
-      localStorage.setItem(CHAVE, JSON.stringify(p));
+ 
+  /* ---------- ações da biblioteca ---------- */
+  function salvar(){
+    var p = plano(), g = pendencias(p).filter(function(x){ return x.g; });
+    if(g.length){ msg(g[0].t + (g.length > 1 ? " (e mais " + (g.length - 1) + " pendência(s) na aba Revisão)" : ""), true); return; }
+    var nome = Q("[data-pc-nome]").value.trim() || p.titulo || "Peça sem título", agora = Date.now(), e = lib.atual && achar(lib.atual), novo = false;
+    if(e){ e.nome = nome; e.plano = p; e.atualizado = agora; }
+    else{ e = {id:novoId(), nome:nome, criado:agora, atualizado:agora, plano:p}; lib.lista.unshift(e); lib.atual = e.id; novo = true; }
+    if(gravarLib()){
+      Q("[data-pc-nome]").value = nome; marcarSujo(false); renderLib();
       var soma = somaSecoes();
-      msg("Plano guardado neste navegador. Nenhuma música foi gerada." + (soma !== p.compassos ? " Atenção: as seções somam " + soma + " compassos e o total da peça é " + p.compassos + "." : ""));
-    }catch(x){ msg("Não foi possível guardar neste navegador.", true); }
+      msg("Plano “" + nome + "” guardado neste navegador. Nenhuma música foi gerada." + (soma !== p.compassos ? " Atenção: as seções somam " + soma + " compassos e o total da peça é " + p.compassos + "." : ""));
+    }else if(novo){ lib.lista.shift(); lib.atual = null; }
+  }
+  function confirmaDescarte(){ return !sujo || window.confirm("Há alterações não guardadas neste plano. Continuar mesmo assim?"); }
+  function abrir(id, quieto){
+    var e = achar(id); if(!e) return;
+    if(!quieto && !confirmaDescarte()) return;
+    reiniciar();
+    if(!aplicar(e.plano)){ msg("Este plano está danificado e não pôde ser aberto.", true); return; }
+    lib.atual = e.id; Q("[data-pc-nome]").value = e.nome; marcarSujo(false); renderLib();
+    msg("Plano “" + e.nome + "” aberto.");
+  }
+  function acaoLib(a, id){
+    if(a === "salvar") salvar();
+    else if(a === "novo"){ if(!confirmaDescarte()) return; reiniciar(); lib.atual = null; marcarSujo(false); renderLib(); mostrarAba("projeto"); msg("Novo plano em branco."); }
+    else if(a === "abrir") abrir(id);
+    else if(a === "duplicar"){
+      var e = achar(id); if(!e) return;
+      var c = JSON.parse(JSON.stringify(e)); c.id = novoId(); c.nome = e.nome + " (cópia)"; c.criado = c.atualizado = Date.now();
+      lib.lista.unshift(c); if(gravarLib()){ renderLib(); msg("Cópia criada."); } else lib.lista.shift();
+    }else if(a === "excluir"){
+      var x = achar(id); if(!x || !window.confirm("Excluir o plano “" + x.nome + "”? Não dá para desfazer.")) return;
+      var antes = lib.lista.slice(); lib.lista = lib.lista.filter(function(y){ return y.id !== id; });
+      if(gravarLib()){ if(lib.atual === id){ lib.atual = null; Q("[data-pc-nome]").value = ""; } renderLib(); msg("Plano excluído."); } else lib.lista = antes;
+    }
+  }
+ 
+  /* ================= EVENTOS ================= */
+  sec.addEventListener("click", function(ev){
+    var t = ev.target, b;
+    if((b = t.closest("[data-pc-aba]"))) return mostrarAba(b.dataset.pcAba);
+    if((b = t.closest("[data-pc-ir]"))) return mostrarAba(b.dataset.pcIr, true);
+    if((b = t.closest("[data-pc-lib-acao]"))) return acaoLib(b.dataset.pcLibAcao, b.dataset.pcId);
+    if(t.closest("[data-pc-voltar]")){ painel.setAttribute("data-fase", "escolha"); $("esToggle").scrollIntoView({behavior:"smooth", block:"start"}); return; }
+    if(t.closest("[data-pc-addsecao]")){ addSecao("Nova seção", 8); Q("[data-pc-modelo]").value = ""; marcarSujo(true); marcarAbas(); return; }
+    if(t.closest(".pc-rem")){ t.closest(".pc-secao").remove(); Q("[data-pc-modelo]").value = ""; somar(); marcarSujo(true); marcarAbas(); return; }
+    if(t.closest("[data-pc-baixar]")){
+      var blob = new Blob([JSON.stringify(plano(), null, 2)], {type:"application/json"}), u = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = u; a.download = "peca-instrumental-plano.json"; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(u); }, 1000); msg("Plano baixado.");
+    }
   });
-  $("pcBaixarPlano").addEventListener("click", function(){
-    var blob = new Blob([JSON.stringify(plano(), null, 2)], {type:"application/json"}), u = URL.createObjectURL(blob);
-    var a = document.createElement("a"); a.href = u; a.download = "peca-instrumental-plano.json";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
-    msg("Plano baixado.");
+  function reagir(ev){
+    ev.stopPropagation();                       /* impede o salvamento automático dos outros projetos do Estúdio */
+    var t = ev.target;
+    if(t.closest("[data-pc-lib]")) return;
+    if(t.hasAttribute("data-pc-busca")){
+      var q = norm(t.value.trim());
+      QA('[data-pc-multi="orquestracao.instrumentos"] label').forEach(function(l){ l.hidden = !!q && norm(l.textContent).indexOf(q) < 0; });
+      QA('[data-pc-multi="orquestracao.instrumentos"] details').forEach(function(d){ var vis = d.querySelectorAll("label:not([hidden])").length; d.hidden = !vis; if(q && vis) d.open = true; });
+      return;
+    }
+    if(t.hasAttribute("data-pc-preset")){ if(t.value) Q('[data-pc="harmonia.progressao"]').value = t.value; }
+    else if(t.hasAttribute("data-pc-modelo")){ if(t.value) carregarModelo(t.value); }
+    else if(t.hasAttribute("data-pc-papel")){ papeis[t.dataset.pcPapel] = t.value; if(t.value === "Melodia" && ctl("orquestracao.melodia").value !== t.dataset.pcPapel){ ctl("orquestracao.melodia").value = t.dataset.pcPapel; } }
+    else if(t.dataset.pc === "orquestracao.melodia"){ papeis[t.value] = "Melodia"; renderPapeis(marcados()); }
+    else if(t.dataset.pc === "ritmo.compasso") opcoesAgrup();
+    else if(t.dataset.pc === "base.escala") notaEscala();
+    else if(t.dataset.pc === "andamento.indicacao"){ var m = /(\d+)/.exec((ANDAMENTOS.filter(function(x){ return lbl(x).v === t.value; })[0] || "")); if(m) ctl("andamento.bpm").value = m[1]; }
+    else if(t.closest('[data-pc-multi="orquestracao.instrumentos"]')) instrumentos();
+    if(t.closest("[data-pc-secoes]") || t.dataset.pc === "compassos") somar();
+    condicoes(); marcarSujo(true); marcarAbas();
+  }
+  sec.addEventListener("input", reagir);
+  sec.addEventListener("change", reagir);
+ 
+  card.addEventListener("click", function(){
+    painel.setAttribute("data-fase", "pecas"); mostrarAba("projeto");
+    $("esToggle").scrollIntoView({behavior:"smooth", block:"start"});
   });
  
   /* ================= INÍCIO ================= */
-  carregarModelo(MODELOS_FORMA[2].split("|")[1]); $(idDe("compassos")).value = 32; somar();
-  instrumentos(); notaEscala();
-  try{
-    var g = JSON.parse(localStorage.getItem(CHAVE) || "null");
-    if(g){ aplicar(g); msg(g.versao >= 2 ? "Plano anterior recuperado." : "Plano antigo recuperado e convertido para o formato novo."); }
-  }catch(e){}
- 
-  card.addEventListener("click", function(){
-    painel.setAttribute("data-fase", "pecas");
-    mostrarAba("musica");
-    $("esToggle").scrollIntoView({behavior:"smooth", block:"start"});
-  });
-  $("pcVoltar").addEventListener("click", function(){
-    painel.setAttribute("data-fase", "escolha");
-    $("esToggle").scrollIntoView({behavior:"smooth", block:"start"});
-  });
+  reiniciar();
+  lib = lerLib();
+  if(!lib.lista.length){
+    try{
+      var ant = JSON.parse(localStorage.getItem(CHAVE_ANT) || "null");
+      if(ant && typeof ant === "object"){
+        var t0 = Date.now();
+        lib.lista.push({id:novoId(), nome:(ant.titulo || "Plano anterior"), criado:t0, atualizado:t0, plano:ant});
+        if(gravarLib()) setTimeout(function(){ msg("Seu plano anterior foi guardado na lista de planos."); }, 0);
+      }
+    }catch(e){}
+  }
+  renderLib();
+  if(lib.lista.length){ var rec = lib.lista.slice().sort(function(a, b){ return b.atualizado - a.atualizado; })[0]; abrir(rec.id, true); }
 })();
 </script>
-<!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (ESTRUTURA COMPLETA DE MENUS, V2) ===== -->
+<!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->
+ 
+
 
 </body>
 </html>
