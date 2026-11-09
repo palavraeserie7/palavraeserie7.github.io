@@ -10385,7 +10385,7 @@ texto: $("esTexto").value
 })();
 </script>
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
-                                                           
+
  <!-- ===================================================================================================================== --> 
 
  <!-- ===== INÍCIO: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3: FLUXO DE PRODUÇÃO EM 9 ETAPAS) ==== -->
@@ -10430,6 +10430,11 @@ texto: $("esTexto").value
 #pcEstrutura pre{margin:0;max-height:420px;overflow:auto;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:12.5px/1.5 Consolas,monospace}
 #pcEstrutura .pc-lib{border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink);padding:10px 14px}
 #pcEstrutura .pc-lib > summary{font:600 16px Georgia,serif;color:var(--ink)}
+#pcEstrutura .pc-lib-linha{display:flex;gap:8px;align-items:stretch}
+#pcEstrutura .pc-lib-linha > .pc-lib{flex:1 1 auto;min-width:0}
+#pcEstrutura .pc-biblioteca{display:flex;flex:0 1 250px;min-width:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;text-align:left;white-space:normal;line-height:1.25;padding:8px 14px}
+#pcEstrutura .pc-biblioteca strong{font:700 12px "Segoe UI",Arial,sans-serif}
+#pcEstrutura .pc-biblioteca small{font:12px "Segoe UI",Arial,sans-serif;opacity:.85}
 #pcEstrutura .pc-lib-corpo{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 #pcEstrutura .pc-item{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6}
 #pcEstrutura .pc-item.atual{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass);background:var(--brass-wash)}
@@ -10770,10 +10775,11 @@ texto: $("esTexto").value
   var sec = document.createElement("section");
   sec.id = "pcEstrutura";
   sec.innerHTML = '<div class="pc-topo"><div><small>Você está criando</small><strong>Peças instrumentais</strong></div><button type="button" class="at-btn" data-pc-voltar>TROCAR TIPO</button></div>' +
-    '<details class="pc-lib" data-pc-lib open><summary data-pc-libresumo>Meus planos de peças</summary><div class="pc-lib-corpo">' +
+    '<div class="pc-lib-linha"><details class="pc-lib" data-pc-lib open><summary data-pc-libresumo>Meus planos de peças</summary><div class="pc-lib-corpo">' +
       '<div class="pc-linha"><label style="flex:1 1 240px">Nome do plano<input type="text" data-pc-nome placeholder="Se ficar vazio, usa o título da peça"></label>' +
       '<button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><button type="button" class="at-btn" data-pc-lib-acao="novo">NOVO PLANO</button></div>' +
       '<div class="pc-lista" data-pc-lista></div></div></details>' +
+      '<button type="button" class="at-btn pc-biblioteca" aria-label="BIBLIOTECA MUSICAL — Arquitetura expansível"><strong>BIBLIOTECA MUSICAL</strong><small>Arquitetura expansível</small></button></div>' +
     '<div class="pc-abas" role="tablist" aria-label="Etapas da peça">' + ABAS.map(function(a, i){ return '<button type="button" role="tab" id="pcTab_' + a[0] + '" data-pc-aba="' + a[0] + '" aria-controls="pcPainel_' + a[0] + '" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '">' + a[1] + '</button>'; }).join("") + '</div>' +
     ABAS.map(function(a, i){ return painelHtml(a, i === 0); }).join("") +
     '<div class="pc-linha"><button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><span class="es-nota" data-pc-sujo hidden>● alterações ainda não guardadas</span></div>' +
@@ -11140,7 +11146,8 @@ texto: $("esTexto").value
   if(lib.lista.length){ var rec = lib.lista.slice().sort(function(a, b){ return b.atualizado - a.atualizado; })[0]; abrir(rec.id, true); }
 })();
 </script>
-<!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->
+<!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->                                                           
+
  
 
 
