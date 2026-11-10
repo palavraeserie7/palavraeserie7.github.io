@@ -20047,6 +20047,706 @@ function inverter(numero, qualidade){
 })();
 
      <!----===== FIM DA FICHA — Acordes emprestados =====-->
+
+       <!----===== INÍCIO DA FICHA — Modulações =====-->
+
+     (function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+
+  var N = window.MaestroNucleo;
+
+  var escalas = {
+    maior:{
+      nome:"Maior",
+      intervalos:[0,2,4,5,7,9,11],
+      acordes:[
+        {grau:"I",qualidade:"maior"},
+        {grau:"ii",qualidade:"menor"},
+        {grau:"iii",qualidade:"menor"},
+        {grau:"IV",qualidade:"maior"},
+        {grau:"V",qualidade:"maior"},
+        {grau:"vi",qualidade:"menor"},
+        {grau:"vii°",qualidade:"diminuto"}
+      ]
+    },
+    menorNatural:{
+      nome:"Menor natural",
+      intervalos:[0,2,3,5,7,8,10],
+      acordes:[
+        {grau:"i",qualidade:"menor"},
+        {grau:"ii°",qualidade:"diminuto"},
+        {grau:"III",qualidade:"maior"},
+        {grau:"iv",qualidade:"menor"},
+        {grau:"v",qualidade:"menor"},
+        {grau:"VI",qualidade:"maior"},
+        {grau:"VII",qualidade:"maior"}
+      ]
+    }
+  };
+
+  var qualidades = {
+    maior:{nome:"Maior",intervalos:[0,4,7]},
+    menor:{nome:"Menor",intervalos:[0,3,7]},
+    diminuto:{nome:"Diminuto",intervalos:[0,3,6]},
+    aumentado:{nome:"Aumentado",intervalos:[0,4,8]},
+    maior7:{nome:"Maior com sétima maior",intervalos:[0,4,7,11]},
+    dominante7:{nome:"Dominante com sétima menor",intervalos:[0,4,7,10]},
+    menor7:{nome:"Menor com sétima menor",intervalos:[0,3,7,10]},
+    meioDiminuto:{nome:"Meio-diminuto",intervalos:[0,3,6,10]},
+    diminuto7:{nome:"Diminuto com sétima diminuta",intervalos:[0,3,6,9]}
+  };
+
+  function classe(n){
+    return ((n%12)+12)%12;
+  }
+
+  function nomeNota(n){
+    return [
+      "Dó","Dó#/Réb","Ré","Ré#/Mib","Mi","Fá",
+      "Fá#/Solb","Sol","Sol#/Láb","Lá","Lá#/Sib","Si"
+    ][classe(n)];
+  }
+
+  function escalaAbsoluta(tonica,intervalos){
+    return intervalos.map(function(i){
+      return classe(tonica+i);
+    });
+  }
+
+  function formarAcorde(fundamental,intervalos){
+    return intervalos.map(function(i){
+      return classe(fundamental+i);
+    });
+  }
+
+  function pertence(acorde,escala){
+    return acorde.every(function(n){
+      return escala.indexOf(classe(n))!==-1;
+    });
+  }
+
+  function intersecao(a,b){
+    return a.filter(function(n){
+      return b.indexOf(n)!==-1;
+    });
+  }
+
+  function diferenca(a,b){
+    return a.filter(function(n){
+      return b.indexOf(n)===-1;
+    });
+  }
+
+  function distanciaSemitons(a,b){
+    return classe(b-a);
+  }
+
+  function distanciaQuintas(a,b){
+    var x=classe(a*7);
+    var y=classe(b*7);
+    var d=classe(y-x);
+    return Math.min(d,12-d);
+  }
+
+  function acordeDoGrau(tonica,escala,indice){
+    var notas=escalaAbsoluta(tonica,escala.intervalos);
+    var item=escala.acordes[indice];
+    return {
+      grau:item.grau,
+      fundamental:notas[indice],
+      qualidade:item.qualidade,
+      notas:formarAcorde(
+        notas[indice],
+        qualidades[item.qualidade].intervalos
+      )
+    };
+  }
+
+  function campoHarmonico(tonica,escala){
+    return escala.acordes.map(function(item,index){
+      return acordeDoGrau(tonica,escala,index);
+    });
+  }
+
+  function nomeAcorde(acorde){
+    return nomeNota(acorde.fundamental)+" "+qualidades[acorde.qualidade].nome;
+  }
+
+  function identificarAcordesComuns(tonicaA,tonicaB,escalaA,escalaB){
+    var campoA=campoHarmonico(tonicaA,escalaA);
+    var campoB=campoHarmonico(tonicaB,escalaB);
+    var comuns=[];
+
+    campoA.forEach(function(a){
+      campoB.forEach(function(b){
+        if(
+          a.fundamental===b.fundamental &&
+          a.qualidade===b.qualidade &&
+          a.notas.length===b.notas.length
+        ){
+          comuns.push({
+            acorde:nomeAcorde(a),
+            grauA:a.grau,
+            grauB:b.grau,
+            notas:a.notas
+          });
+        }
+      });
+    });
+
+    return comuns;
+  }
+
+  function analisarTransicao(tonicaA,tonicaB,escalaA,escalaB){
+    var notasA=escalaAbsoluta(tonicaA,escalaA.intervalos);
+    var notasB=escalaAbsoluta(tonicaB,escalaB.intervalos);
+
+    var comuns=intersecao(notasA,notasB);
+    var exclusivasA=diferenca(notasA,notasB);
+    var exclusivasB=diferenca(notasB,notasA);
+
+    return {
+      notasComuns:comuns,
+      exclusivasA:exclusivasA,
+      exclusivasB:exclusivasB,
+      quantidadeComuns:comuns.length,
+      quantidadeNovas:exclusivasB.length
+    };
+  }
+
+  function encontrarAcordePivo(comuns,indiceA,indiceB){
+    return comuns.find(function(c){
+      return c.grauA===indiceA && c.grauB===indiceB;
+    }) || null;
+  }
+
+  function classificarRelacao(tonicaA,tonicaB,escalaA,escalaB){
+    if(
+      classe(tonicaA)===classe(tonicaB) &&
+      escalaA.nome===escalaB.nome
+    ) return "Mesmo centro tonal e mesma organização escalar.";
+
+    if(classe(tonicaA)===classe(tonicaB)){
+      return "Mesmo centro tonal com mudança de organização modal ou escalar.";
+    }
+
+    var distancia=distanciaSemitons(tonicaA,tonicaB);
+    var quintas=distanciaQuintas(tonicaA,tonicaB);
+
+    if(distancia===7 || distancia===5){
+      return "Centros tonais separados por uma quinta justa ou quarta justa.";
+    }
+
+    if(quintas===1){
+      return "Tonalidades vizinhas no círculo das quintas.";
+    }
+
+    if(distancia===3 || distancia===9){
+      return "Centros tonais separados por terça menor.";
+    }
+
+    if(distancia===4 || distancia===8){
+      return "Centros tonais separados por terça maior.";
+    }
+
+    return "Relação tonal com distância de "+distancia+" semitons.";
+  }
+
+  window.MaestroFichas.registrar({
+    modulo:"Harmonia",
+    titulo:"Modulações",
+    tipos:["Harmonia tonal","Organização tonal","Transição entre tonalidades"],
+    depende:[
+      "Notas e alturas musicais",
+      "Intervalos musicais",
+      "Escalas e modos",
+      "Graus da escala",
+      "Formação de acordes",
+      "Tríades e tétrades",
+      "Funções harmônicas",
+      "Acordes diatônicos e não diatônicos",
+      "Dominantes secundárias",
+      "Acordes emprestados",
+      "Cadências e resoluções",
+      "Relações tonais e modais"
+    ],
+    revisada:false,
+
+    definicao:[
+      {
+        termo:"Modulação",
+        texto:"Processo harmônico pelo qual uma composição estabelece um novo centro tonal, deixando de organizar sua progressão prioritariamente em torno da tonalidade anterior."
+      },
+      {
+        termo:"Tonalidade de origem",
+        texto:"Centro tonal estabelecido antes da transição harmônica. Serve como referência para identificar a mudança de organização tonal."
+      },
+      {
+        termo:"Tonalidade de destino",
+        texto:"Novo centro tonal que passa a organizar a harmonia após o processo de modulação."
+      },
+      {
+        termo:"Tonalidade intermediária",
+        texto:"Centro tonal que pode ser estabelecido temporariamente antes de uma nova modulação."
+      },
+      {
+        termo:"Acorde-pivô",
+        texto:"Acorde que pode ser interpretado como pertencente simultaneamente à tonalidade de origem e à tonalidade de destino, permitindo uma transição entre os dois campos harmônicos."
+      },
+      {
+        termo:"Modulação direta",
+        texto:"Mudança de tonalidade realizada sem a necessidade de um acorde-pivô compartilhado. A nova tonalidade pode ser introduzida por um acorde característico, uma dominante ou uma mudança harmônica abrupta."
+      },
+      {
+        termo:"Tonicização",
+        texto:"Ênfase temporária em um acorde diferente da tônica principal, geralmente por meio de sua dominante aplicada. Não constitui necessariamente uma modulação."
+      },
+      {
+        termo:"Estabelecimento tonal",
+        texto:"Processo pelo qual a nova tônica passa a ser percebida como centro organizador da progressão, especialmente por meio de relações dominantes, resoluções e cadências."
+      }
+    ],
+
+    formulas:[
+      {
+        nome:"Distância entre centros tonais",
+        texto:"d = (T₂ − T₁) mod 12",
+        nota:"Calcula a distância em semitons entre a tônica de origem e a tônica de destino."
+      },
+      {
+        nome:"Conjunto de notas da tonalidade de origem",
+        texto:"E₁ = {T₁ + s₁, T₁ + s₂, ..., T₁ + sₙ} mod 12",
+        nota:"Representa as classes de altura da escala de origem."
+      },
+      {
+        nome:"Conjunto de notas da tonalidade de destino",
+        texto:"E₂ = {T₂ + s₁, T₂ + s₂, ..., T₂ + sₙ} mod 12",
+        nota:"Representa as classes de altura da escala de destino."
+      },
+      {
+        nome:"Notas compartilhadas",
+        texto:"C = E₁ ∩ E₂",
+        nota:"Identifica as classes de altura presentes nas duas escalas."
+      },
+      {
+        nome:"Notas exclusivas da tonalidade de destino",
+        texto:"N = E₂ − E₁",
+        nota:"Identifica as classes de altura que pertencem à nova escala, mas não à escala de origem."
+      },
+      {
+        nome:"Critério de acorde-pivô",
+        texto:"A ⊆ E₁ ∩ E₂",
+        nota:"Um acorde pode funcionar como pivô quando todas as suas notas pertencem às duas tonalidades. A compatibilidade não comprova, isoladamente, sua função de pivô."
+      },
+      {
+        nome:"Distância pelo círculo das quintas",
+        texto:"d₅ = min(|q₂ − q₁|, 12 − |q₂ − q₁|)",
+        nota:"Mede a distância mínima entre posições tonais no círculo das quintas, considerando as classes de altura."
+      }
+    ],
+
+    tabela:{
+      titulo:"Tipos de modulação e seus mecanismos",
+      cabecalho:[
+        "Tipo",
+        "Mecanismo",
+        "Evidência necessária"
+      ],
+      linhas:[
+        [
+          "Por acorde-pivô",
+          "Acorde compartilhado entre a tonalidade de origem e a de destino.",
+          "Reinterpretação funcional e estabelecimento da nova tônica."
+        ],
+        [
+          "Direta",
+          "Mudança sem acorde compartilhado como elemento de transição.",
+          "Progressão posterior que confirme o novo centro tonal."
+        ],
+        [
+          "Por dominante secundária",
+          "Uma dominante aplicada prepara um acorde que pode se tornar nova tônica.",
+          "A tonicização deve evoluir para estabelecimento tonal mais amplo."
+        ],
+        [
+          "Por sequência harmônica",
+          "Progressão de acordes deslocada para outro centro tonal.",
+          "Confirmação do novo centro por relações harmônicas e cadenciais."
+        ],
+        [
+          "Enarmônica",
+          "Reinterpretação de um acorde por equivalência sonora e mudança de grafia.",
+          "A nova interpretação deve conduzir funcionalmente à tonalidade de destino."
+        ],
+        [
+          "Gradual",
+          "Mudança progressiva do material harmônico e das relações tonais.",
+          "Evidências acumuladas de abandono do centro anterior e estabelecimento do novo."
+        ]
+      ]
+    },
+
+    exemplos:[
+      {
+        titulo:"Modulação de Dó maior para Sol maior",
+        entrada:"Dó maior – Lá menor – Ré7 – Sol maior.",
+        resultado:"Possível modulação de Dó maior para Sol maior.",
+        analise:"Lá menor pode ser interpretado como vi em Dó maior e ii em Sol maior. Ré7 funciona como dominante de Sol e a resolução em Sol maior reforça o novo centro tonal. A confirmação depende da continuidade da progressão."
+      },
+      {
+        titulo:"Modulação por acorde-pivô",
+        entrada:"Dó maior: Dó maior – Lá menor; Sol maior: Lá menor – Ré7 – Sol maior.",
+        resultado:"Lá menor pode atuar como acorde-pivô.",
+        analise:"O acorde de Lá menor pertence aos dois campos harmônicos, sendo vi em Dó maior e ii em Sol maior. Sua função é reinterpretada na nova tonalidade."
+      },
+      {
+        titulo:"Modulação direta",
+        entrada:"Dó maior – Mi bemol maior – Lá bemol maior – Mi bemol7 – Lá bemol maior.",
+        resultado:"Possível modulação de Dó maior para Lá bemol maior.",
+        analise:"A progressão introduz material harmônico de Lá bemol maior e sua dominante. A nova tonalidade é reforçada pela resolução de Mi bemol7 em Lá bemol maior."
+      },
+      {
+        titulo:"Modulação de Dó maior para Lá menor",
+        entrada:"Dó maior – Ré menor – Mi7 – Lá menor.",
+        resultado:"Possível estabelecimento de Lá menor.",
+        analise:"Mi7 introduz Sol# e funciona como dominante de Lá menor. A resolução em Lá menor e sua continuidade podem estabelecer o novo centro tonal. A relação entre tonalidades relativas, por si só, não comprova a modulação."
+      },
+      {
+        titulo:"Tonicização sem modulação",
+        entrada:"Dó maior – Lá7 – Ré menor – Sol7 – Dó maior.",
+        resultado:"Tonicização temporária de Ré menor, sem modulação obrigatória.",
+        analise:"Lá7 funciona como dominante aplicada de Ré menor. O retorno a Sol7 e Dó maior mantém o centro tonal principal em Dó."
+      },
+      {
+        titulo:"Modulação enarmônica",
+        entrada:"Acorde de sétima diminuta reinterpretado para conduzir a uma tonalidade diferente.",
+        resultado:"Possibilidade de mudança de função por reinterpretação enarmônica.",
+        analise:"A estrutura simétrica da tétrade diminuta permite diferentes grafias e resoluções. A nova tonalidade deve ser confirmada pela condução das vozes e pela progressão posterior."
+      }
+    ],
+
+    erros:[
+      {
+        erro:"Classificar qualquer acorde não diatônico como evidência de modulação.",
+        correcao:"Acordes não diatônicos também aparecem em empréstimos modais, dominantes secundárias e alterações cromáticas. A modulação exige estabelecimento de um novo centro tonal."
+      },
+      {
+        erro:"Confundir tonicização com modulação.",
+        correcao:"A tonicização enfatiza temporariamente um acorde; a modulação estabelece uma nova organização tonal."
+      },
+      {
+        erro:"Considerar que a presença de um acorde-pivô comprova uma modulação.",
+        correcao:"O acorde compartilhado oferece uma possibilidade de transição, mas é necessário verificar a reinterpretação funcional e a confirmação da nova tonalidade."
+      },
+      {
+        erro:"Determinar a tonalidade de destino apenas pela última nota ou pelo último acorde.",
+        correcao:"A identificação deve considerar a progressão, as funções harmônicas, as resoluções e a confirmação do novo centro tonal."
+      },
+      {
+        erro:"Confundir tonalidades relativas com tonalidades paralelas.",
+        correcao:"Tonalidades relativas compartilham a armadura ou o conjunto de notas, mas possuem tônicas diferentes. Tonalidades paralelas compartilham a mesma tônica e possuem organizações escalares diferentes."
+      },
+      {
+        erro:"Tratar a quantidade de notas compartilhadas entre duas escalas como prova de modulação.",
+        correcao:"A interseção dos conjuntos escalares indica compatibilidade de material, não estabelece direção harmônica nem intenção tonal."
+      },
+      {
+        erro:"Considerar que toda modulação precisa utilizar acorde-pivô.",
+        correcao:"A modulação também pode ocorrer diretamente, por dominante, por sequência ou por reinterpretação enarmônica."
+      },
+      {
+        erro:"Ignorar a condução das vozes durante a transição.",
+        correcao:"A análise deve considerar movimentos melódicos, notas comuns, movimentos cromáticos e resoluções que sustentam a nova tonalidade."
+      }
+    ],
+
+    notacao:[
+      {
+        simbolo:"T₁",
+        significado:"Tônica da tonalidade de origem."
+      },
+      {
+        simbolo:"T₂",
+        significado:"Tônica da tonalidade de destino."
+      },
+      {
+        simbolo:"A ⊆ E₁ ∩ E₂",
+        significado:"Condição de pertencimento de um acorde aos dois conjuntos escalares, necessária para sua possível utilização como acorde-pivô."
+      },
+      {
+        simbolo:"V/V",
+        significado:"Dominante da dominante. Exemplo em Dó maior: Ré maior ou Ré7, dirigido ao acorde de Sol."
+      },
+      {
+        simbolo:"V/ii",
+        significado:"Dominante aplicada ao segundo grau. Exemplo em Dó maior: Lá maior ou Lá7, dirigido a Ré menor."
+      },
+      {
+        simbolo:"V/vi",
+        significado:"Dominante aplicada ao sexto grau. Exemplo em Dó maior: Mi maior ou Mi7, dirigido a Lá menor."
+      },
+      {
+        simbolo:"I → V",
+        significado:"Representação simplificada de uma mudança de centro tonal de primeiro para quinto grau, conforme a tonalidade de destino estabelecida."
+      },
+      {
+        simbolo:"♯ / ♭",
+        significado:"Alterações cromáticas que podem introduzir notas características da tonalidade de destino."
+      }
+    ],
+
+    relacoes:[
+      {
+        assunto:"Acordes diatônicos e não diatônicos",
+        relacao:"Permitem identificar quais notas e acordes pertencem ao campo de origem e quais introduzem material da tonalidade de destino."
+      },
+      {
+        assunto:"Acordes emprestados",
+        relacao:"Podem introduzir notas externas à escala principal sem necessariamente estabelecer uma nova tonalidade."
+      },
+      {
+        assunto:"Dominantes secundárias",
+        relacao:"Podem preparar acordes que se tornam centros tonais temporários ou pontos de partida para uma modulação."
+      },
+      {
+        assunto:"Acordes-pivô",
+        relacao:"Utilizam acordes compartilhados para permitir uma reinterpretação funcional entre tonalidades."
+      },
+      {
+        assunto:"Cadências e resoluções",
+        relacao:"Ajudam a confirmar o estabelecimento da tonalidade de destino, especialmente por meio de relações dominante-tônica."
+      },
+      {
+        assunto:"Funções harmônicas",
+        relacao:"Permitem comparar a função de um mesmo acorde antes e depois da mudança de tonalidade."
+      },
+      {
+        assunto:"Relações tonais e modais",
+        relacao:"Fornecem critérios para calcular distâncias entre centros tonais e comparar conjuntos escalares."
+      },
+      {
+        assunto:"Condução de vozes",
+        relacao:"Contribui para a continuidade melódica e para a preparação das notas características da nova tonalidade."
+      }
+    ],
+
+    fontes:[
+      {
+        autor:"Walter Piston",
+        obra:"Harmony",
+        contribuicao:"Referência para modulação, relações tonais, acordes-pivô e progressões harmônicas."
+      },
+      {
+        autor:"Stefan Kostka, Dorothy Payne e Byron Almén",
+        obra:"Tonal Harmony",
+        contribuicao:"Referência para processos de modulação, tonicização e estabelecimento de novas tonalidades."
+      },
+      {
+        autor:"Steven G. Laitz",
+        obra:"The Complete Musician",
+        contribuicao:"Referência para análise de transições tonais, funções harmônicas e condução de vozes."
+      },
+      {
+        autor:"Arnold Schoenberg",
+        obra:"Structural Functions of Harmony",
+        contribuicao:"Discussão sobre regiões tonais, relações harmônicas e organização estrutural da tonalidade."
+      }
+    ],
+
+    dados:{
+      escalas:escalas,
+      qualidades:qualidades,
+      tiposModulacao:[
+        "Por acorde-pivô",
+        "Direta",
+        "Por dominante secundária",
+        "Por sequência harmônica",
+        "Enarmônica",
+        "Gradual"
+      ],
+      criterios:{
+        transicao:"Identificar o centro tonal de origem e o possível centro tonal de destino.",
+        compatibilidade:"Comparar os conjuntos de classes de altura das duas escalas.",
+        acordePivo:"Verificar se o acorde pertence integralmente aos dois campos harmônicos.",
+        confirmacao:"Buscar evidências de estabelecimento do novo centro tonal por funções, resoluções e continuidade harmônica.",
+        tonicizacao:"Identificar a dominante aplicada e verificar se o centro principal é retomado sem estabelecimento de uma nova tonalidade."
+      },
+      regras:[
+        "A modulação é uma mudança de centro tonal, não apenas uma alteração de notas.",
+        "A identificação exige contexto harmônico suficiente.",
+        "Um acorde-pivô deve ser compatível com as duas tonalidades.",
+        "Acordes compartilhados podem exercer funções diferentes em cada tonalidade.",
+        "A dominante da nova tonalidade é uma evidência importante, mas não deve ser analisada isoladamente.",
+        "Uma cadência na tonalidade de destino fortalece a confirmação da modulação.",
+        "A tonalidade relativa não deve ser confundida com a tonalidade paralela.",
+        "A distância entre tonalidades não determina a facilidade ou a qualidade musical da modulação.",
+        "Uma sequência de acordes cromáticos não comprova automaticamente mudança tonal.",
+        "A condução das vozes deve ser considerada na construção da transição."
+      ]
+    },
+
+    testes:[
+      {
+        entrada:"Dó maior para Sol maior",
+        esperado:"Centros tonais diferentes, separados por quinta justa.",
+        obtido:function(){
+          return distanciaSemitons(0,7)===7
+            ?"Centros tonais diferentes, separados por quinta justa."
+            :"Distância incorreta.";
+        }
+      },
+      {
+        entrada:"Acorde de Lá menor compartilhado por Dó maior e Sol maior",
+        esperado:"Acorde compatível com as duas tonalidades.",
+        obtido:function(){
+          var campoA=campoHarmonico(0,escalas.maior);
+          var campoB=campoHarmonico(7,escalas.maior);
+          var comum=campoA.some(function(a){
+            return a.fundamental===9 &&
+              a.qualidade==="menor" &&
+              campoB.some(function(b){
+                return b.fundamental===a.fundamental &&
+                  b.qualidade===a.qualidade;
+              });
+          });
+          return comum
+            ?"Acorde compatível com as duas tonalidades."
+            :"Acorde não compartilhado.";
+        }
+      },
+      {
+        entrada:"Dó maior e Lá menor natural",
+        esperado:"Conjuntos escalares iguais.",
+        obtido:function(){
+          var a=escalaAbsoluta(0,escalas.maior.intervalos).sort(function(x,y){return x-y;});
+          var b=escalaAbsoluta(9,escalas.menorNatural.intervalos).sort(function(x,y){return x-y;});
+          return a.join(",")===b.join(",")
+            ?"Conjuntos escalares iguais."
+            :"Conjuntos diferentes.";
+        }
+      },
+      {
+        entrada:"Dó maior para Dó menor",
+        esperado:"Mesmo centro tonal com mudança de organização escalar.",
+        obtido:function(){
+          return classificarRelacao(0,0,escalas.maior,escalas.menorNatural);
+        }
+      },
+      {
+        entrada:"Tonicização de Ré menor em Dó maior por Lá7",
+        esperado:"Acorde de Lá7 não pertence integralmente ao campo de Dó maior.",
+        obtido:function(){
+          var acorde=formarAcorde(9,qualidades.dominante7.intervalos);
+          var escala=escalaAbsoluta(0,escalas.maior.intervalos);
+          return pertence(acorde,escala)
+            ?"Pertence ao campo de Dó maior."
+            :"Não pertence integralmente ao campo de Dó maior.";
+        }
+      },
+      {
+        entrada:"Acorde-pivô entre Dó maior e Sol maior",
+        esperado:"Lá menor pertence aos dois campos harmônicos.",
+        obtido:function(){
+          var a=escalaAbsoluta(0,escalas.maior.intervalos);
+          var b=escalaAbsoluta(7,escalas.maior.intervalos);
+          var acorde=formarAcorde(9,qualidades.menor.intervalos);
+          return pertence(acorde,a)&&pertence(acorde,b)
+            ?"Lá menor pertence aos dois campos harmônicos."
+            :"Não é compartilhado.";
+        }
+      }
+    ],
+
+    experimente:{
+      html:
+        '<div class="mf-experimento">'+
+          '<div class="mf-campo">'+
+            '<label>Tonalidade de origem</label>'+
+            '<select data-mf="origem">'+
+              '<option value="0">Dó maior</option>'+
+              '<option value="2">Ré maior</option>'+
+              '<option value="4">Mi maior</option>'+
+              '<option value="5">Fá maior</option>'+
+              '<option value="7">Sol maior</option>'+
+              '<option value="9">Lá maior</option>'+
+              '<option value="11">Si maior</option>'+
+            '</select>'+
+          '</div>'+
+          '<div class="mf-campo">'+
+            '<label>Tonalidade de destino</label>'+
+            '<select data-mf="destino">'+
+              '<option value="7">Sol maior</option>'+
+              '<option value="0">Dó maior</option>'+
+              '<option value="2">Ré maior</option>'+
+              '<option value="4">Mi maior</option>'+
+              '<option value="5">Fá maior</option>'+
+              '<option value="9">Lá maior</option>'+
+              '<option value="11">Si maior</option>'+
+            '</select>'+
+          '</div>'+
+          '<div class="mf-campo">'+
+            '<label>Tipo de escala</label>'+
+            '<select data-mf="tipo">'+
+              '<option value="maior">Maior</option>'+
+              '<option value="menorNatural">Menor natural</option>'+
+            '</select>'+
+          '</div>'+
+          '<button type="button" data-mf="analisar">ANALISAR TRANSIÇÃO TONAL</button>'+
+          '<div data-mf="resultado" aria-live="polite"></div>'+
+        '</div>',
+
+      ligar:function(ev,cont){
+        var alvo=ev.target;
+        if(!alvo || !cont.contains(alvo)) return;
+
+        if(alvo.matches('[data-mf="analisar"]')){
+          var origem=Number(cont.querySelector('[data-mf="origem"]').value);
+          var destino=Number(cont.querySelector('[data-mf="destino"]').value);
+          var tipo=cont.querySelector('[data-mf="tipo"]').value;
+
+          var escala=escalas[tipo];
+          var analise=analisarTransicao(origem,destino,escala,escala);
+          var comuns=identificarAcordesComuns(origem,destino,escala,escala);
+          var campoA=campoHarmonico(origem,escala);
+          var campoB=campoHarmonico(destino,escala);
+
+          var resultado=cont.querySelector('[data-mf="resultado"]');
+
+          var texto=
+            '<strong>Origem:</strong> '+nomeNota(origem)+' '+escala.nome+'<br>'+
+            '<strong>Destino:</strong> '+nomeNota(destino)+' '+escala.nome+'<br>'+
+            '<strong>Distância entre tônicas:</strong> '+
+            distanciaSemitons(origem,destino)+' semitons<br>'+
+            '<strong>Relação tonal:</strong> '+
+            classificarRelacao(origem,destino,escala,escala)+'<br>'+
+            '<strong>Notas compartilhadas:</strong> '+
+            (analise.notasComuns.length?
+              analise.notasComuns.map(nomeNota).join(', '):
+              'Nenhuma')+'<br>'+
+            '<strong>Notas exclusivas do destino:</strong> '+
+            (analise.exclusivasB.length?
+              analise.exclusivasB.map(nomeNota).join(', '):
+              'Nenhuma')+'<br>'+
+            '<strong>Acordes compartilhados:</strong><br>';
+
+          if(comuns.length){
+            texto+=comuns.map(function(c){
+              return c.acorde+' ('+c.grauA+' na origem / '+c.grauB+' no destino)';
+            }).join('<br>');
+          }else{
+            texto+='Nenhum acorde compartilhado com a mesma estrutura.';
+          }
+
+          texto+='<br><small>Esta análise identifica compatibilidades entre campos harmônicos. A confirmação de modulação exige análise da progressão, das funções, das resoluções e do estabelecimento do novo centro tonal.</small>';
+
+          resultado.innerHTML=texto;
+        }
+      }
+    }
+  });
+})();
+
+      <!----===== FIM DA FICHA — Modulações =====-->
 </body>
 </html>
  
