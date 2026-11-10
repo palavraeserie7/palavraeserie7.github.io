@@ -14983,7 +14983,519 @@ function inverter(numero, qualidade){
 </script>
 <!-- ===== FIM: FICHA 08 — CONSONÂNCIAS E DISSONÂNCIAS ===== -->
 
+<!-- ===== 3. FICHA 09 — Armaduras e tonalidades ===== -->
+<script>
+(function(){
+  "use strict";
 
+  var N = window.MaestroNucleo;
+  if (!window.MaestroFichas || !N) return;
+
+  var modulo = "fundamentos/armaduras-e-tonalidades";
+
+  var notas = ["Dó","Ré","Mi","Fá","Sol","Lá","Si"];
+  var sustenidos = ["Fá","Dó","Sol","Ré","Lá","Mi","Si"];
+  var bemoles = ["Si","Mi","Lá","Ré","Sol","Dó","Fá"];
+
+  var ordemSustenidos = ["Fá","Dó","Sol","Ré","Lá","Mi","Si"];
+  var ordemBemoles = ["Si","Mi","Lá","Ré","Sol","Dó","Fá"];
+
+  var tonalidades = [
+    {nome:"Dó maior",tipo:"maior",alteracoes:0,acidentes:[]},
+    {nome:"Sol maior",tipo:"maior",alteracoes:1,acidentes:["Fá♯"]},
+    {nome:"Ré maior",tipo:"maior",alteracoes:2,acidentes:["Fá♯","Dó♯"]},
+    {nome:"Lá maior",tipo:"maior",alteracoes:3,acidentes:["Fá♯","Dó♯","Sol♯"]},
+    {nome:"Mi maior",tipo:"maior",alteracoes:4,acidentes:["Fá♯","Dó♯","Sol♯","Ré♯"]},
+    {nome:"Si maior",tipo:"maior",alteracoes:5,acidentes:["Fá♯","Dó♯","Sol♯","Ré♯","Lá♯"]},
+    {nome:"Fá♯ maior",tipo:"maior",alteracoes:6,acidentes:["Fá♯","Dó♯","Sol♯","Ré♯","Lá♯","Mi♯"]},
+    {nome:"Dó♯ maior",tipo:"maior",alteracoes:7,acidentes:["Fá♯","Dó♯","Sol♯","Ré♯","Lá♯","Mi♯","Si♯"]},
+    {nome:"Fá maior",tipo:"maior",alteracoes:-1,acidentes:["Si♭"]},
+    {nome:"Si♭ maior",tipo:"maior",alteracoes:-2,acidentes:["Si♭","Mi♭"]},
+    {nome:"Mi♭ maior",tipo:"maior",alteracoes:-3,acidentes:["Si♭","Mi♭","Lá♭"]},
+    {nome:"Lá♭ maior",tipo:"maior",alteracoes:-4,acidentes:["Si♭","Mi♭","Lá♭","Ré♭"]},
+    {nome:"Ré♭ maior",tipo:"maior",alteracoes:-5,acidentes:["Si♭","Mi♭","Lá♭","Ré♭","Sol♭"]},
+    {nome:"Sol♭ maior",tipo:"maior",alteracoes:-6,acidentes:["Si♭","Mi♭","Lá♭","Ré♭","Sol♭","Dó♭"]},
+    {nome:"Dó♭ maior",tipo:"maior",alteracoes:-7,acidentes:["Si♭","Mi♭","Lá♭","Ré♭","Sol♭","Dó♭","Fá♭"]},
+    {nome:"Lá menor",tipo:"menor",alteracoes:0,relativa:"Dó maior",acidentes:[]},
+    {nome:"Mi menor",tipo:"menor",alteracoes:1,relativa:"Sol maior",acidentes:["Fá♯"]},
+    {nome:"Si menor",tipo:"menor",alteracoes:2,relativa:"Ré maior",acidentes:["Fá♯","Dó♯"]},
+    {nome:"Fá♯ menor",tipo:"menor",alteracoes:3,relativa:"Lá maior",acidentes:["Fá♯","Dó♯","Sol♯"]},
+    {nome:"Dó♯ menor",tipo:"menor",alteracoes:4,relativa:"Mi maior",acidentes:["Fá♯","Dó♯","Sol♯","Ré♯"]},
+    {nome:"Sol♯ menor",tipo:"menor",alteracoes:5,relativa:"Si maior",acidentes:["Fá♯","Dó♯","Sol♯","Ré♯","Lá♯"]},
+    {nome:"Ré♯ menor",tipo:"menor",alteracoes:6,relativa:"Fá♯ maior",acidentes:["Fá♯","Dó♯","Sol♯","Ré♯","Lá♯","Mi♯"]},
+    {nome:"Lá♯ menor",tipo:"menor",alteracoes:7,relativa:"Dó♯ maior",acidentes:["Fá♯","Dó♯","Sol♯","Ré♯","Lá♯","Mi♯","Si♯"]},
+    {nome:"Ré menor",tipo:"menor",alteracoes:-1,relativa:"Fá maior",acidentes:["Si♭"]},
+    {nome:"Sol menor",tipo:"menor",alteracoes:-2,relativa:"Si♭ maior",acidentes:["Si♭","Mi♭"]},
+    {nome:"Dó menor",tipo:"menor",alteracoes:-3,relativa:"Mi♭ maior",acidentes:["Si♭","Mi♭","Lá♭"]},
+    {nome:"Fá menor",tipo:"menor",alteracoes:-4,relativa:"Lá♭ maior",acidentes:["Si♭","Mi♭","Lá♭","Ré♭"]},
+    {nome:"Si♭ menor",tipo:"menor",alteracoes:-5,relativa:"Ré♭ maior",acidentes:["Si♭","Mi♭","Lá♭","Ré♭","Sol♭"]},
+    {nome:"Mi♭ menor",tipo:"menor",alteracoes:-6,relativa:"Sol♭ maior",acidentes:["Si♭","Mi♭","Lá♭","Ré♭","Sol♭","Dó♭"]},
+    {nome:"Lá♭ menor",tipo:"menor",alteracoes:-7,relativa:"Dó♭ maior",acidentes:["Si♭","Mi♭","Lá♭","Ré♭","Sol♭","Dó♭","Fá♭"]}
+  ];
+
+  function obterTonalidade(nome){
+    return tonalidades.find(function(t){return t.nome===nome;}) || null;
+  }
+
+  function assinatura(alteracoes){
+    if(alteracoes>0) return ordemSustenidos.slice(0,alteracoes).map(function(n){return n+"♯";});
+    if(alteracoes<0) return ordemBemoles.slice(0,Math.abs(alteracoes)).map(function(n){return n+"♭";});
+    return [];
+  }
+
+  function relativaMaior(nome){
+    var t=obterTonalidade(nome);
+    if(!t) return null;
+    if(t.tipo==="menor") return t.relativa;
+    var mapa={
+      "Dó maior":"Lá menor","Sol maior":"Mi menor","Ré maior":"Si menor",
+      "Lá maior":"Fá♯ menor","Mi maior":"Dó♯ menor","Si maior":"Sol♯ menor",
+      "Fá♯ maior":"Ré♯ menor","Dó♯ maior":"Lá♯ menor","Fá maior":"Ré menor",
+      "Si♭ maior":"Sol menor","Mi♭ maior":"Dó menor","Lá♭ maior":"Fá menor",
+      "Ré♭ maior":"Si♭ menor","Sol♭ maior":"Mi♭ menor","Dó♭ maior":"Lá♭ menor"
+    };
+    return mapa[nome] || null;
+  }
+
+  function maiorRelativa(nome){
+    var t=obterTonalidade(nome);
+    return t && t.tipo==="menor" ? t.relativa : null;
+  }
+
+  function textoAlteracoes(t){
+    if(!t || !t.acidentes.length) return "Sem acidentes na armadura.";
+    return t.acidentes.join(", ");
+  }
+
+  function contarAlteracoes(t){
+    return t ? Math.abs(t.alteracoes) : 0;
+  }
+
+  function identificarPorArmadura(tipo,alteracoes){
+    return tonalidades.filter(function(t){
+      return t.tipo===tipo && t.alteracoes===alteracoes;
+    });
+  }
+
+  function gerarEscalaMaior(tonica){
+    var escalas={
+      "Dó":["Dó","Ré","Mi","Fá","Sol","Lá","Si"],
+      "Sol":["Sol","Lá","Si","Dó","Ré","Mi","Fá♯"],
+      "Ré":["Ré","Mi","Fá♯","Sol","Lá","Si","Dó♯"],
+      "Lá":["Lá","Si","Dó♯","Ré","Mi","Fá♯","Sol♯"],
+      "Mi":["Mi","Fá♯","Sol♯","Lá","Si","Dó♯","Ré♯"],
+      "Si":["Si","Dó♯","Ré♯","Mi","Fá♯","Sol♯","Lá♯"],
+      "Fá":["Fá","Sol","Lá","Si♭","Dó","Ré","Mi"],
+      "Si♭":["Si♭","Dó","Ré","Mi♭","Fá","Sol","Lá"],
+      "Mi♭":["Mi♭","Fá","Sol","Lá♭","Si♭","Dó","Ré"],
+      "Lá♭":["Lá♭","Si♭","Dó","Ré♭","Mi♭","Fá","Sol"],
+      "Ré♭":["Ré♭","Mi♭","Fá","Sol♭","Lá♭","Si♭","Dó"],
+      "Sol♭":["Sol♭","Lá♭","Si♭","Dó♭","Ré♭","Mi♭","Fá"],
+      "Dó♭":["Dó♭","Ré♭","Mi♭","Fá♭","Sol♭","Lá♭","Si♭"],
+      "Fá♯":["Fá♯","Sol♯","Lá♯","Si","Dó♯","Ré♯","Mi♯"],
+      "Dó♯":["Dó♯","Ré♯","Mi♯","Fá♯","Sol♯","Lá♯","Si♯"]
+    };
+    return escalas[tonica] || null;
+  }
+
+  function montarTabelaTonalidades(){
+    return tonalidades.map(function(t){
+      return [
+        t.nome,
+        t.tipo==="maior" ? "Maior" : "Menor",
+        t.alteracoes===0 ? "0" : Math.abs(t.alteracoes)+(t.alteracoes>0?" sustenidos":" bemóis"),
+        textoAlteracoes(t),
+        t.tipo==="maior" ? relativaMaior(t.nome) : t.relativa
+      ];
+    });
+  }
+
+  window.MaestroFichas.registrar({
+    modulo: modulo,
+    titulo: "Armaduras e tonalidades",
+    tipos: ["teoria","fundamentos","harmonia","notacao","tonalidade"],
+    depende: [
+      "fundamentos/notas-e-alturas-musicais",
+      "fundamentos/acustica-e-fundamentos-matematicos",
+      "fundamentos/intervalos-simples-e-compostos"
+    ],
+    revisada: true,
+
+    definicao: {
+      resumo: "Armadura de clave é o conjunto de acidentes fixos colocado no início da pauta, após a clave, que indica alterações recorrentes das notas ao longo da peça. Tonalidade é a organização hierárquica dos sons em torno de uma nota central, a tônica, e de um centro harmônico percebido como repouso.",
+      conceito: "A armadura de clave registra graficamente uma coleção de alterações que se aplicam, por convenção notacional, às notas correspondentes em todas as oitavas, salvo cancelamento ou modificação por acidente ocorrente. Ela não determina sozinha a tonalidade: a mesma armadura pode corresponder a uma tonalidade maior e à sua relativa menor. A identificação tonal depende também da melodia, da harmonia, das cadências, das notas de repouso e do contexto musical.",
+      armadura: "Os acidentes da armadura aparecem em uma ordem convencional. Com sustenidos, a sequência é Fá, Dó, Sol, Ré, Lá, Mi e Si. Com bemóis, a sequência é Si, Mi, Lá, Ré, Sol, Dó e Fá. A posição de cada acidente na pauta depende da clave utilizada.",
+      tonalidade: "A tonalidade maior organiza os graus em torno de uma tônica e utiliza como referência a escala maior. A tonalidade menor também possui uma tônica própria, mas apresenta formas de escala natural, harmônica e melódica, que podem coexistir na mesma obra. A armadura da tonalidade menor corresponde, em princípio, à de sua relativa maior.",
+      relativa: "Tonalidades relativas compartilham a mesma armadura, mas possuem tônicas diferentes. A relativa menor de uma tonalidade maior está uma terça menor abaixo de sua tônica; a relativa maior de uma tonalidade menor está uma terça menor acima. Por exemplo, Dó maior e Lá menor não possuem acidentes na armadura, mas seus centros tonais são diferentes.",
+      paralela: "Tonalidades paralelas compartilham a mesma tônica, mas pertencem a modos diferentes. Dó maior e Dó menor são paralelas: ambas partem de Dó, porém suas armaduras e estruturas intervalares diferem.",
+      acidentesOcorrentes: "Acidente ocorrente é aquele escrito junto a uma nota no decorrer do compasso. Ele pode alterar temporariamente a nota indicada, segundo as regras de notação. O acidente ocorrente prevalece sobre a armadura para a mesma nota e oitava, dentro do compasso, conforme a convenção notacional adotada. O acidente de precaução pode ser empregado para evitar ambiguidades de leitura, sem necessariamente modificar a estrutura tonal.",
+      limites: "A armadura é uma indicação notacional e uma pista para a análise, não uma prova absoluta de tonalidade. Uma composição pode começar em uma tonalidade e modular para outra; pode empregar empréstimos modais, dominantes secundárias, cromatismos e notas estranhas à escala diatônica sem que cada alteração exija uma nova armadura."
+    },
+
+    formulas: [
+      {
+        nome:"Número de acidentes",
+        expressao:"n = |a|",
+        explicacao:"O valor absoluto de a representa a quantidade de acidentes: positivo para sustenidos, negativo para bemóis e zero para ausência de acidentes."
+      },
+      {
+        nome:"Relação entre tonalidades relativas",
+        expressao:"Tônica menor = tônica maior − 3 semitons",
+        explicacao:"Na relação entre uma tonalidade maior e sua relativa menor, a tônica menor está uma terça menor abaixo da tônica maior, considerando a relação enarmônica adequada."
+      },
+      {
+        nome:"Escala maior",
+        expressao:"T – T – S – T – T – T – S",
+        explicacao:"A escala maior apresenta a sequência de tons e semitons: tom, tom, semitom, tom, tom, tom e semitom."
+      },
+      {
+        nome:"Escala menor natural",
+        expressao:"T – S – T – T – S – T – T",
+        explicacao:"A escala menor natural apresenta a sequência de tons e semitons: tom, semitom, tom, tom, semitom, tom e tom."
+      }
+    ],
+
+    tabela: {
+      titulo:"Armaduras e tonalidades correspondentes",
+      cabecalho:["Tonalidade","Modo","Acidentes","Alterações na armadura","Relativa"],
+      linhas: montarTabelaTonalidades()
+    },
+
+    exemplos: [
+      {
+        titulo:"Dó maior e Lá menor",
+        texto:"As duas tonalidades não possuem acidentes na armadura. Em Dó maior, Dó é a tônica; em Lá menor, Lá é a tônica. A armadura, isoladamente, não permite decidir qual delas é o centro tonal."
+      },
+      {
+        titulo:"Sol maior e Mi menor",
+        texto:"Ambas possuem um sustenido na armadura: Fá♯. Sol maior tem Sol como tônica; Mi menor tem Mi como tônica."
+      },
+      {
+        titulo:"Fá maior e Ré menor",
+        texto:"Ambas possuem um bemol na armadura: Si♭. A diferença entre elas não está na armadura, mas na organização melódica e harmônica em torno de suas respectivas tônicas."
+      },
+      {
+        titulo:"Dó maior e Dó menor",
+        texto:"São tonalidades paralelas. Dó maior não possui acidentes na armadura; Dó menor possui três bemóis: Si♭, Mi♭ e Lá♭."
+      },
+      {
+        titulo:"Alteração cromática em Lá menor",
+        texto:"Na escala de Lá menor harmônica, o sétimo grau é elevado de Sol para Sol♯. Essa alteração não precisa ser incorporada à armadura: pode aparecer como acidente ocorrente."
+      }
+    ],
+
+    erros: [
+      {
+        erro:"A armadura determina automaticamente a tonalidade.",
+        correcao:"A armadura aponta para duas tonalidades relativas possíveis. A análise do centro tonal exige observar tônica, cadências, progressões harmônicas e comportamento melódico."
+      },
+      {
+        erro:"Tonalidades relativas e paralelas são a mesma coisa.",
+        correcao:"Relativas compartilham a armadura e possuem tônicas diferentes. Paralelas compartilham a tônica e possuem modos diferentes."
+      },
+      {
+        erro:"Toda nota alterada precisa aparecer na armadura.",
+        correcao:"Alterações cromáticas, notas de empréstimo modal e alterações próprias das formas harmônica e melódica da escala menor podem ser escritas como acidentes ocorrentes."
+      },
+      {
+        erro:"Os acidentes da armadura podem ser escritos em qualquer ordem.",
+        correcao:"A ordem convencional dos sustenidos é Fá, Dó, Sol, Ré, Lá, Mi, Si; a dos bemóis é Si, Mi, Lá, Ré, Sol, Dó, Fá."
+      },
+      {
+        erro:"A escala menor possui uma única forma.",
+        correcao:"A teoria tonal tradicional distingue as formas menor natural, menor harmônica e menor melódica. A armadura permanece associada à tonalidade, enquanto alterações adicionais podem aparecer no decorrer da música."
+      },
+      {
+        erro:"Uma peça com muitos acidentes ocorrentes necessariamente mudou de tonalidade.",
+        correcao:"Cromatismo, dominantes secundárias, empréstimos modais e ornamentações podem produzir acidentes sem estabelecer uma modulação."
+      }
+    ],
+
+    notacao: {
+      titulo:"Convenções de escrita",
+      itens:[
+        "A armadura é escrita imediatamente após a clave e antes da indicação de compasso.",
+        "Os acidentes da armadura são dispostos na ordem convencional e em posições específicas da pauta.",
+        "Cada acidente da armadura afeta a nota correspondente em todas as oitavas, de acordo com a convenção de notação musical.",
+        "Um acidente ocorrente modifica a nota indicada e prevalece sobre a armadura no âmbito do compasso, conforme as regras de escrita.",
+        "Uma mudança de tonalidade pode ser indicada por uma nova armadura, precedida pelos sinais necessários para cancelar a armadura anterior.",
+        "A ausência de acidentes na armadura não significa ausência de cromatismo na composição."
+      ]
+    },
+
+    relacoes: [
+      {
+        modulo:"fundamentos/notas-e-alturas-musicais",
+        relacao:"A leitura das notas e de suas alterações é necessária para interpretar a armadura."
+      },
+      {
+        modulo:"fundamentos/intervalos-simples-e-compostos",
+        relacao:"A construção das escalas e a relação entre tonalidades dependem da compreensão dos intervalos."
+      },
+      {
+        modulo:"fundamentos/consonancias-e-dissonancias",
+        relacao:"A organização tonal utiliza relações de tensão e repouso, consonância e dissonância."
+      },
+      {
+        modulo:"harmonia/escalas-maiores-e-menores",
+        relacao:"As escalas maiores e menores materializam as estruturas intervalares associadas às tonalidades."
+      },
+      {
+        modulo:"harmonia/campo-harmonico",
+        relacao:"O campo harmônico apresenta os acordes diatônicos relacionados à tonalidade."
+      },
+      {
+        modulo:"harmonia/modulacao",
+        relacao:"A modulação descreve a passagem de um centro tonal para outro."
+      }
+    ],
+
+    fontes: [
+      "BACH, Johann Sebastian. Clavier-Übung III e obras para teclado: referências históricas de escrita tonal e notação.",
+      "PISTON, Walter. Harmony. W. W. Norton.",
+      "KOSTKA, Stefan; PAYNE, Dorothy; ALMÉN, Byron. Tonal Harmony. McGraw-Hill.",
+      "ALDWELL, Edward; SCHACHTER, Carl; CADWALLADER, Allen. Harmony and Voice Leading. Cengage Learning.",
+      "BENWARD, Bruce; SAKER, Marilyn. Music in Theory and Practice. McGraw-Hill."
+    ],
+
+    dados: {
+      area:"Fundamentos Musicais",
+      nivel:"Intermediário",
+      assunto:"Notação, escalas e organização tonal",
+      palavrasChave:[
+        "armadura de clave","tonalidade","tônica","relativa maior",
+        "relativa menor","tonalidade paralela","sustenidos","bemóis",
+        "acidentes ocorrentes","escala maior","escala menor"
+      ],
+      objetivos:[
+        "Compreender a função da armadura de clave.",
+        "Memorizar a ordem dos sustenidos e dos bemóis.",
+        "Identificar tonalidades maiores e menores pelas armaduras.",
+        "Distinguir tonalidades relativas e paralelas.",
+        "Reconhecer os limites da armadura na identificação tonal.",
+        "Compreender o uso de acidentes ocorrentes nas escalas menores."
+      ]
+    },
+
+    testes: [
+      {
+        nome:"Armadura de Dó maior",
+        entrada:"obterTonalidade('Dó maior').alteracoes",
+        esperado:0,
+        obtido:obterTonalidade("Dó maior").alteracoes
+      },
+      {
+        nome:"Armadura de Sol maior",
+        entrada:"obterTonalidade('Sol maior').acidentes",
+        esperado:["Fá♯"],
+        obtido:obterTonalidade("Sol maior").acidentes
+      },
+      {
+        nome:"Armadura de Ré maior",
+        entrada:"obterTonalidade('Ré maior').acidentes",
+        esperado:["Fá♯","Dó♯"],
+        obtido:obterTonalidade("Ré maior").acidentes
+      },
+      {
+        nome:"Armadura de Fá maior",
+        entrada:"obterTonalidade('Fá maior').acidentes",
+        esperado:["Si♭"],
+        obtido:obterTonalidade("Fá maior").acidentes
+      },
+      {
+        nome:"Relativa menor de Dó maior",
+        entrada:"relativaMaior('Dó maior')",
+        esperado:"Lá menor",
+        obtido:relativaMaior("Dó maior")
+      },
+      {
+        nome:"Relativa maior de Mi menor",
+        entrada:"maiorRelativa('Mi menor')",
+        esperado:"Sol maior",
+        obtido:maiorRelativa("Mi menor")
+      },
+      {
+        nome:"Ordem dos sustenidos",
+        entrada:"ordemSustenidos",
+        esperado:["Fá","Dó","Sol","Ré","Lá","Mi","Si"],
+        obtido:ordemSustenidos
+      },
+      {
+        nome:"Ordem dos bemóis",
+        entrada:"ordemBemoles",
+        esperado:["Si","Mi","Lá","Ré","Sol","Dó","Fá"],
+        obtido:ordemBemoles
+      },
+      {
+        nome:"Quantidade de acidentes em Mi♭ maior",
+        entrada:"contarAlteracoes(obterTonalidade('Mi♭ maior'))",
+        esperado:3,
+        obtido:contarAlteracoes(obterTonalidade("Mi♭ maior"))
+      },
+      {
+        nome:"Relativa de Si♭ maior",
+        entrada:"relativaMaior('Si♭ maior')",
+        esperado:"Sol menor",
+        obtido:relativaMaior("Si♭ maior")
+      }
+    ],
+
+    experimente: {
+      titulo:"Laboratório de armaduras e tonalidades",
+      descricao:"Selecione uma tonalidade para visualizar sua armadura, identificar sua relativa e examinar a escala maior correspondente. Depois, experimente identificar tonalidades a partir da quantidade de acidentes.",
+      html: `
+        <div class="maestro-lab">
+          <style>
+            .maestro-lab{display:grid;gap:14px;font:inherit}
+            .maestro-lab .painel{padding:14px;border:1px solid var(--maestro-borda,#ccc);border-radius:12px}
+            .maestro-lab label{display:block;font-weight:600;margin-bottom:6px}
+            .maestro-lab select,.maestro-lab button{font:inherit;padding:9px 11px;border:1px solid var(--maestro-borda,#aaa);border-radius:8px;background:var(--maestro-fundo,#fff);color:inherit}
+            .maestro-lab select{width:100%}
+            .maestro-lab button{cursor:pointer}
+            .maestro-lab .linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+            .maestro-lab .resultado{padding:12px;border-radius:9px;background:var(--maestro-superficie,#eee);line-height:1.7}
+            .maestro-lab .acidentes{font-size:1.35rem;font-weight:700;letter-spacing:2px;overflow-wrap:anywhere}
+            .maestro-lab .escala{display:flex;gap:6px;flex-wrap:wrap}
+            .maestro-lab .nota{padding:8px 10px;border:1px solid var(--maestro-borda,#aaa);border-radius:8px;min-width:44px;text-align:center}
+            .maestro-lab .nota.tonica{font-weight:800;border:2px solid currentColor}
+            .maestro-lab .muted{opacity:.75;font-size:.92em}
+            .maestro-lab .feedback{min-height:26px;font-weight:600}
+          </style>
+
+          <section class="painel">
+            <label for="maestro-tonalidade">Escolha a tonalidade</label>
+            <select id="maestro-tonalidade">
+              ${tonalidades.map(function(t){return '<option value="'+t.nome+'">'+t.nome+'</option>';}).join("")}
+            </select>
+            <div class="resultado" id="maestro-detalhes" aria-live="polite"></div>
+          </section>
+
+          <section class="painel">
+            <strong>Identificação pela quantidade de acidentes</strong>
+            <p class="muted">Selecione o tipo de acidente e sua quantidade.</p>
+            <div class="linha">
+              <select id="maestro-tipo-acidente" aria-label="Tipo de acidente">
+                <option value="sustenidos">Sustenidos</option>
+                <option value="bemoles">Bemóis</option>
+                <option value="nenhum">Nenhum acidente</option>
+              </select>
+              <select id="maestro-qtd-acidentes" aria-label="Quantidade de acidentes">
+                ${Array.from({length:8},function(_,i){return '<option value="'+i+'">'+i+'</option>';}).join("")}
+              </select>
+              <button type="button" id="maestro-identificar">Identificar</button>
+            </div>
+            <div class="resultado" id="maestro-identificacao" aria-live="polite">Escolha os parâmetros e identifique as tonalidades.</div>
+          </section>
+
+          <section class="painel">
+            <strong>Desafio: relativa maior ou menor?</strong>
+            <p id="maestro-pergunta"></p>
+            <div class="linha">
+              <button type="button" id="maestro-resposta-a"></button>
+              <button type="button" id="maestro-resposta-b"></button>
+              <button type="button" id="maestro-novo-desafio">Novo desafio</button>
+            </div>
+            <div class="feedback" id="maestro-feedback" aria-live="polite"></div>
+          </section>
+        </div>
+      `,
+
+      ligar:function(ev,cont){
+        var raiz=cont.querySelector(".maestro-lab");
+        if(!raiz || raiz.dataset.ligado==="sim") return;
+        raiz.dataset.ligado="sim";
+
+        var el=function(id){return raiz.querySelector("#"+id);};
+
+        function atualizarTonalidade(){
+          var t=obterTonalidade(el("maestro-tonalidade").value);
+          if(!t) return;
+
+          var acidentes=textoAlteracoes(t);
+          var relativa=t.tipo==="maior"?relativaMaior(t.nome):t.relativa;
+          var escala=t.tipo==="maior"?gerarEscalaMaior(t.nome.replace(" maior","")):null;
+
+          var html="<strong>"+t.nome+"</strong><br>";
+          html+="Modo: "+(t.tipo==="maior"?"Maior":"Menor")+"<br>";
+          html+="Armadura: "+(t.acidentes.length?t.acidentes.length+" acidente(s)":"nenhum acidente")+"<br>";
+          html+='<div class="acidentes">'+(t.acidentes.length?t.acidentes.join("　"):"—")+"</div>";
+          html+="Tonalidade relativa: "+relativa+"<br>";
+          html+="Tonalidade paralela: "+(t.tipo==="maior"?t.nome.replace("maior","menor"):t.nome.replace("menor","maior"))+"<br>";
+
+          if(escala){
+            html+="<p><strong>Escala maior diatônica</strong></p>";
+            html+='<div class="escala">'+escala.map(function(n,i){
+              return '<span class="nota '+(i===0?"tonica":"")+'">'+n+'</span>';
+            }).join("")+"</div>";
+          }else{
+            html+='<p class="muted">A escala menor pode ser apresentada nas formas natural, harmônica e melódica. A armadura, por si só, não contém todas as alterações dessas formas.</p>';
+          }
+
+          el("maestro-detalhes").innerHTML=html;
+        }
+
+        el("maestro-tonalidade").addEventListener("change",atualizarTonalidade);
+        atualizarTonalidade();
+
+        el("maestro-identificar").addEventListener("click",function(){
+          var tipo=el("maestro-tipo-acidente").value;
+          var qtd=Number(el("maestro-qtd-acidentes").value);
+          var valor=tipo==="sustenidos"?qtd:tipo==="bemoles"?-qtd:0;
+
+          if(tipo==="nenhum") valor=0;
+          if(tipo==="nenhum" && qtd!==0){
+            el("maestro-identificacao").textContent="Para ausência de acidentes, selecione quantidade zero.";
+            return;
+          }
+
+          var encontrados=tonalidades.filter(function(t){return t.alteracoes===valor;});
+          if(!encontrados.length){
+            el("maestro-identificacao").textContent="Não foi encontrada uma tonalidade para essa configuração.";
+            return;
+          }
+
+          el("maestro-identificacao").innerHTML="<strong>Tonalidades correspondentes:</strong><br>"+encontrados.map(function(t){return t.nome;}).join(" e ")+"<br><span class='muted'>A mesma armadura pode representar tonalidades relativas.</span>";
+        });
+
+        var desafio=null;
+
+        function novoDesafio(){
+          var maiores=tonalidades.filter(function(t){return t.tipo==="maior";});
+          desafio=maiores[Math.floor(Math.random()*maiores.length)];
+          var correta=relativaMaior(desafio.nome);
+          var alternativas=[correta];
+          var menores=tonalidades.filter(function(t){return t.tipo==="menor" && t.nome!==correta;});
+          alternativas.push(menores[Math.floor(Math.random()*menores.length)].nome);
+          alternativas.sort(function(){return Math.random()-.5;});
+
+          el("maestro-pergunta").textContent="Qual é a relativa menor de "+desafio.nome+"?";
+          el("maestro-resposta-a").textContent=alternativas[0];
+          el("maestro-resposta-b").textContent=alternativas[1];
+          el("maestro-feedback").textContent="";
+          el("maestro-resposta-a").disabled=false;
+          el("maestro-resposta-b").disabled=false;
+        }
+
+        function responder(valor){
+          if(!desafio) return;
+          var correta=relativaMaior(desafio.nome);
+          el("maestro-feedback").textContent=valor===correta?"Correto! "+correta+" compartilha a armadura de "+desafio.nome+".":"Não é essa. A resposta correta é "+correta+".";
+          el("maestro-resposta-a").disabled=true;
+          el("maestro-resposta-b").disabled=true;
+        }
+
+        el("maestro-resposta-a").addEventListener("click",function(){responder(this.textContent);});
+        el("maestro-resposta-b").addEventListener("click",function(){responder(this.textContent);});
+        el("maestro-novo-desafio").addEventListener("click",novoDesafio);
+
+        novoDesafio();
+      }
+    }
+  });
+
+})();
+</script>
+<!-- ===== FIM: FICHA 09 — Armaduras e tonalidades ===== -->
 
 </body>
 </html>
