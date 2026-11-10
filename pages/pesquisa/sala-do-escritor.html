@@ -13903,6 +13903,1086 @@ function inverter(numero, qualidade){
 <!-- ===== FIM: FICHA 06 — ACÚSTICA E FUNDAMENTOS MATEMÁTICOS ===== -->
 
 
+<!-- ---------- 3. FICHA 07 — Fundamentos Musicais / Intervalos simples e compostos ---------- -->
+<script>
+(function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+
+  var N = window.MaestroNucleo;
+  var fx = function(x){ return Number(x).toFixed(2); };
+
+  var nomes = {
+    0:"uníssono",
+    1:"segunda",
+    2:"terça",
+    3:"quarta",
+    4:"quinta",
+    5:"sexta",
+    6:"sétima"
+  };
+
+  var qualidade = function(numero, semitons){
+    var base = [0,2,4,5,7,9,11];
+    var idx = ((numero - 1) % 7);
+    var oitavas = Math.floor((numero - 1) / 7);
+    var esperado = base[idx] + (oitavas * 12);
+    var diferenca = semitons - esperado;
+    var perfeito = [0,3,4];
+
+    if(perfeito.indexOf(idx) !== -1){
+      if(diferenca === 0) return "justa";
+      if(diferenca === 1) return "aumentada";
+      if(diferenca === -1) return "diminuta";
+      if(diferenca > 1) return "duplamente aumentada";
+      if(diferenca < -1) return "duplamente diminuta";
+    }else{
+      if(diferenca === 0) return "maior";
+      if(diferenca === -1) return "menor";
+      if(diferenca === 1) return "aumentada";
+      if(diferenca === -2) return "diminuta";
+      if(diferenca > 1) return "duplamente aumentada";
+      if(diferenca < -2) return "duplamente diminuta";
+    }
+    return "não classificado";
+  };
+
+  var letras = ["Dó","Ré","Mi","Fá","Sol","Lá","Si"];
+
+  var indiceLetra = function(letra){
+    var s = String(letra || "").toLowerCase();
+    var mapa = {
+      c:0,"dó":0,"do":0,
+      d:1,"ré":1,"re":1,
+      e:2,"mi":2,
+      f:3,"fá":3,"fa":3,
+      g:4,"sol":4,
+      a:5,"lá":5,"la":5,
+      b:6,"si":6
+    };
+    return mapa[s];
+  };
+
+  var analisar = function(a,b){
+    var p1 = N.parse(a);
+    var p2 = N.parse(b);
+
+    if(!p1 || !p2) return null;
+
+    var m1 = N.midi(p1);
+    var m2 = N.midi(p2);
+    var i1 = indiceLetra(p1.letra);
+    var i2 = indiceLetra(p2.letra);
+
+    if(i1 === undefined || i2 === undefined) return null;
+
+    var numero = (p2.oitava - p1.oitava) * 7 + (i2 - i1) + 1;
+    var semitons = m2 - m1;
+
+    if(numero < 1) return null;
+
+    var nomeBase = nomes[(numero - 1) % 7] || "intervalo";
+    var q = qualidade(numero, semitons);
+
+    return {
+      numero:numero,
+      semitons:semitons,
+      nome:q + " " + nomeBase,
+      qualidade:q,
+      simples:numero <= 8,
+      composto:numero > 8,
+      direcao:semitons > 0 ? "ascendente" : semitons < 0 ? "descendente" : "mesma altura",
+      oitavas:Math.floor((numero - 1) / 7),
+      frequencia:N.freq(m2) / N.freq(m1),
+      nota1:N.nome(p1),
+      nota2:N.nome(p2)
+    };
+  };
+
+  var inversao = function(numero){
+    return 9 - numero;
+  };
+
+  var reducao = function(numero){
+    return ((numero - 1) % 7) + 1;
+  };
+
+  window.MaestroFichas.registrar({
+    modulo:"Fundamentos Musicais",
+    titulo:"Intervalos simples e compostos",
+    tipos:[
+      "Teoria dos intervalos",
+      "Classificação diatônica e cromática",
+      "Relações matemáticas e acústicas"
+    ],
+    depende:[
+      "fundamentos/notas-e-alturas-musicais",
+      "fundamentos/acustica-e-fundamentos-matematicos"
+    ],
+    revisada:false,
+
+    definicao:[
+      "Intervalo musical é a distância entre duas notas, considerando tanto a separação entre suas alturas quanto a relação entre suas grafias. É uma das unidades fundamentais da linguagem musical e permite compreender melodias, harmonias, escalas, acordes e movimentos entre vozes.",
+      "A classificação de um intervalo depende de dois elementos: o número intervalar, determinado pela distância entre as letras musicais, e a qualidade, determinada pela quantidade de semitons em comparação com a estrutura diatônica correspondente.",
+      "O número intervalar é contado de maneira inclusiva. Dó–Ré é segunda, Dó–Mi é terça, Dó–Fá é quarta, Dó–Sol é quinta, Dó–Lá é sexta, Dó–Si é sétima e Dó–Dó é oitava.",
+      "Intervalos simples são aqueles que permanecem dentro do limite de uma oitava, incluindo o próprio intervalo de oitava. São eles: uníssono, segunda, terça, quarta, quinta, sexta, sétima e oitava.",
+      "Intervalos compostos ultrapassam uma oitava. São formados pela combinação de uma oitava com outro intervalo simples. Exemplos: nona, décima, décima primeira, décima segunda, décima terceira, décima quarta e décima quinta.",
+      "A qualidade intervalar pode ser justa, maior, menor, aumentada ou diminuta. Os intervalos de uníssono, quarta, quinta e oitava pertencem à família dos intervalos justos. Segundas, terças, sextas e sétimas pertencem à família dos intervalos maiores e menores.",
+      "Um intervalo maior, quando reduzido em um semitom, transforma-se em menor. Um intervalo menor, quando reduzido em um semitom, transforma-se em diminuto. Um intervalo justo pode ser aumentado ou diminuto conforme sua alteração cromática.",
+      "Intervalo melódico ocorre quando as notas são executadas sucessivamente. Pode ser ascendente, quando a segunda nota é mais aguda, ou descendente, quando é mais grave.",
+      "Intervalo harmônico ocorre quando as duas notas são executadas simultaneamente. Sua identificação utiliza a mesma classificação intervalar, embora a percepção envolva a interação sonora entre as frequências.",
+      "Intervalo diatônico considera a distância entre as letras musicais e sua posição na organização da escala. Intervalo cromático considera a distância em semitons. Uma classificação completa precisa considerar os dois aspectos.",
+      "Intervalos enarmônicos podem possuir a mesma quantidade de semitons e, ainda assim, apresentar nomes diferentes. Dó–Fá sustenido é uma quarta aumentada, enquanto Dó–Sol bemol é uma quinta diminuta. Ambos possuem seis semitons no temperamento igual.",
+      "A inversão de um intervalo ocorre quando uma das notas é deslocada uma oitava, de modo que a nota superior passa a ser inferior ou vice-versa. A soma dos números de um intervalo simples e de sua inversão é sempre nove.",
+      "Na inversão, intervalos justos permanecem justos, maiores tornam-se menores, menores tornam-se maiores, aumentados tornam-se diminutos e diminutos tornam-se aumentados.",
+      "Intervalos compostos podem ser reduzidos à sua forma simples, retirando-se uma ou mais oitavas. Uma nona equivale a uma segunda acrescida de uma oitava; uma décima equivale a uma terça acrescida de uma oitava.",
+      "No temperamento igual de doze semitons, cada semitom corresponde à razão de frequência 2^(1/12). Portanto, a distância de doze semitons representa uma duplicação da frequência, equivalente a uma oitava.",
+      "A classificação intervalar é essencial para identificar estruturas de escalas, construir acordes, analisar progressões harmônicas, compreender condução de vozes e realizar transposições musicais."
+    ],
+
+    formulas:[
+      {
+        nome:"Número do intervalo",
+        texto:"N = diferença entre posições diatônicas + 1",
+        nota:"A contagem é inclusiva. Dó–Mi possui três posições: Dó, Ré e Mi, portanto é uma terça."
+      },
+      {
+        nome:"Distância em semitons",
+        texto:"S = MIDI₂ − MIDI₁",
+        nota:"A diferença entre os números MIDI determina a distância cromática quando se considera o movimento ascendente."
+      },
+      {
+        nome:"Redução de intervalo composto",
+        texto:"Intervalo simples = ((N − 1) mod 7) + 1",
+        nota:"A redução retira as oitavas excedentes, preservando a classe numérica do intervalo."
+      },
+      {
+        nome:"Oitavas excedentes",
+        texto:"O = parte inteira de ((N − 1) / 7)",
+        nota:"Indica quantas oitavas adicionais estão presentes no intervalo composto."
+      },
+      {
+        nome:"Relação entre intervalo simples e composto",
+        texto:"N composto = N simples + 7 × O",
+        nota:"Cada oitava adicional acrescenta sete posições diatônicas ao número intervalar."
+      },
+      {
+        nome:"Inversão de intervalo simples",
+        texto:"N + N inverso = 9",
+        nota:"Exemplos: segunda e sétima; terça e sexta; quarta e quinta; uníssono e oitava."
+      },
+      {
+        nome:"Inversão da qualidade",
+        texto:"Maior ↔ menor · Aumentado ↔ diminuto · Justo ↔ justo",
+        nota:"A inversão mantém a família intervalar, mas modifica a qualidade conforme a relação estabelecida."
+      },
+      {
+        nome:"Razão de frequências",
+        texto:"R = f₂ / f₁",
+        nota:"Representa a proporção entre a frequência da nota superior e a frequência da nota inferior."
+      },
+      {
+        nome:"Semitons e frequência",
+        texto:"R = 2^(S/12)",
+        nota:"Válida para o temperamento igual de doze divisões. S representa a quantidade de semitons ascendentes."
+      },
+      {
+        nome:"Distância em cents",
+        texto:"C = 1200 × log₂(f₂ / f₁)",
+        nota:"Uma oitava corresponde a 1200 cents e cada semitom temperado corresponde a 100 cents."
+      },
+      {
+        nome:"Nona",
+        texto:"Nona = segunda + uma oitava",
+        nota:"Uma nona maior possui 14 semitons; uma nona menor possui 13 semitons."
+      },
+      {
+        nome:"Décima",
+        texto:"Décima = terça + uma oitava",
+        nota:"Uma décima maior possui 16 semitons e uma décima menor possui 15 semitons."
+      }
+    ],
+
+    tabela:{
+      titulo:"Classificação dos intervalos no temperamento igual",
+      cabecalho:[
+        "Intervalo",
+        "Semitons",
+        "Classificação",
+        "Exemplo a partir de Dó"
+      ],
+      linhas:[
+        ["Uníssono justo","0","Justo","Dó–Dó"],
+        ["Segunda menor","1","Menor","Dó–Réb"],
+        ["Segunda maior","2","Maior","Dó–Ré"],
+        ["Terça menor","3","Menor","Dó–Mib"],
+        ["Terça maior","4","Maior","Dó–Mi"],
+        ["Quarta justa","5","Justo","Dó–Fá"],
+        ["Quarta aumentada","6","Aumentado","Dó–Fá#"],
+        ["Quinta diminuta","6","Diminuto","Dó–Solb"],
+        ["Quinta justa","7","Justo","Dó–Sol"],
+        ["Quinta aumentada","8","Aumentado","Dó–Sol#"],
+        ["Sexta menor","8","Menor","Dó–Láb"],
+        ["Sexta maior","9","Maior","Dó–Lá"],
+        ["Sétima menor","10","Menor","Dó–Sib"],
+        ["Sétima maior","11","Maior","Dó–Si"],
+        ["Oitava justa","12","Justo","Dó–Dó"],
+        ["Nona menor","13","Menor","Dó–Réb5"],
+        ["Nona maior","14","Maior","Dó–Ré5"],
+        ["Nona aumentada","15","Aumentado","Dó–Ré#5"],
+        ["Décima menor","15","Menor","Dó–Mib5"],
+        ["Décima maior","16","Maior","Dó–Mi5"],
+        ["Décima primeira justa","17","Justo","Dó–Fá5"],
+        ["Décima primeira aumentada","18","Aumentado","Dó–Fá#5"],
+        ["Décima segunda justa","19","Justo","Dó–Sol5"],
+        ["Décima terceira menor","20","Menor","Dó–Láb5"],
+        ["Décima terceira maior","21","Maior","Dó–Lá5"],
+        ["Décima quarta menor","22","Menor","Dó–Sib5"],
+        ["Décima quarta maior","23","Maior","Dó–Si5"],
+        ["Décima quinta justa","24","Justo","Dó–Dó6"]
+      ]
+    },
+
+    exemplos:[
+      "Dó4–Ré4: segunda maior, com dois semitons.",
+      "Dó4–Mib4: terça menor, com três semitons.",
+      "Dó4–Mi4: terça maior, com quatro semitons.",
+      "Dó4–Fá4: quarta justa, com cinco semitons.",
+      "Dó4–Fá#4: quarta aumentada, com seis semitons.",
+      "Dó4–Solb4: quinta diminuta, também com seis semitons, mas com grafia e função intervalar diferentes.",
+      "Dó4–Sol4: quinta justa, com sete semitons.",
+      "Dó4–Lá4: sexta maior, com nove semitons.",
+      "Dó4–Si4: sétima maior, com onze semitons.",
+      "Dó4–Dó5: oitava justa, com doze semitons.",
+      "Dó4–Ré5: nona maior, com quatorze semitons, equivalente a uma segunda maior mais uma oitava.",
+      "Dó4–Mi5: décima maior, com dezesseis semitons, equivalente a uma terça maior mais uma oitava.",
+      "Dó4–Sol5: décima segunda justa, com dezenove semitons, equivalente a uma quinta justa mais uma oitava.",
+      "Dó4–Lá5: décima terceira maior, com vinte e um semitons, equivalente a uma sexta maior mais uma oitava.",
+      "A terça maior Dó–Mi, quando invertida, transforma-se em sexta menor Mi–Dó.",
+      "A quinta justa Dó–Sol, quando invertida, transforma-se em quarta justa Sol–Dó.",
+      "A segunda menor Dó–Réb, quando invertida, transforma-se em sétima maior Réb–Dó."
+    ],
+
+    erros:[
+      "Contar intervalos sem incluir a nota inicial. A contagem diatônica é inclusiva.",
+      "Confundir quantidade de semitons com número intervalar. Seis semitons podem formar uma quarta aumentada ou uma quinta diminuta.",
+      "Classificar um intervalo somente pelo teclado ou pela quantidade de teclas percorridas, ignorando a grafia musical.",
+      "Tratar Dó# e Réb como grafias equivalentes em todos os contextos. Embora possam soar iguais no temperamento igual, possuem funções e nomes intervalares diferentes.",
+      "Confundir intervalo melódico com harmônico. O primeiro ocorre sucessivamente e o segundo simultaneamente.",
+      "Considerar que todo intervalo dentro de uma oitava é simples sem observar seu número. A oitava é o limite superior da classificação simples.",
+      "Confundir nona com segunda, décima com terça ou décima segunda com quinta. São intervalos compostos e possuem registros diferentes.",
+      "Esquecer que a inversão de uma terça é uma sexta, e não uma quinta.",
+      "Afirmar que a inversão de um intervalo maior continua maior. A qualidade se transforma em menor.",
+      "Confundir intervalo aumentado com maior. São classificações diferentes.",
+      "Confundir intervalo diminuto com menor. São classificações diferentes.",
+      "Afirmar que quarta aumentada e quinta diminuta são o mesmo intervalo em qualquer contexto. São enarmonicamente equivalentes em semitons, mas possuem identidades diatônicas distintas.",
+      "Usar a fórmula de inversão N + N inverso = 9 diretamente em intervalos compostos sem antes reduzi-los à forma simples.",
+      "Confundir proporção de frequência com quantidade de semitons. A proporção é uma relação física; os semitons dependem do sistema de afinação adotado.",
+      "Supor que todas as relações intervalares são matematicamente idênticas em qualquer sistema de afinação. As quantidades em cents podem variar conforme o sistema utilizado."
+    ],
+
+    notacao:[
+      "Os intervalos são representados pelo número ordinal e pela qualidade: 2ª menor, 2ª maior, 3ª menor, 3ª maior, 4ª justa, 4ª aumentada, 5ª diminuta, 5ª justa, 6ª maior e 7ª menor.",
+      "As abreviações mais utilizadas incluem: m para menor, M para maior, J para justa, A para aumentada e d para diminuta. A convenção de abreviação pode variar entre publicações.",
+      "Intervalos compostos podem ser escritos por extenso ou por números ordinais: 9ª, 10ª, 11ª, 12ª, 13ª, 14ª e 15ª.",
+      "A representação melódica utiliza duas notas sucessivas. A representação harmônica utiliza duas notas simultâneas.",
+      "A direção ascendente ou descendente deve ser considerada na análise. A classificação tradicional identifica a distância e a qualidade, enquanto a direção descreve o movimento entre as notas.",
+      "Na escrita musical, a grafia enarmônica deve ser preservada. Fá# e Solb não devem ser substituídos automaticamente quando a análise depende da função intervalar.",
+      "Em sistemas digitais, uma nota deve ser armazenada com letra, alteração e oitava. O número MIDI isolado não é suficiente para preservar a identidade diatônica do intervalo."
+    ],
+
+    relacoes:[
+      "Depende de: Notas e alturas musicais, para identificação das notas, alterações e registros; Acústica e fundamentos matemáticos, para compreender frequências, proporções, semitons e relações físicas.",
+      "Alimenta: Classificação e inversão de intervalos; Escalas e modos; Formação de acordes; Tríades e tétrades; Consonâncias e dissonâncias; Melodia; Harmonia vocal e instrumental.",
+      "É fundamental para a construção de escalas, identificação de acordes, condução de vozes, transposição, análise harmônica e composição.",
+      "Limites desta ficha: a classificação detalhada das funções harmônicas pertence ao bloco Harmonia; a percepção de consonância, dissonância e tensão será aprofundada no módulo específico de Consonâncias e dissonâncias."
+    ],
+
+    fontes:[
+      "Referências gerais: Walter Piston — Harmony.",
+      "Arnold Schoenberg — Theory of Harmony.",
+      "Aldwell, Schachter e Cadwallader — Harmony and Voice Leading.",
+      "Stefan Kostka, Dorothy Payne e Byron Almén — Tonal Harmony.",
+      "Benward e Saker — Music in Theory and Practice.",
+      "Referências de acústica: Rossing, Moore e Wheeler — The Science of Sound.",
+      "As classificações desta ficha seguem a teoria tradicional dos intervalos no sistema tonal ocidental e o temperamento igual de doze semitons, quando indicada a equivalência cromática."
+    ],
+
+    dados:{
+      id:"fundamentos/intervalos-simples-e-compostos",
+      sistema:"temperamento igual de 12 semitons",
+      convencaoOitava:"dó central = dó4 = MIDI 60",
+      simples:{
+        minimo:1,
+        maximo:8
+      },
+      composto:{
+        minimo:9,
+        reducao:"((numero - 1) mod 7) + 1"
+      },
+      inversao:{
+        formula:"9 - numero",
+        regras:{
+          justa:"justa",
+          maior:"menor",
+          menor:"maior",
+          aumentada:"diminuta",
+          diminuta:"aumentada"
+        }
+      },
+      qualidades:{
+        justos:[0,5,7,12],
+        maiores:[2,4,9,11],
+        menores:[1,3,8,10],
+        aumentados:[6,8],
+        diminutos:[6]
+      },
+      frequencia:{
+        formula:"2^(semitons/12)",
+        centsPorSemitom:100,
+        centsPorOitava:1200
+      },
+      limites:{
+        numeroMinimo:1,
+        semitonsMinimo:0,
+        faixaMidi:[0,127]
+      },
+      observacoes:[
+        "A classificação utiliza simultaneamente número diatônico e distância cromática.",
+        "Intervalos enarmônicos podem compartilhar a mesma quantidade de semitons.",
+        "A direção é independente da qualidade intervalar.",
+        "Intervalos compostos conservam a qualidade da forma simples correspondente quando acrescentadas oitavas justas.",
+        "A classificação de intervalos descendentes deve considerar a grafia e a direção das notas."
+      ]
+    },
+
+    testes:[
+      {
+        entrada:"Dó4 → Ré4",
+        esperado:"2 semitons · segunda maior",
+        obtido:function(){
+          var i = analisar("Dó4","Ré4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Mib4",
+        esperado:"3 semitons · terça menor",
+        obtido:function(){
+          var i = analisar("Dó4","Mib4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Mi4",
+        esperado:"4 semitons · terça maior",
+        obtido:function(){
+          var i = analisar("Dó4","Mi4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Fá4",
+        esperado:"5 semitons · quarta justa",
+        obtido:function(){
+          var i = analisar("Dó4","Fá4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Fá#4",
+        esperado:"6 semitons · quarta aumentada",
+        obtido:function(){
+          var i = analisar("Dó4","Fá#4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Solb4",
+        esperado:"6 semitons · quinta diminuta",
+        obtido:function(){
+          var i = analisar("Dó4","Solb4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Sol4",
+        esperado:"7 semitons · quinta justa",
+        obtido:function(){
+          var i = analisar("Dó4","Sol4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Lá4",
+        esperado:"9 semitons · sexta maior",
+        obtido:function(){
+          var i = analisar("Dó4","Lá4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Si4",
+        esperado:"11 semitons · sétima maior",
+        obtido:function(){
+          var i = analisar("Dó4","Si4");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Dó5",
+        esperado:"12 semitons · oitava justa",
+        obtido:function(){
+          var i = analisar("Dó4","Dó5");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Ré5",
+        esperado:"14 semitons · nona maior",
+        obtido:function(){
+          var i = analisar("Dó4","Ré5");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Mi5",
+        esperado:"16 semitons · décima maior",
+        obtido:function(){
+          var i = analisar("Dó4","Mi5");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Sol5",
+        esperado:"19 semitons · décima segunda justa",
+        obtido:function(){
+          var i = analisar("Dó4","Sol5");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Lá5",
+        esperado:"21 semitons · décima terceira maior",
+        obtido:function(){
+          var i = analisar("Dó4","Lá5");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Dó6",
+        esperado:"24 semitons · décima quinta justa",
+        obtido:function(){
+          var i = analisar("Dó4","Dó6");
+          return i ? i.semitons + " semitons · " + i.nome : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Mi4: inversão",
+        esperado:"3ª maior → 6ª menor",
+        obtido:function(){
+          var i = analisar("Dó4","Mi4");
+          return i ? i.nome + " → " + qualidade(6,9) + " sexta" : "inválido";
+        }
+      },
+      {
+        entrada:"Dó4 → Sol4: inversão",
+        esperado:"5ª justa → 4ª justa",
+        obtido:function(){
+          var i = analisar("Dó4","Sol4");
+          return i ? i.nome + " → " + qualidade(4,5) + " quarta" : "inválido";
+        }
+      },
+      {
+        entrada:"Dó#4 e Réb4",
+        esperado:"mesma altura · grafias diferentes",
+        obtido:function(){
+          return N.midi("Dó#4") === N.midi("Réb4") &&
+            N.nome("Dó#4") !== N.nome("Réb4")
+            ? "mesma altura · grafias diferentes"
+            : "divergência";
+        }
+      },
+      {
+        entrada:"Texto inválido Xyz4",
+        esperado:"inválido",
+        obtido:function(){
+          return N.parse("Xyz4") === null ? "inválido" : "aceito";
+        }
+      }
+    ],
+
+    experimente:{
+      html:
+        '<div class="pc-fi-calc">' +
+          '<label>Primeira nota<input type="text" data-fi-n1 value="Dó4" placeholder="Ex.: Dó4, Fá#3, C4"></label>' +
+          '<label>Segunda nota<input type="text" data-fi-n2 value="Mi5" placeholder="Ex.: Mi5, Solb4, G4"></label>' +
+        '</div>' +
+        '<button type="button" class="at-btn gold" data-fi-calc style="margin-top:8px">ANALISAR INTERVALO</button>' +
+        '<pre class="pc-fi-saida" data-fi-saida></pre>',
+
+      ligar:function(ev,cont){
+        if(!ev.target.closest("[data-fi-calc]")) return;
+
+        var s = cont.querySelector("[data-fi-saida]");
+        var a = cont.querySelector("[data-fi-n1]").value.trim();
+        var b = cont.querySelector("[data-fi-n2]").value.trim();
+
+        var p1 = N.parse(a);
+        var p2 = N.parse(b);
+
+        if(!p1 || !p2){
+          s.textContent = "Nota inválida. Utilize exemplos como Dó4, Mi5, Fá#3, Solb4 ou C4.";
+          return;
+        }
+
+        var i = analisar(a,b);
+
+        if(!i){
+          s.textContent = "Não foi possível classificar este intervalo. Verifique as notas e suas oitavas.";
+          return;
+        }
+
+        var m1 = N.midi(p1);
+        var m2 = N.midi(p2);
+        var f1 = N.freq(m1);
+        var f2 = N.freq(m2);
+
+        var semitonsAbs = Math.abs(i.semitons);
+        var razao = Math.pow(2,semitonsAbs / 12);
+        var cents = semitonsAbs * 100;
+
+        var simples = reducao(i.numero);
+        var oitavas = Math.floor((i.numero - 1) / 7);
+
+        var inversaoNome = null;
+
+        if(i.simples && i.semitons >= 0){
+          var numeroInv = inversao(i.numero);
+          var semitonsInv = 12 - i.semitons;
+          var nomeInv = qualidade(numeroInv,semitonsInv);
+
+          inversaoNome = nomeInv + " " +
+            (nomes[(numeroInv - 1) % 7] || "intervalo");
+        }
+
+        var out = [
+          "ANÁLISE INTERVALAR",
+          "Primeira nota: " + N.nome(p1),
+          "Segunda nota: " + N.nome(p2),
+          "Classificação: " + i.nome,
+          "Número intervalar: " + i.numero + "ª",
+          "Quantidade de semitons: " + i.semitons,
+          "Direção: " + i.direcao,
+          "Tipo: " + (i.simples ? "intervalo simples" : "intervalo composto"),
+          "Redução simples: " + simples + "ª",
+          "Oitavas adicionais: " + oitavas,
+          "Distância cromática absoluta: " + semitonsAbs + " semitons",
+          "Distância em cents: " + fx(cents) + " cents",
+          "Razão de frequências no temperamento igual: " + fx(razao) + ":1",
+          "Frequência da primeira nota: " + fx(f1) + " Hz",
+          "Frequência da segunda nota: " + fx(f2) + " Hz",
+          "Frequência relativa: " + fx(f2 / f1),
+          inversaoNome ? "Inversão: " + inversaoNome : "Inversão: consulte a grafia e a direção das notas.",
+          "Sistema de referência: temperamento igual de 12 semitons."
+        ];
+
+        s.textContent = out.join("\n");
+      }
+    }
+  });
+})();
+</script>
+<!-- ===== FIM: FICHA 07 — INTERVALOS SIMPLES E COMPOSTOS ===== -->
+
+<!-- ---------- 3. FICHA 08 — Fundamentos Musicais / Consonâncias e dissonâncias ---------- -->
+<script>
+(function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+
+  var N = window.MaestroNucleo;
+  var fx = function(x){ return Number(x).toFixed(2); };
+
+  var intervalos = [
+    {semitons:0,nome:"Uníssono",classe:"Consonância perfeita"},
+    {semitons:1,nome:"Segunda menor",classe:"Dissonância"},
+    {semitons:2,nome:"Segunda maior",classe:"Dissonância"},
+    {semitons:3,nome:"Terça menor",classe:"Consonância imperfeita"},
+    {semitons:4,nome:"Terça maior",classe:"Consonância imperfeita"},
+    {semitons:5,nome:"Quarta justa",classe:"Consonância perfeita"},
+    {semitons:6,nome:"Quarta aumentada / quinta diminuta",classe:"Dissonância"},
+    {semitons:7,nome:"Quinta justa",classe:"Consonância perfeita"},
+    {semitons:8,nome:"Sexta menor",classe:"Consonância imperfeita"},
+    {semitons:9,nome:"Sexta maior",classe:"Consonância imperfeita"},
+    {semitons:10,nome:"Sétima menor",classe:"Dissonância"},
+    {semitons:11,nome:"Sétima maior",classe:"Dissonância"},
+    {semitons:12,nome:"Oitava justa",classe:"Consonância perfeita"}
+  ];
+
+  var razaoIdeal = function(semitons){
+    return Math.pow(2,semitons/12);
+  };
+
+  var cents = function(f1,f2){
+    return 1200 * Math.log2(f2/f1);
+  };
+
+  var classificar = function(semitons){
+    var s = Math.abs(semitons) % 12;
+    var registro = intervalos.find(function(i){
+      return i.semitons === s;
+    });
+    return registro ? registro.classe : "Intervalo não classificado";
+  };
+
+  window.MaestroFichas.registrar({
+    modulo:"Fundamentos Musicais",
+    titulo:"Consonâncias e dissonâncias",
+    tipos:[
+      "Acústica musical",
+      "Percepção auditiva",
+      "Harmonia tonal",
+      "Contraponto"
+    ],
+    depende:[
+      "fundamentos/notas-e-alturas-musicais",
+      "fundamentos/acustica-e-fundamentos-matematicos",
+      "fundamentos/intervalos-simples-e-compostos"
+    ],
+    revisada:false,
+
+    definicao:[
+      "Consonância e dissonância são conceitos utilizados para descrever diferentes relações sonoras entre notas simultâneas. A consonância está tradicionalmente associada à estabilidade, integração e repouso relativo, enquanto a dissonância está associada à tensão, instabilidade e necessidade potencial de resolução em determinados contextos musicais.",
+      "Consonância não significa simplesmente que dois sons são agradáveis, nem dissonância significa que são desagradáveis. Esses conceitos dependem do contexto histórico, estilístico, harmônico, contrapontístico e perceptivo.",
+      "Na teoria musical tradicional ocidental, os intervalos são frequentemente classificados em consonâncias perfeitas, consonâncias imperfeitas e dissonâncias. Essa classificação constitui uma convenção teórica importante para o estudo da harmonia e do contraponto.",
+      "As consonâncias perfeitas incluem o uníssono justo, a quarta justa, a quinta justa e a oitava justa. Na prática contrapontística, a quarta justa possui tratamento particular: quando formada entre uma voz superior e o baixo, pode funcionar como dissonância.",
+      "As consonâncias imperfeitas incluem terças e sextas maiores e menores. São intervalos tradicionalmente considerados consonantes, mas apresentam comportamento diferente das consonâncias perfeitas na condução das vozes.",
+      "As dissonâncias incluem segundas, sétimas, intervalos aumentados e diminutos, além de determinados intervalos compostos. Sua classificação e seu tratamento dependem da linguagem musical utilizada.",
+      "A consonância perfeita apresenta uma relação acústica historicamente associada a proporções simples entre frequências, especialmente 1:1, 2:1 e 3:2. Essas proporções correspondem ao uníssono, à oitava e à quinta justa em sistemas de afinação que preservam tais relações.",
+      "As terças e sextas podem ser aproximadas por proporções simples, como 5:4 e 6:5 para as terças maior e menor na afinação justa. Entretanto, no temperamento igual, essas relações são aproximadas e não coincidem exatamente com as razões puras.",
+      "A percepção de consonância também está relacionada à estrutura espectral dos sons. Componentes harmônicos que apresentam relações simples podem produzir maior integração perceptiva, enquanto componentes próximos podem gerar batimentos e rugosidade.",
+      "Batimentos ocorrem quando duas frequências próximas se sobrepõem, provocando variações periódicas na amplitude percebida. A frequência dos batimentos corresponde à diferença absoluta entre as frequências componentes.",
+      "Rugosidade é uma sensação auditiva relacionada à interação entre componentes espectrais próximos, especialmente quando produzem flutuações rápidas de amplitude. Ela contribui para a percepção de aspereza ou tensão sonora.",
+      "Dissonância tonal não é determinada exclusivamente pela acústica. Uma nota pode ser dissonante em relação à estrutura harmônica e, ainda assim, ser tratada como elemento expressivo, melódico ou estrutural dentro de uma composição.",
+      "Na harmonia tonal, a dissonância frequentemente participa de movimentos de tensão e resolução. A preparação, a ocorrência e a resolução de uma dissonância constituem princípios importantes da escrita tradicional.",
+      "No contraponto, determinadas dissonâncias exigem preparação, movimento por grau conjunto e resolução, conforme a espécie contrapontística e as regras estilísticas adotadas. Outras podem ser introduzidas livremente, dependendo de sua função.",
+      "As principais formas de dissonância melódica ou harmônica incluem notas de passagem, bordaduras, suspensões, retardos, antecipações, escapadas, apojaturas e notas de cambiata.",
+      "Uma suspensão é uma dissonância produzida pela permanência de uma nota de um acorde anterior sobre uma nova harmonia, na qual ela passa a formar tensão. Tradicionalmente, é preparada como consonância, mantida como dissonância e resolvida por movimento descendente conjunto.",
+      "A apojatura é uma nota dissonante que alcança a harmonia por salto ou movimento expressivo e normalmente resolve por grau conjunto. Diferentemente da suspensão, não exige necessariamente preparação como consonância.",
+      "Uma nota de passagem conecta duas notas consonantes por movimento conjunto, produzindo uma dissonância intermediária. Pode ocorrer em posição forte ou fraca, conforme a organização rítmica e o estilo.",
+      "Uma bordadura parte de uma nota estrutural, desloca-se por grau conjunto para uma nota vizinha e retorna à nota inicial. Quando a nota vizinha não pertence à harmonia, pode gerar dissonância.",
+      "A consonância e a dissonância devem ser estudadas em três dimensões complementares: acústica, percepção e organização musical. Nenhuma delas, isoladamente, explica todos os usos históricos e estilísticos desses conceitos."
+    ],
+
+    formulas:[
+      {
+        nome:"Razão entre frequências",
+        texto:"R = f₂ / f₁",
+        nota:"Expressa a proporção entre duas frequências. Razões simples são frequentemente associadas a intervalos consonantes na tradição acústica."
+      },
+      {
+        nome:"Intervalo em cents",
+        texto:"C = 1200 × log₂(f₂ / f₁)",
+        nota:"Permite comparar a distância entre frequências em uma escala logarítmica."
+      },
+      {
+        nome:"Frequência no temperamento igual",
+        texto:"f₂ = f₁ × 2^(S/12)",
+        nota:"S é a distância em semitons. Essa relação descreve a divisão da oitava em doze partes iguais."
+      },
+      {
+        nome:"Batimentos",
+        texto:"fᵦ = |f₁ − f₂|",
+        nota:"A diferença entre duas frequências próximas determina a frequência dos batimentos."
+      },
+      {
+        nome:"Razão da oitava justa",
+        texto:"R = 2:1",
+        nota:"Uma frequência duplicada corresponde à oitava superior."
+      },
+      {
+        nome:"Razão da quinta justa na afinação justa",
+        texto:"R = 3:2",
+        nota:"A frequência superior corresponde a uma vez e meia a frequência inferior."
+      },
+      {
+        nome:"Razão da terça maior na afinação justa",
+        texto:"R = 5:4",
+        nota:"Equivale a aproximadamente 386,31 cents."
+      },
+      {
+        nome:"Razão da terça menor na afinação justa",
+        texto:"R = 6:5",
+        nota:"Equivale a aproximadamente 315,64 cents."
+      },
+      {
+        nome:"Intensidade e pressão sonora",
+        texto:"I = p² / Z",
+        nota:"Em uma onda progressiva plana, a intensidade está relacionada ao quadrado da pressão eficaz e à impedância acústica do meio."
+      }
+    ],
+
+    tabela:{
+      titulo:"Classificação tradicional dos intervalos",
+      cabecalho:[
+        "Intervalo",
+        "Semitons",
+        "Classificação tradicional",
+        "Observação"
+      ],
+      linhas:[
+        ["Uníssono justo","0","Consonância perfeita","Mesma altura"],
+        ["Segunda menor","1","Dissonância","Tensão intervalar"],
+        ["Segunda maior","2","Dissonância","Tensão intervalar"],
+        ["Terça menor","3","Consonância imperfeita","Estabilidade relativa"],
+        ["Terça maior","4","Consonância imperfeita","Estabilidade relativa"],
+        ["Quarta justa","5","Consonância perfeita*","Tratamento especial sobre o baixo"],
+        ["Quarta aumentada","6","Dissonância","Intervalo aumentado"],
+        ["Quinta diminuta","6","Dissonância","Intervalo diminuto"],
+        ["Quinta justa","7","Consonância perfeita","Relação acústica simples"],
+        ["Sexta menor","8","Consonância imperfeita","Estabilidade relativa"],
+        ["Sexta maior","9","Consonância imperfeita","Estabilidade relativa"],
+        ["Sétima menor","10","Dissonância","Tensão intervalar"],
+        ["Sétima maior","11","Dissonância","Tensão intervalar"],
+        ["Oitava justa","12","Consonância perfeita","Duplicação de frequência"]
+      ]
+    },
+
+    exemplos:[
+      "Dó4–Dó5: oitava justa, consonância perfeita, com razão de frequências 2:1.",
+      "Dó4–Sol4: quinta justa, consonância perfeita, com razão 3:2 na afinação justa.",
+      "Dó4–Mi4: terça maior, consonância imperfeita, com razão 5:4 na afinação justa.",
+      "Dó4–Mib4: terça menor, consonância imperfeita, com razão 6:5 na afinação justa.",
+      "Dó4–Ré4: segunda maior, tradicionalmente classificada como dissonância.",
+      "Dó4–Si4: sétima maior, tradicionalmente classificada como dissonância.",
+      "Dó4–Fá4: quarta justa. Embora pertença à família das consonâncias perfeitas, pode ser tratada como dissonância quando formada contra o baixo no contraponto tonal tradicional.",
+      "Duas frequências de 440 Hz e 442 Hz produzem dois batimentos por segundo.",
+      "Na afinação justa, a terça maior 5:4 possui aproximadamente 386,31 cents; no temperamento igual, possui 400 cents.",
+      "Na afinação justa, a quinta 3:2 possui aproximadamente 701,96 cents; no temperamento igual, possui 700 cents.",
+      "Uma suspensão 4–3 sobre o baixo de Dó pode apresentar Fá como dissonância, resolvendo para Mi.",
+      "Uma suspensão 7–6 pode manter uma nota dissonante sobre a nova harmonia e resolvê-la descendentemente por grau conjunto.",
+      "Uma nota de passagem entre Dó e Mi pode utilizar Ré como ligação melódica, dependendo da harmonia e da posição rítmica.",
+      "Uma bordadura pode partir de Mi, subir para Fá e retornar a Mi, produzindo tensão momentânea conforme o contexto harmônico."
+    ],
+
+    erros:[
+      "Definir consonância como som bonito e dissonância como som feio. São categorias teóricas, acústicas, perceptivas e históricas mais complexas.",
+      "Afirmar que a consonância depende exclusivamente de proporções matemáticas simples. A percepção envolve também espectro, registro, intensidade, duração e contexto.",
+      "Confundir consonância perfeita com consonância imperfeita. As duas categorias possuem comportamentos diferentes na teoria tradicional.",
+      "Classificar automaticamente a quarta justa como consonância em qualquer situação. Sobre o baixo, pode funcionar como dissonância no contraponto tradicional.",
+      "Confundir dissonância acústica com dissonância funcional. Um intervalo pode ser consonante isoladamente e apresentar tensão em determinado contexto harmônico.",
+      "Supor que uma dissonância precisa sempre ser resolvida imediatamente. A música de diferentes períodos e estilos emprega dissonâncias com tratamentos variados.",
+      "Confundir batimentos com rugosidade. Batimentos correspondem a flutuações periódicas de amplitude; rugosidade é uma sensação perceptiva mais complexa.",
+      "Considerar que todos os instrumentos possuem componentes espectrais perfeitamente harmônicos.",
+      "Tratar as razões da afinação justa como se fossem exatamente iguais às do temperamento igual.",
+      "Confundir suspensão com apojatura. A suspensão exige preparação e retenção de uma nota; a apojatura não exige necessariamente essa preparação.",
+      "Classificar toda nota fora do acorde como erro. Notas não pertencentes ao acorde podem exercer funções melódicas e expressivas legítimas.",
+      "Desconsiderar a posição rítmica, a condução das vozes e o contexto tonal na análise de uma dissonância.",
+      "Aplicar regras de contraponto renascentista ou tonal a toda música contemporânea sem considerar a linguagem estilística."
+    ],
+
+    notacao:[
+      "As abreviações consonância perfeita e consonância imperfeita podem aparecer como CP e CI em materiais analíticos, embora não exista uma abreviação universal obrigatória.",
+      "D representa frequentemente dissonância em análises didáticas, mas a notação pode variar conforme o método.",
+      "As razões acústicas são representadas como proporções entre frequências: 2:1, 3:2, 5:4 e 6:5.",
+      "O símbolo f representa frequência e fᵦ representa a frequência dos batimentos.",
+      "O símbolo C pode representar a distância em cents, unidade logarítmica de intervalo.",
+      "As suspensões são identificadas tradicionalmente por números que representam o intervalo formado sobre o baixo e sua resolução, como 4–3, 7–6, 9–8 e 2–3.",
+      "As notas de passagem e bordaduras são identificadas pela relação melódica com as notas estruturais e pela sua posição na harmonia.",
+      "A análise deve preservar a grafia das notas. Uma quarta aumentada e uma quinta diminuta podem compartilhar seis semitons, mas não possuem a mesma identidade diatônica."
+    ],
+
+    relacoes:[
+      "Depende de: Notas e alturas musicais; Acústica e fundamentos matemáticos; Intervalos simples e compostos.",
+      "Alimenta: Escalas e modos; Formação de acordes; Tríades e tétrades; Funções harmônicas; Cadências e resoluções; Contraponto; Condução de vozes.",
+      "Relaciona-se diretamente com a organização da tensão e do repouso, a percepção de estabilidade, a construção de acordes e o desenvolvimento de linhas melódicas.",
+      "No bloco Harmonia, este conhecimento será aplicado à análise de acordes, progressões, dominantes, resoluções e modulações.",
+      "Limites desta ficha: o tratamento detalhado das dissonâncias em cada período histórico, incluindo contraponto de espécies, harmonia modal, atonalidade e técnicas contemporâneas, será desenvolvido nos módulos específicos."
+    ],
+
+    fontes:[
+      "Walter Piston — Harmony.",
+      "Aldwell, Schachter e Cadwallader — Harmony and Voice Leading.",
+      "Stefan Kostka, Dorothy Payne e Byron Almén — Tonal Harmony.",
+      "Arnold Schoenberg — Theory of Harmony.",
+      "Knud Jeppesen — Counterpoint: The Polyphonic Vocal Style of the Sixteenth Century.",
+      "Paul Hindemith — The Craft of Musical Composition.",
+      "Rossing, Moore e Wheeler — The Science of Sound.",
+      "Plomp e Levelt — Tonal Consonance and Critical Bandwidth.",
+      "A classificação intervalar desta ficha segue a tradição teórica ocidental. A classificação não representa uma regra universal para todas as culturas, épocas e sistemas musicais."
+    ],
+
+    dados:{
+      id:"fundamentos/consonancias-e-dissonancias",
+      sistema:"teoria tradicional ocidental e temperamento igual de 12 semitons",
+      categorias:{
+        perfeitas:[
+          "uníssono justo",
+          "quarta justa",
+          "quinta justa",
+          "oitava justa"
+        ],
+        imperfeitas:[
+          "terça menor",
+          "terça maior",
+          "sexta menor",
+          "sexta maior"
+        ],
+        dissonantes:[
+          "segunda menor",
+          "segunda maior",
+          "quarta aumentada",
+          "quinta diminuta",
+          "sétima menor",
+          "sétima maior"
+        ]
+      },
+      proporcoesAfinaçãoJusta:{
+        unissono:"1:1",
+        oitava:"2:1",
+        quintaJusta:"3:2",
+        quartaJusta:"4:3",
+        terçaMaior:"5:4",
+        terçaMenor:"6:5",
+        sextaMaior:"5:3",
+        sextaMenor:"8:5"
+      },
+      referencias:{
+        pressaoAr:0.000020,
+        intensidadeAr:0.000000000001,
+        centsOitava:1200,
+        centsSemitom:100
+      },
+      tratamentoEspecial:{
+        quartaJusta:"Pode funcionar como dissonância quando formada contra o baixo no contraponto tradicional.",
+        contexto:"A classificação depende da posição, função e linguagem musical."
+      },
+      dissonanciasMelodicas:[
+        "nota de passagem",
+        "bordadura",
+        "suspensão",
+        "retardo",
+        "antecipação",
+        "escapada",
+        "apojatura",
+        "cambiata"
+      ],
+      observacoes:[
+        "Consonância e dissonância possuem dimensões acústicas, perceptivas e estilísticas.",
+        "As proporções de afinação justa não coincidem exatamente com o temperamento igual.",
+        "A classificação tradicional não é universal para todas as culturas musicais.",
+        "A quarta justa possui tratamento contrapontístico particular."
+      ]
+    },
+
+    testes:[
+      {
+        entrada:"Uníssono → classificação",
+        esperado:"Consonância perfeita",
+        obtido:function(){
+          return classificar(0);
+        }
+      },
+      {
+        entrada:"Segunda menor → classificação",
+        esperado:"Dissonância",
+        obtido:function(){
+          return classificar(1);
+        }
+      },
+      {
+        entrada:"Segunda maior → classificação",
+        esperado:"Dissonância",
+        obtido:function(){
+          return classificar(2);
+        }
+      },
+      {
+        entrada:"Terça menor → classificação",
+        esperado:"Consonância imperfeita",
+        obtido:function(){
+          return classificar(3);
+        }
+      },
+      {
+        entrada:"Terça maior → classificação",
+        esperado:"Consonância imperfeita",
+        obtido:function(){
+          return classificar(4);
+        }
+      },
+      {
+        entrada:"Quarta justa → classificação",
+        esperado:"Consonância perfeita",
+        obtido:function(){
+          return classificar(5);
+        }
+      },
+      {
+        entrada:"Quarta aumentada → classificação",
+        esperado:"Dissonância",
+        obtido:function(){
+          return classificar(6);
+        }
+      },
+      {
+        entrada:"Quinta justa → classificação",
+        esperado:"Consonância perfeita",
+        obtido:function(){
+          return classificar(7);
+        }
+      },
+      {
+        entrada:"Sexta maior → classificação",
+        esperado:"Consonância imperfeita",
+        obtido:function(){
+          return classificar(9);
+        }
+      },
+      {
+        entrada:"Sétima menor → classificação",
+        esperado:"Dissonância",
+        obtido:function(){
+          return classificar(10);
+        }
+      },
+      {
+        entrada:"Oitava justa → classificação",
+        esperado:"Consonância perfeita",
+        obtido:function(){
+          return classificar(12);
+        }
+      },
+      {
+        entrada:"Razão 2:1 → cents",
+        esperado:"1200.00",
+        obtido:function(){
+          return fx(cents(440,880));
+        }
+      },
+      {
+        entrada:"Razão 3:2 → cents",
+        esperado:"701.96",
+        obtido:function(){
+          return fx(cents(440,660));
+        }
+      },
+      {
+        entrada:"Razão 5:4 → cents",
+        esperado:"386.31",
+        obtido:function(){
+          return fx(cents(400,500));
+        }
+      },
+      {
+        entrada:"Razão 6:5 → cents",
+        esperado:"315.64",
+        obtido:function(){
+          return fx(cents(400,480));
+        }
+      },
+      {
+        entrada:"440 Hz e 442 Hz → batimentos",
+        esperado:"2.00 Hz",
+        obtido:function(){
+          return fx(Math.abs(440-442)) + " Hz";
+        }
+      },
+      {
+        entrada:"Quinta justa no temperamento igual",
+        esperado:"700.00 cents",
+        obtido:function(){
+          return fx(1200 * Math.log2(Math.pow(2,7/12)));
+        }
+      },
+      {
+        entrada:"Quinta justa na afinação justa",
+        esperado:"701.96 cents",
+        obtido:function(){
+          return fx(cents(2,3));
+        }
+      }
+    ],
+
+    experimente:{
+      html:
+        '<div class="pc-fi-calc">' +
+          '<label>Primeira nota<input type="text" data-fi-n1 value="Dó4" placeholder="Ex.: Dó4"></label>' +
+          '<label>Segunda nota<input type="text" data-fi-n2 value="Mi4" placeholder="Ex.: Mi4"></label>' +
+          '<label>Sistema de referência' +
+            '<select data-fi-sistema>' +
+              '<option value="igual">Temperamento igual</option>' +
+              '<option value="justa">Afinação justa (aproximação)</option>' +
+            '</select>' +
+          '</label>' +
+        '</div>' +
+        '<button type="button" class="at-btn gold" data-fi-calc style="margin-top:8px">ANALISAR CONSONÂNCIA</button>' +
+        '<pre class="pc-fi-saida" data-fi-saida></pre>',
+
+      ligar:function(ev,cont){
+        if(!ev.target.closest("[data-fi-calc]")) return;
+
+        var s = cont.querySelector("[data-fi-saida]");
+        var a = cont.querySelector("[data-fi-n1]").value.trim();
+        var b = cont.querySelector("[data-fi-n2]").value.trim();
+        var sistema = cont.querySelector("[data-fi-sistema]").value;
+
+        var p1 = N.parse(a);
+        var p2 = N.parse(b);
+
+        if(!p1 || !p2){
+          s.textContent = "Nota inválida. Utilize exemplos como Dó4, Mi4, Fá#3 ou Solb4.";
+          return;
+        }
+
+        var m1 = N.midi(p1);
+        var m2 = N.midi(p2);
+        var semitons = Math.abs(m2-m1);
+        var f1 = N.freq(m1);
+        var f2 = N.freq(m2);
+        var razao = Math.pow(2,semitons/12);
+        var classificacao = classificar(semitons);
+
+        var nomeIntervalo = N.intervalo(a,b);
+        var centsIgual = semitons * 100;
+
+        var out = [
+          "ANÁLISE DE CONSONÂNCIA E DISSONÂNCIA",
+          "Primeira nota: " + N.nome(p1),
+          "Segunda nota: " + N.nome(p2),
+          "Intervalo: " + nomeIntervalo.nome,
+          "Distância: " + semitons + " semitons",
+          "Frequência da primeira nota: " + fx(f1) + " Hz",
+          "Frequência da segunda nota: " + fx(f2) + " Hz",
+          "Razão de frequências: " + fx(Math.max(f1,f2)/Math.min(f1,f2)),
+          "Classificação intervalar tradicional: " + classificacao,
+          "Sistema selecionado: " + (sistema === "igual" ? "Temperamento igual" : "Afinação justa"),
+          "Distância no temperamento igual: " + fx(centsIgual) + " cents",
+          "Observação: a classificação tradicional não determina sozinha a função harmônica."
+        ];
+
+        if(sistema === "justa"){
+          out.push(
+            "A afinação justa utiliza proporções simples específicas. A razão exata depende da função e da grafia do intervalo.",
+            "A distância em cents da razão adotada deve ser calculada separadamente; o sistema não atribui uma única razão universal a cada intervalo sem contexto."
+          );
+        }else{
+          out.push(
+            "Razão teórica no temperamento igual: " + fx(razao) + ":1"
+          );
+        }
+
+        if(semitons === 5){
+          out.push("Atenção: a quarta justa pode assumir função dissonante quando formada contra o baixo em contextos contrapontísticos tradicionais.");
+        }
+
+        s.textContent = out.join("\n");
+      }
+    }
+  });
+})();
+</script>
+<!-- ===== FIM: FICHA 08 — CONSONÂNCIAS E DISSONÂNCIAS ===== -->
+
 
 
 </body>
