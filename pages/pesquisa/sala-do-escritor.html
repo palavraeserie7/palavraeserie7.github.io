@@ -11466,6 +11466,281 @@ texto: $("esTexto").value
 </script>
 <!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->
 
+<!-- ===== INÍCIO: BIBLIOTECA MUSICAL — FICHAS (NÚCLEO + MOTOR + FICHA 01) ==== -->
+<style>
+#pcEstrutura .pc-ficha{display:flex;flex-direction:column;gap:14px;margin:10px 0 14px}
+#pcEstrutura .pc-fi-selos{display:flex;gap:8px;flex-wrap:wrap}
+#pcEstrutura .pc-fi-selo{padding:3px 11px;border-radius:12px;font:700 12px "Segoe UI",Arial,sans-serif;background:var(--brass-wash);color:var(--brass-deep)}
+#pcEstrutura .pc-fi-selo.rascunho{background:#f7ead0;color:#8a5a0b}
+#pcEstrutura .pc-fi-selo.ok{background:#e4efdf;color:#2f6b3a}
+#pcEstrutura .pc-fi-selo.falha{background:#f6dcd8;color:#a14747}
+#pcEstrutura .pc-fi-sec{border-top:1px solid var(--paper-line);padding-top:10px}
+#pcEstrutura .pc-fi-sec h4{grid-column:auto;margin:0 0 8px;font:600 17px Georgia,"Times New Roman",serif;color:var(--ink)}
+#pcEstrutura .pc-fi-sec p,#pcEstrutura .pc-fi-sec li{font:14px/1.6 "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#pcEstrutura .pc-fi-sec p{margin:0 0 8px}
+#pcEstrutura .pc-fi-sec ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+#pcEstrutura .pc-fi-sec code{padding:1px 6px;border-radius:4px;background:#fff;border:1px solid var(--paper-line);font:13px Consolas,monospace;color:var(--ink)}
+#pcEstrutura .pc-fi-tab{width:100%;border-collapse:collapse;font:13.5px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#pcEstrutura .pc-fi-tab th,#pcEstrutura .pc-fi-tab td{padding:6px 8px;border:1px solid var(--paper-line);text-align:left;vertical-align:top}
+#pcEstrutura .pc-fi-tab th{background:var(--brass-wash);font-weight:700}
+#pcEstrutura .pc-fi-tab td.ok{color:#2f6b3a;font-weight:700}
+#pcEstrutura .pc-fi-tab td.falha{color:#a14747;font-weight:700}
+#pcEstrutura .pc-fi-calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end}
+#pcEstrutura .pc-fi-saida{margin:8px 0 0;min-height:1.4em;white-space:pre-wrap;font:13.5px/1.6 Consolas,monospace;color:var(--ink)}
+@media(max-width:760px){#pcEstrutura .pc-fi-calc{grid-template-columns:1fr}}
+</style>
+ 
+<!-- ---------- 1. NÚCLEO DE CÁLCULO (sem tela; usado pelas fichas e, depois, pelo motor de regras) ---------- -->
+<script>
+(function(){
+  if(window.MaestroNucleo) return;
+  var LETRAS = ["Dó","Ré","Mi","Fá","Sol","Lá","Si"], PT = ["do","re","mi","fa","sol","la","si"], EN = ["c","d","e","f","g","a","b"];
+  var BASE = [0,2,4,5,7,9,11];
+  var ACC = {"":0,"#":1,"##":2,"x":2,"b":-1,"bb":-2}, SIMB = {"-2":"bb","-1":"b","0":"","1":"#","2":"x"};
+  var ENARM = [["Dó","Si#"],["Dó#","Réb"],["Ré"],["Ré#","Mib"],["Mi","Fáb"],["Fá","Mi#"],["Fá#","Solb"],["Sol"],["Sol#","Láb"],["Lá"],["Lá#","Sib"],["Si","Dób"]];
+  var ORD = ["uníssono","segunda","terça","quarta","quinta","sexta","sétima","oitava","nona","décima","décima primeira","décima segunda","décima terceira","décima quarta","décima quinta"];
+  var sem = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim(); };
+ 
+  /* Nota = { letra: 0..6 (Dó..Si), alt: -2..2, oitava: inteiro }. Guarda a grafia, e não só o número. */
+  function parse(t){
+    if(t && typeof t === "object" && typeof t.letra === "number") return t;
+    var m = /^(do|re|mi|fa|sol|la|si|[a-g])(##|#|x|bb|b)?(-?\d+)$/.exec(sem(t));
+    if(!m) return null;
+    var i = PT.indexOf(m[1]); if(i < 0) i = EN.indexOf(m[1]);
+    return {letra:i, alt:ACC[m[2] || ""], oitava:parseInt(m[3], 10)};
+  }
+  function nome(n){ n = parse(n); return n ? LETRAS[n.letra] + SIMB[String(n.alt)] + n.oitava : null; }
+  function midi(n){ n = parse(n); return n ? 12 * (n.oitava + 1) + BASE[n.letra] + n.alt : null; }
+  function classe(n){ var m = typeof n === "number" ? n : midi(n); return m == null ? null : ((m % 12) + 12) % 12; }
+  function freq(m, a4){ return (a4 || 440) * Math.pow(2, (m - 69) / 12); }
+  function cents(f1, f2){ return 1200 * Math.log2(f2 / f1); }
+ 
+  /* Intervalo entre duas notas, pela grafia: a letra decide o número e os semitons decidem a qualidade. */
+  function intervalo(a, b){
+    var x = parse(a), y = parse(b); if(!x || !y) return null;
+    var passos = (y.oitava * 7 + y.letra) - (x.oitava * 7 + x.letra), semis = midi(y) - midi(x), sentido = 1;
+    if(passos < 0 || (passos === 0 && semis < 0)){ passos = -passos; semis = -semis; sentido = -1; }
+    var oit = Math.floor(passos / 7), pm = passos % 7, dif = (semis - 12 * oit) - BASE[pm], perfeito = pm === 0 || pm === 3 || pm === 4, q = null;
+    if(perfeito) q = {"0":"justa","1":"aumentada","-1":"diminuta","2":"duplamente aumentada","-2":"duplamente diminuta"}[String(dif)];
+    else q = {"0":"maior","-1":"menor","1":"aumentada","2":"duplamente aumentada","-2":"diminuta","-3":"duplamente diminuta"}[String(dif)];
+    var g = passos + 1, base = ORD[g - 1] || (g + "ª");
+    if(q && g === 1) q = q.replace(/a$/, "o");
+    return {semitons:semis, generico:g, qualidade:q, nome:q ? base + " " + q : null, sentido:sentido > 0 ? "ascendente" : "descendente", composto:passos > 7};
+  }
+  window.MaestroNucleo = {parse:parse, nome:nome, midi:midi, classe:classe, freq:freq, cents:cents, intervalo:intervalo, enarmonicos:function(c){ return ENARM[((c % 12) + 12) % 12].slice(); }, ENARM:ENARM, LETRAS:LETRAS, BASE:BASE};
+})();
+</script>
+ 
+<!-- ---------- 2. MOTOR DE FICHAS (interface da consulta; independente do conteúdo) ---------- -->
+<script>
+(function(){
+  if(window.MaestroFichas) return;
+  var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim(); };
+  var R = window.MaestroFichas = {mapa:{}};
+  R.chave = function(modulo, titulo){ return norm(modulo) + "/" + norm(titulo); };
+  R.registrar = function(f){
+    if(!f || !f.modulo || !f.titulo) throw new Error("Ficha sem módulo ou título.");
+    var k = R.chave(f.modulo, f.titulo);
+    if(R.mapa[k]) throw new Error("Ficha repetida: " + f.modulo + " / " + f.titulo);
+    R.mapa[k] = f;
+  };
+  R.obter = function(modulo, titulo){ return R.mapa[R.chave(modulo, titulo)] || null; };
+  R.rodarTestes = function(f){
+    var N = window.MaestroNucleo;
+    return (f.testes || []).map(function(t){
+      var obtido; try{ obtido = String(t.obtido(N)); }catch(e){ obtido = "ERRO: " + e.message; }
+      return {entrada:t.entrada, esperado:t.esperado, obtido:obtido, ok:obtido === t.esperado};
+    });
+  };
+ 
+  var li = function(a){ return '<ul>' + a.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul>'; };
+  var sec = function(t, corpo){ return '<section class="pc-fi-sec"><h4>' + esc(t) + '</h4>' + corpo + '</section>'; };
+  function tabelaTestes(res){
+    return '<table class="pc-fi-tab"><thead><tr><th>Entrada</th><th>Esperado</th><th>Obtido</th><th>Resultado</th></tr></thead><tbody>' +
+      res.map(function(r){ return '<tr><td>' + esc(r.entrada) + '</td><td>' + esc(r.esperado) + '</td><td>' + esc(r.obtido) + '</td><td class="' + (r.ok ? 'ok' : 'falha') + '">' + (r.ok ? 'passou' : 'FALHOU') + '</td></tr>'; }).join("") + '</tbody></table>';
+  }
+  R.html = function(f, res){
+    var passou = res.filter(function(r){ return r.ok; }).length, tudo = passou === res.length;
+    var checks = [
+      ["Texto de estudo completo", true],
+      ["Dados estruturados para o maestro", !!f.dados],
+      ["Casos de teste passam (" + passou + " de " + res.length + ")", tudo],
+      ["Dependências consolidadas", !(f.depende && f.depende.length)],
+      ["Revisão por uma pessoa", !!f.revisada]
+    ];
+    var consolidada = checks.every(function(c){ return c[1]; });
+    var h = '<div class="pc-fi-selos"><span class="pc-fi-selo ' + (consolidada ? 'ok' : 'rascunho') + '">' + (consolidada ? 'Consolidada' : 'Rascunho — aguardando revisão') + '</span>' +
+      (f.tipos || []).map(function(t){ return '<span class="pc-fi-selo">' + esc(t) + '</span>'; }).join("") +
+      '<span class="pc-fi-selo ' + (tudo ? 'ok' : 'falha') + '" data-fi-resumo>Testes: ' + passou + '/' + res.length + '</span></div>';
+    h += sec("Definição", f.definicao.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join(""));
+    h += sec("Fórmulas e regras de cálculo", '<ul>' + f.formulas.map(function(x){ return '<li><strong>' + esc(x.nome) + ':</strong> <code>' + esc(x.texto) + '</code>' + (x.nota ? ' ' + esc(x.nota) : '') + '</li>'; }).join("") + '</ul>');
+    if(f.tabela) h += sec(f.tabela.titulo, '<table class="pc-fi-tab"><thead><tr>' + f.tabela.cabecalho.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join("") + '</tr></thead><tbody>' +
+      f.tabela.linhas.map(function(l){ return '<tr>' + l.map(function(c){ return '<td>' + esc(c) + '</td>'; }).join("") + '</tr>'; }).join("") + '</tbody></table>');
+    h += sec("Exemplos resolvidos", li(f.exemplos));
+    h += sec("Erros comuns e exceções", li(f.erros));
+    h += sec("Representação em partitura e MusicXML", li(f.notacao));
+    h += sec("Relações com outros assuntos", li(f.relacoes));
+    if(f.experimente) h += sec("Experimente", f.experimente.html);
+    h += sec("Casos de teste", '<p>Cada linha é uma entrada com o resultado esperado. O maestro só deve usar este assunto se todos passarem.</p><div data-fi-testes>' + tabelaTestes(res) + '</div><button type="button" class="at-btn" data-fi-rodar>RODAR OS TESTES DE NOVO</button>');
+    h += sec("Dados para o maestro", '<p>Este é o registro que o maestro lê. O texto acima é para as pessoas, e os dois nascem do mesmo cadastro.</p><details><summary>Ver dados (JSON)</summary><pre>' + esc(JSON.stringify(f.dados, null, 2)) + '</pre></details>');
+    h += sec("Fontes e revisão", li(f.fontes) + '<ul style="margin-top:8px">' + checks.map(function(c){ return '<li>' + (c[1] ? '✓ ' : '○ ') + esc(c[0]) + '</li>'; }).join("") + '</ul>');
+    return h;
+  };
+ 
+  /* ---- integração com a consulta da biblioteca (não altera a V3) ---- */
+  var raiz = document.getElementById("pcEstrutura");
+  if(!raiz) return;
+  var atual = null;
+  function limpar(){
+    var c = raiz.querySelector(".pc-ficha"); if(c) c.remove();
+    var av = raiz.querySelector(".pc-bib-aviso"); if(av) av.hidden = false;
+    atual = null;
+  }
+  function abrir(f){
+    var art = raiz.querySelector("[data-bib-consulta]"), titulo = art && art.querySelector("[data-bib-assunto-titulo]");
+    if(!art || !titulo) return;
+    var cont = document.createElement("div"); cont.className = "pc-ficha";
+    cont.innerHTML = R.html(f, R.rodarTestes(f));
+    /* o que se digita ou escolhe na ficha não deve marcar o plano da peça como alterado */
+    ["input","change"].forEach(function(tp){ cont.addEventListener(tp, function(ev){ ev.stopPropagation(); }); });
+    cont.addEventListener("click", function(ev){
+      if(ev.target.closest("[data-fi-rodar]")){
+        var res = R.rodarTestes(f), passou = res.filter(function(r){ return r.ok; }).length;
+        cont.querySelector("[data-fi-testes]").innerHTML = tabelaTestes(res);
+        var s = cont.querySelector("[data-fi-resumo]"); s.textContent = "Testes: " + passou + "/" + res.length; s.className = "pc-fi-selo " + (passou === res.length ? "ok" : "falha");
+        return;
+      }
+      if(f.experimente && f.experimente.ligar) f.experimente.ligar(ev, cont);
+    });
+    var av = art.querySelector(".pc-bib-aviso"); if(av) av.hidden = true;
+    titulo.insertAdjacentElement("afterend", cont);
+    atual = f;
+  }
+  raiz.addEventListener("click", function(ev){      /* registrado depois da V3: roda depois dela */
+    var t = ev.target, b;
+    if(t.closest("[data-bib-fechar]")){ var v = raiz.querySelector("[data-biblioteca-view]"); if(v) v.hidden = true; limpar(); return; }
+    if(t.closest("[data-bib-voltar]")){ limpar(); return; }
+    if((b = t.closest("[data-bib-assunto]"))){
+      limpar();
+      var det = b.closest("details"), modulo = det ? det.querySelector("summary").textContent.replace(/^\s*\d+\.\s*/, "") : "";
+      var f = R.obter(modulo, b.textContent);
+      if(f) abrir(f);
+    }
+  });
+})();
+</script>
+ 
+<!-- ---------- 3. FICHA 01 — Fundamentos Musicais / Notas e alturas musicais ---------- -->
+<script>
+(function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+  var N = window.MaestroNucleo, fx = function(x){ return x.toFixed(2); };
+  var tabelaClasses = N.ENARM.map(function(n, i){ return [String(i), n.join(" = ")]; });
+ 
+  window.MaestroFichas.registrar({
+    modulo:"Fundamentos Musicais", titulo:"Notas e alturas musicais",
+    tipos:["Acústico e matemático","Convenção histórica"],
+    depende:[], revisada:false,
+    definicao:[
+      "Altura é a qualidade do som que o faz parecer grave ou agudo. Fisicamente, ela corresponde à frequência de vibração, medida em hertz (Hz): quanto maior a frequência, mais aguda a altura.",
+      "Nota é o nome que damos a uma altura dentro de um sistema musical. No sistema ocidental com temperamento igual, a oitava (razão de frequências 2:1) é dividida em 12 semitons iguais, e cada semitom multiplica a frequência por 2^(1/12), cerca de 1,0595.",
+      "Classe de altura é a nota sem a oitava (dó, dó#, ré…). São 12 classes, numeradas de 0 a 11. Altura, no sentido de nota com registro, é a classe mais a oitava, como em lá4.",
+      "Grafia é o modo como a nota se escreve: letra (dó a si), alteração (sustenido, bemol, dobrados) e oitava. Duas grafias diferentes podem soar iguais (dó# e réb são enarmônicas), mas funcionam de modo diferente numa tonalidade e dão nomes diferentes aos intervalos."
+    ],
+    formulas:[
+      {nome:"Número da nota (MIDI)", texto:"n = 12 × (oitava + 1) + base da letra + alteração", nota:"Bases: dó 0, ré 2, mi 4, fá 5, sol 7, lá 9, si 11. Alterações: # +1, b −1, x +2, bb −2. A oitava acompanha a letra: si#3 vale o mesmo que dó4."},
+      {nome:"Classe de altura", texto:"classe = n mod 12"},
+      {nome:"Frequência", texto:"f = A4 × 2^((n − 69) / 12)", nota:"A4 vale 440 Hz por padrão e é configurável (por exemplo 432 Hz)."},
+      {nome:"Cents", texto:"c = 1200 × log2(f2 / f1)", nota:"100 cents equivalem a um semitom e 1200 a uma oitava."},
+      {nome:"Intervalo entre duas grafias", texto:"número = diferença de letras + 1; qualidade = semitons comparados com a escala maior", nota:"Por isso a letra importa: dó→fá# é quarta aumentada e dó→solb é quinta diminuta, ambos com 6 semitons."}
+    ],
+    tabela:{titulo:"As 12 classes de altura", cabecalho:["Classe","Grafias que soam igual (enarmônicas)"], linhas:tabelaClasses},
+    exemplos:[
+      "Dó4 é o dó central do piano: número 60, cerca de 261,63 Hz.",
+      "Lá4 é número 69 e 440,00 Hz. Lá3, uma oitava abaixo, é número 57 e 220,00 Hz.",
+      "Dó#4 e Réb4 têm o mesmo número (61) e cerca de 277,18 Hz, mas são grafias diferentes.",
+      "Si#3 vale 60, o mesmo que dó4, e dób4 vale 59, o mesmo que si3: a oitava segue a letra.",
+      "Com A4 = 432 Hz, o dó4 passa a medir cerca de 256,87 Hz."
+    ],
+    erros:[
+      "Confundir classe de altura (sem oitava) com nota com oitava.",
+      "Tratar dó# e réb como idênticas em qualquer contexto: no temperamento igual elas soam iguais, mas se escrevem e se comportam de forma diferente.",
+      "Misturar convenções de numeração de oitavas. Alguns teclados e programas chamam o dó central de dó3. Esta biblioteca declara dó central = dó4 = número 60.",
+      "Tomar a divisão em 12 partes iguais como lei da natureza: é uma convenção. Na afinação justa, a quinta (3:2) mede 701,96 cents e a quinta temperada mede 700, uma diferença de cerca de 2 cents.",
+      "Esquecer que o número MIDI só cobre de 0 a 127."
+    ],
+    notacao:[
+      "O MusicXML escreve a altura com três dados: letra (step, de A a G), alteração em semitons (alter) e oitava (octave, onde 4 é a oitava do dó central). Exemplo: dó#4 é step C, alter 1, octave 4.",
+      "Por isso o maestro deve guardar cada nota como letra, alteração e oitava, e não apenas como número. Só com a grafia ele consegue escrever a partitura corretamente e nomear intervalos.",
+      "Escrever Si#3 em vez de Dó4 é correto quando o contexto harmônico pedir; o número é o mesmo, a grafia não."
+    ],
+    relacoes:[
+      "Não depende de nenhum outro assunto: é a base.",
+      "Alimenta: Frequências e proporções; Intervalos simples e compostos; Classificação e inversão de intervalos; Escalas e modos; Armaduras e tonalidades.",
+      "Limites desta ficha: microtons e outros temperamentos ficam em Acústica, Timbre e Sistemas de Afinação; a transposição dos instrumentos fica em Notação e Representação Musical."
+    ],
+    fontes:[
+      "Referências gerais a conferir pelo revisor: notação científica de alturas; norma ISO 16 (lá4 = 440 Hz); especificação MIDI (notas 0 a 127); especificação MusicXML (elemento pitch).",
+      "Os valores numéricos desta ficha são calculados pelo núcleo e conferidos pelos testes abaixo."
+    ],
+    dados:{
+      id:"fundamentos/notas-e-alturas-musicais", convencaoOitava:"dó central = dó4 = MIDI 60", a4Padrao:440, a4Intervalo:[400,480],
+      semitonsPorOitava:12, razaoSemitom:"2^(1/12)", classes:N.ENARM, basesLetras:{"Dó":0,"Ré":2,"Mi":4,"Fá":5,"Sol":7,"Lá":9,"Si":11},
+      alteracoes:{"#":1,"b":-1,"x":2,"bb":-2}, faixaMidi:[0,127], representacao:{letra:"step", alteracao:"alter", oitava:"octave"}
+    },
+    testes:[
+      {entrada:"Dó4 → número", esperado:"60", obtido:function(n){ return n.midi("Dó4"); }},
+      {entrada:"Dó4 → frequência (A4 = 440)", esperado:"261.63", obtido:function(n){ return fx(n.freq(n.midi("Dó4"))); }},
+      {entrada:"Lá4 → número e frequência", esperado:"69 / 440.00", obtido:function(n){ return n.midi("Lá4") + " / " + fx(n.freq(69)); }},
+      {entrada:"Lá3 → frequência", esperado:"220.00", obtido:function(n){ return fx(n.freq(n.midi("Lá3"))); }},
+      {entrada:"Lá4 → classe de altura", esperado:"9", obtido:function(n){ return n.classe("Lá4"); }},
+      {entrada:"Dó#4 e Réb4 → números e grafias", esperado:"61 / 61 / grafias diferentes", obtido:function(n){ return n.midi("Dó#4") + " / " + n.midi("Réb4") + " / " + (n.nome("Dó#4") !== n.nome("Réb4") ? "grafias diferentes" : "iguais"); }},
+      {entrada:"Si#3 → número (a oitava segue a letra)", esperado:"60", obtido:function(n){ return n.midi("Si#3"); }},
+      {entrada:"Dób4 → número", esperado:"59", obtido:function(n){ return n.midi("Dób4"); }},
+      {entrada:"Dó-1 → número", esperado:"0", obtido:function(n){ return n.midi("Dó-1"); }},
+      {entrada:"C#4 (nome em letras) é o mesmo que Dó#4", esperado:"sim", obtido:function(n){ var a = n.parse("C#4"), b = n.parse("Dó#4"); return a.letra === b.letra && a.alt === b.alt && a.oitava === b.oitava ? "sim" : "não"; }},
+      {entrada:"Dó4 → Sol4", esperado:"7 semitons · quinta justa", obtido:function(n){ var i = n.intervalo("Dó4", "Sol4"); return i.semitons + " semitons · " + i.nome; }},
+      {entrada:"Dó4 → Fá#4", esperado:"6 semitons · quarta aumentada", obtido:function(n){ var i = n.intervalo("Dó4", "Fá#4"); return i.semitons + " semitons · " + i.nome; }},
+      {entrada:"Dó4 → Solb4", esperado:"6 semitons · quinta diminuta", obtido:function(n){ var i = n.intervalo("Dó4", "Solb4"); return i.semitons + " semitons · " + i.nome; }},
+      {entrada:"Dó4 → Ré5", esperado:"14 semitons · nona maior", obtido:function(n){ var i = n.intervalo("Dó4", "Ré5"); return i.semitons + " semitons · " + i.nome; }},
+      {entrada:"Si#3 → Dó4", esperado:"0 semitons · segunda diminuta", obtido:function(n){ var i = n.intervalo("Si#3", "Dó4"); return i.semitons + " semitons · " + i.nome; }},
+      {entrada:"Lá4 = 432 Hz → frequência do Dó4", esperado:"256.87", obtido:function(n){ return fx(n.freq(n.midi("Dó4"), 432)); }},
+      {entrada:"Razão 3:2 em cents", esperado:"701.96", obtido:function(n){ return fx(n.cents(2, 3)); }},
+      {entrada:"Quinta temperada menos quinta justa (cents)", esperado:"-1.96", obtido:function(n){ return fx(700 - n.cents(2, 3)); }},
+      {entrada:"Classe 6 → grafias enarmônicas", esperado:"Fá# / Solb", obtido:function(n){ return n.enarmonicos(6).join(" / "); }},
+      {entrada:"Texto inválido “Xyz4”", esperado:"inválida", obtido:function(n){ return n.parse("Xyz4") === null ? "inválida" : "aceita"; }}
+    ],
+    experimente:{
+      html:'<div class="pc-fi-calc"><label>Nota<input type="text" data-fi-n1 value="Dó4" placeholder="Ex.: Dó4, Sib3, F#5"></label>' +
+        '<label>Segunda nota (opcional)<input type="text" data-fi-n2 value="Sol4"></label>' +
+        '<label>Lá4 (Hz)<input type="number" data-fi-a4 min="400" max="480" value="440"></label></div>' +
+        '<button type="button" class="at-btn gold" data-fi-calc style="margin-top:8px">CALCULAR</button><pre class="pc-fi-saida" data-fi-saida></pre>',
+      ligar:function(ev, cont){
+        if(!ev.target.closest("[data-fi-calc]")) return;
+        var s = cont.querySelector("[data-fi-saida]"), a = cont.querySelector("[data-fi-n1]").value, b = cont.querySelector("[data-fi-n2]").value.trim(), a4 = Number(cont.querySelector("[data-fi-a4]").value);
+        if(!(a4 >= 400 && a4 <= 480)){ s.textContent = "A altura de referência deve ficar entre 400 e 480 Hz."; return; }
+        var linha = function(txt){
+          var p = N.parse(txt); if(!p) return null;
+          var m = N.midi(p);
+          return N.nome(p) + " → classe " + N.classe(p) + " · número " + m + (m < 0 || m > 127 ? " (fora de 0–127)" : "") + " · " + fx(N.freq(m, a4)) + " Hz · mesma altura que: " + (N.enarmonicos(N.classe(p)).join(" = "));
+        };
+        var l1 = linha(a);
+        if(!l1){ s.textContent = "Nota inválida. Use, por exemplo, Dó4, Sib3, F#5 ou C4."; return; }
+        var out = [l1];
+        if(b){
+          var l2 = linha(b);
+          if(!l2){ s.textContent = "Segunda nota inválida. Use, por exemplo, Sol4 ou Solb4."; return; }
+          var i = N.intervalo(a, b);
+          out.push(l2, "Intervalo: " + i.semitons + " semitons · " + i.nome + " (" + i.sentido + ") · " + (i.semitons * 100) + " cents no temperamento igual");
+        }
+        s.textContent = out.join("\n");
+      }
+    }
+  });
+})();
+</script>
+<!-- ===== FIM: BIBLIOTECA MUSICAL — FICHAS (NÚCLEO + MOTOR + FICHA 01) ===== -->
 
 </body>
 </html>
