@@ -11742,6 +11742,336 @@ texto: $("esTexto").value
 </script>
 <!-- ===== FIM: BIBLIOTECA MUSICAL — FICHAS (NÚCLEO + MOTOR + FICHA 01) ===== -->
 
+ 
+<!-- ---------- FICHA 02 — Fundamentos Musicais / Frequências e proporções ---------- -->
+<script>
+(function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+
+  var N = window.MaestroNucleo;
+  var fx = function(x){ return Number(x).toFixed(2); };
+  var cents = function(r){ return 1200 * Math.log2(r); };
+
+  window.MaestroFichas.registrar({
+    modulo:"Fundamentos Musicais",
+    titulo:"Frequências e proporções",
+
+    tipos:[
+      "Acústico e físico",
+      "Matemático",
+      "Musical e histórico"
+    ],
+
+    depende:["Notas e alturas musicais"],
+    revisada:false,
+
+    definicao:[
+      "Frequência é o número de ciclos de uma vibração periódica por segundo. Sua unidade é o hertz (Hz). Uma frequência de 440 Hz representa 440 ciclos por segundo.",
+      "Em sons periódicos com altura definida, a frequência fundamental é a frequência de repetição do ciclo e serve como referência física importante para a percepção da altura. Sons reais podem conter componentes adicionais, chamados parciais ou harmônicos.",
+      "Proporção de frequências é a relação matemática entre duas frequências. Para comparar duas notas, utiliza-se a razão entre a frequência mais alta e a mais baixa: r = f2 / f1.",
+      "Intervalos musicais não dependem apenas da diferença absoluta entre frequências, mas da relação proporcional entre elas. Por isso, uma oitava acima de 220 Hz é 440 Hz, e uma oitava acima de 440 Hz é 880 Hz: ambas apresentam a mesma razão 2:1.",
+      "Uma proporção simples, como 2:1, 3:2 ou 4:3, pode surgir entre componentes da série harmônica e servir de referência para sistemas de afinação. Isso não significa que todos os sistemas musicais utilizem exclusivamente essas proporções.",
+      "No temperamento igual de 12 sons, a oitava é dividida em doze partes iguais em escala logarítmica. Cada semitom possui a mesma razão de frequência: 2^(1/12).",
+      "Na afinação justa, determinados intervalos são construídos por razões de números inteiros pequenos, como 3:2 para a quinta justa e 5:4 para a terça maior. Esses valores não coincidem exatamente com todos os intervalos do temperamento igual."
+    ],
+
+    formulas:[
+      {
+        nome:"Frequência",
+        texto:"f = número de ciclos / tempo",
+        nota:"A frequência é expressa em hertz (Hz). Um hertz corresponde a um ciclo por segundo."
+      },
+      {
+        nome:"Razão entre frequências",
+        texto:"r = f2 / f1",
+        nota:"Nesta ficha, f2 representa a frequência mais alta e f1 a mais baixa. A razão é apresentada como valor ou proporção, por exemplo 3/2 ou 3:2."
+      },
+      {
+        nome:"Frequência a partir de uma proporção",
+        texto:"f2 = f1 × r",
+        nota:"Se uma nota de 200 Hz for elevada por uma proporção 3:2, a nova frequência será 300 Hz."
+      },
+      {
+        nome:"Oitava",
+        texto:"f2 = 2 × f1",
+        nota:"A frequência dobra na subida de uma oitava e cai pela metade na descida de uma oitava."
+      },
+      {
+        nome:"Série harmônica ideal",
+        texto:"fn = n × f0",
+        nota:"f0 é a frequência fundamental e n é o número inteiro positivo do parcial. A relação descreve uma série harmônica ideal."
+      },
+      {
+        nome:"Temperamento igual — semitom",
+        texto:"r = 2^(1/12)",
+        nota:"A razão entre frequências consecutivas é aproximadamente 1,059463. Doze multiplicações sucessivas produzem uma oitava."
+      },
+      {
+        nome:"Temperamento igual — n semitons",
+        texto:"f2 = f1 × 2^(n/12)",
+        nota:"n pode ser positivo ou negativo. A fórmula pressupõe o temperamento igual de doze sons."
+      },
+      {
+        nome:"Conversão de razão em cents",
+        texto:"c = 1200 × log2(f2/f1)",
+        nota:"Uma oitava corresponde a 1200 cents. Um semitom temperado corresponde a 100 cents."
+      },
+      {
+        nome:"Diferença entre frequências",
+        texto:"Δf = f2 − f1",
+        nota:"A diferença em hertz não representa, sozinha, o tamanho musical de um intervalo. A proporção entre as frequências é necessária para essa comparação."
+      },
+      {
+        nome:"Frequência de batimentos",
+        texto:"fb = |f2 − f1|",
+        nota:"Para duas componentes próximas que soam simultaneamente, a diferença entre suas frequências pode produzir batimentos audíveis. A percepção depende também das condições acústicas."
+      }
+    ],
+
+    tabela:{
+      titulo:"Proporções de referência entre frequências",
+      cabecalho:[
+        "Relação musical",
+        "Razão de referência",
+        "Cents aproximados"
+      ],
+      linhas:[
+        ["Uníssono","1:1","0"],
+        ["Oitava justa","2:1","1200"],
+        ["Quinta justa — afinação justa","3:2","701,96"],
+        ["Quarta justa — afinação justa","4:3","498,04"],
+        ["Terça maior — afinação justa","5:4","386,31"],
+        ["Terça menor — afinação justa","6:5","315,64"],
+        ["Sexta maior — afinação justa","5:3","884,36"],
+        ["Sexta menor — afinação justa","8:5","813,69"],
+        ["Semitom — afinação justa, exemplo","16:15","111,73"],
+        ["Semitom — temperamento igual","2^(1/12)","100"],
+        ["Quinta — temperamento igual","2^(7/12)","700"],
+        ["Terça maior — temperamento igual","2^(4/12)","400"]
+      ]
+    },
+
+    exemplos:[
+      "Uma frequência de 220 Hz elevada em uma oitava resulta em 440 Hz. A proporção é 440/220 = 2:1.",
+      "Uma frequência de 440 Hz elevada em uma oitava resulta em 880 Hz. A proporção continua sendo 2:1, embora a diferença absoluta seja agora 440 Hz.",
+      "Uma frequência de 200 Hz multiplicada por 3/2 resulta em 300 Hz. A razão entre as frequências é 3:2, referência tradicional para a quinta justa em afinação justa.",
+      "Uma frequência de 200 Hz multiplicada por 4/3 resulta em aproximadamente 266,67 Hz. A proporção é 4:3, referência para a quarta justa em afinação justa.",
+      "Uma frequência de 200 Hz multiplicada por 5/4 resulta em 250 Hz. A proporção é 5:4, referência para a terça maior em afinação justa.",
+      "No temperamento igual, uma frequência de 440 Hz elevada em sete semitons resulta em aproximadamente 659,26 Hz. A razão é 2^(7/12), e o intervalo mede exatamente 700 cents.",
+      "Uma quinta de afinação justa mede aproximadamente 701,96 cents. A quinta do temperamento igual mede 700 cents. A diferença é de aproximadamente 1,96 cents.",
+      "Se uma frequência fundamental é 100 Hz, sua série harmônica ideal apresenta componentes em 100, 200, 300, 400, 500 Hz e assim sucessivamente.",
+      "Dois sons de 440 Hz e 442 Hz, quando simultâneos e em condições adequadas, podem produzir batimentos de aproximadamente 2 por segundo."
+    ],
+
+    erros:[
+      "Confundir diferença absoluta em hertz com proporção musical. A diferença entre 200 e 400 Hz é 200 Hz; entre 400 e 800 Hz é 400 Hz. Ambas representam uma oitava.",
+      "Afirmar que toda quinta musical possui exatamente a proporção 3:2. Esse valor corresponde à quinta justa em afinação justa; no temperamento igual, a razão é 2^(7/12).",
+      "Tratar a proporção 2^(1/12) como uma lei física. Ela é uma propriedade matemática do temperamento igual de doze sons.",
+      "Confundir frequência fundamental com todas as frequências presentes em um som. Um som complexo pode conter fundamental, harmônicos, parciais e componentes de ruído.",
+      "Supor que todo parcial de um instrumento real seja exatamente um múltiplo inteiro da fundamental. Cordas, sinos e outros instrumentos podem apresentar inarmonicidade.",
+      "Afirmar que razões simples garantem, em qualquer contexto, uma consonância perceptiva universal. A percepção depende também do espectro, registro, intensidade, contexto e características do sistema musical.",
+      "Confundir afinação justa com temperamento igual. São sistemas diferentes, com critérios distintos para organizar as alturas.",
+      "Calcular intervalos musicais usando somente a subtração das frequências em hertz.",
+      "Esquecer que a fórmula de cents utiliza logaritmo da razão entre frequências, e não a diferença entre elas.",
+      "Tratar batimentos como uma propriedade exclusiva de intervalos musicais. Eles são um fenômeno acústico relacionado à interação de componentes sonoros próximos."
+    ],
+
+    notacao:[
+      "A frequência deve ser registrada com valor numérico e unidade Hz. Exemplo: 440 Hz.",
+      "Uma razão deve ser registrada com numerador e denominador ou com a notação proporcional. Exemplo: 3/2 ou 3:2.",
+      "A razão deve declarar a ordem da comparação. Nesta ficha, a frequência mais alta é dividida pela mais baixa.",
+      "Cents devem ser registrados com o símbolo ¢ ou com a palavra cents. Exemplo: 700 cents.",
+      "Quando o valor representar um sistema de afinação, ele deve identificar o sistema. Exemplo: quinta justa em afinação justa: 3:2; quinta no temperamento igual: 2^(7/12).",
+      "A série harmônica deve identificar a fundamental e a ordem do parcial. Exemplo: fundamental de 100 Hz; segundo harmônico ideal de 200 Hz."
+    ],
+
+    relacoes:[
+      "Depende de: Notas e alturas musicais, especialmente a identificação de notas e frequências de referência.",
+      "Alimenta: Intervalos simples e compostos; Classificação e inversão de intervalos; Consonâncias e dissonâncias; Escalas e modos; Acústica, Timbre e Sistemas de Afinação.",
+      "A relação com Harmonia ocorre quando as proporções entre notas são utilizadas para estudar acordes, afinação e relações entre componentes sonoros.",
+      "A relação com Melodia ocorre quando as proporções ajudam a compreender distâncias entre alturas e transposições.",
+      "Limite desta ficha: a explicação detalhada da percepção de consonância e dissonância pertence ao assunto específico de Consonâncias e dissonâncias.",
+      "Limite desta ficha: a análise aprofundada da série harmônica, dos parciais e da inarmonicidade pertence também ao módulo Acústica, Timbre e Sistemas de Afinação."
+    ],
+
+    fontes:[
+      "Abbot, Derek. Understanding Sound — seção Musical Intervals and Temperament. Physics LibreTexts. Referência didática para razões de frequência, intervalos e temperamento igual. https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Understanding_Sound_(Abbot)/02%3A_Perception_of_sound/2.04%3A_Musical_intervals_and_temperament",
+      "Sonic Arts Research Centre / SFU, Barry Truax. Handbook for Acoustic Ecology — verbete Just Tuning. Referência para afinação justa, proporções inteiras e valores em cents. https://www.sfu.ca/sonic-studio-webdav/cmns/Handbook5/handbook/Just_Tuning.html",
+      "Revising the musical equal temperament. Revista Brasileira de Ensino de Física. Artigo sobre temperamento igual, proporções, escala logarítmica e cents. https://www.scielo.br/j/rbef/a/VLCrpPV5NQVZwcRD7xsXDpJ/?lang=en",
+      "Fraunhofer Institute for Integrated Circuits — Fundamentals of Music Processing, seção Intervals. Referência para relações de frequência entre componentes da série harmônica. https://www.audiolabs-erlangen.de/resources/MIR/FMP/C5/C5S1_Intervals.html",
+      "Os valores numéricos desta ficha decorrem das fórmulas matemáticas declaradas. A implementação e os resultados dos testes ainda devem ser verificados no núcleo do Maestro."
+    ],
+
+    dados:{
+      id:"fundamentos/frequencias-e-proporcoes",
+      unidadeFrequencia:"Hz",
+      unidadeIntervalo:"cents",
+      razaoOitava:"2/1",
+      razaoQuintaJusta:"3/2",
+      razaoQuartaJusta:"4/3",
+      razaoTercaMaiorJusta:"5/4",
+      razaoTercaMenorJusta:"6/5",
+      razaoSemitomTemperado:"2^(1/12)",
+      razaoQuintaTemperada:"2^(7/12)",
+      centsOitava:1200,
+      centsSemitomTemperado:100,
+      referenciaTemperamento:"12-TET",
+      convencaoRazao:"frequência maior dividida pela frequência menor",
+      observacao:"Razões de afinação justa e razões do temperamento igual devem permanecer identificadas separadamente."
+    },
+
+    testes:[
+      {
+        entrada:"Razão entre 440 Hz e 220 Hz",
+        esperado:"2.00",
+        obtido:function(){ return fx(440/220); }
+      },
+      {
+        entrada:"Razão entre 880 Hz e 440 Hz",
+        esperado:"2.00",
+        obtido:function(){ return fx(880/440); }
+      },
+      {
+        entrada:"Frequência resultante de 200 Hz × 3/2",
+        esperado:"300.00 Hz",
+        obtido:function(){ return fx(200*(3/2)) + " Hz"; }
+      },
+      {
+        entrada:"Frequência resultante de 200 Hz × 4/3",
+        esperado:"266.67 Hz",
+        obtido:function(){ return fx(200*(4/3)); }
+      },
+      {
+        entrada:"Frequência resultante de 200 Hz × 5/4",
+        esperado:"250.00 Hz",
+        obtido:function(){ return fx(200*(5/4)); }
+      },
+      {
+        entrada:"Cents da razão 2:1",
+        esperado:"1200.00",
+        obtido:function(){ return fx(cents(2)); }
+      },
+      {
+        entrada:"Cents da razão 3:2",
+        esperado:"701.96",
+        obtido:function(){ return fx(cents(3/2)); }
+      },
+      {
+        entrada:"Cents da razão 4:3",
+        esperado:"498.04",
+        obtido:function(){ return fx(cents(4/3)); }
+      },
+      {
+        entrada:"Cents da razão 5:4",
+        esperado:"386.31",
+        obtido:function(){ return fx(cents(5/4)); }
+      },
+      {
+        entrada:"Razão de um semitom no temperamento igual",
+        esperado:"1.05946",
+        obtido:function(){ return fx(Math.pow(2,1/12)); }
+      },
+      {
+        entrada:"Razão de uma quinta no temperamento igual",
+        esperado:"1.49831",
+        obtido:function(){ return fx(Math.pow(2,7/12)); }
+      },
+      {
+        entrada:"Cents de uma quinta no temperamento igual",
+        esperado:"700.00",
+        obtido:function(){ return fx(cents(Math.pow(2,7/12))); }
+      },
+      {
+        entrada:"Diferença entre quinta justa e quinta temperada",
+        esperado:"1.96 cents aproximadamente",
+        obtido:function(){ return fx(cents(3/2)-700) + " cents"; }
+      },
+      {
+        entrada:"Segundo harmônico de uma fundamental de 100 Hz",
+        esperado:"200.00 Hz",
+        obtido:function(){ return fx(2*100) + " Hz"; }
+      },
+      {
+        entrada:"Quinto harmônico de uma fundamental de 100 Hz",
+        esperado:"500.00 Hz",
+        obtido:function(){ return fx(5*100) + " Hz"; }
+      },
+      {
+        entrada:"Batimentos entre 440 Hz e 442 Hz",
+        esperado:"2.00 Hz",
+        obtido:function(){ return fx(Math.abs(442-440)) + " Hz"; }
+      },
+      {
+        entrada:"Mesma proporção entre 220/440 e 440/880",
+        esperado:"sim",
+        obtido:function(){ return (220/440 === 440/880) ? "sim" : "não"; }
+      }
+    ],
+
+    experimente:{
+      html:
+        '<div class="pc-fi-calc">' +
+          '<label>Frequência inicial (Hz)<input type="number" data-fp-f1 value="220" min="0.01" step="0.01"></label>' +
+          '<label>Frequência final (Hz)<input type="number" data-fp-f2 value="440" min="0.01" step="0.01"></label>' +
+        '</div>' +
+        '<button type="button" class="at-btn gold" data-fp-calc style="margin-top:8px">CALCULAR PROPORÇÃO</button>' +
+        '<pre class="pc-fi-saida" data-fp-saida></pre>',
+
+      ligar:function(ev, cont){
+        if(!ev.target.closest("[data-fp-calc]")) return;
+
+        var s = cont.querySelector("[data-fp-saida]");
+        var f1 = Number(cont.querySelector("[data-fp-f1]").value);
+        var f2 = Number(cont.querySelector("[data-fp-f2]").value);
+
+        if(!(f1 > 0) || !(f2 > 0) || !Number.isFinite(f1) || !Number.isFinite(f2)){
+          s.textContent = "Informe duas frequências positivas e válidas.";
+          return;
+        }
+
+        var maior = Math.max(f1,f2);
+        var menor = Math.min(f1,f2);
+        var r = maior/menor;
+        var c = cents(r);
+        var diferenca = Math.abs(f2-f1);
+        var oitavas = Math.log2(r);
+
+        var saida = [
+          "Frequência inicial: " + fx(f1) + " Hz",
+          "Frequência final: " + fx(f2) + " Hz",
+          "Diferença absoluta: " + fx(diferenca) + " Hz",
+          "Razão entre frequências: " + fx(r) + ":1",
+          "Tamanho proporcional: " + fx(c) + " cents",
+          "Distância em oitavas: " + fx(oitavas),
+          "Batimentos potenciais: " + fx(diferenca) + " Hz"
+        ];
+
+        if(Math.abs(r-2) < 0.00001){
+          saida.push("Relação identificada: oitava (2:1).");
+        } else if(Math.abs(r-1.5) < 0.00001){
+          saida.push("Relação identificada: quinta justa de afinação justa (3:2).");
+        } else if(Math.abs(r-(4/3)) < 0.00001){
+          saida.push("Relação identificada: quarta justa de afinação justa (4:3).");
+        } else if(Math.abs(r-(5/4)) < 0.00001){
+          saida.push("Relação identificada: terça maior de afinação justa (5:4).");
+        } else if(Math.abs(r-Math.pow(2,7/12)) < 0.00001){
+          saida.push("Relação identificada: quinta do temperamento igual.");
+        } else if(Math.abs(r-Math.pow(2,1/12)) < 0.00001){
+          saida.push("Relação identificada: semitom do temperamento igual.");
+        } else {
+          saida.push("Não há identificação automática de um intervalo específico nesta ficha.");
+        }
+
+        saida.push("Observação: a razão matemática, isoladamente, não determina a grafia nem a função harmônica do intervalo.");
+
+        s.textContent = saida.join("\n");
+      }
+    }
+  });
+})();
+</script>
+<!-- ---------- FIM DA FICHA 02 — Frequências e proporções ---------- -->
+
 </body>
 </html>
  
