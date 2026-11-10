@@ -12072,6 +12072,517 @@ texto: $("esTexto").value
 </script>
 <!-- ---------- FIM DA FICHA 02 — Frequências e proporções ---------- -->
 
+ 
+<!-- ---------- FICHA 03 — Fundamentos Musicais / Classificação e inversão de intervalos ---------- -->
+<script>
+(function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+
+  var fx = function(x){ return Number(x).toFixed(2); };
+
+  var letras = {
+    C:{indice:0,semitons:0},
+    D:{indice:1,semitons:2},
+    E:{indice:2,semitons:4},
+    F:{indice:3,semitons:5},
+    G:{indice:4,semitons:7},
+    A:{indice:5,semitons:9},
+    B:{indice:6,semitons:11}
+  };
+
+  var bases = {
+    1:0, 2:2, 3:4, 4:5,
+    5:7, 6:9, 7:11
+  };
+
+  var nomes = {
+    P:"justo",
+    M:"maior",
+    m:"menor",
+    A:"aumentado",
+    d:"diminuto",
+    AA:"duplamente aumentado",
+    dd:"duplamente diminuto"
+  };
+
+  function lerNota(texto){
+    var m = String(texto || "").trim().match(/^([A-Ga-g])([#b]{0,2}|x)?(-?\d+)$/);
+    if(!m) return null;
+
+    var letra = m[1].toUpperCase();
+    var acidente = m[2] || "";
+    var oitava = Number(m[3]);
+    var alteracao = 0;
+
+    if(acidente === "#") alteracao = 1;
+    if(acidente === "##" || acidente === "x") alteracao = 2;
+    if(acidente === "b") alteracao = -1;
+    if(acidente === "bb") alteracao = -2;
+
+    var info = letras[letra];
+    return {
+      letra:letra,
+      oitava:oitava,
+      alteracao:alteracao,
+      diatonico:oitava*7 + info.indice,
+      cromatico:oitava*12 + info.semitons + alteracao
+    };
+  }
+
+  function classificar(n1,n2){
+    var a = lerNota(n1);
+    var b = lerNota(n2);
+
+    if(!a || !b) return {erro:"Nota inválida. Use formatos como C4, F#4, Bb3 ou Cb5."};
+
+    var direcao = b.diatonico >= a.diatonico ? "ascendente" : "descendente";
+
+    if(direcao === "descendente"){
+      var temp = a;
+      a = b;
+      b = temp;
+    }
+
+    var numero = b.diatonico - a.diatonico + 1;
+    var semitons = b.cromatico - a.cromatico;
+
+    if(numero < 1 || semitons < 0){
+      return {erro:"Não foi possível classificar este intervalo."};
+    }
+
+    var simples = ((numero - 1) % 7) + 1;
+    var oitavas = Math.floor((numero - 1) / 7);
+    var semitonsEsperados = bases[simples] + oitavas*12;
+    var diferenca = semitons - semitonsEsperados;
+
+    var familiaJusta = [1,4,5].indexOf(simples) !== -1;
+    var qualidade = "";
+
+    if(familiaJusta){
+      if(diferenca === 0) qualidade = "P";
+      else if(diferenca === 1) qualidade = "A";
+      else if(diferenca === -1) qualidade = "d";
+      else if(diferenca > 1) qualidade = "A".repeat(diferenca);
+      else qualidade = "d".repeat(Math.abs(diferenca));
+    } else {
+      if(diferenca === 0) qualidade = "M";
+      else if(diferenca === -1) qualidade = "m";
+      else if(diferenca === 1) qualidade = "A";
+      else if(diferenca === -2) qualidade = "d";
+      else if(diferenca > 1) qualidade = "A".repeat(diferenca);
+      else qualidade = "d".repeat(Math.abs(diferenca)-1);
+    }
+
+    var nomeQualidade = nomes[qualidade] || qualidade;
+    var nomeCompleto = nomeQualidade + " " + numero;
+
+    return {
+      notaInicial:n1,
+      notaFinal:n2,
+      direcao:direcao,
+      numero:numero,
+      simples:simples,
+      oitavas:oitavas,
+      qualidade:qualidade,
+      nome:nomeCompleto,
+      semitons:semitons,
+      semitonsEsperados:semitonsEsperados,
+      diferenca:diferenca
+    };
+  }
+
+ 
+function inverter(numero, qualidade){
+  var simples = numero % 7;
+
+  if(simples === 0) simples = 7;
+  if(numero > 1 && numero % 7 === 1) simples = 8;
+
+  var numeroInvertido = 9 - simples;
+
+  var mapa = {
+    P:"P",
+    M:"m",
+    m:"M",
+    A:"d",
+    d:"A",
+    AA:"dd",
+    dd:"AA"
+  };
+
+  var qualidadeInvertida = mapa[qualidade] || "";
+
+  return {
+    numeroOriginal:numero,
+    numeroInvertido:numeroInvertido,
+    qualidadeOriginal:qualidade,
+    qualidadeInvertida:qualidadeInvertida,
+    nome:qualidadeInvertida
+      ? (nomes[qualidadeInvertida] + " " + numeroInvertido)
+      : "Qualidade não reconhecida"
+  };
+}
+
+
+  window.MaestroFichas.registrar({
+    modulo:"Fundamentos Musicais",
+    titulo:"Classificação e inversão de intervalos",
+
+    tipos:[
+      "Teoria musical",
+      "Diatônico e cromático",
+      "Classificação intervalar"
+    ],
+
+    depende:[
+      "Notas e alturas musicais",
+      "Frequências e proporções",
+      "Intervalos simples e compostos"
+    ],
+
+    revisada:false,
+
+    definicao:[
+      "Intervalo musical é a distância entre duas alturas. Sua classificação exige observar a distância entre os nomes das notas e a quantidade de semitons que as separa.",
+      "O número do intervalo é determinado pela contagem diatônica das letras, incluindo a nota inicial e a nota final. Por exemplo, de C até E há três posições: C, D e E; portanto, é algum tipo de terça.",
+      "A qualidade do intervalo indica sua classificação específica: justo, maior, menor, aumentado ou diminuto. Ela depende da combinação entre o número diatônico e a distância cromática.",
+      "Os intervalos justos são a família tradicional de uníssono, quarta, quinta e oitava. Os intervalos maiores e menores pertencem à família de segundas, terças, sextas e sétimas.",
+      "Um intervalo simples não ultrapassa uma oitava. Um intervalo composto ultrapassa uma oitava e pode ser entendido como um intervalo simples acrescido de uma ou mais oitavas.",
+      "A inversão de um intervalo ocorre quando uma das notas é deslocada uma oitava, de modo que a nota mais grave passa a ser a mais aguda ou vice-versa.",
+      "Na inversão simples, os números dos intervalos complementam nove: segunda e sétima, terça e sexta, quarta e quinta. A oitava inverte em uníssono.",
+      "As qualidades também se transformam: justo permanece justo; maior transforma-se em menor; menor em maior; aumentado em diminuto; diminuto em aumentado.",
+      "Intervalos enarmônicos podem apresentar a mesma quantidade de semitons e, ainda assim, possuir nomes e funções diferentes. Por exemplo, C–F# é uma quarta aumentada, enquanto C–Gb é uma quinta diminuta."
+    ],
+
+    formulas:[
+      {
+        nome:"Número diatônico do intervalo",
+        texto:"n = distância entre as posições das letras + 1",
+        nota:"A contagem inclui a nota inicial e a nota final. C–E corresponde a uma terça."
+      },
+      {
+        nome:"Número do intervalo composto",
+        texto:"n = número de posições diatônicas + 1",
+        nota:"A contagem continua através das oitavas. C4–D5 corresponde a uma nona."
+      },
+      {
+        nome:"Redução para intervalo simples",
+        texto:"n simples = ((n − 1) mod 7) + 1",
+        nota:"O resultado identifica o número simples correspondente, de 1 a 7."
+      },
+      {
+        nome:"Quantidade de oitavas adicionais",
+        texto:"oitavas = floor((n − 1) / 7)",
+        nota:"Indica quantas oitavas completas estão incorporadas ao intervalo composto."
+      },
+      {
+        nome:"Distância cromática",
+        texto:"s = diferença entre as posições cromáticas das notas",
+        nota:"A distância é expressa em semitons. A grafia das notas continua necessária para determinar o número e a qualidade."
+      },
+      {
+        nome:"Qualidade intervalar",
+        texto:"alteração = semitons reais − semitons de referência",
+        nota:"A comparação é feita com a referência diatônica da família justa ou maior."
+      },
+      {
+        nome:"Número da inversão simples",
+        texto:"n invertido = 9 − n simples",
+        nota:"Aplica-se aos intervalos simples, incluindo a oitava como complemento do uníssono."
+      },
+      {
+        nome:"Cents a partir de semitons temperados",
+        texto:"c = 100 × quantidade de semitons",
+        nota:"Válido para intervalos medidos no temperamento igual de doze sons. Não substitui a medida acústica em outros sistemas."
+      }
+    ],
+
+    tabela:{
+      titulo:"Classificação dos intervalos simples",
+      cabecalho:["Número","Referência maior/justa","Semitons de referência"],
+      linhas:[
+        ["1ª","Justo","0"],
+        ["2ª","Maior","2"],
+        ["3ª","Maior","4"],
+        ["4ª","Justo","5"],
+        ["5ª","Justo","7"],
+        ["6ª","Maior","9"],
+        ["7ª","Maior","11"],
+        ["8ª","Justo","12"]
+      ]
+    },
+
+    exemplos:[
+      "C–D: segunda maior, pois as letras C e D formam uma segunda e a distância é de dois semitons.",
+      "C–Eb: terça menor, pois as letras formam uma terça e a distância é de três semitons.",
+      "C–E: terça maior, com quatro semitons.",
+      "C–F: quarta justa, com cinco semitons.",
+      "C–F#: quarta aumentada, com seis semitons.",
+      "C–Gb: quinta diminuta, também com seis semitons. Apesar de possuir a mesma distância cromática de C–F#, sua classificação diatônica é diferente.",
+      "C–G: quinta justa, com sete semitons.",
+      "C–A: sexta maior, com nove semitons.",
+      "C–Bb: sétima menor, com dez semitons.",
+      "C4–D5: nona maior, intervalo composto equivalente a uma segunda maior acrescida de uma oitava.",
+      "C4–E5: décima maior, equivalente a uma terça maior acrescida de uma oitava.",
+      "C4–G5: décima segunda justa, equivalente a uma quinta justa acrescida de uma oitava.",
+      "A inversão de uma terça maior é uma sexta menor.",
+      "A inversão de uma quarta justa é uma quinta justa.",
+      "A inversão de uma quarta aumentada é uma quinta diminuta.",
+      "A inversão de uma segunda menor é uma sétima maior."
+    ],
+
+    erros:[
+      "Classificar um intervalo apenas contando os semitons, sem considerar os nomes das notas.",
+      "Confundir quarta aumentada com quinta diminuta por possuírem a mesma distância cromática no temperamento igual.",
+      "Confundir intervalo simples com intervalo composto.",
+      "Afirmar que toda terça possui quatro semitons. Terças maiores possuem quatro semitons no temperamento igual; terças menores possuem três.",
+      "Afirmar que toda quinta possui sete semitons. A quinta diminuta possui seis semitons e a quinta aumentada possui oito no temperamento igual.",
+      "Inverter o número do intervalo sem transformar sua qualidade.",
+      "Afirmar que a inversão de uma terça maior é uma sexta maior. A qualidade correta é sexta menor.",
+      "Confundir inversão intervalar com inversão de um acorde. São operações relacionadas, mas diferentes.",
+      "Tratar a fórmula de 100 cents por semitom como universal para todos os sistemas de afinação.",
+      "Ignorar a direção do intervalo. Um intervalo ascendente e um descendente podem exigir análise de direção e grafia.",
+      "Supor que a classificação intervalar isolada determina a função harmônica. A função depende também do contexto musical."
+    ],
+
+    notacao:[
+      "Os intervalos podem ser identificados por número ordinal e qualidade: 2ª maior, 3ª menor, 4ª justa, 5ª diminuta.",
+      "As abreviações P, M, m, A e d podem representar justo, maior, menor, aumentado e diminuto, respectivamente, desde que o padrão seja declarado.",
+      "Intervalos duplamente aumentados e duplamente diminutos podem ser indicados por AA e dd.",
+      "A grafia das notas deve ser preservada. F# e Gb não devem ser substituídos automaticamente um pelo outro durante a classificação.",
+      "Intervalos compostos devem manter seu número completo: nona, décima, décima primeira, décima segunda e assim por diante.",
+      "A direção pode ser registrada como ascendente ou descendente.",
+      "A inversão deve ser documentada separadamente do intervalo original."
+    ],
+
+    relacoes:[
+      "Depende de: Notas e alturas musicais, Frequências e proporções e Intervalos simples e compostos.",
+      "Alimenta: Consonâncias e dissonâncias, Escalas e modos, Harmonia, Melodia e Contraponto e Condução de Vozes.",
+      "A classificação intervalar fornece a identificação necessária para estudar consonâncias, dissonâncias e relações entre notas.",
+      "A inversão intervalar é importante para compreender o comportamento das vozes, a organização dos acordes e as relações entre registros.",
+      "A grafia enarmônica deve ser interpretada em conjunto com tonalidade, função harmônica e condução de vozes.",
+      "Limite desta ficha: a função harmônica detalhada dos intervalos será desenvolvida no módulo Harmonia.",
+      "Limite desta ficha: as regras de consonância e dissonância serão aprofundadas no assunto Consonâncias e dissonâncias."
+    ],
+
+    fontes:[
+      "Kostka, Stefan; Payne, Dorothy; Almen, Byron. Tonal Harmony. 8ª edição. McGraw-Hill, 2018. Referência de teoria tonal, classificação intervalar e relações harmônicas.",
+      "Laitz, Steven G. The Complete Musician: An Integrated Approach to Theory, Analysis, and Listening. 4ª edição. Oxford University Press, 2016. Referência para teoria, análise e aplicação dos intervalos.",
+      "Open Music Theory. Seções sobre intervalos, intervalos compostos e inversão intervalar. Recurso didático aberto de teoria musical. https://viva.pressbooks.pub/openmusictheory/",
+      "Os cálculos e exemplos desta ficha são apresentados como regras didáticas de teoria musical tonal. A implementação do classificador deve ser validada com testes e revisão musical."
+    ],
+
+    dados:{
+      id:"fundamentos/classificacao-e-inversao-de-intervalos",
+      convencao:"C4 como referência de oitava para os cálculos internos desta ficha",
+      familiaJusta:["uníssono","quarta","quinta","oitava"],
+      familiaMaiorMenor:["segunda","terça","sexta","sétima"],
+      referenciasSemitons:{
+        unissono:0,
+        segundaMaior:2,
+        tercaMaior:4,
+        quartaJusta:5,
+        quintaJusta:7,
+        sextaMaior:9,
+        setimaMaior:11,
+        oitavaJusta:12
+      },
+      regraNumeroInversao:"9 - número do intervalo simples",
+      inversoesQualidade:{
+        justo:"justo",
+        maior:"menor",
+        menor:"maior",
+        aumentado:"diminuto",
+        diminuto:"aumentado"
+      },
+      observacao:"O cálculo automático desta ficha cobre grafias com até dois acidentes e intervalos ascendentes ou descendentes. Casos teóricos extremos e grafias não convencionais exigem revisão."
+    },
+
+    testes:[
+      {
+        entrada:"C4–D4",
+        esperado:"segunda maior; 2 semitons",
+        obtido:function(){
+          var r = classificar("C4","D4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–Eb4",
+        esperado:"terça menor; 3 semitons",
+        obtido:function(){
+          var r = classificar("C4","Eb4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–E4",
+        esperado:"terça maior; 4 semitons",
+        obtido:function(){
+          var r = classificar("C4","E4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–F4",
+        esperado:"quarta justa; 5 semitons",
+        obtido:function(){
+          var r = classificar("C4","F4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–F#4",
+        esperado:"quarta aumentada; 6 semitons",
+        obtido:function(){
+          var r = classificar("C4","F#4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–Gb4",
+        esperado:"quinta diminuta; 6 semitons",
+        obtido:function(){
+          var r = classificar("C4","Gb4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–G4",
+        esperado:"quinta justa; 7 semitons",
+        obtido:function(){
+          var r = classificar("C4","G4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–A4",
+        esperado:"sexta maior; 9 semitons",
+        obtido:function(){
+          var r = classificar("C4","A4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–Bb4",
+        esperado:"sétima menor; 10 semitons",
+        obtido:function(){
+          var r = classificar("C4","Bb4");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–D5",
+        esperado:"nona maior; 14 semitons",
+        obtido:function(){
+          var r = classificar("C4","D5");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–E5",
+        esperado:"décima maior; 16 semitons",
+        obtido:function(){
+          var r = classificar("C4","E5");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"C4–G5",
+        esperado:"décima segunda justa; 19 semitons",
+        obtido:function(){
+          var r = classificar("C4","G5");
+          return r.nome + "; " + r.semitons + " semitons";
+        }
+      },
+      {
+        entrada:"Inversão de terça maior",
+        esperado:"sexta menor",
+        obtido:function(){
+          return inverter(3,"M").nome;
+        }
+      },
+      {
+        entrada:"Inversão de quarta justa",
+        esperado:"quinta justa",
+        obtido:function(){
+          return inverter(4,"P").nome;
+        }
+      },
+      {
+        entrada:"Inversão de quarta aumentada",
+        esperado:"quinta diminuta",
+        obtido:function(){
+          return inverter(4,"A").nome;
+        }
+      },
+      {
+        entrada:"Inversão de segunda menor",
+        esperado:"sétima maior",
+        obtido:function(){
+          return inverter(2,"m").nome;
+        }
+      },
+      {
+        entrada:"Inversão de quinta diminuta",
+        esperado:"quarta aumentada",
+        obtido:function(){
+          return inverter(5,"d").nome;
+        }
+      },
+      {
+        entrada:"Intervalo enarmônico C4–F#4 e C4–Gb4",
+        esperado:"quarta aumentada e quinta diminuta",
+        obtido:function(){
+          return classificar("C4","F#4").nome + " / " +
+                 classificar("C4","Gb4").nome;
+        }
+      }
+    ],
+
+    experimente:{
+      html:
+        '<div class="pc-fi-calc">' +
+          '<label>Primeira nota<input type="text" data-ci-n1 value="C4" placeholder="Ex.: C4"></label>' +
+          '<label>Segunda nota<input type="text" data-ci-n2 value="F#4" placeholder="Ex.: F#4"></label>' +
+        '</div>' +
+        '<button type="button" class="at-btn gold" data-ci-calc style="margin-top:8px">CLASSIFICAR INTERVALO</button>' +
+        '<pre class="pc-fi-saida" data-ci-saida></pre>',
+
+      ligar:function(ev,cont){
+        if(!ev.target.closest("[data-ci-calc]")) return;
+
+        var s = cont.querySelector("[data-ci-saida]");
+        var n1 = cont.querySelector("[data-ci-n1]").value;
+        var n2 = cont.querySelector("[data-ci-n2]").value;
+        var r = classificar(n1,n2);
+
+        if(r.erro){
+          s.textContent = r.erro;
+          return;
+        }
+
+        var inv = inverter(r.simples,r.qualidade);
+
+        s.textContent = [
+          "Nota inicial: " + n1,
+          "Nota final: " + n2,
+          "Direção: " + r.direcao,
+          "Classificação: " + r.nome,
+          "Número do intervalo: " + r.numero,
+          "Intervalo simples correspondente: " + r.simples + "ª",
+          "Oitavas adicionais: " + r.oitavas,
+          "Distância cromática: " + r.semitons + " semitons",
+          "Inversão simples: " + inv.nome,
+          "Observação: a inversão apresentada é a do intervalo simples correspondente."
+        ].join("\n");
+      }
+    }
+  });
+})();
+</script>
+<!-- ---------- FIM DA FICHA 03 — Classificação e inversão de intervalos ---------- -->
+
 </body>
 </html>
  
