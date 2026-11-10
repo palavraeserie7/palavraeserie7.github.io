@@ -12582,6 +12582,889 @@ function inverter(numero, qualidade){
 })();
 </script>
 <!-- ---------- FIM DA FICHA 03 — Classificação e inversão de intervalos ---------- -->
+ 
+<!-- ---------- FICHA 04 — Fundamentos Musicais / Escalas e modos ---------- -->
+<script>
+(function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+
+  var nomesNotas = [
+    "C","C#","D","D#","E","F",
+    "F#","G","G#","A","A#","B"
+  ];
+
+  var escalas = {
+    "Maior natural (Jônica)": {
+      tipo:"Diatônica",
+      intervalos:[2,2,1,2,2,2,1],
+      graus:["1","2","3","4","5","6","7"]
+    },
+    "Menor natural (Eólia)": {
+      tipo:"Diatônica",
+      intervalos:[2,1,2,2,1,2,2],
+      graus:["1","2","b3","4","5","b6","b7"]
+    },
+    "Menor harmônica": {
+      tipo:"Menor harmônica",
+      intervalos:[2,1,2,2,1,3,1],
+      graus:["1","2","b3","4","5","b6","7"]
+    },
+    "Menor melódica ascendente": {
+      tipo:"Menor melódica",
+      intervalos:[2,1,2,2,2,2,1],
+      graus:["1","2","b3","4","5","6","7"]
+    },
+    "Jônico": {
+      tipo:"Modo maior",
+      intervalos:[2,2,1,2,2,2,1],
+      graus:["1","2","3","4","5","6","7"]
+    },
+    "Dórico": {
+      tipo:"Modo maior",
+      intervalos:[2,1,2,2,2,1,2],
+      graus:["1","2","b3","4","5","6","b7"]
+    },
+    "Frígio": {
+      tipo:"Modo maior",
+      intervalos:[1,2,2,2,1,2,2],
+      graus:["1","b2","b3","4","5","b6","b7"]
+    },
+    "Lídio": {
+      tipo:"Modo maior",
+      intervalos:[2,2,2,1,2,2,1],
+      graus:["1","2","3","#4","5","6","7"]
+    },
+    "Mixolídio": {
+      tipo:"Modo maior",
+      intervalos:[2,2,1,2,2,1,2],
+      graus:["1","2","3","4","5","6","b7"]
+    },
+    "Eólio": {
+      tipo:"Modo maior",
+      intervalos:[2,1,2,2,1,2,2],
+      graus:["1","2","b3","4","5","b6","b7"]
+    },
+    "Lócrio": {
+      tipo:"Modo maior",
+      intervalos:[1,2,2,1,2,2,2],
+      graus:["1","b2","b3","4","b5","b6","b7"]
+    },
+    "Pentatônica maior": {
+      tipo:"Pentatônica",
+      intervalos:[2,2,3,2,3],
+      graus:["1","2","3","5","6"]
+    },
+    "Pentatônica menor": {
+      tipo:"Pentatônica",
+      intervalos:[3,2,2,3,2],
+      graus:["1","b3","4","5","b7"]
+    },
+    "Escala blues menor": {
+      tipo:"Blues",
+      intervalos:[3,2,1,1,3,2],
+      graus:["1","b3","4","b5","5","b7"]
+    }
+  };
+
+  var acidentes = {
+    "C":0,"C#":1,"Db":1,
+    "D":2,"D#":3,"Eb":3,
+    "E":4,"Fb":4,"E#":5,
+    "F":5,"F#":6,"Gb":6,
+    "G":7,"G#":8,"Ab":8,
+    "A":9,"A#":10,"Bb":10,
+    "B":11,"Cb":11,"B#":0
+  };
+
+  function normalizarNota(nota){
+    return String(nota || "").trim().replace(/♯/g,"#").replace(/♭/g,"b");
+  }
+
+  function gerarEscala(tonica,nome){
+    var t = normalizarNota(tonica);
+    var altura = acidentes[t];
+    var escala = escalas[nome];
+
+    if(altura === undefined || !escala) return null;
+
+    var resultado = [];
+    var atual = altura;
+
+    resultado.push(nomesNotas[atual]);
+
+    for(var i=0;i<escala.intervalos.length-1;i++){
+      atual = (atual + escala.intervalos[i]) % 12;
+      resultado.push(nomesNotas[atual]);
+    }
+
+    return {
+      tonica:t,
+      nome:nome,
+      notas:resultado,
+      intervalos:escala.intervalos.slice(),
+      graus:escala.graus.slice(),
+      tipo:escala.tipo
+    };
+  }
+
+  function soma(arr){
+    return arr.reduce(function(a,b){return a+b;},0);
+  }
+
+  window.MaestroFichas.registrar({
+    modulo:"Fundamentos Musicais",
+    titulo:"Escalas e modos",
+
+    tipos:[
+      "Teoria musical",
+      "Organização das alturas",
+      "Estruturas diatônicas e não diatônicas"
+    ],
+
+    depende:[
+      "Notas e alturas musicais",
+      "Frequências e proporções",
+      "Intervalos simples e compostos",
+      "Classificação e inversão de intervalos"
+    ],
+
+    revisada:false,
+
+    definicao:[
+      "Escala musical é uma organização de alturas ordenadas, geralmente em sequência ascendente ou descendente, segundo uma estrutura de intervalos definida.",
+      "Os graus são as posições ocupadas pelas notas dentro de uma escala. São normalmente identificados por números ordinais: primeiro grau, segundo grau, terceiro grau e assim sucessivamente.",
+      "A tônica é o primeiro grau de referência de uma escala. Em contextos tonais e modais, ela pode funcionar como centro de estabilidade, embora sua função dependa da organização musical.",
+      "Modo é uma organização específica dos graus e intervalos em relação a uma nota central. Os modos podem apresentar diferentes estruturas de tons e semitons.",
+      "Escalas diatônicas tradicionais possuem sete graus distintos dentro da oitava. A escala maior natural e a menor natural são exemplos importantes.",
+      "A escala maior natural possui a sequência de intervalos: tom, tom, semitom, tom, tom, tom e semitom.",
+      "A escala menor natural possui a sequência: tom, semitom, tom, tom, semitom, tom e tom.",
+      "Os sete modos derivados da escala maior são: jônico, dórico, frígio, lídio, mixolídio, eólio e lócrio.",
+      "Cada modo derivado da escala maior utiliza as mesmas notas da escala de origem, mas estabelece um centro modal diferente. A mudança de centro modifica a relação dos graus com a tônica.",
+      "Escalas menores harmônicas e melódicas são estruturas utilizadas na tradição tonal para organizar diferentes possibilidades melódicas e harmônicas da tonalidade menor.",
+      "Escalas pentatônicas possuem cinco notas distintas por oitava. São encontradas em diversas tradições musicais e não pertencem exclusivamente a um único sistema cultural.",
+      "A escala blues menor é frequentemente descrita como uma estrutura de seis notas, incluindo a chamada blue note, geralmente representada como quinta diminuta em relação à tônica.",
+      "A classificação de uma escala não depende apenas da lista de notas. A grafia, a tônica, a disposição dos graus e o contexto musical são necessários para compreender sua organização."
+    ],
+
+    formulas:[
+      {
+        nome:"Distância em semitons",
+        texto:"distância = soma dos semitons entre os graus",
+        nota:"Cada tom corresponde a dois semitons no sistema de doze sons com temperamento igual."
+      },
+      {
+        nome:"Construção de escala por intervalos",
+        texto:"próxima nota = nota atual + intervalo",
+        nota:"A soma é realizada em semitons e deve respeitar a organização dos graus e a grafia musical."
+      },
+      {
+        nome:"Altura em classes de notas",
+        texto:"classe = (altura inicial + deslocamento) mod 12",
+        nota:"A operação permite calcular classes de altura no sistema cromático de doze sons."
+      },
+      {
+        nome:"Escala maior natural",
+        texto:"2 – 2 – 1 – 2 – 2 – 2 – 1",
+        nota:"Sequência em semitons entre os sete graus e o retorno à oitava."
+      },
+      {
+        nome:"Escala menor natural",
+        texto:"2 – 1 – 2 – 2 – 1 – 2 – 2",
+        nota:"Sequência em semitons entre os sete graus e o retorno à oitava."
+      },
+      {
+        nome:"Escala menor harmônica",
+        texto:"2 – 1 – 2 – 2 – 1 – 3 – 1",
+        nota:"Em relação à menor natural, apresenta o sétimo grau elevado."
+      },
+      {
+        nome:"Escala menor melódica ascendente",
+        texto:"2 – 1 – 2 – 2 – 2 – 2 – 1",
+        nota:"Na forma clássica tradicional, a escala menor melódica descendente pode retornar à estrutura da menor natural. Há outras práticas e convenções."
+      },
+      {
+        nome:"Escala pentatônica maior",
+        texto:"2 – 2 – 3 – 2 – 3",
+        nota:"Estrutura de cinco notas que completa a oitava."
+      },
+      {
+        nome:"Escala pentatônica menor",
+        texto:"3 – 2 – 2 – 3 – 2",
+        nota:"Estrutura de cinco notas que completa a oitava."
+      },
+      {
+        nome:"Escala blues menor",
+        texto:"3 – 2 – 1 – 1 – 3 – 2",
+        nota:"Estrutura didática de seis notas, com a quinta diminuta entre a quarta e a quinta justa."
+      }
+    ],
+
+    tabela:{
+      titulo:"Estruturas dos sete modos derivados da escala maior",
+      cabecalho:["Modo","Graus característicos","Sequência de semitons"],
+      linhas:[
+        ["Jônico","1 2 3 4 5 6 7","2–2–1–2–2–2–1"],
+        ["Dórico","1 2 b3 4 5 6 b7","2–1–2–2–2–1–2"],
+        ["Frígio","1 b2 b3 4 5 b6 b7","1–2–2–2–1–2–2"],
+        ["Lídio","1 2 3 #4 5 6 7","2–2–2–1–2–2–1"],
+        ["Mixolídio","1 2 3 4 5 6 b7","2–2–1–2–2–1–2"],
+        ["Eólio","1 2 b3 4 5 b6 b7","2–1–2–2–1–2–2"],
+        ["Lócrio","1 b2 b3 4 b5 b6 b7","1–2–2–1–2–2–2"]
+      ]
+    },
+
+    exemplos:[
+      "Dó maior: C, D, E, F, G, A, B. Sua estrutura é tom, tom, semitom, tom, tom, tom e semitom.",
+      "Lá menor natural: A, B, C, D, E, F, G. Sua estrutura é tom, semitom, tom, tom, semitom, tom e tom.",
+      "Lá menor harmônica: A, B, C, D, E, F, G#. O sétimo grau é elevado em relação à menor natural.",
+      "Lá menor melódica ascendente: A, B, C, D, E, F#, G#. O sexto e o sétimo graus são elevados em relação à menor natural.",
+      "Dó jônico: C, D, E, F, G, A, B. Corresponde à estrutura da escala maior natural.",
+      "Ré dórico: D, E, F, G, A, B, C. Utiliza as mesmas notas de Dó maior, mas estabelece Ré como centro modal.",
+      "Mi frígio: E, F, G, A, B, C, D. Possui segunda menor em relação à tônica.",
+      "Fá lídio: F, G, A, B, C, D, E. Possui quarta aumentada em relação à tônica.",
+      "Sol mixolídio: G, A, B, C, D, E, F. Possui sétima menor em relação à tônica.",
+      "Lá eólio: A, B, C, D, E, F, G. Corresponde à escala menor natural.",
+      "Si lócrio: B, C, D, E, F, G, A. Possui quinta diminuta em relação à tônica.",
+      "Dó pentatônica maior: C, D, E, G, A.",
+      "Lá pentatônica menor: A, C, D, E, G.",
+      "Lá blues menor: A, C, D, Eb, E, G."
+    ],
+
+    erros:[
+      "Confundir escala com tonalidade. Escala é uma organização de notas; tonalidade envolve relações hierárquicas e funções harmônicas em torno de um centro tonal.",
+      "Tratar modo e escala como termos sempre intercambiáveis. Um modo envolve uma organização de graus em relação a um centro modal.",
+      "Afirmar que os sete modos maiores possuem notas diferentes entre si quando são derivados de uma mesma escala diatônica. Eles podem compartilhar as mesmas notas e diferir pelo centro modal.",
+      "Confundir a sequência de notas de uma escala com sua estrutura intervalar.",
+      "Confundir escala menor natural, menor harmônica e menor melódica.",
+      "Ignorar que a menor melódica possui convenções diferentes entre a tradição clássica e diversas práticas modernas.",
+      "Identificar um modo apenas pela nota inicial de uma sequência. É necessário considerar o centro modal e o contexto musical.",
+      "Confundir o modo dórico com a escala menor natural. Ambos possuem terça menor, mas o dórico apresenta sexta maior.",
+      "Confundir o modo mixolídio com a escala maior natural. O mixolídio possui sétima menor.",
+      "Confundir o modo lídio com a escala maior natural. O lídio possui quarta aumentada.",
+      "Tratar as escalas pentatônicas como estruturas exclusivamente ocidentais.",
+      "Tratar a blue note como uma altura fixa e universal. Sua entonação e interpretação podem variar conforme tradição, estilo e contexto.",
+      "Gerar nomes de notas exclusivamente por classes cromáticas, sem preservar a grafia diatônica adequada.",
+      "Supor que a presença das mesmas notas garante, por si só, a identidade modal. O centro, a ênfase e o comportamento musical também importam."
+    ],
+
+    notacao:[
+      "Os graus podem ser representados por números: 1, 2, 3, 4, 5, 6 e 7.",
+      "Alterações em relação à escala maior são indicadas por símbolos como b3, b6, b7 e #4.",
+      "Os intervalos entre os graus podem ser representados por números de semitons.",
+      "A tônica deve ser identificada explicitamente ao registrar uma escala ou modo.",
+      "A grafia das notas deve respeitar a organização diatônica sempre que a função musical exigir.",
+      "Uma escala deve registrar seu nome, tônica, sequência de graus e sequência intervalar.",
+      "A forma descendente da menor melódica deve ser registrada conforme a convenção adotada: clássica tradicional ou prática contemporânea."
+    ],
+
+    relacoes:[
+      "Depende de: Notas e alturas musicais, Frequências e proporções, Intervalos simples e compostos e Classificação e inversão de intervalos.",
+      "Alimenta: Armaduras e tonalidades, Graus da escala, Harmonia, Melodia, Improvisação e Composição.",
+      "A construção de escalas utiliza intervalos para organizar as alturas.",
+      "A identificação dos graus permite reconhecer relações melódicas e harmônicas.",
+      "A compreensão dos modos contribui para a criação de melodias, ambientes sonoros e centros modais.",
+      "As escalas menores harmônica e melódica possuem relações importantes com a formação de acordes e funções harmônicas.",
+      "Limite desta ficha: armaduras de clave e organização das tonalidades serão aprofundadas no assunto Armaduras e tonalidades.",
+      "Limite desta ficha: a aplicação dos graus na construção de acordes será aprofundada no assunto Harmonia."
+    ],
+
+    fontes:[
+      "Kostka, Stefan; Payne, Dorothy; Almen, Byron. Tonal Harmony. 8ª edição. McGraw-Hill, 2018. Referência para escalas, tonalidade e organização diatônica.",
+      "Laitz, Steven G. The Complete Musician: An Integrated Approach to Theory, Analysis, and Listening. 4ª edição. Oxford University Press, 2016. Referência para escalas, modos e análise musical.",
+      "Open Music Theory. Seções sobre escalas, modos e tonalidade. Recurso didático aberto de teoria musical. https://viva.pressbooks.pub/openmusictheory/",
+      "Aebersold, Jamey. A New Approach to Jazz Improvisation. Referência complementar para aplicação de escalas e modos na prática do jazz.",
+      "As sequências intervalares desta ficha são apresentadas como estruturas teóricas de referência. Sua aplicação musical deve considerar grafia, centro tonal ou modal e contexto."
+    ],
+
+    dados:{
+      id:"fundamentos/escalas-e-modos",
+      sistemaCromatico:"12 classes de altura",
+      quantidadeModosMaiores:7,
+      modosMaiores:[
+        "Jônico","Dórico","Frígio","Lídio",
+        "Mixolídio","Eólio","Lócrio"
+      ],
+      escalaMaior:[2,2,1,2,2,2,1],
+      escalaMenorNatural:[2,1,2,2,1,2,2],
+      escalaMenorHarmonica:[2,1,2,2,1,3,1],
+      escalaMenorMelodicaAscendente:[2,1,2,2,2,2,1],
+      escalaPentatonicaMaior:[2,2,3,2,3],
+      escalaPentatonicaMenor:[3,2,2,3,2],
+      escalaBluesMenor:[3,2,1,1,3,2],
+      observacao:"As estruturas são referências teóricas. A identificação modal depende do centro modal e do contexto musical, não apenas da sequência de notas."
+    },
+
+    testes:[
+      {
+        entrada:"Soma dos intervalos da escala maior",
+        esperado:"12 semitons",
+        obtido:function(){
+          return soma(escalas["Maior natural (Jônica)"].intervalos) + " semitons";
+        }
+      },
+      {
+        entrada:"Soma dos intervalos da escala menor natural",
+        esperado:"12 semitons",
+        obtido:function(){
+          return soma(escalas["Menor natural (Eólia)"].intervalos) + " semitons";
+        }
+      },
+      {
+        entrada:"Soma dos intervalos da escala menor harmônica",
+        esperado:"12 semitons",
+        obtido:function(){
+          return soma(escalas["Menor harmônica"].intervalos) + " semitons";
+        }
+      },
+      {
+        entrada:"Soma dos intervalos da escala menor melódica ascendente",
+        esperado:"12 semitons",
+        obtido:function(){
+          return soma(escalas["Menor melódica ascendente"].intervalos) + " semitons";
+        }
+      },
+      {
+        entrada:"Soma dos intervalos da pentatônica maior",
+        esperado:"12 semitons",
+        obtido:function(){
+          return soma(escalas["Pentatônica maior"].intervalos) + " semitons";
+        }
+      },
+      {
+        entrada:"Soma dos intervalos da pentatônica menor",
+        esperado:"12 semitons",
+        obtido:function(){
+          return soma(escalas["Pentatônica menor"].intervalos) + " semitons";
+        }
+      },
+      {
+        entrada:"Soma dos intervalos da escala blues menor",
+        esperado:"12 semitons",
+        obtido:function(){
+          return soma(escalas["Escala blues menor"].intervalos) + " semitons";
+        }
+      },
+      {
+        entrada:"Dó maior",
+        esperado:"C, D, E, F, G, A, B",
+        obtido:function(){
+          return gerarEscala("C","Maior natural (Jônica)").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Lá menor natural",
+        esperado:"A, B, C, D, E, F, G",
+        obtido:function(){
+          return gerarEscala("A","Menor natural (Eólia)").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Lá menor harmônica",
+        esperado:"A, B, C, D, E, F, G#",
+        obtido:function(){
+          return gerarEscala("A","Menor harmônica").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Lá menor melódica ascendente",
+        esperado:"A, B, C, D, E, F#, G#",
+        obtido:function(){
+          return gerarEscala("A","Menor melódica ascendente").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Ré dórico",
+        esperado:"D, E, F, G, A, B, C",
+        obtido:function(){
+          return gerarEscala("D","Dórico").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Fá lídio",
+        esperado:"F, G, A, B, C, D, E",
+        obtido:function(){
+          return gerarEscala("F","Lídio").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Sol mixolídio",
+        esperado:"G, A, B, C, D, E, F",
+        obtido:function(){
+          return gerarEscala("G","Mixolídio").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Dó pentatônica maior",
+        esperado:"C, D, E, G, A",
+        obtido:function(){
+          return gerarEscala("C","Pentatônica maior").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Lá pentatônica menor",
+        esperado:"A, C, D, E, G",
+        obtido:function(){
+          return gerarEscala("A","Pentatônica menor").notas.join(", ");
+        }
+      },
+      {
+        entrada:"Lá blues menor",
+        esperado:"A, C, D, D#, E, G",
+        obtido:function(){
+          return gerarEscala("A","Escala blues menor").notas.join(", ");
+        }
+      }
+    ],
+
+    experimente:{
+      html:
+        '<div class="pc-fi-calc">' +
+          '<label>Tônica<select data-em-tonica>' +
+            '<option>C</option><option>C#</option><option>D</option>' +
+            '<option>Eb</option><option>E</option><option>F</option>' +
+            '<option>F#</option><option>G</option><option>Ab</option>' +
+            '<option>A</option><option>Bb</option><option>B</option>' +
+          '</select></label>' +
+          '<label>Escala ou modo<select data-em-tipo>' +
+            Object.keys(escalas).map(function(n){
+              return '<option value="' + n + '">' + n + '</option>';
+            }).join("") +
+          '</select></label>' +
+        '</div>' +
+        '<button type="button" class="at-btn gold" data-em-calc style="margin-top:8px">GERAR ESCALA</button>' +
+        '<pre class="pc-fi-saida" data-em-saida></pre>',
+
+      ligar:function(ev,cont){
+        if(!ev.target.closest("[data-em-calc]")) return;
+
+        var tonica = cont.querySelector("[data-em-tonica]").value;
+        var tipo = cont.querySelector("[data-em-tipo]").value;
+        var resultado = gerarEscala(tonica,tipo);
+        var saida = cont.querySelector("[data-em-saida]");
+
+        if(!resultado){
+          saida.textContent = "Não foi possível gerar esta escala.";
+          return;
+        }
+
+        saida.textContent = [
+          "Tônica: " + resultado.tonica,
+          "Estrutura: " + resultado.nome,
+          "Tipo: " + resultado.tipo,
+          "Notas: " + resultado.notas.join(", "),
+          "Graus: " + resultado.graus.join(" – "),
+          "Intervalos em semitons: " + resultado.intervalos.join(" – "),
+          "Total de semitons: " + soma(resultado.intervalos),
+          "Observação: a grafia das notas deve ser refinada conforme a tonalidade e a função musical."
+        ].join("\n");
+      }
+    }
+  });
+})();
+</script>
+<!-- ---------- FIM DA FICHA 04 — Escalas e modos ---------- -->
+
+<!-- ---------- FICHA 05 — Fundamentos Musicais / Graus da escala ---------- -->
+<script>
+(function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+
+  var notasCromaticas = [
+    "C","C#","D","D#","E","F",
+    "F#","G","G#","A","A#","B"
+  ];
+
+  var alturas = {
+    "C":0,"B#":0,
+    "C#":1,"Db":1,
+    "D":2,
+    "D#":3,"Eb":3,
+    "E":4,"Fb":4,
+    "F":5,"E#":5,
+    "F#":6,"Gb":6,
+    "G":7,
+    "G#":8,"Ab":8,
+    "A":9,
+    "A#":10,"Bb":10,
+    "B":11,"Cb":11
+  };
+
+  var modelos = {
+    "Maior natural": {
+      intervalos:[0,2,4,5,7,9,11],
+      graus:["1","2","3","4","5","6","7"]
+    },
+    "Menor natural": {
+      intervalos:[0,2,3,5,7,8,10],
+      graus:["1","2","b3","4","5","b6","b7"]
+    },
+    "Menor harmônica": {
+      intervalos:[0,2,3,5,7,8,11],
+      graus:["1","2","b3","4","5","b6","7"]
+    },
+    "Menor melódica ascendente": {
+      intervalos:[0,2,3,5,7,9,11],
+      graus:["1","2","b3","4","5","6","7"]
+    },
+    "Dórico": {
+      intervalos:[0,2,3,5,7,9,10],
+      graus:["1","2","b3","4","5","6","b7"]
+    },
+    "Frígio": {
+      intervalos:[0,1,3,5,7,8,10],
+      graus:["1","b2","b3","4","5","b6","b7"]
+    },
+    "Lídio": {
+      intervalos:[0,2,4,6,7,9,11],
+      graus:["1","2","3","#4","5","6","7"]
+    },
+    "Mixolídio": {
+      intervalos:[0,2,4,5,7,9,10],
+      graus:["1","2","3","4","5","6","b7"]
+    },
+    "Lócrio": {
+      intervalos:[0,1,3,5,6,8,10],
+      graus:["1","b2","b3","4","b5","b6","b7"]
+    }
+  };
+
+  var nomesGraus = [
+    "Tônica",
+    "Supertônica",
+    "Mediante",
+    "Subdominante",
+    "Dominante",
+    "Superdominante",
+    "Sensível ou subtônica"
+  ];
+
+  var romanos = ["I","II","III","IV","V","VI","VII"];
+
+  function obterNota(tonica, deslocamento){
+    var base = alturas[tonica];
+    if(base === undefined) return null;
+    return notasCromaticas[(base + deslocamento) % 12];
+  }
+
+  function gerarGraus(tonica,nomeModelo){
+    var modelo = modelos[nomeModelo];
+    if(!modelo || alturas[tonica] === undefined) return null;
+
+    return modelo.intervalos.map(function(semitons,i){
+      var nota = obterNota(tonica,semitons);
+      var nome = nomesGraus[i];
+
+      if(i === 6){
+        if(semitons === 11) nome = "Sensível";
+        else if(semitons === 10) nome = "Subtônica";
+      }
+
+      return {
+        numero:i+1,
+        romano:romanos[i],
+        nome:nome,
+        grau:modelo.graus[i],
+        semitons:semitons,
+        nota:nota
+      };
+    });
+  }
+
+  window.MaestroFichas.registrar({
+    modulo:"Fundamentos Musicais",
+    titulo:"Graus da escala",
+
+    tipos:[
+      "Teoria musical",
+      "Organização tonal e modal",
+      "Funções e relações entre graus"
+    ],
+
+    depende:[
+      "Notas e alturas musicais",
+      "Frequências e proporções",
+      "Intervalos simples e compostos",
+      "Classificação e inversão de intervalos",
+      "Escalas e modos"
+    ],
+
+    revisada:false,
+
+    definicao:[
+      "Grau da escala é a posição ocupada por uma nota dentro de uma escala, considerando a tônica como primeiro grau de referência.",
+      "Em uma escala diatônica de sete notas, os graus são identificados pelos números ordinais: primeiro, segundo, terceiro, quarto, quinto, sexto e sétimo.",
+      "A tônica é o primeiro grau e constitui o principal ponto de referência da organização tonal ou modal.",
+      "Os graus possuem nomes tradicionais: tônica, supertônica, mediante, subdominante, dominante, superdominante e sensível ou subtônica.",
+      "O nome atribuído ao sétimo grau depende de sua distância em relação à tônica. Quando está um semitom abaixo da tônica, é chamado de sensível. Quando está um tom abaixo, é chamado de subtônica.",
+      "A posição de um grau não determina, por si só, sua função harmônica. A função depende da tonalidade, do contexto, da organização dos acordes e do comportamento musical.",
+      "Os graus podem ser representados por números arábicos, números romanos e alterações cromáticas. Exemplos: 1, 2, b3, #4, I, ii e V.",
+      "As alterações dos graus indicam diferenças em relação à estrutura de referência adotada. Na teoria tonal tradicional, a escala maior costuma ser a referência para identificar graus alterados.",
+      "Os graus podem ser analisados em escalas maiores, menores e modais. A mesma posição numérica pode apresentar diferentes distâncias intervalares em cada estrutura.",
+      "Na análise harmônica, números romanos representam acordes construídos sobre os graus, e não apenas notas isoladas. A qualidade do acorde é indicada pela convenção de letras maiúsculas, minúsculas e símbolos adicionais.",
+      "A sensível possui forte tendência de resolução para a tônica em determinados contextos tonais, especialmente quando aparece como sétimo grau da escala maior ou da menor harmônica.",
+      "A subtônica aparece em estruturas como a escala menor natural e o modo mixolídio. Sua relação com a tônica difere daquela da sensível."
+    ],
+
+    formulas:[
+      {
+        nome:"Identificação do grau",
+        texto:"grau = posição da nota na escala em relação à tônica",
+        nota:"A contagem começa na tônica, que corresponde ao primeiro grau."
+      },
+      {
+        nome:"Distância cromática a partir da tônica",
+        texto:"distância = altura do grau − altura da tônica",
+        nota:"No sistema de doze classes de altura, o resultado pode ser representado módulo 12."
+      },
+      {
+        nome:"Altura cromática do grau",
+        texto:"altura do grau = altura da tônica + deslocamento em semitons",
+        nota:"A fórmula calcula a classe de altura. A grafia correta da nota exige também a análise diatônica."
+      },
+      {
+        nome:"Grau em relação à escala maior",
+        texto:"1 – 2 – 3 – 4 – 5 – 6 – 7",
+        nota:"Essa sequência representa os graus sem alteração da escala maior natural."
+      },
+      {
+        nome:"Graus da escala menor natural",
+        texto:"1 – 2 – b3 – 4 – 5 – b6 – b7",
+        nota:"As alterações são apresentadas em relação à escala maior com a mesma tônica."
+      },
+      {
+        nome:"Identificação da sensível",
+        texto:"distância de 11 semitons em relação à tônica",
+        nota:"No sistema cromático de doze sons, representa uma nota um semitom abaixo da tônica."
+      },
+      {
+        nome:"Identificação da subtônica",
+        texto:"distância de 10 semitons em relação à tônica",
+        nota:"Representa uma nota um tom abaixo da tônica."
+      }
+    ],
+
+    tabela:{
+      titulo:"Os sete graus e seus nomes tradicionais",
+      cabecalho:[
+        "Grau",
+        "Nome",
+        "Representação romana",
+        "Referência na escala maior"
+      ],
+      linhas:[
+        ["1º","Tônica","I","1"],
+        ["2º","Supertônica","II","2"],
+        ["3º","Mediante","III","3"],
+        ["4º","Subdominante","IV","4"],
+        ["5º","Dominante","V","5"],
+        ["6º","Superdominante","VI","6"],
+        ["7º","Sensível","VII","7"]
+      ]
+    },
+
+    exemplos:[
+      "Na escala de Dó maior (C, D, E, F, G, A, B), C é a tônica, D é a supertônica, E é a mediante, F é a subdominante, G é a dominante, A é a superdominante e B é a sensível.",
+      "Na escala de Lá menor natural (A, B, C, D, E, F, G), A é a tônica, B é a supertônica, C é a mediante, D é a subdominante, E é a dominante, F é a superdominante e G é a subtônica.",
+      "Na escala de Lá menor harmônica (A, B, C, D, E, F, G#), o sétimo grau é G#, que está um semitom abaixo da tônica A e recebe o nome de sensível.",
+      "Na escala de Sol mixolídio (G, A, B, C, D, E, F), o sétimo grau é F, um tom abaixo da tônica G, sendo denominado subtônica.",
+      "Na escala de Fá lídio (F, G, A, B, C, D, E), o quarto grau é B, representado como #4 em relação à escala maior de Fá.",
+      "Na escala de Ré dórico (D, E, F, G, A, B, C), o terceiro grau é F, representado como b3, e o sexto grau é B, representado como 6.",
+      "Na escala de Si lócrio (B, C, D, E, F, G, A), o quinto grau é F, representado como b5.",
+      "Em Dó maior, o acorde construído sobre o quinto grau é formado pelas notas G, B e D. Na análise tonal tradicional, é representado por V.",
+      "Em Dó maior, o acorde construído sobre o segundo grau é formado pelas notas D, F e A. Na análise tonal tradicional, é representado por ii.",
+      "O sétimo grau de Dó maior é B. Sua tendência de resolução para C é um exemplo tradicional do comportamento da sensível na tonalidade maior."
+    ],
+
+    erros:[
+      "Confundir grau da escala com intervalo. O grau identifica uma posição em uma escala; o intervalo descreve a distância entre duas notas.",
+      "Confundir o nome do grau com sua função harmônica. A dominante é o nome do quinto grau, mas sua função depende do contexto musical.",
+      "Afirmar que o sétimo grau é sempre uma sensível. Em escalas como a menor natural e o modo mixolídio, ele pode ser uma subtônica.",
+      "Confundir sensível com subtônica. A sensível está um semitom abaixo da tônica; a subtônica está um tom abaixo.",
+      "Afirmar que o terceiro grau é sempre maior. Na escala menor natural e em diversos modos, ele é menor.",
+      "Confundir números arábicos que representam notas da escala com números romanos que representam acordes em análises harmônicas.",
+      "Tratar os graus de uma escala como funções harmônicas fixas e universais.",
+      "Ignorar a escala de referência ao interpretar alterações como b3, b6 ou #4.",
+      "Supor que a mesma nota possui sempre o mesmo grau em qualquer tonalidade. O grau depende da tônica e da escala de referência.",
+      "Confundir a nota dominante, que corresponde ao quinto grau, com o acorde dominante construído sobre esse grau.",
+      "Identificar o centro tonal somente pela primeira nota escrita de uma sequência. O centro depende do contexto musical e da hierarquia percebida.",
+      "Tratar a resolução da sensível como uma regra absoluta em toda música. Sua condução pode variar conforme o estilo, a voz e o contexto."
+    ],
+
+    notacao:[
+      "Os graus podem ser registrados por números arábicos: 1, 2, 3, 4, 5, 6 e 7.",
+      "As alterações cromáticas podem ser indicadas com b e #: b3, b6, b7 e #4.",
+      "Os nomes tradicionais devem ser preservados: tônica, supertônica, mediante, subdominante, dominante, superdominante e sensível ou subtônica.",
+      "Os números romanos maiúsculos e minúsculos são utilizados na análise de acordes por grau, seguindo a convenção analítica adotada.",
+      "A escala de referência deve ser declarada antes de interpretar graus alterados.",
+      "O sétimo grau deve ser identificado como sensível ou subtônica conforme sua distância em relação à tônica.",
+      "A grafia musical deve respeitar a estrutura diatônica. Uma classe de altura cromática não substitui a identificação correta do nome da nota."
+    ],
+
+    relacoes:[
+      "Depende de: Notas e alturas musicais, Intervalos simples e compostos, Classificação e inversão de intervalos e Escalas e modos.",
+      "Alimenta: Armaduras e tonalidades, Harmonia, Melodia, Progressões harmônicas e Condução de vozes.",
+      "Os graus fornecem a referência para identificar a posição de cada nota dentro de uma escala.",
+      "A análise dos graus permite compreender a organização melódica e a construção de acordes.",
+      "Os graus alterados são importantes para compreender escalas menores, modos e relações cromáticas.",
+      "A identificação da sensível e da subtônica ajuda a analisar tendências melódicas e relações com a tônica.",
+      "Limite desta ficha: a construção e a classificação de acordes sobre os graus serão desenvolvidas no módulo Harmonia.",
+      "Limite desta ficha: as relações entre graus, armaduras e tonalidades serão aprofundadas no assunto Armaduras e tonalidades."
+    ],
+
+    fontes:[
+      "Kostka, Stefan; Payne, Dorothy; Almen, Byron. Tonal Harmony. 8ª edição. McGraw-Hill, 2018. Referência para graus da escala, funções tonais e análise por números romanos.",
+      "Laitz, Steven G. The Complete Musician: An Integrated Approach to Theory, Analysis, and Listening. 4ª edição. Oxford University Press, 2016. Referência para organização tonal, graus e relações melódicas.",
+      "Open Music Theory. Seções sobre scale degrees, tonal function e Roman numeral analysis. Recurso didático aberto de teoria musical. https://viva.pressbooks.pub/openmusictheory/",
+      "As nomenclaturas e exemplos desta ficha seguem convenções tradicionais de teoria musical tonal. A interpretação funcional deve considerar o contexto e o sistema musical analisado."
+    ],
+
+    dados:{
+      id:"fundamentos/graus-da-escala",
+      quantidadeGrausDiatonicos:7,
+      nomes:[
+        "Tônica",
+        "Supertônica",
+        "Mediante",
+        "Subdominante",
+        "Dominante",
+        "Superdominante",
+        "Sensível ou subtônica"
+      ],
+      romanos:["I","II","III","IV","V","VI","VII"],
+      referenciaMaior:["1","2","3","4","5","6","7"],
+      referenciaMenorNatural:["1","2","b3","4","5","b6","b7"],
+      sensivelSemitonsAbaixo:1,
+      subtonicaSemitonsAbaixo:2,
+      convencao:"Alterações dos graus comparadas à escala maior de mesma tônica.",
+      observacao:"A identificação do grau não determina automaticamente a função harmônica."
+    },
+
+    testes:[
+      {
+        entrada:"Quantidade de graus na escala diatônica tradicional",
+        esperado:"7",
+        obtido:function(){ return "7"; }
+      },
+      {
+        entrada:"Graus da escala maior",
+        esperado:"1, 2, 3, 4, 5, 6, 7",
+        obtido:function(){ return modelos["Maior natural"].graus.join(", "); }
+      },
+      {
+        entrada:"Graus da escala menor natural",
+        esperado:"1, 2, b3, 4, 5, b6, b7",
+        obtido:function(){ return modelos["Menor natural"].graus.join(", "); }
+      },
+      {
+        entrada:"Sétimo grau da escala maior",
+        esperado:"sensível",
+        obtido:function(){
+          return modelos["Maior natural"].intervalos[6] === 11 ? "sensível" : "verificar";
+        }
+      },
+      {
+        entrada:"Sétimo grau da escala menor natural",
+        esperado:"subtônica",
+        obtido:function(){
+          return modelos["Menor natural"].intervalos[6] === 10 ? "subtônica" : "verificar";
+        }
+      },
+      {
+        entrada:"Sétimo grau da escala menor harmônica",
+        esperado:"sensível",
+        obtido:function(){
+          return modelos["Menor harmônica"].intervalos[6] === 11 ? "sensível" : "verificar";
+        }
+      },
+      {
+        entrada:"Terceiro grau da escala menor natural",
+        esperado:"b3",
+        obtido:function(){ return modelos["Menor natural"].graus[2]; }
+      },
+      {
+        entrada:"Quarto grau do modo lídio",
+        esperado:"#4",
+        obtido:function(){ return modelos["Lídio"].graus[3]; }
+      },
+      {
+        entrada:"Quinto grau do modo lócrio",
+        esperado:"b5",
+        obtido:function(){ return modelos["Lócrio"].graus[4]; }
+      },
+      {
+        entrada:"Graus da escala de Dó maior",
+        esperado:"C, D, E, F, G, A, B",
+        obtido:function(){
+          return gerarGraus("C","Maior natural").map(function(g){return g.nota;}).join(", ");
+        }
+      },
+      {
+        entrada:"Graus da escala de Lá menor natural",
+        esperado:"A, B, D#, F, G, A, A#",
+        obtido:function(){
+          return gerarGraus("A","Menor natural").map(function(g){return g.nota;}).join(", ");
+        }
+      },
+      {
+        entrada:"Sétimo grau de Sol mixolídio",
+        esperado:"F; subtônica",
+        obtido:function(){
+          var g = gerarGraus("G","Mixolídio")[6];
+          return g.nota + "; " + g.nome;
+        }
+      }
+    ],
+
+    experimente:{
+      html:
+        '<div class="pc-fi-calc">' +
+          '<label>Tônica<select data-gd-tonica>' +
+            '<option>C</option><option>C#</option><option>D</option>' +
+            '<option>Eb</option><option>E</option><option>F</option>' +
+            '<option>F#</option><option>G</option><option>Ab</option>' +
+            '<option>A</option><option>Bb</option><option>B</option>' +
+          '</select></label>' +
+          '<label>Escala ou modo<select data-gd-modelo>' +
+            Object.keys(modelos).map(function(nome){
+              return '<option value="' + nome + '">' + nome + '</option>';
+            }).join("") +
+          '</select></label>' +
+        '</div>' +
+        '<button type="button" class="at-btn gold" data-gd-calc style="margin-top:8px">IDENTIFICAR GRAUS</button>' +
+        '<pre class="pc-fi-saida" data-gd-saida></pre>',
+
+      ligar:function(ev,cont){
+        if(!ev.target.closest("[data-gd-calc]")) return;
+
+        var tonica = cont.querySelector("[data-gd-tonica]").value;
+        var modelo = cont.querySelector("[data-gd-modelo]").value;
+        var resultado = gerarGraus(tonica,modelo);
+        var saida = cont.querySelector("[data-gd-saida]");
+
+        if(!resultado){
+          saida.textContent = "Não foi possível identificar os graus.";
+          return;
+        }
+
+        saida.textContent = [
+          "Tônica: " + tonica,
+          "Estrutura: " + modelo,
+          "",
+          resultado.map(function(g){
+            return g.numero + "º grau — " + g.nome +
+              " — " + g.grau + " — nota " + g.nota +
+              " — " + g.semitons + " semitons";
+          }).join("\n"),
+          "",
+          "Observação: os nomes e as notas exibidos são uma representação cromática simplificada. A grafia diatônica deve ser validada antes do uso em partituras."
+        ].join("\n");
+      }
+    }
+  });
+})();
+</script>
+<!-- ---------- FIM DA FICHA 05 — Graus da escala ---------- -->
+
 
 </body>
 </html>
