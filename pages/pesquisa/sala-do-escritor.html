@@ -13466,6 +13466,442 @@ function inverter(numero, qualidade){
 </script>
 <!-- ---------- FIM DA FICHA 05 — Graus da escala ---------- -->
 
+<!-- ---------- 3. FICHA 06 — Fundamentos Musicais / Acústica e fundamentos matemáticos ---------- -->
+<script>
+(function(){
+  if(!window.MaestroFichas || !window.MaestroNucleo) return;
+
+  var N = window.MaestroNucleo;
+  var fx = function(x){ return Number(x).toFixed(2); };
+  var PI = Math.PI;
+
+  var temperatura = function(t){
+    return 331.3 + (0.606 * t);
+  };
+
+  var periodo = function(f){
+    return 1 / f;
+  };
+
+  var comprimento = function(f, v){
+    return v / f;
+  };
+
+  var decibeis = function(p, pref){
+    return 20 * Math.log10(p / pref);
+  };
+
+  var intensidade = function(p, z){
+    return (p * p) / z;
+  };
+
+  var batimentos = function(f1, f2){
+    return Math.abs(f1 - f2);
+  };
+
+  window.MaestroFichas.registrar({
+    modulo:"Fundamentos Musicais",
+    titulo:"Acústica e fundamentos matemáticos",
+    tipos:[
+      "Física do som",
+      "Matemática das ondas",
+      "Acústica musical"
+    ],
+    depende:["fundamentos/notas-e-alturas-musicais"],
+    revisada:false,
+
+    definicao:[
+      "Acústica é o ramo da física que estuda a produção, a propagação, o comportamento e a percepção do som. Na música, permite compreender por que os instrumentos produzem diferentes alturas, intensidades, timbres e comportamentos sonoros.",
+      "O som é uma onda mecânica: precisa de um meio material, como ar, água ou sólidos, para se propagar. No ar, em condições normais, propaga-se principalmente como onda longitudinal, por sucessivas regiões de compressão e rarefação das partículas do meio. Não se propaga no vácuo.",
+      "Uma onda sonora é caracterizada por frequência, período, comprimento de onda, amplitude e velocidade de propagação. Essas grandezas estão relacionadas matematicamente e permitem descrever o comportamento físico do som.",
+      "Frequência é o número de ciclos completos de uma vibração por segundo, medida em hertz (Hz). Na música, está diretamente relacionada à percepção de altura: em condições comparáveis, frequências maiores correspondem a sons mais agudos e frequências menores a sons mais graves.",
+      "Período é o tempo necessário para completar um ciclo de vibração. É o inverso da frequência. Portanto, quanto maior a frequência, menor o período.",
+      "Comprimento de onda é a distância entre dois pontos consecutivos em mesma fase, como duas compressões sucessivas. Depende da velocidade de propagação e da frequência.",
+      "Amplitude representa a magnitude da oscilação da onda. Na acústica, a amplitude da pressão sonora está relacionada à intensidade física e à sensação de volume, embora a percepção também dependa da frequência, da duração e da sensibilidade auditiva.",
+      "Intensidade sonora é a potência acústica que atravessa uma unidade de área perpendicular à direção de propagação. É medida em watts por metro quadrado (W/m²). Não deve ser confundida com a sensação subjetiva de volume.",
+      "Nível sonoro é frequentemente expresso em decibéis (dB), uma escala logarítmica. Na medição do nível de pressão sonora, utiliza-se como referência convencional 20 micropascals no ar. O decibel expressa uma relação entre grandezas, não uma unidade linear de intensidade.",
+      "A velocidade do som depende das propriedades do meio, especialmente de sua elasticidade e densidade. No ar, também varia com a temperatura. A aproximadamente 20 °C, sua velocidade é cerca de 343 m/s.",
+      "Uma onda periódica complexa pode ser entendida como a combinação de componentes senoidais. A frequência fundamental determina a repetição básica do fenômeno, enquanto os harmônicos e demais componentes contribuem para a estrutura espectral e o timbre.",
+      "Ressonância ocorre quando um sistema responde com amplitude elevada a uma excitação próxima de uma de suas frequências naturais, dependendo também do amortecimento. Esse fenômeno é importante na construção e no funcionamento de instrumentos musicais.",
+      "Interferência é o resultado da superposição de ondas. Quando duas ondas se encontram, suas amplitudes se combinam. Dependendo da relação de fase, podem produzir reforço ou cancelamento parcial. Quando duas frequências próximas são ouvidas simultaneamente, podem surgir batimentos."
+    ],
+
+    formulas:[
+      {
+        nome:"Frequência e período",
+        texto:"f = 1 / T  ·  T = 1 / f",
+        nota:"f é medida em hertz (Hz) e T em segundos (s). Uma vibração de 440 Hz realiza 440 ciclos por segundo."
+      },
+      {
+        nome:"Velocidade de propagação",
+        texto:"v = λ × f",
+        nota:"v é a velocidade em m/s, λ é o comprimento de onda em metros e f é a frequência em Hz."
+      },
+      {
+        nome:"Comprimento de onda",
+        texto:"λ = v / f",
+        nota:"Mantida a velocidade do meio, frequências maiores apresentam comprimentos de onda menores."
+      },
+      {
+        nome:"Velocidade do som no ar",
+        texto:"v ≈ 331,3 + 0,606 × θ",
+        nota:"Aproximação para ar seco, próximo das condições atmosféricas normais. θ é a temperatura em graus Celsius. A umidade e outras condições também podem influenciar a velocidade."
+      },
+      {
+        nome:"Frequência angular",
+        texto:"ω = 2πf",
+        nota:"Expressa a taxa angular da oscilação em radianos por segundo."
+      },
+      {
+        nome:"Número de onda",
+        texto:"k = 2π / λ",
+        nota:"Expressa a variação de fase espacial em radianos por metro."
+      },
+      {
+        nome:"Onda senoidal",
+        texto:"y(x,t) = A × sen(ωt − kx + φ)",
+        nota:"A é a amplitude, ω é a frequência angular, k é o número de onda, x é a posição, t é o tempo e φ é a fase inicial."
+      },
+      {
+        nome:"Intensidade sonora",
+        texto:"I = P / S",
+        nota:"P é a potência acústica em watts e S é a área em metros quadrados. Para uma fonte pontual ideal irradiando uniformemente em todas as direções: I = P / (4πr²)."
+      },
+      {
+        nome:"Nível de pressão sonora",
+        texto:"Lₚ = 20 × log₁₀(p / p₀)",
+        nota:"p é a pressão sonora eficaz (RMS), p₀ = 20 μPa no ar. O resultado é expresso em dB."
+      },
+      {
+        nome:"Nível de intensidade sonora",
+        texto:"Lᵢ = 10 × log₁₀(I / I₀)",
+        nota:"I₀ = 10⁻¹² W/m² é a intensidade de referência convencional no ar."
+      },
+      {
+        nome:"Frequências harmônicas",
+        texto:"fₙ = n × f₀",
+        nota:"Em um modelo ideal de série harmônica, f₀ é a frequência fundamental e n é um número inteiro positivo. Os harmônicos correspondem a múltiplos inteiros da fundamental."
+      },
+      {
+        nome:"Batimentos",
+        texto:"fᵦ = |f₁ − f₂|",
+        nota:"A frequência dos batimentos corresponde à diferença absoluta entre duas frequências próximas."
+      },
+      {
+        nome:"Intensidade e pressão sonora",
+        texto:"I = p² / Z",
+        nota:"Para uma onda progressiva plana, p é a pressão sonora eficaz e Z é a impedância acústica característica do meio. No ar, Z pode ser aproximada por ρv."
+      }
+    ],
+
+    tabela:{
+      titulo:"Grandezas acústicas fundamentais",
+      cabecalho:[
+        "Grandeza",
+        "Símbolo",
+        "Unidade",
+        "Significado"
+      ],
+      linhas:[
+        ["Frequência","f","Hz","Ciclos por segundo"],
+        ["Período","T","s","Duração de um ciclo"],
+        ["Comprimento de onda","λ","m","Distância de um ciclo espacial"],
+        ["Velocidade","v","m/s","Rapidez de propagação"],
+        ["Amplitude","A","Variável","Magnitude da oscilação"],
+        ["Pressão sonora","p","Pa","Variação de pressão no meio"],
+        ["Intensidade","I","W/m²","Potência por unidade de área"],
+        ["Potência acústica","P","W","Energia sonora por unidade de tempo"],
+        ["Impedância acústica","Z","Pa·s/m","Relação entre pressão e velocidade de partícula"],
+        ["Frequência angular","ω","rad/s","Taxa angular da oscilação"],
+        ["Número de onda","k","rad/m","Variação espacial da fase"],
+        ["Nível sonoro","L","dB","Expressão logarítmica de uma razão"]
+      ]
+    },
+
+    exemplos:[
+      "Uma nota de 440 Hz possui período de aproximadamente 0,00227 s, ou 2,27 milissegundos.",
+      "Uma frequência de 220 Hz apresenta período de aproximadamente 0,00455 s, ou 4,55 milissegundos.",
+      "Uma onda de 440 Hz que se propaga no ar a 343 m/s possui comprimento de onda aproximado de 0,78 m.",
+      "A 20 °C, a velocidade aproximada do som no ar é 343,42 m/s.",
+      "Uma onda de 100 Hz em um meio onde o som se propaga a 343 m/s apresenta comprimento de onda de 3,43 m.",
+      "Se a frequência fundamental de uma corda é 110 Hz, seu segundo harmônico é 220 Hz, o terceiro é 330 Hz e o quarto é 440 Hz.",
+      "Duas fontes com frequências de 440 Hz e 442 Hz produzem dois batimentos por segundo, em condições adequadas de audição.",
+      "Uma duplicação da pressão sonora eficaz corresponde a um aumento aproximado de 6,02 dB, mantidas as condições de referência.",
+      "Uma duplicação da intensidade sonora corresponde a um aumento aproximado de 3,01 dB.",
+      "Uma onda sonora não se propaga no vácuo, pois depende de um meio material para transportar sua energia."
+    ],
+
+    erros:[
+      "Confundir frequência com período. São grandezas inversamente proporcionais, não equivalentes.",
+      "Confundir frequência com velocidade de propagação. Uma nota mantém sua frequência ao passar de um meio para outro, enquanto sua velocidade e seu comprimento de onda podem mudar.",
+      "Afirmar que o som se propaga no vácuo. O som é uma onda mecânica e necessita de um meio material.",
+      "Tratar amplitude e intensidade como a mesma grandeza. A amplitude descreve a oscilação; a intensidade descreve a potência transportada por unidade de área.",
+      "Confundir intensidade física com volume percebido. A percepção sonora depende também da frequência, da duração e das características auditivas.",
+      "Tratar decibéis como uma escala linear. O decibel é uma expressão logarítmica de uma razão.",
+      "Usar 10 × log₁₀ para calcular nível de pressão sonora. Para pressão, utiliza-se 20 × log₁₀; para intensidade, utiliza-se 10 × log₁₀.",
+      "Esquecer que a referência de 20 μPa corresponde ao nível de pressão sonora convencional no ar.",
+      "Afirmar que todos os instrumentos possuem harmônicos exatamente inteiros. Isso é uma idealização: instrumentos reais podem apresentar componentes inarmônicos.",
+      "Confundir harmônico com parcial. Harmônicos são múltiplos inteiros da fundamental; parciais são componentes espectrais, que nem sempre são harmônicos.",
+      "Supor que a velocidade do som no ar é constante em qualquer temperatura e condição atmosférica.",
+      "Confundir ressonância com simples amplificação eletrônica. Ressonância é uma resposta física de um sistema a determinadas frequências de excitação.",
+      "Confundir batimentos com uma nova frequência fundamental. Batimentos são variações periódicas de amplitude resultantes da superposição de frequências próximas."
+    ],
+
+    notacao:[
+      "A frequência é representada pela letra f, o período por T, o comprimento de onda pela letra grega λ (lambda) e a velocidade de propagação por v.",
+      "A amplitude é frequentemente representada por A. A pressão sonora é representada por p, a intensidade por I e a potência acústica por P.",
+      "A frequência angular utiliza ω (ômega), e o número de onda utiliza k.",
+      "A unidade hertz (Hz) equivale a um ciclo por segundo. Um quilohertz (kHz) equivale a mil hertz.",
+      "A unidade pascal (Pa) expressa pressão. Um micropascal (μPa) equivale a 10⁻⁶ Pa.",
+      "O decibel (dB) expressa uma relação logarítmica. Sempre deve ser considerada a grandeza de referência utilizada.",
+      "Na representação de uma onda senoidal, a fase inicial é indicada por φ (phi).",
+      "Na série harmônica, f₀ representa a frequência fundamental e fₙ representa a frequência do harmônico de ordem n."
+    ],
+
+    relacoes:[
+      "Depende de: Notas e alturas musicais, para relacionar frequência física e altura musical.",
+      "Alimenta: Frequências e proporções; Intervalos simples e compostos; Classificação e inversão de intervalos; Escalas e modos; Harmonia; Acústica, Timbre e Sistemas de Afinação.",
+      "Relaciona-se diretamente com a construção de instrumentos, a produção sonora, a afinação, a análise espectral, a ressonância e a percepção auditiva.",
+      "Limites desta ficha: o estudo detalhado da percepção psicoacústica, curvas de igual sonoridade, mascaramento auditivo, microtons e sistemas de afinação será desenvolvido nos módulos específicos de acústica, timbre e afinação."
+    ],
+
+    fontes:[
+      "Referências fundamentais: Halliday, Resnick e Walker — Fundamentos de Física, capítulos de oscilações e ondas.",
+      "Kinsler, Frey, Coppens e Sanders — Fundamentals of Acoustics.",
+      "Rossing, Moore e Wheeler — The Science of Sound.",
+      "ISO 226 — Acoustics: Normal equal-loudness-level contours.",
+      "ISO 1683 — Acoustics: Preferred reference values for acoustical and vibratory levels.",
+      "IEC 61672 — Electroacoustics: Sound level meters.",
+      "Os valores numéricos apresentados nesta ficha são aproximações calculadas a partir das fórmulas físicas indicadas. As condições do meio devem ser consideradas em aplicações experimentais."
+    ],
+
+    dados:{
+      id:"fundamentos/acustica-e-fundamentos-matematicos",
+      unidades:{
+        frequencia:"Hz",
+        periodo:"s",
+        comprimento:"m",
+        velocidade:"m/s",
+        pressao:"Pa",
+        intensidade:"W/m²",
+        potencia:"W",
+        nivel:"dB"
+      },
+      constantes:{
+        pressaoReferenciaAr:0.000020,
+        intensidadeReferencia:0.000000000001,
+        temperaturaReferencia:20,
+        velocidadeArA20:343.42
+      },
+      modelos:{
+        velocidadeAr:"331.3 + 0.606 × temperatura",
+        periodo:"1 / frequência",
+        comprimento:"velocidade / frequência",
+        pressaoSonora:"20 × log10(pressão / pressãoReferencia)",
+        intensidadeSonora:"10 × log10(intensidade / intensidadeReferencia)",
+        harmonicos:"n × frequênciaFundamental",
+        batimentos:"abs(frequencia1 - frequencia2)"
+      },
+      limites:{
+        frequenciaMinima:0,
+        temperatura:[-20,50],
+        distanciaMinima:0
+      },
+      observacoes:[
+        "O modelo de velocidade do som é uma aproximação para o ar.",
+        "O cálculo de pressão sonora utiliza pressão eficaz (RMS).",
+        "A fórmula I = p²/Z pressupõe uma onda progressiva plana.",
+        "O modelo de harmônicos inteiros é uma idealização física."
+      ]
+    },
+
+    testes:[
+      {
+        entrada:"440 Hz → período",
+        esperado:"0.00227 s",
+        obtido:function(){
+          return fx(periodo(440)) + " s";
+        }
+      },
+      {
+        entrada:"220 Hz → período",
+        esperado:"0.00455 s",
+        obtido:function(){
+          return fx(periodo(220)) + " s";
+        }
+      },
+      {
+        entrada:"440 Hz → comprimento de onda a 343 m/s",
+        esperado:"0.78 m",
+        obtido:function(){
+          return fx(comprimento(440,343)) + " m";
+        }
+      },
+      {
+        entrada:"100 Hz → comprimento de onda a 343 m/s",
+        esperado:"3.43 m",
+        obtido:function(){
+          return fx(comprimento(100,343)) + " m";
+        }
+      },
+      {
+        entrada:"Velocidade do som a 20 °C",
+        esperado:"343.42 m/s",
+        obtido:function(){
+          return fx(temperatura(20)) + " m/s";
+        }
+      },
+      {
+        entrada:"Velocidade do som a 0 °C",
+        esperado:"331.30 m/s",
+        obtido:function(){
+          return fx(temperatura(0)) + " m/s";
+        }
+      },
+      {
+        entrada:"440 Hz → frequência angular",
+        esperado:"2764.60 rad/s",
+        obtido:function(){
+          return fx(2 * PI * 440) + " rad/s";
+        }
+      },
+      {
+        entrada:"440 Hz → segundo harmônico",
+        esperado:"880.00 Hz",
+        obtido:function(){
+          return fx(2 * 440) + " Hz";
+        }
+      },
+      {
+        entrada:"110 Hz → terceiro harmônico",
+        esperado:"330.00 Hz",
+        obtido:function(){
+          return fx(3 * 110) + " Hz";
+        }
+      },
+      {
+        entrada:"440 Hz e 442 Hz → batimentos",
+        esperado:"2.00 Hz",
+        obtido:function(){
+          return fx(batimentos(440,442)) + " Hz";
+        }
+      },
+      {
+        entrada:"Pressão sonora de 20 μPa → nível",
+        esperado:"0.00 dB",
+        obtido:function(){
+          return fx(decibeis(0.000020,0.000020)) + " dB";
+        }
+      },
+      {
+        entrada:"Pressão sonora de 40 μPa → nível",
+        esperado:"6.02 dB",
+        obtido:function(){
+          return fx(decibeis(0.000040,0.000020)) + " dB";
+        }
+      },
+      {
+        entrada:"Pressão sonora de 200 μPa → nível",
+        esperado:"20.00 dB",
+        obtido:function(){
+          return fx(decibeis(0.000200,0.000020)) + " dB";
+        }
+      },
+      {
+        entrada:"Intensidade de 2 × 10⁻¹² W/m² → nível",
+        esperado:"3.01 dB",
+        obtido:function(){
+          return fx(10 * Math.log10(2)) + " dB";
+        }
+      },
+      {
+        entrada:"Intensidade de referência → nível",
+        esperado:"0.00 dB",
+        obtido:function(){
+          return fx(10 * Math.log10(0.000000000001 / 0.000000000001)) + " dB";
+        }
+      },
+      {
+        entrada:"Frequência negativa → cálculo de período",
+        esperado:"inválida",
+        obtido:function(){
+          return -440 > 0 ? "válida" : "inválida";
+        }
+      }
+    ],
+
+    experimente:{
+      html:
+        '<div class="pc-fi-calc">' +
+          '<label>Frequência (Hz)' +
+            '<input type="number" data-fi-f min="0.01" step="0.01" value="440">' +
+          '</label>' +
+          '<label>Temperatura do ar (°C)' +
+            '<input type="number" data-fi-t min="-20" max="50" step="0.1" value="20">' +
+          '</label>' +
+          '<label>Distância de propagação (m)' +
+            '<input type="number" data-fi-d min="0" step="0.1" value="10">' +
+          '</label>' +
+        '</div>' +
+        '<button type="button" class="at-btn gold" data-fi-calc style="margin-top:8px">CALCULAR</button>' +
+        '<pre class="pc-fi-saida" data-fi-saida></pre>',
+
+      ligar:function(ev,cont){
+        if(!ev.target.closest("[data-fi-calc]")) return;
+
+        var s = cont.querySelector("[data-fi-saida]");
+        var f = Number(cont.querySelector("[data-fi-f]").value);
+        var t = Number(cont.querySelector("[data-fi-t]").value);
+        var d = Number(cont.querySelector("[data-fi-d]").value);
+
+        if(!Number.isFinite(f) || f <= 0){
+          s.textContent = "Informe uma frequência maior que zero.";
+          return;
+        }
+
+        if(!Number.isFinite(t) || t < -20 || t > 50){
+          s.textContent = "Informe uma temperatura entre -20 °C e 50 °C.";
+          return;
+        }
+
+        if(!Number.isFinite(d) || d < 0){
+          s.textContent = "Informe uma distância igual ou superior a zero.";
+          return;
+        }
+
+        var v = temperatura(t);
+        var T = periodo(f);
+        var lambda = comprimento(f,v);
+        var omega = 2 * PI * f;
+        var k = 2 * PI / lambda;
+        var tempo = d / v;
+
+        var out = [
+          "RESULTADOS ACÚSTICOS",
+          "Frequência: " + fx(f) + " Hz",
+          "Período: " + fx(T) + " s",
+          "Período: " + fx(T * 1000) + " ms",
+          "Velocidade aproximada do som: " + fx(v) + " m/s",
+          "Comprimento de onda: " + fx(lambda) + " m",
+          "Frequência angular: " + fx(omega) + " rad/s",
+          "Número de onda: " + fx(k) + " rad/m",
+          "Segundo harmônico: " + fx(2 * f) + " Hz",
+          "Terceiro harmônico: " + fx(3 * f) + " Hz",
+          "Quarto harmônico: " + fx(4 * f) + " Hz",
+          "Distância de propagação: " + fx(d) + " m",
+          "Tempo aproximado de propagação: " + fx(tempo) + " s",
+          "Modelo: ar seco, aproximação pela temperatura.",
+          "Observação: o tempo calculado não considera obstáculos, vento ou variações locais do meio."
+        ];
+
+        s.textContent = out.join("\n");
+      }
+    }
+  });
+})();
+</script>
+<!-- ===== FIM: FICHA 06 — ACÚSTICA E FUNDAMENTOS MATEMÁTICOS ===== -->
+
 
 
 
