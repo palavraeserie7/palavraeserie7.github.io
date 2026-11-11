@@ -10695,39 +10695,146 @@ texto: $("esTexto").value
  
   /* ================= ETAPAS (abas) ================= */
   var LEGENDA = "Marcas nas opções: avançado = o gerador só vai usar numa fase posterior; só reprodução = não entra na partitura. Campos condicionais aparecem quando fazem sentido.";
-  var ABAS = [
-    ["projeto","1. Projeto",[{nota:LEGENDA},"titulo","projeto.finalidade","projeto.tipoObra",
-      {h:"Estilo e clima"},"estilo.generos","estilo.climas",
-      {h:"Perfil de regras"},{nota:"O perfil decide o quanto o futuro maestro segue as leis de harmonia, melodia e ritmo. Estrito vale para coral e contraponto, livre para jazz e pop."},
-      "regras.perfil","regras.rigorMelodia","regras.rigorHarmonia","regras.rigorRitmo"]],
-    ["base","2. Base musical",[
-      {h:"Tonalidade e escala"},"base.tonica","base.tonicaPersonalizada","base.escala",{id:"notaEscala"},
-      "base.armadura","base.clave","base.extensao","base.a4","base.notaInicial","base.notaFinal",
-      {h:"Compasso"},"ritmo.compasso","ritmo.agrupamento","ritmo.agrupamentoPersonalizado",
-      {h:"Andamento"},"andamento.indicacao","andamento.bpm","andamento.variacoes"]],
-    ["forma","3. Forma",["compassos",{id:"modelos"},{id:"secoes"}]],
-    ["ritmo","4. Ritmo",[
-      {h:"Padrão rítmico por papel"},{nota:"Cada padrão será escrito em notas na etapa do gerador. Por enquanto você só escolhe."},
-      "ritmo.padroes.melodia","ritmo.padroes.acompanhamento","ritmo.padroes.baixo","ritmo.padroes.percussao",
-      {h:"Pulso, acentuação e subdivisão"},"ritmo.pulso","ritmo.acentuacao","ritmo.subdivisao","ritmo.densidade",
-      "ritmo.polirritmia","ritmo.figuras","ritmo.recursos","ritmo.quialteras","ritmo.pausas","ritmo.ostinatoPapel"]],
-    ["harmonia","5. Harmonia",[
-      "harmonia.campo","harmonia.cifras","harmonia.acordes","harmonia.cadencias","harmonia.modulacao","harmonia.recursos",
-      {h:"Progressão"},{id:"preset"},"harmonia.progressao","harmonia.ritmoHarmonico",
-      {h:"Vozes e distâncias"},"harmonia.espacamento","harmonia.distanciaMax","harmonia.conducao",
-      "harmonia.vozes","harmonia.extensaoSoprano","harmonia.extensaoContralto","harmonia.extensaoTenor","harmonia.extensaoBaixo"]],
-    ["melodia","6. Melodia",[
-      {h:"Desenho da melodia"},"textura.contorno","melodia.movimento","melodia.extensao","melodia.culminancia","melodia.frases","melodia.motivo",
-      {h:"Texturas e técnicas"},"textura.texturas","textura.tecnicas",
-      {h:"Voz cantada"},"voz.texto","voz.silabas","voz.respiracao","voz.tonica","voz.tessitura"]],
-    ["orq","7. Orquestração",[
-      "orquestracao.formacao",{id:"buscaInstr"},"orquestracao.instrumentos",
-      {nota:"Saxofones, clarinete, trompete e trompa são instrumentos transpositores, e a percussão sem altura usa clave própria. O gerador tratará isso na etapa de exportação."},
-      "orquestracao.melodia",{h:"Papel de cada instrumento"},{id:"papeis"}]],
-    ["expr","8. Expressão",["expressao.dinamicaInicial","expressao.dinamicas","expressao.articulacoes","expressao.tecnicas",
-      {nota:"Técnicas ligadas a uma família (cordas, metais…) ficam ativas só quando há instrumento dessa família na aba Orquestração."}]],
-    ["revisao","9. Revisão e exportar",[{id:"revisao"}]]
-  ];
+ 
+var ABAS = [
+  ["projeto","1. Projeto",[
+    {nota:LEGENDA},
+    "titulo",
+    "projeto.finalidade",
+    "projeto.tipoObra",
+    {h:"Linguagem musical"},
+    "estilo.generos",
+    "estilo.climas",
+    {h:"Perfil de composição"},
+    {nota:"Define o rigor que o Maestro aplicará às regras musicais."},
+    "regras.perfil",
+    "regras.rigorMelodia",
+    "regras.rigorHarmonia",
+    "regras.rigorRitmo"
+  ]],
+
+  ["forma","2. Estrutura e forma",[
+    "compassos",
+    {id:"modelos"},
+    {id:"secoes"}
+  ]],
+
+  ["base","3. Fundamentos musicais",[
+    {h:"Tonalidade"},
+    "base.tonica",
+    "base.tonicaPersonalizada",
+    "base.escala",
+    {id:"notaEscala"},
+    "base.armadura",
+    "base.clave",
+    "base.extensao",
+    "base.a4",
+    {h:"Notas estruturais"},
+    "base.notaInicial",
+    "base.notaFinal"
+  ]],
+
+  ["ritmo","4. Ritmo e métrica",[
+    {h:"Compasso e agrupamento"},
+    "ritmo.compasso",
+    "ritmo.agrupamento",
+    "ritmo.agrupamentoPersonalizado",
+    {h:"Andamento"},
+    "andamento.indicacao",
+    "andamento.bpm",
+    "andamento.variacoes",
+    {h:"Organização rítmica"},
+    "ritmo.pulso",
+    "ritmo.acentuacao",
+    "ritmo.subdivisao",
+    "ritmo.densidade",
+    {h:"Padrões por função"},
+    "ritmo.padroes.melodia",
+    "ritmo.padroes.acompanhamento",
+    "ritmo.padroes.baixo",
+    "ritmo.padroes.percussao",
+    {h:"Recursos rítmicos"},
+    "ritmo.polirritmia",
+    "ritmo.figuras",
+    "ritmo.recursos",
+    "ritmo.quialteras",
+    "ritmo.pausas",
+    "ritmo.ostinatoPapel"
+  ]],
+
+  ["harmonia","5. Harmonia",[
+    {h:"Organização harmônica"},
+    "harmonia.campo",
+    "harmonia.cifras",
+    "harmonia.acordes",
+    "harmonia.cadencias",
+    "harmonia.modulacao",
+    "harmonia.recursos",
+    {h:"Progressão harmônica"},
+    {id:"preset"},
+    "harmonia.progressao",
+    "harmonia.ritmoHarmonico",
+    {h:"Condução harmônica"},
+    "harmonia.espacamento",
+    "harmonia.distanciaMax",
+    "harmonia.conducao",
+    {h:"Escrita vocal harmônica"},
+    "harmonia.vozes",
+    "harmonia.extensaoSoprano",
+    "harmonia.extensaoContralto",
+    "harmonia.extensaoTenor",
+    "harmonia.extensaoBaixo"
+  ]],
+
+  ["melodia","6. Melodia e textura",[
+    {h:"Construção melódica"},
+    "textura.contorno",
+    "melodia.movimento",
+    "melodia.extensao",
+    "melodia.culminancia",
+    "melodia.frases",
+    "melodia.motivo",
+    {h:"Organização das vozes e texturas"},
+    "textura.texturas",
+    "textura.tecnicas"
+  ]],
+
+  ["voz","7. Composição vocal",[
+    {nota:"Esta etapa aparece quando a formação selecionada contém vozes."},
+    "voz.texto",
+    "voz.silabas",
+    "voz.respiracao",
+    "voz.tonica",
+    "voz.tessitura"
+  ]],
+
+  ["orq","8. Orquestração",[
+    {h:"Formação instrumental ou vocal"},
+    "orquestracao.formacao",
+    {id:"buscaInstr"},
+    "orquestracao.instrumentos",
+    {nota:"A seleção dos instrumentos determina a formação e os recursos de escrita disponíveis."},
+    {h:"Distribuição musical"},
+    "orquestracao.melodia",
+    {h:"Papel de cada instrumento"},
+    {id:"papeis"}
+  ]],
+
+  ["expr","9. Expressão e interpretação",[
+    {h:"Dinâmica"},
+    "expressao.dinamicaInicial",
+    "expressao.dinamicas",
+    {h:"Articulação"},
+    "expressao.articulacoes",
+    {h:"Técnicas de execução"},
+    "expressao.tecnicas"
+  ]],
+
+  ["revisao","10. Revisão e exportação",[
+    {id:"revisao"}
+  ]]
+];
+
   var ESTADO = [
     ["Menus, escolhas, planos nomeados e plano JSON","ok","Disponível"],
     ["Gerador de notas (melodia, baixo, acordes)","prep","Em preparação"],
