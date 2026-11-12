@@ -11346,38 +11346,6 @@ var ABAS = [
         ]
     }
 ];
-
-   var CONTEUDO_BIB = {
-   "6-12": [ String.raw`Maxixe(Levada Tradicional)
-Compasso 2/4 — acompanhamento de violão — notação em LilyPond:
-
-\version "2.24.0"
-\header { title = "Maxixe (Levada Tradicional)" }
-\score {
-  \new Staff {
-    \clef "treble_8"
-    \time 2/4
-    \repeat volta 2 {
-      <<
-        \new Voice { \voiceOne
-          r16 <e g c'>8 <e g c'>16 r8 <e g c'>8 |
-          r16 <d f b>8 <d f b>16 r8 <d f b>8 |
-        }
-        \new Voice { \voiceTwo
-          c4 c | g,4 g, |
-        }
-      >>
-    }
-      <c e g c' e'>2 \bar "|."
-  }
-}`,
-    String.raw`NOME DO PRÓXIMO RITMO
-Compasso e instrumento — notação em LilyPond:
-
-(aqui entra o código do próximo ritmo)`
-  ]
-  };
- 
   var bibView = document.createElement("section");
   bibView.className = "pc-biblioteca-view";
   bibView.setAttribute("data-biblioteca-view", "");
@@ -11385,7 +11353,7 @@ Compasso e instrumento — notação em LilyPond:
   bibView.innerHTML = '<div class="pc-bib-cabecalho"><h2 tabindex="-1" data-bib-titulo>BIBLIOTECA MUSICAL</h2><button type="button" class="at-btn" data-bib-fechar>VOLTAR À CRIAÇÃO</button></div>' +
     '<p class="pc-bib-intro">Arquitetura expansível — selecione um módulo para consultar os seus assuntos.</p>' +
     '<div data-bib-indice>' + MODULOS_BIB.map(function(m, mi){ return '<details class="pc-bib-modulo"><summary>' + (mi + 1) + '. ' + m.nome + '</summary><div class="pc-bib-assuntos">' + m.assuntos.map(function(a, ai){ return '<button type="button" class="at-btn pc-bib-assunto" data-bib-modulo="' + mi + '" data-bib-assunto="' + ai + '">' + a + '</button>'; }).join("") + '</div></details>'; }).join("") + '</div>' +
-    '<article class="pc-bib-consulta" data-bib-consulta hidden><p class="pc-bib-breadcrumb" data-bib-caminho></p><h3 data-bib-assunto-titulo></h3><p class="pc-bib-aviso">Área de consulta preparada. O conteúdo explicativo e os dados executáveis deste assunto ainda não foram implementados.</p><pre data-bib-conteudo hidden style="white-space:pre-wrap;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:13px/1.5 Consolas,monospace"></pre><button type="button" class="at-btn" data-bib-voltar>VOLTAR AOS MÓDULOS</button></article>';
+    '<article class="pc-bib-consulta" data-bib-consulta hidden><p class="pc-bib-breadcrumb" data-bib-caminho></p><h3 data-bib-assunto-titulo></h3><p class="pc-bib-aviso">Área de consulta preparada. O conteúdo explicativo e os dados executáveis deste assunto ainda não foram implementados.</p><button type="button" class="at-btn" data-bib-voltar>VOLTAR AOS MÓDULOS</button></article>';
   sec.appendChild(bibView);
   painel.appendChild(sec);
   var Q = function(s){ return sec.querySelector(s); }, QA = function(s){ return sec.querySelectorAll(s); };
@@ -11705,8 +11673,6 @@ Compasso e instrumento — notação em LilyPond:
       bibView.querySelector("[data-bib-consulta]").hidden = false;
       bibView.querySelector("[data-bib-caminho]").textContent = "Biblioteca Musical / " + (mi + 1) + ". " + modulo.nome;
       bibView.querySelector("[data-bib-assunto-titulo]").textContent = assunto;
-           var conteudo = CONTEUDO_BIB[mi + "-" + ai], caixa = bibView.querySelector("[data-bib-conteudo]"), aviso = bibView.querySelector(".pc-bib-aviso");
-     caixa.textContent = conteudo ? conteudo.join("\n\n────────────────\n\n") : ""; caixa.hidden = !conteudo; aviso.hidden = !!conteudo;
       bibView.querySelector("[data-bib-assunto-titulo]").focus(); return;
     }
     if((b = t.closest("[data-bib-voltar]"))){
@@ -11781,6 +11747,7 @@ Compasso e instrumento — notação em LilyPond:
  
  
  
+
 
 
 
