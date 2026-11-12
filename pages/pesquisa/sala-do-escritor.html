@@ -11348,7 +11348,7 @@ var ABAS = [
 ];
 
    var CONTEUDO_BIB = {
-    "6-12": String.raw`Maxixe (Levada Tradicional)
+   "6-12": [ String.raw`Maxixe(Levada Tradicional)
 Compasso 2/4 — acompanhamento de violão — notação em LilyPond:
 
 \version "2.24.0"
@@ -11368,9 +11368,14 @@ Compasso 2/4 — acompanhamento de violão — notação em LilyPond:
         }
       >>
     }
-    <c e g c' e'>2 \bar "|."
+      <c e g c' e'>2 \bar "|."
   }
-}`
+}`,
+    String.raw`NOME DO PRÓXIMO RITMO
+Compasso e instrumento — notação em LilyPond:
+
+(aqui entra o código do próximo ritmo)`
+  ]
   };
  
   var bibView = document.createElement("section");
@@ -11701,7 +11706,7 @@ Compasso 2/4 — acompanhamento de violão — notação em LilyPond:
       bibView.querySelector("[data-bib-caminho]").textContent = "Biblioteca Musical / " + (mi + 1) + ". " + modulo.nome;
       bibView.querySelector("[data-bib-assunto-titulo]").textContent = assunto;
            var conteudo = CONTEUDO_BIB[mi + "-" + ai], caixa = bibView.querySelector("[data-bib-conteudo]"), aviso = bibView.querySelector(".pc-bib-aviso");
-      caixa.textContent = conteudo || ""; caixa.hidden = !conteudo; aviso.hidden = !!conteudo;
+     caixa.textContent = conteudo ? conteudo.join("\n\n────────────────\n\n") : ""; caixa.hidden = !conteudo; aviso.hidden = !!conteudo;
       bibView.querySelector("[data-bib-assunto-titulo]").focus(); return;
     }
     if((b = t.closest("[data-bib-voltar]"))){
