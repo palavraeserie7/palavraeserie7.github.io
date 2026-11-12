@@ -10746,7 +10746,8 @@ texto: $("esTexto").value
   var ehVocal = function(v){ return VOCAIS.indexOf(v("orquestracao.formacao")) > -1 || v("orquestracao.instrumentos").some(function(n){ return FAM_DE[n] === "Vozes"; }); };
   function F(p, l, t, o, d, x){ var r = {p:p, l:l, t:t, o:o, d:d}; if(x){ for(var k in x) r[k] = x[k]; } return r; }
   var CAMPOS = [
-    F("titulo","Título da peça","txt",null,"",{ph:"Ex.: Aurora sobre o monte"}),
+   F("autor","Autor da obra","txt",null,"",{ph:"Nome e sobrenome"}),
+   F("titulo","Título da peça","txt",null,"",{ph:"Ex.: Aurora sobre o monte"}),
     F("projeto.finalidade","Finalidade da peça","sel",FINALIDADES,FINALIDADES[0]),
     F("projeto.tipoObra","Tipo de obra","sel",TIPOS_OBRA,"Miniatura (peça curta)"),
     F("estilo.generos","Gêneros musicais","multi",GENEROS,[]),
@@ -10832,41 +10833,30 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
 var ABAS = [
   ["projeto","1. Projeto",[
     {nota:LEGENDA},
+    "autor",
     "titulo",
+    {h:"Classificação musical"},
+    "estilo.generos",
+    "estilo.estilos",
+    "estilo.caraterExpressivo",
+    "estilo.climas",
     "projeto.finalidade",
     "projeto.tipoObra",
-   
-{h:"Classificação musical"},
-"estilo.generos",
-"estilo.estilos",
-"estilo.caraterExpressivo",
-"estilo.climas",
-
-       {h:"Diretrizes de composição do Maestro"},
+    {h:"Diretrizes de composição do Maestro"},
     {nota:"Configure o modelo de composição e o grau de liberdade que o Maestro deverá respeitar ao desenvolver a peça. Estas diretrizes orientam a construção musical; não substituem as definições de melodia, harmonia e ritmo das etapas seguintes."},
-
     {h:"Modelo de composição"},
     "regras.perfil",
     {nota:"Estrito: prioriza regras tradicionais de coral e contraponto. Clássico: prioriza a prática comum da música tonal. Livre: permite maior flexibilidade na linguagem musical, como no jazz e na música popular."},
-
     {h:"Grau de rigor por elemento musical"},
     "regras.rigorMelodia",
     {nota:"Estrito: restringe os movimentos melódicos às regras estabelecidas. Moderado: permite variações controladas. Livre: permite maior liberdade na construção das frases e dos motivos."},
-
     "regras.rigorHarmonia",
     {nota:"Estrito: exige maior controle das relações harmônicas e da condução das vozes. Moderado: admite variações coerentes. Livre: permite maior flexibilidade nas progressões, acordes e resoluções."},
-
     "regras.rigorRitmo",
     {nota:"Estrito: mantém maior regularidade e controle métrico. Moderado: admite variações rítmicas controladas. Livre: permite síncopes, deslocamentos, mudanças de acentuação e maior liberdade rítmica."}
   ]],
 
-  ["forma","2. Estrutura e forma",[
-    "compassos",
-    {id:"modelos"},
-    {id:"secoes"}
-  ]],
-
-  ["base","3. Fundamentos musicais",[
+  ["base","2. Fundamentos musicais",[
     {h:"Tonalidade"},
     "base.tonica",
     "base.tonicaPersonalizada",
@@ -10881,15 +10871,30 @@ var ABAS = [
     "base.notaFinal"
   ]],
 
-  ["ritmo","4. Ritmo e métrica",[
+  ["forma","3. Estrutura e forma",[
+    "compassos",
+    {id:"modelos"},
+    {id:"secoes"}
+  ]],
+
+  ["melodia","4. Melodia e textura",[
+    {h:"Construção melódica"},
+    "textura.contorno",
+    "melodia.movimento",
+    "melodia.extensao",
+    "melodia.culminancia",
+    "melodia.frases",
+    "melodia.motivo",
+    {h:"Organização das vozes e texturas"},
+    "textura.texturas",
+    "textura.tecnicas"
+  ]],
+
+  ["ritmo","5. Ritmo e métrica",[
     {h:"Compasso e agrupamento"},
     "ritmo.compasso",
     "ritmo.agrupamento",
     "ritmo.agrupamentoPersonalizado",
-    {h:"Andamento"},
-    "andamento.indicacao",
-    "andamento.bpm",
-    "andamento.variacoes",
     {h:"Organização rítmica"},
     "ritmo.pulso",
     "ritmo.acentuacao",
@@ -10909,7 +10914,7 @@ var ABAS = [
     "ritmo.ostinatoPapel"
   ]],
 
-  ["harmonia","5. Harmonia",[
+  ["harmonia","6. Harmonia",[
     {h:"Organização harmônica"},
     "harmonia.campo",
     "harmonia.cifras",
@@ -10933,29 +10938,7 @@ var ABAS = [
     "harmonia.extensaoBaixo"
   ]],
 
-  ["melodia","6. Melodia e textura",[
-    {h:"Construção melódica"},
-    "textura.contorno",
-    "melodia.movimento",
-    "melodia.extensao",
-    "melodia.culminancia",
-    "melodia.frases",
-    "melodia.motivo",
-    {h:"Organização das vozes e texturas"},
-    "textura.texturas",
-    "textura.tecnicas"
-  ]],
-
-  ["voz","7. Composição vocal",[
-    {nota:"Esta etapa aparece quando a formação selecionada contém vozes."},
-    "voz.texto",
-    "voz.silabas",
-    "voz.respiracao",
-    "voz.tonica",
-    "voz.tessitura"
-  ]],
-
-  ["orq","8. Orquestração",[
+  ["orq","7. Orquestração",[
     {h:"Formação instrumental ou vocal"},
     "orquestracao.formacao",
     {id:"buscaInstr"},
@@ -10967,7 +10950,20 @@ var ABAS = [
     {id:"papeis"}
   ]],
 
-  ["expr","9. Expressão e interpretação",[
+  ["voz","8. Composição vocal",[
+    {nota:"Esta etapa aparece quando a formação selecionada contém vozes."},
+    "voz.texto",
+    "voz.silabas",
+    "voz.respiracao",
+    "voz.tonica",
+    "voz.tessitura"
+  ]],
+
+  ["expr","9. Andamento e expressão",[
+    {h:"Andamento"},
+    "andamento.indicacao",
+    "andamento.bpm",
+    "andamento.variacoes",
     {h:"Dinâmica"},
     "expressao.dinamicaInicial",
     "expressao.dinamicas",
