@@ -11191,7 +11191,8 @@ var ABAS = [
             "Polirritmia",
             "Ostinatos",
             "Relações rítmicas entre instrumentos",
-            "Ritmos brasileiros e suas variações"
+           "Ritmos brasileiros e suas variações",
+            "Ritmos internacionais"
         ]
     },
     {
@@ -11346,6 +11347,54 @@ var ABAS = [
         ]
     }
 ];
+   var BASE_RITMOS = "sala-do-escritor/estudio-de-criacao/pecas-instrumentais/biblioteca-musical/07-ritmo/ritmos/";
+  var API_RITMOS = "https://api.github.com/repos/palavraeserie7/palavraeserie7.github.io/contents/pages/pesquisa/" + BASE_RITMOS;
+  var GRUPOS_RITMOS = {
+    "12": [["samba-e-derivados","Samba e derivados"],["urbanos","Urbanos"],["nordestinos","Nordestinos"],["regionais","Regionais e folclóricos"]],
+    "13": [["rock-pop-country","Rock, pop e country"],["norte-americanos","Norte-americanos"],["latinos","Latinos"],["europeus","Europeus"]]
+  };
+  function carregarRitmos(mi, ai){
+    var cx = bibView.querySelector("[data-bib-conteudo]"), aviso = bibView.querySelector(".pc-bib-aviso");
+    var grupos = mi === 6 ? GRUPOS_RITMOS[ai] : null;
+    cx.innerHTML = ""; aviso.hidden = !!grupos;
+    if(!grupos) return;
+    grupos.forEach(function(g){
+      var d = document.createElement("details"); d.className = "pc-bib-modulo";
+      d.innerHTML = '<summary>' + g[1] + '</summary><div class="pc-bib-assuntos"></div><div data-rit-mostra></div>';
+      cx.appendChild(d);
+      var lista = d.querySelector(".pc-bib-assuntos"), mostra = d.querySelector("[data-rit-mostra]"), carregado = false;
+      d.addEventListener("toggle", function(){
+        if(!d.open || carregado) return;
+        carregado = true; lista.textContent = "Carregando…";
+        fetch(API_RITMOS + g[0]).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(arqs){
+          lista.innerHTML = "";
+          var nomes = arqs.filter(function(a){ return a.type === "file" && /\.txt$/.test(a.name); });
+          if(!nomes.length){ lista.textContent = "Nenhum ritmo nesta pasta ainda."; return; }
+          nomes.forEach(function(a){
+            var b = document.createElement("button"); b.type = "button"; b.className = "at-btn pc-bib-assunto";
+            b.textContent = a.name === "_catalogo.txt" ? "Catálogo (o que já está pronto)" : a.name.replace(/\.txt$/, "").replace(/-/g, " ");
+            b.addEventListener("click", function(){
+              mostra.textContent = "Carregando…";
+              fetch(BASE_RITMOS + g[0] + "/" + a.name).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); }).then(function(t){
+                mostra.innerHTML = "";
+                var pre = document.createElement("pre");
+                pre.style.cssText = "white-space:pre-wrap;padding:12px;margin-top:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:13px/1.5 Consolas,monospace";
+                pre.textContent = t;
+                mostra.appendChild(pre);
+                var i = t.indexOf("\\version");
+                if(i > -1 && navigator.clipboard){
+                  var c = document.createElement("button"); c.type = "button"; c.className = "at-btn"; c.style.marginTop = "8px"; c.textContent = "COPIAR CÓDIGO";
+                  c.addEventListener("click", function(){ navigator.clipboard.writeText(t.slice(i)); c.textContent = "COPIADO"; });
+                  mostra.appendChild(c);
+                }
+              }).catch(function(e){ mostra.textContent = "Não foi possível abrir este arquivo (" + e.message + ")."; });
+            });
+            lista.appendChild(b);
+          });
+        }).catch(function(e){ carregado = false; lista.textContent = "Não foi possível listar esta pasta (" + e.message + ")."; });
+      });
+    });
+  }
   var bibView = document.createElement("section");
   bibView.className = "pc-biblioteca-view";
   bibView.setAttribute("data-biblioteca-view", "");
@@ -11353,7 +11402,7 @@ var ABAS = [
   bibView.innerHTML = '<div class="pc-bib-cabecalho"><h2 tabindex="-1" data-bib-titulo>BIBLIOTECA MUSICAL</h2><button type="button" class="at-btn" data-bib-fechar>VOLTAR À CRIAÇÃO</button></div>' +
     '<p class="pc-bib-intro">Arquitetura expansível — selecione um módulo para consultar os seus assuntos.</p>' +
     '<div data-bib-indice>' + MODULOS_BIB.map(function(m, mi){ return '<details class="pc-bib-modulo"><summary>' + (mi + 1) + '. ' + m.nome + '</summary><div class="pc-bib-assuntos">' + m.assuntos.map(function(a, ai){ return '<button type="button" class="at-btn pc-bib-assunto" data-bib-modulo="' + mi + '" data-bib-assunto="' + ai + '">' + a + '</button>'; }).join("") + '</div></details>'; }).join("") + '</div>' +
-    '<article class="pc-bib-consulta" data-bib-consulta hidden><p class="pc-bib-breadcrumb" data-bib-caminho></p><h3 data-bib-assunto-titulo></h3><p class="pc-bib-aviso">Área de consulta preparada. O conteúdo explicativo e os dados executáveis deste assunto ainda não foram implementados.</p><button type="button" class="at-btn" data-bib-voltar>VOLTAR AOS MÓDULOS</button></article>';
+    '<article class="pc-bib-consulta" data-bib-consulta hidden><p class="pc-bib-breadcrumb" data-bib-caminho></p><h3 data-bib-assunto-titulo></h3><p class="pc-bib-aviso">Área de consulta preparada. O conteúdo explicativo e os dados executáveis deste assunto ainda não foram implementados.</p><div data-bib-conteudo></div><button type="button" class="at-btn" data-bib-voltar>VOLTAR AOS MÓDULOS</button></article>';
   sec.appendChild(bibView);
   painel.appendChild(sec);
   var Q = function(s){ return sec.querySelector(s); }, QA = function(s){ return sec.querySelectorAll(s); };
@@ -11673,6 +11722,7 @@ var ABAS = [
       bibView.querySelector("[data-bib-consulta]").hidden = false;
       bibView.querySelector("[data-bib-caminho]").textContent = "Biblioteca Musical / " + (mi + 1) + ". " + modulo.nome;
       bibView.querySelector("[data-bib-assunto-titulo]").textContent = assunto;
+           carregarRitmos(mi, ai);
       bibView.querySelector("[data-bib-assunto-titulo]").focus(); return;
     }
     if((b = t.closest("[data-bib-voltar]"))){
