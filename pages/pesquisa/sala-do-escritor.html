@@ -11347,54 +11347,121 @@ var ABAS = [
         ]
     }
 ];
-   var BASE_RITMOS = "sala-do-escritor/estudio-de-criacao/pecas-instrumentais/biblioteca-musical/07-ritmo/ritmos/";
-  var API_RITMOS = "https://api.github.com/repos/palavraeserie7/palavraeserie7.github.io/contents/pages/pesquisa/" + BASE_RITMOS;
-  var GRUPOS_RITMOS = {
-    "12": [["samba-e-derivados","Samba e derivados"],["urbanos","Urbanos"],["nordestinos","Nordestinos"],["regionais","Regionais e folclóricos"]],
-    "13": [["rock-pop-country","Rock, pop e country"],["norte-americanos","Norte-americanos"],["latinos","Latinos"],["europeus","Europeus"]]
-  };
-  function carregarRitmos(mi, ai){
-    var cx = bibView.querySelector("[data-bib-conteudo]"), aviso = bibView.querySelector(".pc-bib-aviso");
-    var grupos = mi === 6 ? GRUPOS_RITMOS[ai] : null;
-    cx.innerHTML = ""; aviso.hidden = !!grupos;
-    if(!grupos) return;
-    grupos.forEach(function(g){
-      var d = document.createElement("details"); d.className = "pc-bib-modulo";
-      d.innerHTML = '<summary>' + g[1] + '</summary><div class="pc-bib-assuntos"></div><div data-rit-mostra></div>';
-      cx.appendChild(d);
-      var lista = d.querySelector(".pc-bib-assuntos"), mostra = d.querySelector("[data-rit-mostra]"), carregado = false;
-      d.addEventListener("toggle", function(){
-        if(!d.open || carregado) return;
-        carregado = true; lista.textContent = "Carregando…";
-        fetch(API_RITMOS + g[0]).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(arqs){
+var BASE_RITMOS =
+  "https://palavraeserie7.github.io/pages/pesquisa/";
+
+var ARQUIVOS_RITMOS = {
+  "samba-e-derivados": "ritmos-samba-e-derivados.txt"
+};
+
+var GRUPOS_RITMOS = {
+  "12": [
+    ["samba-e-derivados", "Samba e derivados"],
+    ["urbanos", "Urbanos"],
+    ["nordestinos", "Nordestinos"],
+    ["regionais", "Regionais e folclóricos"]
+  ],
+  "13": [
+    ["rock-pop-country", "Rock, pop e country"],
+    ["norte-americanos", "Norte-americanos"],
+    ["latinos", "Latinos"],
+    ["europeus", "Europeus"]
+  ]
+};
+
+function carregarRitmos(mi, ai) {
+  var cx = bibView.querySelector("[data-bib-conteudo]");
+  var aviso = bibView.querySelector(".pc-bib-aviso");
+  var grupos = mi === 6 ? GRUPOS_RITMOS[ai] : null;
+
+  cx.innerHTML = "";
+  aviso.hidden = !!grupos;
+
+  if (!grupos) return;
+
+  grupos.forEach(function(g) {
+    var d = document.createElement("details");
+    d.className = "pc-bib-modulo";
+
+    d.innerHTML =
+      "<summary>" + g[1] + "</summary>" +
+      '<div class="pc-bib-assuntos"></div>' +
+      '<div data-rit-mostra></div>';
+
+    cx.appendChild(d);
+
+    var lista = d.querySelector(".pc-bib-assuntos");
+    var mostra = d.querySelector("[data-rit-mostra]");
+    var arquivo = ARQUIVOS_RITMOS[g[0]];
+
+    d.addEventListener("toggle", function() {
+      if (!d.open || d.dataset.carregado) return;
+
+      d.dataset.carregado = "1";
+
+      if (!arquivo) {
+        lista.textContent =
+          "Este conteúdo ainda não foi criado no repositório.";
+        return;
+      }
+
+      lista.textContent = "Carregando…";
+
+      fetch(BASE_RITMOS + arquivo)
+        .then(function(r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.text();
+        })
+        .then(function(texto) {
           lista.innerHTML = "";
-          var nomes = arqs.filter(function(a){ return a.type === "file" && /\.txt$/.test(a.name); });
-          if(!nomes.length){ lista.textContent = "Nenhum ritmo nesta pasta ainda."; return; }
-          nomes.forEach(function(a){
-            var b = document.createElement("button"); b.type = "button"; b.className = "at-btn pc-bib-assunto";
-            b.textContent = a.name === "_catalogo.txt" ? "Catálogo (o que já está pronto)" : a.name.replace(/\.txt$/, "").replace(/-/g, " ");
-            b.addEventListener("click", function(){
-              mostra.textContent = "Carregando…";
-              fetch(BASE_RITMOS + g[0] + "/" + a.name).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); }).then(function(t){
-                mostra.innerHTML = "";
-                var pre = document.createElement("pre");
-                pre.style.cssText = "white-space:pre-wrap;padding:12px;margin-top:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:13px/1.5 Consolas,monospace";
-                pre.textContent = t;
-                mostra.appendChild(pre);
-                var i = t.indexOf("\\version");
-                if(i > -1 && navigator.clipboard){
-                  var c = document.createElement("button"); c.type = "button"; c.className = "at-btn"; c.style.marginTop = "8px"; c.textContent = "COPIAR CÓDIGO";
-                  c.addEventListener("click", function(){ navigator.clipboard.writeText(t.slice(i)); c.textContent = "COPIADO"; });
-                  mostra.appendChild(c);
-                }
-              }).catch(function(e){ mostra.textContent = "Não foi possível abrir este arquivo (" + e.message + ")."; });
-            });
-            lista.appendChild(b);
+
+          var botao = document.createElement("button");
+          botao.type = "button";
+          botao.className = "at-btn pc-bib-assunto";
+          botao.textContent = "Abrir conteúdo";
+
+          botao.addEventListener("click", function() {
+            mostra.innerHTML = "";
+
+            var pre = document.createElement("pre");
+            pre.style.cssText =
+              "white-space:pre-wrap;padding:12px;margin-top:10px;" +
+              "border:1px solid var(--paper-line);border-radius:6px;" +
+              "background:#fff;color:var(--ink);" +
+              "font:13px/1.5 Consolas,monospace";
+
+            pre.textContent = texto;
+            mostra.appendChild(pre);
+
+            var inicio = texto.indexOf("\\version");
+
+            if (inicio > -1 && navigator.clipboard) {
+              var copiar = document.createElement("button");
+              copiar.type = "button";
+              copiar.className = "at-btn";
+              copiar.style.marginTop = "8px";
+              copiar.textContent = "COPIAR CÓDIGO";
+
+              copiar.addEventListener("click", function() {
+                navigator.clipboard.writeText(texto.slice(inicio));
+                copiar.textContent = "COPIADO";
+              });
+
+              mostra.appendChild(copiar);
+            }
           });
-        }).catch(function(e){ carregado = false; lista.textContent = "Não foi possível listar esta pasta (" + e.message + ")."; });
-      });
+
+          lista.appendChild(botao);
+        })
+        .catch(function(e) {
+          d.dataset.carregado = "";
+          lista.textContent =
+            "Não foi possível abrir este arquivo (" + e.message + ").";
+        });
     });
-  }
+  });
+}
+
   var bibView = document.createElement("section");
   bibView.className = "pc-biblioteca-view";
   bibView.setAttribute("data-biblioteca-view", "");
