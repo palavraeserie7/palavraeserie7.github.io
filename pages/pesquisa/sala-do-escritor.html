@@ -10577,24 +10577,7 @@ texto: $("esTexto").value
   var TEC_EXPR = ["Pizzicato@Cordas","Tremolo@Cordas,Percussão","Vibrato ~","Glissando@Cordas,Teclas,Metais,Percussão","Fermata","Sul ponticello@Cordas","Sul tasto@Cordas","Col legno@Cordas","Harmônicos@Cordas","Surdina (con sordino, mute)@Cordas,Metais","Flutter tongue@Madeiras,Metais"];
  
   var GENEROS = {
-    "Cristão protestante": [
-      "Música gospel",
-      "Música de louvor e adoração",
-      "Música congregacional",
-      "Hino cristão protestante",
-      "Cântico espiritual",
-      "Música devocional",
-      "Música de oração",
-      "Música de intercessão",
-      "Música de evangelização",
-      "Música de testemunho cristão",
-      "Música de consagração",
-      "Música de celebração cristã",
-      "Música de inspiração nos Salmos",
-      "Música de temática bíblica",
-      "Música de temática doutrinária",
-      "Música cristã instrumental"
-    ],
+   
     "Sacra e coral": [
       "Música sacra",
       "Música litúrgica protestante",
@@ -10750,7 +10733,7 @@ texto: $("esTexto").value
    F("titulo","Título da peça","txt",null,"",{ph:"Ex.: Aurora sobre o monte"}),
     F("projeto.finalidade","Finalidade da peça","sel",FINALIDADES,FINALIDADES[0]),
     F("projeto.tipoObra","Tipo de obra","sel",TIPOS_OBRA,"Miniatura (peça curta)"),
-    F("estilo.generos","Gêneros musicais","multi",GENEROS,[]),
+  
     F("estilo.estilos","Estilos musicais","multi",ESTILOS,["Clássico"]),
     F("estilo.caraterExpressivo","Caráter expressivo da obra","multi",CARATERES_EXPRESSIVOS,[]),
     F("estilo.climas","Atmosfera emocional da obra","multi",CLIMAS,["Contemplativo"]),
@@ -10835,7 +10818,7 @@ var ABAS = [
     "autor",
     "titulo",
     {h:"Classificação musical"},
-    "estilo.generos",
+   
     "estilo.estilos",
     "estilo.caraterExpressivo",
     "estilo.climas",
@@ -11599,7 +11582,7 @@ function carregarRitmos(mi, ai) {
   function pendencias(p){
     var r = [], add = function(a, t, g){ r.push({aba:a, t:t, g:!!g}); };
     if(!p.titulo) add("projeto", "Dê um título à peça.");
-    if(!p.estilo.generos.length) add("projeto", "Escolha ao menos um gênero ou estilo.");
+  
     if(p.base.tonica === "Personalizada" && !p.base.tonicaPersonalizada) add("base", "Preencha a tônica personalizada.", 1);
     if(p.andamento.bpm == null || p.andamento.bpm < 30 || p.andamento.bpm > 220) add("base", "O andamento deve ficar entre 30 e 220.", 1);
     if(p.base.a4 == null || p.base.a4 < 400 || p.base.a4 > 480) add("base", "A altura de referência deve ficar entre 400 e 480 Hz.", 1);
@@ -11693,14 +11676,14 @@ function carregarRitmos(mi, ai) {
     if(p.versao >= 3) return p;
     if(!(p.versao >= 2)){
       var tx = {"Melodia com acompanhamento":"Melodia acompanhada","Polifonia leve":"Polifonia","Arpejos contínuos":"Arpejos"};
-      var es = {"Jazz básico":"Jazz","Folk acústico":"Folk","Trilha cinematográfico":"Orquestral","Trilha cinematográfica":"Orquestral"};
+  
       var h = p.harmonia || {};
       p = {versao:2, titulo:p.titulo, compassos:p.compassos,
         base:{tonica:p.tonalidade, escala:p.modo === "Menor" ? "Eólio (menor natural)" : "Jônio (maior natural)"},
         ritmo:{compasso:p.compasso}, andamento:{bpm:p.andamento, indicacao:p.carater},
         harmonia:{progressao:h.progressao, ritmoHarmonico:h.ritmoHarmonico},
         textura:{texturas:p.textura ? [tx[p.textura] || p.textura] : null},
-        estilo:{generos:p.estilo ? [es[p.estilo] || p.estilo] : null, climas:p.clima ? [p.clima] : null},
+       estilo:{climas:p.clima ? [p.clima] : null}
         orquestracao:{instrumentos:p.instrumentos, melodia:p.melodia}, forma:p.forma};
     }
     var c = JSON.parse(JSON.stringify(p)); c.versao = 3;
