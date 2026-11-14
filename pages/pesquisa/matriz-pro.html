@@ -3133,6 +3133,27 @@ const M12_RULES = {
   ...M05_RULES, ...M06_RULES, ...M07_RULES, ...M08_RULES,
   ...M09_RULES, ...M10_RULES, ...M11_RULES, ...M12_RULES
 };
+// ===== REGRAS DO 01.1 POR NÍVEL =====
+const M01_RULES_01_1 = {
+
+  I: "Realize a análise do livro em forma de comentário introdutório, com linguagem simples e acessível, para quem estuda a Bíblia em casa e não tem formação teológica. Responda as cinco perguntas, cada uma em uma seção curta: 1) Quem escreveu (nome ou tradição de autoria)? 2) Para quem (leitor-alvo)? 3) Quando (data ou período provável)? 4) Por quê (motivo moral, espiritual ou político)? 5) Qual o plano do livro (mudanças de sentimentos e comportamentos esperadas do leitor)? REGRAS: (a) comece pelo que o próprio texto bíblico afirma sobre autoria, data e propósito, citando referências bíblicas; (b) quando houver mais de uma posição entre estudiosos cristãos, apresente cada uma com o mesmo espaço e o mesmo respeito, sem dizer qual é a correta; (c) explique cada termo técnico na primeira vez que aparecer, ou evite o termo; (d) se usar a palavra 'mito' ao falar de textos antigos de outros povos, explique que é um termo técnico para narrativas de origem e não significa 'mentira'; (e) não invente autores, obras ou páginas; indique 1 ou 2 obras de leitura recomendada, separadas por posição; (f) termine com perguntas para reflexão pessoal e para conversar com o pastor ou professor. Limite: cerca de 600 palavras.",
+
+  II: "Realize a análise do livro em forma de dossiê de comentário, em nível de instituto teológico. Estrutura: 1) Quem escreveu (nome ou tradição de autoria); 2) Para quem (leitor-alvo); 3) Quando (data ou período provável); 4) Por quê (motivo moral, espiritual ou político); 5) Qual o plano do livro (mudanças de sentimentos e comportamentos esperadas do leitor). REGRAS: (a) separe sempre o que o texto afirma explicitamente, o que a tradição afirma e o que é inferência de estudiosos; (b) onde houver divergência, apresente as posições concorrentes (por exemplo, autoria tradicional e abordagens crítico-históricas) com os argumentos e pressupostos de cada uma e o mesmo peso, sem concluir por uma delas, a não ser que as evidências sejam claramente desiguais, e então diga isso; (c) use termos técnicos, mas defina-os brevemente; (d) cite obras reconhecidas (introduções ao AT/NT, comentários, dicionários) com autor e título; se não puder confirmar página ou localização, escreva 'localização não confirmada'; nunca invente fontes; (e) esclareça que 'mito', quando aplicado a textos do Antigo Oriente Próximo, é termo técnico e não equivale a 'falso'; (f) a estrutura do livro deve ser apoiada no próprio texto, com referências bíblicas; (g) termine com um quadro de posições em formato de lista e uma lista de leituras sugeridas por posição.",
+
+  III: "Realize um dossiê crítico-exegético em forma de comentário, em nível de faculdade de teologia e pesquisa. Estrutura: 1) Autoria (nome ou tradição); 2) Leitor-alvo; 3) Data ou período provável; 4) Propósito (moral, espiritual ou político); 5) Plano do livro (mudanças de sentimentos e comportamentos esperadas do leitor). REGRAS: (a) distinga em cada ponto: evidência interna, evidência externa (tradição, citações posteriores, testemunhos), reconstrução crítica e inferência; (b) apresente as principais posições da literatura acadêmica com seus argumentos, pressupostos metodológicos e grau de consenso, com peso equilibrado, incluindo posições conservadoras, críticas e mediadoras; (c) cite autor, obra e localização (capítulo, seção, verbete ou página) apenas quando tiver confiança; caso contrário, escreva 'localização não confirmada' ou 'NÃO VERIFICADO'; nunca invente fontes, citações ou páginas; (d) trate de questões textuais relevantes ao livro (testemunhos hebraicos, gregos e versões) quando afetarem autoria, data ou estrutura; (e) use paralelos do Antigo Oriente Próximo com a ressalva de que a semelhança não prova dependência, e esclareça o uso técnico de 'mito'; (f) finalize com síntese, principais divergências, lacunas de evidência e limites da análise, sem apresentar ausência de evidência como refutação."
+};
+
+function regraPorNivel() {
+  const plano = String(currentUserPlan || "FREE").toUpperCase();
+  const nivel = plano === "FREE" ? "I" : plano === "PRO" ? "II" : "III";
+  return M01_RULES_01_1[nivel];
+}
+
+function templatePorNivel(code) {
+  if (code === "01.1") return regraPorNivel();
+  return objetivosDasSubetapas[code];
+}
+// ===== FIM DAS REGRAS DO 01.1 POR NÍVEL =====
 // >>>>>>>>>> INÍCIO — LIMPEZA DE MARKDOWN COM TABELAS >>>>>>>>>>
 function limparTabelaMarkdown(t) {
   return String(t || "")
