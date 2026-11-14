@@ -3832,7 +3832,7 @@ function prepareQuestionForStep(skipIntroMessage) {
   const code = extractStepCode(activeStep);
   const config = M01_INPUT_CONFIG[code];
  const reference = "";
-  const template = objetivosDasSubetapas[code];
+  const template = templatePorNivel(code);
  
   questionInput.placeholder = config
     ? config.prompt
@@ -4557,7 +4557,7 @@ async function sendQuestion(event) {
       extractStepCode(activeStep);
  
     const template =
-      objetivosDasSubetapas[code];
+     templatePorNivel(code);
  
        questionForApi =
       template
@@ -5346,7 +5346,7 @@ function usarBiblia() {
     return;
   }
 
-  const template = objetivosDasSubetapas[code];
+  const template = templatePorNivel(code);
   questionInput.value = template
     ? aplicarReferencia(template, ref)
     : "Objeto da pesquisa: " + ref + ".";
