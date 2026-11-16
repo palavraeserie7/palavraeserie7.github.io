@@ -11264,7 +11264,7 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
   }
   function renderRevisao(){
     var p = plano(), r = marcarAbas(), nomes = {}; ABAS.forEach(function(a){ nomes[a[0]] = a[1].replace(/^\d+\.\s*/, ""); });
-   nomes.ficha = "Ficha da peça";
+    nomes.ficha = "Ficha da peça";
     Q("[data-pc-pend]").innerHTML = r.length ? r.map(function(i){
       return '<li><span class="pc-selo ' + (i.g ? 'grave' : 'aviso') + '">' + (i.g ? 'Corrigir' : 'Aviso') + '</span>' + esc(nomes[i.aba]) + ': ' + esc(i.t) + ' <button type="button" class="at-btn" data-pc-ir="' + i.aba + '">IR</button></li>';
     }).join("") : '<li><span class="pc-selo">Tudo certo</span>Nenhuma pendência encontrada.</li>';
@@ -11277,7 +11277,7 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
     QA("[data-pc-aba]").forEach(function(b){ var s = b.dataset.pcAba === id; b.setAttribute("aria-selected", String(s)); b.tabIndex = s ? 0 : -1; if(s && foco) b.focus(); });
     QA("[data-pc-painel]").forEach(function(p){ p.hidden = p.dataset.pcPainel !== id; });
   }
-  }
+  
   Q(".pc-abas").addEventListener("keydown", function(ev){
     var ids = ABAS.map(function(a){ return a[0]; }), at = Q('[data-pc-aba][aria-selected="true"]').dataset.pcAba, i = ids.indexOf(at), n = -1;
     if(ev.key === "ArrowRight") n = (i + 1) % ids.length; else if(ev.key === "ArrowLeft") n = (i + ids.length - 1) % ids.length;
