@@ -10452,6 +10452,12 @@ texto: $("esTexto").value
 #pcEstrutura .pc-item strong{display:block;font:600 15px Georgia,serif}
 #pcEstrutura .pc-item small{font:12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
 @media(max-width:760px){#pcEstrutura .pc-grade{grid-template-columns:1fr}#pcEstrutura .pc-secao{grid-template-columns:1fr 80px 90px auto}}
+#pcEstrutura .pc-abas button[data-estado="aceso"]:not([aria-selected="true"]){background:#e4efdf;color:#2f6b3a}
+#pcEstrutura .pc-abas button[data-estado="aceso"]::before{content:"● ";color:#2f9e44}
+#pcEstrutura .pc-aceso{padding:12px;border-left:3px solid #2f9e44;background:#e4efdf;font:14px/1.5 "Segoe UI",Arial,sans-serif;color:#1f4a2a}
+#pcEstrutura h4 .at-btn{margin-left:8px;font-size:11px;padding:4px 10px;min-height:0;vertical-align:middle}
+#pcEstrutura .pc-auto{margin:6px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#pcEstrutura .pc-auto li{display:flex;gap:8px;align-items:center;font:14px "Segoe UI",Arial,sans-serif;color:var(--ink)}
 </style>
 <script>
 (function(){
@@ -10830,172 +10836,175 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
   /* ================= ETAPAS (abas) ================= */
   var LEGENDA = "Marcas nas opções: avançado = o gerador só vai usar numa fase posterior; só reprodução = não entra na partitura. Campos condicionais aparecem quando fazem sentido.";
  
-var ABAS = [
-    ["projeto","1. Projeto",[
-    "autor",
-    "titulo",
-    {h:"Classificação musical"},
-    "estilo.generos",
-    "estilo.estilos",
-    "estilo.caraterExpressivo",
-    "estilo.climas",
-    "projeto.finalidade",
-    "projeto.tipoObra",
-    {id:"avancadoIni"},
-    {nota:LEGENDA},
-    {h:"Diretrizes de composição do Maestro"},
-    {nota:"Configure o modelo de composição e o grau de liberdade que o Maestro deverá respeitar ao desenvolver a peça. Estas diretrizes orientam a construção musical; não substituem as definições de melodia, harmonia e ritmo das etapas seguintes."},
-    {h:"Modelo de composição"},
-    "regras.perfil",
-    {nota:"Estrito: prioriza regras tradicionais de coral e contraponto. Clássico: prioriza a prática comum da música tonal. Livre: permite maior flexibilidade na linguagem musical, como no jazz e na música popular."},
-    {h:"Grau de rigor por elemento musical"},
-    "regras.rigorMelodia",
-    {nota:"Estrito: restringe os movimentos melódicos às regras estabelecidas. Moderado: permite variações controladas. Livre: permite maior liberdade na construção das frases e dos motivos."},
-    "regras.rigorHarmonia",
-    {nota:"Estrito: exige maior controle das relações harmônicas e da condução das vozes. Moderado: admite variações coerentes. Livre: permite maior flexibilidade nas progressões, acordes e resoluções."},
-    "regras.rigorRitmo",
-    {nota:"Estrito: mantém maior regularidade e controle métrico. Moderado: admite variações rítmicas controladas. Livre: permite síncopes, deslocamentos, mudanças de acentuação e maior liberdade rítmica."},
-    {id:"avancadoFim"}
-  ]],
-
-    ["base","2. Fundamentos musicais",[
-    {h:"Tonalidade"},
-    "base.tonica",
-    "base.tonicaPersonalizada",
-    "base.escala",
-    {id:"notaEscala"},
-    {h:"Notas estruturais"},
-    "base.notaInicial",
-    "base.notaFinal",
-    {id:"avancadoIni"},
-    {h:"Escrita na partitura"},
-    "base.armadura",
-    "base.clave",
-    "base.extensao",
-    "base.a4",
-    {id:"avancadoFim"}
-  ]],
-
-  ["forma","3. Estrutura e forma",[
-    "compassos",
-    {id:"modelos"},
-    {id:"secoes"}
-  ]],
-
- 
-  ["ritmo","4. Ritmo e métrica",[
-    {h:"Ritmo básico"},
-    "ritmo.compasso",
-    "ritmo.agrupamento",
-    "ritmo.agrupamentoPersonalizado",
-    "ritmo.pulso",
-    "ritmo.densidade",
-    {id:"avancadoIni"},
-    {h:"Detalhes do ritmo"},
-    "ritmo.acentuacao",
-    "ritmo.subdivisao",
-    "ritmo.figuras",
-    "ritmo.pausas",
-    {h:"Padrões por função"},
-    "ritmo.padroes.melodia",
-    "ritmo.padroes.acompanhamento",
-    "ritmo.padroes.baixo",
-    "ritmo.padroes.percussao",
-    {h:"Recursos especiais"},
-    "ritmo.polirritmia",
-    "ritmo.recursos",
-    "ritmo.quialteras",
-    "ritmo.ostinatoPapel",
-    {id:"avancadoFim"}
-  ]],
-  
-   ["melodia","5. Melodia e textura",[
-    {h:"Construção melódica"},
-    "textura.contorno",
-    "melodia.movimento",
-    "melodia.extensao",
-    "melodia.culminancia",
-    "melodia.frases",
-    "melodia.motivo",
-    {id:"avancadoIni"},
-    {h:"Organização das vozes e texturas"},
-    "textura.texturas",
-    "textura.tecnicas",
-    {id:"avancadoFim"}
-  ]],
-   ["harmonia","6. Harmonia",[
-    {h:"Harmonia básica"},
-    "harmonia.campo",
-    "harmonia.acordes",
-    {h:"Progressão de acordes"},
-    {id:"preset"},
-    "harmonia.progressao",
-    {id:"avancadoIni"},
-    {h:"Notação e ritmo harmônico"},
-    "harmonia.cifras",
-    "harmonia.ritmoHarmonico",
-    {h:"Cadências e modulação"},
-    "harmonia.cadencias",
-    "harmonia.modulacao",
-    "harmonia.recursos",
-    {h:"Condução de vozes (partitura)"},
-    "harmonia.espacamento",
-    "harmonia.distanciaMax",
-    "harmonia.conducao",
-    {h:"Escrita vocal"},
-    "harmonia.vozes",
-    "harmonia.extensaoSoprano",
-    "harmonia.extensaoContralto",
-    "harmonia.extensaoTenor",
-    "harmonia.extensaoBaixo",
-    {id:"avancadoFim"}
-  ]],
-
-   ["orq","7. Orquestração",[
-    {h:"Formação instrumental ou vocal"},
-    "orquestracao.formacao",
-    {id:"buscaInstr"},
-    "orquestracao.instrumentos",
-    {nota:"A seleção dos instrumentos determina a formação e os recursos de escrita disponíveis."},
-    {h:"Distribuição musical"},
-    "orquestracao.melodia",
-    {id:"avancadoIni"},
-    {h:"Papel de cada instrumento"},
-    {id:"papeis"},
-    {id:"avancadoFim"}
-  ]],
-
-  ["voz","8. Composição vocal",[
-    {nota:"Esta etapa aparece quando a formação selecionada contém vozes."},
-    "voz.texto",
-    "voz.silabas",
-    "voz.respiracao",
-    "voz.tonica",
-    "voz.tessitura"
-  ]],
-
-    ["expr","9. Andamento e expressão",[
-    {h:"Andamento"},
-    "andamento.indicacao",
-    "andamento.bpm",
-    {h:"Dinâmica inicial"},
-    "expressao.dinamicaInicial",
-    {id:"avancadoIni"},
-    {h:"Variações de andamento"},
-    "andamento.variacoes",
-    {h:"Dinâmicas e variações usadas"},
-    "expressao.dinamicas",
-    {h:"Articulação"},
-    "expressao.articulacoes",
-    {h:"Técnicas de execução"},
-    "expressao.tecnicas",
-    {id:"avancadoFim"}
-  ]],
-
-  ["revisao","10. Revisão e exportação",[
-    {id:"revisao"}
-  ]]
-];
+  var TAB = [
+   ["Fundamentos Musicais", null, [
+     ["Notas e alturas musicais","base.extensao"],
+     "Acústica e fundamentos matemáticos",
+     "Frequências e proporções",
+     "Intervalos simples e compostos",
+     "Classificação e inversão de intervalos",
+     "Consonâncias e dissonâncias",
+     ["Escalas e modos","base.escala","#notaEscala"],
+     ["Armaduras e tonalidades","base.tonica","base.tonicaPersonalizada"],
+     ["Graus da escala","base.notaInicial","base.notaFinal"]]],
+   ["Harmonia", null, [
+     "Formação de acordes",
+     ["Tríades e tétrades","harmonia.acordes"],
+     ["Acordes com extensões e alterações","harmonia.acordes"],
+     ["Inversões e baixos alternativos","Permitir inversões"],
+     ["Funções harmônicas","#preset","harmonia.progressao","harmonia.ritmoHarmonico"],
+     ["Acordes diatônicos e não diatônicos","harmonia.campo"],
+     ["Dominantes secundárias","harmonia.recursos"],
+     ["Acordes emprestados","harmonia.recursos"],
+     ["Cadências e resoluções","harmonia.cadencias"],
+     ["Modulações","harmonia.modulacao"],
+     ["Relações tonais e modais","harmonia.campo"]]],
+   ["Melodia", null, [
+     "Movimento ascendente e descendente",
+     ["Movimento conjunto e disjunto","melodia.movimento"],
+     ["Saltos melódicos","Tamanho máximo dos saltos"],
+     "Compensação de saltos",
+     ["Contorno melódico","textura.contorno","melodia.culminancia"],
+     "Notas reais e notas estranhas ao acorde",
+     ["Notas de passagem e bordaduras","Notas estranhas permitidas"],
+     ["Apogiaturas e antecipações","Notas estranhas permitidas"],
+     ["Retardos e suspensões","Notas estranhas permitidas"],
+     ["Notas de escape","Notas estranhas permitidas"],
+     ["Cromatismos e ornamentações","Notas estranhas permitidas"],
+     ["Tessitura e extensão melódica","melodia.extensao"]]],
+   ["Contraponto e Condução de Vozes", null, [
+     "Movimento paralelo","Movimento contrário","Movimento oblíquo","Movimento direto",
+     "Condução independente das vozes",
+     ["Quintas e oitavas paralelas","harmonia.conducao"],
+     ["Quintas e oitavas ocultas","harmonia.conducao"],
+     ["Cruzamento de vozes","harmonia.conducao"],
+     ["Sobreposição de registros","harmonia.conducao"],
+     "Preparação e resolução de dissonâncias",
+     "Notas comuns entre acordes",
+     ["Contraponto de primeira à quinta espécie","Espécie de contraponto"]]],
+   ["Harmonia Vocal — SATB", "Os campos vocais aparecem quando a formação escolhida contém vozes.", [
+     ["Soprano","harmonia.extensaoSoprano"],
+     ["Contralto","harmonia.extensaoContralto"],
+     ["Tenor","harmonia.extensaoTenor"],
+     ["Baixo","harmonia.extensaoBaixo"],
+     ["Extensão e tessitura vocal","harmonia.vozes"],
+     ["Regiões de dificuldade","voz.tessitura"],
+     ["Espaçamento entre vozes","harmonia.espacamento","harmonia.distanciaMax"],
+     "Cruzamento e sobreposição","Dobramento de notas","Condução harmônica",
+     "Resolução de sensíveis","Tratamento de dissonâncias","Limites de execução vocal",
+     ["Texto e prosódia vocal","voz.texto","voz.silabas","voz.tonica"]]],
+   ["Harmonia Instrumental e Instrumentos", null, [
+     ["Formações","orquestracao.formacao"],
+     ["Cordas","#buscaInstr","orquestracao.instrumentos"],
+     ["Madeiras","orquestracao.instrumentos"],
+     ["Metais","orquestracao.instrumentos"],
+     ["Percussão","orquestracao.instrumentos"],
+     ["Teclas","orquestracao.instrumentos"],
+     ["Instrumentos populares e tradicionais","orquestracao.instrumentos"],
+     "Extensão e tessitura instrumental","Claves e transposições","Afinações","Regiões expressivas e de dificuldade",
+     ["Técnicas e articulações","expressao.tecnicas"],
+     "Limitações de execução",
+     ["Dobramentos e distribuição instrumental","orquestracao.melodia","#papeis"]]],
+   ["Ritmo", null, [
+     ["Fórmulas de compasso","ritmo.compasso","ritmo.pulso"],
+     "Métrica simples","Métrica composta",
+     ["Métrica irregular","ritmo.agrupamento","ritmo.agrupamentoPersonalizado"],
+     ["Figuras rítmicas e pausas","ritmo.figuras","ritmo.pausas"],
+     ["Subdivisões binárias e ternárias","ritmo.subdivisao"],
+     ["Acentuação métrica","ritmo.acentuacao"],
+     ["Síncopes e contratempos","ritmo.recursos"],
+     ["Quiálteras","ritmo.quialteras"],
+     ["Polirritmia","ritmo.polirritmia"],
+     ["Ostinatos","ritmo.ostinatoPapel"],
+     ["Relações rítmicas entre instrumentos","ritmo.padroes.melodia","ritmo.padroes.acompanhamento","ritmo.padroes.baixo","ritmo.padroes.percussao"],
+     ["Ritmos brasileiros e suas variações","ritmo.padroes.melodia"]]],
+   ["Relações Musicais", null, [
+     "Relações entre notas e intervalos","Relações entre escalas e tonalidades",
+     "Relações entre acordes e funções harmônicas","Relações entre melodia e harmonia",
+     "Relações entre melodia e ritmo","Relações entre baixo e harmonia",
+     "Relações entre vozes","Relações entre instrumentos","Compatibilidade entre elementos musicais"]],
+   ["Perfis de Linguagem Musical", null, [
+     ["Gêneros e estilos","estilo.generos","estilo.estilos"],
+     ["Contraponto renascentista","Perfil de linguagem musical"],
+     ["Harmonia tonal clássica","Perfil de linguagem musical"],
+     ["Romantismo","Perfil de linguagem musical"],
+     ["Escrita coral tradicional","Perfil de linguagem musical"],
+     ["Jazz","Perfil de linguagem musical"],
+     ["Música popular","Perfil de linguagem musical"],
+     ["Música brasileira","Perfil de linguagem musical"],
+     ["Música modal","Perfil de linguagem musical"],
+     ["Música contemporânea","Perfil de linguagem musical"],
+     ["Música experimental","Perfil de linguagem musical"]]],
+   ["Regras e Validação Musical", null, [
+     "Cadastro de regras","Identificação e classificação","Critérios de aplicação","Condições de validade","Gravidade","Exceções",
+     ["Restrições estilísticas","regras.perfil"],
+     "Justificativas musicais",
+     ["Erros","regras.rigorMelodia","regras.rigorHarmonia","regras.rigorRitmo"],
+     ["Alertas","regras.rigorMelodia"],
+     ["Licenças artísticas","Permitir licenças artísticas"]]],
+   ["Integração da Inteligência Musical", null, [
+     "Integração melódica","Integração harmônica","Integração rítmica","Integração contrapontística",
+     "Integração vocal","Integração instrumental","Relações entre os sistemas","Coerência musical global"]],
+   ["Forma e Estrutura Musical", null, [
+     ["Frases e semifrases","melodia.frases"],
+     ["Motivos e temas","melodia.motivo"],
+     "Períodos musicais",
+     ["Seções e subseções","#modelos","compassos","#secoes"],
+     ["Introdução, desenvolvimento e conclusão","#modelos"],
+     ["Formas binária e ternária","#modelos"],
+     ["Rondó","#modelos"],
+     ["Tema com variações","#modelos"],
+     ["Forma-sonata","#modelos"],
+     ["Outras formas históricas","#modelos"],
+     "Repetição, contraste e transformação temática","Coerência e proporção estrutural"]],
+   ["Textura e Organização Musical", null, [
+     ["Monofonia","textura.texturas"],
+     ["Homofonia","textura.texturas"],
+     ["Polifonia","textura.texturas"],
+     ["Heterofonia","textura.texturas"],
+     ["Melodia acompanhada","textura.texturas"],
+     ["Densidade musical","ritmo.densidade"],
+     "Independência e dependência entre vozes","Distribuição de funções musicais","Equilíbrio entre planos sonoros",
+     ["Técnicas de composição","textura.tecnicas"]]],
+   ["Expressão, Dinâmica e Articulação", null, [
+     ["Intensidade e dinâmica","expressao.dinamicaInicial","expressao.dinamicas"],
+     ["Crescendo e diminuendo","expressao.dinamicas"],
+     "Acentos e acentuação expressiva",
+     ["Legato, staccato e tenuto","expressao.articulacoes"],
+     "Fraseado",
+     ["Respiração musical","voz.respiracao"],
+     ["Agógica e rubato","andamento.variacoes"],
+     ["Caráter e intenção expressiva","estilo.caraterExpressivo","estilo.climas"],
+     "Relação entre expressão e estilo"]],
+   ["Notação e Representação Musical", null, [
+     ["Pauta e claves","base.clave"],
+     "Notas e valores na partitura",
+     ["Armaduras e acidentes","base.armadura"],
+     "Ligaduras e articulações",
+     ["Indicações de andamento","andamento.indicacao","andamento.bpm"],
+     "Indicações de dinâmica",
+     ["Notação de acordes e cifras","harmonia.cifras"],
+     "Escrita para instrumentos transpositores","Representação de compassos e ritmos",
+     "Leitura e validação de partituras","Representação simbólica das informações musicais"]],
+   ["Acústica, Timbre e Sistemas de Afinação", null, [
+     "Série harmônica","Harmônicos e parciais","Timbre","Intensidade e amplitude",
+     ["Altura e frequência","base.a4"],
+     "Temperamentos musicais",
+     ["Afinação justa e temperamento igual","Temperamento (por ora, só o igual)"],
+     "Sistemas de afinação históricos e culturais","Microtonalidade","Batimentos e consonância acústica"]],
+   ["Análise e Interpretação Musical", null, [
+     "Identificação de elementos musicais","Análise melódica","Análise harmônica","Análise rítmica",
+     "Análise contrapontística","Análise formal e estrutural","Análise de textura","Análise estilística",
+     "Identificação de padrões musicais","Coerência entre elementos da obra",
+     "Interpretação de intenções musicais","Justificativa das decisões musicais"]]
+  ];
+  var MODULOS_BIB = TAB.map(function(m){
+    var it = m[2].map(function(a){ return typeof a === "string" ? {nome:a, tipo:"A", refs:[]} : {nome:a[0], tipo:"D", refs:a.slice(1)}; });
+    return {nome:m[0], nota:m[1], itens:it, assuntos:it.map(function(x){ return x.nome; })};
+  });
+  var ABAS = MODULOS_BIB.map(function(m, i){
+    return ["m" + (i + 1), (i + 1) + ". " + m.nome, null, m.itens.some(function(x){ return x.tipo === "D"; }) ? "decisao" : "aceso"];
+  });
 
   var ESTADO = [
     ["Menus, escolhas, planos nomeados e plano JSON","ok","Disponível"],
@@ -11035,14 +11044,27 @@ var ABAS = [
       ["MUSICXML (para o MuseScore)","MIDI","MP3","MP4"].map(function(n){ return '<button type="button" class="at-btn" disabled>' + n + '</button>'; }).join("") + '</div>' +
       '<ul class="pc-estado pc-wide">' + ESTADO.map(function(e){ return '<li><span class="pc-selo ' + e[1] + '">' + e[2] + '</span>' + e[0] + '</li>'; }).join("") + '</ul>'
   };
-  function painelHtml(a, primeira){
-    return '<div class="es-box" role="tabpanel" id="pcPainel_' + a[0] + '" aria-labelledby="pcTab_' + a[0] + '" data-pc-painel="' + a[0] + '"' + (primeira ? '' : ' hidden') + '><h3>' + esc(a[1].replace(/^\d+\.\s*/, "")) + '</h3><div class="pc-grade">' +
-      a[2].map(function(x){
-        if(typeof x === "string") return campoHtml(POR[x]);
-        if(x.h) return '<h4>' + esc(x.h) + '</h4>';
-        if(x.nota) return '<p class="es-nota pc-wide">' + esc(x.nota) + '</p>';
-        return CUSTOM[x.id];
-      }).join("") + '</div></div>';
+    var FICHA = '<div class="es-box" data-pc-ficha><h3>Ficha da peça</h3><div class="pc-grade">' +
+    ["autor","titulo","projeto.finalidade","projeto.tipoObra"].map(function(p){ return campoHtml(POR[p]); }).join("") +
+    '<p class="es-nota pc-wide">' + esc(LEGENDA) + '</p></div></div>';
+  var REVISAO = '<details class="pc-lib" data-pc-revisao style="margin-top:14px"><summary>Revisar e exportar</summary><div class="pc-grade">' + CUSTOM.revisao + '</div></details>';
+  function painelHtml(a, i){
+    var m = MODULOS_BIB[i], feitos = {}, corpo = "", auto = [], temD = a[3] === "decisao";
+    var ver = function(ai){ return '<button type="button" class="at-btn" data-pc-bib-ver="' + i + ':' + ai + '">VER NA BIBLIOTECA</button>'; };
+    m.itens.forEach(function(x, ai){
+      if(x.tipo !== "D"){ auto.push('<li>' + esc(x.nome) + ' ' + ver(ai) + '</li>'); return; }
+      corpo += '<h4>' + esc(x.nome) + ' ' + ver(ai) + '</h4>' + x.refs.map(function(r){
+        if(feitos[r]) return '<p class="es-nota pc-wide">Usa a escolha de «' + esc(feitos[r]) + '», acima.</p>';
+        feitos[r] = x.nome;
+        if(r.charAt(0) === "#") return CUSTOM[r.slice(1)];
+        if(POR[r]) return campoHtml(POR[r]);
+        return '<p class="es-nota pc-wide"><span class="pc-selo prep">Em preparação</span> ' + esc(r) + '</p>';
+      }).join("");
+    });
+    return '<div class="es-box" role="tabpanel" id="pcPainel_' + a[0] + '" aria-labelledby="pcTab_' + a[0] + '" data-pc-painel="' + a[0] + '"' + (i ? ' hidden' : '') + '><h3>' + esc(m.nome) + '</h3><div class="pc-grade">' +
+      (temD ? (m.nota ? '<p class="es-nota pc-wide">' + esc(m.nota) + '</p>' : '') : '<div class="pc-aceso pc-wide"><span class="pc-selo">● Decisão no ar</span> Nenhuma escolha sua é necessária aqui. O Maestro aplica tudo direto da Biblioteca.</div>') +
+      corpo + (auto.length ? '<details class="pc-wide"' + (temD ? '' : ' open') + '><summary>Aplicado automaticamente pelo Maestro (' + auto.length + ')</summary><ul class="pc-auto">' + auto.join("") + '</ul></details>' : '') +
+      '</div></div>';
   }
  
   var card = document.createElement("button");
@@ -11070,289 +11092,18 @@ var ABAS = [
       '<button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><button type="button" class="at-btn" data-pc-lib-acao="novo">NOVO PLANO</button></div>' +
       '<div class="pc-lista" data-pc-lista></div></div></details>' +
    '</div>' +
-    '<div class="pc-abas" role="tablist" aria-label="Etapas da peça">' + ABAS.map(function(a, i){ return '<button type="button" role="tab" id="pcTab_' + a[0] + '" data-pc-aba="' + a[0] + '" aria-controls="pcPainel_' + a[0] + '" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '">' + a[1] + '</button>'; }).join("") + '</div>' +
-    ABAS.map(function(a, i){ return painelHtml(a, i === 0); }).join("") +
+    FICHA +'<div class="pc-abas" role="tablist" aria-label="Etapas da peça">' + ABAS.map(function(a, i){ return '<button type="button" role="tab" id="pcTab_' + a[0] + '" data-pc-aba="' + a[0] + '" aria-controls="pcPainel_' + a[0] + '" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '">' + a[1] + '</button>'; }).join("") + '</div>' +
+   ABAS.map(function(a, i){ return painelHtml(a, i); }).join("") + REVISAO +
     '<div class="pc-linha"><button type="button" class="at-btn gold" data-pc-lib-acao="salvar">SALVAR PLANO</button><span class="es-nota" data-pc-sujo hidden>● alterações ainda não guardadas</span></div>' +
     '<p class="es-msg" id="pcMsg" role="status"></p>';
- var MODULOS_BIB = [
-
-    {
-        nome: "Fundamentos Musicais",
-        assuntos: [
-            "Notas e alturas musicais",
-            "Acústica e fundamentos matemáticos",
-            "Frequências e proporções",
-            "Intervalos simples e compostos",
-            "Classificação e inversão de intervalos",
-            "Consonâncias e dissonâncias",
-            "Escalas e modos",
-            "Armaduras e tonalidades",
-            "Graus da escala"
-        ]
-    },
-    {
-        nome: "Harmonia",
-        assuntos: [
-            "Formação de acordes",
-            "Tríades e tétrades",
-            "Acordes com extensões e alterações",
-            "Inversões e baixos alternativos",
-            "Funções harmônicas",
-            "Acordes diatônicos e não diatônicos",
-            "Dominantes secundárias",
-            "Acordes emprestados",
-            "Cadências e resoluções",
-            "Modulações",
-            "Relações tonais e modais"
-        ]
-    },
-    {
-        nome: "Melodia",
-        assuntos: [
-            "Movimento ascendente e descendente",
-            "Movimento conjunto e disjunto",
-            "Saltos melódicos",
-            "Compensação de saltos",
-            "Contorno melódico",
-            "Notas reais e notas estranhas ao acorde",
-            "Notas de passagem e bordaduras",
-            "Apogiaturas e antecipações",
-            "Retardos e suspensões",
-            "Notas de escape",
-            "Cromatismos e ornamentações",
-            "Tessitura e extensão melódica"
-        ]
-    },
-    {
-        nome: "Contraponto e Condução de Vozes",
-        assuntos: [
-            "Movimento paralelo",
-            "Movimento contrário",
-            "Movimento oblíquo",
-            "Movimento direto",
-            "Condução independente das vozes",
-            "Quintas e oitavas paralelas",
-            "Quintas e oitavas ocultas",
-            "Cruzamento de vozes",
-            "Sobreposição de registros",
-            "Preparação e resolução de dissonâncias",
-            "Notas comuns entre acordes",
-            "Contraponto de primeira à quinta espécie"
-        ]
-    },
-    {
-        nome: "Harmonia Vocal — SATB",
-        assuntos: [
-            "Soprano",
-            "Contralto",
-            "Tenor",
-            "Baixo",
-            "Extensão e tessitura vocal",
-            "Regiões de dificuldade",
-            "Espaçamento entre vozes",
-            "Cruzamento e sobreposição",
-            "Dobramento de notas",
-            "Condução harmônica",
-            "Resolução de sensíveis",
-            "Tratamento de dissonâncias",
-            "Limites de execução vocal"
-        ]
-    },
-    {
-        nome: "Harmonia Instrumental e Instrumentos",
-        assuntos: [
-            "Cordas",
-            "Madeiras",
-            "Metais",
-            "Percussão",
-            "Teclas",
-            "Instrumentos populares e tradicionais",
-            "Extensão e tessitura instrumental",
-            "Claves e transposições",
-            "Afinações",
-            "Regiões expressivas e de dificuldade",
-            "Técnicas e articulações",
-            "Limitações de execução",
-            "Dobramentos e distribuição instrumental"
-        ]
-    },
-    {
-        nome: "Ritmo",
-        assuntos: [
-            "Fórmulas de compasso",
-            "Métrica simples",
-            "Métrica composta",
-            "Métrica irregular",
-            "Figuras rítmicas e pausas",
-            "Subdivisões binárias e ternárias",
-            "Acentuação métrica",
-            "Síncopes e contratempos",
-            "Quiálteras",
-            "Polirritmia",
-            "Ostinatos",
-            "Relações rítmicas entre instrumentos",
-            "Ritmos brasileiros e suas variações"
-        ]
-    },
-    {
-        nome: "Relações Musicais",
-        assuntos: [
-            "Relações entre notas e intervalos",
-            "Relações entre escalas e tonalidades",
-            "Relações entre acordes e funções harmônicas",
-            "Relações entre melodia e harmonia",
-            "Relações entre melodia e ritmo",
-            "Relações entre baixo e harmonia",
-            "Relações entre vozes",
-            "Relações entre instrumentos",
-            "Compatibilidade entre elementos musicais"
-        ]
-    },
-    {
-        nome: "Perfis de Linguagem Musical",
-        assuntos: [
-            "Contraponto renascentista",
-            "Harmonia tonal clássica",
-            "Romantismo",
-            "Escrita coral tradicional",
-            "Jazz",
-            "Música popular",
-            "Música brasileira",
-            "Música modal",
-            "Música contemporânea",
-            "Música experimental"
-        ]
-    },
-    {
-        nome: "Regras e Validação Musical",
-        assuntos: [
-            "Cadastro de regras",
-            "Identificação e classificação",
-            "Critérios de aplicação",
-            "Condições de validade",
-            "Gravidade",
-            "Exceções",
-            "Restrições estilísticas",
-            "Justificativas musicais",
-            "Erros",
-            "Alertas",
-            "Licenças artísticas"
-        ]
-    },
-    {
-        nome: "Integração da Inteligência Musical",
-        assuntos: [
-            "Integração melódica",
-            "Integração harmônica",
-            "Integração rítmica",
-            "Integração contrapontística",
-            "Integração vocal",
-            "Integração instrumental",
-            "Relações entre os sistemas",
-            "Coerência musical global"
-        ]
-    },
-    {
-        nome: "Forma e Estrutura Musical",
-        assuntos: [
-            "Frases e semifrases",
-            "Motivos e temas",
-            "Períodos musicais",
-            "Seções e subseções",
-            "Introdução, desenvolvimento e conclusão",
-            "Formas binária e ternária",
-            "Rondó",
-            "Tema com variações",
-            "Forma-sonata",
-            "Outras formas históricas",
-            "Repetição, contraste e transformação temática",
-            "Coerência e proporção estrutural"
-        ]
-    },
-    {
-        nome: "Textura e Organização Musical",
-        assuntos: [
-            "Monofonia",
-            "Homofonia",
-            "Polifonia",
-            "Heterofonia",
-            "Melodia acompanhada",
-            "Densidade musical",
-            "Independência e dependência entre vozes",
-            "Distribuição de funções musicais",
-            "Equilíbrio entre planos sonoros"
-        ]
-    },
-    {
-        nome: "Expressão, Dinâmica e Articulação",
-        assuntos: [
-            "Intensidade e dinâmica",
-            "Crescendo e diminuendo",
-            "Acentos e acentuação expressiva",
-            "Legato, staccato e tenuto",
-            "Fraseado",
-            "Respiração musical",
-            "Agógica e rubato",
-            "Caráter e intenção expressiva",
-            "Relação entre expressão e estilo"
-        ]
-    },
-    {
-        nome: "Notação e Representação Musical",
-        assuntos: [
-            "Pauta e claves",
-            "Notas e valores na partitura",
-            "Armaduras e acidentes",
-            "Ligaduras e articulações",
-            "Indicações de andamento",
-            "Indicações de dinâmica",
-            "Notação de acordes e cifras",
-            "Escrita para instrumentos transpositores",
-            "Representação de compassos e ritmos",
-            "Leitura e validação de partituras",
-            "Representação simbólica das informações musicais"
-        ]
-    },
-    {
-        nome: "Acústica, Timbre e Sistemas de Afinação",
-        assuntos: [
-            "Série harmônica",
-            "Harmônicos e parciais",
-            "Timbre",
-            "Intensidade e amplitude",
-            "Altura e frequência",
-            "Temperamentos musicais",
-            "Afinação justa e temperamento igual",
-            "Sistemas de afinação históricos e culturais",
-            "Microtonalidade",
-            "Batimentos e consonância acústica"
-        ]
-    },
-    {
-        nome: "Análise e Interpretação Musical",
-        assuntos: [
-            "Identificação de elementos musicais",
-            "Análise melódica",
-            "Análise harmônica",
-            "Análise rítmica",
-            "Análise contrapontística",
-            "Análise formal e estrutural",
-            "Análise de textura",
-            "Análise estilística",
-            "Identificação de padrões musicais",
-            "Coerência entre elementos da obra",
-            "Interpretação de intenções musicais",
-            "Justificativa das decisões musicais"
-        ]
-    }
-];
+ 
   var bibView = document.createElement("section");
   bibView.className = "pc-biblioteca-view";
   bibView.setAttribute("data-biblioteca-view", "");
   bibView.hidden = true;
   bibView.innerHTML = '<div class="pc-bib-cabecalho"><h2 tabindex="-1" data-bib-titulo>BIBLIOTECA MUSICAL</h2><button type="button" class="at-btn" data-bib-fechar>VOLTAR À CRIAÇÃO</button></div>' +
     '<p class="pc-bib-intro">Arquitetura expansível — selecione um módulo para consultar os seus assuntos.</p>' +
-    '<div data-bib-indice>' + MODULOS_BIB.map(function(m, mi){ return '<details class="pc-bib-modulo"><summary>' + (mi + 1) + '. ' + m.nome + '</summary><div class="pc-bib-assuntos">' + m.assuntos.map(function(a, ai){ return '<button type="button" class="at-btn pc-bib-assunto" data-bib-modulo="' + mi + '" data-bib-assunto="' + ai + '">' + a + '</button>'; }).join("") + '</div></details>'; }).join("") + '</div>' +
+    '<div data-bib-indice>' + MODULOS_BIB.map(function(m, mi){ return '<details class="pc-bib-modulo"><summary>' + (mi + 1) + '. ' + m.nome + '</summary><div class="pc-bib-assuntos">' + m.assuntos.map(function(a, ai){ return '<button type="button" class="at-btn pc-bib-assunto" data-bib-modulo="' + mi + '" data-bib-assunto="' + ai + '">' + a + (m.itens[ai].tipo === "D" ? " ● decisão" : "") + '</button>'; }).join("") + '</div></details>'; }).join("") + '</div>' +
     '<article class="pc-bib-consulta" data-bib-consulta hidden><p class="pc-bib-breadcrumb" data-bib-caminho></p><h3 data-bib-assunto-titulo></h3><p class="pc-bib-aviso">Área de consulta preparada. O conteúdo explicativo e os dados executáveis deste assunto ainda não foram implementados.</p><button type="button" class="at-btn" data-bib-voltar>VOLTAR AOS MÓDULOS</button></article>';
   sec.appendChild(bibView);
   painel.appendChild(sec);
@@ -11481,26 +11232,26 @@ var ABAS = [
     o.orquestracao = o.orquestracao || {}; o.orquestracao.papeis = papeisAtuais();
     return o;
   }
-  function pendencias(p){
+   function pendencias(p){
     var r = [], add = function(a, t, g){ r.push({aba:a, t:t, g:!!g}); };
-    if(!p.titulo) add("projeto", "Dê um título à peça.");
-    if(!p.estilo.generos.length) add("projeto", "Escolha ao menos um gênero ou estilo.");
-    if(p.base.tonica === "Personalizada" && !p.base.tonicaPersonalizada) add("base", "Preencha a tônica personalizada.", 1);
-    if(p.andamento.bpm == null || p.andamento.bpm < 30 || p.andamento.bpm > 220) add("base", "O andamento deve ficar entre 30 e 220.", 1);
-    if(p.base.a4 == null || p.base.a4 < 400 || p.base.a4 > 480) add("base", "A altura de referência deve ficar entre 400 e 480 Hz.", 1);
-    var ea = erroAgrupamento(p); if(ea) add("base", ea, 1);
-    if(p.compassos == null || p.compassos < 4) add("forma", "O total de compassos deve ser de pelo menos 4.", 1);
-    if(!p.forma.length) add("forma", "Adicione ao menos uma seção.", 1);
+    if(!p.titulo) add("ficha", "Dê um título à peça.");
+    if(!p.estilo.generos.length) add("m9", "Escolha ao menos um gênero ou estilo.");
+    if(p.base.tonica === "Personalizada" && !p.base.tonicaPersonalizada) add("m1", "Preencha a tônica personalizada.", 1);
+    if(p.andamento.bpm == null || p.andamento.bpm < 30 || p.andamento.bpm > 220) add("m15", "O andamento deve ficar entre 30 e 220.", 1);
+    if(p.base.a4 == null || p.base.a4 < 400 || p.base.a4 > 480) add("m16", "A altura de referência deve ficar entre 400 e 480 Hz.", 1);
+    var ea = erroAgrupamento(p); if(ea) add("m7", ea, 1);
+    if(p.compassos == null || p.compassos < 4) add("m12", "O total de compassos deve ser de pelo menos 4.", 1);
+    if(!p.forma.length) add("m12", "Adicione ao menos uma seção.", 1);
     else{
-      if(p.forma.some(function(s){ return !s.secao; })) add("forma", "Dê nome a todas as seções.", 1);
-      if(p.forma.some(function(s){ return s.compassos < 1; })) add("forma", "Toda seção precisa ter ao menos 1 compasso.", 1);
+      if(p.forma.some(function(s){ return !s.secao; })) add("m12", "Dê nome a todas as seções.", 1);
+      if(p.forma.some(function(s){ return s.compassos < 1; })) add("m12", "Toda seção precisa ter ao menos 1 compasso.", 1);
       var soma = p.forma.reduce(function(a, s){ return a + s.compassos; }, 0);
-      if(p.compassos && soma !== p.compassos) add("forma", "As seções somam " + soma + " compassos, e o total da peça é " + p.compassos + ".");
-      if(p.forma.some(function(s){ return s.andamento != null && (s.andamento < 30 || s.andamento > 220); })) add("forma", "O andamento de uma seção está fora de 30 a 220.", 1);
+      if(p.compassos && soma !== p.compassos) add("m12", "As seções somam " + soma + " compassos, e o total da peça é " + p.compassos + ".");
+      if(p.forma.some(function(s){ return s.andamento != null && (s.andamento < 30 || s.andamento > 220); })) add("m12", "O andamento de uma seção está fora de 30 a 220.", 1);
     }
-    if(!p.ritmo.figuras.length) add("ritmo", "Marque ao menos uma figura permitida.", 1);
-    if(!p.harmonia.progressao) add("harmonia", "Sem progressão de acordes: o motor decidirá sozinho.");
-    if(!p.orquestracao.instrumentos.length) add("orq", "Marque ao menos um instrumento.", 1);
+    if(!p.ritmo.figuras.length) add("m7", "Marque ao menos uma figura permitida.", 1);
+    if(!p.harmonia.progressao) add("m2", "Sem progressão de acordes: o motor decidirá sozinho.");
+    if(!p.orquestracao.instrumentos.length) add("m6", "Marque ao menos um instrumento.", 1);
     return r;
   }
   function marcarAbas(){
@@ -11513,6 +11264,7 @@ var ABAS = [
   }
   function renderRevisao(){
     var p = plano(), r = marcarAbas(), nomes = {}; ABAS.forEach(function(a){ nomes[a[0]] = a[1].replace(/^\d+\.\s*/, ""); });
+   nomes.ficha = "Ficha da peça";
     Q("[data-pc-pend]").innerHTML = r.length ? r.map(function(i){
       return '<li><span class="pc-selo ' + (i.g ? 'grave' : 'aviso') + '">' + (i.g ? 'Corrigir' : 'Aviso') + '</span>' + esc(nomes[i.aba]) + ': ' + esc(i.t) + ' <button type="button" class="at-btn" data-pc-ir="' + i.aba + '">IR</button></li>';
     }).join("") : '<li><span class="pc-selo">Tudo certo</span>Nenhuma pendência encontrada.</li>';
@@ -11520,10 +11272,11 @@ var ABAS = [
   }
  
   /* ---------- abas (com teclado) ---------- */
-  function mostrarAba(id, foco){
+    function mostrarAba(id, foco){
+    if(id === "ficha"){ var f = Q("[data-pc-ficha]"); f.scrollIntoView({behavior:"smooth", block:"center"}); var i0 = f.querySelector("input"); if(i0) i0.focus(); return; }
     QA("[data-pc-aba]").forEach(function(b){ var s = b.dataset.pcAba === id; b.setAttribute("aria-selected", String(s)); b.tabIndex = s ? 0 : -1; if(s && foco) b.focus(); });
     QA("[data-pc-painel]").forEach(function(p){ p.hidden = p.dataset.pcPainel !== id; });
-    if(id === "revisao") renderRevisao();
+  }
   }
   Q(".pc-abas").addEventListener("keydown", function(ev){
     var ids = ABAS.map(function(a){ return a[0]; }), at = Q('[data-pc-aba][aria-selected="true"]').dataset.pcAba, i = ids.indexOf(at), n = -1;
@@ -11643,7 +11396,7 @@ var ABAS = [
   }
   function acaoLib(a, id){
     if(a === "salvar") salvar();
-    else if(a === "novo"){ if(!confirmaDescarte()) return; reiniciar(); lib.atual = null; marcarSujo(false); renderLib(); mostrarAba("projeto"); msg("Novo plano em branco."); }
+    else if(a === "novo"){ if(!confirmaDescarte()) return; reiniciar(); lib.atual = null; marcarSujo(false); renderLib(); mostrarAba("m1"); msg("Novo plano em branco."); }
     else if(a === "abrir") abrir(id);
     else if(a === "duplicar"){
       var e = achar(id); if(!e) return;
@@ -11657,8 +11410,18 @@ var ABAS = [
   }
  
   /* ================= EVENTOS ================= */
+   function abrirAssunto(mi, ai){
+    var m = MODULOS_BIB[mi];
+    sec.setAttribute("data-biblioteca", "aberta"); bibView.hidden = false;
+    bibView.querySelector("[data-bib-indice]").hidden = true;
+    bibView.querySelector("[data-bib-consulta]").hidden = false;
+    bibView.querySelector("[data-bib-caminho]").textContent = "Biblioteca Musical / " + (mi + 1) + ". " + m.nome;
+    bibView.querySelector("[data-bib-assunto-titulo]").textContent = m.assuntos[ai];
+    bibView.querySelector("[data-bib-assunto-titulo]").focus();
+  }
   sec.addEventListener("click", function(ev){
     var t = ev.target, b;
+    if((b = t.closest("[data-pc-bib-ver]"))){ var q2 = b.dataset.pcBibVer.split(":"); abrirAssunto(+q2[0], +q2[1]); return; }
     if((b = t.closest("[data-biblioteca-abrir]"))){
       sec.setAttribute("data-biblioteca", "aberta"); bibView.hidden = false;
       bibView.querySelector("[data-bib-indice]").hidden = false;
@@ -11710,13 +11473,13 @@ var ABAS = [
     else if(t.dataset.pc === "andamento.indicacao"){ var m = /(\d+)/.exec((ANDAMENTOS.filter(function(x){ return lbl(x).v === t.value; })[0] || "")); if(m) ctl("andamento.bpm").value = m[1]; }
     else if(t.closest('[data-pc-multi="orquestracao.instrumentos"]')) instrumentos();
     if(t.closest("[data-pc-secoes]") || t.dataset.pc === "compassos") somar();
-    condicoes(); marcarSujo(true); marcarAbas();
+   condicoes(); marcarSujo(true); marcarAbas(); if(Q("[data-pc-revisao]").open) renderRevisao();
   }
   sec.addEventListener("input", reagir);
   sec.addEventListener("change", reagir);
- 
+   sec.addEventListener("toggle", function(ev){ if(ev.target.hasAttribute("data-pc-revisao") && ev.target.open) renderRevisao(); }, true);
   card.addEventListener("click", function(){
-    painel.setAttribute("data-fase", "pecas"); mostrarAba("projeto");
+    painel.setAttribute("data-fase", "pecas"); mostrarAba("m1");
     $("esToggle").scrollIntoView({behavior:"smooth", block:"start"});
   });
  
