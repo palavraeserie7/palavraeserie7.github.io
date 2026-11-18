@@ -11510,7 +11510,11 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
   }
   sec.addEventListener("input", reagir);
   sec.addEventListener("change", reagir);
-   sec.addEventListener("toggle", function(ev){ if(ev.target.hasAttribute("data-pc-revisao") && ev.target.open) renderRevisao(); }, true);
+   sec.addEventListener("toggle", function(ev){
+    var d = ev.target;
+    if(d.hasAttribute && d.hasAttribute("data-pc-revisao") && d.open) renderRevisao();
+    if(d.classList && d.classList.contains("pc-bib-modulo") && d.open){ var b0 = d.querySelector("[data-bib-modulo]"); if(b0) marcarModulo(Number(b0.dataset.bibModulo)); }
+  }, true);
   card.addEventListener("click", function(){
     painel.setAttribute("data-fase", "pecas"); mostrarAba("m1");
     $("esToggle").scrollIntoView({behavior:"smooth", block:"start"});
