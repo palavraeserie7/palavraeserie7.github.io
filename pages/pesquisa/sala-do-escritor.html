@@ -10927,7 +10927,7 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
      "Relações entre melodia e ritmo","Relações entre baixo e harmonia",
      "Relações entre vozes","Relações entre instrumentos","Compatibilidade entre elementos musicais"]],
    ["Perfis de Linguagem Musical", null, [
-     ["Gêneros e estilos","estilo.generos","estilo.estilos"],
+    "Gêneros e estilos",
      ["Contraponto renascentista","Perfil de linguagem musical"],
      ["Harmonia tonal clássica","Perfil de linguagem musical"],
      ["Romantismo","Perfil de linguagem musical"],
@@ -10977,7 +10977,7 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
      "Fraseado",
      ["Respiração musical","voz.respiracao"],
      ["Agógica e rubato","andamento.variacoes"],
-     ["Caráter e intenção expressiva","estilo.caraterExpressivo","estilo.climas"],
+    "Caráter e intenção expressiva",
      "Relação entre expressão e estilo"]],
    ["Notação e Representação Musical", null, [
      ["Pauta e claves","base.clave"],
@@ -11048,7 +11048,7 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
       '<ul class="pc-estado pc-wide">' + ESTADO.map(function(e){ return '<li><span class="pc-selo ' + e[1] + '">' + e[2] + '</span>' + e[0] + '</li>'; }).join("") + '</ul>'
   };
     var FICHA = '<div class="es-box" data-pc-ficha><h3>Ficha da peça</h3><div class="pc-grade">' +
-    ["autor","titulo","projeto.finalidade","projeto.tipoObra"].map(function(p){ return campoHtml(POR[p]); }).join("") +
+   ["autor","titulo"].map(function(p){ return campoHtml(POR[p]); }).join("") +
     '<p class="es-nota pc-wide">' + esc(LEGENDA) + '</p></div></div>';
   var REVISAO = '<details class="pc-lib" data-pc-revisao style="margin-top:14px"><summary>Revisar e exportar</summary><div class="pc-grade">' + CUSTOM.revisao + '</div></details>';
   function painelHtml(a, i){
@@ -11238,7 +11238,7 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
    function pendencias(p){
     var r = [], add = function(a, t, g){ r.push({aba:a, t:t, g:!!g}); };
     if(!p.titulo) add("ficha", "Dê um título à peça.");
-    if(!p.estilo.generos.length) add("m9", "Escolha ao menos um gênero ou estilo.");
+  
     if(p.base.tonica === "Personalizada" && !p.base.tonicaPersonalizada) add("m1", "Preencha a tônica personalizada.", 1);
     if(p.andamento.bpm == null || p.andamento.bpm < 30 || p.andamento.bpm > 220) add("m15", "O andamento deve ficar entre 30 e 220.", 1);
     if(p.base.a4 == null || p.base.a4 < 400 || p.base.a4 > 480) add("m16", "A altura de referência deve ficar entre 400 e 480 Hz.", 1);
