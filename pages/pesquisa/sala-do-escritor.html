@@ -10455,6 +10455,8 @@ texto: $("esTexto").value
 #pcEstrutura .pc-abas button[data-estado="aceso"]:not([aria-selected="true"]){background:#e4efdf;color:#2f6b3a}
 #pcEstrutura .pc-abas button[data-estado="aceso"]::before{content:"● ";color:#2f9e44}
 #pcEstrutura .es-box{min-height:0!important;height:auto!important}
+#pcEstrutura .pc-bib-texto{margin:10px 0;max-height:520px;overflow:auto;white-space:pre;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:13px/1.5 Consolas,monospace}
+#pcEstrutura .pc-bib-caminho-arq{margin:4px 0;font:12px Consolas,monospace;color:var(--ink-soft)}
 #pcEstrutura .pc-aceso{padding:12px;border-left:3px solid #2f9e44;background:#e4efdf;font:14px/1.5 "Segoe UI",Arial,sans-serif;color:#1f4a2a}
 #pcEstrutura h4 .at-btn{margin-left:8px;font-size:11px;padding:4px 10px;min-height:0;vertical-align:middle}
 #pcEstrutura .pc-auto{margin:6px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
@@ -11105,7 +11107,7 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
   bibView.innerHTML = '<div class="pc-bib-cabecalho"><h2 tabindex="-1" data-bib-titulo>BIBLIOTECA MUSICAL</h2><button type="button" class="at-btn" data-bib-fechar>VOLTAR À CRIAÇÃO</button></div>' +
     '<p class="pc-bib-intro">Arquitetura expansível — selecione um módulo para consultar os seus assuntos.</p>' +
     '<div data-bib-indice>' + MODULOS_BIB.map(function(m, mi){ return '<details class="pc-bib-modulo"><summary>' + (mi + 1) + '. ' + m.nome + '</summary><div class="pc-bib-assuntos">' + m.assuntos.map(function(a, ai){ return '<button type="button" class="at-btn pc-bib-assunto" data-bib-modulo="' + mi + '" data-bib-assunto="' + ai + '">' + a + (m.itens[ai].tipo === "D" ? " ● decisão" : "") + '</button>'; }).join("") + '</div></details>'; }).join("") + '</div>' +
-    '<article class="pc-bib-consulta" data-bib-consulta hidden><p class="pc-bib-breadcrumb" data-bib-caminho></p><h3 data-bib-assunto-titulo></h3><p class="pc-bib-aviso">Área de consulta preparada. O conteúdo explicativo e os dados executáveis deste assunto ainda não foram implementados.</p><button type="button" class="at-btn" data-bib-voltar>VOLTAR AOS MÓDULOS</button></article>';
+    '<article class="pc-bib-consulta" data-bib-consulta hidden><p class="pc-bib-breadcrumb" data-bib-caminho></p><h3 data-bib-assunto-titulo></h3><p class="pc-bib-aviso" data-bib-aviso></p><p class="pc-bib-caminho-arq" data-bib-arquivo></p><pre class="pc-bib-texto" data-bib-texto hidden></pre><button type="button" class="at-btn" data-bib-voltar>VOLTAR AOS MÓDULOS</button></article>';
   sec.appendChild(bibView);
   painel.appendChild(sec);
   var Q = function(s){ return sec.querySelector(s); }, QA = function(s){ return sec.querySelectorAll(s); };
