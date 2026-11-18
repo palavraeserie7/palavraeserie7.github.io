@@ -3871,12 +3871,6 @@ document.addEventListener("visibilitychange",function(){
     if(s){ tipo = s.tipo || null; ext = s.ext || null; if(tipo) cat = Number(String(tipo).split(".")[0]) || 1; }
   }catch(e){}
  
-   var CAMINHO_CAT = "sala-do-escritor/06-harmonia-instrumental-e-instrumentos/catalogo-instrumentos.json";
-  fetch(CAMINHO_CAT, {cache:"no-store"})
-    .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .catch(function(e){ console.warn("Catálogo de instrumentos não carregou; usando a lista interna.", e); return null; })
-    .then(function(cat){ iniciar(cat); });
-  function iniciar(CAT){
   var $ = function(id){ return document.getElementById(id); };
   var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
   var tela = $("dgTela");
@@ -10572,19 +10566,6 @@ texto: $("esTexto").value
     "Eletrônicos":["Pad ~","Lead ~","Bass synth ~","Arpeggiator ~"],
     "Vozes":["Soprano","Contralto","Tenor","Baixo (voz)","Coro misto","Voz solo"]
   };
-   var CATALOGO = {};
-  if(CAT && Array.isArray(CAT.instrumentos) && CAT.instrumentos.length){
-    var novo = {};
-    ["Cordas","Madeiras","Metais","Teclas","Percussão","Eletrônicos","Vozes"].forEach(function(f){ novo[f] = []; });
-    CAT.instrumentos.forEach(function(x){
-      if(!x || !x.nomeSite || !x.familia) return;
-      if(!novo[x.familia]) novo[x.familia] = [];
-      novo[x.familia].push(x.nomeSite + (x.familia === "Eletrônicos" ? " ~" : ""));
-      CATALOGO[x.nomeSite] = x;
-    });
-    Object.keys(novo).forEach(function(f){ if(!novo[f].length) delete novo[f]; });
-    INSTRUMENTOS = novo;
-  }
   var BAIXOS = ["Contrabaixo","Baixo elétrico","Tuba","Contrafagote","Bass synth"];
   var PAPEIS = ["Melodia","Contracanto","Harmonia","Baixo","Pedal","Percussão"];
   var TEXTURAS = ["Monofonia","Homofonia","Polifonia","Contraponto *","Melodia acompanhada","Coral em blocos","Arpejos","Ostinato","Pedal harmônico","Uníssono","Contramelodia"];
@@ -11406,7 +11387,6 @@ texto: $("esTexto").value
   }
   renderLib();
   if(lib.lista.length){ var rec = lib.lista.slice().sort(function(a, b){ return b.atualizado - a.atualizado; })[0]; abrir(rec.id, true); }
-   }
 })();
 </script>
 <!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->
@@ -11419,7 +11399,6 @@ texto: $("esTexto").value
  
  
  
-
 
 
 
