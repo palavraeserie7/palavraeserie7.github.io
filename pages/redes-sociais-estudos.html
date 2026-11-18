@@ -56,6 +56,11 @@ ul.pts li{margin-bottom:6px}
 .aprof[open] summary::after{content:"－"}
 .aprof .inner{padding:0 20px 20px}
 .aprof h2{font-size:1.3rem;margin:26px 0 10px}
+.ouvir{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between;margin:24px 0;padding:18px 20px;background:var(--panel);border-left:3px solid var(--gold)}
+.ouvir p{margin:0;flex:1 1 320px}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1a1208;margin:0}
+.player{position:relative;aspect-ratio:16/9;margin:0 0 24px;border:1px solid var(--line)}
+.player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .cta{margin-top:48px;padding:24px;background:var(--panel);border:1px solid var(--line);text-align:center}
 .cta p{margin-bottom:16px}
 .btn{display:inline-block;font-family:var(--ui);font-weight:700;font-size:.9rem;text-decoration:none;padding:12px 22px;margin:4px;border:1px solid var(--gold)}
@@ -126,7 +131,8 @@ footer{border-top:1px solid var(--line);padding:24px 0;font-family:var(--ui);fon
      titulo: "Estudo do Salmo 1",
      texto: "Salmos 1",
      resumo: `Uma frase para o índice.`,
-     abertura: `Você acabou de ouvir o Salmo 1. Agora vamos estudá-lo.`,
+     conteudo: `o Salmo 1`,
+     video: ``,   (opcional: ID do vídeo do YouTube; com ele, o vídeo aparece na página)
      secoes: [
        { titulo: `Título da seção`, texto: `Parágrafo 1.
 
@@ -147,18 +153,29 @@ const CANAL = "https://www.youtube.com/@Palavraeserie";
 const MATRIZ = "pesquisa/matriz-pro.html";
 
 /* As 5 categorias (playlists). O "id" é o que se escreve em "categoria" no estudo.
+   "msg" é a mensagem do topo do estudo ({c} vira o conteúdo) e "botao" é o texto do botão.
    Se um link de playlist estiver incompleto, corrija o campo "playlist". */
 const CATEGORIAS = [
   { id: "serie",   nome: "Série de estudo bíblico",     playlist: "https://www.youtube.com/playlist?list=PLMUW8wrJsx-s&playnext=1&index=1",
-    desc: "Estudos de textos bíblicos frequentemente interpretados de forma equivocada." },
+    desc: "Estudos de textos bíblicos frequentemente interpretados de forma equivocada.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo do texto, para entender o que ele diz e o que não diz. Se quiser ouvir de novo, o áudio está no canal.",
+    botao: "Ouvir de novo no canal" },
   { id: "oracao",  nome: "Momentos de oração",          playlist: "https://www.youtube.com/playlist?list=PLH3lq9vJzsio&playnext=1&index=1",
-    desc: "Orações e momentos de meditação baseados nas Escrituras." },
+    desc: "Orações e momentos de meditação baseados nas Escrituras.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo das Escrituras em que a oração se apoia. Se quiser orar de novo, o áudio está no canal.",
+    botao: "Orar de novo no canal" },
   { id: "engano",  nome: "Tirando a mente do engano",   playlist: "https://www.youtube.com/playlist?list=PLNL8itelYU-E&playnext=1&index=1",
-    desc: "Estudos para discernir o que o mundo, e até a igreja, aceita como normal, mas a Escritura não." },
+    desc: "Estudos para discernir o que o mundo, e até a igreja, aceita como normal, mas a Escritura não.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo que confere o assunto com a Escritura. Se quiser ouvir de novo, o áudio está no canal.",
+    botao: "Ouvir de novo no canal" },
   { id: "direcao", nome: "Bíblia e direção de vida",    playlist: "https://www.youtube.com/playlist?list=PLQP9mSjlQCV0&playnext=1&index=1",
-    desc: "Respostas bíblicas para dúvidas que desafiam a fé e a vida cristã." },
+    desc: "Respostas bíblicas para dúvidas que desafiam a fé e a vida cristã.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo bíblico por trás da resposta. Se quiser ouvir de novo, o áudio está no canal.",
+    botao: "Ouvir de novo no canal" },
   { id: "salmos",  nome: "Salmos e reflexões bíblicas", playlist: "https://www.youtube.com/playlist?list=PLdXZVtjxhh18",
-    desc: "Estudo e reflexão sobre os Salmos: texto, contexto e aplicação à vida cristã." }
+    desc: "Estudo e reflexão sobre os Salmos: texto, contexto e aplicação à vida cristã.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo. Se quiser se edificar ouvindo o áudio, ele está no canal.",
+    botao: "Ouvir no canal" }
 ];
 
 const ESTUDOS = [
@@ -169,7 +186,8 @@ const ESTUDOS = [
   titulo: "Estudo do Salmo 1",
   texto: "Salmos 1",
   resumo: `O Salmo 1 funciona como o pórtico sapiencial de todo o Saltério.`,
-  abertura: `Você acabou de ouvir o Salmo 1. Este é o estudo do texto.`,
+  conteudo: `o Salmo 1`,
+  video: ``,   /* ID do vídeo do YouTube (opcional). Ex.: se o link é youtube.com/watch?v=AbC123, escreva AbC123 */
   secoes: [
     { titulo: `1. IDENTIFICAÇÃO DA ETAPA`, texto: `• ETAPA: Análise da Mensagem Principal, Análise Lexical (Substantivos, Adjetivos e Verbos), Relação com Deus e Comentário Teológico de Salmos 1.
 • MÓDULO: Análise exegética e textual com base no texto bíblico como fonte primária.` },
@@ -333,13 +351,18 @@ function estudo(e){
   app.innerHTML = `
     <p class="sub">${c ? `<a href="#cat-${c.id}">${esc(c.nome)}</a> · ` : ""}${esc(e.texto)}</p>
     <h1>${esc(e.titulo)}</h1>
+    <div class="ouvir">
+      <p>${(e.mensagem || (c && c.msg) || "Se você acabou de ouvir {c}, este é o estudo. O áudio está no canal.").replace("{c}", "<b>" + esc(e.conteudo || e.texto) + "</b>")}</p>
+      <a class="btn gold" href="${e.video ? "https://www.youtube.com/watch?v=" + esc(e.video) : (c ? esc(c.playlist) : CANAL)}" target="_blank" rel="noopener">${esc((c && c.botao) || "Ouvir no canal")}</a>
+    </div>
+    ${e.video ? `<div class="player"><iframe src="https://www.youtube.com/embed/${esc(e.video)}" title="${esc(e.titulo)}" loading="lazy" allowfullscreen></iframe></div>` : ""}
     ${e.abertura ? blocos(e.abertura) : ""}
     ${abertas.map(secao).join("")}
     ${fundas.length ? `<details class="aprof"><summary>Aprofundamento</summary><div class="inner">${fundas.map(secao).join("")}</div></details>` : ""}
     <div class="cta">
       <p>Quer ir mais fundo em ${esc(e.texto)}? Abra a Matriz de Pesquisa.</p>
       <a class="btn main" href="${MATRIZ}">Aprofundar ${esc(e.texto)}</a>
-      <a class="btn sec" href="${c ? esc(c.playlist) : CANAL}" target="_blank" rel="noopener">Voltar ao canal</a>
+      <a class="btn sec" href="${e.video ? "https://www.youtube.com/watch?v=" + esc(e.video) : (c ? esc(c.playlist) : CANAL)}" target="_blank" rel="noopener">Voltar ao canal</a>
       <a class="btn sec" href="${CANAL}?sub_confirmation=1" target="_blank" rel="noopener">Inscrever-se</a>
     </div>
     <div class="outros">
