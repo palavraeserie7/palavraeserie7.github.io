@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estudos · Palavra e Série</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0a06; --panel:#17110a; --line:#3a2c14; --gold:#d4a132; --gold-d:#9c761f;
+  --text:#f1ead8; --muted:#a89c82; --ok:#1fcf6b;
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --body:Georgia,"Times New Roman",serif;
+  --ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse 80% 420px at 50% 0,#2a1d08 0,transparent 70%),var(--bg);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.7}
+a{color:var(--gold)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+header.top{border-bottom:1px solid var(--line);background:radial-gradient(ellipse 60% 100% at 25% 40%,rgba(212,161,50,.22),transparent 70%),linear-gradient(180deg,#1a1208,#0d0a06)}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+.top .wrap{display:flex;gap:20px;align-items:center;padding-top:22px;padding-bottom:20px}
+.logo{flex:none;width:76px;height:76px;border-radius:50%;background:#000;border:3px solid var(--gold);box-shadow:0 0 22px rgba(212,161,50,.55);display:grid;place-items:center;font-family:"Times New Roman",serif;font-style:italic;font-weight:700;font-size:1.8rem;color:var(--gold);text-decoration:none}
+.brand{display:block;font-family:"Times New Roman",Times,serif;font-size:2rem;font-weight:700;letter-spacing:.14em;color:var(--gold);text-decoration:none;line-height:1.1;padding-bottom:8px;border-bottom:1px solid var(--gold)}
+.brand-sub{font-family:"Times New Roman",Times,serif;font-size:1.05rem;margin:8px 0 2px;color:var(--text)}
+.brand-tag{font-family:"Times New Roman",Times,serif;font-size:.85rem;color:var(--gold-d);margin:0;filter:brightness(1.3)}
+nav.menu{border-bottom:1px solid var(--line);background:#0d0a06}
+nav.menu .wrap{display:flex;flex-wrap:wrap;gap:6px 22px;padding-top:10px;padding-bottom:10px}
+nav.menu a{font-family:var(--ui);font-size:.8rem;font-weight:600;color:var(--text);text-decoration:none}
+nav.menu a:hover{color:var(--gold)}
+@media (max-width:560px){.brand{font-size:1.35rem}.logo{width:60px;height:60px;font-size:1.4rem}}
+main{padding:36px 0 72px}
+h1,h2,h3{font-family:var(--serif);line-height:1.2;margin:0}
+h1{font-size:2.6rem;font-weight:700}
+h2{font-size:1.7rem;font-weight:600;color:var(--gold);margin:40px 0 12px}
+h3{font-size:1.25rem;font-weight:600;margin:0 0 4px}
+p{margin:0 0 14px}
+ul.pts{margin:0 0 14px;padding-left:22px}
+ul.pts li{margin-bottom:6px}
+.sub{font-family:var(--ui);font-size:.9rem;color:var(--muted);margin:8px 0 0}
+.aprof{margin-top:44px;border:1px solid var(--gold-d);background:var(--panel)}
+.aprof summary{cursor:pointer;padding:18px 20px;font-family:var(--serif);font-size:1.5rem;font-weight:600;color:var(--gold);list-style:none}
+.aprof summary::-webkit-details-marker{display:none}
+.aprof summary::after{content:"＋";float:right;font-family:var(--ui)}
+.aprof[open] summary::after{content:"－"}
+.aprof .inner{padding:0 20px 20px}
+.aprof h2{font-size:1.3rem;margin:26px 0 10px}
+.cta{margin-top:48px;padding:24px;background:var(--panel);border:1px solid var(--line);text-align:center}
+.cta p{margin-bottom:16px}
+.btn{display:inline-block;font-family:var(--ui);font-weight:700;font-size:.9rem;text-decoration:none;padding:12px 22px;margin:4px;border:1px solid var(--gold)}
+.btn.main{background:var(--ok);border-color:var(--ok);color:#06210f}
+.btn.sec{color:var(--gold)}
+.btn:hover{filter:brightness(1.12)}
+.outros{margin-top:40px}
+.outros a{font-family:var(--ui);font-size:.95rem}
+.lista{display:grid;gap:12px;margin-top:24px}
+.card{display:block;background:var(--panel);border:1px solid var(--line);padding:18px 20px;text-decoration:none;color:var(--text)}
+.card:hover{border-color:var(--gold)}
+.card small{font-family:var(--ui);font-size:.8rem;color:var(--gold)}
+.card p{margin:4px 0 0;color:var(--muted);font-size:.95rem}
+.vazio{color:var(--muted);font-style:italic;margin-top:24px}
+.nf{padding:32px 0}
+footer{border-top:1px solid var(--line);padding:24px 0;font-family:var(--ui);font-size:.8rem;color:var(--muted);text-align:center}
+@media (max-width:560px){body{font-size:17px}h1{font-size:2.1rem}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="../index.html" aria-label="Palavra e Série">PS</a>
+    <div>
+      <a class="brand" href="#">PALAVRA E SÉRIE</a>
+      <p class="brand-sub">Plataforma de Consulta e Estudo Bíblico</p>
+      <p class="brand-tag">Conhecimento bíblico &nbsp;•&nbsp; Pesquisa &nbsp;•&nbsp; Formação cristã</p>
+    </div>
+  </div>
+</header>
+<nav class="menu" aria-label="Principal">
+  <div class="wrap">
+    <a href="../index.html">Início</a>
+    <a href="#">Estudos</a>
+    <a href="pesquisa/matriz-pro.html">Matriz de Pesquisa</a>
+    <a href="https://www.youtube.com/@Palavraeserie" target="_blank" rel="noopener">Canal</a>
+  </div>
+</nav>
+
+<main><div class="wrap" id="app"></div></main>
+<footer><div class="wrap">Palavra e Série · Conhecimento bíblico, pesquisa e formação cristã.</div></footer>
+
+<script>
+/* ==========================================================
+   COMO CADASTRAR UM ESTUDO
+
+   1. Copie o MODELO abaixo e cole dentro da lista ESTUDOS,
+      entre os colchetes [ ].
+   2. Entre um estudo e o próximo vai uma VÍRGULA.
+   3. Os textos ficam entre ACENTOS GRAVES ( ` ), não entre
+      aspas. Assim você pode escrever com aspas, quebras de
+      linha e hebraico à vontade. Só não use o próprio acento
+      grave dentro do texto.
+   4. Em "texto", deixe uma LINHA EM BRANCO entre parágrafos.
+      Linhas que começam com "• " viram lista.
+   5. Cada seção é do tamanho e com o título que você quiser.
+      Com aprofundamento: true, a seção vai para a parte que
+      abre ao clicar. Sem isso, fica aberta para todos.
+
+   MODELO (copie daqui, sem os asteriscos):
+
+   {
+     id: "salmo-1",
+     tipo: "Salmos",
+     titulo: "Estudo do Salmo 1",
+     texto: "Salmos 1",
+     resumo: `Uma frase para o índice.`,
+     abertura: `Você acabou de ouvir o Salmo 1. Agora vamos estudá-lo.`,
+     secoes: [
+       { titulo: `Título da seção`, texto: `Parágrafo 1.
+
+Parágrafo 2.
+
+• Item de lista
+• Outro item` },
+       { titulo: `Outra seção`, texto: `...` },
+       { titulo: `Seção técnica`, aprofundamento: true, texto: `...` }
+     ]
+   },
+
+   O "id" é o final do link e não deve mudar depois de
+   divulgado: ...redes-sociais-estudos.html#salmo-1
+   ========================================================== */
+
+const CANAL = "https://www.youtube.com/@Palavraeserie";
+const MATRIZ = "pesquisa/matriz-pro.html";
+
+const ESTUDOS = [
+
+];
+
+/* ---------- renderização (não precisa mexer) ---------- */
+const app = document.getElementById("app");
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function blocos(t){
+  return String(t || "").trim().split(/\n\s*\n/).map(b => {
+    const l = b.split("\n").map(x => x.trim()).filter(Boolean);
+    if (l.length && l.every(x => /^[•\-]\s/.test(x)))
+      return `<ul class="pts">${l.map(x => `<li>${esc(x.replace(/^[•\-]\s/, ""))}</li>`).join("")}</ul>`;
+    return `<p>${l.map(esc).join("<br>")}</p>`;
+  }).join("");
+}
+const secao = s => `<h2>${esc(s.titulo)}</h2>${blocos(s.texto)}`;
+
+function indice(){
+  document.title = "Estudos · Palavra e Série";
+  app.innerHTML = `
+    <h1>Estudos</h1>
+    <p class="sub">Estudos dos conteúdos publicados no canal Palavra e Série.</p>
+    ${ESTUDOS.length ? `<div class="lista">${ESTUDOS.map(e => `
+      <a class="card" href="#${esc(e.id)}">
+        <small>${esc(e.tipo)}</small>
+        <h3>${esc(e.titulo)}</h3>
+        <p>${esc(e.resumo)}</p>
+      </a>`).join("")}</div>` : `<p class="vazio">Nenhum estudo publicado ainda.</p>`}`;
+}
+
+function estudo(e){
+  document.title = e.titulo + " · Palavra e Série";
+  const secs = e.secoes || [];
+  const abertas = secs.filter(s => !s.aprofundamento);
+  const fundas = secs.filter(s => s.aprofundamento);
+  const outros = ESTUDOS.filter(x => x.id !== e.id);
+  app.innerHTML = `
+    <p class="sub">${esc(e.tipo)} · ${esc(e.texto)}</p>
+    <h1>${esc(e.titulo)}</h1>
+    ${e.abertura ? blocos(e.abertura) : ""}
+    ${abertas.map(secao).join("")}
+    ${fundas.length ? `<details class="aprof"><summary>Aprofundamento</summary><div class="inner">${fundas.map(secao).join("")}</div></details>` : ""}
+    <div class="cta">
+      <p>Quer ir mais fundo em ${esc(e.texto)}? Abra a Matriz de Pesquisa.</p>
+      <a class="btn main" href="${MATRIZ}">Aprofundar ${esc(e.texto)}</a>
+      <a class="btn sec" href="${CANAL}" target="_blank" rel="noopener">Voltar ao canal</a>
+      <a class="btn sec" href="${CANAL}?sub_confirmation=1" target="_blank" rel="noopener">Inscrever-se</a>
+    </div>
+    <div class="outros">
+      ${outros.length ? `<h2>Outros estudos</h2>` + outros.map(o => `<p><a href="#${esc(o.id)}">${esc(o.titulo)}</a></p>`).join("") : ""}
+      <p><a href="#">Ver todos os estudos</a></p>
+    </div>`;
+  window.scrollTo(0, 0);
+}
+
+function rota(){
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return indice();
+  const e = ESTUDOS.find(x => x.id === id);
+  if (e) return estudo(e);
+  document.title = "Estudo não encontrado · Palavra e Série";
+  app.innerHTML = `<div class="nf"><h1>Estudo não encontrado</h1>
+    <p>Esse link não corresponde a nenhum estudo publicado. <a href="#">Veja todos os estudos.</a></p></div>`;
+}
+window.addEventListener("hashchange", rota);
+rota();
+</script>
+</body>
+</html>
