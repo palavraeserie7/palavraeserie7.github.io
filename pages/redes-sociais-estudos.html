@@ -31,6 +31,13 @@ nav.menu{border-bottom:1px solid var(--line);background:#0d0a06}
 nav.menu .wrap{display:flex;flex-wrap:wrap;gap:6px 22px;padding-top:10px;padding-bottom:10px}
 nav.menu a{font-family:var(--ui);font-size:.8rem;font-weight:600;color:var(--text);text-decoration:none}
 nav.menu a:hover{color:var(--gold)}
+nav.cats{background:#0a0804}
+nav.cats .wrap{gap:8px;padding-top:12px;padding-bottom:12px}
+nav.cats a{border:1px solid var(--line);padding:6px 12px;font-weight:600}
+nav.cats a:hover{border-color:var(--gold)}
+nav.cats a.on{background:var(--gold);border-color:var(--gold);color:#1a1208;border-bottom:1px solid var(--gold);padding-bottom:6px}
+.grid{display:grid;gap:12px;margin-top:24px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card b{font-family:var(--ui);font-size:.8rem;color:var(--gold)}
 nav.menu a.on{color:var(--gold);border-bottom:2px solid var(--gold);padding-bottom:2px}
 @media (max-width:560px){.brand{font-size:1.35rem}.logo{width:60px;height:60px;font-size:1.4rem}}
 main{padding:36px 0 72px}
@@ -82,10 +89,13 @@ footer{border-top:1px solid var(--line);padding:24px 0;font-family:var(--ui);fon
 </header>
 <nav class="menu" aria-label="Principal">
   <div class="wrap">
-    <a class="on" href="#" aria-current="page">Estudos</a>
+    <a id="m-estudos" href="#">Estudos</a>
     <a href="pesquisa/matriz-pro.html">Plataforma de Pesquisa</a>
     <a href="https://www.youtube.com/@Palavraeserie" target="_blank" rel="noopener">Ver no canal</a>
   </div>
+</nav>
+<nav class="menu cats" aria-label="Categorias de estudos">
+  <div class="wrap" id="cats"></div>
 </nav>
 
 <main><div class="wrap" id="app"></div></main>
@@ -112,7 +122,7 @@ footer{border-top:1px solid var(--line);padding:24px 0;font-family:var(--ui);fon
 
    {
      id: "salmo-1",
-     tipo: "Salmos",
+     categoria: "salmos",   (serie, oracao, engano, direcao ou salmos)
      titulo: "Estudo do Salmo 1",
      texto: "Salmos 1",
      resumo: `Uma frase para o índice.`,
@@ -136,6 +146,21 @@ Parágrafo 2.
 const CANAL = "https://www.youtube.com/@Palavraeserie";
 const MATRIZ = "pesquisa/matriz-pro.html";
 
+/* As 5 categorias (playlists). O "id" é o que se escreve em "categoria" no estudo.
+   Se um link de playlist estiver incompleto, corrija o campo "playlist". */
+const CATEGORIAS = [
+  { id: "serie",   nome: "Série de estudo bíblico",     playlist: "https://www.youtube.com/playlist?list=PLMUW8wrJsx-s&playnext=1&index=1",
+    desc: "Estudos de textos bíblicos frequentemente interpretados de forma equivocada." },
+  { id: "oracao",  nome: "Momentos de oração",          playlist: "https://www.youtube.com/playlist?list=PLH3lq9vJzsio&playnext=1&index=1",
+    desc: "Orações e momentos de meditação baseados nas Escrituras." },
+  { id: "engano",  nome: "Tirando a mente do engano",   playlist: "https://www.youtube.com/playlist?list=PLNL8itelYU-E&playnext=1&index=1",
+    desc: "Estudos para discernir o que o mundo, e até a igreja, aceita como normal, mas a Escritura não." },
+  { id: "direcao", nome: "Bíblia e direção de vida",    playlist: "https://www.youtube.com/playlist?list=PLQP9mSjlQCV0&playnext=1&index=1",
+    desc: "Respostas bíblicas para dúvidas que desafiam a fé e a vida cristã." },
+  { id: "salmos",  nome: "Salmos e reflexões bíblicas", playlist: "https://www.youtube.com/playlist?list=PLdXZVtjxhh18",
+    desc: "Estudo e reflexão sobre os Salmos: texto, contexto e aplicação à vida cristã." }
+];
+
 const ESTUDOS = [
 
 ];
@@ -143,6 +168,16 @@ const ESTUDOS = [
 /* ---------- renderização (não precisa mexer) ---------- */
 const app = document.getElementById("app");
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const catDe = id => CATEGORIAS.find(c => c.id === id);
+const doCat = id => ESTUDOS.filter(e => e.categoria === id);
+
+document.getElementById("cats").innerHTML = CATEGORIAS.map(c =>
+  `<a href="#cat-${c.id}" data-cat="${c.id}">${esc(c.nome)}</a>`).join("");
+
+function marcar(catId, noIndice){
+  document.getElementById("m-estudos").classList.toggle("on", !!noIndice);
+  document.querySelectorAll("#cats a").forEach(a => a.classList.toggle("on", a.dataset.cat === catId));
+}
 
 function blocos(t){
   return String(t || "").trim().split(/\n\s*\n/).map(b => {
@@ -156,25 +191,50 @@ const secao = s => `<h2>${esc(s.titulo)}</h2>${blocos(s.texto)}`;
 
 function indice(){
   document.title = "Estudos · Palavra e Série";
+  marcar(null, true);
   app.innerHTML = `
     <h1>Estudos</h1>
-    <p class="sub">Estudos dos conteúdos publicados no canal Palavra e Série.</p>
-    ${ESTUDOS.length ? `<div class="lista">${ESTUDOS.map(e => `
+    <p class="sub">Ouviu no canal? Escolha a lista do conteúdo que você ouviu e encontre o estudo.</p>
+    <div class="grid">${CATEGORIAS.map(c => {
+      const n = doCat(c.id).length;
+      return `<a class="card" href="#cat-${c.id}">
+        <h3>${esc(c.nome)}</h3>
+        <p>${esc(c.desc)}</p>
+        <p><b>${n ? n + (n === 1 ? " estudo" : " estudos") : "Em breve"}</b></p>
+      </a>`;}).join("")}</div>`;
+}
+
+function categoria(c){
+  document.title = c.nome + " · Palavra e Série";
+  marcar(c.id, false);
+  const lista = doCat(c.id);
+  app.innerHTML = `
+    <p class="sub"><a href="#">Estudos</a></p>
+    <h1>${esc(c.nome)}</h1>
+    <p class="sub">${esc(c.desc)}</p>
+    ${lista.length ? `<div class="lista">${lista.map(e => `
       <a class="card" href="#${esc(e.id)}">
-        <small>${esc(e.tipo)}</small>
+        <small>${esc(e.texto)}</small>
         <h3>${esc(e.titulo)}</h3>
         <p>${esc(e.resumo)}</p>
-      </a>`).join("")}</div>` : `<p class="vazio">Nenhum estudo publicado ainda.</p>`}`;
+      </a>`).join("")}</div>` : `<p class="vazio">Nenhum estudo nesta categoria ainda.</p>`}
+    <div class="cta">
+      <p>Prefere ouvir? Veja esta playlist no canal.</p>
+      <a class="btn sec" href="${esc(c.playlist)}" target="_blank" rel="noopener">Ver playlist no YouTube</a>
+    </div>`;
+  window.scrollTo(0, 0);
 }
 
 function estudo(e){
   document.title = e.titulo + " · Palavra e Série";
+  const c = catDe(e.categoria);
+  marcar(c ? c.id : null, false);
   const secs = e.secoes || [];
   const abertas = secs.filter(s => !s.aprofundamento);
   const fundas = secs.filter(s => s.aprofundamento);
-  const outros = ESTUDOS.filter(x => x.id !== e.id);
+  const outros = c ? doCat(c.id).filter(x => x.id !== e.id) : [];
   app.innerHTML = `
-    <p class="sub">${esc(e.tipo)} · ${esc(e.texto)}</p>
+    <p class="sub">${c ? `<a href="#cat-${c.id}">${esc(c.nome)}</a> · ` : ""}${esc(e.texto)}</p>
     <h1>${esc(e.titulo)}</h1>
     ${e.abertura ? blocos(e.abertura) : ""}
     ${abertas.map(secao).join("")}
@@ -182,12 +242,12 @@ function estudo(e){
     <div class="cta">
       <p>Quer ir mais fundo em ${esc(e.texto)}? Abra a Matriz de Pesquisa.</p>
       <a class="btn main" href="${MATRIZ}">Aprofundar ${esc(e.texto)}</a>
-      <a class="btn sec" href="${CANAL}" target="_blank" rel="noopener">Voltar ao canal</a>
+      <a class="btn sec" href="${c ? esc(c.playlist) : CANAL}" target="_blank" rel="noopener">Voltar ao canal</a>
       <a class="btn sec" href="${CANAL}?sub_confirmation=1" target="_blank" rel="noopener">Inscrever-se</a>
     </div>
     <div class="outros">
-      ${outros.length ? `<h2>Outros estudos</h2>` + outros.map(o => `<p><a href="#${esc(o.id)}">${esc(o.titulo)}</a></p>`).join("") : ""}
-      <p><a href="#">Ver todos os estudos</a></p>
+      ${outros.length ? `<h2>Mais em ${esc(c.nome)}</h2>` + outros.map(o => `<p><a href="#${esc(o.id)}">${esc(o.titulo)}</a></p>`).join("") : ""}
+      <p><a href="#${c ? "cat-" + c.id : ""}">${c ? "Ver todos em " + esc(c.nome) : "Ver todos os estudos"}</a></p>
     </div>`;
   window.scrollTo(0, 0);
 }
@@ -195,9 +255,14 @@ function estudo(e){
 function rota(){
   const id = decodeURIComponent(location.hash.slice(1));
   if (!id) return indice();
+  if (id.startsWith("cat-")) {
+    const c = catDe(id.slice(4));
+    if (c) return categoria(c);
+  }
   const e = ESTUDOS.find(x => x.id === id);
   if (e) return estudo(e);
   document.title = "Estudo não encontrado · Palavra e Série";
+  marcar(null, false);
   app.innerHTML = `<div class="nf"><h1>Estudo não encontrado</h1>
     <p>Esse link não corresponde a nenhum estudo publicado. <a href="#">Veja todos os estudos.</a></p></div>`;
 }
