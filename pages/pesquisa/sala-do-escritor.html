@@ -11413,14 +11413,52 @@ F("regras.rigorRitmo","Grau de rigor do desenvolvimento rítmico","sel",RIGOR,"M
   }
  
   /* ================= EVENTOS ================= */
-   function abrirAssunto(mi, ai){
-    var m = MODULOS_BIB[mi];
+  var EXTRAS = ["Formações","Gêneros e estilos","Texto e prosódia vocal","Técnicas de composição"];
+  var slug2 = function(s){ return norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,""); };
+  var p2 = function(n){ return (n < 10 ? "0" : "") + n; };
+  function caminhoAssunto(mi, ai){
+    var m = MODULOS_BIB[mi], nome = m.assuntos[ai], n = 0, i;
+    if(EXTRAS.indexOf(nome) < 0){ for(i = 0; i <= ai; i++){ if(EXTRAS.indexOf(m.assuntos[i]) < 0) n++; } }
+    else{
+      for(i = 0; i < m.assuntos.length; i++){ if(EXTRAS.indexOf(m.assuntos[i]) < 0) n++; }
+      for(i = 0; i <= ai; i++){ if(EXTRAS.indexOf(m.assuntos[i]) > -1) n++; }
+    }
+    return "sala-do-escritor/" + p2(mi + 1) + "-" + slug2(m.nome) + "/" + p2(n) + "-" + slug2(nome) + ".txt";
+  }
+  function lerAssunto(mi, ai){
+    var url = caminhoAssunto(mi, ai);
+    return fetch(url, {cache:"no-store"}).then(function(r){
+      if(!r.ok) return {estado:"ausente", url:url};
+      return r.text().then(function(t){ return {estado:t.trim() ? "ok" : "vazio", url:url, texto:t}; });
+    }).catch(function(){ return {estado:"erro", url:url}; });
+  }
+  function marcarModulo(mi){
+    QA('[data-bib-modulo="' + mi + '"]').forEach(function(b){
+      var ai = Number(b.dataset.bibAssunto);
+      lerAssunto(mi, ai).then(function(r){
+        var tag = r.estado === "ok" ? "✓ " : r.estado === "vazio" ? "○ " : "✕ ";
+        b.textContent = tag + MODULOS_BIB[mi].assuntos[ai] + (MODULOS_BIB[mi].itens[ai].tipo === "D" ? " ● decisão" : "");
+      });
+    });
+  }
+  var fichaBib = 0;
+  function abrirAssunto(mi, ai){
+    var m = MODULOS_BIB[mi], meu = ++fichaBib;
+    var av = bibView.querySelector("[data-bib-aviso]"), pre = bibView.querySelector("[data-bib-texto]"), arq = bibView.querySelector("[data-bib-arquivo]");
     sec.setAttribute("data-biblioteca", "aberta"); bibView.hidden = false;
     bibView.querySelector("[data-bib-indice]").hidden = true;
     bibView.querySelector("[data-bib-consulta]").hidden = false;
     bibView.querySelector("[data-bib-caminho]").textContent = "Biblioteca Musical / " + (mi + 1) + ". " + m.nome;
-    bibView.querySelector("[data-bib-assunto-titulo]").textContent = m.assuntos[ai];
-    bibView.querySelector("[data-bib-assunto-titulo]").focus();
+    var t = bibView.querySelector("[data-bib-assunto-titulo]"); t.textContent = m.assuntos[ai];
+    av.textContent = "Carregando…"; arq.textContent = caminhoAssunto(mi, ai); pre.hidden = true;
+    bibView.scrollIntoView({behavior:"smooth", block:"start"}); t.focus();
+    lerAssunto(mi, ai).then(function(r){
+      if(meu !== fichaBib) return;
+      if(r.estado === "ok"){ av.textContent = "Conteúdo do arquivo:"; pre.textContent = r.texto; pre.hidden = false; }
+      else if(r.estado === "vazio") av.textContent = "Assunto criado, conteúdo ainda não abastecido.";
+      else if(r.estado === "ausente") av.textContent = "Arquivo não encontrado. Crie-o neste caminho (ou corrija o nome):";
+      else av.textContent = "Não foi possível ler o arquivo. Abra o site pelo endereço publicado (github.io), não pelo arquivo no computador.";
+    });
   }
   sec.addEventListener("click", function(ev){
     var t = ev.target, b;
