@@ -1236,6 +1236,19 @@ main{
  #atMesa .mz-linha{display:flex;gap:14px;align-items:flex-start}
 #atMesa .mz-linha .mz-desc{flex:1}
 #atMesa .mz-linha .at-btn{flex:0 0 auto;white-space:nowrap}
+
+/* ----- Confronto e validação de estudos ----- */
+#atComparador{display:none;margin:14px 0 6px;background:var(--paper-card);border:1px solid var(--paper-line);border-radius:var(--radius);padding:18px;color:var(--ink);gap:14px}
+#atComparador .cmp-intro{font:14px/1.6 "Segoe UI",Arial,sans-serif;color:var(--ink-soft);margin:0}
+#atComparador .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#atComparador .cmp-campo{display:flex;flex-direction:column;gap:7px;font:700 11px "Segoe UI",Arial,sans-serif;letter-spacing:.8px;color:var(--ink-soft)}
+#atComparador textarea{width:100%;min-height:260px;resize:vertical;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);padding:12px;font:15px/1.7 Georgia,"Times New Roman",serif}
+#atComparador textarea:focus{outline:none;border-color:var(--brass)}
+#cmpResultado{min-height:120px;white-space:pre-wrap;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;padding:14px;font:16px/1.75 Georgia,"Times New Roman",serif;color:var(--ink)}
+#cmpResultado:empty:before{content:"O relatório de confronto aparecerá aqui.";color:#9b8b70}
+#atComparador .cmp-nota{font:12px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+@media(max-width:760px){#atComparador .cmp-grid{grid-template-columns:1fr}#atComparador textarea{min-height:190px}}
+
 </style>
 </head>
  
@@ -3172,6 +3185,77 @@ $("atEditor").insertAdjacentElement("afterend", mz);
 
 document.querySelector(".at-modo").insertAdjacentHTML("beforeend",
   '<button id="atModoMesa" class="at-btn" type="button">MESA DE ESTUDO</button>');
+
+/* ===== CONFRONTO E VALIDAÇÃO DE ESTUDOS ===== */
+document.querySelector(".at-modo").insertAdjacentHTML("beforeend",
+  '<button id="atModoComparar" class="at-btn" type="button">CONFRONTAR ESTUDOS</button>');
+const cmp = document.createElement("section");
+cmp.id = "atComparador";
+cmp.innerHTML =
+  '<div class="at-row" style="justify-content:space-between">' +
+    '<div><h2 style="margin:0 0 5px;font:600 25px Georgia,serif;color:var(--ink)">Confronto e validação de estudos</h2>' +
+    '<p class="cmp-intro">Compare um texto em análise com uma referência previamente consolidada. A referência orienta a comparação, mas também pode conter falhas que precisam ser apontadas.</p></div>' +
+    '<button id="cmpVoltar" class="at-btn" type="button">← EDITOR</button>' +
+  '</div>' +
+  '<div class="cmp-grid">' +
+    '<label class="cmp-campo">1. TEXTO EM ANÁLISE<textarea id="cmpTexto" placeholder="Cole aqui o estudo, comentário, interpretação ou ensinamento que deseja verificar..."></textarea></label>' +
+    '<label class="cmp-campo">2. TEXTO DE REFERÊNCIA — CONSOLIDADO<textarea id="cmpReferencia" placeholder="Cole aqui o conteúdo aprovado que servirá como referência de comparação..."></textarea></label>' +
+  '</div>' +
+  '<p class="cmp-nota">A análise deve distinguir concordâncias, divergências, omissões, acréscimos e possíveis erros. Em estudos bíblicos, não trate a referência humana como autoridade superior às Escrituras.</p>' +
+  '<div class="at-row"><button id="cmpExecutar" class="at-btn gold" type="button">EXECUTAR CONFRONTO</button><button id="cmpLimpar" class="at-btn" type="button">LIMPAR CAMPOS</button><span id="cmpStatus" class="cmp-nota"></span></div>' +
+  '<div><h3 style="margin:4px 0 8px;color:var(--ink-soft);font:700 12px Segoe UI,Arial,sans-serif;letter-spacing:1px">RELATÓRIO DE CONFRONTO</h3><div id="cmpResultado" aria-live="polite"></div></div>' +
+  '<div class="at-row"><button id="cmpInserir" class="at-btn" type="button" disabled>INSERIR RELATÓRIO NO EDITOR</button></div>';
+mz.insertAdjacentElement("afterend", cmp);
+
+function cmpAbrir(){
+  mz.style.display = "none";
+  $("atEditor").style.display = "none";
+  cmp.style.display = "flex"; cmp.style.flexDirection = "column";
+  document.querySelectorAll(".at-modo .at-btn").forEach(b => b.classList.remove("on"));
+  $("atModoComparar").classList.add("on");
+}
+function cmpFechar(){
+  cmp.style.display = "none";
+  $("atEditor").style.display = "";
+  $("atModoComparar").classList.remove("on");
+  aplicarModo();
+}
+$("atModoComparar").addEventListener("click", cmpAbrir);
+$("cmpVoltar").addEventListener("click", cmpFechar);
+$("cmpLimpar").addEventListener("click", function(){
+  if(!window.confirm("Limpar os dois textos e o relatório?")) return;
+  $("cmpTexto").value = ""; $("cmpReferencia").value = ""; $("cmpResultado").textContent = ""; $("cmpStatus").textContent = ""; $("cmpInserir").disabled = true;
+});
+$("cmpExecutar").addEventListener("click", async function(){
+  const texto = $("cmpTexto").value.trim();
+  const referencia = $("cmpReferencia").value.trim();
+  if(!texto || !referencia){ toast("Preencha o texto em análise e o texto de referência."); return; }
+  const btn = this; btn.disabled = true; btn.textContent = "ANALISANDO…";
+  $("cmpStatus").textContent = "Comparação em andamento…"; $("cmpResultado").textContent = ""; $("cmpInserir").disabled = true;
+  const instrucao = "Realize um confronto crítico entre dois conteúdos. TEXTO EM ANÁLISE: examine o primeiro conteúdo. TEXTO DE REFERÊNCIA CONSOLIDADO: use o segundo como padrão de comparação, sem presumir que seja infalível. Produza um relatório com: 1) síntese do que o texto em análise afirma; 2) concordâncias; 3) divergências; 4) omissões relevantes; 5) acréscimos não sustentados pela referência; 6) possíveis erros, contradições ou distorções; 7) parecer final fundamentado, indicando o que está de acordo, parcialmente de acordo ou em desacordo. Não invente dados nem force uma conclusão. Se forem estudos bíblicos, diferencie o que a referência afirma, o que o texto bíblico sustenta e o que exige verificação adicional. A referência é um parâmetro de comparação, não uma verdade absoluta. Seja específico e cite trechos dos próprios textos quando possível.";
+  try{
+    const sess = (await supabaseClient.auth.getSession()).data.session;
+    if(!sess) throw new Error("Sessão encerrada. Entre novamente.");
+    const combinado = "TEXTO EM ANÁLISE\n\n" + texto + "\n\n==============================\nTEXTO DE REFERÊNCIA CONSOLIDADO\n\n" + referencia;
+    const resp = await fetch("https://yellow-lab-f4b2.palavraeserie.workers.dev/api/pesquisa", {
+      method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer " + sess.access_token},
+      body:JSON.stringify({analysisType:"textual_study_step",scope:"Confronto de estudos",stepCode:"VALIDACAO",stepName:"Confronto e validação de estudos",instruction:instrucao,question:"Compare criticamente o texto em análise com o texto de referência consolidado.",passage:{book:"Confronto de estudos",reference:"Texto em análise × texto de referência",text:combinado}})
+    });
+    const dados = await resp.json().catch(() => ({}));
+    if(!resp.ok || !dados.ok) throw new Error(dados.error || "Não foi possível executar o confronto. Verifique se o serviço de pesquisa aceita esta operação.");
+    const resultado = String(dados.text || dados.answer || "").trim();
+    if(!resultado) throw new Error("A análise foi concluída sem retornar um relatório.");
+    $("cmpResultado").textContent = resultado; $("cmpStatus").textContent = "Confronto concluído."; $("cmpInserir").disabled = false;
+  }catch(e){
+    console.error(e); $("cmpStatus").textContent = e.message || "Falha no confronto."; toast(e.message || "Não foi possível executar o confronto.");
+  }finally{ btn.disabled = false; btn.textContent = "EXECUTAR CONFRONTO"; }
+});
+$("cmpInserir").addEventListener("click", function(){
+  const resultado = $("cmpResultado").textContent.trim();
+  if(!resultado) return;
+  cmpFechar();
+  inserirNoCursor("## Relatório de confronto e validação\n\n" + resultado + "\n");
+});
 
 function mzDados(){
   const d = ativo();
