@@ -215,7 +215,7 @@ Areas academicas · HTML
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
       var(--paper);
   }
-  .paper-inner { max-width: 1280px; margin: 0 auto; padding: clamp(18px, 3.5vw, 44px) clamp(16px, 4vw, 56px) 80px; }
+ .paper-inner { max-width: 1600px; margin: 0 auto; padding: clamp(18px, 3.5vw, 44px) clamp(16px, 4vw, 56px) 80px; }
  
   /* herói */
   .hero {
@@ -259,6 +259,7 @@ Areas academicas · HTML
   /* ───────────── Árvore ───────────── */
   .tree { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
   .tree > details.node[open] { grid-column: 1 / -1; }
+  .tree > details.root:nth-last-child(2):has(+ details.root[open]) { grid-column: 1 / -1; }
   details.node.is-empty { display: none; }
   summary { list-style: none; cursor: pointer; user-select: none; }
   summary::-webkit-details-marker { display: none; }
@@ -458,6 +459,14 @@ Areas academicas · HTML
     </header>
  
     <main class="paper">
+     .paper { position: relative; }
+.paper::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(600px 500px at 0% 30%, rgba(184,137,59,.12), transparent 70%),
+    radial-gradient(600px 500px at 100% 70%, rgba(24,191,255,.07), transparent 70%);
+}
+.paper-inner { position: relative; }
       <div class="paper-inner">
  
         <section class="hero">
