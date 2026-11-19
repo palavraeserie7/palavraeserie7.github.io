@@ -680,10 +680,46 @@ document.getElementById('collapse-all').addEventListener('click', () => {
 treeEl.addEventListener('click', event => {
   const topic = event.target.closest('.topic');
   if (!topic) return;
-  academicChatSetTopic(JSON.parse(topic.dataset.path || '[]'));
+  abrirLeitura(JSON.parse(topic.dataset.path || '[]'));
 });
 </script>
- 
+
+ <section id="leitura" style="display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center;padding:22px;background:rgba(3,9,21,.78);" onclick="if(event.target===this)fecharLeitura()">
+  <div style="width:min(860px,100%);max-height:90vh;overflow:auto;padding:26px;border:1px solid #35506d;border-radius:12px;background:#111b30;color:#dbe7f5;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+      <div>
+        <div id="leitura-caminho" style="color:#91a4bd;font-size:11px;line-height:1.5;"></div>
+        <h2 id="leitura-titulo" style="margin:6px 0 0;color:#d9a94d;font-size:22px;"></h2>
+      </div>
+      <button type="button" onclick="fecharLeitura()" style="padding:8px 12px;border:1px solid #35506d;border-radius:5px;background:transparent;color:#dbe7f5;font-weight:900;cursor:pointer;">FECHAR</button>
+    </div>
+    <div id="leitura-texto" style="margin-top:18px;font-size:15px;line-height:1.8;white-space:pre-wrap;"></div>
+  </div>
+</section>
+<script>
+let CONTEUDO_INDICE = null;
+async function carregarConteudo(){
+  if (CONTEUDO_INDICE) return CONTEUDO_INDICE;
+  try {
+    const r = await fetch('conteudo-indice.json', {cache:'no-store'});
+    CONTEUDO_INDICE = r.ok ? await r.json() : {};
+  } catch (e) { CONTEUDO_INDICE = {}; }
+  return CONTEUDO_INDICE;
+}
+async function abrirLeitura(path){
+  const janela = document.getElementById('leitura');
+  document.getElementById('leitura-titulo').textContent = path[path.length-1] || '';
+  document.getElementById('leitura-caminho').textContent = path.slice(0,-1).join(' › ');
+  const caixa = document.getElementById('leitura-texto');
+  caixa.textContent = 'Carregando...';
+  janela.style.display = 'flex';
+  const dados = await carregarConteudo();
+  const texto = dados[path.join(' > ')];
+  caixa.textContent = (texto && String(texto).trim()) ? texto : 'Conteúdo em preparação.';
+}
+function fecharLeitura(){ document.getElementById('leitura').style.display = 'none'; }
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fecharLeitura(); });
+</script>
 <!-- ═══════════ CHAT ACADÊMICO (mantido do arquivo original) ═══════════ -->
 <section id="academic-chat" class="academic-chat-panel" aria-label="Chat acadêmico" role="dialog" aria-modal="true">
   <div class="academic-chat-inner">
