@@ -4542,17 +4542,22 @@ async function sendQuestion(event) {
   const stepCode =
     extractStepCode(activeStep);
  
-  if (activeStep && !stepIsAllowed(stepCode, currentUserPlan)) {
- 
+   // >>>>>>>>>> INÍCIO — EXIGÊNCIA PRO NA PERGUNTA LIVRE >>>>>>>>>>
+  const nivelExigido = activeStep ? getStepLevel(stepCode) : "PRO";
+  const liberado = activeStep
+    ? stepIsAllowed(stepCode, currentUserPlan)
+    : (LEVEL_RANK[currentUserPlan] ?? 0) >= LEVEL_RANK.PRO;
+
+  if (!liberado) {
     appendLockedMessage(
-      "A subetapa \"" + activeStep + "\" requer o plano " +
-      getStepLevel(stepCode) +
-      ". Faça upgrade para continuar.",
-      getStepLevel(stepCode)
+      activeStep
+        ? "A subetapa \"" + activeStep + "\" requer o plano " + levelName(nivelExigido) + ". Faça upgrade para continuar."
+        : "A pergunta livre requer o plano " + levelName(nivelExigido) + " (Nível II). Faça upgrade para continuar.",
+      nivelExigido
     );
- 
     return false;
   }
+  // <<<<<<<<<< FIM — EXIGÊNCIA PRO NA PERGUNTA LIVRE <<<<<<<<<<
  
  
   let questionForApi =
@@ -4713,7 +4718,7 @@ async function sendQuestion(event) {
               stepCode || "",
  
             requiredLevel:
-              stepCode ? getStepLevel(stepCode) : "FREE",
+            stepCode ? getStepLevel(stepCode) : "PRO",
  
             discipline:
               "MÉTODO TÉCNICO DE PESQUISA"
