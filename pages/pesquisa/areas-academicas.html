@@ -947,6 +947,38 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fechar
     .catch(function(){ concluir(null, null); });
 })();
 </script>
+<script>
+(function(){
+  if (!/[?&]modelo=1/.test(location.search)) return;
+  const caminhos = [];
+  (function andar(no, ate){
+    (no.children || []).forEach(function(f){
+      if (f.kind === 'item') caminhos.push([...ate, no.title, f.title].join(' > '));
+      else andar(f, [...ate, no.title]);
+    });
+  })
+  ;
+  ACADEMIC_TREE.forEach(function(area){
+    (function andar(no, ate){
+      (no.children || []).forEach(function(f){
+        if (f.kind === 'item') caminhos.push([...ate, no.title, f.title].join(' > '));
+        else andar(f, [...ate, no.title]);
+      });
+    })(area, []);
+  });
+  carregarConteudo().then(function(atual){
+    const modelo = {};
+    caminhos.forEach(function(c){ modelo[c] = (atual && atual[c]) ? atual[c] : ''; });
+    const blob = new Blob([JSON.stringify(modelo, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'conteudo-indice.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+})();
+</script>
 </body>
 </html>
  
