@@ -7416,6 +7416,33 @@ texto: $("esTexto").value
     return blobs.length === 1 ? blobs[0] : new Blob(blobs, {type: blobs[0].type || "audio/mpeg"});
   }
   /* ===== FIM: VOZ EM PARTES ===== */
+   /* ===== INÍCIO: VOZ EM PARTES PARA O VÍDEO (decodifica cada parte) ===== */
+  async function pedirVozBuffer(texto, det, ac){
+    var s = (await supabaseClient.auth.getSession()).data.session;
+    if(!s) throw new Error("Sessão encerrada. Entre de novo.");
+    var partes = dividirTexto(texto, 600), buffers = [];
+    for(var i = 0; i < partes.length; i++){
+      if(partes.length > 1) info("Gerando a voz… parte " + (i + 1) + " de " + partes.length + ".", false, 0.03 + 0.05 * i / partes.length);
+      var b;
+      try{
+        b = await pedirParte(partes[i], det, s.access_token);
+      }catch(e){
+        if(partes.length > 1) e.message = e.message + " (parte " + (i + 1) + " de " + partes.length + ")";
+        throw e;
+      }
+      buffers.push(await ac.decodeAudioData(await b.arrayBuffer()));
+    }
+    if(buffers.length === 1) return buffers[0];
+    var taxa = ac.sampleRate, pausa = Math.round(0.2 * taxa), canais = 1, total = 0;
+    buffers.forEach(function(x, k){ canais = Math.max(canais, x.numberOfChannels); total += x.length + (k < buffers.length - 1 ? pausa : 0); });
+    var saida = ac.createBuffer(canais, total, taxa), pos = 0;
+    buffers.forEach(function(x){
+      for(var c = 0; c < canais; c++) saida.getChannelData(c).set(x.getChannelData(Math.min(c, x.numberOfChannels - 1)), pos);
+      pos += x.length + pausa;
+    });
+    return saida;
+  }
+  /* ===== FIM: VOZ EM PARTES PARA O VÍDEO ===== */
  
   /* ---------- 5. renderização no navegador (canvas + MediaRecorder) ---------- */
  var TAM = {f916: [1080, 1920], f11: [1080, 1080], f169: [1920, 1080]};
@@ -7468,8 +7495,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
     info("Gerando a voz…", false, 0.03);
     var buf = null, aviso = "";
     try{
-      var vb = await pedirVoz(proj.fala, det);
-      buf = await ac.decodeAudioData(await vb.arrayBuffer());
+    buf = await pedirVozBuffer(proj.fala, det, ac);
     }catch(e){ aviso = " Sem voz: " + (e.message || "falhou") + " O vídeo sai só com texto e música."; }
  
     var palavras = proj.fala.split(/\s+/).length;
