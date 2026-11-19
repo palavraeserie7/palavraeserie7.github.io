@@ -7403,7 +7403,7 @@ texto: $("esTexto").value
   async function pedirVoz(texto, det){
     var s = (await supabaseClient.auth.getSession()).data.session;
     if(!s) throw new Error("Sessão encerrada. Entre de novo.");
-    var partes = dividirTexto(texto, 250), blobs = [];
+    var partes = dividirTexto(texto, 1200), blobs = [];
     for(var i = 0; i < partes.length; i++){
       if(partes.length > 1) info("Gerando a voz… parte " + (i + 1) + " de " + partes.length + ".", false, 0.03 + 0.05 * i / partes.length);
       try{
@@ -7420,7 +7420,7 @@ texto: $("esTexto").value
   async function pedirVozBuffer(texto, det, ac){
     var s = (await supabaseClient.auth.getSession()).data.session;
     if(!s) throw new Error("Sessão encerrada. Entre de novo.");
-    var partes = dividirTexto(texto, 250), buffers = [];
+    var partes = dividirTexto(texto, 1200), buffers = [];
     for(var i = 0; i < partes.length; i++){
       if(partes.length > 1) info("Gerando a voz… parte " + (i + 1) + " de " + partes.length + ".", false, 0.03 + 0.05 * i / partes.length);
       var b;
