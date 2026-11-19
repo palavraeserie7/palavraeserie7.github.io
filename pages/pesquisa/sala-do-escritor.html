@@ -7365,11 +7365,33 @@ texto: $("esTexto").value
   }
  
   /* ---------- 4. voz real (rota /api/voz do Worker) ---------- */
-  async function pedirVoz(texto, det){
-    var s = (await supabaseClient.auth.getSession()).data.session;
-    if(!s) throw new Error("Sessão encerrada. Entre de novo.");
+   /* ===== INÍCIO: VOZ EM PARTES (textos longos) ===== */
+  function dividirTexto(texto, max){
+    var unidades = [];
+    texto.split(/\r?\n/).forEach(function(lin){
+      lin = lin.trim(); if(!lin) return;
+      if(lin.length <= max){ unidades.push(lin); return; }
+      var fr = lin.match(/[^.!?…]+[.!?…]*["”’)]*\s*/g) || [lin];
+      fr.forEach(function(f){
+        f = f.trim();
+        while(f.length > max){
+          var c = f.lastIndexOf(" ", max); if(c < max / 2) c = max;
+          unidades.push(f.slice(0, c).trim()); f = f.slice(c).trim();
+        }
+        if(f) unidades.push(f);
+      });
+    });
+    var partes = [], at = "";
+    unidades.forEach(function(u){
+      if(at && (at + "\n" + u).length > max){ partes.push(at); at = u; }
+      else at = at ? at + "\n" + u : u;
+    });
+    if(at) partes.push(at);
+    return partes.length ? partes : [texto];
+  }
+  async function pedirParte(texto, det, token){
     var r = await fetch(URL_VOZ, {method: "POST",
-      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + s.access_token},
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token},
       body: JSON.stringify({texto: texto, voz: $("f1Voz").value, velocidade: det.velocidade})});
     if(!r.ok){
       var j = await r.json().catch(function(){ return {}; });
@@ -7378,6 +7400,22 @@ texto: $("esTexto").value
     if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
     return r.blob();
   }
+  async function pedirVoz(texto, det){
+    var s = (await supabaseClient.auth.getSession()).data.session;
+    if(!s) throw new Error("Sessão encerrada. Entre de novo.");
+    var partes = dividirTexto(texto, 600), blobs = [];
+    for(var i = 0; i < partes.length; i++){
+      if(partes.length > 1) info("Gerando a voz… parte " + (i + 1) + " de " + partes.length + ".", false, 0.03 + 0.05 * i / partes.length);
+      try{
+        blobs.push(await pedirParte(partes[i], det, s.access_token));
+      }catch(e){
+        if(partes.length > 1) e.message = e.message + " (parte " + (i + 1) + " de " + partes.length + ")";
+        throw e;
+      }
+    }
+    return blobs.length === 1 ? blobs[0] : new Blob(blobs, {type: blobs[0].type || "audio/mpeg"});
+  }
+  /* ===== FIM: VOZ EM PARTES ===== */
  
   /* ---------- 5. renderização no navegador (canvas + MediaRecorder) ---------- */
  var TAM = {f916: [1080, 1920], f11: [1080, 1080], f169: [1920, 1080]};
