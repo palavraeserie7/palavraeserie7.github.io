@@ -24,6 +24,31 @@ Areas academicas · HTML
    display:inline-block;border:1px solid #7b5b35;background:#7b5b35;color:#fff;
    padding:10px 18px;border-radius:9px;text-decoration:none;font-size:14px;
  }
+ /* ═══════════ INÍCIO — JANELAS DO CONHECIMENTO (CSS) ═══════════ */
+.knowledge-window{max-width:1100px;margin:32px auto;padding:0 16px}
+.knowledge-heading{text-align:center;margin-bottom:18px}
+.knowledge-kicker{display:inline-block;font-size:.72rem;letter-spacing:.2em;opacity:.7}
+.knowledge-heading h2{margin:6px 0 4px}
+.knowledge-heading p{margin:0;opacity:.75}
+
+.knowledge-slide{position:relative;display:grid;grid-template-columns:1fr 1.1fr;min-height:320px;border-radius:16px;overflow:hidden;background:#14171f;color:#f2f2f2;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.kw-image{background:linear-gradient(135deg,#2a2f3d,#4a3f2a);background-size:cover;background-position:center;min-height:220px}
+.kw-body{padding:28px;display:flex;flex-direction:column;justify-content:center;gap:12px;transition:opacity .4s}
+.kw-body.is-fading{opacity:0}
+.kw-category{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:#d9b36b}
+.kw-title{font-size:1.35rem;line-height:1.3;margin:0}
+.kw-text{margin:0;line-height:1.6;opacity:.9}
+.kw-source{font-size:.8rem;opacity:.65}
+.kw-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:8px}
+.kw-dot{width:9px;height:9px;border-radius:50%;border:0;padding:0;background:rgba(255,255,255,.35);cursor:pointer}
+.kw-dot.is-active{background:#d9b36b}
+
+@media (max-width:720px){
+  .knowledge-slide{grid-template-columns:1fr}
+  .kw-image{min-height:180px}
+  .kw-body{padding:20px 20px 36px}
+}
+/* ═══════════ FIM — JANELAS DO CONHECIMENTO (CSS) ═══════════ */
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -492,7 +517,22 @@ Areas academicas · HTML
             <div class="stat"><b>4</b><span>Níveis</span></div>
           </div>
         </section>
- 
+
+       
+<!-- ═══════════ JANELAS DO CONHECIMENTO ═══════════ -->
+<section class="knowledge-window" id="janelas-conhecimento">
+  <div class="knowledge-heading">
+    <span class="knowledge-kicker">EXPOSIÇÃO CONTÍNUA</span>
+    <h2>Janelas do Conhecimento</h2>
+    <p>Pequenas descobertas. Grandes horizontes.</p>
+  </div>
+
+  <div class="knowledge-slide" id="knowledge-slide">
+    <!-- O conteúdo rotativo será inserido aqui -->
+  </div>
+</section>
+<!-- ═══════════ FIM JANELAS DO CONHECIMENTO ═══════════ -->
+
         <div class="toolbar" id="toolbar">
           <div>
             <h2>Áreas do conhecimento</h2>
@@ -1029,6 +1069,106 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fechar
   });
 })();
 </script>
+ <!-- ═══════════ INÍCIO — JANELAS DO CONHECIMENTO (JS) ═══════════ -->
+<script>
+(function () {
+  // Coleção 01 — para trocar uma imagem, preencha "imagem" com o endereço dela.
+  var COLECAO_01 = [
+    { titulo: "Os manuscritos que ficaram escondidos por quase dois mil anos",
+      categoria: "Arqueologia bíblica",
+      texto: "Em 1947, manuscritos antigos foram descobertos em cavernas próximas ao Mar Morto. Sua preservação por cerca de dois milênios e a descoberta acidental por pastores beduínos fizeram desse achado um dos acontecimentos arqueológicos mais extraordinários do século XX.",
+      fonte: "Library of Congress — Scrolls from the Dead Sea", imagem: "" },
+    { titulo: "Uma biblioteca antiga com quase mil obras",
+      categoria: "História bíblica",
+      texto: "A coleção de manuscritos de Qumran representa uma verdadeira biblioteca antiga. Ela reúne cerca de mil composições diferentes, preservadas em milhares de fragmentos, que revelam uma atividade literária intensa no período do Segundo Templo.",
+      fonte: "Library of Congress — The Qumran Library", imagem: "" },
+    { titulo: "Um manuscrito bíblico escrito em cobre",
+      categoria: "Manuscritos antigos",
+      texto: "Entre os manuscritos encontrados na região do Mar Morto existe um documento extraordinário conhecido como Rolo de Cobre. Diferentemente dos manuscritos escritos em pergaminho ou papiro, esse documento foi inscrito em placas de cobre.",
+      fonte: "Royal Ontario Museum — Dead Sea Scrolls: Words that Changed the World", imagem: "" },
+    { titulo: "Em Qumran foram encontrados textos de quase todos os livros da Bíblia Hebraica",
+      categoria: "Preservação das Escrituras",
+      texto: "Entre os manuscritos bíblicos encontrados em Qumran estão exemplares de todos os livros da Bíblia Hebraica, com uma exceção: Ester. Esses documentos permitem comparar cópias antigas dos textos bíblicos com manuscritos preservados em épocas posteriores.",
+      fonte: "Biblical Archaeology Society — Qumran and the Dead Sea Scrolls", imagem: "" },
+    { titulo: "Fragmentos de Enoque em aramaico reapareceram no deserto",
+      categoria: "Literatura do período bíblico",
+      texto: "Partes do livro de Enoque, uma antiga obra judaica, foram encontradas em fragmentos aramaicos nas cavernas de Qumran. A descoberta ajudou estudiosos a conhecer textos que, durante muito tempo, não eram acessíveis em sua forma original.",
+      fonte: "Library of Congress — The Qumran Library", imagem: "" },
+    { titulo: "Os manuscritos ajudam a compreender o mundo em que o cristianismo nasceu",
+      categoria: "Contexto do Novo Testamento",
+      texto: "Os manuscritos do Mar Morto revelam crenças, práticas, interpretações das Escrituras e formas de organização de comunidades judaicas da época. Eles ajudam a compreender o ambiente religioso no qual o cristianismo surgiu, embora sem provar uma ligação direta entre a comunidade de Qumran e Jesus ou os apóstolos.",
+      fonte: "Library of Congress — Two Thousand Years Later", imagem: "" },
+    { titulo: "Um dos manuscritos mais importantes do Novo Testamento também preserva outros escritos antigos",
+      categoria: "História da Bíblia",
+      texto: "O Codex Sinaiticus é um manuscrito do século IV. Além dos textos bíblicos, ele preservava escritos cristãos antigos como a Epístola de Barnabé e o Pastor de Hermas, que não fazem parte do Novo Testamento canônico.",
+      fonte: "Smithsonian National Museum of Asian Art — Codex Sinaiticus", imagem: "" },
+    { titulo: "O Coliseu tornou-se um símbolo do martírio cristão, mas a história é mais complexa",
+      categoria: "História do cristianismo",
+      texto: "Cristãos foram perseguidos e executados em diferentes lugares do Império Romano, inclusive em arenas. Porém, a associação específica do Coliseu de Roma com martírios cristãos não é comprovada de forma conclusiva para muitos casos. Ao longo dos séculos, o Coliseu se tornou um poderoso símbolo da memória cristã dos mártires.",
+      fonte: "ZENIT — The Colosseum: a Symbol of Martyrs", imagem: "" }
+  ];
+
+  var INTERVALO = 9000; // 9 segundos por curiosidade
+  var palco = document.getElementById("knowledge-slide");
+  if (!palco) return;
+
+  palco.innerHTML =
+    '<div class="kw-image" id="kw-image"></div>' +
+    '<div class="kw-body" id="kw-body">' +
+      '<span class="kw-category" id="kw-category"></span>' +
+      '<h3 class="kw-title" id="kw-title"></h3>' +
+      '<p class="kw-text" id="kw-text"></p>' +
+      '<span class="kw-source" id="kw-source"></span>' +
+    '</div>' +
+    '<div class="kw-dots" id="kw-dots"></div>';
+
+  var elImg = document.getElementById("kw-image");
+  var elBody = document.getElementById("kw-body");
+  var elCat = document.getElementById("kw-category");
+  var elTit = document.getElementById("kw-title");
+  var elTxt = document.getElementById("kw-text");
+  var elSrc = document.getElementById("kw-source");
+  var elDots = document.getElementById("kw-dots");
+  var atual = 0, timer = null;
+
+  COLECAO_01.forEach(function (_, i) {
+    var b = document.createElement("button");
+    b.className = "kw-dot";
+    b.type = "button";
+    b.setAttribute("aria-label", "Curiosidade " + (i + 1));
+    b.addEventListener("click", function () { mostrar(i); reiniciar(); });
+    elDots.appendChild(b);
+  });
+
+  function mostrar(i) {
+    atual = i;
+    var d = COLECAO_01[i];
+    elBody.classList.add("is-fading");
+    setTimeout(function () {
+      elCat.textContent = d.categoria;
+      elTit.textContent = d.titulo;
+      elTxt.textContent = d.texto;
+      elSrc.textContent = "Fonte: " + d.fonte;
+      elImg.style.backgroundImage = d.imagem ? 'url("' + d.imagem + '")' : "";
+      Array.prototype.forEach.call(elDots.children, function (el, k) {
+        el.classList.toggle("is-active", k === i);
+      });
+      elBody.classList.remove("is-fading");
+    }, 300);
+  }
+
+  function proximo() { mostrar((atual + 1) % COLECAO_01.length); }
+  function iniciar() { timer = setInterval(proximo, INTERVALO); }
+  function reiniciar() { clearInterval(timer); iniciar(); }
+
+  palco.addEventListener("mouseenter", function () { clearInterval(timer); });
+  palco.addEventListener("mouseleave", iniciar);
+
+  mostrar(0);
+  iniciar();
+})();
+</script>
+<!-- ═══════════ FIM — JANELAS DO CONHECIMENTO (JS) ═══════════ -->
 </body>
 </html>
  
