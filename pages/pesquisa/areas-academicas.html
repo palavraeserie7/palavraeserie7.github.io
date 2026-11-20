@@ -1,6 +1,3 @@
-
-
-Areas academicas · HTML
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -39,8 +36,12 @@ Areas academicas · HTML
 .kw-title{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:1.5rem;line-height:1.25;font-weight:700;color:#fff}
 .kw-text{margin:0;line-height:1.65;color:#d9d3c4}
 .kw-source{font-size:.78rem;color:#9d9784;border-top:1px solid rgba(255,255,255,.12);padding-top:10px}
-.kw-dots{position:absolute;right:34px;bottom:16px;display:flex;gap:8px}
-.kw-dot{width:9px;height:9px;border-radius:50%;border:0;padding:0;background:rgba(255,255,255,.3);cursor:pointer}
+.knowledge-slide.sem-imagem{grid-template-columns:1fr}
+.knowledge-slide.sem-imagem .kw-image{display:none}
+.kw-credit{font-size:.72rem;color:#9d9784}
+.kw-credit a{color:#d9b36b}
+.kw-dots{position:absolute;right:34px;bottom:16px;display:flex;flex-wrap:wrap;justify-content:flex-end;max-width:60%;gap:5px}
+.kw-dot{width:7px;height:7px;border-radius:50%;border:0;padding:0;background:rgba(255,255,255,.3);cursor:pointer}
 .kw-dot.is-active{background:#e0b95f}
 
 @media (max-width:720px){
@@ -1072,43 +1073,196 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fechar
 </script>
  <!-- ═══════════ INÍCIO — JANELAS DO CONHECIMENTO (JS) ═══════════ -->
 <script>
+
+
 (function () {
-  // Coleção 01 — para trocar uma imagem, preencha "imagem" com o endereço dela.
+  function n(titulo, categoria, texto, fonte) {
+    return { titulo: titulo, categoria: categoria, texto: texto, fonte: fonte,
+      imagem: "", creditoImagem: "", licencaImagem: "", paginaImagem: "" };
+  }
+
   var COLECAO_01 = [
     { titulo: "Os manuscritos que ficaram escondidos por quase dois mil anos",
       categoria: "Arqueologia bíblica",
       texto: "Em 1947, manuscritos antigos foram descobertos em cavernas próximas ao Mar Morto. Sua preservação por cerca de dois milênios e a descoberta acidental por pastores beduínos fizeram desse achado um dos acontecimentos arqueológicos mais extraordinários do século XX.",
-      fonte: "Library of Congress — Scrolls from the Dead Sea", imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Dead%20Sea%20Scrolls%2001.jpg" },
+      fonte: "Library of Congress — Scrolls from the Dead Sea",
+      imagem: "", creditoImagem: "", licencaImagem: "", paginaImagem: "",
+      imagemCandidata: "https://commons.wikimedia.org/wiki/Special:FilePath/Dead%20Sea%20Scrolls%2001.jpg", autorCandidato: "Mohammad hajeer", licencaCandidata: "CC BY-SA 4.0" },
     { titulo: "Uma biblioteca antiga com quase mil obras",
       categoria: "História bíblica",
       texto: "A coleção de manuscritos de Qumran representa uma verdadeira biblioteca antiga. Ela reúne cerca de mil composições diferentes, preservadas em milhares de fragmentos, que revelam uma atividade literária intensa no período do Segundo Templo.",
-      fonte: "Library of Congress — The Qumran Library", imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Storage%20jars%2C%20Qumran%2C%202019%20%2801%29.jpg" },
-    { titulo: "Um manuscrito bíblico escrito em cobre",
+      fonte: "Library of Congress — The Qumran Library",
+      imagem: "", creditoImagem: "", licencaImagem: "", paginaImagem: "",
+      imagemCandidata: "https://commons.wikimedia.org/wiki/Special:FilePath/Storage%20jars%2C%20Qumran%2C%202019%20%2801%29.jpg", autorCandidato: "Bahnfrend", licencaCandidata: "CC BY-SA 4.0" },
+    { titulo: "Um manuscrito de Qumran escrito em placas de cobre",
       categoria: "Manuscritos antigos",
-      texto: "Entre os manuscritos encontrados na região do Mar Morto existe um documento extraordinário conhecido como Rolo de Cobre. Diferentemente dos manuscritos escritos em pergaminho ou papiro, esse documento foi inscrito em placas de cobre.",
-      fonte: "Royal Ontario Museum — Dead Sea Scrolls: Words that Changed the World", imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/The%20so-called%20Copper%20Dead%20Sea%20Scrolls%20at%20the%20Jordan%20Museum%2C%20from%20Qumran%20Cave%203%2C%201st%20century%20CE.jpg" },
+      texto: "Entre os manuscritos encontrados na região do Mar Morto existe um documento extraordinário conhecido como Rolo de Cobre. Diferentemente dos manuscritos escritos em pergaminho ou papiro, esse documento foi inscrito em placas de cobre e traz uma lista de locais onde tesouros teriam sido escondidos.",
+      fonte: "Royal Ontario Museum — Dead Sea Scrolls: Words that Changed the World",
+      imagem: "", creditoImagem: "", licencaImagem: "", paginaImagem: "",
+      imagemCandidata: "https://commons.wikimedia.org/wiki/Special:FilePath/The%20so-called%20Copper%20Dead%20Sea%20Scrolls%20at%20the%20Jordan%20Museum%2C%20from%20Qumran%20Cave%203%2C%201st%20century%20CE.jpg", autorCandidato: "Osama Shukir Muhammed Amin", licencaCandidata: "CC BY-SA 4.0" },
     { titulo: "Em Qumran foram encontrados textos de quase todos os livros da Bíblia Hebraica",
       categoria: "Preservação das Escrituras",
       texto: "Entre os manuscritos bíblicos encontrados em Qumran estão exemplares de todos os livros da Bíblia Hebraica, com uma exceção: Ester. Esses documentos permitem comparar cópias antigas dos textos bíblicos com manuscritos preservados em épocas posteriores.",
-      fonte: "Biblical Archaeology Society — Qumran and the Dead Sea Scrolls", imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Dead%20Sea%20Scroll%2C%20Pesher%20Isaiah%2C%20from%20Qumran%20Cave%204.%20The%20Jordan%20Museum%2C%20Amman.jpg" },
+      fonte: "Biblical Archaeology Society — Qumran and the Dead Sea Scrolls",
+      imagem: "", creditoImagem: "", licencaImagem: "", paginaImagem: "",
+      imagemCandidata: "https://commons.wikimedia.org/wiki/Special:FilePath/Dead%20Sea%20Scroll%2C%20Pesher%20Isaiah%2C%20from%20Qumran%20Cave%204.%20The%20Jordan%20Museum%2C%20Amman.jpg", autorCandidato: "Osama Shukir Muhammed Amin", licencaCandidata: "CC BY-SA 4.0" },
     { titulo: "Fragmentos de Enoque em aramaico reapareceram no deserto",
       categoria: "Literatura do período bíblico",
       texto: "Partes do livro de Enoque, uma antiga obra judaica, foram encontradas em fragmentos aramaicos nas cavernas de Qumran. A descoberta ajudou estudiosos a conhecer textos que, durante muito tempo, não eram acessíveis em sua forma original.",
-      fonte: "Library of Congress — The Qumran Library", imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Qumran%2C%20frammenti%20biblici%20dei%20rotoli%20del%20mar%20morto%2C%201-20%20dc%20ca.%20%28bnf%29.jpg" },
+      fonte: "Library of Congress — The Qumran Library",
+      imagem: "", creditoImagem: "", licencaImagem: "", paginaImagem: "",
+      imagemCandidata: "https://commons.wikimedia.org/wiki/Special:FilePath/Qumran%2C%20frammenti%20biblici%20dei%20rotoli%20del%20mar%20morto%2C%201-20%20dc%20ca.%20%28bnf%29.jpg", autorCandidato: "não confirmado", licencaCandidata: "não confirmada" },
     { titulo: "Os manuscritos ajudam a compreender o mundo em que o cristianismo nasceu",
       categoria: "Contexto do Novo Testamento",
       texto: "Os manuscritos do Mar Morto revelam crenças, práticas, interpretações das Escrituras e formas de organização de comunidades judaicas da época. Eles ajudam a compreender o ambiente religioso no qual o cristianismo surgiu, embora sem provar uma ligação direta entre a comunidade de Qumran e Jesus ou os apóstolos.",
-      fonte: "Library of Congress — Two Thousand Years Later", imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Qumran%20Caves.jpg" },
+      fonte: "Library of Congress — Two Thousand Years Later",
+      imagem: "", creditoImagem: "", licencaImagem: "", paginaImagem: "",
+      imagemCandidata: "https://commons.wikimedia.org/wiki/Special:FilePath/Qumran%20Caves.jpg", autorCandidato: "Holyland2026", licencaCandidata: "CC BY-SA 4.0" },
     { titulo: "Um dos manuscritos mais importantes do Novo Testamento também preserva outros escritos antigos",
       categoria: "História da Bíblia",
       texto: "O Codex Sinaiticus é um manuscrito do século IV. Além dos textos bíblicos, ele preservava escritos cristãos antigos como a Epístola de Barnabé e o Pastor de Hermas, que não fazem parte do Novo Testamento canônico.",
-      fonte: "Smithsonian National Museum of Asian Art — Codex Sinaiticus", imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Codex%20Sinaiticus.jpg" },
+      fonte: "Codex Sinaiticus Project — codexsinaiticus.org",
+      imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Codex%20Sinaiticus.jpg", creditoImagem: "PotatoCow25", licencaImagem: "CC0", paginaImagem: "https://commons.wikimedia.org/wiki/File:Codex_Sinaiticus.jpg" },
     { titulo: "O Coliseu tornou-se um símbolo do martírio cristão, mas a história é mais complexa",
       categoria: "História do cristianismo",
       texto: "Cristãos foram perseguidos e executados em diferentes lugares do Império Romano, inclusive em arenas. Porém, a associação específica do Coliseu de Roma com martírios cristãos não é comprovada de forma conclusiva para muitos casos. Ao longo dos séculos, o Coliseu se tornou um poderoso símbolo da memória cristã dos mártires.",
-      fonte: "ZENIT — The Colosseum: a Symbol of Martyrs", imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20-%20Rome.jpg" }
+      fonte: "ZENIT — The Colosseum: a Symbol of Martyrs",
+      imagem: "https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20-%20Rome.jpg", creditoImagem: "Mattia.masala", licencaImagem: "CC0", paginaImagem: "https://commons.wikimedia.org/wiki/File:Colosseum_-_Rome.jpg" },
+    n("Uma inscrição fora da Bíblia menciona a “casa de Davi”",
+      "Arqueologia bíblica",
+      "A Inscrição de Tel Dan, do século IX a.C., foi encontrada no norte de Israel. Ela registra uma vitória de um rei arameu e traz a expressão “casa de Davi”, uma das referências extrabíblicas mais citadas à dinastia davídica.",
+      "Israel Museum, Jerusalém — Tel Dan Stele"),
+    n("Um rei de Moabe conta sua própria versão dos fatos",
+      "Arqueologia bíblica",
+      "A Estela de Messa, do século IX a.C., relata a independência de Moabe diante de Israel. Ela cita o rei Omri e o nome divino YHWH, e dialoga com o relato de 2 Reis 3.",
+      "Museu do Louvre — Estela de Messa"),
+    n("O Prisma de Senaqueribe descreve o cerco a Judá",
+      "Contexto do Antigo Testamento",
+      "Registros assírios do rei Senaqueribe contam a campanha de 701 a.C. contra Judá e dizem que o rei Ezequias foi cercado em Jerusalém. A narrativa assíria e a bíblica concordam em partes e diferem em outras.",
+      "British Museum — Taylor Prism"),
+    n("Um túnel escavado em Jerusalém tem uma inscrição de seus construtores",
+      "Arqueologia de Jerusalém",
+      "O Túnel de Ezequias leva água da fonte de Giom ao tanque de Siloé. A Inscrição de Siloé, em hebraico antigo, descreve o momento em que as duas equipes de escavadores se encontraram.",
+      "Israel Antiquities Authority — Hezekiah's Tunnel"),
+    n("Um cilindro babilônico registra a política de Ciro com povos deslocados",
+      "Império Persa",
+      "O Cilindro de Ciro, de 539 a.C., relata a conquista da Babilônia e a devolução de imagens e povos a seus locais de origem. Ele não menciona os judeus, mas ilustra a política persa que o contexto de Esdras descreve.",
+      "British Museum — Cyrus Cylinder"),
+    n("A Pedra de Roseta abriu o caminho para ler os hieróglifos",
+      "História e cultura",
+      "Datada de 196 a.C., traz o mesmo decreto em hieróglifos, demótico e grego. A comparação dos textos permitiu a Jean-François Champollion decifrar a escrita egípcia em 1822.",
+      "British Museum — Rosetta Stone"),
+    n("Uma pedra em Cesareia cita Pôncio Pilatos",
+      "Contexto do Novo Testamento",
+      "Descoberta em 1961, a inscrição de Cesareia Marítima traz o nome de Pôncio Pilatos e o identifica como prefeito da Judeia, confirmando por evidência material uma figura dos Evangelhos.",
+      "Israel Museum, Jerusalém — Pilate Stone"),
+    n("Uma inscrição em Delfos ajuda a datar a missão de Paulo",
+      "Cronologia do Novo Testamento",
+      "Um texto em Delfos menciona Gálio como procônsul da Acaia por volta de 51–52 d.C. Atos 18 narra o encontro de Paulo com Gálio em Corinto, o que fornece um ponto de apoio para a cronologia.",
+      "Biblical Archaeology Society — Gallio Inscription"),
+    n("Um tanque de cinco pórticos foi escavado em Jerusalém",
+      "Arqueologia de Jerusalém",
+      "João 5 descreve o tanque de Betesda com cinco pórticos. Escavações perto da Igreja de Santa Ana revelaram os restos de grandes reservatórios que correspondem ao cenário geral do relato.",
+      "Biblical Archaeology Society — Pool of Bethesda"),
+    n("Um pequeno fragmento de papiro guarda trechos do Evangelho de João",
+      "Manuscritos do Novo Testamento",
+      "O Papiro P52, na Biblioteca John Rylands, é datado por análise da escrita na primeira metade do século II. É um dos mais antigos fragmentos conhecidos do Novo Testamento.",
+      "John Rylands Research Institute — Papyrus P52"),
+    n("Papiros do século III preservam as cartas de Paulo",
+      "Manuscritos do Novo Testamento",
+      "O Papiro Chester Beatty II (P46), de cerca de 200 d.C., preserva boa parte das epístolas paulinas e é uma das fontes mais antigas para o estudo desses textos.",
+      "Chester Beatty Library — Biblical Papyri"),
+    n("O Códice Vaticano é um dos grandes manuscritos em grego do século IV",
+      "História da Bíblia",
+      "Conservado na Biblioteca Apostólica Vaticana, o Códice Vaticano contém grande parte da Bíblia em grego e é uma das testemunhas mais importantes do texto bíblico antigo.",
+      "Biblioteca Apostólica Vaticana — Codex Vaticanus"),
+    n("A Septuaginta foi a Bíblia grega de muitos judeus e cristãos antigos",
+      "Tradução da Bíblia",
+      "Traduzida do hebraico para o grego em Alexandria entre os séculos III e II a.C., a Septuaginta foi muito usada no mundo mediterrâneo e é frequentemente citada no Novo Testamento.",
+      "Encyclopaedia Britannica — Septuagint"),
+    n("Treze códices em copta foram achados no Egito em 1945",
+      "Literatura cristã antiga",
+      "A biblioteca de Nag Hammadi reúne textos do século IV, muitos de grupos gnósticos. Ela mostra a diversidade de escritos que circulavam no cristianismo antigo e ajuda a entender, por contraste, o processo de formação do cânon.",
+      "Claremont Graduate University — Nag Hammadi Library"),
+    n("A Vulgata de Jerônimo moldou a leitura da Bíblia no Ocidente",
+      "História da Bíblia",
+      "No fim do século IV, Jerônimo, em Belém, traduziu e revisou textos bíblicos para o latim. Por mais de mil anos, a Vulgata foi a Bíblia padrão da Igreja latina.",
+      "Encyclopaedia Britannica — Vulgate"),
+    n("O Códice de Leningrado é a base de edições críticas do Antigo Testamento hebraico",
+      "Texto massorético",
+      "Copiado por volta de 1008–1009 d.C., é o mais antigo manuscrito completo da Bíblia Hebraica no texto massorético e serve de base para edições críticas modernas como a Biblia Hebraica Stuttgartensia.",
+      "Biblioteca Nacional da Rússia — Codex Leningradensis"),
+    n("A Bíblia de Gutenberg marcou o início da Bíblia impressa na Europa",
+      "História da Bíblia",
+      "Impressa em Mogúncia por volta de 1455, em latim, a Bíblia de Gutenberg foi um dos primeiros grandes livros impressos com tipos móveis no Ocidente.",
+      "British Library — Gutenberg Bible"),
+    n("O Código de Hamurabi mostra como eram as leis no Antigo Oriente",
+      "Contexto do Antigo Testamento",
+      "Gravado em uma estela de diorito por volta de 1754 a.C., reúne cerca de 280 leis. Comparar leis do Antigo Oriente com as da Torá ajuda a ver semelhanças e diferenças.",
+      "Museu do Louvre — Código de Hamurabi"),
+    n("Cartas de Amarna mostram a diplomacia do Egito no século XIV a.C.",
+      "Antigo Oriente",
+      "As Cartas de Amarna, escritas em acadiano, reúnem a correspondência entre o faraó e governantes de cidades de Canaã e de outras regiões, retratando a política da época.",
+      "British Museum — Amarna Letters"),
+    n("A Estela de Merneptá traz a mais antiga menção conhecida a Israel",
+      "Arqueologia bíblica",
+      "Datada de cerca de 1208 a.C., a estela do faraó Merneptá cita “Israel” entre povos de Canaã. É a referência extrabíblica mais antiga conhecida a esse nome.",
+      "Museu Egípcio do Cairo — Merneptah Stele"),
+    n("Um relato mesopotâmico de dilúvio foi achado em tabletes de argila",
+      "Literatura do Antigo Oriente",
+      "A biblioteca de Assurbanípal, em Nínive, preservou tabletes do Épico de Gilgámesh, que inclui um relato de dilúvio. A comparação com Gênesis é tema de muitos estudos.",
+      "British Museum — Library of Ashurbanipal"),
+    n("Uma crônica babilônica registra a tomada de Jerusalém em 597 a.C.",
+      "Contexto do Antigo Testamento",
+      "A Crônica Babilônica cita a captura de Jerusalém por Nabucodonosor II. É um registro externo de um episódio também narrado em 2 Reis.",
+      "British Museum — Babylonian Chronicle"),
+    n("Cartas em fragmentos de cerâmica descrevem os últimos dias de Laquis",
+      "Arqueologia bíblica",
+      "Os Ostracos de Laquis, de cerca de 588 a.C., são mensagens militares escritas em hebraico durante a campanha babilônica contra Judá, no tempo de Jeremias.",
+      "British Museum — Lachish Letters"),
+    n("Dois pequenos rolos de prata guardam uma bênção bíblica",
+      "Manuscritos antigos",
+      "Encontrados em Ketef Hinnom, em Jerusalém, os amuletos de prata dos séculos VII–VI a.C. trazem palavras próximas à bênção sacerdotal de Números 6.",
+      "Israel Museum, Jerusalém — Ketef Hinnom Amulets"),
+    n("O teatro de Éfeso é o cenário de um episódio de Atos",
+      "Cidades do Novo Testamento",
+      "Atos 19 relata um tumulto em Éfeso em que o povo se reuniu no teatro. O teatro escavado hoje tinha capacidade estimada em cerca de 25 mil lugares.",
+      "Escavações austríacas em Éfeso — Grand Theatre"),
+    n("A Via Ápia foi a estrada que levou a Roma",
+      "Mundo romano",
+      "Construída a partir de 312 a.C., a Via Ápia ligava Roma ao sul da Itália. Atos 28 menciona o Foro de Ápio, localidade nessa rota, ao narrar a chegada de Paulo.",
+      "Parque Arqueológico da Via Ápia Antiga — História"),
+    n("As catacumbas de Roma são cemitérios subterrâneos dos primeiros cristãos",
+      "História do cristianismo",
+      "Usadas entre os séculos II e V, as catacumbas guardam inscrições e pinturas com símbolos como o peixe e a âncora. Elas eram cemitérios, e não esconderijos habituais.",
+      "Pontifícia Comissão de Arqueologia Sacra — Catacombe"),
+    n("Uma sinagoga do século I foi descoberta em Magdala",
+      "Arqueologia do Novo Testamento",
+      "Descoberta em 2009, a sinagoga de Magdala tem uma pedra decorada com uma menorá, e o local fica na região onde Jesus ensinou na Galileia.",
+      "Israel Antiquities Authority — Magdala Synagogue"),
+    n("O Concílio de Niceia reuniu bispos em 325 d.C.",
+      "História do cristianismo",
+      "Convocado pelo imperador Constantino, o Concílio de Niceia debateu a natureza de Cristo e produziu um credo que se tornou ponto de partida para a doutrina trinitária.",
+      "Encyclopaedia Britannica — Council of Nicaea"),
+    n("Lutero traduziu o Novo Testamento para o alemão em poucos meses",
+      "Reforma e tradução",
+      "Publicado em 1522, o Novo Testamento de Lutero foi uma das traduções mais influentes e contribuiu para a padronização do alemão escrito.",
+      "Encyclopaedia Britannica — Martin Luther"),
+    n("João Ferreira de Almeida iniciou a Bíblia em português",
+      "Tradução da Bíblia",
+      "O Novo Testamento de Almeida foi publicado em 1681. A Bíblia completa só ficou pronta em 1753, depois de trabalho de outros tradutores.",
+      "Sociedade Bíblica do Brasil — História de João Ferreira de Almeida"),
+    n("Um aviso em grego proibia estrangeiros de entrar no pátio interior do Templo",
+      "Templo de Jerusalém",
+      "Uma inscrição do tempo de Herodes advertia gentios a não ultrapassarem a barreira do pátio do Templo, sob pena de morte. Atos 21 menciona a acusação de que Paulo teria levado gentios ao Templo.",
+      "Museu Arqueológico de Istambul — Temple Warning Inscription")
   ];
 
+  window.COLECAO_01_FINAL = COLECAO_01;
+})();
+
+(function () {
+  var COLECAO_01 = window.COLECAO_01_FINAL;
   var INTERVALO = 9000; // 9 segundos por curiosidade
   var palco = document.getElementById("knowledge-slide");
   if (!palco) return;
@@ -1120,6 +1274,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fechar
       '<h3 class="kw-title" id="kw-title"></h3>' +
       '<p class="kw-text" id="kw-text"></p>' +
       '<span class="kw-source" id="kw-source"></span>' +
+      '<span class="kw-credit" id="kw-credit"></span>' +
     '</div>' +
     '<div class="kw-dots" id="kw-dots"></div>';
 
@@ -1129,6 +1284,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fechar
   var elTit = document.getElementById("kw-title");
   var elTxt = document.getElementById("kw-text");
   var elSrc = document.getElementById("kw-source");
+  var elCred = document.getElementById("kw-credit");
   var elDots = document.getElementById("kw-dots");
   var atual = 0, timer = null;
 
@@ -1151,6 +1307,24 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fechar
       elTxt.textContent = d.texto;
       elSrc.textContent = "Fonte: " + d.fonte;
       elImg.style.backgroundImage = d.imagem ? 'url("' + d.imagem + '")' : "";
+      palco.classList.toggle("sem-imagem", !d.imagem);
+      elCred.textContent = "";
+      if (d.imagem && d.creditoImagem) {
+        elCred.appendChild(document.createTextNode("Imagem: "));
+        if (d.paginaImagem) {
+          var a = document.createElement("a");
+          a.href = d.paginaImagem;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.textContent = d.creditoImagem;
+          elCred.appendChild(a);
+        } else {
+          elCred.appendChild(document.createTextNode(d.creditoImagem));
+        }
+        if (d.licencaImagem) {
+          elCred.appendChild(document.createTextNode(" · " + d.licencaImagem));
+        }
+      }
       Array.prototype.forEach.call(elDots.children, function (el, k) {
         el.classList.toggle("is-active", k === i);
       });
