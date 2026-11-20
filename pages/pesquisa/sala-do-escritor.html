@@ -10529,6 +10529,328 @@ texto: $("esTexto").value
   var bAj = $("a1Ajustar");
   if(bAj) bAj.title = "Corta o texto no fim de uma frase para caber na meta de duração, na velocidade escolhida no passo 2.";
 })();
+ <!-- ===== INÍCIO: SINCRONIA DA FALA + RITMO (VOZ, IMAGEM E MÚSICA) ===== -->
+<style>
+#sxRitmo{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;color:var(--ink);padding:14px;display:flex;flex-direction:column;gap:12px;margin:10px 0}
+#sxRitmo h4{margin:0;font:600 17px Georgia,"Times New Roman",serif}
+#sxRitmo .sx-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+#sxRitmo label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#sxRitmo select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#sxRitmo p{margin:0;font:12.5px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), vel = $("esVel");
+  if(!painel || !vel || !$("f1Info") || !$("esMsg4")) return;
+
+  var URL_VOZ = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/voz";
+  var BASE = 130;                                   /* palavras por minuto na velocidade Normal */
+  var TAM = {f916:[1080,1920], f11:[1080,1080], f169:[1920,1080]};
+
+  /* ---------- 1. controles no passo 2 ---------- */
+  var sec = document.createElement("section");
+  sec.id = "sxRitmo";
+  sec.innerHTML =
+    '<h4>Sincronia e ritmo do vídeo</h4>' +
+    '<div class="sx-grade">' +
+      '<label>Sincronizar fala e legenda<select id="sxSinc">' +
+        '<option value="precisa">Precisa: uma voz por legenda (mais lenta)</option>' +
+        '<option value="rapida">Rápida: voz em trechos maiores</option></select></label>' +
+      '<label>Tamanho da legenda<select id="sxLeg">' +
+        '<option value="80">Curta (cerca de 80 letras)</option>' +
+        '<option value="140" selected>Média (cerca de 140 letras)</option>' +
+        '<option value="220">Longa (cerca de 220 letras)</option></select></label>' +
+      '<label>Troca de imagem ou fundo<select id="sxImg">' +
+        '<option value="0" selected>Acompanhar as legendas</option>' +
+        '<option value="4">A cada 4 segundos</option><option value="6">A cada 6 segundos</option>' +
+        '<option value="8">A cada 8 segundos</option><option value="12">A cada 12 segundos</option>' +
+        '<option value="20">A cada 20 segundos</option></select></label>' +
+      '<label>Movimento da imagem (zoom)<select id="sxZoom">' +
+        '<option value="0">Parado</option><option value="0.04">Suave</option>' +
+        '<option value="0.08" selected>Normal</option><option value="0.15">Forte</option></select></label>' +
+      '<label>Velocidade da música<select id="sxMus">' +
+        '<option value="0.8">0,8× (mais lenta)</option><option value="0.9">0,9×</option>' +
+        '<option value="1" selected>1× (original)</option>' +
+        '<option value="1.1">1,1×</option><option value="1.25">1,25× (mais rápida)</option></select></label>' +
+    '</div>' +
+    '<p>A velocidade da fala é a do campo Velocidade, acima. Na música, mudar a velocidade também muda o tom. A sincronia exata só vale no MP4; a prévia do passo 3 usa a voz do navegador.</p>';
+  var ref = $("tfNota") || vel.closest(".at-row") || vel.closest("label");
+  ref.insertAdjacentElement("afterend", sec);
+
+  /* ---------- 2. música enviada (guarda o arquivo) ---------- */
+  var musica = null;
+  painel.addEventListener("change", function(ev){
+    if(ev.target.id === "esMusArq" && ev.target.files && ev.target.files[0]) musica = ev.target.files[0];
+    if(ev.target.id === "esMusica" && !ev.target.value) musica = null;
+  }, true);
+
+  /* ---------- 3. prévia: velocidade da música e troca de imagem ---------- */
+  var playOrig = HTMLMediaElement.prototype.play;
+  HTMLMediaElement.prototype.play = function(){
+    if(this instanceof HTMLAudioElement && this.loop){ try{ this.playbackRate = Number($("sxMus").value) || 1; }catch(e){} }
+    return playOrig.apply(this, arguments);
+  };
+  var siOrig = window.setInterval;
+  window.setInterval = function(fn, ms){
+    if(ms === 6000){ var s = Number($("sxImg").value); if(s > 0) ms = s * 1000; }
+    var resto = Array.prototype.slice.call(arguments, 2);
+    return siOrig.apply(window, [fn, ms].concat(resto));
+  };
+
+  /* ---------- 4. apoio ---------- */
+  function info(t, erro, p){
+    var card = $("f1Info").parentElement; card.hidden = false;
+    $("f1Info").textContent = t; $("f1Info").className = "f1-info" + (erro ? " erro" : "");
+    if(p != null) $("f1Prog").style.width = Math.round(p * 100) + "%";
+  }
+  var urlAtual = null;
+  function entregar(blob, nome){
+    if(urlAtual) URL.revokeObjectURL(urlAtual);
+    urlAtual = URL.createObjectURL(blob);
+    var a = $("f1Baixar"); a.href = urlAtual; a.download = nome; a.hidden = false; a.style.display = "inline-block";
+    var v = $("f1Video"); v.hidden = false; v.src = urlAtual;
+    $("f1Prog").style.width = "100%";
+  }
+  function carregarImg(src){
+    return new Promise(function(ok){ var i = new Image(); i.onload = function(){ ok(i); }; i.onerror = function(){ ok(null); }; i.src = src; });
+  }
+  function fmt(s){ s = Math.round(s); return s < 60 ? s + " s" : Math.floor(s / 60) + " min " + (s % 60) + " s"; }
+
+  /* ---------- 5. texto -> legendas ---------- */
+  function partir(f, lim){
+    var o = [];
+    while(f.length > lim){
+      var c = f.lastIndexOf(" ", lim); if(c < lim / 2) c = lim;
+      o.push(f.slice(0, c).trim()); f = f.slice(c).trim();
+    }
+    if(f) o.push(f);
+    return o;
+  }
+  function cenasDoTexto(t, max){
+    var fr = (t.replace(/\n+/g, " ").match(/[^.!?…]+[.!?…]*/g) || [t]).map(function(s){ return s.trim(); }).filter(Boolean);
+    var out = [], buf = "";
+    fr.forEach(function(f){
+      partir(f, Math.round(max * 1.6)).forEach(function(p){
+        if(buf && (buf + " " + p).length > max){ out.push(buf); buf = p; } else buf = buf ? buf + " " + p : p;
+      });
+    });
+    if(buf) out.push(buf);
+    return out;
+  }
+  /* o que aparece na tela é o que a voz lê: assim a sincronia é garantida */
+  function montarCenas(det, max){
+    var cenas = cenasDoTexto(det.texto.trim(), max);
+    if(!cenas.length && painel.getAttribute("data-modo-ativo") === "filme"){
+      Array.prototype.forEach.call(document.querySelectorAll("#esFilmeCenas .es-cena"), function(c){
+        var d = c.querySelector(".es-cena-desc").value.trim() || c.querySelector(".es-cena-titulo").value.trim();
+        if(d) partir(d, Math.round(max * 1.6)).forEach(function(p){ cenas.push(p); });
+      });
+    }
+    return cenas;
+  }
+  function agrupar(cenas, preciso){
+    if(preciso) return cenas.map(function(_, i){ return [i]; });
+    var gr = [], at = [], len = 0;
+    cenas.forEach(function(c, i){
+      if(at.length && len + c.length > 1000){ gr.push(at); at = []; len = 0; }
+      at.push(i); len += c.length + 1;
+    });
+    if(at.length) gr.push(at);
+    return gr;
+  }
+
+  /* ---------- 6. voz: uma chamada por grupo, com duração real ---------- */
+  function aparar(buf, ac){
+    var n = buf.length, ch = buf.numberOfChannels, dados = [], c, ini = 0, fim = n - 1, lim = 0.01;
+    for(c = 0; c < ch; c++) dados.push(buf.getChannelData(c));
+    function alto(i){ for(var k = 0; k < ch; k++){ if(Math.abs(dados[k][i]) > lim) return true; } return false; }
+    while(ini < n && !alto(ini)) ini++;
+    if(ini >= n) return buf;
+    while(fim > ini && !alto(fim)) fim--;
+    var m = Math.round(0.04 * buf.sampleRate);
+    ini = Math.max(0, ini - m); fim = Math.min(n - 1, fim + m);
+    if(ini === 0 && fim === n - 1) return buf;
+    var out = ac.createBuffer(ch, fim - ini + 1, buf.sampleRate);
+    for(c = 0; c < ch; c++) out.getChannelData(c).set(dados[c].subarray(ini, fim + 1));
+    return out;
+  }
+  async function gerarVoz(cenas, det, ac, preciso){
+    var s = (await supabaseClient.auth.getSession()).data.session;
+    if(!s) throw new Error("Sessão encerrada. Entre de novo.");
+    var grupos = agrupar(cenas, preciso), bufs = new Array(grupos.length), prox = 0, feitos = 0;
+    async function trab(){
+      for(;;){
+        var i = prox++; if(i >= grupos.length) return;
+        var texto = grupos[i].map(function(k){ return cenas[k]; }).join(" ");
+        var r = await fetch(URL_VOZ, {method:"POST",
+          headers:{"Content-Type":"application/json", "Authorization":"Bearer " + s.access_token},
+          body: JSON.stringify({texto: texto, voz: $("f1Voz").value, velocidade: det.velocidade})});
+        if(!r.ok){
+          var j = await r.json().catch(function(){ return {}; });
+          throw new Error(j.error || "A rota /api/voz respondeu com erro " + r.status + ".");
+        }
+        if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
+        bufs[i] = aparar(await ac.decodeAudioData(await r.arrayBuffer()), ac);
+        feitos++;
+        info("Gerando a voz… " + feitos + " de " + grupos.length + ".", false, 0.03 + 0.17 * feitos / grupos.length);
+      }
+    }
+    await Promise.all([trab(), trab()]);
+    return {grupos: grupos, bufs: bufs};
+  }
+
+  /* ---------- 7. linha do tempo com as durações reais ---------- */
+  function linha(cenas, voz, det, ac){
+    var out = [], gap = 0.12, c;
+    if(voz){
+      var taxa = ac.sampleRate, pausa = Math.round(gap * taxa), canais = 1, total = 0;
+      voz.bufs.forEach(function(b, k){ canais = Math.max(canais, b.numberOfChannels); total += b.length + (k < voz.bufs.length - 1 ? pausa : 0); });
+      var saida = ac.createBuffer(canais, total, taxa), pos = 0;
+      voz.grupos.forEach(function(g, k){
+        var b = voz.bufs[k], acc = pos / taxa, durG = b.length / taxa;
+        var soma = g.reduce(function(a, i){ return a + cenas[i].length; }, 0);
+        g.forEach(function(i){ var d = durG * cenas[i].length / soma; out[i] = {i: i, texto: cenas[i], ini: acc, dur: d}; acc += d; });
+        for(c = 0; c < canais; c++) saida.getChannelData(c).set(b.getChannelData(Math.min(c, b.numberOfChannels - 1)), pos);
+        pos += b.length + pausa;
+      });
+      return {cenas: out, buffer: saida, fim: total / taxa};
+    }
+    var t = 0, v = det.velocidade || 1;
+    cenas.forEach(function(tx, i){
+      var d = tx.split(/\s+/).length / BASE * 60 / v;
+      out[i] = {i: i, texto: tx, ini: t, dur: d}; t += d + 0.05;
+    });
+    return {cenas: out, buffer: null, fim: t};
+  }
+
+  /* ---------- 8. desenho de cada quadro ---------- */
+  function quebrar(g, texto, larg){
+    var pal = texto.split(/\s+/), lin = [], at = "";
+    pal.forEach(function(p){
+      var t = at ? at + " " + p : p;
+      if(g.measureText(t).width > larg && at){ lin.push(at); at = p; } else at = t;
+    });
+    if(at) lin.push(at);
+    return lin;
+  }
+  function desenhar(g, W, H, imgs, cena, t, tit, cfg){
+    var n = imgs.length, img = null, p = 0;
+    if(n){
+      if(cfg.slot > 0){ var k = Math.floor(t / cfg.slot); img = imgs[k % n]; p = (t - k * cfg.slot) / cfg.slot; }
+      else{ img = imgs[cena.i % n]; p = Math.min(1, Math.max(0, (t - cena.ini) / cena.dur)); }
+    }
+    g.fillStyle = "#0b1428"; g.fillRect(0, 0, W, H);
+    if(img){
+      var z = 1 + cfg.zoom * p, r = Math.max(W / img.width, H / img.height) * z, w = img.width * r, h = img.height * r;
+      g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+    }else{
+      var gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, "#17243a"); gr.addColorStop(1, "#7c5f26");
+      g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    }
+    var sh = g.createLinearGradient(0, H * 0.35, 0, H); sh.addColorStop(0, "rgba(0,0,0,0)"); sh.addColorStop(1, "rgba(0,0,0,.78)");
+    g.fillStyle = sh; g.fillRect(0, 0, W, H);
+
+    var fs = Math.round(Math.min(W, H) * (W > H ? 0.06 : 0.055));
+    g.textAlign = "center"; g.shadowColor = "rgba(0,0,0,.8)"; g.shadowBlur = 12;
+    var f = Math.min(0.25, cena.dur / 3);
+    var a = Math.min(1, (t - cena.ini) / f, (cena.ini + cena.dur - t) / f);
+    if(a > 0){
+      g.globalAlpha = a; g.fillStyle = "#fff"; g.font = "600 " + fs + "px Georgia, serif";
+      var lin = quebrar(g, cena.texto, W * 0.82), y = H - H * 0.1 - (lin.length - 1) * fs * 1.4;
+      lin.forEach(function(l, i){ g.fillText(l, W / 2, y + i * fs * 1.4); });
+    }
+    if(tit && t < 4){
+      g.globalAlpha = Math.max(0, Math.min(1, t / 0.4, (4 - t) / 0.4));
+      g.font = "600 " + Math.round(fs * 0.6) + "px Georgia, serif"; g.fillStyle = "#f1d58a";
+      g.fillText(tit, W / 2, H * 0.09);
+    }
+    g.globalAlpha = 1; g.shadowBlur = 0;
+  }
+
+  /* ---------- 9. renderização do MP4 ---------- */
+  async function renderizar(det){
+    var cfg = {slot: Number($("sxImg").value) || 0, zoom: Number($("sxZoom").value) || 0,
+      velMus: Number($("sxMus").value) || 1, preciso: $("sxSinc").value === "precisa", leg: Number($("sxLeg").value) || 140};
+    var ac = new (window.AudioContext || window.webkitAudioContext)();
+    if(ac.state === "suspended") await ac.resume();
+    var dims = TAM[det.formato] || TAM.f916, W = dims[0], H = dims[1];
+
+    var cenasTxt = montarCenas(det, cfg.leg);
+    if(!cenasTxt.length){ info("Não há texto para o vídeo.", true); ac.close(); return; }
+
+    info("Gerando a voz…", false, 0.03);
+    var voz = null, aviso = "";
+    try{ voz = await gerarVoz(cenasTxt, det, ac, cfg.preciso); }
+    catch(e){ console.error(e); aviso = " Sem voz: " + (e.message || "falhou") + " O vídeo sai só com texto e música."; }
+
+    var lin = linha(cenasTxt, voz, det, ac), total = lin.fim + 0.8;
+    info("Carregando imagens…", false, 0.2);
+    var urls = Array.prototype.map.call(document.querySelectorAll("#esFotos img"), function(i){ return i.src; });
+    var imgs = (await Promise.all(urls.map(carregarImg))).filter(Boolean);
+
+    var mb = null;
+    if(musica && $("esMusica").value){
+      try{ mb = await ac.decodeAudioData(await musica.arrayBuffer()); }
+      catch(e){ aviso += " A música não pôde ser lida."; }
+    }
+
+    var tipos = ["video/mp4;codecs=avc1,mp4a.40.2", "video/webm;codecs=vp9,opus", "video/webm"];
+    var mime = tipos.filter(function(t){ return window.MediaRecorder && MediaRecorder.isTypeSupported(t); })[0];
+    if(!mime){ info("Este navegador não grava vídeo. Use o Chrome ou o Edge atualizado.", true); ac.close(); return; }
+
+    var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    var g = cv.getContext("2d"), dest = ac.createMediaStreamDestination();
+    var fluxo = new MediaStream(cv.captureStream(30).getVideoTracks().concat(dest.stream.getAudioTracks()));
+    var rec = new MediaRecorder(fluxo, {mimeType: mime, videoBitsPerSecond: 8000000}), pedacos = [];
+    rec.ondataavailable = function(e){ if(e.data.size) pedacos.push(e.data); };
+    var fim = new Promise(function(ok){ rec.onstop = ok; });
+
+    /* gravação, voz e música começam no mesmo instante */
+    rec.start(500);
+    var ac0 = ac.currentTime;
+    if(lin.buffer){ var sv = ac.createBufferSource(); sv.buffer = lin.buffer; sv.connect(dest); sv.start(); }
+    if(mb){
+      var sm = ac.createBufferSource(), gn = ac.createGain(), vol = det.volumeMusica / 100;
+      sm.buffer = mb; sm.loop = true; sm.playbackRate.value = cfg.velMus;
+      gn.gain.setValueAtTime(vol, ac0);
+      gn.gain.setValueAtTime(vol, ac0 + Math.max(0, total - 1.5));
+      gn.gain.linearRampToValueAtTime(0, ac0 + total);
+      sm.connect(gn); gn.connect(dest); sm.start();
+    }
+    var ini = performance.now();
+
+    await new Promise(function(ok){
+      (function quadro(){
+        var t = (performance.now() - ini) / 1000;
+        var c = lin.cenas.filter(function(x){ return t >= x.ini; }).pop() || lin.cenas[0];
+        desenhar(g, W, H, imgs, c, t, det.titulo, cfg);
+        info("Gravando o vídeo… " + fmt(t) + " de " + fmt(total) + ". Mantenha esta aba aberta e visível." + aviso, false, 0.22 + 0.76 * Math.min(1, t / total));
+        if(t >= total){ ok(); return; }
+        requestAnimationFrame(quadro);
+      })();
+    });
+    rec.stop(); await fim; ac.close();
+
+    var ext = mime.indexOf("mp4") > -1 ? "mp4" : "webm";
+    entregar(new Blob(pedacos, {type: mime.split(";")[0]}), "palavra-e-serie." + ext);
+    info("Vídeo pronto (" + ext.toUpperCase() + ", " + W + "×" + H + ", " + fmt(total) + ", " + lin.cenas.length + " legendas)." +
+      (ext === "webm" ? " Este navegador gravou em WebM; para MP4 use o Chrome atualizado." : "") + aviso, !!aviso && !voz);
+  }
+
+  /* ---------- 10. assume o MP4 (o MP3 continua como antes) ---------- */
+  document.addEventListener("estudio:exportar", function(ev){
+    var d = ev.detail; if(d.tipoArquivo !== "mp4") return;
+    ev.stopImmediatePropagation(); d.tratado = true;
+    $("esMsg4").textContent = "";
+    var busy = painel.querySelectorAll("[data-exp]");
+    busy.forEach(function(b){ b.disabled = true; });
+    renderizar(d).catch(function(e){ console.error(e); info(e.message || "Não foi possível exportar agora.", true); })
+      .then(function(){ busy.forEach(function(b){ b.disabled = false; }); });
+  }, true);
+})();
+</script>
+<!-- ===== FIM: SINCRONIA DA FALA + RITMO (VOZ, IMAGEM E MÚSICA) ===== -->
 </script>
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
