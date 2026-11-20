@@ -981,6 +981,36 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fechar
   });
 })();
 </script>
+ <script>
+(function(){
+  if (/[?&](todos|modelo)=1/.test(location.search)) return;
+  carregarConteudo().then(function(dados){
+    function tem(path){
+      var t = dados[path.join(' > ')];
+      return !!(t && String(t).trim() !== '');
+    }
+    function filtrar(no, ate){
+      var aqui = [...ate, no.title];
+      var filhos = [];
+      (no.children || []).forEach(function(f){
+        if (f.kind === 'item') {
+          if (tem([...aqui, f.title])) filhos.push(f);
+        } else {
+          var r = filtrar(f, aqui);
+          if (r) filhos.push(r);
+        }
+      });
+      if (!filhos.length) return null;
+      return Object.assign({}, no, {children: filhos});
+    }
+    var novo = ACADEMIC_TREE.map(function(a){ return filtrar(a, []); }).filter(Boolean);
+    ACADEMIC_TREE.splice(0, ACADEMIC_TREE.length, ...novo);
+    renderTree();
+    fillStats();
+    applyFilter();
+  });
+})();
+</script>
 </body>
 </html>
  
