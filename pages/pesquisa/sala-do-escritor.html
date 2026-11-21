@@ -6476,9 +6476,35 @@ body.dg-livro-vivo .dgp-nota{display:none}
   }catch(e){}
 })();
 </script>
+ <!-- ===== INÍCIO: NOME DA UNIDADE NO EDITOR (2D-1) ===== -->
+<script>
+(function(){
+  function nomeUnidade(){
+    var pd = window.padraoD10;
+    return (pd && pd.unidade) ? pd.unidade : "Dia";
+  }
+  function ajustar(){
+    var lbl = document.querySelector('#dgDiaBox label[for="dgDiaInp"]');
+    if(!lbl) return;
+    var u = nomeUnidade();
+    var novo = u + " nº (1 a 99)";
+    if(lbl.textContent !== novo) lbl.textContent = novo;
+    var inp = document.getElementById("dgDiaInp");
+    if(inp) inp.title = "Número do " + u.toLowerCase() + " dentro do livro.";
+  }
+  document.addEventListener("padraoD10:pronto", ajustar);
+  var tit = document.getElementById("dgEtitulo");
+  if(tit && window.MutationObserver){
+    new MutationObserver(function(){ setTimeout(ajustar, 0); })
+      .observe(tit, {childList: true, characterData: true, subtree: true});
+  }
+  ajustar();
+})();
+</script>
+<!-- ===== FIM: NOME DA UNIDADE NO EDITOR (2D-1) ===== -->
 <!-- ===== FIM: LER PADRÃO DO D10 CONFORME O TIPO ===== -->
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
- <!-- ==== ESTÚDIO ==== -->
+                                   <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
  
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
