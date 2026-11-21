@@ -1,1 +1,133 @@
-
+{
+  "tipo": "9.6",
+  "nome": "Livros por capítulos",
+  "unidade": "Capítulo",
+  "rotulo_numero": "CAPÍTULO",
+  "cabecalho_texto": "autor (página par) · título do capítulo (página ímpar)",
+  "padrao_editorial": null,
+  "regras": [
+    "Todos os capítulos têm o mesmo desenho de abertura.",
+    "Apenas a abertura (D10.1) e o corpo (D10.3) são obrigatórios. Epígrafe, destaque, exercício e resumo são opcionais.",
+    "Não há seções fixas nem faixas de palavras. A contagem do capítulo é só informativa.",
+    "Páginas seguintes à abertura começam na margem superior, sem repetir título.",
+    "A numeração dos capítulos é sequencial e automática, mas o autor pode trocar o rótulo (Capítulo, Passo, Lição…)."
+  ],
+  "global": {
+    "corpo": {
+      "tamanho_pt": 10.5,
+      "entrelinha_pt": 15,
+      "alinhamento": "justificado",
+      "recuo_primeira_linha_pt": 12,
+      "espaco_entre_paragrafos_pt": 0,
+      "primeiro_paragrafo_apos_titulo_ou_quebra": "sem recuo"
+    },
+    "subtitulos": {
+      "nivel_1": { "tamanho_pt": 12, "peso": "negrito", "alinhamento": "esquerda", "entrelinha_pt": 15, "espaco_antes_pt": 22.5, "espaco_depois_pt": 7.5, "manter_com_proximo": true },
+      "nivel_2": { "tamanho_pt": 10.5, "peso": "negrito", "estilo": "itálico", "alinhamento": "esquerda", "entrelinha_pt": 15, "espaco_antes_pt": 15, "espaco_depois_pt": 0, "manter_com_proximo": true }
+    },
+    "quebra_de_cena": { "marcador": "* * *", "alinhamento": "centro", "espaco_antes_pt": 15, "espaco_depois_pt": 15 },
+    "citacao_em_bloco": { "tamanho_pt": 9.5, "entrelinha_pt": 15, "estilo": "itálico", "recuo_lateral_pt": 24, "espaco_antes_pt": 7.5, "espaco_depois_pt": 7.5, "alinhamento": "justificado" },
+    "lista_com_marcador": { "marcador": "•", "recuo_frances_pt": 12, "espaco_entre_itens_pt": 3.75, "tamanho_pt": 10.5 },
+    "lista_numerada": { "formato": "1.", "recuo_frances_pt": 16, "espaco_entre_itens_pt": 3.75 }
+  },
+  "subpartes": [
+    {
+      "cod": "D10.1",
+      "nome": "Abertura do capítulo",
+      "estilo": {
+        "afundamento_pt": 105,
+        "rotulo": { "formato": "CAPÍTULO + número", "tamanho_pt": 9, "peso": "negrito", "caixa": "alta", "espacamento_letras_em": 0.2, "alinhamento": "centro" },
+        "titulo": { "tamanho_pt": 24, "peso": "negrito", "alinhamento": "centro", "entrelinha_pt": 30, "espaco_antes_pt": 15, "linhas": "uma a três" },
+        "subtitulo": { "opcional": true, "tamanho_pt": 11, "estilo": "itálico", "alinhamento": "centro", "espaco_antes_pt": 7.5 },
+        "filete": { "largura_pt": 30, "espaco_antes_pt": 22.5, "espaco_depois_pt": 37.5 },
+        "primeiro_paragrafo": { "recuo_pt": 0, "primeiras_palavras": "versalete (opcional)", "capitular": { "ativa": false, "linhas": 3 } }
+      },
+      "regras": [
+        "Começa em página nova (ímpar no impresso).",
+        "O afundamento mede-se a partir da margem superior.",
+        "Título longo empurra o corpo para baixo em múltiplos de 15 pt."
+      ],
+      "prompt": "Abertura do capítulo: afundamento de 105 pt; rótulo CAPÍTULO N em 9 pt negrito caixa alta espaçado, centralizado; título 24 pt negrito, entrelinha 30, centralizado, até três linhas; subtítulo opcional 11 pt itálico; filete de 30 pt; corpo começa 37,5 pt abaixo. Sem cabeçalho nesta página."
+    },
+    {
+      "cod": "D10.2",
+      "nome": "Epígrafe do capítulo",
+      "opcional": true,
+      "estilo": {
+        "citacao": { "tamanho_pt": 9.5, "estilo": "itálico", "alinhamento": "direita", "recuo_esquerdo_pt": 80, "entrelinha_pt": 15 },
+        "autoria": { "tamanho_pt": 8.5, "alinhamento": "direita", "formato": "— Autor, referência", "espaco_antes_pt": 3.75 },
+        "espaco_depois_pt": 30
+      },
+      "prompt": "Epígrafe do capítulo: citação em 9,5 pt itálico alinhada à direita, com 80 pt de recuo à esquerda; autoria em 8,5 pt na linha seguinte; 30 pt de espaço antes do texto."
+    },
+    {
+      "cod": "D10.3",
+      "nome": "Corpo do capítulo",
+      "estilo": {
+        "corpo": { "herda": "global.corpo" },
+        "subtitulos": { "herda": "global.subtitulos" },
+        "quebra_de_cena": { "herda": "global.quebra_de_cena" },
+        "citacao_em_bloco": { "herda": "global.citacao_em_bloco" }
+      },
+      "secoes": {
+        "quantidade": "livre",
+        "marcacao": "linha iniciada por # = subtítulo nível 1; ## = nível 2; --- = quebra de cena; > = citação em bloco"
+      },
+      "regras": [
+        "Texto corrido livre, com subtítulos opcionais.",
+        "Subtítulo nunca fica sozinho no fim da página (mínimo 2 linhas depois)."
+      ],
+      "prompt": "Corpo do capítulo: 10,5 pt, entrelinha 15, justificado, hifenizado, recuo de primeira linha de 12 pt sem espaço entre parágrafos; primeiro parágrafo após título ou quebra sem recuo; subtítulos, quebras de cena e citações em bloco conforme o padrão global."
+    },
+    {
+      "cod": "D10.4",
+      "nome": "Destaque",
+      "opcional": true,
+      "estilo": {
+        "frase": { "tamanho_pt": 13, "estilo": "itálico", "alinhamento": "centro", "entrelinha_pt": 18, "recuo_lateral_pt": 30 },
+        "filetes": { "acima_e_abaixo": true, "largura_pt": 30 },
+        "espaco_antes_pt": 22.5,
+        "espaco_depois_pt": 22.5
+      },
+      "regras": [
+        "Frase curta de impacto entre dois filetes.",
+        "Não quebra entre páginas."
+      ],
+      "prompt": "Destaque: frase curta em 13 pt itálico centralizada, entrelinha 18, recuo lateral de 30 pt, com filete de 30 pt acima e abaixo e 22,5 pt de espaço. Não quebra entre páginas."
+    },
+    {
+      "cod": "D10.5",
+      "nome": "Exercício ou prática",
+      "opcional": true,
+      "rotulo_padrao": "PARA PRATICAR",
+      "rotulo_editavel": true,
+      "estilo": {
+        "rotulo": { "tamanho_pt": 9, "peso": "negrito", "caixa": "alta", "espacamento_letras_em": 0.12, "alinhamento": "esquerda", "espaco_antes_pt": 22.5, "espaco_depois_pt": 7.5 },
+        "itens": { "herda": "global.lista_numerada", "tamanho_pt": 10.5, "alinhamento": "esquerda" },
+        "filete_superior": { "largura": "texto inteiro", "espessura_pt": 0.5 }
+      },
+      "regras": [
+        "Itens numerados ou com marcador, um por linha.",
+        "Rótulo nunca sozinho no fim da página.",
+        "O bloco inteiro tenta ficar na mesma página."
+      ],
+      "prompt": "Exercício ou prática: filete fino em cima; rótulo em 9 pt negrito caixa alta espaçado, à esquerda; itens em lista numerada de 10,5 pt com recuo francês de 16 pt."
+    },
+    {
+      "cod": "D10.6",
+      "nome": "Resumo do capítulo",
+      "opcional": true,
+      "rotulo_padrao": "EM RESUMO",
+      "rotulo_editavel": true,
+      "estilo": {
+        "rotulo": { "herda": "D10.5.rotulo" },
+        "itens": { "herda": "global.lista_com_marcador", "tamanho_pt": 10, "alinhamento": "esquerda" }
+      },
+      "regras": [
+        "De três a cinco pontos-chave, em lista com marcador.",
+        "Fecha o capítulo."
+      ],
+      "prompt": "Resumo do capítulo: rótulo no estilo de seção; pontos-chave em lista com marcador '•', 10 pt, recuo francês de 12 pt."
+    }
+  ]
+}
