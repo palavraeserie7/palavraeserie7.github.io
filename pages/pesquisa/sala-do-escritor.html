@@ -3237,7 +3237,7 @@ $("cmpExecutar").addEventListener("click", async function(){
     const sess = (await supabaseClient.auth.getSession()).data.session;
     if(!sess) throw new Error("Sessão encerrada. Entre novamente.");
     const combinado = "TEXTO EM ANÁLISE\n\n" + texto + "\n\n==============================\nTEXTO DE REFERÊNCIA CONSOLIDADO\n\n" + referencia;
-    const resp = await fetch("https://yellow-lab-f4b2.palavraeserie.workers.dev/api/pesquisa", {
+    const resp = await fetch("https://sala-escritor.palavraeserie.workers.dev/api/pesquisa", {
       method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer " + sess.access_token},
       body:JSON.stringify({analysisType:"textual_study_step",scope:"Confronto de estudos",stepCode:"VALIDACAO",stepName:"Confronto e validação de estudos",instruction:instrucao,question:"Compare criticamente o texto em análise com o texto de referência consolidado.",passage:{book:"Confronto de estudos",reference:"Texto em análise × texto de referência",text:combinado}})
     });
@@ -3559,7 +3559,7 @@ async function mzPesquisar(cod, btn){
   try{
     const sess = (await supabaseClient.auth.getSession()).data.session;
     if(!sess) throw new Error("Sessão encerrada. Entre de novo.");
-    const resp = await fetch("https://yellow-lab-f4b2.palavraeserie.workers.dev/api/pesquisa", {
+    const resp = await fetch("https://sala-escritor.palavraeserie.workers.dev/api/pesquisa", {
       method:"POST",
       headers:{"Content-Type":"application/json", "Authorization":"Bearer " + sess.access_token},
       body: JSON.stringify({
@@ -7198,7 +7198,7 @@ texto: $("esTexto").value
   var $ = function(id){ return document.getElementById(id); };
   if(!("a1Usar")||!("a1ResTxt")) return;
  
-  var URL_ESCRITA = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/escrita";
+  var URL_ESCRITA = "https://sala-escritor.palavraeserie.workers.dev/api/escrita";
   var NOMES = {criar:"Criar com IA", reescrever:"Reescrever", aumentar:"Aumentar a duração", tom:"Adaptar o tom"};
   var res = $("a1ResTit").parentElement;
  
@@ -7287,7 +7287,7 @@ texto: $("esTexto").value
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel");
   if(!painel || !$("esMsg4")) return;
-  var URL_VOZ = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/voz";
+  var URL_VOZ = "https://sala-escritor.palavraeserie.workers.dev/api/voz";
  
   /* ---------- 1. layout: passos para todos os modos, blocos no lugar certo ---------- */
   var passoAtual = 1;
@@ -8151,7 +8151,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
   var painel = $("esPainel"), selVp = $("f1Voz");
   if(!painel || !selVp || !$("esVoz")) return;
 
-  var URL_VOZ = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/voz";
+  var URL_VOZ = "https://sala-escritor.palavraeserie.workers.dev/api/voz";
   var FRASE_PADRAO = "A paz do Senhor seja com você neste dia.";
 
   var labelVp = selVp.closest("label");
@@ -10546,7 +10546,7 @@ texto: $("esTexto").value
   var painel = $("esPainel"), vel = $("esVel");
   if(!painel || !vel || !$("f1Info") || !$("esMsg4")) return;
 
-  var URL_VOZ = "https://yellow-lab-f4b2.palavraeserie.workers.dev/api/voz";
+  var URL_VOZ = "https://sala-escritor.palavraeserie.workers.dev/api/voz";
   var BASE = 130;                                   /* palavras por minuto na velocidade Normal */
   var TAM = {f916:[1080,1920], f11:[1080,1080], f169:[1920,1080]};
 
