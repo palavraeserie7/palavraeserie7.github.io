@@ -10853,6 +10853,74 @@ texto: $("esTexto").value
 })();
 </script>
 <!-- ===== FIM: SINCRONIA DA FALA + RITMO (VOZ, IMAGEM E MÚSICA) ===== -->
+<!-- ===== INÍCIO: FUNDO EM MOVIMENTO SUAVE (EMENDA DO LOOP) ===== -->
+<style>
+#fsSuave{margin-top:6px;padding-top:12px;border-top:1px solid var(--paper-line);display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+#fsSuave label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#fsSuave select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var sec = $("sxRitmo");
+  if(!sec || $("fsSuave")) return;
+
+  var box = document.createElement("div");
+  box.id = "fsSuave";
+  box.innerHTML =
+    '<label>Emenda do vídeo de fundo<select id="fsModo">' +
+      '<option value="suave" selected>Suave: escurece na volta do vídeo</option>' +
+      '<option value="seco">Seca (como era antes)</option></select></label>' +
+    '<label>Velocidade do vídeo de fundo<select id="fsVel">' +
+      '<option value="auto" selected>Automática (lenta nos curtos, normal nos longos)</option><option value="1">1× (original)</option><option value="0.75">0,75×</option>' +
+      '<option value="0.5">0,5× (câmera lenta)</option><option value="0.35">0,35× (bem lenta)</option></select></label>' +
+    '<label>Duração da suavização<select id="fsDur">' +
+      '<option value="0.8">Curta (0,8 s)</option><option value="1.2" selected>Média (1,2 s)</option><option value="2">Longa (2 s)</option></select></label>';
+  sec.insertBefore(box, sec.querySelector("p"));
+
+  var vids = [], ultimo = null;
+  function taxa(v){
+    var o = $("fsVel").value;
+    if(o !== "auto") return Number(o) || 1;
+    var d = v.duration || 0;
+    return d <= 12 ? 0.5 : (d <= 20 ? 0.75 : 1);
+  }
+  var playOrig = HTMLMediaElement.prototype.play;
+  HTMLMediaElement.prototype.play = function(){
+    if(this instanceof HTMLVideoElement && this.loop && this.muted && !this.isConnected){
+      if(vids.indexOf(this) < 0) vids.push(this);
+      ultimo = this;
+      try{ this.playbackRate = taxa(this); }catch(e){}
+    }
+    return playOrig.apply(this, arguments);
+  };
+
+  var drawOrig = CanvasRenderingContext2D.prototype.drawImage;
+  CanvasRenderingContext2D.prototype.drawImage = function(){
+    var r = drawOrig.apply(this, arguments);
+    try{
+      if($("fsModo").value !== "suave" || !vids.length) return r;
+      var v = (ultimo && !ultimo.paused) ? ultimo : null;
+      if(!v){ for(var i = 0; i < vids.length; i++){ if(!vids[i].paused){ v = vids[i]; break; } } }
+      if(!v || v.readyState < 2 || !(v.duration > 3)) return r;
+      var rate = taxa(v);
+      if(v.playbackRate !== rate) v.playbackRate = rate;
+      var f = Math.min((Number($("fsDur").value) || 1.2) * rate, v.duration / 4);
+      var resta = v.duration - v.currentTime, passou = v.currentTime, a = 0;
+      if(resta < f) a = 1 - resta / f;
+      else if(passou < f) a = 1 - passou / f;
+      if(a > 0){
+        var c = this.canvas;
+        this.save(); this.globalAlpha = Math.min(0.85, a * 0.85); this.fillStyle = "#0b1428";
+        this.fillRect(0, 0, c.width, c.height); this.restore();
+      }
+    }catch(e){}
+    return r;
+  };
+})();
+</script>
+<!-- ===== FIM: FUNDO EM MOVIMENTO SUAVE (EMENDA DO LOOP) ===== -->
+ 
 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
