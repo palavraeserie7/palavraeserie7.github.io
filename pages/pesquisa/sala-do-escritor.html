@@ -6406,6 +6406,59 @@ body.dg-livro-vivo .dgp-nota{display:none}
   });
 })();
 </script>
+ <!-- ===== INÍCIO: LER PADRÃO DO D10 CONFORME O TIPO ===== -->
+<script>
+(function(){
+  var PASTA = "padroes-d10/";
+  var cache = {};
+  var contador = 0;
+  window.padraoD10 = null;
+  window.padraoD10Tipo = null;
+
+  function buscar(nome){
+    if(cache[nome]) return Promise.resolve(cache[nome]);
+    return fetch(PASTA + nome + ".json", {cache: "no-cache"})
+      .then(function(r){
+        if(!r.ok) throw new Error("não encontrado: " + nome);
+        return r.json();
+      })
+      .then(function(d){ cache[nome] = d; return d; });
+  }
+
+  window.carregarPadraoD10 = function(tipo){
+    var minha = ++contador;
+    return buscar(tipo)
+      .catch(function(){ return buscar("generico"); })
+      .then(function(d){
+        if(minha !== contador) return window.padraoD10;
+        window.padraoD10 = d;
+        window.padraoD10Tipo = tipo;
+        console.log("Padrão D10 carregado para o tipo " + tipo + ":", d.nome);
+        return d;
+      })
+      .catch(function(e){
+        console.error("Não foi possível carregar o padrão D10:", e);
+        return null;
+      });
+  };
+
+  /* ao clicar num tipo */
+  var caixa = document.getElementById("dgTiposBox");
+  if(caixa){
+    caixa.addEventListener("click", function(ev){
+      var b = ev.target.closest && ev.target.closest("[data-tipo]");
+      if(b) window.carregarPadraoD10(b.dataset.tipo);
+    });
+  }
+
+  /* se já havia um tipo escolhido da última vez, carrega também */
+  try{
+    var s = JSON.parse(localStorage.getItem("ps_diagramador") || "null");
+    if(s && s.tipo) window.carregarPadraoD10(s.tipo);
+  }catch(e){}
+})();
+</script>
+<!-- ===== FIM: LER PADRÃO DO D10 CONFORME O TIPO ===== -->
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
  <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
@@ -7257,8 +7310,7 @@ texto: $("esTexto").value
 </script>
 <!-- ===== FIM: ÁREA 1 — LIGAR A IA ===== -->
 
-<!-- ===== INÍCIO: ESTÚDIO FASE 1 — LAYOUT UNIFICADO + RENDERIZAÇÃO REAL =====
-     COLE este bloco logo ANTES de </body>, depois de "ÁREA 1 — LIGAR A IA". Não apague nada. -->
+<!-- ===== INÍCIO: ESTÚDIO FASE 1 — LAYOUT UNIFICADO + RENDERIZAÇÃO REAL ===== -->
 <style>
 /* um só seletor de tipo: os cartões do passo 1 */
 #esTipoRapido{display:none!important}
