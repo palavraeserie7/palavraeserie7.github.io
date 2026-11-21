@@ -6501,6 +6501,87 @@ body.dg-livro-vivo .dgp-nota{display:none}
   ajustar();
 })();
 </script>
+ <!-- ===== INÍCIO: EDITOR LIVRE PARA TIPOS SEM PADRÃO EDITORIAL (2D-2a) ===== -->
+<style>
+body.dg-livre #dgAbrirPad,
+body.dg-livre #dgPadFooter,
+body.dg-livre #dgSecBox,
+body.dg-livre #dgCont,
+body.dg-livre #dgSecNome,
+body.dg-livre #dgTotalDia{display:none!important}
+body.dg-livre #dgTexto.dg-ocultar{display:block!important}
+body.dg-livre #dgDiaBox.dgd-cresce{flex:0 0 auto!important}
+#dgContLivre{font:700 12.5px "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48);margin:2px 0 4px}
+</style>
+<script>
+(function(){
+  var tit = document.getElementById("dgEtitulo");
+  var desc = document.getElementById("dgEdesc");
+  var txt = document.getElementById("dgTexto");
+  var dica = document.getElementById("dgDiaDica");
+  var caixaDia = document.getElementById("dgDiaBox");
+  if(!tit || !txt || !caixaDia) return;
+
+  var cont = document.createElement("div");
+  cont.id = "dgContLivre";
+  cont.hidden = true;
+  caixaDia.appendChild(cont);
+
+  function livre(){
+    var pd = window.padraoD10;
+    return !!(pd && pd.padrao_editorial == null);
+  }
+  function codAberto(){
+    var m = /^(D\d+(?:\.\d)?)/.exec((tit.textContent || "").trim());
+    return m ? m[1] : null;
+  }
+  function ehUnidade(cod){ return !!(cod && /^D10\.\d$/.test(cod)); }
+
+  function contar(){
+    var n = (txt.value.match(/[A-Za-zÀ-ÿ0-9]+(?:[-'’][A-Za-zÀ-ÿ0-9]+)*/g) || []).length;
+    cont.textContent = n + (n === 1 ? " palavra" : " palavras");
+  }
+
+  function ajustar(){
+    var on = livre();
+    document.body.classList.toggle("dg-livre", on);
+    var cod = codAberto();
+    var mostrar = on && ehUnidade(cod);
+    cont.hidden = !mostrar;
+    if(!mostrar) return;
+
+    var sp = (window.padraoD10.subpartes || []).filter(function(s){ return s.cod === cod; })[0];
+    if(sp){
+      var novo = cod + " — " + sp.nome;
+      if(tit.textContent !== novo) tit.textContent = novo;
+      if(desc) desc.textContent = (sp.regras && sp.regras[0]) || "";
+    }
+    if(dica){
+      dica.textContent = cod === "D10.3"
+        ? "Texto livre. Marque com # um subtítulo, ## um subtítulo menor, --- uma quebra de cena e > uma citação."
+        : "Escreva o texto desta parte.";
+    }
+    contar();
+  }
+
+  document.addEventListener("padraoD10:pronto", ajustar);
+  txt.addEventListener("input", function(){ if(!cont.hidden) contar(); });
+  if(window.MutationObserver){
+    new MutationObserver(function(){ setTimeout(ajustar, 0); })
+      .observe(tit, {childList: true, characterData: true, subtree: true});
+  }
+
+  /* o aviso "fora da estrutura editorial" não vale para tipos livres */
+  var confirmOriginal = window.confirm;
+  window.confirm = function(msg){
+    if(livre() && String(msg).indexOf("fora da estrutura editorial") > -1) return true;
+    return confirmOriginal.apply(window, arguments);
+  };
+
+  ajustar();
+})();
+</script>
+<!-- ===== FIM: EDITOR LIVRE PARA TIPOS SEM PADRÃO EDITORIAL (2D-2a) ===== -->
 <!-- ===== FIM: NOME DA UNIDADE NO EDITOR (2D-1) ===== -->
 <!-- ===== FIM: LER PADRÃO DO D10 CONFORME O TIPO ===== -->
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
