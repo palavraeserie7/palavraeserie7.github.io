@@ -4356,7 +4356,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   }
  
   /* ---------- lista à direita do conteúdo ---------- */
-  function botao(){ return document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
+ function botao(){ return document.querySelector('#dgTiposBox [data-tipo][aria-pressed="true"]') || document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
   function listaAberta(){ return lista.classList.contains("aberta"); }
   function editorAberto(){ return ed.classList.contains("aberto"); }
   function fixosAberto(){ return fx.classList.contains("aberto"); }
@@ -4482,7 +4482,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     var t = ev.target;
     if(t.closest && t.closest("#dgLista")) return;
     var b = t.closest && t.closest("[data-tipo]");
-    if(b && b.dataset.tipo === "4.1"){
+      if(b){
       if(listaAberta()) fecharLista(); else abrirLista();
       setTimeout(function(){ if(listaAberta()) posicionar(); }, 0);
     } else {
