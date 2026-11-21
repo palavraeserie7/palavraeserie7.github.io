@@ -1,1 +1,108 @@
-
+{
+  "tipo": "4.1",
+  "nome": "Devocionais diários",
+  "unidade": "Dia",
+  "rotulo_numero": "DIA",
+  "padrao_editorial": {
+    "descricao": "Padrão editorial do devocional diário: cinco seções fixas no desenvolvimento, cada uma com faixa de palavras. Os nomes e as faixas podem ser alterados na tela PADRÃO DO DIA, com confirmação.",
+    "regra": "Nunca aumente ou reduza significativamente qualquer seção.",
+    "total_palavras": [1180, 1250],
+    "secoes": [
+      { "cod": "D10.2", "nome": "Texto Bíblico Central", "palavras": [20, 30] },
+      { "cod": "D10.3.1", "nome": "Experiência Humana", "palavras": [200, 230] },
+      { "cod": "D10.3.2", "nome": "O Engano do Coração", "palavras": [200, 230] },
+      { "cod": "D10.3.3", "nome": "Quando Nossas Forças Não Bastam", "palavras": [160, 190] },
+      { "cod": "D10.3.4", "nome": "Cristo, Nossa Esperança", "palavras": [240, 270] },
+      { "cod": "D10.3.5", "nome": "Vivendo à Luz da Graça", "palavras": [130, 160] },
+      { "cod": "D10.4", "nome": "Reflexão", "palavras": [35, 50] },
+      { "cod": "D10.6", "nome": "Oração", "palavras": [120, 140] }
+    ]
+  },
+  "subpartes": [
+    {
+      "cod": "D10.1",
+      "nome": "Abertura do dia",
+      "estilo": {
+        "numero_do_dia": { "formato": "DIA + número", "tamanho_pt": 11, "peso": "negrito", "caixa": "alta", "alinhamento": "centro", "espaco_antes_pt": 29 },
+        "titulo": { "tamanho_pt": 22, "peso": "negrito", "alinhamento": "centro", "espaco_antes_pt": 8, "linhas": "uma ou duas" }
+      },
+      "prompt": "Abertura do dia: 'DIA N' em 11 pt negrito caixa alta centralizado; título do dia logo abaixo em 22 pt negrito centralizado, até duas linhas."
+    },
+    {
+      "cod": "D10.2",
+      "nome": "Texto bíblico central",
+      "opcional": true,
+      "rotulo_padrao": "TEXTO BÍBLICO CENTRAL",
+      "rotulo_editavel": true,
+      "estilo": {
+        "rotulo": { "tamanho_pt": 8, "peso": "negrito", "caixa": "alta", "alinhamento": "centro", "espaco_antes_pt": 30 },
+        "citacao": { "tamanho_pt": 11.5, "estilo": "itálico", "alinhamento": "centro", "entrelinha_pt": 17, "recuo_lateral_pt": 33, "aspas": "curvas", "espaco_antes_pt": 8 },
+        "referencia": { "formato": "— Livro cap:vers", "tamanho_pt": 9.5, "alinhamento": "centro", "espaco_antes_pt": 5 }
+      },
+      "prompt": "Texto bíblico central: rótulo 8 pt negrito caixa alta centralizado; citação em 11,5 pt itálico centralizada, entrelinha 17, com 33 pt de recuo de cada lado e aspas curvas; referência na linha seguinte em 9,5 pt, centralizada, no formato '— Livro cap:vers'."
+    },
+    {
+      "cod": "D10.3",
+      "nome": "Desenvolvimento devocional",
+      "secoes": { "quantidade": "livre", "rotulo_de_cada_secao": "editável pelo autor" },
+      "estilo": {
+        "rotulo_de_secao": { "herda": "global.rotulo_de_secao" },
+        "corpo": { "herda": "global.corpo" }
+      },
+      "regras": [
+        "Cada seção: rótulo em caixa alta + parágrafos.",
+        "O rótulo nunca fica sozinho no fim da página."
+      ],
+      "prompt": "Desenvolvimento do dia: cada seção começa com um rótulo em 9 pt negrito caixa alta, à esquerda, com 18 pt de espaço antes e 11 pt depois; o texto segue em 10,3 pt, entrelinha 14,6, justificado, sem recuo, 6,5 pt entre parágrafos. O rótulo nunca fica sozinho no fim da página."
+    },
+    {
+      "cod": "D10.4",
+      "nome": "Reflexão",
+      "opcional": true,
+      "rotulo_padrao": "REFLEXÃO",
+      "rotulo_editavel": true,
+      "estilo": {
+        "rotulo": { "herda": "global.rotulo_de_secao" },
+        "itens": { "herda": "global.lista_com_marcador", "tamanho_pt": 10.3, "alinhamento": "esquerda" }
+      },
+      "regras": [
+        "Cada pergunta ou ponto é um item com marcador.",
+        "Segunda linha do item recuada 12 pt."
+      ],
+      "prompt": "Reflexão: rótulo no estilo de seção (9 pt negrito caixa alta); itens em lista com marcador '•', 10,3 pt, recuo francês de 12 pt, 5 pt entre itens, alinhados à esquerda."
+    },
+    {
+      "cod": "D10.5",
+      "nome": "Leitura complementar",
+      "opcional": true,
+      "texto_padrao": "Sugestão de leitura complementar:",
+      "texto_editavel": true,
+      "estilo": {
+        "linha": { "formato": "{texto_padrao} Livro cap:vers", "tamanho_pt": 9.5, "estilo": "itálico", "alinhamento": "esquerda", "espaco_antes_pt": 19.4 }
+      },
+      "regras": [
+        "Só referências, sem transcrever o texto.",
+        "Vem logo após a reflexão, ou após o desenvolvimento se não houver reflexão."
+      ],
+      "prompt": "Leitura complementar: uma linha em 9,5 pt itálico, à esquerda, com a frase padrão seguida da referência (Livro cap:vers), logo após a seção anterior. Omitir se o dia não tiver leitura complementar."
+    },
+    {
+      "cod": "D10.6",
+      "nome": "Oração",
+      "opcional": true,
+      "rotulo_padrao": "ORAÇÃO",
+      "rotulo_editavel": true,
+      "fecho_padrao": "Amém.",
+      "fecho_editavel": true,
+      "estilo": {
+        "rotulo": { "herda": "global.rotulo_de_secao" },
+        "corpo": { "tamanho_pt": 10.3, "estilo": "itálico", "alinhamento": "justificado", "recuo_lateral_pt": 9, "espaco_entre_paragrafos_pt": 11 }
+      },
+      "regras": [
+        "A oração fica inteira na mesma página; se não couber, passa toda para a próxima.",
+        "Termina com o fecho padrão."
+      ],
+      "prompt": "Oração: rótulo no estilo de seção; texto em 10,3 pt itálico, justificado, com 9 pt de recuo de cada lado e 11 pt entre parágrafos. Termina com o fecho padrão. Mantenha a oração inteira na mesma página."
+    }
+  ]
+}
