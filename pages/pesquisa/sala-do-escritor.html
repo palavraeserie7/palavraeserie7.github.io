@@ -4371,12 +4371,28 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
  
   function montarLista(){
     var rolagem = lista.scrollTop;
+    var pd = window.padraoD10;
     var h = '<button type="button" class="dgl-fixos" data-acao="fixos">⚙ Dados do autor e da editora<span>' + (normasDados ? 'automáticos' : '…') + '</span></button>';
     GRUPOS.forEach(function(g){
-      h += '<div class="dgl-grupo">' + g.g + '</div>';
-      g.itens.forEach(function(it){
+      var titulo = g.g, itens = g.itens;
+
+      /* o grupo D10 vem do arquivo do tipo escolhido */
+      if(g.g.indexOf("D10") === 0 && pd && Array.isArray(pd.subpartes) && pd.subpartes.length){
+        titulo = "D10 — " + (pd.unidade || "Unidade");
+        itens = pd.subpartes.map(function(s){
+          return [s.cod, s.nome, s.descricao || ""];
+        });
+      }
+
+      /* o nome "devocional" só vale no tipo 4.1 */
+      var devocional = window.padraoD10Tipo === "4.1" || !window.padraoD10Tipo;
+
+      h += '<div class="dgl-grupo">' + titulo + '</div>';
+      itens.forEach(function(it){
+        var nome = it[1];
+        if(it[0] === "D07" && !devocional) nome = "Como usar este livro";
         h += '<button type="button" class="dgl-item' + (it[0] === atual ? ' ativa' : '') + '" role="option" data-cod="' + it[0] + '" title="' + it[2] + '">' +
-             '<b>' + it[0] + '</b><span>' + it[1] + '</span>' + marca(it[0]) + '</button>';
+             '<b>' + it[0] + '</b><span>' + nome + '</span>' + marca(it[0]) + '</button>';
       });
     });
     lista.innerHTML = h;
@@ -4501,6 +4517,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     if(editorAberto() || fixosAberto()) posicionarEditor();
   }
   window.addEventListener("resize", reposicionar);
+   document.addEventListener("padraoD10:pronto", function(){ if(listaAberta()) montarLista(); });
   window.addEventListener("scroll", reposicionar, true);
  
   /* ---------- saídas: a principal (PDF Digital A5) e as que virão depois ---------- */
@@ -6434,6 +6451,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
         window.padraoD10 = d;
         window.padraoD10Tipo = tipo;
         console.log("Padrão D10 carregado para o tipo " + tipo + ":", d.nome);
+        document.dispatchEvent(new CustomEvent("padraoD10:pronto"));
         return d;
       })
       .catch(function(e){
