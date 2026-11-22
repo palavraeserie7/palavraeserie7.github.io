@@ -4356,7 +4356,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   }
  
   /* ---------- lista à direita do conteúdo ---------- */
- function botao(){ return document.querySelector('#dgTiposBox [data-tipo][aria-pressed="true"]') || document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
+  function botao(){ return document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
   function listaAberta(){ return lista.classList.contains("aberta"); }
   function editorAberto(){ return ed.classList.contains("aberto"); }
   function fixosAberto(){ return fx.classList.contains("aberto"); }
@@ -4371,28 +4371,12 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
  
   function montarLista(){
     var rolagem = lista.scrollTop;
-    var pd = window.padraoD10;
     var h = '<button type="button" class="dgl-fixos" data-acao="fixos">⚙ Dados do autor e da editora<span>' + (normasDados ? 'automáticos' : '…') + '</span></button>';
     GRUPOS.forEach(function(g){
-      var titulo = g.g, itens = g.itens;
-
-      /* o grupo D10 vem do arquivo do tipo escolhido */
-      if(g.g.indexOf("D10") === 0 && pd && Array.isArray(pd.subpartes) && pd.subpartes.length){
-        titulo = "D10 — " + (pd.unidade || "Unidade");
-        itens = pd.subpartes.map(function(s){
-          return [s.cod, s.nome, s.descricao || ""];
-        });
-      }
-
-      /* o nome "devocional" só vale no tipo 4.1 */
-      var devocional = window.padraoD10Tipo === "4.1" || !window.padraoD10Tipo;
-
-      h += '<div class="dgl-grupo">' + titulo + '</div>';
-      itens.forEach(function(it){
-        var nome = it[1];
-        if(it[0] === "D07" && !devocional) nome = "Como usar este livro";
+      h += '<div class="dgl-grupo">' + g.g + '</div>';
+      g.itens.forEach(function(it){
         h += '<button type="button" class="dgl-item' + (it[0] === atual ? ' ativa' : '') + '" role="option" data-cod="' + it[0] + '" title="' + it[2] + '">' +
-             '<b>' + it[0] + '</b><span>' + nome + '</span>' + marca(it[0]) + '</button>';
+             '<b>' + it[0] + '</b><span>' + it[1] + '</span>' + marca(it[0]) + '</button>';
       });
     });
     lista.innerHTML = h;
@@ -4498,7 +4482,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     var t = ev.target;
     if(t.closest && t.closest("#dgLista")) return;
     var b = t.closest && t.closest("[data-tipo]");
-      if(b){
+    if(b && b.dataset.tipo === "4.1"){
       if(listaAberta()) fecharLista(); else abrirLista();
       setTimeout(function(){ if(listaAberta()) posicionar(); }, 0);
     } else {
@@ -4517,7 +4501,6 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     if(editorAberto() || fixosAberto()) posicionarEditor();
   }
   window.addEventListener("resize", reposicionar);
-   document.addEventListener("padraoD10:pronto", function(){ if(listaAberta()) montarLista(); });
   window.addEventListener("scroll", reposicionar, true);
  
   /* ---------- saídas: a principal (PDF Digital A5) e as que virão depois ---------- */
@@ -4976,8 +4959,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     s = s.replace(/\s+(?:--|-|–)\s+/g, " — ");
     s = s.replace(/(^|[\s(\[—])"/g, "$1“").replace(/"/g, "”");
     s = s.replace(/(^|[\s(\[—“])'/g, "$1‘").replace(/'/g, "’");
-    s = s.replace(/(^|[\s(“—])([1-3])\s([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+\s\d+:\d)/g, "$1$2\u00A0$3");
-    s = s.replace(/(^|[\s(“—])([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+)\s(\d+:\d)/g, "$1$2\u00A0$3");
+    s = s.replace(/(^|[\s(“—])([1-3])\s([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+\s\d+:\d)/g, "12 $3");
+    s = s.replace(/(^|[\s(“—])([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+)\s(\d+:\d)/g, "12 $3");
     return s;
   }
   function T(s){ return esc(tip(s)); }
@@ -6423,169 +6406,8 @@ body.dg-livro-vivo .dgp-nota{display:none}
   });
 })();
 </script>
- <!-- ===== INÍCIO: LER PADRÃO DO D10 CONFORME O TIPO ===== -->
-<script>
-(function(){
-  var PASTA = "padroes-d10/";
-  var cache = {};
-  var contador = 0;
-  window.padraoD10 = null;
-  window.padraoD10Tipo = null;
-
-  function buscar(nome){
-    if(cache[nome]) return Promise.resolve(cache[nome]);
-    return fetch(PASTA + nome + ".json", {cache: "no-cache"})
-      .then(function(r){
-        if(!r.ok) throw new Error("não encontrado: " + nome);
-        return r.json();
-      })
-      .then(function(d){ cache[nome] = d; return d; });
-  }
-
-  window.carregarPadraoD10 = function(tipo){
-    var minha = ++contador;
-    return buscar(tipo)
-      .catch(function(){ return buscar("generico"); })
-      .then(function(d){
-        if(minha !== contador) return window.padraoD10;
-        window.padraoD10 = d;
-        window.padraoD10Tipo = tipo;
-        console.log("Padrão D10 carregado para o tipo " + tipo + ":", d.nome);
-        document.dispatchEvent(new CustomEvent("padraoD10:pronto"));
-        return d;
-      })
-      .catch(function(e){
-        console.error("Não foi possível carregar o padrão D10:", e);
-        return null;
-      });
-  };
-
-  /* ao clicar num tipo */
-  var caixa = document.getElementById("dgTiposBox");
-  if(caixa){
-    caixa.addEventListener("click", function(ev){
-      var b = ev.target.closest && ev.target.closest("[data-tipo]");
-      if(b) window.carregarPadraoD10(b.dataset.tipo);
-    });
-  }
-
-  /* se já havia um tipo escolhido da última vez, carrega também */
-  try{
-    var s = JSON.parse(localStorage.getItem("ps_diagramador") || "null");
-    if(s && s.tipo) window.carregarPadraoD10(s.tipo);
-  }catch(e){}
-})();
-</script>
- <!-- ===== INÍCIO: NOME DA UNIDADE NO EDITOR (2D-1) ===== -->
-<script>
-(function(){
-  function nomeUnidade(){
-    var pd = window.padraoD10;
-    return (pd && pd.unidade) ? pd.unidade : "Dia";
-  }
-  function ajustar(){
-    var lbl = document.querySelector('#dgDiaBox label[for="dgDiaInp"]');
-    if(!lbl) return;
-    var u = nomeUnidade();
-    var novo = u + " nº (1 a 99)";
-    if(lbl.textContent !== novo) lbl.textContent = novo;
-    var inp = document.getElementById("dgDiaInp");
-    if(inp) inp.title = "Número do " + u.toLowerCase() + " dentro do livro.";
-  }
-  document.addEventListener("padraoD10:pronto", ajustar);
-  var tit = document.getElementById("dgEtitulo");
-  if(tit && window.MutationObserver){
-    new MutationObserver(function(){ setTimeout(ajustar, 0); })
-      .observe(tit, {childList: true, characterData: true, subtree: true});
-  }
-  ajustar();
-})();
-</script>
- <!-- ===== INÍCIO: EDITOR LIVRE PARA TIPOS SEM PADRÃO EDITORIAL (2D-2a) ===== -->
-<style>
-body.dg-livre #dgAbrirPad,
-body.dg-livre #dgPadFooter,
-body.dg-livre #dgSecBox,
-body.dg-livre #dgCont,
-body.dg-livre #dgSecNome,
-body.dg-livre #dgTotalDia{display:none!important}
-body.dg-livre #dgTexto.dg-ocultar{display:block!important}
-body.dg-livre #dgDiaBox.dgd-cresce{flex:0 0 auto!important}
-#dgContLivre{font:700 12.5px "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48);margin:2px 0 4px}
-</style>
-<script>
-(function(){
-  var tit = document.getElementById("dgEtitulo");
-  var desc = document.getElementById("dgEdesc");
-  var txt = document.getElementById("dgTexto");
-  var dica = document.getElementById("dgDiaDica");
-  var caixaDia = document.getElementById("dgDiaBox");
-  if(!tit || !txt || !caixaDia) return;
-
-  var cont = document.createElement("div");
-  cont.id = "dgContLivre";
-  cont.hidden = true;
-  caixaDia.appendChild(cont);
-
-  function livre(){
-    var pd = window.padraoD10;
-    return !!(pd && pd.padrao_editorial == null);
-  }
-  function codAberto(){
-    var m = /^(D\d+(?:\.\d)?)/.exec((tit.textContent || "").trim());
-    return m ? m[1] : null;
-  }
-  function ehUnidade(cod){ return !!(cod && /^D10\.\d$/.test(cod)); }
-
-  function contar(){
-    var n = (txt.value.match(/[A-Za-zÀ-ÿ0-9]+(?:[-'’][A-Za-zÀ-ÿ0-9]+)*/g) || []).length;
-    cont.textContent = n + (n === 1 ? " palavra" : " palavras");
-  }
-
-  function ajustar(){
-    var on = livre();
-    document.body.classList.toggle("dg-livre", on);
-    var cod = codAberto();
-    var mostrar = on && ehUnidade(cod);
-    cont.hidden = !mostrar;
-    if(!mostrar) return;
-
-    var sp = (window.padraoD10.subpartes || []).filter(function(s){ return s.cod === cod; })[0];
-    if(sp){
-      var novo = cod + " — " + sp.nome;
-      if(tit.textContent !== novo) tit.textContent = novo;
-      if(desc) desc.textContent = (sp.regras && sp.regras[0]) || "";
-    }
-    if(dica){
-      dica.textContent = cod === "D10.3"
-        ? "Texto livre. Marque com # um subtítulo, ## um subtítulo menor, --- uma quebra de cena e > uma citação."
-        : "Escreva o texto desta parte.";
-    }
-    contar();
-  }
-
-  document.addEventListener("padraoD10:pronto", ajustar);
-  txt.addEventListener("input", function(){ if(!cont.hidden) contar(); });
-  if(window.MutationObserver){
-    new MutationObserver(function(){ setTimeout(ajustar, 0); })
-      .observe(tit, {childList: true, characterData: true, subtree: true});
-  }
-
-  /* o aviso "fora da estrutura editorial" não vale para tipos livres */
-  var confirmOriginal = window.confirm;
-  window.confirm = function(msg){
-    if(livre() && String(msg).indexOf("fora da estrutura editorial") > -1) return true;
-    return confirmOriginal.apply(window, arguments);
-  };
-
-  ajustar();
-})();
-</script>
-<!-- ===== FIM: EDITOR LIVRE PARA TIPOS SEM PADRÃO EDITORIAL (2D-2a) ===== -->
-<!-- ===== FIM: NOME DA UNIDADE NO EDITOR (2D-1) ===== -->
-<!-- ===== FIM: LER PADRÃO DO D10 CONFORME O TIPO ===== -->
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
-                                   <!-- ==== ESTÚDIO ==== -->
+ <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
  
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
@@ -7435,7 +7257,8 @@ texto: $("esTexto").value
 </script>
 <!-- ===== FIM: ÁREA 1 — LIGAR A IA ===== -->
 
-<!-- ===== INÍCIO: ESTÚDIO FASE 1 — LAYOUT UNIFICADO + RENDERIZAÇÃO REAL ===== -->
+<!-- ===== INÍCIO: ESTÚDIO FASE 1 — LAYOUT UNIFICADO + RENDERIZAÇÃO REAL =====
+     COLE este bloco logo ANTES de </body>, depois de "ÁREA 1 — LIGAR A IA". Não apague nada. -->
 <style>
 /* um só seletor de tipo: os cartões do passo 1 */
 #esTipoRapido{display:none!important}
@@ -12116,7 +11939,6 @@ texto: $("esTexto").value
  
  
  
-
 
 
 
