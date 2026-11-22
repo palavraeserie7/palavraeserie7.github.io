@@ -3999,7 +3999,7 @@ document.addEventListener("visibilitychange",function(){
     partes.push(tipo ? '<strong>' + tipo + ' ' + esc(nomeTipo(tipo)) + '</strong>' : 'Gênero: <em>falta escolher</em>');
     partes.push(e ? '<strong>' + e[0] + ' ' + esc(e[1]) + '</strong> (' + esc(e[2]) + ')' : 'Extensão: <em>falta escolher</em>');
     $("dgResumo").innerHTML = (msg ? '<strong>' + esc(msg) + '</strong> ' : '') + partes.join(' &nbsp;·&nbsp; ');
-    $("dgConfirmar").disabled = !(tipo && ext);
+    $("dgConfirmar").disabled = !tipo;
   }
  
   /* ---------- eventos ---------- */
@@ -4021,7 +4021,7 @@ document.addEventListener("visibilitychange",function(){
     desenhar();
   });
   $("dgConfirmar").addEventListener("click", function(){
-    if(!(tipo && ext)) return;
+   if(!tipo) return;
     try{ localStorage.setItem(CHAVE, JSON.stringify({tipo:tipo, ext:ext})); }catch(e){}
     resumo("Escolha registrada.");
     /* PRÓXIMO PASSO: aqui entra a tela de colar o texto. */
@@ -4782,7 +4782,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     if(!atual || !normaAtual) return;
     var tipoSel = document.querySelector('#dgTiposBox .dg-tipo[aria-pressed="true"]');
     var extSel = document.querySelector('#dgExts .dg-ext[aria-pressed="true"]');
-    if(!extSel){ status.textContent = "Escolha o tamanho da obra (E01–E10) antes de diagramar."; return; }
+   
  
     var inf = info(atual), om = !!omitidas[atual];
     if(inf.tipo === "livro" && !om){ salvos[atual] = txt.value; gravar(); }
@@ -4812,7 +4812,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
         ano: new Date().getFullYear()
       },
       tipo: tipoSel ? tipoSel.dataset.tipo : null,
-      extensao: extSel.dataset.ext,
+      extensao: extSel ? extSel.dataset.ext : null,
       saida: normaAtual.saida,
       saidas: [normaAtual.saida],
       normas: normaAtual,
@@ -4820,7 +4820,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     };
     /* PRÓXIMO PASSO: quem gera a página/PDF escuta este evento */
     document.dispatchEvent(new CustomEvent("dg:diagramar", {detail: pedido}));
-    status.textContent = "Diagramação solicitada: " + pedido.parte + " · " + pedido.extensao + " · " + pedido.saida;
+       status.textContent = "Diagramação solicitada: " + pedido.parte + (pedido.extensao ? " · " + pedido.extensao : "") + " · " + pedido.saida;
   });
  
   btnSalvar.addEventListener("click", function(){
