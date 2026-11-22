@@ -4047,7 +4047,58 @@ document.addEventListener("visibilitychange",function(){
   }, true);
 })();
 </script>
+<!-- ===== INÍCIO: DADOS SEPARADOS POR TIPO ===== -->
+<script>
+(function(){
+  /* textos, títulos, omitidas, backup e lixeira passam a ser guardados POR TIPO (ex.: ps_diagramador_partes@9.6).
+     Não mexe em assinatura/planos, nem em Supabase, nem nos dados do autor e da editora. */
+  var NS = ["ps_diagramador_partes","ps_diagramador_livro","ps_diagramador_titulos","ps_diagramador_omitidas","ps_diagramador_backup","ps_diagramador_lixeira"];
+  var proto = Storage.prototype;
+  var rawGet = proto.getItem, rawSet = proto.setItem, rawDel = proto.removeItem;
+  var LS = window.localStorage;
+  var TA = "4.1";
+  try{
+    var s = JSON.parse(rawGet.call(LS, "ps_diagramador") || "null");
+    if(s && s.tipo) TA = String(s.tipo);
+  }catch(e){}
 
+  function mapa(k){ return NS.indexOf(k) > -1 ? k + "@" + TA : k; }
+  proto.getItem = function(k){ return this === LS ? rawGet.call(this, mapa(k)) : rawGet.call(this, k); };
+  proto.setItem = function(k, v){ return this === LS ? rawSet.call(this, mapa(k), v) : rawSet.call(this, k, v); };
+  proto.removeItem = function(k){ return this === LS ? rawDel.call(this, mapa(k)) : rawDel.call(this, k); };
+  window.dgTipoAtivo = function(){ return TA; };
+
+  /* migração única: o que já estava salvo (sem tipo) vai para o seu tipo pelo prefixo do código.
+     Os dados antigos NÃO são apagados: ficam como cópia de segurança. */
+  try{
+    if(!rawGet.call(LS, "ps_diagramador_migrado_v1")){
+      ["ps_diagramador_partes","ps_diagramador_titulos","ps_diagramador_omitidas"].forEach(function(ch){
+        var txt = rawGet.call(LS, ch); if(!txt) return;
+        var o = JSON.parse(txt) || {}, d = {}, l = {};
+        Object.keys(o).forEach(function(k){ if(/^D\d/.test(k)) d[k] = o[k]; else if(/^L\d/.test(k)) l[k] = o[k]; });
+        if(Object.keys(d).length && !rawGet.call(LS, ch + "@4.1")) rawSet.call(LS, ch + "@4.1", JSON.stringify(d));
+        if(Object.keys(l).length && !rawGet.call(LS, ch + "@9.6")) rawSet.call(LS, ch + "@9.6", JSON.stringify(l));
+      });
+      var liv = rawGet.call(LS, "ps_diagramador_livro");
+      if(liv && !rawGet.call(LS, "ps_diagramador_livro@4.1")) rawSet.call(LS, "ps_diagramador_livro@4.1", liv);
+      rawSet.call(LS, "ps_diagramador_migrado_v1", "1");
+    }
+  }catch(e){}
+
+  /* ao clicar em outro tipo, passa a trabalhar nos dados dele (roda antes do menu, por estar acima dele) */
+  document.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("#dgTiposBox [data-tipo]");
+    if(!b || b.dataset.tipo === TA) return;
+    var ed = document.getElementById("dg-editor"), fx = document.getElementById("dg-fixos");
+    if((ed && ed.classList.contains("aberto")) || (fx && fx.classList.contains("aberto"))) return;
+    TA = b.dataset.tipo;
+    document.dispatchEvent(new CustomEvent("dg:tipo-ativo", {detail: TA}));
+    var pv = document.getElementById("dgPrevia");
+    if(pv && pv.classList.contains("aberta")) setTimeout(function(){ var a = document.getElementById("dgLivroAbrir"); if(a) a.click(); }, 400);
+  }, true);
+})();
+</script>
+<!-- ===== FIM: DADOS SEPARADOS POR TIPO ===== -->
 
 
 <!-- ===== INÍCIO: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
