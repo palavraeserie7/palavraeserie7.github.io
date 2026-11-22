@@ -5970,6 +5970,246 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 </script>
 
  <!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
+ <!-- ===== INÍCIO: EXCLUIR LIVRO / PARTES ===== -->
+<style>
+#dgExcl{position:fixed;inset:0;z-index:100030;background:rgba(30,22,10,.72);display:flex;align-items:center;justify-content:center;padding:14px}
+#dgExcl[hidden]{display:none}
+.dgx-box{display:flex;flex-direction:column;gap:8px;width:min(640px,96vw);max-height:calc(100vh - 28px);background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;padding:16px 18px;box-shadow:0 12px 30px rgba(0,0,0,.4);box-sizing:border-box;color:var(--ink,#2a2217)}
+.dgx-topo{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dgx-topo strong{font:600 18px Georgia,"Times New Roman",serif}
+.dgx-nota{margin:0;font:13px/1.45 "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
+.dgx-todos{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid var(--paper-line,#e3d8bd);font:700 13px "Segoe UI",Arial,sans-serif}
+.dgx-lista{flex:1 1 auto;overflow-y:auto;min-height:120px;border:1px solid var(--paper-line,#e3d8bd);border-radius:6px;background:#fff}
+.dgx-grupo{padding:8px 12px 3px;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--brass-deep,#7d5f1e)}
+.dgx-item{display:flex;align-items:baseline;gap:10px;padding:7px 12px;cursor:pointer;font:15px/1.35 Georgia,"Times New Roman",serif}
+.dgx-item:hover{background:var(--brass-wash,#f3e9cc)}
+.dgx-item input{flex:0 0 auto;transform:translateY(2px)}
+.dgx-item span{flex:1 1 auto}
+.dgx-item small{flex:0 0 auto;color:var(--ink-soft,#6b5f48);font:12px "Segoe UI",Arial,sans-serif}
+.dgx-vazio{padding:22px;text-align:center;color:var(--ink-soft,#6b5f48);font:14px "Segoe UI",Arial,sans-serif}
+.dgx-msg{min-height:1.3em;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep,#7d5f1e)}
+.dgx-rod{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.dgx-rod button[disabled]{opacity:.45;cursor:not-allowed}
+#dgxTudo{border-color:#a14747;color:#a14747}
+</style>
+
+<div id="dgExcl" hidden role="dialog" aria-modal="true" aria-labelledby="dgExclTit">
+  <div class="dgx-box">
+    <div class="dgx-topo">
+      <strong id="dgExclTit">Excluir do livro</strong>
+      <button id="dgExclFechar" class="at-btn" type="button">FECHAR</button>
+    </div>
+    <p class="dgx-nota">Marque o que deseja excluir. Os dados do autor e da editora e o padrão do dia não são apagados. Depois de excluir, dá para desfazer.</p>
+    <label class="dgx-todos"><input type="checkbox" id="dgxTodos"> Selecionar tudo <span id="dgxConta" style="margin-left:auto;font-weight:600"></span></label>
+    <div class="dgx-lista" id="dgxLista"></div>
+    <div class="dgx-msg" id="dgxMsg" role="status"></div>
+    <div class="dgx-rod">
+      <button id="dgxDesfazer" class="at-btn" type="button">DESFAZER ÚLTIMA EXCLUSÃO</button>
+      <button id="dgxTudo" class="at-btn" type="button">EXCLUIR LIVRO INTEIRO</button>
+      <button id="dgxSel" class="at-btn gold" type="button" disabled>EXCLUIR SELECIONADOS</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var K_PARTES = "ps_diagramador_partes", K_LIVRO = "ps_diagramador_livro", K_TIT = "ps_diagramador_titulos";
+  var K_OM = "ps_diagramador_omitidas", K_IMG = "ps_diagramador_imagens", K_LIX = "ps_diagramador_lixeira";
+  var CHAVES = [K_PARTES, K_LIVRO, K_TIT, K_OM, K_IMG];
+  var NOMES = {D01:"Capa", D02:"Página de rosto", D03:"Direitos autorais", D04:"Dedicatória", D05:"Palavra do autor", D06:"Introdução", D07:"Como usar o devocional", D11:"Encerramento", D12:"Palavra final", D13:"Sobre o autor"};
+  var NOMES_IMG = {capa:"Imagem da capa", contracapa:"Imagem da contracapa"};
+
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function ler(k){ try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } }
+  function gravarObj(k, o){
+    try{
+      if(Object.keys(o).length) localStorage.setItem(k, JSON.stringify(o)); else localStorage.removeItem(k);
+      return true;
+    }catch(e){ return false; }
+  }
+  function palavras(t){ return (String(t || "").match(/\S+/g) || []).length; }
+  function nomeParte(cod){
+    var d = window.DG_PADRAO, ps = (d && d.partes) || [];
+    for(var i = 0; i < ps.length; i++){
+      if(ps[i].cod === cod) return ps[i].nome;
+      var sub = ps[i].subpartes || [];
+      for(var j = 0; j < sub.length; j++) if(sub[j].cod === cod) return sub[j].nome;
+    }
+    return NOMES[cod] || "";
+  }
+
+  var tela = $("dgExcl"), lista = $("dgxLista"), msg = $("dgxMsg");
+  var btnSel = $("dgxSel"), btnTudo = $("dgxTudo"), btnDesf = $("dgxDesfazer"), chkTodos = $("dgxTodos");
+  var itens = [];
+  var ultimoSnap = null;   /* cópia da última exclusão, também guardada no navegador */
+
+  /* ---------- levanta o que existe no livro ---------- */
+  function levantar(){
+    var P = ler(K_PARTES), L = ler(K_LIVRO), I = ler(K_IMG), out = [];
+    Object.keys(P).filter(function(k){ return typeof P[k] === "string" && P[k].trim(); }).sort().forEach(function(cod){
+      var n = nomeParte(cod);
+      out.push({id:"p:" + cod, grupo:"Partes do livro", rot: cod + (n ? " — " + n : ""), info: palavras(P[cod]) + " palavras"});
+    });
+    var dias = {};
+    Object.keys(L).forEach(function(k){
+      var m = /^(D10\.\d)@(\d+)$/.exec(k);
+      if(m && typeof L[k] === "string" && L[k].trim()){ (dias[m[2]] = dias[m[2]] || []).push(m[1]); }
+    });
+    Object.keys(dias).map(Number).sort(function(a, b){ return a - b; }).forEach(function(n){
+      var tit = String(L["D10.1@" + n] || "").split(/\r?\n/)[0].trim();
+      var pal = 0;
+      dias[n].forEach(function(c){ pal += palavras(L[c + "@" + n]); });
+      out.push({id:"d:" + n, grupo:"Dias devocionais", rot:"Dia " + n + (tit ? " — " + tit : ""), info: dias[n].length + (dias[n].length === 1 ? " parte · " : " partes · ") + pal + " palavras"});
+    });
+    ["capa", "contracapa"].forEach(function(k){
+      if(I[k] && I[k].d) out.push({id:"i:" + k, grupo:"Imagens", rot: NOMES_IMG[k], info: I[k].w + " × " + I[k].h + " px"});
+    });
+    return out;
+  }
+
+  function desenhar(){
+    itens = levantar();
+    if(!itens.length){
+      lista.innerHTML = '<div class="dgx-vazio">Não há nada salvo no livro.</div>';
+    } else {
+      var h = "", g = "";
+      itens.forEach(function(it, i){
+        if(it.grupo !== g){ g = it.grupo; h += '<div class="dgx-grupo">' + esc(g) + '</div>'; }
+        h += '<label class="dgx-item"><input type="checkbox" data-i="' + i + '"><span>' + esc(it.rot) + '</span><small>' + esc(it.info) + '</small></label>';
+      });
+      lista.innerHTML = h;
+    }
+    chkTodos.checked = false;
+    chkTodos.disabled = !itens.length;
+    btnTudo.disabled = !itens.length;
+    btnDesf.disabled = !temSnap();
+    contar();
+  }
+  function marcados(){
+    var ids = [];
+    Array.prototype.forEach.call(lista.querySelectorAll("input[data-i]:checked"), function(c){ ids.push(itens[+c.dataset.i]); });
+    return ids;
+  }
+  function contar(){
+    var n = marcados().length;
+    $("dgxConta").textContent = n ? n + (n === 1 ? " selecionado" : " selecionados") : "";
+    btnSel.disabled = !n;
+    var tot = lista.querySelectorAll("input[data-i]").length;
+    chkTodos.checked = tot > 0 && n === tot;
+  }
+
+  /* ---------- cópia para desfazer ---------- */
+  function temSnap(){
+    if(ultimoSnap) return true;
+    try{ return !!localStorage.getItem(K_LIX); }catch(e){ return false; }
+  }
+  function tirarSnap(){
+    var s = {};
+    CHAVES.forEach(function(k){ s[k] = localStorage.getItem(k); });
+    return s;
+  }
+  function guardarSnap(s){
+    ultimoSnap = s;
+    try{ localStorage.setItem(K_LIX, JSON.stringify({quando: Date.now(), dados: s})); return true; }
+    catch(e){ return false; }
+  }
+  function lerSnap(){
+    if(ultimoSnap) return ultimoSnap;
+    try{ var o = JSON.parse(localStorage.getItem(K_LIX) || "null"); return (o && o.dados) || null; }catch(e){ return null; }
+  }
+
+  /* ---------- atualiza o resto da tela depois de excluir/desfazer ---------- */
+  function atualizarTela(vazio){
+    try{ document.dispatchEvent(new CustomEvent("dg:padrao", {detail: window.DG_PADRAO})); }catch(e){}
+    var t = $("dgTexto"); if(t) t.dispatchEvent(new Event("input", {bubbles: true}));
+    var pv = $("dgPrevia");
+    if(pv && pv.classList.contains("aberta")){
+      if(vazio){ var f = $("dgpFechar"); if(f) f.click(); }
+      else { var b = $("dgLivroAbrir"); if(b) setTimeout(function(){ b.click(); }, 150); }
+    }
+  }
+
+  /* ---------- exclusão ---------- */
+  function aplicar(sel, tudo){
+    var P = ler(K_PARTES), L = ler(K_LIVRO), T = ler(K_TIT), O = ler(K_OM), I = ler(K_IMG);
+    if(tudo){ P = {}; L = {}; T = {}; O = {}; I = {}; }
+    else sel.forEach(function(it){
+      var t = it.id.charAt(0), v = it.id.slice(2);
+      if(t === "p"){ delete P[v]; delete T[v]; }
+      else if(t === "d"){ Object.keys(L).forEach(function(k){ var m = /^(D10\.\d)@(\d+)$/.exec(k); if(m && m[2] === v) delete L[k]; }); }
+      else if(t === "i"){ delete I[v]; }
+    });
+    var ok = gravarObj(K_PARTES, P) && gravarObj(K_LIVRO, L) && gravarObj(K_TIT, T) && gravarObj(K_OM, O) && gravarObj(K_IMG, I);
+    return ok;
+  }
+  function executar(sel, tudo, textoConfirma){
+    if(!confirm(textoConfirma)) return;
+    var snap = tirarSnap();
+    if(!guardarSnap(snap)){
+      if(!confirm("Não há espaço no navegador para guardar a cópia de desfazer. Você ainda poderá desfazer enquanto esta página estiver aberta, mas não depois de recarregar.\n\nExcluir mesmo assim?")) return;
+    }
+    if(!aplicar(sel, tudo)){ msg.textContent = "O navegador não conseguiu concluir a exclusão."; return; }
+    msg.textContent = tudo ? "Livro inteiro excluído. Use DESFAZER ÚLTIMA EXCLUSÃO se precisar." : "Exclusão feita. Use DESFAZER ÚLTIMA EXCLUSÃO se precisar.";
+    desenhar();
+    atualizarTela(tudo || !levantar().length);
+  }
+
+  btnSel.addEventListener("click", function(){
+    var sel = marcados(); if(!sel.length) return;
+    var l = sel.slice(0, 8).map(function(it){ return "• " + it.rot; }).join("\n");
+    if(sel.length > 8) l += "\n• … e mais " + (sel.length - 8);
+    executar(sel, false, "Excluir " + sel.length + (sel.length === 1 ? " item" : " itens") + " do livro?\n\n" + l + "\n\nVocê poderá desfazer.");
+  });
+  btnTudo.addEventListener("click", function(){
+    executar([], true, "Excluir o LIVRO INTEIRO?\n\nIsto apaga todas as partes, todos os dias, os títulos trocados, as partes omitidas e as imagens da capa e da contracapa.\n\nOs dados do autor e da editora e o padrão do dia ficam. Você poderá desfazer.");
+  });
+  btnDesf.addEventListener("click", function(){
+    var s = lerSnap();
+    if(!s){ msg.textContent = "Não há exclusão para desfazer."; return; }
+    if(!confirm("Desfazer a última exclusão?\n\nO livro volta ao estado de antes dela. Alterações feitas depois dela serão substituídas.")) return;
+    try{
+      CHAVES.forEach(function(k){ if(s[k] == null) localStorage.removeItem(k); else localStorage.setItem(k, s[k]); });
+    }catch(e){ msg.textContent = "O navegador não conseguiu restaurar (sem espaço)."; return; }
+    ultimoSnap = null;
+    try{ localStorage.removeItem(K_LIX); }catch(e){}
+    msg.textContent = "Exclusão desfeita.";
+    desenhar();
+    atualizarTela(false);
+  });
+
+  lista.addEventListener("change", contar);
+  chkTodos.addEventListener("change", function(){
+    Array.prototype.forEach.call(lista.querySelectorAll("input[data-i]"), function(c){ c.checked = chkTodos.checked; });
+    contar();
+  });
+
+  /* ---------- abrir e fechar ---------- */
+  function abrir(){ msg.textContent = ""; desenhar(); tela.hidden = false; btnSel.focus(); }
+  function fechar(){ tela.hidden = true; }
+  $("dgExclFechar").addEventListener("click", fechar);
+  tela.addEventListener("click", function(ev){ if(ev.target === tela) fechar(); });
+  window.addEventListener("keydown", function(ev){
+    if(ev.key === "Escape" && !tela.hidden){ fechar(); ev.stopImmediatePropagation(); }
+  }, true);
+
+  /* fecha junto com o Diagramador */
+  var dgTela = $("dgTela");
+  if(dgTela && window.MutationObserver){
+    new MutationObserver(function(){ if(dgTela.hidden) fechar(); }).observe(dgTela, {attributes: true, attributeFilter: ["hidden"]});
+  }
+
+  /* ---------- botão EXCLUIR ao lado de ABRIR LIVRO ---------- */
+  var b = document.createElement("button");
+  b.id = "dgLivroExcluir"; b.type = "button"; b.className = "at-btn"; b.textContent = "EXCLUIR";
+  b.title = "Excluir o livro inteiro ou só partes dele";
+  var ref = $("dgLivroAbrir");
+  if(ref) ref.insertAdjacentElement("afterend", b);
+  else if($("dgLimpar")) $("dgLimpar").insertAdjacentElement("beforebegin", b);
+  b.addEventListener("click", abrir);
+})();
+</script>
+<!-- ===== FIM: EXCLUIR LIVRO / PARTES ===== -->
  <!-- ===== INÍCIO: FECHAR TUDO JUNTO =====  -->
 <script>
 (function(){
