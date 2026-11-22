@@ -6326,7 +6326,10 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       $("dgiRem_" + k).disabled = !(v && v.d);
     });
   }
-  function eD01(){ return /^D01(\s|$)/.test((tit.textContent || "").trim()); }
+  function eD01(){
+    var t = (tit.textContent || "").trim();
+    return /^D01(\s|$)/.test(t) || /^[A-Za-z]+\d+(?:\.\d+)*\s+[—–-]\s+(?:Capa|Contracapa)\s*$/i.test(t);
+  }
   function atualizar(){
     box.classList.toggle("dg-hide", !eD01());
     if(eD01()) desenhar();
