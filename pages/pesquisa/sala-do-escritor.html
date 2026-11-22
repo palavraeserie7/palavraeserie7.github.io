@@ -4305,6 +4305,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   function gravarChave(ch, o){ try{ localStorage.setItem(ch, JSON.stringify(o)); }catch(e){} }
   var salvos = ler(CHAVE), titulos = ler(CHAVE_TIT), omitidas = ler(CHAVE_OM), fixos = ler(CHAVE_FX);
   function gravar(){ gravarChave(CHAVE, salvos); }
+   document.addEventListener("dg:tipo-ativo", function(){ salvos = ler(CHAVE); titulos = ler(CHAVE_TIT); omitidas = ler(CHAVE_OM); });
  
   /* ---------- dados fixos: já vêm preenchidos pelo JSON (conteudo_fixo); aqui ficam só as trocas do autor ---------- */
   var CAMPOS_FX = [
@@ -6094,6 +6095,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   var btnSel = $("dgxSel"), btnTudo = $("dgxTudo"), btnDesf = $("dgxDesfazer"), chkTodos = $("dgxTodos");
   var itens = [];
   var ultimoSnap = null;   /* cópia da última exclusão, também guardada no navegador */
+   document.addEventListener("dg:tipo-ativo", function(){ ultimoSnap = null; });
 
   /* ---------- levanta o que existe no livro ---------- */
   function levantar(){
@@ -6184,7 +6186,11 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   /* ---------- exclusão ---------- */
   function aplicar(sel, tudo){
     var P = ler(K_PARTES), L = ler(K_LIVRO), T = ler(K_TIT), O = ler(K_OM), I = ler(K_IMG);
-    if(tudo){ P = {}; L = {}; T = {}; O = {}; I = {}; }
+       if(tudo){
+      P = {}; L = {}; T = {}; O = {};
+      var ta = (window.dgTipoAtivo && window.dgTipoAtivo()) || "4.1";
+      Object.keys(I).forEach(function(k){ if(k.slice(-(ta.length + 1)) === "@" + ta) delete I[k]; });
+    }
     else sel.forEach(function(it){
       var t = it.id.charAt(0), v = it.id.slice(2);
       if(t === "p"){ delete P[v]; delete T[v]; }
