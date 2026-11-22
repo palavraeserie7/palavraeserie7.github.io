@@ -6254,7 +6254,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 <!-- ===== FIM: SEM ESCOLHA DE TAMANHO ===== -->
 
 <!-- ===== INÍCIO: CAPA E CONTRACAPA EM IMAGEM ===== -->
- 
+
 <style>
 #dgImgBox{margin:0 0 10px;padding:12px 14px;border:1px solid var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);color:var(--ink,#2a2217)}
 #dgImgBox .dgi-tit{margin:0 0 4px;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.04em}
@@ -6269,29 +6269,46 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 #dgImgBox .at-btn{padding:6px 10px;font-size:11px}
 #dgImgBox button[disabled]{opacity:.45;cursor:not-allowed}
 </style>
- 
+
 <script>
 (function(){
-  var CH = "ps_diagramador_imagens";   /* {capa:{d,w,h,aviso}, contracapa:{...}} */
+  /* guarda as imagens POR TIPO: "capa@9.6", "contracapa@9.6", "capa@4.1"...
+     as chaves antigas "capa" e "contracapa" (sem @) eram compartilhadas e só servem para migrar */
+  var CH = "ps_diagramador_imagens";
   var LARG = 1240;                     /* largura máxima guardada (px): A5 a ~212 dpi */
   var QUAL = 0.85;                     /* qualidade JPG */
   var RAZAO = 148 / 210;               /* proporção A5 */
   var NOMES = {capa: "Capa (frente)", contracapa: "Contracapa (fim do livro)"};
   var CHAVES = ["capa", "contracapa"];
- 
+
   function $(id){ return document.getElementById(id); }
   function lerImgs(){ try{ return JSON.parse(localStorage.getItem(CH) || "{}") || {}; }catch(e){ return {}; } }
   function gravarImgs(o){ try{ localStorage.setItem(CH, JSON.stringify(o)); return true; }catch(e){ return false; } }
- 
+
+  /* tipo do livro que está aberto no Diagramador (ex.: 9.6) */
+  function tipoAtual(){
+    var b = document.querySelector('#dgTiposBox .dg-tipo[aria-pressed="true"]');
+    if(b && b.dataset.tipo) return b.dataset.tipo;
+    var d = window.DG_PADRAO;
+    if(d && d.tipo) return String(d.tipo);
+    try{ var s = JSON.parse(localStorage.getItem("ps_diagramador") || "null"); if(s && s.tipo) return String(s.tipo); }catch(e){}
+    return "4.1";
+  }
+  function nomeTipo(t){
+    var d = window.DG_PADRAO;
+    return t + ((d && String(d.tipo) === t && d.nome) ? " " + d.nome : "");
+  }
+  function chave(k, t){ return k + "@" + (t || tipoAtual()); }
+
   var tit = $("dgEtitulo"), txt = $("dgTexto"), frame = $("dgpFrame");
   if(!tit || !txt || !frame) return;
- 
-  /* ---------- caixa de imagens dentro do editor da D01 ---------- */
+
+  /* ---------- caixa de imagens dentro do editor da capa (de qualquer tipo) ---------- */
   var box = document.createElement("div");
   box.id = "dgImgBox";
   box.className = "dg-hide";
-  var h = '<p class="dgi-tit">IMAGENS DA CAPA (feitas no Canva)</p>' +
-          '<p class="dgi-nota">Use PNG ou JPG no tamanho A5 (148 × 210 mm). A imagem ocupa a página inteira, sem margens. ' +
+  var h = '<p class="dgi-tit">IMAGENS DA CAPA (feitas no Canva) — <span id="dgiTipo"></span></p>' +
+          '<p class="dgi-nota">Estas imagens valem só para este livro (este tipo). Use PNG ou JPG no tamanho A5 (148 × 210 mm). A imagem ocupa a página inteira, sem margens. ' +
           'Continue digitando o título e o subtítulo abaixo: eles são usados na página de rosto e no cabeçalho.</p>' +
           '<div class="dgi-cols">';
   CHAVES.forEach(function(k){
@@ -6303,17 +6320,21 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
                '<button type="button" class="at-btn" data-acao="escolher" data-k="' + k + '">ESCOLHER IMAGEM</button>' +
                '<button type="button" class="at-btn" data-acao="remover" data-k="' + k + '" id="dgiRem_' + k + '">REMOVER</button>' +
              '</div>' +
+             '<div class="dgi-bt dg-hide" id="dgiLeg_' + k + '">' +
+               '<button type="button" class="at-btn" data-acao="usar" data-k="' + k + '">USAR IMAGEM ANTERIOR NESTE LIVRO</button>' +
+             '</div>' +
              '<input type="file" accept="image/png,image/jpeg,image/webp" class="dg-hide" id="dgiArq_' + k + '">' +
            '</div></div>';
   });
   h += '</div>';
   box.innerHTML = h;
   txt.insertAdjacentElement("beforebegin", box);
- 
+
   function desenhar(){
-    var im = lerImgs();
+    var im = lerImgs(), t = tipoAtual();
+    $("dgiTipo").textContent = "livro " + nomeTipo(t);
     CHAVES.forEach(function(k){
-      var m = $("dgiMini_" + k), i = $("dgiInfo_" + k), v = im[k];
+      var m = $("dgiMini_" + k), i = $("dgiInfo_" + k), v = im[chave(k, t)], leg = im[k];
       if(v && v.d){
         m.style.backgroundImage = 'url("' + v.d + '")';
         m.textContent = "";
@@ -6324,8 +6345,11 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
         i.textContent = (k === "capa") ? "Sem imagem: o livro usa a capa de texto." : "Sem imagem: o livro termina sem contracapa.";
       }
       $("dgiRem_" + k).disabled = !(v && v.d);
+      /* imagem antiga (compartilhada) ainda não atribuída a nenhum livro */
+      $("dgiLeg_" + k).classList.toggle("dg-hide", !(leg && leg.d && !(v && v.d)));
     });
   }
+  /* abre a caixa na capa do devocional (D01) e em qualquer parte chamada "Capa" (ex.: L01 — Capa) */
   function eD01(){
     var t = (tit.textContent || "").trim();
     return /^D01(\s|$)/.test(t) || /^[A-Za-z]+\d+(?:\.\d+)*\s+[—–-]\s+(?:Capa|Contracapa)\s*$/i.test(t);
@@ -6335,14 +6359,16 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     if(eD01()) desenhar();
   }
   if(window.MutationObserver) new MutationObserver(atualizar).observe(tit, {childList: true, characterData: true, subtree: true});
+  document.addEventListener("dg:padrao", atualizar);
   atualizar();
- 
+
   function msg(t){ var s = $("dgStatus"); if(s) s.textContent = t; }
- 
+
   /* ---------- ler, reduzir e guardar a imagem ---------- */
   function processar(k, file){
     if(!file) return;
     if(!/^image\//.test(file.type)){ alert("Escolha um arquivo de imagem (PNG ou JPG)."); return; }
+    var t = tipoAtual();
     var rd = new FileReader();
     rd.onload = function(){
       var img = new Image();
@@ -6357,56 +6383,66 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
         var d = c.toDataURL("image/jpeg", QUAL);
         var aviso = (Math.abs((w / hh) / RAZAO - 1) > 0.03) ? "fora da proporção A5 (será cortada nas bordas)" : "";
         var im = lerImgs();
-        im[k] = {d: d, w: cw, h: alt, aviso: aviso};
+        im[chave(k, t)] = {d: d, w: cw, h: alt, aviso: aviso};
         if(!gravarImgs(im)){
-          alert("O navegador não conseguiu guardar esta imagem (sem espaço). Use uma imagem menor ou remova a outra.");
+          alert("O navegador não conseguiu guardar esta imagem (sem espaço). Use uma imagem menor ou remova outra.");
           return;
         }
         desenhar();
-        msg(NOMES[k] + " salva." + (aviso ? " Atenção: " + aviso + "." : ""));
+        msg(NOMES[k] + " salva para o livro " + t + "." + (aviso ? " Atenção: " + aviso + "." : ""));
       };
       img.onerror = function(){ alert("Não foi possível abrir esta imagem."); };
       img.src = rd.result;
     };
     rd.readAsDataURL(file);
   }
- 
+
   CHAVES.forEach(function(k){
     var inp = $("dgiArq_" + k);
     inp.addEventListener("change", function(){
       var f = inp.files && inp.files[0];
       if(f){
         var im = lerImgs();
-        if(im[k] && im[k].d && !confirm("Já existe uma imagem de " + NOMES[k].toLowerCase() + ". Substituir pela nova?")){ inp.value = ""; return; }
+        var ex = im[chave(k)];
+        if(ex && ex.d && !confirm("Já existe uma imagem de " + NOMES[k].toLowerCase() + " neste livro. Substituir pela nova?")){ inp.value = ""; return; }
         processar(k, f);
       }
       inp.value = "";
     });
   });
- 
+
   box.addEventListener("click", function(ev){
     var b = ev.target.closest && ev.target.closest("button"); if(!b) return;
     var k = b.dataset.k;
     if(b.dataset.acao === "escolher"){ $("dgiArq_" + k).click(); return; }
     if(b.dataset.acao === "remover"){
-      if(!confirm("Remover a imagem de " + NOMES[k].toLowerCase() + "?")) return;
-      var im = lerImgs(); delete im[k]; gravarImgs(im);
-      desenhar(); msg(NOMES[k] + " removida.");
+      if(!confirm("Remover a imagem de " + NOMES[k].toLowerCase() + " deste livro?")) return;
+      var im = lerImgs(); delete im[chave(k)]; gravarImgs(im);
+      desenhar(); msg(NOMES[k] + " removida deste livro.");
+      return;
+    }
+    if(b.dataset.acao === "usar"){
+      var im2 = lerImgs();
+      if(!(im2[k] && im2[k].d)) return;
+      if(!confirm("Usar a imagem anterior de " + NOMES[k].toLowerCase() + " no livro " + tipoAtual() + "?\n\nEla deixa de ser compartilhada e passa a valer só para este livro.")) return;
+      im2[chave(k)] = im2[k]; delete im2[k]; gravarImgs(im2);
+      desenhar(); msg(NOMES[k] + " atribuída ao livro " + tipoAtual() + ".");
     }
   });
- 
+
   /* ---------- coloca as imagens no HTML da prévia (sem mexer no código do livro) ---------- */
   function sec(cls, inner, extra){ return '<section class="sec ' + cls + '"' + (extra || "") + '>' + inner + '</section>'; }
   function pagina(src){ return '<div class="fl"><img alt="" src="' + src + '" style="display:block;width:100%;height:100%;object-fit:cover"></div>'; }
- 
+
   function transformar(html){
     if(typeof html !== "string" || html.indexOf('class="sec ') < 0) return html;
-    var im = lerImgs();
-    var capa = im.capa && im.capa.d, contra = im.contracapa && im.contracapa.d;
+    var im = lerImgs(), t = tipoAtual();
+    var capa = im[chave("capa", t)] && im[chave("capa", t)].d;
+    var contra = im[chave("contracapa", t)] && im[chave("contracapa", t)].d;
     var cheio = html.indexOf("break-before:right") > -1;          /* livro completo */
-    var temCapa = html.indexOf('class="sec pg-capa"') > -1;       /* prévia da D01 */
+    var temCapa = html.indexOf('class="sec pg-capa"') > -1;       /* prévia da capa */
     if(!cheio && !temCapa) return html;                           /* prévia de outra parte: não mexe */
- 
+
     if(capa){
       var re = /<section class="sec pg-capa"[^>]*>([\s\S]*?)<\/section>/;
       var m = re.exec(html);
@@ -6424,7 +6460,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     }
     return html;
   }
- 
+
   var desc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
   if(desc && desc.set){
     Object.defineProperty(frame, "srcdoc", {
