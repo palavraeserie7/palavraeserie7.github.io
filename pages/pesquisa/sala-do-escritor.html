@@ -6630,7 +6630,135 @@ body.dg-livro-vivo .dgp-nota{display:none}
 <!-- ===== FIM: MONTADOR DE PÁGINAS DOS TIPOS NOVOS ===== -->
 <!-- ===== FIM: PADRÃO JSON DO TIPO ===== -->
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
- <!-- ==== ESTÚDIO ==== -->
+<!-- ===== INÍCIO: ABRIR LIVRO SÓ PARA O TIPO ATIVO + APAGAR LIVROS ===== -->
+<script>
+(function(){
+  function tipoAtual(){
+    var d = window.DG_PADRAO;
+    return (d && d.tipo) ? String(d.tipo) : "4.1";
+  }
+  window.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("#dgLivroAbrir");
+    if(!b) return;
+    var t = tipoAtual();
+    if(t === "4.1") return;
+    ev.stopImmediatePropagation();
+    ev.preventDefault();
+    alert("O livro completo ainda só existe para o tipo 4.1 (Devocionais diários).\n\nO tipo escolhido agora é o " + t + ". Para ver o que você está escrevendo nele, use o botão DIAGRAMAR dentro de cada parte.");
+  }, true);
+})();
+</script>
+
+<script>
+(function(){
+  var menu = document.getElementById("dgLivroMenu");
+  if(!menu) return;
+
+  var NOMES = {D:"Devocional diário (4.1)", L:"Livros por capítulos (9.6)"};
+  var CH = ["ps_diagramador_partes","ps_diagramador_titulos","ps_diagramador_omitidas"];
+  var EXTRA_D = ["ps_diagramador_livro","ps_diagramador_imagens","ps_diagramador_backup","ps_diagramador_ultimo_dia","ps_diagramador_padrao","ps_diagramador_padrao_anterior"];
+
+  function ler(k){ try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } }
+  function gravar(k, o){ try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} }
+
+  function grupos(){
+    var g = {};
+    CH.forEach(function(ch){
+      Object.keys(ler(ch)).forEach(function(k){
+        var m = /^([A-Z]+)\d/.exec(k); if(m) g[m[1]] = 1;
+      });
+    });
+    if(Object.keys(ler("ps_diagramador_livro")).length) g.D = 1;
+    if(localStorage.getItem("ps_diagramador_imagens")) g.D = 1;
+    return Object.keys(g).sort();
+  }
+
+  function apagar(sel, apagarFixos){
+    var copia = {partes:{}, extras:{}};
+    CH.forEach(function(ch){
+      var o = ler(ch), tira = {};
+      Object.keys(o).forEach(function(k){
+        var m = /^([A-Z]+)\d/.exec(k);
+        if(m && sel.indexOf(m[1]) > -1){ tira[k] = o[k]; delete o[k]; }
+      });
+      copia.partes[ch] = tira;
+      gravar(ch, o);
+    });
+    if(sel.indexOf("D") > -1){
+      EXTRA_D.forEach(function(k){
+        var v = localStorage.getItem(k);
+        if(v != null){ copia.extras[k] = v; localStorage.removeItem(k); }
+      });
+    }
+    if(apagarFixos){
+      var f = localStorage.getItem("ps_diagramador_fixos");
+      if(f != null){ copia.extras["ps_diagramador_fixos"] = f; localStorage.removeItem("ps_diagramador_fixos"); }
+    }
+    try{
+      var blob = new Blob([JSON.stringify({tipo:"copia-antes-de-apagar", quando:new Date().toISOString(), dados:copia}, null, 2)], {type:"application/json"});
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "copia-antes-de-apagar-" + new Date().toISOString().slice(0,10) + ".json";
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    }catch(e){}
+  }
+
+  function abrir(){
+    var lista = grupos();
+    var ov = document.createElement("div");
+    ov.style.cssText = "position:fixed;inset:0;z-index:100030;background:rgba(30,22,10,.72);display:flex;align-items:center;justify-content:center;padding:14px";
+    var h = '<div style="width:min(520px,96vw);background:#fffdf6;border:2px solid #a07d33;border-radius:8px;padding:18px 20px;color:#2a2217;font:15px/1.5 Georgia,serif">' +
+      '<h3 style="margin:0 0 6px;font:600 20px Georgia,serif">Apagar livros</h3>' +
+      '<p style="margin:0 0 12px;font:13.5px/1.5 Segoe UI,Arial,sans-serif;color:#6b5f48">Marque o que quer apagar. Antes de apagar, o site baixa um arquivo de segurança com o que foi removido.</p>';
+    if(!lista.length){
+      h += '<p>Não há nenhum livro com texto salvo.</p>';
+    } else {
+      h += '<label style="display:block;margin:0 0 8px;font:700 14px Segoe UI,Arial,sans-serif"><input type="checkbox" id="apTodos"> Marcar tudo</label>';
+      lista.forEach(function(c){
+        h += '<label style="display:block;margin:0 0 6px"><input type="checkbox" class="apG" value="' + c + '"> ' + (NOMES[c] || ("Partes com código " + c)) + '</label>';
+      });
+      h += '<hr style="border:0;border-top:1px solid #e3d8bd;margin:12px 0">' +
+        '<label style="display:block"><input type="checkbox" id="apFixos"> Apagar também os dados do autor e da editora</label>';
+    }
+    h += '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">' +
+      '<button type="button" class="at-btn" id="apCancelar">CANCELAR</button>' +
+      (lista.length ? '<button type="button" class="at-btn gold" id="apOk">APAGAR</button>' : '') +
+      '</div></div>';
+    ov.innerHTML = h;
+    document.body.appendChild(ov);
+
+    function fechar(){ ov.remove(); }
+    ov.querySelector("#apCancelar").addEventListener("click", fechar);
+    var todos = ov.querySelector("#apTodos");
+    if(todos) todos.addEventListener("change", function(){
+      Array.prototype.forEach.call(ov.querySelectorAll(".apG"), function(c){ c.checked = todos.checked; });
+    });
+    var ok = ov.querySelector("#apOk");
+    if(ok) ok.addEventListener("click", function(){
+      var sel = Array.prototype.map.call(ov.querySelectorAll(".apG:checked"), function(c){ return c.value; });
+      var fx = !!(ov.querySelector("#apFixos") && ov.querySelector("#apFixos").checked);
+      if(!sel.length && !fx){ alert("Marque pelo menos uma opção."); return; }
+      if(!confirm("Apagar o que você marcou?\n\nUm arquivo de segurança será baixado antes.")) return;
+      apagar(sel, fx);
+      alert("Apagado. A página vai recarregar.");
+      location.reload();
+    });
+  }
+
+  var b = document.createElement("button");
+  b.id = "dgLivroApagarTudo"; b.type = "button"; b.className = "at-btn";
+  b.textContent = "APAGAR LIVROS…";
+  menu.appendChild(b);
+  b.addEventListener("click", function(){
+    menu.classList.remove("aberto");
+    abrir();
+  });
+})();
+</script>
+<!-- ===== FIM: ABRIR LIVRO SÓ PARA O TIPO ATIVO + APAGAR LIVROS ===== -->
+ 
+                                                  <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
  
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
