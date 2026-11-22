@@ -3999,7 +3999,7 @@ document.addEventListener("visibilitychange",function(){
     partes.push(tipo ? '<strong>' + tipo + ' ' + esc(nomeTipo(tipo)) + '</strong>' : 'Gênero: <em>falta escolher</em>');
     partes.push(e ? '<strong>' + e[0] + ' ' + esc(e[1]) + '</strong> (' + esc(e[2]) + ')' : 'Extensão: <em>falta escolher</em>');
     $("dgResumo").innerHTML = (msg ? '<strong>' + esc(msg) + '</strong> ' : '') + partes.join(' &nbsp;·&nbsp; ');
-    $("dgConfirmar").disabled = !tipo;
+    $("dgConfirmar").disabled = !(tipo && ext);
   }
  
   /* ---------- eventos ---------- */
@@ -4021,7 +4021,7 @@ document.addEventListener("visibilitychange",function(){
     desenhar();
   });
   $("dgConfirmar").addEventListener("click", function(){
-   if(!tipo) return;
+    if(!(tipo && ext)) return;
     try{ localStorage.setItem(CHAVE, JSON.stringify({tipo:tipo, ext:ext})); }catch(e){}
     resumo("Escolha registrada.");
     /* PRÓXIMO PASSO: aqui entra a tela de colar o texto. */
@@ -4047,58 +4047,7 @@ document.addEventListener("visibilitychange",function(){
   }, true);
 })();
 </script>
-<!-- ===== INÍCIO: DADOS SEPARADOS POR TIPO ===== -->
-<script>
-(function(){
-  /* textos, títulos, omitidas, backup e lixeira passam a ser guardados POR TIPO (ex.: ps_diagramador_partes@9.6).
-     Não mexe em assinatura/planos, nem em Supabase, nem nos dados do autor e da editora. */
-  var NS = ["ps_diagramador_partes","ps_diagramador_livro","ps_diagramador_titulos","ps_diagramador_omitidas","ps_diagramador_backup","ps_diagramador_lixeira"];
-  var proto = Storage.prototype;
-  var rawGet = proto.getItem, rawSet = proto.setItem, rawDel = proto.removeItem;
-  var LS = window.localStorage;
-  var TA = "4.1";
-  try{
-    var s = JSON.parse(rawGet.call(LS, "ps_diagramador") || "null");
-    if(s && s.tipo) TA = String(s.tipo);
-  }catch(e){}
 
-  function mapa(k){ return NS.indexOf(k) > -1 ? k + "@" + TA : k; }
-  proto.getItem = function(k){ return this === LS ? rawGet.call(this, mapa(k)) : rawGet.call(this, k); };
-  proto.setItem = function(k, v){ return this === LS ? rawSet.call(this, mapa(k), v) : rawSet.call(this, k, v); };
-  proto.removeItem = function(k){ return this === LS ? rawDel.call(this, mapa(k)) : rawDel.call(this, k); };
-  window.dgTipoAtivo = function(){ return TA; };
-
-  /* migração única: o que já estava salvo (sem tipo) vai para o seu tipo pelo prefixo do código.
-     Os dados antigos NÃO são apagados: ficam como cópia de segurança. */
-  try{
-    if(!rawGet.call(LS, "ps_diagramador_migrado_v1")){
-      ["ps_diagramador_partes","ps_diagramador_titulos","ps_diagramador_omitidas"].forEach(function(ch){
-        var txt = rawGet.call(LS, ch); if(!txt) return;
-        var o = JSON.parse(txt) || {}, d = {}, l = {};
-        Object.keys(o).forEach(function(k){ if(/^D\d/.test(k)) d[k] = o[k]; else if(/^L\d/.test(k)) l[k] = o[k]; });
-        if(Object.keys(d).length && !rawGet.call(LS, ch + "@4.1")) rawSet.call(LS, ch + "@4.1", JSON.stringify(d));
-        if(Object.keys(l).length && !rawGet.call(LS, ch + "@9.6")) rawSet.call(LS, ch + "@9.6", JSON.stringify(l));
-      });
-      var liv = rawGet.call(LS, "ps_diagramador_livro");
-      if(liv && !rawGet.call(LS, "ps_diagramador_livro@4.1")) rawSet.call(LS, "ps_diagramador_livro@4.1", liv);
-      rawSet.call(LS, "ps_diagramador_migrado_v1", "1");
-    }
-  }catch(e){}
-
-  /* ao clicar em outro tipo, passa a trabalhar nos dados dele (roda antes do menu, por estar acima dele) */
-  document.addEventListener("click", function(ev){
-    var b = ev.target.closest && ev.target.closest("#dgTiposBox [data-tipo]");
-    if(!b || b.dataset.tipo === TA) return;
-    var ed = document.getElementById("dg-editor"), fx = document.getElementById("dg-fixos");
-    if((ed && ed.classList.contains("aberto")) || (fx && fx.classList.contains("aberto"))) return;
-    TA = b.dataset.tipo;
-    document.dispatchEvent(new CustomEvent("dg:tipo-ativo", {detail: TA}));
-    var pv = document.getElementById("dgPrevia");
-    if(pv && pv.classList.contains("aberta")) setTimeout(function(){ var a = document.getElementById("dgLivroAbrir"); if(a) a.click(); }, 400);
-  }, true);
-})();
-</script>
-<!-- ===== FIM: DADOS SEPARADOS POR TIPO ===== -->
 
 
 <!-- ===== INÍCIO: MENU DE DIAGRAMAÇÃO (4.1) ===== -->
@@ -4305,7 +4254,6 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   function gravarChave(ch, o){ try{ localStorage.setItem(ch, JSON.stringify(o)); }catch(e){} }
   var salvos = ler(CHAVE), titulos = ler(CHAVE_TIT), omitidas = ler(CHAVE_OM), fixos = ler(CHAVE_FX);
   function gravar(){ gravarChave(CHAVE, salvos); }
-   document.addEventListener("dg:tipo-ativo", function(){ salvos = ler(CHAVE); titulos = ler(CHAVE_TIT); omitidas = ler(CHAVE_OM); });
  
   /* ---------- dados fixos: já vêm preenchidos pelo JSON (conteudo_fixo); aqui ficam só as trocas do autor ---------- */
   var CAMPOS_FX = [
@@ -4782,7 +4730,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     if(!atual || !normaAtual) return;
     var tipoSel = document.querySelector('#dgTiposBox .dg-tipo[aria-pressed="true"]');
     var extSel = document.querySelector('#dgExts .dg-ext[aria-pressed="true"]');
-   
+    if(!extSel){ status.textContent = "Escolha o tamanho da obra (E01–E10) antes de diagramar."; return; }
  
     var inf = info(atual), om = !!omitidas[atual];
     if(inf.tipo === "livro" && !om){ salvos[atual] = txt.value; gravar(); }
@@ -4812,7 +4760,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
         ano: new Date().getFullYear()
       },
       tipo: tipoSel ? tipoSel.dataset.tipo : null,
-      extensao: extSel ? extSel.dataset.ext : null,
+      extensao: extSel.dataset.ext,
       saida: normaAtual.saida,
       saidas: [normaAtual.saida],
       normas: normaAtual,
@@ -4820,7 +4768,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     };
     /* PRÓXIMO PASSO: quem gera a página/PDF escuta este evento */
     document.dispatchEvent(new CustomEvent("dg:diagramar", {detail: pedido}));
-       status.textContent = "Diagramação solicitada: " + pedido.parte + (pedido.extensao ? " · " + pedido.extensao : "") + " · " + pedido.saida;
+    status.textContent = "Diagramação solicitada: " + pedido.parte + " · " + pedido.extensao + " · " + pedido.saida;
   });
  
   btnSalvar.addEventListener("click", function(){
@@ -6022,251 +5970,6 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 </script>
 
  <!-- ===== FIM: LIVRO COMPLETO (passo 4) ===== -->
- <!-- ===== INÍCIO: EXCLUIR LIVRO / PARTES ===== -->
-<style>
-#dgExcl{position:fixed;inset:0;z-index:100030;background:rgba(30,22,10,.72);display:flex;align-items:center;justify-content:center;padding:14px}
-#dgExcl[hidden]{display:none}
-.dgx-box{display:flex;flex-direction:column;gap:8px;width:min(640px,96vw);max-height:calc(100vh - 28px);background:var(--paper-card,#fffdf6);border:2px solid var(--brass,#a07d33);border-radius:8px;padding:16px 18px;box-shadow:0 12px 30px rgba(0,0,0,.4);box-sizing:border-box;color:var(--ink,#2a2217)}
-.dgx-topo{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.dgx-topo strong{font:600 18px Georgia,"Times New Roman",serif}
-.dgx-nota{margin:0;font:13px/1.45 "Segoe UI",Arial,sans-serif;color:var(--ink-soft,#6b5f48)}
-.dgx-todos{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid var(--paper-line,#e3d8bd);font:700 13px "Segoe UI",Arial,sans-serif}
-.dgx-lista{flex:1 1 auto;overflow-y:auto;min-height:120px;border:1px solid var(--paper-line,#e3d8bd);border-radius:6px;background:#fff}
-.dgx-grupo{padding:8px 12px 3px;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--brass-deep,#7d5f1e)}
-.dgx-item{display:flex;align-items:baseline;gap:10px;padding:7px 12px;cursor:pointer;font:15px/1.35 Georgia,"Times New Roman",serif}
-.dgx-item:hover{background:var(--brass-wash,#f3e9cc)}
-.dgx-item input{flex:0 0 auto;transform:translateY(2px)}
-.dgx-item span{flex:1 1 auto}
-.dgx-item small{flex:0 0 auto;color:var(--ink-soft,#6b5f48);font:12px "Segoe UI",Arial,sans-serif}
-.dgx-vazio{padding:22px;text-align:center;color:var(--ink-soft,#6b5f48);font:14px "Segoe UI",Arial,sans-serif}
-.dgx-msg{min-height:1.3em;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep,#7d5f1e)}
-.dgx-rod{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
-.dgx-rod button[disabled]{opacity:.45;cursor:not-allowed}
-#dgxTudo{border-color:#a14747;color:#a14747}
-</style>
-
-<div id="dgExcl" hidden role="dialog" aria-modal="true" aria-labelledby="dgExclTit">
-  <div class="dgx-box">
-    <div class="dgx-topo">
-      <strong id="dgExclTit">Excluir do livro</strong>
-      <button id="dgExclFechar" class="at-btn" type="button">FECHAR</button>
-    </div>
-    <p class="dgx-nota">Marque o que deseja excluir. Os dados do autor e da editora e o padrão do dia não são apagados. Depois de excluir, dá para desfazer.</p>
-    <label class="dgx-todos"><input type="checkbox" id="dgxTodos"> Selecionar tudo <span id="dgxConta" style="margin-left:auto;font-weight:600"></span></label>
-    <div class="dgx-lista" id="dgxLista"></div>
-    <div class="dgx-msg" id="dgxMsg" role="status"></div>
-    <div class="dgx-rod">
-      <button id="dgxDesfazer" class="at-btn" type="button">DESFAZER ÚLTIMA EXCLUSÃO</button>
-      <button id="dgxTudo" class="at-btn" type="button">EXCLUIR LIVRO INTEIRO</button>
-      <button id="dgxSel" class="at-btn gold" type="button" disabled>EXCLUIR SELECIONADOS</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  var K_PARTES = "ps_diagramador_partes", K_LIVRO = "ps_diagramador_livro", K_TIT = "ps_diagramador_titulos";
-  var K_OM = "ps_diagramador_omitidas", K_IMG = "ps_diagramador_imagens", K_LIX = "ps_diagramador_lixeira";
-  var CHAVES = [K_PARTES, K_LIVRO, K_TIT, K_OM, K_IMG];
-  var NOMES = {D01:"Capa", D02:"Página de rosto", D03:"Direitos autorais", D04:"Dedicatória", D05:"Palavra do autor", D06:"Introdução", D07:"Como usar o devocional", D11:"Encerramento", D12:"Palavra final", D13:"Sobre o autor"};
-  var NOMES_IMG = {capa:"Imagem da capa", contracapa:"Imagem da contracapa"};
-
-  function $(id){ return document.getElementById(id); }
-  function esc(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-  function ler(k){ try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } }
-  function gravarObj(k, o){
-    try{
-      if(Object.keys(o).length) localStorage.setItem(k, JSON.stringify(o)); else localStorage.removeItem(k);
-      return true;
-    }catch(e){ return false; }
-  }
-  function palavras(t){ return (String(t || "").match(/\S+/g) || []).length; }
-  function nomeParte(cod){
-    var d = window.DG_PADRAO, ps = (d && d.partes) || [];
-    for(var i = 0; i < ps.length; i++){
-      if(ps[i].cod === cod) return ps[i].nome;
-      var sub = ps[i].subpartes || [];
-      for(var j = 0; j < sub.length; j++) if(sub[j].cod === cod) return sub[j].nome;
-    }
-    return NOMES[cod] || "";
-  }
-
-  var tela = $("dgExcl"), lista = $("dgxLista"), msg = $("dgxMsg");
-  var btnSel = $("dgxSel"), btnTudo = $("dgxTudo"), btnDesf = $("dgxDesfazer"), chkTodos = $("dgxTodos");
-  var itens = [];
-  var ultimoSnap = null;   /* cópia da última exclusão, também guardada no navegador */
-   document.addEventListener("dg:tipo-ativo", function(){ ultimoSnap = null; });
-
-  /* ---------- levanta o que existe no livro ---------- */
-  function levantar(){
-    var P = ler(K_PARTES), L = ler(K_LIVRO), I = ler(K_IMG), out = [];
-    Object.keys(P).filter(function(k){ return typeof P[k] === "string" && P[k].trim(); }).sort().forEach(function(cod){
-      var n = nomeParte(cod);
-      out.push({id:"p:" + cod, grupo:"Partes do livro", rot: cod + (n ? " — " + n : ""), info: palavras(P[cod]) + " palavras"});
-    });
-    var dias = {};
-    Object.keys(L).forEach(function(k){
-      var m = /^(D10\.\d)@(\d+)$/.exec(k);
-      if(m && typeof L[k] === "string" && L[k].trim()){ (dias[m[2]] = dias[m[2]] || []).push(m[1]); }
-    });
-    Object.keys(dias).map(Number).sort(function(a, b){ return a - b; }).forEach(function(n){
-      var tit = String(L["D10.1@" + n] || "").split(/\r?\n/)[0].trim();
-      var pal = 0;
-      dias[n].forEach(function(c){ pal += palavras(L[c + "@" + n]); });
-      out.push({id:"d:" + n, grupo:"Dias devocionais", rot:"Dia " + n + (tit ? " — " + tit : ""), info: dias[n].length + (dias[n].length === 1 ? " parte · " : " partes · ") + pal + " palavras"});
-    });
-    ["capa", "contracapa"].forEach(function(k){
-      if(I[k] && I[k].d) out.push({id:"i:" + k, grupo:"Imagens", rot: NOMES_IMG[k], info: I[k].w + " × " + I[k].h + " px"});
-    });
-    return out;
-  }
-
-  function desenhar(){
-    itens = levantar();
-    if(!itens.length){
-      lista.innerHTML = '<div class="dgx-vazio">Não há nada salvo no livro.</div>';
-    } else {
-      var h = "", g = "";
-      itens.forEach(function(it, i){
-        if(it.grupo !== g){ g = it.grupo; h += '<div class="dgx-grupo">' + esc(g) + '</div>'; }
-        h += '<label class="dgx-item"><input type="checkbox" data-i="' + i + '"><span>' + esc(it.rot) + '</span><small>' + esc(it.info) + '</small></label>';
-      });
-      lista.innerHTML = h;
-    }
-    chkTodos.checked = false;
-    chkTodos.disabled = !itens.length;
-    btnTudo.disabled = !itens.length;
-    btnDesf.disabled = !temSnap();
-    contar();
-  }
-  function marcados(){
-    var ids = [];
-    Array.prototype.forEach.call(lista.querySelectorAll("input[data-i]:checked"), function(c){ ids.push(itens[+c.dataset.i]); });
-    return ids;
-  }
-  function contar(){
-    var n = marcados().length;
-    $("dgxConta").textContent = n ? n + (n === 1 ? " selecionado" : " selecionados") : "";
-    btnSel.disabled = !n;
-    var tot = lista.querySelectorAll("input[data-i]").length;
-    chkTodos.checked = tot > 0 && n === tot;
-  }
-
-  /* ---------- cópia para desfazer ---------- */
-  function temSnap(){
-    if(ultimoSnap) return true;
-    try{ return !!localStorage.getItem(K_LIX); }catch(e){ return false; }
-  }
-  function tirarSnap(){
-    var s = {};
-    CHAVES.forEach(function(k){ s[k] = localStorage.getItem(k); });
-    return s;
-  }
-  function guardarSnap(s){
-    ultimoSnap = s;
-    try{ localStorage.setItem(K_LIX, JSON.stringify({quando: Date.now(), dados: s})); return true; }
-    catch(e){ return false; }
-  }
-  function lerSnap(){
-    if(ultimoSnap) return ultimoSnap;
-    try{ var o = JSON.parse(localStorage.getItem(K_LIX) || "null"); return (o && o.dados) || null; }catch(e){ return null; }
-  }
-
-  /* ---------- atualiza o resto da tela depois de excluir/desfazer ---------- */
-  function atualizarTela(vazio){
-    try{ document.dispatchEvent(new CustomEvent("dg:padrao", {detail: window.DG_PADRAO})); }catch(e){}
-    var t = $("dgTexto"); if(t) t.dispatchEvent(new Event("input", {bubbles: true}));
-    var pv = $("dgPrevia");
-    if(pv && pv.classList.contains("aberta")){
-      if(vazio){ var f = $("dgpFechar"); if(f) f.click(); }
-      else { var b = $("dgLivroAbrir"); if(b) setTimeout(function(){ b.click(); }, 150); }
-    }
-  }
-
-  /* ---------- exclusão ---------- */
-  function aplicar(sel, tudo){
-    var P = ler(K_PARTES), L = ler(K_LIVRO), T = ler(K_TIT), O = ler(K_OM), I = ler(K_IMG);
-       if(tudo){
-      P = {}; L = {}; T = {}; O = {};
-      var ta = (window.dgTipoAtivo && window.dgTipoAtivo()) || "4.1";
-      Object.keys(I).forEach(function(k){ if(k.slice(-(ta.length + 1)) === "@" + ta) delete I[k]; });
-    }
-    else sel.forEach(function(it){
-      var t = it.id.charAt(0), v = it.id.slice(2);
-      if(t === "p"){ delete P[v]; delete T[v]; }
-      else if(t === "d"){ Object.keys(L).forEach(function(k){ var m = /^(D10\.\d)@(\d+)$/.exec(k); if(m && m[2] === v) delete L[k]; }); }
-      else if(t === "i"){ delete I[v]; }
-    });
-    var ok = gravarObj(K_PARTES, P) && gravarObj(K_LIVRO, L) && gravarObj(K_TIT, T) && gravarObj(K_OM, O) && gravarObj(K_IMG, I);
-    return ok;
-  }
-  function executar(sel, tudo, textoConfirma){
-    if(!confirm(textoConfirma)) return;
-    var snap = tirarSnap();
-    if(!guardarSnap(snap)){
-      if(!confirm("Não há espaço no navegador para guardar a cópia de desfazer. Você ainda poderá desfazer enquanto esta página estiver aberta, mas não depois de recarregar.\n\nExcluir mesmo assim?")) return;
-    }
-    if(!aplicar(sel, tudo)){ msg.textContent = "O navegador não conseguiu concluir a exclusão."; return; }
-    msg.textContent = tudo ? "Livro inteiro excluído. Use DESFAZER ÚLTIMA EXCLUSÃO se precisar." : "Exclusão feita. Use DESFAZER ÚLTIMA EXCLUSÃO se precisar.";
-    desenhar();
-    atualizarTela(tudo || !levantar().length);
-  }
-
-  btnSel.addEventListener("click", function(){
-    var sel = marcados(); if(!sel.length) return;
-    var l = sel.slice(0, 8).map(function(it){ return "• " + it.rot; }).join("\n");
-    if(sel.length > 8) l += "\n• … e mais " + (sel.length - 8);
-    executar(sel, false, "Excluir " + sel.length + (sel.length === 1 ? " item" : " itens") + " do livro?\n\n" + l + "\n\nVocê poderá desfazer.");
-  });
-  btnTudo.addEventListener("click", function(){
-    executar([], true, "Excluir o LIVRO INTEIRO?\n\nIsto apaga todas as partes, todos os dias, os títulos trocados, as partes omitidas e as imagens da capa e da contracapa.\n\nOs dados do autor e da editora e o padrão do dia ficam. Você poderá desfazer.");
-  });
-  btnDesf.addEventListener("click", function(){
-    var s = lerSnap();
-    if(!s){ msg.textContent = "Não há exclusão para desfazer."; return; }
-    if(!confirm("Desfazer a última exclusão?\n\nO livro volta ao estado de antes dela. Alterações feitas depois dela serão substituídas.")) return;
-    try{
-      CHAVES.forEach(function(k){ if(s[k] == null) localStorage.removeItem(k); else localStorage.setItem(k, s[k]); });
-    }catch(e){ msg.textContent = "O navegador não conseguiu restaurar (sem espaço)."; return; }
-    ultimoSnap = null;
-    try{ localStorage.removeItem(K_LIX); }catch(e){}
-    msg.textContent = "Exclusão desfeita.";
-    desenhar();
-    atualizarTela(false);
-  });
-
-  lista.addEventListener("change", contar);
-  chkTodos.addEventListener("change", function(){
-    Array.prototype.forEach.call(lista.querySelectorAll("input[data-i]"), function(c){ c.checked = chkTodos.checked; });
-    contar();
-  });
-
-  /* ---------- abrir e fechar ---------- */
-  function abrir(){ msg.textContent = ""; desenhar(); tela.hidden = false; btnSel.focus(); }
-  function fechar(){ tela.hidden = true; }
-  $("dgExclFechar").addEventListener("click", fechar);
-  tela.addEventListener("click", function(ev){ if(ev.target === tela) fechar(); });
-  window.addEventListener("keydown", function(ev){
-    if(ev.key === "Escape" && !tela.hidden){ fechar(); ev.stopImmediatePropagation(); }
-  }, true);
-
-  /* fecha junto com o Diagramador */
-  var dgTela = $("dgTela");
-  if(dgTela && window.MutationObserver){
-    new MutationObserver(function(){ if(dgTela.hidden) fechar(); }).observe(dgTela, {attributes: true, attributeFilter: ["hidden"]});
-  }
-
-  /* ---------- botão EXCLUIR ao lado de ABRIR LIVRO ---------- */
-  var b = document.createElement("button");
-  b.id = "dgLivroExcluir"; b.type = "button"; b.className = "at-btn"; b.textContent = "EXCLUIR";
-  b.title = "Excluir o livro inteiro ou só partes dele";
-  var ref = $("dgLivroAbrir");
-  if(ref) ref.insertAdjacentElement("afterend", b);
-  else if($("dgLimpar")) $("dgLimpar").insertAdjacentElement("beforebegin", b);
-  b.addEventListener("click", abrir);
-})();
-</script>
-<!-- ===== FIM: EXCLUIR LIVRO / PARTES ===== -->
  <!-- ===== INÍCIO: FECHAR TUDO JUNTO =====  -->
 <script>
 (function(){
@@ -6311,7 +6014,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 <!-- ===== FIM: SEM ESCOLHA DE TAMANHO ===== -->
 
 <!-- ===== INÍCIO: CAPA E CONTRACAPA EM IMAGEM ===== -->
-
+ 
 <style>
 #dgImgBox{margin:0 0 10px;padding:12px 14px;border:1px solid var(--brass,#a07d33);border-radius:8px;background:var(--brass-wash,#f3e9cc);color:var(--ink,#2a2217)}
 #dgImgBox .dgi-tit{margin:0 0 4px;font:700 12px "Segoe UI",Arial,sans-serif;letter-spacing:.04em}
@@ -6326,46 +6029,29 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
 #dgImgBox .at-btn{padding:6px 10px;font-size:11px}
 #dgImgBox button[disabled]{opacity:.45;cursor:not-allowed}
 </style>
-
+ 
 <script>
 (function(){
-  /* guarda as imagens POR TIPO: "capa@9.6", "contracapa@9.6", "capa@4.1"...
-     as chaves antigas "capa" e "contracapa" (sem @) eram compartilhadas e só servem para migrar */
-  var CH = "ps_diagramador_imagens";
+  var CH = "ps_diagramador_imagens";   /* {capa:{d,w,h,aviso}, contracapa:{...}} */
   var LARG = 1240;                     /* largura máxima guardada (px): A5 a ~212 dpi */
   var QUAL = 0.85;                     /* qualidade JPG */
   var RAZAO = 148 / 210;               /* proporção A5 */
   var NOMES = {capa: "Capa (frente)", contracapa: "Contracapa (fim do livro)"};
   var CHAVES = ["capa", "contracapa"];
-
+ 
   function $(id){ return document.getElementById(id); }
   function lerImgs(){ try{ return JSON.parse(localStorage.getItem(CH) || "{}") || {}; }catch(e){ return {}; } }
   function gravarImgs(o){ try{ localStorage.setItem(CH, JSON.stringify(o)); return true; }catch(e){ return false; } }
-
-  /* tipo do livro que está aberto no Diagramador (ex.: 9.6) */
-  function tipoAtual(){
-    var b = document.querySelector('#dgTiposBox .dg-tipo[aria-pressed="true"]');
-    if(b && b.dataset.tipo) return b.dataset.tipo;
-    var d = window.DG_PADRAO;
-    if(d && d.tipo) return String(d.tipo);
-    try{ var s = JSON.parse(localStorage.getItem("ps_diagramador") || "null"); if(s && s.tipo) return String(s.tipo); }catch(e){}
-    return "4.1";
-  }
-  function nomeTipo(t){
-    var d = window.DG_PADRAO;
-    return t + ((d && String(d.tipo) === t && d.nome) ? " " + d.nome : "");
-  }
-  function chave(k, t){ return k + "@" + (t || tipoAtual()); }
-
+ 
   var tit = $("dgEtitulo"), txt = $("dgTexto"), frame = $("dgpFrame");
   if(!tit || !txt || !frame) return;
-
-  /* ---------- caixa de imagens dentro do editor da capa (de qualquer tipo) ---------- */
+ 
+  /* ---------- caixa de imagens dentro do editor da D01 ---------- */
   var box = document.createElement("div");
   box.id = "dgImgBox";
   box.className = "dg-hide";
-  var h = '<p class="dgi-tit">IMAGENS DA CAPA (feitas no Canva) — <span id="dgiTipo"></span></p>' +
-          '<p class="dgi-nota">Estas imagens valem só para este livro (este tipo). Use PNG ou JPG no tamanho A5 (148 × 210 mm). A imagem ocupa a página inteira, sem margens. ' +
+  var h = '<p class="dgi-tit">IMAGENS DA CAPA (feitas no Canva)</p>' +
+          '<p class="dgi-nota">Use PNG ou JPG no tamanho A5 (148 × 210 mm). A imagem ocupa a página inteira, sem margens. ' +
           'Continue digitando o título e o subtítulo abaixo: eles são usados na página de rosto e no cabeçalho.</p>' +
           '<div class="dgi-cols">';
   CHAVES.forEach(function(k){
@@ -6377,21 +6063,17 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
                '<button type="button" class="at-btn" data-acao="escolher" data-k="' + k + '">ESCOLHER IMAGEM</button>' +
                '<button type="button" class="at-btn" data-acao="remover" data-k="' + k + '" id="dgiRem_' + k + '">REMOVER</button>' +
              '</div>' +
-             '<div class="dgi-bt dg-hide" id="dgiLeg_' + k + '">' +
-               '<button type="button" class="at-btn" data-acao="usar" data-k="' + k + '">USAR IMAGEM ANTERIOR NESTE LIVRO</button>' +
-             '</div>' +
              '<input type="file" accept="image/png,image/jpeg,image/webp" class="dg-hide" id="dgiArq_' + k + '">' +
            '</div></div>';
   });
   h += '</div>';
   box.innerHTML = h;
   txt.insertAdjacentElement("beforebegin", box);
-
+ 
   function desenhar(){
-    var im = lerImgs(), t = tipoAtual();
-    $("dgiTipo").textContent = "livro " + nomeTipo(t);
+    var im = lerImgs();
     CHAVES.forEach(function(k){
-      var m = $("dgiMini_" + k), i = $("dgiInfo_" + k), v = im[chave(k, t)], leg = im[k];
+      var m = $("dgiMini_" + k), i = $("dgiInfo_" + k), v = im[k];
       if(v && v.d){
         m.style.backgroundImage = 'url("' + v.d + '")';
         m.textContent = "";
@@ -6402,30 +6084,22 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
         i.textContent = (k === "capa") ? "Sem imagem: o livro usa a capa de texto." : "Sem imagem: o livro termina sem contracapa.";
       }
       $("dgiRem_" + k).disabled = !(v && v.d);
-      /* imagem antiga (compartilhada) ainda não atribuída a nenhum livro */
-      $("dgiLeg_" + k).classList.toggle("dg-hide", !(leg && leg.d && !(v && v.d)));
     });
   }
-  /* abre a caixa na capa do devocional (D01) e em qualquer parte chamada "Capa" (ex.: L01 — Capa) */
-  function eD01(){
-    var t = (tit.textContent || "").trim();
-    return /^D01(\s|$)/.test(t) || /^[A-Za-z]+\d+(?:\.\d+)*\s+[—–-]\s+(?:Capa|Contracapa)\s*$/i.test(t);
-  }
+  function eD01(){ return /^D01(\s|$)/.test((tit.textContent || "").trim()); }
   function atualizar(){
     box.classList.toggle("dg-hide", !eD01());
     if(eD01()) desenhar();
   }
   if(window.MutationObserver) new MutationObserver(atualizar).observe(tit, {childList: true, characterData: true, subtree: true});
-  document.addEventListener("dg:padrao", atualizar);
   atualizar();
-
+ 
   function msg(t){ var s = $("dgStatus"); if(s) s.textContent = t; }
-
+ 
   /* ---------- ler, reduzir e guardar a imagem ---------- */
   function processar(k, file){
     if(!file) return;
     if(!/^image\//.test(file.type)){ alert("Escolha um arquivo de imagem (PNG ou JPG)."); return; }
-    var t = tipoAtual();
     var rd = new FileReader();
     rd.onload = function(){
       var img = new Image();
@@ -6440,66 +6114,56 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
         var d = c.toDataURL("image/jpeg", QUAL);
         var aviso = (Math.abs((w / hh) / RAZAO - 1) > 0.03) ? "fora da proporção A5 (será cortada nas bordas)" : "";
         var im = lerImgs();
-        im[chave(k, t)] = {d: d, w: cw, h: alt, aviso: aviso};
+        im[k] = {d: d, w: cw, h: alt, aviso: aviso};
         if(!gravarImgs(im)){
-          alert("O navegador não conseguiu guardar esta imagem (sem espaço). Use uma imagem menor ou remova outra.");
+          alert("O navegador não conseguiu guardar esta imagem (sem espaço). Use uma imagem menor ou remova a outra.");
           return;
         }
         desenhar();
-        msg(NOMES[k] + " salva para o livro " + t + "." + (aviso ? " Atenção: " + aviso + "." : ""));
+        msg(NOMES[k] + " salva." + (aviso ? " Atenção: " + aviso + "." : ""));
       };
       img.onerror = function(){ alert("Não foi possível abrir esta imagem."); };
       img.src = rd.result;
     };
     rd.readAsDataURL(file);
   }
-
+ 
   CHAVES.forEach(function(k){
     var inp = $("dgiArq_" + k);
     inp.addEventListener("change", function(){
       var f = inp.files && inp.files[0];
       if(f){
         var im = lerImgs();
-        var ex = im[chave(k)];
-        if(ex && ex.d && !confirm("Já existe uma imagem de " + NOMES[k].toLowerCase() + " neste livro. Substituir pela nova?")){ inp.value = ""; return; }
+        if(im[k] && im[k].d && !confirm("Já existe uma imagem de " + NOMES[k].toLowerCase() + ". Substituir pela nova?")){ inp.value = ""; return; }
         processar(k, f);
       }
       inp.value = "";
     });
   });
-
+ 
   box.addEventListener("click", function(ev){
     var b = ev.target.closest && ev.target.closest("button"); if(!b) return;
     var k = b.dataset.k;
     if(b.dataset.acao === "escolher"){ $("dgiArq_" + k).click(); return; }
     if(b.dataset.acao === "remover"){
-      if(!confirm("Remover a imagem de " + NOMES[k].toLowerCase() + " deste livro?")) return;
-      var im = lerImgs(); delete im[chave(k)]; gravarImgs(im);
-      desenhar(); msg(NOMES[k] + " removida deste livro.");
-      return;
-    }
-    if(b.dataset.acao === "usar"){
-      var im2 = lerImgs();
-      if(!(im2[k] && im2[k].d)) return;
-      if(!confirm("Usar a imagem anterior de " + NOMES[k].toLowerCase() + " no livro " + tipoAtual() + "?\n\nEla deixa de ser compartilhada e passa a valer só para este livro.")) return;
-      im2[chave(k)] = im2[k]; delete im2[k]; gravarImgs(im2);
-      desenhar(); msg(NOMES[k] + " atribuída ao livro " + tipoAtual() + ".");
+      if(!confirm("Remover a imagem de " + NOMES[k].toLowerCase() + "?")) return;
+      var im = lerImgs(); delete im[k]; gravarImgs(im);
+      desenhar(); msg(NOMES[k] + " removida.");
     }
   });
-
+ 
   /* ---------- coloca as imagens no HTML da prévia (sem mexer no código do livro) ---------- */
   function sec(cls, inner, extra){ return '<section class="sec ' + cls + '"' + (extra || "") + '>' + inner + '</section>'; }
   function pagina(src){ return '<div class="fl"><img alt="" src="' + src + '" style="display:block;width:100%;height:100%;object-fit:cover"></div>'; }
-
+ 
   function transformar(html){
     if(typeof html !== "string" || html.indexOf('class="sec ') < 0) return html;
-    var im = lerImgs(), t = tipoAtual();
-    var capa = im[chave("capa", t)] && im[chave("capa", t)].d;
-    var contra = im[chave("contracapa", t)] && im[chave("contracapa", t)].d;
+    var im = lerImgs();
+    var capa = im.capa && im.capa.d, contra = im.contracapa && im.contracapa.d;
     var cheio = html.indexOf("break-before:right") > -1;          /* livro completo */
-    var temCapa = html.indexOf('class="sec pg-capa"') > -1;       /* prévia da capa */
+    var temCapa = html.indexOf('class="sec pg-capa"') > -1;       /* prévia da D01 */
     if(!cheio && !temCapa) return html;                           /* prévia de outra parte: não mexe */
-
+ 
     if(capa){
       var re = /<section class="sec pg-capa"[^>]*>([\s\S]*?)<\/section>/;
       var m = re.exec(html);
@@ -6517,7 +6181,7 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     }
     return html;
   }
-
+ 
   var desc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
   if(desc && desc.set){
     Object.defineProperty(frame, "srcdoc", {
@@ -6836,139 +6500,9 @@ body.dg-livro-vivo .dgp-nota{display:none}
   }catch(e){}
 })();
 </script>
- <!-- ===== INÍCIO: MONTADOR DE PÁGINAS DOS TIPOS NOVOS (etapa 1: capa, rosto, direitos, sobre o autor) ===== -->
-<script>
-(function(){
-  var previa = document.getElementById("dgPrevia");
-  var frame = document.getElementById("dgpFrame");
-  if(!previa || !frame) return;
-
-  function esc(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-  function num(v, d){ var n = parseFloat(String(v == null ? "" : v).replace("~","")); return isFinite(n) ? n : d; }
-  function linhas(t){ return String(t || "").split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean); }
-  function tip(s){
-    s = String(s == null ? "" : s);
-    s = s.replace(/\.\.\./g, "…");
-    s = s.replace(/\s+(?:--|-|–)\s+/g, " — ");
-    s = s.replace(/(^|[\s(\[—])"/g, "$1“").replace(/"/g, "”");
-    s = s.replace(/(^|[\s(\[—“])'/g, "$1‘").replace(/'/g, "’");
-    return s;
-  }
-  function T(s){ return esc(tip(s)); }
-
-  /* "herda": pega as medidas de global.xxx e deixa valer o que a parte escreveu por cima */
-  function herdar(o, G){
-    if(!o || typeof o !== "object") return {};
-    if(!o.herda) return o;
-    var base = G[String(o.herda).replace(/^global\./, "")] || {}, r = {};
-    Object.keys(base).forEach(function(k){ r[k] = base[k]; });
-    Object.keys(o).forEach(function(k){ if(k !== "herda") r[k] = o[k]; });
-    return r;
-  }
-  /* transforma as medidas do JSON em CSS */
-  function css(s){
-    var c = [];
-    if(s.tamanho_pt != null) c.push("font-size:" + num(s.tamanho_pt, 10.3) + "pt");
-    var peso = String(s.peso || "");
-    if(/semi/i.test(peso)) c.push("font-weight:600"); else if(/negrito/i.test(peso)) c.push("font-weight:700");
-    if(/it[aá]lico/i.test(String(s.estilo || ""))) c.push("font-style:italic");
-    var cx = String(s.caixa || "");
-    if(cx === "alta") c.push("text-transform:uppercase"); else if(cx === "versalete") c.push("font-variant:small-caps");
-    var al = {centro:"center", direita:"right", esquerda:"left", justificado:"justify", centralizado:"center"}[s.alinhamento];
-    if(al) c.push("text-align:" + al);
-    if(s.espacamento_letras_pt != null) c.push("letter-spacing:" + num(s.espacamento_letras_pt, 0) + "pt");
-    if(s.entrelinha_pt != null && isFinite(num(s.entrelinha_pt, NaN))) c.push("line-height:" + num(s.entrelinha_pt, 14.6) + "pt");
-    return c.join(";");
-  }
-
-  function medidas(N){
-    var s = N.pagina || {}, pm = s.pagina_mm || [148, 210], pp = s.pagina_pt || [419.53, 595.28];
-    var fam = String(s.fonte || "").split("(")[0].trim();
-    var lista = [fam].concat(s.fontes_alternativas || []).filter(Boolean).map(function(f){
-      return /^(serif|sans-serif)$/.test(f) ? f : '"' + f.replace(/"/g, "") + '"';
-    });
-    if(lista.indexOf("serif") < 0) lista.push("serif");
-    var Hpt = pp[1];
-    return {W: pm[0], H: pm[1], Hpt: Hpt, lat: num(s.margem_lateral_pt, 54), top: num(s.margem_superior_pt, 64),
-            base: Hpt - num(s.base_corpo_pt, 525), fam: lista.join(",")};
-  }
-
-  /* página com elementos em posições fixas (capa, folha de rosto) */
-  function paginaPosicionada(e, ls, fx){
-    var itens = [["titulo", ls[0] || ""], ["subtitulo", ls.slice(1).join(" ")], ["autor", fx.autor || ""], ["editora", fx.editora || ""]];
-    var h = '<div class="pg pos">';
-    itens.forEach(function(it){
-      var s = e[it[0]]; if(!s || !it[1]) return;
-      h += '<div class="abs" style="top:' + num(s.posicao_vertical_pct, 50) + '%;' + css(s) + '">' + T(it[1]) + '</div>';
-    });
-    return h + '</div>';
-  }
-  /* página de texto corrido (direitos, sobre o autor etc.) */
-  function paginaTexto(K, e, G, titulo, texto){
-    var tp = herdar(e.titulo, G), corpo = herdar(e.corpo, G), gc = G.corpo || {};
-    var esp = num(corpo.espaco_entre_paragrafos_pt, num(gc.espaco_entre_paragrafos_pt, 6.5));
-    var h = '<div class="pg txt">';
-    if(corpo.posicao_vertical_pct != null) h += '<div style="height:' + Math.max(0, K.Hpt * num(corpo.posicao_vertical_pct, 0) / 100 - K.top) + 'pt"></div>';
-    if(titulo && e.titulo) h += '<h1 class="tp" style="' + css(tp) + ';margin:0 0 ' + num(tp.espaco_ate_corpo_pt, 46) + 'pt;padding-top:' + num(tp.espaco_antes_pt, 20) + 'pt">' + T(titulo) + '</h1>';
-    h += '<div class="corpo" style="' + css(corpo) + '">' + linhas(texto).map(function(l){ return '<p style="margin:0 0 ' + esp + 'pt">' + T(l) + '</p>'; }).join("") + '</div>';
-    return h + '</div>';
-  }
-
-  function documento(K, corpoHtml, posicionada){
-    var c = [];
-    c.push('@page{size:' + K.W + 'mm ' + K.H + 'mm;margin:' + (posicionada ? '0' : K.top + 'pt ' + K.lat + 'pt ' + K.base + 'pt ' + K.lat + 'pt') + '}');
-    c.push('html{-webkit-print-color-adjust:exact;print-color-adjust:exact}');
-    c.push('body{margin:0;font-family:' + K.fam + ';font-size:10.3pt;line-height:14.6pt;color:#111;hyphens:auto;-webkit-hyphens:auto}');
-    c.push('.pg{background:#fff}.pos{position:relative;overflow:hidden}');
-    c.push('.abs{position:absolute;left:0;right:0;padding:0 ' + K.lat + 'pt;line-height:1.15}');
-    c.push('@media screen{body{background:#7a7a7a;padding:16px 0}.pg{width:' + K.W + 'mm;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.45);box-sizing:border-box}.pos{height:' + K.H + 'mm}.txt{min-height:' + K.H + 'mm;padding:' + K.top + 'pt ' + K.lat + 'pt ' + K.base + 'pt}}');
-    c.push('@media print{.pos{width:' + K.W + 'mm;height:' + (K.H - 0.4) + 'mm}}');
-    /* a linha abaixo existe só para a prévia ao vivo não confundir esta página com o livro completo */
-    return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Prévia</title><style>/* break-before:right */\n' + c.join("\n") + '</style></head><body>' + corpoHtml + '</body></html>';
-  }
-  function aviso(msg){
-    return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>/* break-before:right */body{font:16px/1.6 Georgia,serif;color:#2a2217;background:#fffdf6;padding:28px;text-align:center}</style></head><body><p>' + esc(msg) + '</p></body></html>';
-  }
-  function abrir(titulo, html, info){
-    document.getElementById("dgpTitulo").textContent = titulo;
-    document.getElementById("dgpInfo").textContent = info || "";
-    frame.srcdoc = html;
-    previa.classList.add("aberta");
-  }
-
-  /* captura o pedido ANTES do código do devocional; só age em partes que não são do devocional (códigos D...) */
-  document.addEventListener("dg:diagramar", function(ev){
-    var p = ev.detail || {}, cod = p.parte || "";
-    if(!cod || /^D\d/.test(cod)) return;
-    ev.stopImmediatePropagation();
-
-    var N = p.normas || {}, parte = N.parte || {}, G = N.global || {};
-    var tituloJan = "Prévia — " + cod + " · " + (N.nome || cod);
-
-    if(p.omitida){ abrir(tituloJan, aviso("Esta parte está marcada como omitida e não entra no livro."), ""); return; }
-    if(p.tipo_conteudo === "auto"){ abrir(tituloJan, aviso("Esta parte é montada automaticamente no livro completo."), ""); return; }
-    if(N.pai){ abrir(tituloJan, aviso("As partes do capítulo ainda serão montadas na próxima etapa."), ""); return; }
-
-    var e = (parte.estilo && typeof parte.estilo === "object") ? parte.estilo : null;
-    if(!e){ abrir(tituloJan, aviso("Esta parte ainda não tem estilo no JSON."), ""); return; }
-
-    var texto = String(p.texto || "");
-    if(!texto.trim() && parte.conteudo && parte.conteudo.repete){
-      try{ texto = String(JSON.parse(localStorage.getItem("ps_diagramador_partes") || "{}")[parte.conteudo.repete] || ""); }catch(x){}
-    }
-    var K = medidas(N), fx = p.fixos || {};
-    var posicionada = !!(e.titulo && e.titulo.posicao_vertical_pct != null && !e.corpo);
-    var corpo = posicionada ? paginaPosicionada(e, linhas(texto), fx) : paginaTexto(K, e, G, p.titulo, texto);
-    abrir(tituloJan, documento(K, corpo, posicionada), "");
-  }, true);
-})();
-</script>
-<!-- ===== FIM: MONTADOR DE PÁGINAS DOS TIPOS NOVOS ===== -->
 <!-- ===== FIM: PADRÃO JSON DO TIPO ===== -->
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
-
- 
-                                                  <!-- ==== ESTÚDIO ==== -->
+ <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
  
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
@@ -12500,6 +12034,5 @@ texto: $("esTexto").value
  
  
  
-
 
 
