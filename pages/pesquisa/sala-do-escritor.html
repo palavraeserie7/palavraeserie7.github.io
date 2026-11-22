@@ -6500,6 +6500,134 @@ body.dg-livro-vivo .dgp-nota{display:none}
   }catch(e){}
 })();
 </script>
+ <!-- ===== INÍCIO: MONTADOR DE PÁGINAS DOS TIPOS NOVOS (etapa 1: capa, rosto, direitos, sobre o autor) ===== -->
+<script>
+(function(){
+  var previa = document.getElementById("dgPrevia");
+  var frame = document.getElementById("dgpFrame");
+  if(!previa || !frame) return;
+
+  function esc(t){ return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function num(v, d){ var n = parseFloat(String(v == null ? "" : v).replace("~","")); return isFinite(n) ? n : d; }
+  function linhas(t){ return String(t || "").split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean); }
+  function tip(s){
+    s = String(s == null ? "" : s);
+    s = s.replace(/\.\.\./g, "…");
+    s = s.replace(/\s+(?:--|-|–)\s+/g, " — ");
+    s = s.replace(/(^|[\s(\[—])"/g, "$1“").replace(/"/g, "”");
+    s = s.replace(/(^|[\s(\[—“])'/g, "$1‘").replace(/'/g, "’");
+    return s;
+  }
+  function T(s){ return esc(tip(s)); }
+
+  /* "herda": pega as medidas de global.xxx e deixa valer o que a parte escreveu por cima */
+  function herdar(o, G){
+    if(!o || typeof o !== "object") return {};
+    if(!o.herda) return o;
+    var base = G[String(o.herda).replace(/^global\./, "")] || {}, r = {};
+    Object.keys(base).forEach(function(k){ r[k] = base[k]; });
+    Object.keys(o).forEach(function(k){ if(k !== "herda") r[k] = o[k]; });
+    return r;
+  }
+  /* transforma as medidas do JSON em CSS */
+  function css(s){
+    var c = [];
+    if(s.tamanho_pt != null) c.push("font-size:" + num(s.tamanho_pt, 10.3) + "pt");
+    var peso = String(s.peso || "");
+    if(/semi/i.test(peso)) c.push("font-weight:600"); else if(/negrito/i.test(peso)) c.push("font-weight:700");
+    if(/it[aá]lico/i.test(String(s.estilo || ""))) c.push("font-style:italic");
+    var cx = String(s.caixa || "");
+    if(cx === "alta") c.push("text-transform:uppercase"); else if(cx === "versalete") c.push("font-variant:small-caps");
+    var al = {centro:"center", direita:"right", esquerda:"left", justificado:"justify", centralizado:"center"}[s.alinhamento];
+    if(al) c.push("text-align:" + al);
+    if(s.espacamento_letras_pt != null) c.push("letter-spacing:" + num(s.espacamento_letras_pt, 0) + "pt");
+    if(s.entrelinha_pt != null && isFinite(num(s.entrelinha_pt, NaN))) c.push("line-height:" + num(s.entrelinha_pt, 14.6) + "pt");
+    return c.join(";");
+  }
+
+  function medidas(N){
+    var s = N.pagina || {}, pm = s.pagina_mm || [148, 210], pp = s.pagina_pt || [419.53, 595.28];
+    var fam = String(s.fonte || "").split("(")[0].trim();
+    var lista = [fam].concat(s.fontes_alternativas || []).filter(Boolean).map(function(f){
+      return /^(serif|sans-serif)$/.test(f) ? f : '"' + f.replace(/"/g, "") + '"';
+    });
+    if(lista.indexOf("serif") < 0) lista.push("serif");
+    var Hpt = pp[1];
+    return {W: pm[0], H: pm[1], Hpt: Hpt, lat: num(s.margem_lateral_pt, 54), top: num(s.margem_superior_pt, 64),
+            base: Hpt - num(s.base_corpo_pt, 525), fam: lista.join(",")};
+  }
+
+  /* página com elementos em posições fixas (capa, folha de rosto) */
+  function paginaPosicionada(e, ls, fx){
+    var itens = [["titulo", ls[0] || ""], ["subtitulo", ls.slice(1).join(" ")], ["autor", fx.autor || ""], ["editora", fx.editora || ""]];
+    var h = '<div class="pg pos">';
+    itens.forEach(function(it){
+      var s = e[it[0]]; if(!s || !it[1]) return;
+      h += '<div class="abs" style="top:' + num(s.posicao_vertical_pct, 50) + '%;' + css(s) + '">' + T(it[1]) + '</div>';
+    });
+    return h + '</div>';
+  }
+  /* página de texto corrido (direitos, sobre o autor etc.) */
+  function paginaTexto(K, e, G, titulo, texto){
+    var tp = herdar(e.titulo, G), corpo = herdar(e.corpo, G), gc = G.corpo || {};
+    var esp = num(corpo.espaco_entre_paragrafos_pt, num(gc.espaco_entre_paragrafos_pt, 6.5));
+    var h = '<div class="pg txt">';
+    if(corpo.posicao_vertical_pct != null) h += '<div style="height:' + Math.max(0, K.Hpt * num(corpo.posicao_vertical_pct, 0) / 100 - K.top) + 'pt"></div>';
+    if(titulo && e.titulo) h += '<h1 class="tp" style="' + css(tp) + ';margin:0 0 ' + num(tp.espaco_ate_corpo_pt, 46) + 'pt;padding-top:' + num(tp.espaco_antes_pt, 20) + 'pt">' + T(titulo) + '</h1>';
+    h += '<div class="corpo" style="' + css(corpo) + '">' + linhas(texto).map(function(l){ return '<p style="margin:0 0 ' + esp + 'pt">' + T(l) + '</p>'; }).join("") + '</div>';
+    return h + '</div>';
+  }
+
+  function documento(K, corpoHtml, posicionada){
+    var c = [];
+    c.push('@page{size:' + K.W + 'mm ' + K.H + 'mm;margin:' + (posicionada ? '0' : K.top + 'pt ' + K.lat + 'pt ' + K.base + 'pt ' + K.lat + 'pt') + '}');
+    c.push('html{-webkit-print-color-adjust:exact;print-color-adjust:exact}');
+    c.push('body{margin:0;font-family:' + K.fam + ';font-size:10.3pt;line-height:14.6pt;color:#111;hyphens:auto;-webkit-hyphens:auto}');
+    c.push('.pg{background:#fff}.pos{position:relative;overflow:hidden}');
+    c.push('.abs{position:absolute;left:0;right:0;padding:0 ' + K.lat + 'pt;line-height:1.15}');
+    c.push('@media screen{body{background:#7a7a7a;padding:16px 0}.pg{width:' + K.W + 'mm;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.45);box-sizing:border-box}.pos{height:' + K.H + 'mm}.txt{min-height:' + K.H + 'mm;padding:' + K.top + 'pt ' + K.lat + 'pt ' + K.base + 'pt}}');
+    c.push('@media print{.pos{width:' + K.W + 'mm;height:' + (K.H - 0.4) + 'mm}}');
+    /* a linha abaixo existe só para a prévia ao vivo não confundir esta página com o livro completo */
+    return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Prévia</title><style>/* break-before:right */\n' + c.join("\n") + '</style></head><body>' + corpoHtml + '</body></html>';
+  }
+  function aviso(msg){
+    return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>/* break-before:right */body{font:16px/1.6 Georgia,serif;color:#2a2217;background:#fffdf6;padding:28px;text-align:center}</style></head><body><p>' + esc(msg) + '</p></body></html>';
+  }
+  function abrir(titulo, html, info){
+    document.getElementById("dgpTitulo").textContent = titulo;
+    document.getElementById("dgpInfo").textContent = info || "";
+    frame.srcdoc = html;
+    previa.classList.add("aberta");
+  }
+
+  /* captura o pedido ANTES do código do devocional; só age em partes que não são do devocional (códigos D...) */
+  document.addEventListener("dg:diagramar", function(ev){
+    var p = ev.detail || {}, cod = p.parte || "";
+    if(!cod || /^D\d/.test(cod)) return;
+    ev.stopImmediatePropagation();
+
+    var N = p.normas || {}, parte = N.parte || {}, G = N.global || {};
+    var tituloJan = "Prévia — " + cod + " · " + (N.nome || cod);
+
+    if(p.omitida){ abrir(tituloJan, aviso("Esta parte está marcada como omitida e não entra no livro."), ""); return; }
+    if(p.tipo_conteudo === "auto"){ abrir(tituloJan, aviso("Esta parte é montada automaticamente no livro completo."), ""); return; }
+    if(N.pai){ abrir(tituloJan, aviso("As partes do capítulo ainda serão montadas na próxima etapa."), ""); return; }
+
+    var e = (parte.estilo && typeof parte.estilo === "object") ? parte.estilo : null;
+    if(!e){ abrir(tituloJan, aviso("Esta parte ainda não tem estilo no JSON."), ""); return; }
+
+    var texto = String(p.texto || "");
+    if(!texto.trim() && parte.conteudo && parte.conteudo.repete){
+      try{ texto = String(JSON.parse(localStorage.getItem("ps_diagramador_partes") || "{}")[parte.conteudo.repete] || ""); }catch(x){}
+    }
+    var K = medidas(N), fx = p.fixos || {};
+    var posicionada = !!(e.titulo && e.titulo.posicao_vertical_pct != null && !e.corpo);
+    var corpo = posicionada ? paginaPosicionada(e, linhas(texto), fx) : paginaTexto(K, e, G, p.titulo, texto);
+    abrir(tituloJan, documento(K, corpo, posicionada), "");
+  }, true);
+})();
+</script>
+<!-- ===== FIM: MONTADOR DE PÁGINAS DOS TIPOS NOVOS ===== -->
 <!-- ===== FIM: PADRÃO JSON DO TIPO ===== -->
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
  <!-- ==== ESTÚDIO ==== -->
