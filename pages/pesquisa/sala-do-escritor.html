@@ -4211,7 +4211,40 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
       ["D16","Cabeçalho, rodapé e paginação","Regras de paginação e elementos recorrentes."]
     ]}
   ];
- 
+
+   /* ---------- FICHA POR TIPO: a lista de partes vem do JSON do tipo clicado ---------- */
+  var GRUPOS_4_1 = GRUPOS, DESC_4_1 = {}, tipoFicha = "4.1", normasDin = false;
+  for(var gi = 0; gi < GRUPOS.length; gi++)
+    for(var ii = 0; ii < GRUPOS[gi].itens.length; ii++) DESC_4_1[GRUPOS[gi].itens[ii][0]] = GRUPOS[gi].itens[ii][2];
+
+  function construirGrupos(d){
+    var out = [], atual = null;
+    (d.partes || []).forEach(function(p){
+      if(p.subpartes && p.subpartes.length){
+        atual = {g: p.cod + " — " + p.nome, itens: []};
+        out.push(atual);
+        p.subpartes.forEach(function(s){ atual.itens.push([s.cod, s.nome, s.descricao || DESC_4_1[s.cod] || ""]); });
+        atual = null;
+      } else {
+        if(!atual || atual.g !== (p.grupo || "Partes")){ atual = {g: p.grupo || "Partes", itens: []}; out.push(atual); }
+        atual.itens.push([p.cod, p.nome, p.descricao || DESC_4_1[p.cod] || ""]);
+      }
+    });
+    return out;
+  }
+  function aplicarFicha(){
+    var d = window.DG_PADRAO;
+    var casa = d && String(d.tipo || "") === tipoFicha;
+    if(casa && d.partes && d.partes.length){
+      normasDados = d; normasDin = true;
+      GRUPOS = construirGrupos(d);
+      return;
+    }
+    if(normasDin){ normasDados = null; normasPromessa = null; normasDin = false; }
+    if(tipoFicha === "4.1") GRUPOS = GRUPOS_4_1;
+    else GRUPOS = [{g: casa ? "Este tipo ainda não tem partes no JSON." : "Carregando as partes deste tipo…", itens: []}];
+  }
+  document.addEventListener("dg:padrao", function(){ aplicarFicha(); if(listaAberta()) montarLista(); });
   /* ---------- armazenamento (no navegador) ---------- */
   var CHAVE = "ps_diagramador_partes";            /* texto de cada parte */
   var CHAVE_TIT = "ps_diagramador_titulos";       /* títulos/rótulos trocados pelo autor */
@@ -4356,8 +4389,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
   }
  
   /* ---------- lista à direita do conteúdo ---------- */
-  function botao(){ return document.querySelector('#dgTiposBox [data-tipo="4.1"]'); }
-  function listaAberta(){ return lista.classList.contains("aberta"); }
+ function botao(){ return document.querySelector('#dgTiposBox [data-tipo="' + tipoFicha + '"]'); }
+ function listaAberta(){ return lista.classList.contains("aberta"); }
   function editorAberto(){ return ed.classList.contains("aberto"); }
   function fixosAberto(){ return fx.classList.contains("aberto"); }
  
@@ -4482,7 +4515,8 @@ body.dg-lista-aberta .dg-tipo[data-tipo="4.1"]::after{transform:rotate(180deg)}
     var t = ev.target;
     if(t.closest && t.closest("#dgLista")) return;
     var b = t.closest && t.closest("[data-tipo]");
-    if(b && b.dataset.tipo === "4.1"){
+       if(b && b.closest("#dgTiposBox")){
+      if(b.dataset.tipo !== tipoFicha){ tipoFicha = b.dataset.tipo; aplicarFicha(); if(listaAberta()) fecharLista(); }
       if(listaAberta()) fecharLista(); else abrirLista();
       setTimeout(function(){ if(listaAberta()) posicionar(); }, 0);
     } else {
