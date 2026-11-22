@@ -6406,6 +6406,67 @@ body.dg-livro-vivo .dgp-nota{display:none}
   });
 })();
 </script>
+ <!-- ===== INÍCIO: PADRÃO JSON DO TIPO ===== -->
+<script>
+(function(){
+  var BASE = "diagramador/diagramadorer-.json/";
+  var indice = null, promessa = null, ultimo = 0;
+
+  function carregarIndice(){
+    if(indice) return Promise.resolve(indice);
+    if(promessa) return promessa;
+    promessa = fetch(BASE + "indice.json", {cache:"no-cache"})
+      .then(function(r){ if(!r.ok) throw new Error("indice"); return r.json(); })
+      .then(function(d){ indice = d; return d; })
+      .catch(function(e){ promessa = null; throw e; });
+    return promessa;
+  }
+
+  function aviso(txt, erro){
+    var r = document.getElementById("dgResumo"); if(!r) return;
+    var s = r.querySelector(".dg-json");
+    if(!s){ s = document.createElement("div"); s.className = "dg-json"; r.appendChild(s); }
+    s.style.color = erro ? "#a14747" : "#2f6b3a";
+    s.textContent = txt;
+  }
+
+  function carregarTipo(cod){
+    if(!cod) return;
+    var minha = ++ultimo;
+    carregarIndice().then(function(d){
+      var arq = null;
+      d.forEach(function(g){ (g.tipos || []).forEach(function(t){ if(t.tipo === cod) arq = t.arquivo; }); });
+      if(!arq) throw new Error("tipo sem arquivo");
+      return fetch(BASE + arq, {cache:"no-cache"}).then(function(r){
+        if(!r.ok) throw new Error("arquivo");
+        return r.json();
+      });
+    }).then(function(dados){
+      if(minha !== ultimo) return;
+      window.DG_PADRAO = dados;
+      document.dispatchEvent(new CustomEvent("dg:padrao", {detail: dados}));
+      aviso("✓ Padrão carregado: " + cod + " " + (dados.nome || ""), false);
+    }).catch(function(e){
+      if(minha !== ultimo) return;
+      window.DG_PADRAO = null;
+      aviso("Não foi possível ler o JSON do tipo " + cod + ".", true);
+    });
+  }
+
+  /* ao clicar em um tipo, carrega o JSON dele */
+  document.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("#dgTiposBox [data-tipo]");
+    if(b) carregarTipo(b.dataset.tipo);
+  }, true);
+
+  /* se já havia um tipo escolhido antes, carrega também */
+  try{
+    var s = JSON.parse(localStorage.getItem("ps_diagramador") || "null");
+    if(s && s.tipo) carregarTipo(s.tipo);
+  }catch(e){}
+})();
+</script>
+<!-- ===== FIM: PADRÃO JSON DO TIPO ===== -->
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
  <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
