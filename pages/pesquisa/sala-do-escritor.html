@@ -8813,7 +8813,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
   prev.className = "f6-prev"; prev.muted = true; prev.loop = true; prev.playsInline = true; prev.hidden = true;
   tela.insertBefore(prev, tela.firstChild);
   function atualizarPrevia(){
-  var m = /url["']?(["')]+)["']?/.exec(tela.style.backgroundImage || "");
+ var m = /url\(["']?([^"')]+)["']?\)/.exec(tela.style.backgroundImage || "");
     var item = m ? mapa[m[1]] : null;
     if(item){
       if(prev.dataset.url !== item.url){ prev.src = item.url; prev.dataset.url = item.url; }
@@ -10652,8 +10652,8 @@ texto: $("esTexto").value
     '<h4>Sincronia e ritmo do vídeo</h4>' +
     '<div class="sx-grade">' +
       '<label>Sincronizar fala e legenda<select id="sxSinc">' +
-        '<option value="precisa">Precisa: uma voz por legenda (mais lenta)</option>' +
-        '<option value="rapida">Rápida: voz em trechos maiores</option></select></label>' +
+       '<option value="precisa">Precisa: uma voz por legenda (exige plano pago)</option>' +
+     '<option value="rapida" selected>Rápida: poucos pedidos de voz (recomendada)</option></select></label>' +
       '<label>Tamanho da legenda<select id="sxLeg">' +
         '<option value="80">Curta (cerca de 80 letras)</option>' +
         '<option value="140" selected>Média (cerca de 140 letras)</option>' +
@@ -10773,27 +10773,37 @@ texto: $("esTexto").value
     return out;
   }
   async function gerarVoz(cenas, det, ac, preciso){
+   
     var s = (await supabaseClient.auth.getSession()).data.session;
     if(!s) throw new Error("Sessão encerrada. Entre de novo.");
     var grupos = agrupar(cenas, preciso), bufs = new Array(grupos.length), prox = 0, feitos = 0;
-    async function trab(){
-      for(;;){
-        var i = prox++; if(i >= grupos.length) return;
-        var texto = grupos[i].map(function(k){ return cenas[k]; }).join(" ");
-        var r = await fetch(URL_VOZ, {method:"POST",
-          headers:{"Content-Type":"application/json", "Authorization":"Bearer " + s.access_token},
-          body: JSON.stringify({texto: texto, voz: $("f1Voz").value, velocidade: det.velocidade})});
-        if(!r.ok){
-          var j = await r.json().catch(function(){ return {}; });
-          throw new Error(j.error || "A rota /api/voz respondeu com erro " + r.status + ".");
-        }
-        if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
-        bufs[i] = aparar(await ac.decodeAudioData(await r.arrayBuffer()), ac);
-        feitos++;
-        info("Gerando a voz… " + feitos + " de " + grupos.length + ".", false, 0.03 + 0.17 * feitos / grupos.length);
-      }
-    }
-    await Promise.all([trab(), trab()]);
+   async function pedir(texto){
+  for(var tent = 0; tent < 4; tent++){
+    var r = await fetch(URL_VOZ, {method:"POST",
+      headers:{"Content-Type":"application/json", "Authorization":"Bearer " + s.access_token},
+      body: JSON.stringify({texto: texto, voz: $("f1Voz").value, velocidade: det.velocidade})});
+    if(r.ok) return r;
+    var j = await r.json().catch(function(){ return {}; });
+    var erroMsg = j.error || ("A rota /api/voz respondeu com erro " + r.status + ".");
+    var limite = r.status === 429 || /quota|rate limit|retry in/i.test(erroMsg);
+    if(!limite || tent === 3) throw new Error(erroMsg);
+    var m = /retry in ([\d.]+)s/i.exec(erroMsg), espera = (m ? Number(m[1]) : 20) + 2;
+    info("Limite do plano gratuito da voz: aguardando " + Math.ceil(espera) + " s para continuar…");
+    await new Promise(function(ok){ setTimeout(ok, espera * 1000); });
+  }
+}
+async function trab(){
+  for(;;){
+    var i = prox++; if(i >= grupos.length) return;
+    var texto = grupos[i].map(function(k){ return cenas[k]; }).join(" ");
+    var r = await pedir(texto);
+    if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
+    bufs[i] = aparar(await ac.decodeAudioData(await r.arrayBuffer()), ac);
+    feitos++;
+    info("Gerando a voz… " + feitos + " de " + grupos.length + ".", false, 0.03 + 0.17 * feitos / grupos.length);
+  }
+}
+await trab();
     return {grupos: grupos, bufs: bufs};
   }
 
