@@ -10759,7 +10759,7 @@ texto: $("esTexto").value
 
   /* ---------- 6. voz: uma chamada por grupo, com duração real ---------- */
   function aparar(buf, ac){
-    var n = buf.length, ch = buf.numberOfChannels, dados = [], c, ini = 0, fim = n - 1, lim = 0.01;
+    var n = buf.length, ch = buf.numberOfChannels, dados = [], c, ini = 0, fim = n - 1, lim = 0.03;
     for(c = 0; c < ch; c++) dados.push(buf.getChannelData(c));
     function alto(i){ for(var k = 0; k < ch; k++){ if(Math.abs(dados[k][i]) > lim) return true; } return false; }
     while(ini < n && !alto(ini)) ini++;
@@ -10891,7 +10891,7 @@ await trab();
     try{ voz = await gerarVoz(cenasTxt, det, ac, cfg.preciso); }
     catch(e){ console.error(e); aviso = " Sem voz: " + (e.message || "falhou") + " O vídeo sai só com texto e música."; }
 
-    var lin = linha(cenasTxt, voz, det, ac), total = lin.fim + 0.8;
+   var lin = linha(cenasTxt, voz, det, ac), total = lin.fim + (lin.buffer ? 1.5 : 0.8);
     info("Carregando imagens…", false, 0.2);
     var urls = Array.prototype.map.call(document.querySelectorAll("#esFotos img"), function(i){ return i.src; });
     var imgs = (await Promise.all(urls.map(carregarImg))).filter(Boolean);
@@ -10921,8 +10921,8 @@ await trab();
       var sm = ac.createBufferSource(), gn = ac.createGain(), vol = det.volumeMusica / 100;
       sm.buffer = mb; sm.loop = true; sm.playbackRate.value = cfg.velMus;
       gn.gain.setValueAtTime(vol, ac0);
-      gn.gain.setValueAtTime(vol, ac0 + Math.max(0, total - 1.5));
-      gn.gain.linearRampToValueAtTime(0, ac0 + total);
+     gn.gain.setValueAtTime(vol, ac0 + Math.max(0, lin.fim));
+gn.gain.linearRampToValueAtTime(0, ac0 + total);
       sm.connect(gn); gn.connect(dest); sm.start();
     }
     var ini = performance.now();
