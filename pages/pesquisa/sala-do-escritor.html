@@ -11025,6 +11025,196 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 })();
 </script>
 <!-- ===== FIM: FUNDO EM MOVIMENTO SUAVE (EMENDA DO LOOP) ===== -->
+ <!-- ===== INÍCIO: PRÉVIA POR TRECHOS ===== -->
+<style>
+#pvTrechosBox{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+#pvTrechosBox .pv-linha{display:flex;gap:8px;flex-wrap:wrap}
+#pvStatus{margin:0;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#pvLista{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto;padding-right:4px}
+#pvLista button{display:flex;gap:10px;align-items:flex-start;text-align:left;padding:8px 10px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);cursor:pointer;font:14px/1.4 "Segoe UI",Arial,sans-serif}
+#pvLista button:hover{border-color:var(--brass)}
+#pvLista button.on{background:var(--brass-wash);border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}
+#pvLista b{flex:0 0 auto;min-width:26px;color:var(--brass-deep)}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), ouvir = $("esOuvir"), parar = $("esParar"), tela = $("esTela"), leg = $("esLegenda");
+  if(!painel || !ouvir || !parar || !tela || !leg || !window.speechSynthesis) return;
+
+  var trechos = [], atual = 0, tocando = false, pausado = false, token = 0;
+  var arqMusica = null, audioMus = null, urlMus = null;
+
+  /* guarda o arquivo de música escolhido */
+  painel.addEventListener("change", function(ev){
+    if(ev.target.id === "esMusArq" && ev.target.files && ev.target.files[0]) arqMusica = ev.target.files[0];
+    if(ev.target.id === "esMusica" && !ev.target.value) arqMusica = null;
+  }, true);
+
+  /* ---------- interface ---------- */
+  var box = document.createElement("div");
+  box.id = "pvTrechosBox";
+  box.innerHTML =
+    '<div class="pv-linha">' +
+      '<button type="button" class="at-btn" id="pvAnt">◀ ANTERIOR</button>' +
+      '<button type="button" class="at-btn" id="pvPausar">PAUSAR</button>' +
+      '<button type="button" class="at-btn" id="pvProx">PRÓXIMO ▶</button>' +
+    '</div>' +
+    '<p id="pvStatus" role="status"></p>' +
+    '<div id="pvLista"></div>';
+  parar.parentElement.insertAdjacentElement("afterend", box);
+
+  /* ---------- trechos ---------- */
+  function partir(f, lim){
+    var o = [];
+    while(f.length > lim){
+      var c = f.lastIndexOf(" ", lim); if(c < lim / 2) c = lim;
+      o.push(f.slice(0, c).trim()); f = f.slice(c).trim();
+    }
+    if(f) o.push(f);
+    return o;
+  }
+  function dividir(t, max){
+    var fr = (t.replace(/\n+/g, " ").match(/[^.!?…]+[.!?…]*/g) || [t]).map(function(s){ return s.trim(); }).filter(Boolean);
+    var out = [], buf = "";
+    fr.forEach(function(f){
+      partir(f, Math.round(max * 1.6)).forEach(function(p){
+        if(buf && (buf + " " + p).length > max){ out.push(buf); buf = p; } else buf = buf ? buf + " " + p : p;
+      });
+    });
+    if(buf) out.push(buf);
+    return out;
+  }
+  function refazer(){
+    var t = $("esTexto").value.trim();
+    var max = Number(($("sxLeg") && $("sxLeg").value) || 140);
+    trechos = t ? dividir(t, max) : [];
+    desenharLista();
+    status();
+  }
+  function desenharLista(){
+    $("pvLista").innerHTML = trechos.length ? trechos.map(function(x, i){
+      var curto = x.length > 110 ? x.slice(0, 110) + "…" : x;
+      return '<button type="button" data-i="' + i + '"' + (i === atual ? ' class="on"' : '') + '><b>' + (i + 1) + '</b><span></span></button>';
+    }).join("") : '<span class="es-nota">Escreva um texto no passo 1 para ver os trechos.</span>';
+    Array.prototype.forEach.call($("pvLista").querySelectorAll("button"), function(b){
+      var x = trechos[Number(b.dataset.i)];
+      b.querySelector("span").textContent = x.length > 110 ? x.slice(0, 110) + "…" : x;
+    });
+  }
+  function status(){
+    $("pvStatus").textContent = trechos.length
+      ? "Trecho " + (atual + 1) + " de " + trechos.length + (tocando ? (pausado ? " — pausado" : " — tocando") : "")
+      : "";
+    $("pvPausar").textContent = pausado ? "CONTINUAR" : "PAUSAR";
+    Array.prototype.forEach.call($("pvLista").querySelectorAll("button"), function(b){
+      b.classList.toggle("on", Number(b.dataset.i) === atual);
+    });
+  }
+
+  /* ---------- música ---------- */
+  function musicaIniciar(){
+    if(!arqMusica || !$("esMusica").value) return;
+    if(!audioMus){
+      urlMus = URL.createObjectURL(arqMusica);
+      audioMus = new Audio(urlMus); audioMus.loop = true;
+    }
+    audioMus.volume = Number($("esVolMus").value) / 100;
+    audioMus.playbackRate = Number(($("sxMus") && $("sxMus").value) || 1);
+    var p = audioMus.play(); if(p && p.catch) p.catch(function(){});
+  }
+  function musicaPausar(){ if(audioMus) audioMus.pause(); }
+  function musicaParar(){
+    if(audioMus){ audioMus.pause(); audioMus = null; }
+    if(urlMus){ URL.revokeObjectURL(urlMus); urlMus = null; }
+  }
+
+  /* ---------- tela ---------- */
+  function mostrar(i){
+    leg.textContent = trechos[i] || "";
+    var imgs = $("esFotos").querySelectorAll("img");
+    if(imgs.length) tela.style.backgroundImage = 'url("' + imgs[i % imgs.length].src + '")';
+    atual = i; status();
+    var b = $("pvLista").querySelector('[data-i="' + i + '"]');
+    if(b && b.scrollIntoView) b.scrollIntoView({block: "nearest"});
+  }
+
+  /* ---------- reprodução ---------- */
+  function falar(i, meu){
+    if(meu !== token) return;
+    if(i >= trechos.length){ fim(); return; }
+    mostrar(i);
+    var u = new SpeechSynthesisUtterance(trechos[i]);
+    var nome = $("esVoz").value, v = speechSynthesis.getVoices().filter(function(x){ return x.name === nome; })[0];
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "pt-BR";
+    u.rate = Number($("esVel").value) || 1;
+    u.onend = function(){ if(meu === token && !pausado) falar(i + 1, meu); };
+    speechSynthesis.speak(u);
+  }
+  function tocarDe(i){
+    if(!trechos.length) refazer();
+    if(!trechos.length){ var m = $("esMsg3"); if(m){ m.textContent = "Escreva um texto no passo 1."; m.className = "es-msg erro"; } return; }
+    token++; var meu = token;
+    speechSynthesis.cancel();
+    tocando = true; pausado = false;
+    musicaIniciar();
+    setTimeout(function(){ falar(Math.max(0, Math.min(i, trechos.length - 1)), meu); }, 60);
+  }
+  function pausar(){
+    if(!tocando) return;
+    if(!pausado){
+      pausado = true; token++; speechSynthesis.cancel(); musicaPausar();
+    }else{
+      pausado = false; token++; var meu = token; musicaIniciar();
+      setTimeout(function(){ falar(atual, meu); }, 60);   /* recomeça o trecho em que parou */
+    }
+    status();
+  }
+  function fim(){
+    tocando = false; pausado = false; musicaParar(); status();
+  }
+  function pararTudo(){
+    token++; speechSynthesis.cancel(); fim(); atual = 0; status();
+  }
+
+  /* ---------- eventos ---------- */
+  /* assume o OUVIR (antes do código antigo) */
+  document.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("#esOuvir");
+    if(!b) return;
+    ev.stopImmediatePropagation(); ev.preventDefault();
+    refazer(); tocarDe(0);
+  }, true);
+  document.addEventListener("click", function(ev){
+    var b = ev.target.closest && ev.target.closest("#esParar");
+    if(!b) return;
+    ev.stopImmediatePropagation();
+    pararTudo();
+    var imgs = $("esFotos").querySelectorAll("img");
+    tela.style.backgroundImage = imgs.length ? 'url("' + imgs[0].src + '")' : "";
+    leg.textContent = ($("esTitulo").value.trim() || $("esTexto").value.trim().split(/\n/)[0] || "Sua mensagem aparece aqui.").slice(0, 140);
+  }, true);
+
+  $("pvLista").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-i]"); if(b) tocarDe(Number(b.dataset.i));
+  });
+  $("pvPausar").addEventListener("click", pausar);
+  $("pvAnt").addEventListener("click", function(){ tocarDe(Math.max(0, atual - 1)); });
+  $("pvProx").addEventListener("click", function(){ tocarDe(Math.min(trechos.length - 1, atual + 1)); });
+
+  /* ao abrir a prévia, monta a lista; ao sair dela, para */
+  painel.addEventListener("click", function(ev){
+    var p = ev.target.closest && ev.target.closest(".es-passos [data-p]");
+    if(!p) return;
+    if(p.dataset.p === "3") setTimeout(function(){ if(!tocando){ atual = 0; refazer(); } }, 50);
+    else pararTudo();
+  });
+  $("esTexto").addEventListener("input", function(){ if(!tocando){ atual = 0; refazer(); } });
+
+  refazer();
+})();
+</script>
+<!-- ===== FIM: PRÉVIA POR TRECHOS ===== -->
  
 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
