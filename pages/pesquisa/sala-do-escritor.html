@@ -11215,7 +11215,234 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 })();
 </script>
 <!-- ===== FIM: PRÉVIA POR TRECHOS ===== -->
- 
+ <!-- ===== INÍCIO: PUBLICAR NO YOUTUBE (AUTOMÁTICO E MANUAL) ===== -->
+<style>
+#ytCard{border:1px solid var(--brass);border-radius:8px;background:#fffdf6;color:var(--ink);padding:16px;margin-top:14px;display:flex;flex-direction:column;gap:12px}
+#ytCard[hidden]{display:none!important}
+#ytCard h4{margin:0;font:600 18px Georgia,serif}
+#ytCard label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#ytCard input,#ytCard select,#ytCard textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#ytCard textarea{min-height:110px;resize:vertical}
+#ytCard .yt-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+#ytCard .yt-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#ytCard .yt-sep{border-top:1px solid var(--paper-line);padding-top:10px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#ytBarra{height:8px;border-radius:4px;background:var(--paper-line);overflow:hidden}
+#ytBarra i{display:block;height:100%;width:0;background:var(--brass);transition:width .2s}
+#ytMsg{margin:0;min-height:1.4em;font:600 13.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#ytMsg.erro{color:#a14747}
+#ytMsg a{color:var(--brass-deep)}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), baixar = $("f1Baixar");
+  if(!painel || !baixar) return;
+
+  /* ===== COLE AQUI o ID do cliente OAuth (termina em .apps.googleusercontent.com) ===== */
+  var CLIENT_ID = "COLE_AQUI_O_ID_DO_CLIENTE";
+  var SITE = "https://palavraeserie7.github.io/pages/redes-sociais-estudos.html";
+  var SCOPES = "https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube";
+
+  var token = null, validade = 0, clienteGoogle = null, ultimoArquivo = "", enviando = false;
+
+  /* ---------- interface ---------- */
+  var card = document.createElement("section");
+  card.id = "ytCard"; card.hidden = true;
+  card.innerHTML =
+    '<h4>Publicar no YouTube</h4>' +
+    '<label>Título (até 100 letras)<input id="ytTitulo" type="text" maxlength="100"></label>' +
+    '<label>Descrição<textarea id="ytDesc" maxlength="5000"></textarea></label>' +
+    '<div class="yt-grade">' +
+      '<label>Visibilidade<select id="ytVis"><option value="private">Privado (recomendado)</option><option value="unlisted">Não listado</option><option value="public">Público</option></select></label>' +
+      '<label>Tags (separe por vírgula)<input id="ytTags" type="text" placeholder="bíblia, salmos, oração"></label>' +
+      '<label>Playlist<select id="ytPl"><option value="">Nenhuma (entre com o Google para listar)</option></select></label>' +
+    '</div>' +
+    '<div class="yt-sep">OPÇÃO 1 — AUTOMÁTICA (envia direto para o seu canal)</div>' +
+    '<div class="yt-linha">' +
+      '<button type="button" class="at-btn" id="ytLogin">ENTRAR COM O GOOGLE</button>' +
+      '<button type="button" class="at-btn gold" id="ytEnviar">PUBLICAR NO YOUTUBE</button>' +
+    '</div>' +
+    '<div id="ytBarra" hidden><i></i></div>' +
+    '<div class="yt-sep">OPÇÃO 2 — MANUAL (você envia pelo site do YouTube)</div>' +
+    '<div class="yt-linha">' +
+      '<button type="button" class="at-btn" id="ytCopT">COPIAR TÍTULO</button>' +
+      '<button type="button" class="at-btn" id="ytCopD">COPIAR DESCRIÇÃO</button>' +
+      '<button type="button" class="at-btn" id="ytAbrir">ABRIR O YOUTUBE PARA ENVIAR</button>' +
+    '</div>' +
+    '<p class="es-nota">Na opção manual: clique em BAIXAR ARQUIVO, copie o título e a descrição, abra o YouTube e arraste o arquivo. Cole os textos e escolha a playlist lá.</p>' +
+    '<p id="ytMsg" role="status"></p>';
+  var res = baixar.closest(".f1-card");
+  (res || baixar.parentElement).insertAdjacentElement("afterend", card);
+
+  function msg(t, erro, html){
+    var m = $("ytMsg"); m.className = erro ? "erro" : "";
+    if(html) m.innerHTML = t; else m.textContent = t || "";
+  }
+  function limpar(t){ return String(t || "").replace(/[<>]/g, ""); }
+
+  /* ---------- aparece quando há um VÍDEO pronto ---------- */
+  function verificar(){
+    var nome = baixar.getAttribute("download") || "";
+    var ehVideo = /\.(mp4|webm)$/i.test(nome) && baixar.href && !baixar.hidden && baixar.style.display !== "none";
+    card.hidden = !ehVideo;
+    if(ehVideo && baixar.href !== ultimoArquivo){
+      ultimoArquivo = baixar.href;
+      var titulo = $("esTitulo").value.trim() || "Palavra e Série";
+      var corpo = $("esTexto").value.trim().replace(/\n{3,}/g, "\n\n");
+      $("ytTitulo").value = limpar(titulo).slice(0, 100);
+      $("ytDesc").value = limpar(corpo).slice(0, 4500) + "\n\nPalavra e Série — estudo bíblico, salmos e orações.\n" + SITE;
+      $("ytBarra").hidden = true; msg("");
+    }
+  }
+  new MutationObserver(verificar).observe(baixar, {attributes: true, attributeFilter: ["href", "hidden", "style", "download"]});
+  verificar();
+
+  /* ---------- opção 2: manual ---------- */
+  function copiar(texto, ok){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(texto).then(function(){ msg(ok); }, function(){ msg("Não consegui copiar. Selecione o texto e use Ctrl+C.", true); });
+    }else msg("Seu navegador não permite copiar por botão. Selecione o texto e use Ctrl+C.", true);
+  }
+  $("ytCopT").addEventListener("click", function(){ copiar($("ytTitulo").value, "Título copiado."); });
+  $("ytCopD").addEventListener("click", function(){ copiar($("ytDesc").value, "Descrição copiada."); });
+  $("ytAbrir").addEventListener("click", function(){
+    window.open("https://www.youtube.com/upload", "_blank", "noopener");
+    msg("YouTube aberto em outra aba. Baixe o arquivo aqui (BAIXAR ARQUIVO) e arraste para lá.");
+  });
+
+  /* ---------- opção 1: login ---------- */
+  function carregarGoogle(){
+    return new Promise(function(ok, no){
+      if(window.google && google.accounts && google.accounts.oauth2){ ok(); return; }
+      var s = document.createElement("script");
+      s.src = "https://accounts.google.com/gsi/client"; s.async = true;
+      s.onload = function(){ ok(); };
+      s.onerror = function(){ no(new Error("Não consegui carregar o login do Google. Confira a internet.")); };
+      document.head.appendChild(s);
+    });
+  }
+  function configurado(){ return CLIENT_ID && CLIENT_ID.indexOf(".apps.googleusercontent.com") > 0; }
+  async function entrar(){
+    if(!configurado()) throw new Error("Falta colar o ID do cliente OAuth na linha CLIENT_ID do bloco. Enquanto isso, use a opção manual.");
+    if(token && Date.now() < validade - 60000) return token;
+    await carregarGoogle();
+    return new Promise(function(ok, no){
+      clienteGoogle = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID, scope: SCOPES,
+        callback: function(r){
+          if(r.error){ no(new Error("O Google não autorizou: " + (r.error_description || r.error))); return; }
+          token = r.access_token; validade = Date.now() + (Number(r.expires_in) || 3000) * 1000;
+          ok(token);
+        },
+        error_callback: function(e){ no(new Error("Login cancelado ou bloqueado" + (e && e.type ? " (" + e.type + ")" : "") + ".")); }
+      });
+      clienteGoogle.requestAccessToken({prompt: token ? "" : "consent"});
+    });
+  }
+  async function api(url, opc){
+    opc = opc || {}; opc.headers = Object.assign({Authorization: "Bearer " + token}, opc.headers || {});
+    var r = await fetch(url, opc);
+    if(!r.ok){
+      var j = await r.json().catch(function(){ return {}; });
+      throw new Error((j.error && j.error.message) || ("Erro " + r.status));
+    }
+    return r.json();
+  }
+  async function listarPlaylists(){
+    var sel = $("ytPl"), todas = [], pag = "";
+    do{
+      var d = await api("https://www.googleapis.com/youtube/v3/playlists?part=snippet&mine=true&maxResults=50" + (pag ? "&pageToken=" + pag : ""));
+      todas = todas.concat(d.items || []); pag = d.nextPageToken || "";
+    }while(pag);
+    sel.innerHTML = '<option value="">Nenhuma playlist</option>' + todas.map(function(p){
+      return '<option value="' + p.id + '"></option>';
+    }).join("");
+    Array.prototype.forEach.call(sel.options, function(o, i){ if(i > 0) o.textContent = todas[i - 1].snippet.title; });
+    return todas.length;
+  }
+  $("ytLogin").addEventListener("click", async function(){
+    try{
+      msg("Abrindo o login do Google…");
+      await entrar();
+      var n = await listarPlaylists();
+      msg("Conectado. " + n + " playlist(s) encontrada(s).");
+    }catch(e){ console.error(e); msg(e.message || "Não foi possível entrar.", true); }
+  });
+
+  /* ---------- envio ---------- */
+  function subir(url, blob){
+    return new Promise(function(ok, no){
+      var x = new XMLHttpRequest();
+      x.open("PUT", url);
+      x.setRequestHeader("Content-Type", blob.type || "video/mp4");
+      x.upload.onprogress = function(e){
+        if(e.lengthComputable){
+          var p = e.loaded / e.total;
+          $("ytBarra").firstChild.style.width = Math.round(p * 100) + "%";
+          msg("Enviando… " + Math.round(p * 100) + "%. Mantenha esta aba aberta.");
+        }
+      };
+      x.onload = function(){
+        if(x.status >= 200 && x.status < 300){ try{ ok(JSON.parse(x.responseText)); }catch(e){ no(new Error("Resposta inesperada do YouTube.")); } }
+        else{
+          var t = ""; try{ t = JSON.parse(x.responseText).error.message; }catch(e){}
+          no(new Error(t || ("O YouTube recusou o envio (erro " + x.status + ").")));
+        }
+      };
+      x.onerror = function(){ no(new Error("Falha de rede durante o envio.")); };
+      x.send(blob);
+    });
+  }
+  $("ytEnviar").addEventListener("click", async function(){
+    if(enviando) return;
+    var titulo = $("ytTitulo").value.trim();
+    if(!titulo){ msg("Escreva o título.", true); return; }
+    if(!baixar.href){ msg("Gere o vídeo primeiro.", true); return; }
+    enviando = true; $("ytEnviar").disabled = true; $("ytBarra").hidden = false; $("ytBarra").firstChild.style.width = "0";
+    try{
+      msg("Entrando…"); await entrar();
+      msg("Preparando o arquivo…");
+      var blob = await (await fetch(baixar.href)).blob();
+      var tags = $("ytTags").value.split(",").map(function(t){ return limpar(t.trim()); }).filter(Boolean).slice(0, 15);
+      var meta = {
+        snippet: {title: limpar(titulo).slice(0, 100), description: limpar($("ytDesc").value).slice(0, 5000), tags: tags, categoryId: "22", defaultLanguage: "pt"},
+        status: {privacyStatus: $("ytVis").value, selfDeclaredMadeForKids: false}
+      };
+      var ini = await fetch("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status", {
+        method: "POST",
+        headers: {Authorization: "Bearer " + token, "Content-Type": "application/json; charset=UTF-8",
+          "X-Upload-Content-Length": String(blob.size), "X-Upload-Content-Type": blob.type || "video/mp4"},
+        body: JSON.stringify(meta)
+      });
+      if(!ini.ok){
+        var j = await ini.json().catch(function(){ return {}; });
+        throw new Error((j.error && j.error.message) || ("O YouTube não aceitou o pedido (erro " + ini.status + ")."));
+      }
+      var local = ini.headers.get("Location");
+      if(!local) throw new Error("O YouTube não devolveu o endereço de envio.");
+      var video = await subir(local, blob);
+      var extra = "";
+      var pl = $("ytPl").value;
+      if(pl){
+        try{
+          await api("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet", {
+            method: "POST", headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({snippet: {playlistId: pl, resourceId: {kind: "youtube#video", videoId: video.id}}})
+          });
+          extra = " Adicionado à playlist “" + $("ytPl").options[$("ytPl").selectedIndex].textContent + "”.";
+        }catch(e){ extra = " O vídeo foi enviado, mas não entrou na playlist: " + e.message; }
+      }
+      $("ytBarra").firstChild.style.width = "100%";
+      msg('Publicado (' + ($("ytVis").selectedOptions[0].textContent.split(" ")[0].toLowerCase()) + '). <a href="https://studio.youtube.com/video/' + video.id + '/edit" target="_blank" rel="noopener">Abrir no YouTube Studio</a>.' + extra, false, true);
+    }catch(e){
+      console.error(e); msg(e.message || "Não foi possível publicar.", true);
+    }finally{
+      enviando = false; $("ytEnviar").disabled = false;
+    }
+  });
+})();
+</script>
+<!-- ===== FIM: PUBLICAR NO YOUTUBE ===== -->
 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
