@@ -11523,6 +11523,18 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 #pcEstrutura h4 .at-btn{margin-left:8px;font-size:11px;padding:4px 10px;min-height:0;vertical-align:middle}
 #pcEstrutura .pc-auto{margin:6px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 #pcEstrutura .pc-auto li{display:flex;gap:8px;align-items:center;font:14px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+
+/* Importador LilyPond — módulo 6 */
+#pcEstrutura .pc-lily{grid-column:1/-1;margin-top:14px;padding:14px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card)}
+#pcEstrutura .pc-lily textarea{box-sizing:border-box;width:100%;min-height:230px;padding:12px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6;color:var(--ink);font:13px/1.5 Consolas,monospace;resize:vertical}
+#pcEstrutura .pc-lily .pc-lily-tracks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+#pcEstrutura .pc-lily-track{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,1fr);gap:8px;align-items:center;padding:9px;border:1px solid var(--paper-line);border-radius:6px;background:#fffdf6}
+#pcEstrutura .pc-lily-track strong{font:600 14px Georgia,serif;color:var(--ink)}
+#pcEstrutura .pc-lily small{display:block;color:var(--ink-soft);font:12px/1.45 "Segoe UI",Arial,sans-serif}
+#pcEstrutura .pc-lily-status{padding:10px;border-left:3px solid var(--brass);background:var(--brass-wash);color:var(--ink);font:13px/1.5 "Segoe UI",Arial,sans-serif}
+#pcEstrutura .pc-lily audio{width:100%;margin-top:10px}
+@media(max-width:760px){#pcEstrutura .pc-lily .pc-lily-tracks{grid-template-columns:1fr}#pcEstrutura .pc-lily-track{grid-template-columns:1fr}}
+
 </style>
 <script>
 (function(){
@@ -12025,6 +12037,57 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   sec.appendChild(bibView);
   painel.appendChild(sec);
   var Q = function(s){ return sec.querySelector(s); }, QA = function(s){ return sec.querySelectorAll(s); };
+
+  /* Importador LilyPond: a compilação de fato exige um serviço externo configurado. */
+  var lilyState = { codigo:"", timbres:[], tracks:[], audioUrl:null };
+  var lilyInstrumentos = ["Acoustic Grand Piano","Bright Acoustic Piano","Electric Piano 1","Electric Piano 2","Celesta","Harp","Church Organ","Accordion","Nylon Guitar","Steel Guitar","Electric Guitar (clean)","Violin","Viola","Cello","Contrabass","Tremolo Strings","Harp","Flute","Piccolo","Recorder","Oboe","Clarinet","Bassoon","Soprano Sax","Alto Sax","Tenor Sax","Baritone Sax","Trumpet","Trombone","French Horn","Tuba","Synth Strings 1","Choir Aahs","Voice Oohs","Music Box","Vibraphone","Marimba","Glockenspiel","Tubular Bells","Xylophone","Timpani","Acoustic Bass","Electric Bass (finger)","Synth Bass 1","Synth Bass 2","Woodblock","Taiko Drum","Melodic Tom","Synth Drum","Reverse Cymbal","Percussion"] ;
+  var lilyOriginal = function(nome){ var n=String(nome||"").toLowerCase(); var mapa={flute:"Flute",piccolo:"Piccolo",violin:"Violin",viola:"Viola",cello:"Cello",contrabass:"Contrabass",piano:"Acoustic Grand Piano",celesta:"Celesta",harp:"Harp",clarinet:"Clarinet",oboe:"Oboe",bassoon:"Bassoon",trumpet:"Trumpet",trombone:"Trombone",frenchhorn:"French Horn",tuba:"Tuba",saxophone:"Alto Sax","tenor sax":"Tenor Sax",guitar:"Nylon Guitar","electric guitar":"Electric Guitar (clean)",choir:"Choir Aahs",timpani:"Timpani",marimba:"Marimba",vibraphone:"Vibraphone"}; return mapa[n] || "Acoustic Grand Piano"; };
+  function lilyRenderTracks(tracks){
+    var box=Q("[data-lily-tracks]");
+    lilyState.tracks=tracks.slice();
+    box.innerHTML=tracks.length ? tracks.map(function(t,i){
+      var original=lilyOriginal(t.midi||t.nome);
+      var options=lilyInstrumentos.map(function(v){return '<option value="'+esc(v)+'"'+(v===original?' selected':'')+'>'+esc(v)+'</option>';}).join("");
+      return '<div class="pc-lily-track" data-lily-track="'+i+'"><div><strong>'+esc(t.nome||("Pauta "+(i+1)))+'</strong><small>Instrumento original: '+esc(t.midi||"não declarado")+'</small></div><label> Timbre para reprodução<select data-lily-timbre="'+i+'">'+options+'</select></label></div>';
+    }).join("") : '<small>Nenhuma pauta reconhecida ainda. Cole um código LilyPond e clique em IDENTIFICAR INSTRUMENTOS.</small>';
+    lilyState.timbres=tracks.map(function(t,i){var el=box.querySelector('[data-lily-timbre="'+i+'"]');return el?el.value:lilyOriginal(t.midi||t.nome);});
+  }
+  function lilyIdentificar(){
+    var codigo=Q("[data-lily-codigo]").value; lilyState.codigo=codigo;
+    if(!codigo.trim()){Q("[data-lily-status]").textContent="Cole primeiro o código LilyPond.";lilyRenderTracks([]);return;}
+    var re=/\\new\s+Staff(?:\s+\\with\s*\{([\s\S]*?)\})?/g, m, tracks=[], idx=0;
+    while((m=re.exec(codigo))){var bloco=m[1]||"", nome=(/instrumentName\s*=\s*"([^"]+)"/.exec(bloco)||[])[1]||("Pauta "+(++idx)), midi=(/midiInstrument\s*=\s*"([^"]+)"/.exec(bloco)||[])[1]||"";tracks.push({nome:nome,midi:midi});}
+    if(!tracks.length){var nomes=[...codigo.matchAll(/instrumentName\s*=\s*"([^"]+)"/g)];tracks=nomes.map(function(x){return {nome:x[1],midi:""};});}
+    lilyRenderTracks(tracks);
+    Q("[data-lily-status]").textContent=tracks.length?tracks.length+" pauta(s) identificada(s). Confira ou troque os timbres antes de gerar o áudio.":"Não encontrei declarações de instrumento/pauta reconhecíveis. Verifique se o trecho contém \\new Staff e instrumentName.";
+  }
+  function lilySalvarEstado(){
+    lilyState.codigo=Q("[data-lily-codigo]").value; lilyState.timbres=Array.prototype.map.call(QA("[data-lily-timbre]"),function(x){return x.value;});
+    return {codigo:lilyState.codigo,tracks:lilyState.tracks.map(function(t,i){return {nome:t.nome,instrumentoOriginal:t.midi||"",timbre:lilyState.timbres[i]||lilyOriginal(t.midi||t.nome)};})};
+  }
+  function lilyRestaurarEstado(d){
+    d=d&&typeof d==="object"?d:{}; Q("[data-lily-codigo]").value=d.codigo||""; lilyState.codigo=d.codigo||"";
+    if(lilyState.codigo){lilyIdentificar();(d.tracks||[]).forEach(function(t,i){var el=Q('[data-lily-timbre="'+i+'"]'),v=t.timbre;if(el&&Array.prototype.some.call(el.options,function(o){return o.value===v;}))el.value=v;});}
+    else lilyRenderTracks([]);
+  }
+  function lilyGerar(){
+    var codigo=Q("[data-lily-codigo]").value.trim(), endpoint=(window.PS_LILYPOND_COMPILE_URL||"").trim();
+    if(!codigo){Q("[data-lily-status]").textContent="Cole o código LilyPond antes de solicitar a compilação.";return;}
+    if(!endpoint){Q("[data-lily-status]").textContent="O código e os timbres estão preparados, mas falta conectar o serviço compilador. Configure window.PS_LILYPOND_COMPILE_URL com a URL do seu backend LilyPond. O navegador, sozinho, não compila LilyPond.";return;}
+    var btn=Q("[data-lily-gerar]"), audio=Q("[data-lily-audio]"); btn.disabled=true;btn.textContent="COMPILANDO…";
+    fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({format:"audio",source:codigo,tracks:lilySalvarEstado().tracks})})
+      .then(function(r){if(!r.ok)throw new Error("O compilador respondeu HTTP "+r.status);var tipo=r.headers.get("content-type")||"";if(!/audio\//i.test(tipo)&&!/octet-stream/i.test(tipo))throw new Error("O serviço precisa devolver um arquivo de áudio (audio/* ou application/octet-stream).");return r.blob();})
+      .then(function(blob){if(lilyState.audioUrl)URL.revokeObjectURL(lilyState.audioUrl);lilyState.audioUrl=URL.createObjectURL(blob);audio.src=lilyState.audioUrl;audio.hidden=false;audio.load();Q("[data-lily-status]").textContent="Áudio gerado. Use os controles para ouvir.";})
+      .catch(function(e){Q("[data-lily-status]").textContent="Não foi possível gerar o áudio: "+e.message;})
+      .finally(function(){btn.disabled=false;btn.textContent="GERAR ÁUDIO";});
+  }
+  var painelLily=Q('[data-pc-painel="m6"]');
+  if(painelLily){var blocoLily=document.createElement("section");blocoLily.className="pc-lily";blocoLily.innerHTML='<h4>Importar partitura LilyPond e gerar áudio</h4><p class="es-nota">Cole uma partitura criada externamente. O código original será preservado; os timbres escolhidos afetam somente a reprodução.</p><label>Código LilyPond<textarea data-lily-codigo spellcheck="false" placeholder="Cole aqui o código completo, incluindo \\score e as pautas..."></textarea></label><div class="pc-linha" style="margin-top:10px"><button type="button" class="at-btn" data-lily-identificar>IDENTIFICAR INSTRUMENTOS</button><button type="button" class="at-btn gold" data-lily-gerar>GERAR ÁUDIO</button></div><div class="pc-lily-status" data-lily-status role="status" style="margin-top:10px">Aguardando código LilyPond.</div><h4>Instrumentos reconhecidos e timbres de reprodução</h4><div class="pc-lily-tracks" data-lily-tracks><small>Nenhuma pauta reconhecida ainda.</small></div><audio data-lily-audio controls hidden></audio><small>Nota técnica: a identificação de pautas ocorre no navegador. A compilação LilyPond e a síntese de áudio dependem de um backend externo configurado em window.PS_LILYPOND_COMPILE_URL.</small>';
+    painelLily.appendChild(blocoLily);
+    blocoLily.addEventListener("click",function(ev){if(ev.target.closest("[data-lily-identificar]"))lilyIdentificar();if(ev.target.closest("[data-lily-gerar]"))lilyGerar();});
+    blocoLily.addEventListener("change",function(ev){if(ev.target.matches("[data-lily-timbre]"))lilySalvarEstado();});
+    blocoLily.addEventListener("input",function(ev){if(ev.target.matches("[data-lily-codigo]")){lilyState.codigo=ev.target.value;}});
+  }
   var msg = function(t, erro){ var m = $("pcMsg"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); };
  
   /* ================= LEITURA E ESCRITA DOS CAMPOS ================= */
@@ -12147,6 +12210,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     o.formaModelo = sm.selectedOptions[0] ? sm.selectedOptions[0].textContent : "";
     o.forma = secoes();
     o.orquestracao = o.orquestracao || {}; o.orquestracao.papeis = papeisAtuais();
+    if(typeof lilySalvarEstado === "function") o.importacaoLilypond = lilySalvarEstado();
     return o;
   }
    function pendencias(p){
@@ -12278,12 +12342,13 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     if(p.formaModelo) Array.prototype.forEach.call(sm.options, function(o){ if(o.textContent === p.formaModelo) sm.value = o.value; });
     papeis = (getCam(p, "orquestracao.papeis") && typeof p.orquestracao.papeis === "object") ? JSON.parse(JSON.stringify(p.orquestracao.papeis)) : {};
     instrumentos(); condicoes(); notaEscala(); somar(); marcarAbas();
+    if(typeof lilyRestaurarEstado === "function") lilyRestaurarEstado(p.importacaoLilypond);
     return true;
   }
   function reiniciar(){
     CAMPOS.forEach(function(f){ pôr(f, f.d); });
     opcoesAgrup(); ctl("ritmo.agrupamento").value = "Automático";
-    papeis = {}; carregarModelo(MODELOS_FORMA[2].split("|")[1]); ctl("compassos").value = 32;
+    papeis = {}; if(typeof lilyRestaurarEstado === "function") lilyRestaurarEstado(null); carregarModelo(MODELOS_FORMA[2].split("|")[1]); ctl("compassos").value = 32;
     Q("[data-pc-modelo]").value = MODELOS_FORMA[2].split("|")[1];
     Q("[data-pc-nome]").value = "";
     instrumentos(); condicoes(); notaEscala(); somar(); marcarAbas();
@@ -12452,7 +12517,6 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 })();
 </script>
 <!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->
-
 
 </body>
 </html>
