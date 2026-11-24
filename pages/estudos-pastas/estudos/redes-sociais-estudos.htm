@@ -202,7 +202,7 @@ const catDe = id => CATEGORIAS.find(c => c.id === id);
 const doCat = id => ESTUDOS.filter(e => e.categoria === id);
 
 document.getElementById("cats").innerHTML = CATEGORIAS.map(c =>
-  `<a href="#cat-${c.id}" data-cat="${c.id}">${esc(c.nome)}</a>`).join("");
+  `<a href="${PASTAS[c.id]}/" data-cat="${c.id}">${esc(c.nome)}</a>`).join("");
 
 function marcar(catId, noIndice){
   document.getElementById("m-estudos").classList.toggle("on", !!noIndice);
@@ -241,8 +241,8 @@ function indice(){
     <h1>Estudos</h1>
     <p class="sub">Ouviu no canal? Escolha a lista do conteúdo que você ouviu e encontre o estudo.</p>
     <div class="grid">${CATEGORIAS.map(c => {
-      const n = doCat(c.id).length;
-      return `<a class="card" href="#cat-${c.id}">
+    const n = QTD[c.id];
+      return `<a class="card" href="${PASTAS[c.id]}/">
         <h3>${esc(c.nome)}</h3>
         <p>${esc(c.desc)}</p>
         <p><b>${n ? n + (n === 1 ? " estudo" : " estudos") : "Em breve"}</b></p>
