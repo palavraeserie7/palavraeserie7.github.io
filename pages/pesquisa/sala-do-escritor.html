@@ -12055,11 +12055,35 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   function lilyIdentificar(){
     var codigo=Q("[data-lily-codigo]").value; lilyState.codigo=codigo;
     if(!codigo.trim()){Q("[data-lily-status]").textContent="Cole primeiro o código LilyPond.";lilyRenderTracks([]);return;}
-    var re=/\\new\s+Staff(?:\s+\\with\s*\{([\s\S]*?)\})?/g, m, tracks=[], idx=0;
-    while((m=re.exec(codigo))){var bloco=m[1]||"", nome=(/instrumentName\s*=\s*"([^"]+)"/.exec(bloco)||[])[1]||("Pauta "+(++idx)), midi=(/midiInstrument\s*=\s*"([^"]+)"/.exec(bloco)||[])[1]||"";tracks.push({nome:nome,midi:midi});}
+    /* Reconhece declarações comuns e procura o bloco \with sem exigir que venha logo após o tipo. */
+    var re=/\\new\s+(Staff|PianoStaff|GrandStaff|Voice)\b([^\n\r]*)/g, m, tracks=[], idx=0;
+    while((m=re.exec(codigo))){
+      var linha=m[2]||"", nomeDeclarado=(/^[^=]*=\s*"([^"]+)"/.exec(linha)||[])[1]||"";
+      var inicio=m.index+m[0].length, trecho=codigo.slice(inicio, Math.min(codigo.length,inicio+700));
+      var wm=/\\with\s*\{/.exec(trecho), bloco="";
+      if(wm){var bi=inicio+wm.index+wm[0].length, nivel=1, j=bi; for(;j<codigo.length&&nivel>0;j++){if(codigo[j]==="{")nivel++;else if(codigo[j]==="}")nivel--;} bloco=codigo.slice(bi,j-1);}
+      var nome=(/instrumentName\s*=\s*"([^"]+)"/.exec(bloco)||[])[1]||nomeDeclarado||((m[1]==="Voice"?"Voz ":"Pauta ")+ (++idx));
+      var midi=(/midiInstrument\s*=\s*"([^"]+)"/.exec(bloco)||[])[1]||"";
+      tracks.push({nome:nome,midi:midi,tipo:m[1]});
+    }
     if(!tracks.length){var nomes=[...codigo.matchAll(/instrumentName\s*=\s*"([^"]+)"/g)];tracks=nomes.map(function(x){return {nome:x[1],midi:""};});}
     lilyRenderTracks(tracks);
-    Q("[data-lily-status]").textContent=tracks.length?tracks.length+" pauta(s) identificada(s). Confira ou troque os timbres antes de gerar o áudio.":"Não encontrei declarações de instrumento/pauta reconhecíveis. Verifique se o trecho contém \\new Staff e instrumentName.";
+    Q("[data-lily-status]").textContent=tracks.length?tracks.length+" pauta(s)/voz(es) identificada(s). Confira ou troque os timbres antes de gerar o áudio.":"Não encontrei declarações reconhecíveis. Verifique se o trecho contém \\new Staff, PianoStaff, GrandStaff ou Voice.";
+  }
+  /* Validação preliminar local: não substitui o compilador LilyPond. */
+  function lilyValidar(){
+    var codigo=Q("[data-lily-codigo]").value, status=Q("[data-lily-status]");
+    if(!codigo.trim()){status.textContent="Cole primeiro o código LilyPond.";return false;}
+    var semComentarios=codigo.replace(/%[^\n\r]*/g,"");
+    var semStrings=semComentarios.replace(/"(?:\\\\.|[^"\\\\])*"/g,'""');
+    var abre=(semStrings.match(/\{/g)||[]).length, fecha=(semStrings.match(/\}/g)||[]).length;
+    var erros=[];
+    if(!/\\score\b/.test(codigo)) erros.push("não encontrei o bloco \\score");
+    if(!/\\new\s+(Staff|Voice|PianoStaff|GrandStaff)\b/.test(codigo)) erros.push("não encontrei uma declaração de pauta/voz reconhecível");
+    if(abre!==fecha) erros.push("chaves desbalanceadas ("+abre+" abertura(s) e "+fecha+" fechamento(s))");
+    if(erros.length){status.textContent="Validação preliminar: atenção — "+erros.join("; ")+". Revise o código antes de compilar.";return false;}
+    status.textContent="Validação preliminar concluída: estrutura básica reconhecida ("+abre+" bloco(s) entre chaves). Isso não garante que toda a sintaxe ou todos os recursos LilyPond estejam corretos; a compilação real ainda depende do backend.";
+    return true;
   }
   function lilySalvarEstado(){
     lilyState.codigo=Q("[data-lily-codigo]").value; lilyState.timbres=Array.prototype.map.call(QA("[data-lily-timbre]"),function(x){return x.value;});
@@ -12082,9 +12106,9 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
       .finally(function(){btn.disabled=false;btn.textContent="GERAR ÁUDIO";});
   }
   var painelLily=Q('[data-pc-painel="m6"]');
-  if(painelLily){var blocoLily=document.createElement("section");blocoLily.className="pc-lily";blocoLily.innerHTML='<h4>Importar partitura LilyPond e gerar áudio</h4><p class="es-nota">Cole uma partitura criada externamente. O código original será preservado; os timbres escolhidos afetam somente a reprodução.</p><label>Código LilyPond<textarea data-lily-codigo spellcheck="false" placeholder="Cole aqui o código completo, incluindo \\score e as pautas..."></textarea></label><div class="pc-linha" style="margin-top:10px"><button type="button" class="at-btn" data-lily-identificar>IDENTIFICAR INSTRUMENTOS</button><button type="button" class="at-btn gold" data-lily-gerar>GERAR ÁUDIO</button></div><div class="pc-lily-status" data-lily-status role="status" style="margin-top:10px">Aguardando código LilyPond.</div><h4>Instrumentos reconhecidos e timbres de reprodução</h4><div class="pc-lily-tracks" data-lily-tracks><small>Nenhuma pauta reconhecida ainda.</small></div><audio data-lily-audio controls hidden></audio><small>Nota técnica: a identificação de pautas ocorre no navegador. A compilação LilyPond e a síntese de áudio dependem de um backend externo configurado em window.PS_LILYPOND_COMPILE_URL.</small>';
+  if(painelLily){var blocoLily=document.createElement("section");blocoLily.className="pc-lily";blocoLily.innerHTML='<h4>Importar partitura LilyPond e gerar áudio</h4><p class="es-nota">Cole uma partitura criada externamente. O código original será preservado; os timbres escolhidos afetam somente a reprodução.</p><label>Código LilyPond<textarea data-lily-codigo spellcheck="false" placeholder="Cole aqui o código completo, incluindo \\score e as pautas..."></textarea></label><div class="pc-linha" style="margin-top:10px"><button type="button" class="at-btn" data-lily-identificar>IDENTIFICAR INSTRUMENTOS</button><button type="button" class="at-btn" data-lily-validar>VALIDAR ESTRUTURA</button><button type="button" class="at-btn gold" data-lily-gerar>GERAR ÁUDIO</button></div><div class="pc-lily-status" data-lily-status role="status" style="margin-top:10px">Aguardando código LilyPond.</div><h4>Instrumentos reconhecidos e timbres de reprodução</h4><div class="pc-lily-tracks" data-lily-tracks><small>Nenhuma pauta reconhecida ainda.</small></div><audio data-lily-audio controls hidden></audio><small>Nota técnica: a identificação de pautas e a validação estrutural preliminar ocorrem no navegador. A validação não substitui o compilador; a compilação LilyPond e a síntese de áudio ainda dependem de um backend externo configurado em window.PS_LILYPOND_COMPILE_URL.</small>';
     painelLily.appendChild(blocoLily);
-    blocoLily.addEventListener("click",function(ev){if(ev.target.closest("[data-lily-identificar]"))lilyIdentificar();if(ev.target.closest("[data-lily-gerar]"))lilyGerar();});
+    blocoLily.addEventListener("click",function(ev){if(ev.target.closest("[data-lily-identificar]"))lilyIdentificar();if(ev.target.closest("[data-lily-validar]"))lilyValidar();if(ev.target.closest("[data-lily-gerar]"))lilyGerar();});
     blocoLily.addEventListener("change",function(ev){if(ev.target.matches("[data-lily-timbre]"))lilySalvarEstado();});
     blocoLily.addEventListener("input",function(ev){if(ev.target.matches("[data-lily-codigo]")){lilyState.codigo=ev.target.value;}});
   }
