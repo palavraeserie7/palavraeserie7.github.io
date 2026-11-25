@@ -11779,7 +11779,350 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 })();
 </script>
 <!-- ===== FIM: FECHO FALADO "PALAVRA E SÉRIE — PLAYLIST" ===== -->
- 
+ <!-- ===== INÍCIO: CONTEÚDO PRONTO (BIBLIOTECA DOS VÍDEOS EXPORTADOS) ===== -->
+<style>
+#cpBiblioteca{margin:14px 0;border:1px solid var(--paper-line);border-radius:9px;background:var(--paper-card);color:var(--ink)}
+#esPainel[data-fase="escolha"] > details#cpBiblioteca{display:block!important}
+#cpBiblioteca > summary{cursor:pointer;padding:14px 18px;font:600 18px Georgia,"Times New Roman",serif;list-style:none}
+#cpBiblioteca > summary::-webkit-details-marker{display:none}
+#cpBiblioteca > summary::after{content:"▾";float:right;color:var(--brass-deep);transition:transform .2s}
+#cpBiblioteca:not([open]) > summary::after{transform:rotate(-90deg)}
+#cpBiblioteca .cp-corpo{padding:0 18px 18px;display:flex;flex-direction:column;gap:12px}
+#cpBiblioteca .cp-corpo > p{margin:0;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#cpBiblioteca .cp-msg{min-height:1.3em;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)!important}
+#cpBiblioteca .cp-msg.erro{color:#a14747!important}
+#cpBiblioteca label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#cpBiblioteca label.cp-chk{flex-direction:row;align-items:center;gap:8px;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#cpBiblioteca input[type=search],#cpBiblioteca input[type=text],#cpBiblioteca select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#cpBiblioteca .cp-filtros{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;align-items:end}
+#cpBiblioteca .cp-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;max-height:680px;overflow:auto;padding-right:4px;align-items:start}
+#cpBiblioteca .cp-card{border:1px solid var(--paper-line);border-radius:7px;background:#fff;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+#cpBiblioteca .cp-card strong{font:600 15px Georgia,serif;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cpBiblioteca .cp-card small{font:12.5px/1.45 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#cpBiblioteca .cp-media{width:100%;max-height:260px;border-radius:6px;background:#111}
+#cpBiblioteca audio.cp-media{background:transparent}
+#cpBiblioteca .cp-bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+#cpBiblioteca details summary{cursor:pointer;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#cpBiblioteca .cp-edit{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+#cpBiblioteca fieldset{border:1px solid var(--paper-line);border-radius:6px;padding:8px 10px;margin:0;display:flex;gap:6px 14px;flex-wrap:wrap}
+#cpBiblioteca fieldset legend{font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft);padding:0 4px}
+#cpAviso{margin:10px 0 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#cpAviso.erro{color:#a14747}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), baixar = $("f1Baixar");
+  if(!painel || !baixar || $("cpBiblioteca")) return;
+
+  var REDES = [["youtube","YouTube"],["tiktok","TikTok"],["instagram","Instagram"],["facebook","Facebook"],["kwai","Kwai"],["whatsapp","Status do WhatsApp"],["linkedin","LinkedIn"]];
+  var FMT = {vertical:"Vertical 9:16", quadrado:"Quadrado 1:1", horizontal:"Horizontal 16:9"};
+  var TAGF = {vertical:"9x16", quadrado:"1x1", horizontal:"16x9"};
+  var FSEL = {f916:"vertical", f11:"quadrado", f169:"horizontal"};
+
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
+  var fmtDur = function(s){ if(!isFinite(s) || s <= 0) return ""; var m = Math.floor(s/60), r = Math.round(s%60); if(r === 60){ m++; r = 0; } return m + ":" + (r < 10 ? "0" : "") + r; };
+  var fmtTam = function(b){ return b ? (b >= 1073741824 ? (b/1073741824).toFixed(2) + " GB" : (b/1048576).toFixed(1)) .replace(".", ",") + (b >= 1073741824 ? "" : " MB") : ""; };
+  var nomeRede = function(id){ for(var i = 0; i < REDES.length; i++){ if(REDES[i][0] === id) return REDES[i][1]; } return id; };
+
+  var itens = [], carregado = false, semBanco = false, ultimoHref = "", pediuPersistir = false;
+
+  /* ---------- armazenamento neste navegador (IndexedDB) ---------- */
+  var db = null;
+  function abrirDB(){
+    if(db) return Promise.resolve(db);
+    return new Promise(function(ok, no){
+      if(!window.indexedDB){ no(new Error("sem IndexedDB")); return; }
+      var r = indexedDB.open("ps_conteudo_pronto", 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore("videos", {keyPath:"id"}); };
+      r.onsuccess = function(){ db = r.result; ok(db); };
+      r.onerror = function(){ no(r.error || new Error("falha ao abrir")); };
+    });
+  }
+  function tx(modo, fn){
+    return abrirDB().then(function(d){
+      return new Promise(function(ok, no){
+        var t = d.transaction("videos", modo), req = fn(t.objectStore("videos"));
+        t.oncomplete = function(){ ok(req && req.result); };
+        t.onerror = function(){ no(t.error); };
+        t.onabort = function(){ no(t.error || new Error("cancelado")); };
+      });
+    });
+  }
+  function gravar(it){
+    if(semBanco) return Promise.resolve();
+    var r = {}; Object.keys(it).forEach(function(k){ if(k.charAt(0) !== "_") r[k] = it[k]; });
+    return tx("readwrite", function(s){ return s.put(r); });
+  }
+
+  /* ---------- interface ---------- */
+  var sec = document.createElement("details");
+  sec.id = "cpBiblioteca";
+  sec.innerHTML =
+    '<summary><span id="cpResumo">Conteúdo pronto (0)</span></summary>' +
+    '<div class="cp-corpo">' +
+      '<p>Os vídeos e áudios que você exporta ficam guardados aqui sozinhos. Use esta lista para baixar de novo e para marcar em quais redes cada um já foi publicado. Os arquivos ficam neste navegador: guarde também uma cópia numa pasta ou no Drive.</p>' +
+      '<p id="cpEspaco"></p>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
+        '<button type="button" class="at-btn gold" data-cp="add">ADICIONAR ARQUIVOS</button>' +
+        '<input type="file" class="cp-arq" accept="video/*,audio/*" multiple hidden>' +
+      '</div>' +
+      '<p class="cp-msg" id="cpMsg" role="status"></p>' +
+      '<div class="cp-filtros">' +
+        '<label>Pesquisar<input type="search" class="cp-busca" placeholder="Título, playlist, nota…"></label>' +
+        '<label>Formato<select class="cp-fmt"><option value="">Todos</option>' +
+          Object.keys(FMT).map(function(k){ return '<option value="' + k + '">' + FMT[k] + '</option>'; }).join("") + '</select></label>' +
+        '<label>Falta publicar em<select class="cp-falta"><option value="">Qualquer rede</option>' +
+          REDES.map(function(r){ return '<option value="' + r[0] + '">' + r[1] + '</option>'; }).join("") + '</select></label>' +
+        '<label>Tipo<select class="cp-tipo"><option value="">Vídeos e áudios</option><option value="video">Só vídeos</option><option value="audio">Só áudios</option></select></label>' +
+      '</div>' +
+      '<div class="cp-lista" id="cpLista"></div>' +
+    '</div>';
+  var ref = $("e1Biblioteca") || $("f2Barra");
+  if(ref) ref.insertAdjacentElement("afterend", sec); else painel.appendChild(sec);
+
+  var Q = function(s){ return sec.querySelector(s); };
+  function msg(t, erro){ var m = $("cpMsg"); m.textContent = t || ""; m.className = "cp-msg" + (erro ? " erro" : ""); }
+  function achar(id){ for(var i = 0; i < itens.length; i++){ if(itens[i].id === id) return itens[i]; } return null; }
+  function url(it){ if(!it._url) it._url = URL.createObjectURL(it.blob); return it._url; }
+
+  /* aviso logo abaixo do resultado da exportação */
+  var aviso = document.createElement("p");
+  aviso.id = "cpAviso"; aviso.hidden = true;
+  var cardRes = baixar.closest(".f1-card");
+  (cardRes || baixar.parentElement).insertAdjacentElement("beforeend", aviso);
+  function avisar(t, erro, comBotao){
+    aviso.hidden = false; aviso.className = erro ? "erro" : "";
+    aviso.textContent = t + " ";
+    if(comBotao){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "at-btn"; b.textContent = "ABRIR CONTEÚDO PRONTO";
+      b.addEventListener("click", function(){ sec.open = true; sec.scrollIntoView({behavior:"smooth", block:"start"}); });
+      aviso.appendChild(b);
+    }
+  }
+
+  /* ---------- espaço usado ---------- */
+  function espaco(){
+    var el = $("cpEspaco");
+    if(!navigator.storage || !navigator.storage.estimate){ el.textContent = ""; return; }
+    navigator.storage.estimate().then(function(e){
+      if(!e || !e.quota){ el.textContent = ""; return; }
+      var pct = Math.round(100 * (e.usage || 0) / e.quota);
+      el.textContent = "Espaço usado pelo navegador (todas as bibliotecas): " + fmtTam(e.usage || 0) + " de " + fmtTam(e.quota) + " (" + pct + "%).";
+    }).catch(function(){ el.textContent = ""; });
+  }
+  function persistir(){
+    if(pediuPersistir) return; pediuPersistir = true;
+    try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+  }
+
+  /* ---------- carregar o que já foi guardado ---------- */
+  async function carregar(){
+    if(carregado) return; carregado = true;
+    try{
+      var todos = await tx("readonly", function(s){ return s.getAll(); });
+      itens = (todos || []).filter(function(r){ return r && r.blob; }).map(function(r){ if(!Array.isArray(r.pub)) r.pub = []; return r; })
+        .sort(function(a, b){ return (b.criado || 0) - (a.criado || 0); });
+    }catch(e){
+      console.error(e); semBanco = true;
+      msg("Este navegador não permite guardar a biblioteca. Os arquivos valerão só enquanto esta página estiver aberta.", true);
+    }
+    render();
+  }
+
+  /* ---------- lista ---------- */
+  function nomeArquivo(it){
+    var base = String(it.titulo || "video").replace(/[\\\/:*?"<>|]+/g, "").replace(/\s+/g, " ").trim().slice(0, 80) || "video";
+    return base + (it.tipo === "video" && TAGF[it.formato] ? " - " + TAGF[it.formato] : "") + "." + (it.ext || (it.tipo === "audio" ? "mp3" : "mp4"));
+  }
+  function linhaPub(it){
+    return "Já publicado em: " + (it.pub.length ? it.pub.map(nomeRede).join(", ") : "nenhuma rede ainda");
+  }
+  function card(it){
+    var meta = [it.tipo === "audio" ? "Áudio" : "Vídeo", it.tipo === "video" ? FMT[it.formato] : "", fmtDur(it.duracao), (it.ext || "").toUpperCase(), fmtTam(it.tamanho), new Date(it.criado).toLocaleDateString("pt-BR")].filter(Boolean).join(" · ");
+    var midia = it.tipo === "audio"
+      ? '<audio class="cp-media" controls preload="metadata" src="' + url(it) + '"></audio>'
+      : '<video class="cp-media" controls preload="metadata" playsinline src="' + url(it) + '"></video>';
+    return '<article class="cp-card" data-card="' + esc(it.id) + '">' + midia +
+      '<strong title="' + esc(it.titulo) + '">' + esc(it.titulo) + '</strong>' +
+      '<small>' + esc(meta) + '</small>' +
+      (it.playlist ? '<small>Playlist: ' + esc(it.playlist) + '</small>' : '') +
+      (it.nota ? '<small>Nota: ' + esc(it.nota) + '</small>' : '') +
+      '<small class="cp-pub">' + esc(linhaPub(it)) + '</small>' +
+      '<div class="cp-bt">' +
+        '<button type="button" class="at-btn gold" data-cp="baixar" data-id="' + esc(it.id) + '">BAIXAR</button>' +
+        '<button type="button" class="at-btn" data-cp="excluir" data-id="' + esc(it.id) + '">EXCLUIR</button>' +
+      '</div>' +
+      '<details><summary>EDITAR DADOS E PUBLICAÇÕES</summary><div class="cp-edit">' +
+        '<label>Título<input type="text" data-campo="titulo" data-id="' + esc(it.id) + '" value="' + esc(it.titulo) + '"></label>' +
+        '<label>Playlist<input type="text" data-campo="playlist" data-id="' + esc(it.id) + '" value="' + esc(it.playlist) + '"></label>' +
+        '<label>Nota (música, imagens usadas, licença…)<input type="text" data-campo="nota" data-id="' + esc(it.id) + '" value="' + esc(it.nota) + '"></label>' +
+        '<fieldset><legend>Já publicado em</legend>' + REDES.map(function(r){
+          return '<label class="cp-chk"><input type="checkbox" data-pub="' + r[0] + '" data-id="' + esc(it.id) + '"' + (it.pub.indexOf(r[0]) > -1 ? ' checked' : '') + '> ' + esc(r[1]) + '</label>';
+        }).join("") + '</fieldset>' +
+      '</div></details>' +
+    '</article>';
+  }
+  function render(){
+    $("cpResumo").textContent = "Conteúdo pronto (" + itens.length + ")";
+    var lista = $("cpLista");
+    lista.querySelectorAll("video,audio").forEach(function(m){ try{ m.pause(); }catch(e){} });
+    if(!itens.length){
+      lista.innerHTML = '<p class="es-nota">Ainda não há nada aqui. Exporte um vídeo ou clique em ADICIONAR ARQUIVOS.</p>';
+      espaco(); return;
+    }
+    var q = norm(Q(".cp-busca").value), f = Q(".cp-fmt").value, falta = Q(".cp-falta").value, tp = Q(".cp-tipo").value;
+    var vis = itens.filter(function(it){
+      if(tp && it.tipo !== tp) return false;
+      if(f && it.formato !== f) return false;
+      if(falta && it.pub.indexOf(falta) > -1) return false;
+      if(q && norm([it.titulo, it.playlist, it.nota, it.nome].join(" ")).indexOf(q) < 0) return false;
+      return true;
+    });
+    lista.innerHTML = vis.length ? vis.map(card).join("") : '<p class="es-nota">Nada encontrado com esses filtros.</p>';
+    espaco();
+  }
+
+  /* ---------- ler dados do arquivo ---------- */
+  function lerMeta(tipo, blob){
+    return new Promise(function(ok){
+      var u = URL.createObjectURL(blob), fim = false, el = document.createElement(tipo === "audio" ? "audio" : "video");
+      function sair(v){ if(fim) return; fim = true; URL.revokeObjectURL(u); ok(v); }
+      setTimeout(function(){ sair(null); }, 10000);
+      el.preload = "metadata"; el.muted = true;
+      el.onloadedmetadata = function(){ sair({duracao: isFinite(el.duration) ? el.duration : 0, larg: el.videoWidth || 0, alt: el.videoHeight || 0}); };
+      el.onerror = function(){ sair(null); };
+      el.src = u;
+    });
+  }
+  function orient(larg, alt){
+    if(!larg || !alt) return "";
+    if(alt > larg * 1.2) return "vertical";
+    if(larg > alt * 1.2) return "horizontal";
+    return "quadrado";
+  }
+  function novoId(){ return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  /* ---------- guardar o que acabou de ser exportado ---------- */
+  async function guardarExportado(){
+    var href = baixar.href, nome = baixar.getAttribute("download") || "";
+    if(!href || href === ultimoHref) return;
+    ultimoHref = href;
+    await carregar();
+    try{
+      var blob = await (await fetch(href)).blob();
+      var tipo = /^audio\//.test(blob.type) || /\.(mp3|wav|ogg|m4a|aac)$/i.test(nome) ? "audio" : "video";
+      var ext = (nome.split(".").pop() || (tipo === "audio" ? "mp3" : "mp4")).toLowerCase();
+      var m = await lerMeta(tipo, blob) || {duracao: 0, larg: 0, alt: 0};
+      var formato = tipo === "video" ? (orient(m.larg, m.alt) || FSEL[($("esFormato") || {}).value] || "") : "";
+      var t = $("esTitulo") ? $("esTitulo").value.trim() : "";
+      if(!t && $("esTexto")) t = $("esTexto").value.trim().split(/\n/)[0].slice(0, 60);
+      var rede = painel.querySelector("#rdTrabalho .rd-btn[aria-pressed='true']");
+      var it = {id:novoId(), chave:"exp|" + href, tipo:tipo, ext:ext, nome:nome || ("palavra-e-serie." + ext), mime:blob.type, tamanho:blob.size,
+        titulo:t || "Sem título", playlist:($("fcPlaylist") ? $("fcPlaylist").value.trim() : ""), nota:"", pub:[],
+        formato:formato, larg:m.larg, alt:m.alt, duracao:m.duracao, redeTrabalho:rede ? rede.dataset.n : "", criado:Date.now(), blob:blob};
+      var falhou = false;
+      try{ await gravar(it); persistir(); }catch(e){ console.error(e); falhou = true; }
+      itens.unshift(it); render();
+      avisar(falhou
+        ? "Não deu para guardar em Conteúdo pronto neste navegador (espaço insuficiente?). Baixe o arquivo agora."
+        : "Guardado em Conteúdo pronto.", falhou, !falhou);
+    }catch(e){
+      console.error(e);
+      avisar("Não consegui guardar em Conteúdo pronto. Baixe o arquivo agora.", true, false);
+    }
+  }
+  new MutationObserver(guardarExportado).observe(baixar, {attributes: true, attributeFilter: ["href"]});
+
+  /* ---------- adicionar arquivos antigos ---------- */
+  async function adicionar(arquivos){
+    await carregar();
+    var novos = 0, repetidos = 0, ruins = [], falhou = false;
+    msg("Adicionando…");
+    for(var i = 0; i < arquivos.length; i++){
+      var f = arquivos[i], chave = "arq|" + f.name + "|" + f.size + "|" + f.lastModified;
+      if(itens.some(function(x){ return x.chave === chave; })){ repetidos++; continue; }
+      var tipo = /^audio\//.test(f.type) ? "audio" : "video";
+      var m = await lerMeta(tipo, f);
+      if(!m){ ruins.push(f.name); continue; }
+      var ext = (f.name.split(".").pop() || "").toLowerCase();
+      var it = {id:novoId(), chave:chave, tipo:tipo, ext:ext, nome:f.name, mime:f.type || "", tamanho:f.size,
+        titulo:f.name.replace(/\.[^.]+$/, ""), playlist:"", nota:"", pub:[],
+        formato:tipo === "video" ? orient(m.larg, m.alt) : "", larg:m.larg, alt:m.alt, duracao:m.duracao, redeTrabalho:"", criado:Date.now() + i, blob:f};
+      try{ await gravar(it); persistir(); }catch(e){ console.error(e); falhou = true; }
+      itens.unshift(it); novos++;
+    }
+    render();
+    var p = [];
+    if(novos) p.push(novos + " arquivo(s) adicionado(s).");
+    if(repetidos) p.push(repetidos + " já estava(m) na biblioteca.");
+    if(ruins.length) p.push("Não consegui ler: " + ruins.join(", ") + ".");
+    if(falhou) p.push("Não deu para guardar tudo neste navegador (espaço insuficiente?).");
+    msg(p.join(" ") || "Nada adicionado.", !!ruins.length || falhou);
+  }
+
+  /* ---------- eventos ---------- */
+  sec.addEventListener("toggle", function(){ if(sec.open) carregar(); });
+  sec.addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-cp]"); if(!b) return;
+    var a = b.dataset.cp;
+    if(a === "add"){ Q(".cp-arq").click(); return; }
+    var it = achar(b.dataset.id); if(!it) return;
+    if(a === "baixar"){
+      var l = document.createElement("a");
+      l.href = url(it); l.download = nomeArquivo(it);
+      document.body.appendChild(l); l.click(); l.remove();
+      msg("Baixando “" + nomeArquivo(it) + "”.");
+    }else if(a === "excluir"){
+      if(!window.confirm("Excluir “" + it.titulo + "” de Conteúdo pronto? Não dá para desfazer.")) return;
+      if(it._url) URL.revokeObjectURL(it._url);
+      itens = itens.filter(function(x){ return x.id !== it.id; });
+      if(!semBanco) tx("readwrite", function(s){ return s.delete(it.id); }).catch(function(e){ console.error(e); });
+      render(); msg("Arquivo excluído.");
+    }
+  });
+  Q(".cp-arq").addEventListener("change", function(){
+    var l = Array.prototype.slice.call(this.files || []);
+    this.value = "";
+    if(l.length) adicionar(l);
+  });
+
+  /* filtros e edição ficam só aqui: não disparam o salvamento automático dos projetos */
+  function aoMudar(ev){
+    ev.stopPropagation();
+    var t = ev.target;
+    if(t.dataset && t.dataset.pub && ev.type === "change"){
+      var x = achar(t.dataset.id); if(!x) return;
+      var k = x.pub.indexOf(t.dataset.pub);
+      if(t.checked && k < 0) x.pub.push(t.dataset.pub);
+      if(!t.checked && k > -1) x.pub.splice(k, 1);
+      gravar(x).catch(function(){ msg("Não foi possível guardar a alteração neste navegador.", true); });
+      var c = t.closest(".cp-card"), p = c && c.querySelector(".cp-pub");
+      if(p) p.textContent = linhaPub(x);
+      return;
+    }
+    if(t.dataset && t.dataset.campo && ev.type === "change"){
+      var y = achar(t.dataset.id); if(!y) return;
+      y[t.dataset.campo] = t.value.trim();
+      if(t.dataset.campo === "titulo" && !y.titulo) y.titulo = y.nome.replace(/\.[^.]+$/, "");
+      gravar(y).catch(function(){ msg("Não foi possível guardar a alteração neste navegador.", true); });
+      if(t.dataset.campo === "titulo"){
+        var c2 = t.closest(".cp-card"), s = c2 && c2.querySelector("strong");
+        if(s){ s.textContent = y.titulo; s.title = y.titulo; }
+      }
+      return;
+    }
+    if(t.matches(".cp-busca,.cp-fmt,.cp-falta,.cp-tipo")) render();
+  }
+  sec.addEventListener("input", aoMudar);
+  sec.addEventListener("change", aoMudar);
+
+  carregar();
+})();
+</script>
+<!-- ===== FIM: CONTEÚDO PRONTO (BIBLIOTECA DOS VÍDEOS EXPORTADOS) ===== -->
 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
