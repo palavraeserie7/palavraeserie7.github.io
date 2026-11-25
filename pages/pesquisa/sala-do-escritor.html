@@ -11455,7 +11455,16 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 #fxFicha textarea{min-height:70px;resize:vertical}
 #fxCampos{display:flex;flex-direction:column;gap:12px}
 #fxCampos[hidden]{display:none!important}
-#fxPrevia{min-height:260px;background:#f6f1e3!important}
+.yp{background:#0f0f0f;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:14px;font-family:Roboto,Arial,sans-serif}
+.yp-t,.yp-d{border:1px solid #3f3f3f;border-radius:8px;padding:10px 14px;color:#f1f1f1}
+.yp small{display:block;color:#aaa;font-size:12px;margin-bottom:4px}
+.yp-t div{font-size:16px}
+.yp-d div{white-space:pre-wrap;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.yp .v{color:#f1d58a;font-weight:600}
+.yp .v.vazio{opacity:.65;font-style:italic}
+.yp .lk{color:#3ea6ff}
+.yp-d em{display:block;text-align:right;color:#aaa;font-size:12px;font-style:normal;margin-top:6px}
+.yp-nota{margin:0;color:#aaa;font-size:12.5px}
 #fxMsg{margin:0;min-height:1.4em;font:600 13.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
 #fxMsg.erro{color:#a14747}
 #ytCard.fx-bloq{display:none!important}
@@ -11539,7 +11548,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     '<div id="fxCampos" hidden>' +
       '<label><span id="fxTituloRot">Título</span><input id="fxTitulo" type="text" maxlength="100"></label>' +
       '<label><span id="fxAssuntoRot">Apresentação</span><textarea id="fxAssunto" maxlength="300"></textarea></label>' +
-      '<label>Descrição que será usada<textarea id="fxPrevia" readonly></textarea></label>' +
+     '<div class="yp" id="fxPrevia"><div class="yp-t"><small>Título (obrigatório)</small><div id="fxPrevTitulo"></div></div><div class="yp-d"><small>Descrição</small><div id="fxPrevDesc"></div><em id="fxContador"></em></div><p class="yp-nota">Em dourado: o que você preenche. O resto já vem pronto.</p></div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="fxConfirmar">CONFIRMAR FICHA E LIBERAR PUBLICAÇÃO</button></div>' +
     '</div>' +
     '<p id="fxMsg" role="status"></p>';
@@ -11566,7 +11575,17 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
       m.link + "\n\n" +
       m.ass;
   }
-  function atualizarPrevia(){ $("fxPrevia").value = montar(); }
+ function atualizarPrevia(){
+    var m = modelo(); if(!m) return;
+    var e = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+    var tOk = limpar($("fxTitulo").value), aOk = limpar($("fxAssunto").value).replace(/[.\s]+$/, "");
+    var vt = '<span class="v' + (tOk ? '' : ' vazio') + '">' + e(tOk || m.tit) + '</span>';
+    var va = '<span class="v' + (aOk ? '' : ' vazio') + '">' + e(aOk || m.apr) + '</span>';
+    $("fxPrevTitulo").innerHTML = vt;
+    $("fxPrevDesc").innerHTML = vt + "\n\n" + e(m.a1) + va + e(m.a2) + "\n\n" + e(m.p2) + "\n\n" + e(m.p3) + "\n\n" +
+      e(FRASE_LINK) + "\n\n" + '<span class="lk">' + e(m.link) + '</span>' + "\n\n" + e(m.ass);
+    $("fxContador").textContent = montar().length + "/5000";
+  }
 
   /* mostra a ficha da playlist escolhida */
   function abrirModelo(){
