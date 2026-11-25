@@ -12123,7 +12123,351 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 })();
 </script>
 <!-- ===== FIM: CONTEÚDO PRONTO (BIBLIOTECA DOS VÍDEOS EXPORTADOS) ===== -->
+ <!-- ===== INÍCIO: VOZES POR TRECHO + BIBLIOTECA DE VOZES ===== -->
+<style>
+#vtSec{border:1px solid var(--paper-line);border-radius:8px;background:#fffdf6;color:var(--ink);padding:14px;display:flex;flex-direction:column;gap:12px;margin:10px 0}
+#vtSec h4{margin:0;font:600 17px Georgia,"Times New Roman",serif}
+#vtSec .vt-papel{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#vtSec .vt-papel b{flex:0 0 130px;font:600 14px "Segoe UI",Arial,sans-serif}
+#vtSec .vt-cor{flex:none;width:20px;height:20px;border-radius:4px;border:1px solid var(--paper-line)}
+#vtSec .vt-papel select{flex:1 1 220px;max-width:320px;padding:9px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#vtSec .vt-acoes{display:flex;gap:8px;flex-wrap:wrap}
+#vtSec .vt-texto{white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto;padding:14px;border:1px solid var(--paper-line);border-radius:8px;background:#fff;color:var(--ink);font:17px/1.8 Georgia,"Times New Roman",serif;user-select:text;cursor:text}
+#vtSec .vt-seg{border-radius:3px;padding:1px 0}
+#vtSec details summary{cursor:pointer;font:700 13px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
+#vtSec .vt-bib-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:10px}
+#vtSec .vt-voz{border:1px solid var(--paper-line);border-radius:6px;background:#fff;padding:9px 10px;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+#vtSec .vt-voz b{font:600 15px Georgia,"Times New Roman",serif}
+#vtSec .vt-voz small{font:12.5px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+</style>
+<script>
+(function(){
+  if(window.__vtFetch) return;
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), ta = $("esTexto"), selPadrao = $("f1Voz"), box1 = document.querySelector(".f4-box.final");
+  if(!painel || !ta || !selPadrao) return;
+  window.__vtFetch = true;
 
+  var URL_VOZ = "https://sala-escritor.palavraeserie.workers.dev/api/voz";
+  var FRASE = "A paz do Senhor seja com você neste dia.";
+  var fetchOrig = window.fetch.bind(window);
+
+  /* as 29 vozes (nome do serviço, descrição) */
+  var VOZES = [["Zephyr","brilhante"],["Puck","animada"],["Charon","informativa"],["Kore","firme"],["Fenrir","empolgada"],["Leda","jovem"],["Orus","firme"],["Aoede","leve"],["Autonoe","brilhante"],["Enceladus","suave, com ar"],["Iapetus","clara"],["Umbriel","descontraída"],["Algieba","macia"],["Despina","macia"],["Erinome","clara"],["Algenib","rouca"],["Rasalgethi","informativa"],["Laomedeia","animada"],["Achernar","suave"],["Alnilam","firme"],["Schedar","uniforme"],["Gacrux","madura"],["Pulcherrima","direta"],["Achird","amigável"],["Zubenelgenubi","casual"],["Vindemiatrix","gentil"],["Sadachbia","viva"],["Sadaltager","conhecedora"],["Sulafat","calorosa"]];
+  var PAPEIS = [
+    {id:"1", nome:"Narrador",        cor:"rgba(31,111,235,.28)", voz:"Orus"},
+    {id:"2", nome:"Primeira pessoa", cor:"rgba(46,160,67,.30)",  voz:"Kore"},
+    {id:"3", nome:"Segunda pessoa",  cor:"rgba(219,134,20,.32)", voz:"Charon"},
+    {id:"4", nome:"Personagem",      cor:"rgba(137,87,229,.30)", voz:"Puck"}
+  ];
+
+  /*PURE-START*/
+  function normalizar(t){
+    var s = "", m = [], esp = false;
+    for(var i = 0; i < t.length; i++){
+      var c = t.charAt(i);
+      if(/\s/.test(c)){ if(s.length && !esp){ s += " "; m.push(i); esp = true; } }
+      else{ s += c; m.push(i); esp = false; }
+    }
+    return {s: s, m: m};
+  }
+  function papelEm(segs, i){
+    for(var k = 0; k < segs.length; k++){ if(i >= segs[k].a && i < segs[k].b) return segs[k].r; }
+    return "";
+  }
+  function dividirPorPapeis(req, norm, segs, cursor){
+    var R = normalizar(req).s.replace(/\s+$/, "");
+    if(!R) return null;
+    var pos = norm.s.indexOf(R, cursor);
+    if(pos < 0) pos = norm.s.indexOf(R);
+    if(pos < 0) return null;
+    var partes = [], ini = pos, atual = null, k;
+    for(k = pos; k < pos + R.length; k++){
+      var r = papelEm(segs, norm.m[k]);
+      if(atual === null) atual = r;
+      if(r !== atual){ partes.push({t: norm.s.slice(ini, k), r: atual}); ini = k; atual = r; }
+    }
+    partes.push({t: norm.s.slice(ini, pos + R.length), r: atual});
+    partes = partes.map(function(p){ return {t: p.t.trim(), r: p.r}; }).filter(function(p){ return p.t; });
+    /* pontuação de fechamento no começo de um pedaço (. , ; : ! ? ” ) volta para o pedaço anterior */
+    for(k = 1; k < partes.length; k++){
+      var f = /^[.,;:!?\u2026\u201D\u2019)\u00BB\]]+/.exec(partes[k].t);
+      if(f){ partes[k - 1].t += f[0]; partes[k].t = partes[k].t.slice(f[0].length).trim(); }
+    }
+    partes = partes.filter(function(p){ return p.t; });
+    /* pedaço só de pontuação gruda no anterior (ou no seguinte, se for o primeiro) */
+    var out = [], pend = "";
+    partes.forEach(function(p){
+      if(!/[\p{L}\p{N}]/u.test(p.t)){
+        if(out.length) out[out.length - 1].t += p.t; else pend += p.t;
+        return;
+      }
+      out.push({t: pend + p.t, r: p.r}); pend = "";
+    });
+    /* junta vizinhos com o mesmo papel */
+    var fim = [];
+    out.forEach(function(p){
+      var u = fim[fim.length - 1];
+      if(u && u.r === p.r) u.t += " " + p.t; else fim.push({t: p.t, r: p.r});
+    });
+    return {partes: fim, fim: pos + R.length};
+  }
+  function aplicarPapel(segs, a, b, r, t){
+    var out = [];
+    segs.forEach(function(g){
+      if(g.b <= a || g.a >= b){ out.push({a: g.a, b: g.b, r: g.r}); return; }
+      if(g.a < a) out.push({a: g.a, b: a, r: g.r});
+      if(g.b > b) out.push({a: b, b: g.b, r: g.r});
+    });
+    if(r) out.push({a: a, b: b, r: r});
+    out.sort(function(x, y){ return x.a - y.a; });
+    var m = [];
+    out.forEach(function(g){
+      var u = m[m.length - 1];
+      if(u && u.r === g.r && u.b === g.a) u.b = g.b; else m.push({a: g.a, b: g.b, r: g.r});
+    });
+    m.forEach(function(g){ g.s = t.slice(g.a, Math.min(g.b, g.a + 60)); });
+    return m;
+  }
+  function reancorar(segs, texto){
+    var out = [];
+    segs.forEach(function(g){
+      var len = g.b - g.a, a = g.a;
+      if(texto.substr(a, g.s.length) !== g.s){
+        var best = -1, i = texto.indexOf(g.s);
+        while(i >= 0){
+          if(best < 0 || Math.abs(i - g.a) < Math.abs(best - g.a)) best = i;
+          i = texto.indexOf(g.s, i + 1);
+        }
+        if(best < 0 || !g.s) return;
+        a = best;
+      }
+      out.push({a: a, b: Math.min(texto.length, a + len), r: g.r, s: g.s});
+    });
+    out.sort(function(x, y){ return x.a - y.a; });
+    var fim = [];
+    out.forEach(function(g){
+      var u = fim[fim.length - 1];
+      if(u && g.a < u.b) g.a = u.b;
+      if(g.b > g.a) fim.push(g);
+    });
+    return fim;
+  }
+  function juntarWav(buffers){
+    var cab = new DataView(buffers[0]);
+    if(buffers[0].byteLength <= 44 || cab.getUint32(0, false) !== 0x52494646) throw new Error("áudio inesperado");
+    var taxa = cab.getUint32(24, true), pausa = Math.round(taxa * 0.12) * 2;
+    var pcms = buffers.map(function(b){ return new Uint8Array(b, 44); });
+    var total = 0;
+    pcms.forEach(function(p, i){ total += p.length + (i < pcms.length - 1 ? pausa : 0); });
+    var out = new Uint8Array(44 + total), v = new DataView(out.buffer), pos = 44;
+    out.set(new Uint8Array(buffers[0], 0, 44), 0);
+    v.setUint32(4, 36 + total, true);
+    v.setUint32(40, total, true);
+    pcms.forEach(function(p, i){ out.set(p, pos); pos += p.length + (i < pcms.length - 1 ? pausa : 0); });
+    return out;
+  }
+  /*PURE-END*/
+
+  var esc = function(t){ return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var papelPor = function(id){ for(var i = 0; i < PAPEIS.length; i++){ if(PAPEIS[i].id === id) return PAPEIS[i]; } return null; };
+
+  /* ---------- interface ---------- */
+  var sec = document.createElement("section");
+  sec.id = "vtSec";
+  sec.innerHTML =
+    '<h4>Vozes por trecho (opcional)</h4>' +
+    '<p class="es-nota">Escolha a voz de cada papel. Depois selecione um trecho do texto abaixo com o mouse e clique em APLICAR À SELEÇÃO no papel desejado. O trecho fica colorido. O que ficar sem cor usa a Voz profissional do campo acima. Vale para o MP3 e o MP4 finais, não para a prévia do passo 3.</p>' +
+    '<div id="vtPapeis"></div>' +
+    '<div class="vt-acoes"><button type="button" class="at-btn" data-vt="tirar">TIRAR O PAPEL DO TRECHO SELECIONADO</button><button type="button" class="at-btn" data-vt="limpar">LIMPAR TODOS OS TRECHOS</button></div>' +
+    '<div id="vtTexto" class="vt-texto" tabindex="0" aria-label="Texto para marcar as vozes"></div>' +
+    '<p class="es-msg" id="vtMsg" role="status"></p>' +
+    '<details><summary>Biblioteca de vozes (' + VOZES.length + ')</summary><div class="vt-bib-grade" id="vtBib"></div></details>' +
+    '<input type="hidden" id="vtDados" value="">';
+  var ref = box1 || $("sxRitmo") || painel.querySelector('.es-box[data-passo="2"]');
+  if(box1) box1.insertAdjacentElement("afterend", sec);
+  else if($("sxRitmo")) $("sxRitmo").insertAdjacentElement("beforebegin", sec);
+  else if(ref) ref.appendChild(sec);
+  else return;
+
+  var box = $("vtTexto"), dados = $("vtDados");
+  var opcoes = VOZES.map(function(v){ return '<option value="' + v[0] + '">' + v[0] + ' — ' + v[1] + '</option>'; }).join("");
+  $("vtPapeis").innerHTML = PAPEIS.map(function(p){
+    return '<div class="vt-papel"><span class="vt-cor" style="background:' + p.cor + '"></span><b>' + p.nome + '</b>' +
+      '<select id="vtV' + p.id + '" aria-label="Voz de ' + p.nome + '">' + opcoes + '</select>' +
+      '<button type="button" class="at-btn gold" data-vt="aplicar" data-p="' + p.id + '">APLICAR À SELEÇÃO</button>' +
+      '<button type="button" class="at-btn" data-vt="ouvir" data-p="' + p.id + '">OUVIR ESTA VOZ</button></div>';
+  }).join("");
+  PAPEIS.forEach(function(p){ $("vtV" + p.id).value = p.voz; });
+  $("vtBib").innerHTML = VOZES.map(function(v){
+    return '<div class="vt-voz"><b>' + v[0] + '</b><small>' + v[1] + '</small><button type="button" class="at-btn" data-vt="amostra" data-v="' + v[0] + '">OUVIR</button></div>';
+  }).join("");
+
+  function msg(t, erro){ var m = $("vtMsg"); m.textContent = t || ""; m.className = "es-msg" + (erro ? " erro" : ""); }
+
+  /* ---------- estado ---------- */
+  var segs = [], ultimoJson = "", textoVisto = null, ultimaSel = null, cursor = 0, normCache = {t: null, n: null};
+  function normAtual(){
+    var t = ta.value;
+    if(normCache.t !== t) normCache = {t: t, n: normalizar(t)};
+    return normCache.n;
+  }
+  function salvar(){
+    var j = JSON.stringify(segs.map(function(g){ return [g.a, g.b, g.r, g.s]; }));
+    if(dados.value !== j){
+      dados.value = j; ultimoJson = j;
+      dados.dispatchEvent(new Event("input", {bubbles: true}));      /* o projeto guarda junto */
+    }else ultimoJson = j;
+  }
+  function carregarDeDados(){
+    ultimoJson = dados.value;
+    var arr = [];
+    try{ arr = JSON.parse(dados.value || "[]"); }catch(e){ arr = []; }
+    segs = (Array.isArray(arr) ? arr : []).filter(function(x){ return Array.isArray(x) && x.length >= 4; })
+      .map(function(x){ return {a: Number(x[0]), b: Number(x[1]), r: String(x[2]), s: String(x[3])}; });
+    segs = reancorar(segs, ta.value);
+    render();
+  }
+  function render(){
+    var t = ta.value, h = "", p = 0;
+    if(!t){ box.innerHTML = '<span class="es-nota">Escreva ou cole o texto no passo 1. Ele aparece aqui para você marcar os trechos.</span>'; return; }
+    segs.forEach(function(g){
+      var pp = papelPor(g.r); if(!pp) return;
+      var voz = $("vtV" + pp.id) ? $("vtV" + pp.id).value : pp.voz;
+      h += esc(t.slice(p, g.a)) + '<span class="vt-seg" style="background:' + pp.cor + '" title="' + esc(pp.nome + " — " + voz) + '">' + esc(t.slice(g.a, g.b)) + '</span>';
+      p = g.b;
+    });
+    box.innerHTML = h + esc(t.slice(p));
+  }
+  function aoMudarTexto(){
+    textoVisto = ta.value;
+    if(segs.length){
+      var n = reancorar(segs, ta.value);
+      if(n.length < segs.length) msg("Alguns trechos marcados foram desfeitos porque o texto deles mudou.", true);
+      segs = n; salvar();
+    }
+    render();
+  }
+
+  /* ---------- seleção ---------- */
+  function posNoBox(no, desl){
+    var r = document.createRange();
+    r.selectNodeContents(box); r.setEnd(no, desl);
+    return r.toString().length;
+  }
+  function lerSelecao(){
+    var s = window.getSelection();
+    if(!s || !s.rangeCount || s.isCollapsed) return null;
+    var r = s.getRangeAt(0);
+    if(!box.contains(r.startContainer) || !box.contains(r.endContainer)) return null;
+    var a = posNoBox(r.startContainer, r.startOffset), b = posNoBox(r.endContainer, r.endOffset);
+    return a <= b ? {a: a, b: b} : {a: b, b: a};
+  }
+  document.addEventListener("selectionchange", function(){ var s = lerSelecao(); if(s) ultimaSel = s; });
+  box.addEventListener("mousedown", function(){ ultimaSel = null; });
+
+  function aplicar(papel){
+    var sel = lerSelecao() || ultimaSel, t = ta.value;
+    if(!t){ msg("Escreva o texto no passo 1.", true); return; }
+    if(!sel || sel.b <= sel.a){ msg("Selecione primeiro um trecho do texto, com o mouse.", true); return; }
+    var a = Math.max(0, sel.a), b = Math.min(t.length, sel.b), L = /[\p{L}\p{N}]/u;
+    while(a < b && /\s/.test(t.charAt(a))) a++;
+    while(b > a && /\s/.test(t.charAt(b - 1))) b--;
+    while(a > 0 && L.test(t.charAt(a - 1)) && L.test(t.charAt(a))) a--;                 /* não corta palavra */
+    while(b < t.length && L.test(t.charAt(b)) && L.test(t.charAt(b - 1))) b++;
+    while(b < t.length && /[.,;:!?\u2026\u201D\u2019)\u00BB\]]/.test(t.charAt(b))) b++;          /* leva o ponto final junto */
+    if(b <= a){ msg("Selecione um trecho com palavras.", true); return; }
+    segs = aplicarPapel(segs, a, b, papel, t);
+    salvar(); render(); ultimaSel = null;
+    var s2 = window.getSelection(); if(s2) s2.removeAllRanges();
+    var pp = papelPor(papel);
+    msg(pp ? "Trecho marcado como " + pp.nome + " (voz " + $("vtV" + pp.id).value + ")." : "Papel retirado do trecho: volta a usar a voz padrão.");
+  }
+
+  /* ---------- amostras de voz ---------- */
+  var amostras = {}, tocador = null;
+  function pararAmostra(){ if(tocador){ tocador.pause(); tocador = null; } }
+  async function ouvirAmostra(nome){
+    pararAmostra();
+    try{
+      if(!amostras[nome]){
+        msg("Gerando a amostra da voz " + nome + "…");
+        var s = (await supabaseClient.auth.getSession()).data.session;
+        if(!s) throw new Error("Sessão encerrada. Entre de novo.");
+        var r = await fetchOrig(URL_VOZ, {method: "POST",
+          headers: {"Content-Type": "application/json", "Authorization": "Bearer " + s.access_token},
+          body: JSON.stringify({texto: FRASE, voz: nome, velocidade: Number(($("esVel") || {}).value) || 1})});
+        if(!r.ok){ var j = await r.json().catch(function(){ return {}; }); throw new Error(j.error || ("A voz respondeu com erro " + r.status + ".")); }
+        if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
+        amostras[nome] = URL.createObjectURL(await r.blob());
+      }
+      tocador = new Audio(amostras[nome]);
+      tocador.onended = function(){ msg("Fim da amostra."); };
+      await tocador.play();
+      msg("Tocando a voz " + nome + ".");
+    }catch(e){ console.error(e); msg(e.message || "Não foi possível gerar a amostra.", true); }
+  }
+
+  /* ---------- eventos ---------- */
+  sec.addEventListener("mousedown", function(ev){ if(ev.target.closest("[data-vt]")) ev.preventDefault(); });   /* não perde a seleção */
+  sec.addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-vt]"); if(!b) return;
+    var a = b.dataset.vt;
+    if(a === "aplicar") aplicar(b.dataset.p);
+    else if(a === "tirar") aplicar("");
+    else if(a === "ouvir") ouvirAmostra($("vtV" + b.dataset.p).value);
+    else if(a === "amostra") ouvirAmostra(b.dataset.v);
+    else if(a === "limpar"){
+      if(segs.length && !window.confirm("Tirar todos os papéis do texto?")) return;
+      segs = []; salvar(); render(); msg("Todos os trechos voltaram à voz padrão.");
+    }
+  });
+  PAPEIS.forEach(function(p){ $("vtV" + p.id).addEventListener("change", render); });
+  ta.addEventListener("input", aoMudarTexto);
+  painel.addEventListener("click", function(){ cursor = 0; pararAmostra(); }, true);
+  painel.addEventListener("click", function(ev){ if(ev.target.closest && ev.target.closest(".es-passos [data-p]")) setTimeout(function(){ aoMudarTexto(); }, 30); });
+  setInterval(function(){
+    if(dados.value !== ultimoJson) carregarDeDados();
+    if(ta.value !== textoVisto) aoMudarTexto();
+  }, 700);
+
+  /* ---------- na hora de gerar o MP3/MP4: cada trecho vai com a voz do seu papel ---------- */
+  async function falarPartes(partes, corpo, init){
+    var bufs = [];
+    for(var i = 0; i < partes.length; i++){
+      var p = partes[i], pp = p.r ? papelPor(p.r) : null;
+      var voz = pp ? $("vtV" + pp.id).value : corpo.voz;
+      var r = await fetchOrig(URL_VOZ, Object.assign({}, init, {body: JSON.stringify(Object.assign({}, corpo, {texto: p.t, voz: voz}))}));
+      if(!r.ok) return r;                                              /* o erro segue para quem pediu */
+      if((r.headers.get("content-type") || "").indexOf("audio") !== 0) return r;
+      bufs.push(await r.arrayBuffer());
+    }
+    var saida = bufs.length === 1 ? bufs[0] : juntarWav(bufs);
+    return new Response(saida, {status: 200, headers: {"Content-Type": "audio/wav"}});
+  }
+  window.fetch = async function(input, init){
+    var url = typeof input === "string" ? input : ((input && input.url) || "");
+    if(url === URL_VOZ && init && typeof init.body === "string" && segs.length){
+      try{
+        if(ta.value !== textoVisto) aoMudarTexto();
+        var corpo = JSON.parse(init.body);
+        var d = dividirPorPapeis(String(corpo.texto || ""), normAtual(), segs, cursor);
+        if(d && d.partes.some(function(p){ return p.r; })){
+          cursor = d.fim;
+          return await falarPartes(d.partes, corpo, init);
+        }
+      }catch(e){ console.warn("Vozes por trecho: usando a voz padrão neste pedido.", e); }
+    }
+    return fetchOrig(input, init);
+  };
+
+  carregarDeDados();
+  aoMudarTexto();
+})();
+</script>
+<!-- ===== FIM: VOZES POR TRECHO + BIBLIOTECA DE VOZES ===== -->
+
+ 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
  <!-- ===== INÍCIO: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3: FLUXO DE PRODUÇÃO EM 9 ETAPAS) ==== -->
