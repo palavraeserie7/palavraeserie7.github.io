@@ -11688,6 +11688,98 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 })();
 </script>
 <!-- ===== FIM: FICHA DE PUBLICAÇÃO POR PLAYLIST ===== -->
+<!-- ===== INÍCIO: FECHO FALADO "PALAVRA E SÉRIE — PLAYLIST" ===== -->
+<style>
+#fcBox{border:1px solid var(--brass);border-radius:8px;background:var(--brass-wash);color:var(--ink);padding:12px 14px;display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
+#fcBox label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#fcBox label.fc-chk{flex-direction:row;align-items:center;gap:8px;font:600 13px "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#fcBox input[type=text]{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#fcBox input.erro{border-color:#a14747;box-shadow:0 0 0 1px #a14747}
+#fcBox p{margin:0;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink)}
+#fcBox p b{color:var(--brass-deep)}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel");
+  if(!painel || $("fcBox")) return;
+  var box4 = painel.querySelector('.es-box[data-passo="4"]');
+  if(!box4) return;
+
+  var CH = "ps_playlists_fecho";
+  var lista = [];
+  try{ lista = JSON.parse(localStorage.getItem(CH) || "[]"); }catch(e){}
+  if(!Array.isArray(lista)) lista = [];
+  if(lista.indexOf("Tirando a mente do engano") < 0) lista.push("Tirando a mente do engano");
+
+  var limpar = function(t){ return String(t || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim(); };
+  var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); };
+  var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+
+  /* ---------- campo no passo 4 ---------- */
+  var box = document.createElement("div");
+  box.id = "fcBox";
+  box.innerHTML =
+    '<label>Playlist deste vídeo (obrigatória)<input id="fcPlaylist" type="text" maxlength="100" list="fcLista" placeholder="Ex.: Tirando a mente do engano"></label>' +
+    '<datalist id="fcLista">' + lista.map(function(n){ return '<option value="' + esc(n) + '">'; }).join("") + '</datalist>' +
+    '<p>A fala e a última legenda terminam com: <b id="fcPrevia"></b></p>' +
+    '<label class="fc-chk"><input type="checkbox" id="fcSem"> Exportar sem o fecho (só para testes)</label>';
+  var ref = $("exResumo");
+  if(ref) ref.insertAdjacentElement("beforebegin", box);
+  else box4.insertBefore(box, box4.children[1] || null);
+
+  function fecho(n){ return "Palavra e Série — " + n + "."; }
+  function atualizar(){
+    var n = limpar($("fcPlaylist").value);
+    $("fcPrevia").textContent = $("fcSem").checked ? "(desligado)" : (n ? fecho(n) : "escolha a playlist acima.");
+  }
+  $("fcPlaylist").addEventListener("input", function(){ this.classList.remove("erro"); atualizar(); });
+  $("fcSem").addEventListener("change", atualizar);
+  atualizar();
+
+  function guardar(n){
+    if(lista.indexOf(n) < 0){
+      lista.push(n);
+      $("fcLista").insertAdjacentHTML("beforeend", '<option value="' + esc(n) + '">');
+    }
+    try{ localStorage.setItem(CH, JSON.stringify(lista)); }catch(e){}
+  }
+
+  /* o texto já termina com a identidade? */
+  function jaTem(texto){
+    var cauda = norm(texto.slice(-200));
+    return cauda.indexOf("palavra e serie") > -1 || cauda.indexOf("palavra serie") > -1;
+  }
+
+  /* ---------- no momento de exportar (janela captura antes de todos os outros) ---------- */
+  window.addEventListener("estudio:exportar", function(ev){
+    var d = ev.detail;
+    if(!d || d.fechoAplicado) return;
+    if($("fcSem").checked) return;
+    var n = limpar($("fcPlaylist").value);
+    if(!n){
+      ev.stopImmediatePropagation();
+      d.tratado = true;
+      var m = $("esMsg4");
+      if(m){ m.className = "es-msg erro"; m.textContent = "Escolha a playlist deste vídeo antes de exportar: ela entra no fim da fala."; }
+      $("fcPlaylist").classList.add("erro");
+      $("fcPlaylist").focus();
+      box.scrollIntoView({behavior: "smooth", block: "center"});
+      return;
+    }
+    guardar(n);
+    var t = String(d.texto || "").trim();
+    if(!jaTem(t)) d.texto = t + "\n\n" + fecho(n);
+    d.fechoAplicado = true;
+
+    /* leva a playlist para a ficha de publicação */
+    var fp = $("fxPlaylist");
+    if(fp){ fp.value = n; fp.dispatchEvent(new Event("input", {bubbles: true})); }
+  }, true);
+})();
+</script>
+<!-- ===== FIM: FECHO FALADO "PALAVRA E SÉRIE — PLAYLIST" ===== -->
+ 
 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
