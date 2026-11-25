@@ -6505,8 +6505,6 @@ body.dg-livro-vivo .dgp-nota{display:none}
  <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
  
-><!-- ====================================================================================================================== --> 
- 
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
     
 <style>
@@ -11037,21 +11035,12 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 #pvLista button:hover{border-color:var(--brass)}
 #pvLista button.on{background:var(--brass-wash);border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}
 #pvLista b{flex:0 0 auto;min-width:26px;color:var(--brass-deep)}
-/* Encerramento contemplativo: identidade visual discreta, sem alterar a tela da prévia. */
-#esTela .ps-fecho-marca{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);z-index:4;pointer-events:none;display:none;padding:5px 10px;border:1px solid rgba(241,213,138,.42);border-radius:4px;background:rgba(0,0,0,.24);color:rgba(255,253,246,.78);font:600 12px/1.2 Georgia,serif;letter-spacing:.04em;text-shadow:0 1px 5px rgba(0,0,0,.9)}
-#esTela.ps-fecho-ativo .ps-fecho-marca{display:block}
-#esTela.ps-fecho-ativo .es-legenda{display:none}
 </style>
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel"), ouvir = $("esOuvir"), parar = $("esParar"), tela = $("esTela"), leg = $("esLegenda");
   if(!painel || !ouvir || !parar || !tela || !leg || !window.speechSynthesis) return;
-
-  var marca = document.createElement("div");
-  marca.className = "ps-fecho-marca";
-  marca.textContent = "Palavra & Série";
-  tela.appendChild(marca);
 
   var trechos = [], atual = 0, tocando = false, pausado = false, token = 0;
   var arqMusica = null, audioMus = null, urlMus = null;
@@ -11159,12 +11148,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     var nome = $("esVoz").value, v = speechSynthesis.getVoices().filter(function(x){ return x.name === nome; })[0];
     if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "pt-BR";
     u.rate = Number($("esVel").value) || 1;
-    u.onend = function(){
-      if(meu !== token || pausado) return;
-      /* Todo formato termina com 6 s de instrumental + marca-d’água. */
-      if(i + 1 >= trechos.length) fechoContemplativo(meu);
-      else falar(i + 1, meu);
-    };
+    u.onend = function(){ if(meu === token && !pausado) falar(i + 1, meu); };
     speechSynthesis.speak(u);
   }
   function tocarDe(i){
@@ -11186,32 +11170,8 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     }
     status();
   }
-  function playlistAtual(){
-    var a = $("fcPlaylist"), b = $("fxPlaylist");
-    return String((a && a.value) || (b && b.value) || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-  }
-  function contemplativa(){
-    var p = playlistAtual();
-    return p === "momentos de oracao" || p === "salmos e reflexoes biblicas" || p === "salmos na integra";
-  }
-  function fechoContemplativo(meu){
-    if(meu !== token) return;
-    tocando = true; pausado = false;
-    tela.classList.add("ps-fecho-ativo");
-    marca.textContent = "Palavra & Série";
-    /* Se houver música escolhida, ela continua suavemente no encerramento. */
-    musicaIniciar();
-    var restante = 6000, inicio = Date.now();
-    (function atualizar(){
-      if(meu !== token || pausado || !tocando) return;
-      var passado = Date.now() - inicio;
-      status();
-      if(passado >= restante){ fim(); return; }
-      setTimeout(atualizar, 80);
-    })();
-  }
   function fim(){
-    tocando = false; pausado = false; tela.classList.remove("ps-fecho-ativo"); musicaParar(); status();
+    tocando = false; pausado = false; musicaParar(); status();
   }
   function pararTudo(){
     token++; speechSynthesis.cancel(); fim(); atual = 0; status();
@@ -12162,7 +12122,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   carregar();
 })();
 </script>
-
+<!-- ===== FIM: CONTEÚDO PRONTO (BIBLIOTECA DOS VÍDEOS EXPORTADOS) ===== -->
 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
