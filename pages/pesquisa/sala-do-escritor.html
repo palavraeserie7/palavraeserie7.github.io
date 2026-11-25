@@ -6504,6 +6504,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
 <!-- ===== FIM: SEM PÁGINAS EM BRANCO ===== -->
  <!-- ==== ESTÚDIO ==== -->
 <!-- ====================================================================================================================== --> 
+<!-- ====================================================================================================================== --> 
  
 <!-- ===== INÍCIO: ESTÚDIO DE CRIAÇÃO  =====-->
     
@@ -6564,7 +6565,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
-  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,"&quot;"); };
   var ancora = $("ateliPainel");
   if(!ancora) return;
  
@@ -6749,7 +6750,7 @@ body.dg-livro-vivo .dgp-nota{display:none}
   function adicionarCena(titulo, descricao){
     numeroCena++;
     var card = document.createElement('article'); card.className = 'es-cena';
-    card.innerHTML = '<h4>Cena '+numeroCena+'</h4><label class="es-filme-campo">Título da cena<input class="es-cena-titulo" value="'+(titulo||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" placeholder="Ex.: Davi aceita o desafio"></label><label class="es-filme-campo">Ação, fala ou imagem desejada<textarea class="es-cena-desc" placeholder="O que acontece nesta cena?">'+(descricao||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</textarea></label><button type="button" class="at-btn es-cena-remover">Remover cena</button>';
+    card.innerHTML = '<h4>Cena '+numeroCena+'</h4><label class="es-filme-campo">Título da cena<input class="es-cena-titulo" value="'+(titulo||'').replace(/&/g,'&').replace(/"/g,'"')+'" placeholder="Ex.: Davi aceita o desafio"></label><label class="es-filme-campo">Ação, fala ou imagem desejada<textarea class="es-cena-desc" placeholder="O que acontece nesta cena?">'+(descricao||'').replace(/&/g,'&').replace(/</g,'<')+'</textarea></label><button type="button" class="at-btn es-cena-remover">Remover cena</button>';
     card.querySelector('.es-cena-remover').addEventListener('click',function(){card.remove();renumerarCenas();});
     cenas.appendChild(card); renumerarCenas();
   }
@@ -7264,7 +7265,7 @@ texto: $("esTexto").value
   bAjustar.addEventListener("click", function(){
     var t = txt.value.trim();
     if(!t){ msg("Não há texto para ajustar.", true); return; }
-    var alvo = Math.round(Number($("esDur").value) / 60 * 130);        /* ~130 palavras por minuto */
+    var alvo = Math.round(Number($("esDur").value) / 60 * 130);        /* \~130 palavras por minuto */
     var palavras = t.split(/\s+/).length;
     if(palavras <= alvo){
       msg("O texto tem " + palavras + " palavras e cabe no tempo escolhido (até " + alvo + "). Para deixar MAIOR, é preciso a IA.", false); return;
@@ -7828,7 +7829,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
     {titulo:"Desfecho e mensagem", descricao:"Conclua a história e destaque a mensagem espiritual."}
   ];
   var lista = [], atual = null, mudo = false, abrindo = false, timer = null;
-  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,"&quot;"); };
  
   /* ---------- interface ---------- */
   var sec = document.createElement("details");
@@ -8358,7 +8359,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
     "Passos na areia, terra e pedra","Vento no deserto e tempestades","Água, rios, poços e recipientes","Animais e rebanhos","Multidões, mercados e aldeias","Portas, madeira, tecidos, fogo e objetos","Ambientes históricos e efeitos cinematográficos","Trilhas de tensão, emoção, vitória e contemplação",
     "Worship contemporâneo","Gospel acústico","Piano e violão","Instrumentais para oração","Corais e arranjos orquestrais","Hinos e estilos contemplativos",
     "Aberturas e encerramentos","Transições","Impactos sonoros","Trilhas inspiracionais curtas"];
-  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,"&quot;"); };
   var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
   var fmt = function(s){ if(!isFinite(s) || s <= 0) return ""; var m = Math.floor(s/60), r = Math.round(s%60); if(r === 60){ m++; r = 0; } return m + ":" + (r < 10 ? "0" : "") + r; };
   var tam = function(b){ return b ? (b/1048576).toFixed(1).replace(".", ",") + " MB" : ""; };
@@ -8470,7 +8471,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
       var ext = (f.name.split(".").pop() || "").toUpperCase();
       var it = {id:"a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), chave:chave, nome:f.name,
         mime:f.type || "audio/mpeg", tamanho:f.size, formato:ext.length <= 5 ? ext : "", blob:f,
-        titulo:f.name.replace(/\.[^.]+$/, ""), tipo:"", categoria:"", tags:"", licenca:"", credito:"",
+        titulo:f.name.replace(/.[^.]+$/, ""), tipo:"", categoria:"", tags:"", licenca:"", credito:"",
         duracao:d, fav:false, criado:Date.now() + i};
       try{ await gravarItem(it); }catch(e){ console.error(e); falhaGravar = true; }
       itens.unshift(it); novos++;
@@ -8630,7 +8631,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
     if(t.dataset && t.dataset.campo && ev.type === "change"){
       var it = achar(t.dataset.id); if(!it) return;
       it[t.dataset.campo] = t.value.trim();
-      if(t.dataset.campo === "titulo" && !it.titulo) it.titulo = it.nome.replace(/\.[^.]+$/, "");
+      if(t.dataset.campo === "titulo" && !it.titulo) it.titulo = it.nome.replace(/.[^.]+$/, "");
       gravarItem(it).catch(function(){ msg("Não foi possível guardar a alteração neste navegador.", true); });
       cats();
       if(escolhido === it.id) atualizarAtual();
@@ -8889,7 +8890,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
   };
   var CATS = ["Esperança e consolo","Paz e descanso","Fé e confiança em Deus","Oração e reflexão","Amanhecer e luz","Natureza e criação","Céu e nuvens","Mar, rios e chuva","Salmos e louvor","Superação e recomeço","Piano suave e contemplativo","Fundos discretos para narração","Aberturas e encerramentos","Transições","Efeitos sonoros"];
  
-  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,"&quot;"); };
   var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
   var fmt = function(s){ if(!isFinite(s) || s <= 0) return ""; var m = Math.floor(s/60), r = Math.round(s%60); if(r === 60){ m++; r = 0; } return m + ":" + (r < 10 ? "0" : "") + r; };
   var tam = function(b){ return b ? (b/1048576).toFixed(1).replace(".", ",") + " MB" : ""; };
@@ -9139,7 +9140,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
       var ext = (f.name.split(".").pop() || "").toUpperCase();
       var it = {id:"m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), chave:chave, tipo:tipo, redes:redes.slice(),
         nome:f.name, mime:f.type || "", tamanho:f.size, formato:ext.length <= 5 ? ext : "", blob:f,
-        titulo:f.name.replace(/\.[^.]+$/, ""), categoria:"", tags:"", licenca:"", credito:"",
+        titulo:f.name.replace(/.[^.]+$/, ""), categoria:"", tags:"", licenca:"", credito:"",
         duracao:m.duracao, larg:m.larg, alt:m.alt, fav:false, criado:Date.now() + i};
       try{ await gravarItem(it); }catch(e){ console.error(e); falhou = true; }
       itens.unshift(it); novos++;
@@ -9282,7 +9283,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
     if(t.dataset && t.dataset.campo && ev.type === "change"){
       var y = achar(t.dataset.id); if(!y) return;
       y[t.dataset.campo] = t.value.trim();
-      if(t.dataset.campo === "titulo" && !y.titulo) y.titulo = y.nome.replace(/\.[^.]+$/, "");
+      if(t.dataset.campo === "titulo" && !y.titulo) y.titulo = y.nome.replace(/.[^.]+$/, "");
       gravarItem(y).catch(function(){ msg("Não foi possível guardar a alteração neste navegador.", true); });
       cats();
       return;
@@ -9503,7 +9504,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
   var painel = $("esPainel");
   if(!painel || !("esTexto")||!("esDest")) return;
 
-  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,"&quot;"); };
   function msg(n, t, erro){ var el = $("esMsg" + n); if(!el) return; el.textContent = t || ""; el.className = "es-msg" + (erro ? " erro" : ""); }
 
   /* 1. EXPORTAR: monta o pedido corretamente e dispara a geração do arquivo */
@@ -9886,7 +9887,7 @@ texto: $("esTexto").value
   var $ = function(id){ return document.getElementById(id); };
   var painel = $("esPainel"), alvo = $("exTexto"), botao = $("exTrocar");
   if(!painel || !alvo || !botao) return;
-  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">"); };
   var FORMATOS = {f916:"Vertical 9:16", f11:"Quadrado 1:1", f169:"Horizontal 16:9"};
 
   botao.textContent = "VOLTAR E AJUSTAR";
@@ -10153,7 +10154,7 @@ texto: $("esTexto").value
   var reP = "(?<!" + L + ")(" + L + "+(?:['\\u2019]" + L + "+)?)(?!" + L + ")";
   var reW = /\p{L}+/gu;
   var tem = function(o, k){ return Object.prototype.hasOwnProperty.call(o, k); };
-  var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+  var esc = function(t){ return String(t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">"); };
   var strip = function(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); };
   var norm = function(s){ return strip(s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); };
   var chave = function(p){ return p.toLowerCase().replace(/\u2019/g, "'"); };
@@ -10872,6 +10873,28 @@ await trab();
       g.font = "600 " + Math.round(fs * 0.6) + "px Georgia, serif"; g.fillStyle = "#f1d58a";
       g.fillText(tit, W / 2, H * 0.09);
     }
+
+    /* Marca-d'água discreta, presente durante todo o vídeo. */
+    g.globalAlpha = 0.72;
+    g.textAlign = "right";
+    g.font = "600 " + Math.max(18, Math.round(Math.min(W, H) * 0.019)) + "px Georgia, serif";
+    g.fillStyle = "rgba(255,255,255,.88)";
+    g.shadowColor = "rgba(0,0,0,.8)"; g.shadowBlur = 8;
+    g.fillText("PALAVRA & SÉRIE", W * 0.96, H * 0.965);
+
+    /* Nos últimos 6,5 segundos, a fala e as legendas já terminaram. */
+    if(typeof cfg.fimFala === "number" && t >= cfg.fimFala){
+      var entrada = Math.max(0, Math.min(1, (t - cfg.fimFala) / 0.8));
+      g.globalAlpha = 0.58 * entrada;
+      g.fillStyle = "#050b16"; g.fillRect(0, 0, W, H);
+      g.globalAlpha = entrada;
+      g.textAlign = "center"; g.shadowColor = "rgba(0,0,0,.45)"; g.shadowBlur = 14;
+      g.font = "600 " + Math.round(Math.min(W, H) * 0.052) + "px Georgia, serif";
+      g.fillStyle = "#f1d58a";
+      g.fillText("PALAVRA & SÉRIE", W / 2, H * 0.52);
+      g.fillStyle = "rgba(241,213,138,.72)";
+      g.fillRect(W * 0.34, H * 0.55, W * 0.32, Math.max(2, Math.round(Math.min(W, H) * 0.002)));
+    }
     g.globalAlpha = 1; g.shadowBlur = 0;
   }
 
@@ -10891,7 +10914,10 @@ await trab();
     try{ voz = await gerarVoz(cenasTxt, det, ac, cfg.preciso); }
     catch(e){ console.error(e); aviso = " Sem voz: " + (e.message || "falhou") + " O vídeo sai só com texto e música."; }
 
-   var lin = linha(cenasTxt, voz, det, ac), total = lin.fim + (lin.buffer ? 1.5 : 0.8);
+   var lin = linha(cenasTxt, voz, det, ac);
+    var DURACAO_ENCERRAMENTO = 6.5;
+    var total = lin.fim + DURACAO_ENCERRAMENTO;
+    cfg.fimFala = lin.fim;
     info("Carregando imagens…", false, 0.2);
     var urls = Array.prototype.map.call(document.querySelectorAll("#esFotos img"), function(i){ return i.src; });
     var imgs = (await Promise.all(urls.map(carregarImg))).filter(Boolean);
@@ -10921,9 +10947,25 @@ await trab();
       var sm = ac.createBufferSource(), gn = ac.createGain(), vol = det.volumeMusica / 100;
       sm.buffer = mb; sm.loop = true; sm.playbackRate.value = cfg.velMus;
       gn.gain.setValueAtTime(vol, ac0);
-     gn.gain.setValueAtTime(vol, ac0 + Math.max(0, lin.fim));
-gn.gain.linearRampToValueAtTime(0, ac0 + total);
+      gn.gain.setValueAtTime(vol, ac0 + Math.max(0, lin.fim));
+      gn.gain.linearRampToValueAtTime(0, ac0 + total);
       sm.connect(gn); gn.connect(dest); sm.start();
+    }else{
+      /* Acorde ambiente original e suave apenas no encerramento, caso não haja faixa escolhida. */
+      var inicioPad = ac0 + lin.fim, fimPad = inicioPad + DURACAO_ENCERRAMENTO;
+      var pad = ac.createGain(), filtroPad = ac.createBiquadFilter();
+      filtroPad.type = "lowpass"; filtroPad.frequency.setValueAtTime(520, inicioPad);
+      pad.gain.setValueAtTime(0.0001, inicioPad);
+      pad.gain.linearRampToValueAtTime(0.018, inicioPad + 1.2);
+      pad.gain.setValueAtTime(0.018, fimPad - 1.4);
+      pad.gain.linearRampToValueAtTime(0.0001, fimPad);
+      filtroPad.connect(pad); pad.connect(dest);
+      [130.81, 164.81, 196.00, 261.63].forEach(function(hz){
+        var osc = ac.createOscillator(), ganho = ac.createGain();
+        osc.type = "sine"; osc.frequency.setValueAtTime(hz, inicioPad);
+        ganho.gain.value = 0.22; osc.connect(ganho); ganho.connect(filtroPad);
+        osc.start(inicioPad); osc.stop(fimPad + 0.05);
+      });
     }
     var ini = performance.now();
 
@@ -11283,7 +11325,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   /* ---------- aparece quando há um VÍDEO pronto ---------- */
   function verificar(){
     var nome = baixar.getAttribute("download") || "";
-    var ehVideo = /\.(mp4|webm)$/i.test(nome) && baixar.href && !baixar.hidden && baixar.style.display !== "none";
+    var ehVideo = /.(mp4|webm)$/i.test(nome) && baixar.href && !baixar.hidden && baixar.style.display !== "none";
     card.hidden = !ehVideo;
     if(ehVideo && baixar.href !== ultimoArquivo){
       ultimoArquivo = baixar.href;
@@ -11577,7 +11619,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   }
  function atualizarPrevia(){
     var m = modelo(); if(!m) return;
-    var e = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+    var e = function(t){ return String(t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">"); };
     var tOk = limpar($("fxTitulo").value), aOk = limpar($("fxAssunto").value).replace(/[.\s]+$/, "");
     var vt = '<span class="v' + (tOk ? '' : ' vazio') + '">' + e(tOk || m.tit) + '</span>';
     var va = '<span class="v' + (aOk ? '' : ' vazio') + '">' + e(aOk || m.apr) + '</span>';
@@ -11714,7 +11756,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 
   var limpar = function(t){ return String(t || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim(); };
   var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); };
-  var esc = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var esc = function(t){ return String(t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,"&quot;"); };
 
   /* ---------- campo no passo 4 ---------- */
   var box = document.createElement("div");
@@ -11722,16 +11764,23 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   box.innerHTML =
     '<label>Playlist deste vídeo (obrigatória)<input id="fcPlaylist" type="text" maxlength="100" list="fcLista" placeholder="Ex.: Tirando a mente do engano"></label>' +
     '<datalist id="fcLista">' + lista.map(function(n){ return '<option value="' + esc(n) + '">'; }).join("") + '</datalist>' +
-    '<p>A fala e a última legenda terminam com: <b id="fcPrevia"></b></p>' +
+    '<p>Encerramento deste conteúdo: <b id="fcPrevia"></b></p>' +
     '<label class="fc-chk"><input type="checkbox" id="fcSem"> Exportar sem o fecho (só para testes)</label>';
   var ref = $("exResumo");
   if(ref) ref.insertAdjacentElement("beforebegin", box);
   else box4.insertBefore(box, box4.children[1] || null);
 
   function fecho(n){ return "Palavra e Série — " + n + "."; }
+  function playlistContemplativa(n){
+    var k = norm(n).replace(/[^a-z0-9]+/g, " ").trim();
+    return k === "momentos de oracao" || k.indexOf("salmos") === 0;
+  }
   function atualizar(){
-    var n = limpar($("fcPlaylist").value);
-    $("fcPrevia").textContent = $("fcSem").checked ? "(desligado)" : (n ? fecho(n) : "escolha a playlist acima.");
+    var n = limpar($("fcPlaylist").value), contemplativa = n && playlistContemplativa(n);
+    var texto = !n ? "escolha a playlist acima." : (contemplativa
+      ? "sem assinatura falada; encerramento instrumental de 6,5 segundos com marca-d'água Palavra & Série."
+      : fecho(n) + " Depois, encerramento instrumental de 6,5 segundos com marca-d'água.");
+    $("fcPrevia").textContent = $("fcSem").checked ? "(assinatura falada desligada para teste)" : texto;
   }
   $("fcPlaylist").addEventListener("input", function(){ this.classList.remove("erro"); atualizar(); });
   $("fcSem").addEventListener("change", atualizar);
@@ -11755,26 +11804,30 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   window.addEventListener("estudio:exportar", function(ev){
     var d = ev.detail;
     if(!d || d.fechoAplicado) return;
-    if($("fcSem").checked) return;
     var n = limpar($("fcPlaylist").value);
-    if(!n){
+    var testeSemFala = $("fcSem").checked;
+    if(!n && !testeSemFala){
       ev.stopImmediatePropagation();
       d.tratado = true;
       var m = $("esMsg4");
-      if(m){ m.className = "es-msg erro"; m.textContent = "Escolha a playlist deste vídeo antes de exportar: ela entra no fim da fala."; }
+      if(m){ m.className = "es-msg erro"; m.textContent = "Escolha a playlist deste vídeo antes de exportar: ela define o encerramento."; }
       $("fcPlaylist").classList.add("erro");
       $("fcPlaylist").focus();
       box.scrollIntoView({behavior: "smooth", block: "center"});
       return;
     }
-    guardar(n);
+    if(n) guardar(n);
+    var contemplativa = n ? playlistContemplativa(n) : false;
+    d.playlist = n;
+    d.falaAssinatura = !testeSemFala && !contemplativa;
+    d.duracaoEncerramento = 6.5;
     var t = String(d.texto || "").trim();
-    if(!jaTem(t)) d.texto = t + "\n\n" + fecho(n);
+    if(d.falaAssinatura && !jaTem(t)) d.texto = t + "\n\n" + fecho(n);
     d.fechoAplicado = true;
 
     /* leva a playlist para a ficha de publicação */
     var fp = $("fxPlaylist");
-    if(fp){ fp.value = n; fp.dispatchEvent(new Event("input", {bubbles: true})); }
+    if(fp && n){ fp.value = n; fp.dispatchEvent(new Event("input", {bubbles: true})); }
   }, true);
 })();
 </script>
@@ -11820,7 +11873,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   var TAGF = {vertical:"9x16", quadrado:"1x1", horizontal:"16x9"};
   var FSEL = {f916:"vertical", f11:"quadrado", f169:"horizontal"};
 
-  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
+  var esc = function(t){ return String(t==null?"":t).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,"&quot;"); };
   var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim(); };
   var fmtDur = function(s){ if(!isFinite(s) || s <= 0) return ""; var m = Math.floor(s/60), r = Math.round(s%60); if(r === 60){ m++; r = 0; } return m + ":" + (r < 10 ? "0" : "") + r; };
   var fmtTam = function(b){ return b ? (b >= 1073741824 ? (b/1073741824).toFixed(2) + " GB" : (b/1048576).toFixed(1)) .replace(".", ",") + (b >= 1073741824 ? "" : " MB") : ""; };
@@ -12013,7 +12066,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     await carregar();
     try{
       var blob = await (await fetch(href)).blob();
-      var tipo = /^audio\//.test(blob.type) || /\.(mp3|wav|ogg|m4a|aac)$/i.test(nome) ? "audio" : "video";
+      var tipo = /^audio\//.test(blob.type) || /.(mp3|wav|ogg|m4a|aac)$/i.test(nome) ? "audio" : "video";
       var ext = (nome.split(".").pop() || (tipo === "audio" ? "mp3" : "mp4")).toLowerCase();
       var m = await lerMeta(tipo, blob) || {duracao: 0, larg: 0, alt: 0};
       var formato = tipo === "video" ? (orient(m.larg, m.alt) || FSEL[($("esFormato") || {}).value] || "") : "";
@@ -12049,7 +12102,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
       if(!m){ ruins.push(f.name); continue; }
       var ext = (f.name.split(".").pop() || "").toLowerCase();
       var it = {id:novoId(), chave:chave, tipo:tipo, ext:ext, nome:f.name, mime:f.type || "", tamanho:f.size,
-        titulo:f.name.replace(/\.[^.]+$/, ""), playlist:"", nota:"", pub:[],
+        titulo:f.name.replace(/.[^.]+$/, ""), playlist:"", nota:"", pub:[],
         formato:tipo === "video" ? orient(m.larg, m.alt) : "", larg:m.larg, alt:m.alt, duracao:m.duracao, redeTrabalho:"", criado:Date.now() + i, blob:f};
       try{ await gravar(it); persistir(); }catch(e){ console.error(e); falhou = true; }
       itens.unshift(it); novos++;
@@ -12106,7 +12159,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     if(t.dataset && t.dataset.campo && ev.type === "change"){
       var y = achar(t.dataset.id); if(!y) return;
       y[t.dataset.campo] = t.value.trim();
-      if(t.dataset.campo === "titulo" && !y.titulo) y.titulo = y.nome.replace(/\.[^.]+$/, "");
+      if(t.dataset.campo === "titulo" && !y.titulo) y.titulo = y.nome.replace(/.[^.]+$/, "");
       gravar(y).catch(function(){ msg("Não foi possível guardar a alteração neste navegador.", true); });
       if(t.dataset.campo === "titulo"){
         var c2 = t.closest(".cp-card"), s = c2 && c2.querySelector("strong");
@@ -12122,7 +12175,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   carregar();
 })();
 </script>
-<!-- ===== FIM: CONTEÚDO PRONTO (BIBLIOTECA DOS VÍDEOS EXPORTADOS) ===== -->
+
 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
