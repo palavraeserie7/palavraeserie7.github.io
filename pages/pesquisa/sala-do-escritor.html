@@ -11444,17 +11444,18 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 </script>
  
 <!-- ===== FIM: PUBLICAR NO YOUTUBE ===== -->
- <!-- ===== INÍCIO: FICHA OBRIGATÓRIA ANTES DE PUBLICAR ===== -->
+<!-- ===== INÍCIO: FICHA DE PUBLICAÇÃO POR PLAYLIST ===== -->
 <style>
 #fxFicha{border:1px solid var(--brass);border-radius:8px;background:#fffdf6;color:var(--ink);padding:16px;margin-top:14px;display:flex;flex-direction:column;gap:12px}
 #fxFicha[hidden]{display:none!important}
 #fxFicha h4{margin:0;font:600 18px Georgia,serif}
 #fxFicha label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
-#fxFicha input,#fxFicha textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
-#fxFicha input.erro,#fxFicha textarea.erro{border-color:#a14747;box-shadow:0 0 0 1px #a14747}
+#fxFicha input,#fxFicha textarea,#fxFicha select{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#fxFicha .erro{border-color:#a14747;box-shadow:0 0 0 1px #a14747}
 #fxFicha textarea{min-height:70px;resize:vertical}
-#fxFicha .fx-fixo{margin:0;padding:10px 12px;border-left:3px solid var(--brass);background:var(--brass-wash);font:13px/1.55 "Segoe UI",Arial,sans-serif;color:var(--ink)}
-#fxPrevia{min-height:150px;background:#f6f1e3!important}
+#fxCampos{display:flex;flex-direction:column;gap:12px}
+#fxCampos[hidden]{display:none!important}
+#fxPrevia{min-height:260px;background:#f6f1e3!important}
 #fxMsg{margin:0;min-height:1.4em;font:600 13.5px "Segoe UI",Arial,sans-serif;color:var(--brass-deep)}
 #fxMsg.erro{color:#a14747}
 #ytCard.fx-bloq{display:none!important}
@@ -11465,6 +11466,64 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   var yt = $("ytCard"), baixar = $("f1Baixar");
   if(!yt || !baixar || $("fxFicha")) return;
 
+  var FRASE_LINK = "Continue seu estudo na plataforma Palavra & Série:";
+  var BASE = "https://palavraeserie7.github.io/pages/redes-sociais-estudos.html#";
+
+  /* um modelo para cada playlist */
+  var MODELOS = {
+    "Salmos e reflexões bíblicas": {
+      tituloRot: "Título ou assunto do estudo", tituloPh: "Ex.: Salmo 91 — Confiança em tempos difíceis",
+      assuntoRot: "Apresentação do Salmo ou trecho abordado", assuntoPh: "Ex.: o Salmo 91",
+      tit: "[TÍTULO OU ASSUNTO DO ESTUDO]", apr: "[apresentação do Salmo ou trecho abordado]",
+      a1: "Neste estudo, examinamos ",
+      a2: ", buscando compreender sua mensagem, seu contexto e o significado de suas palavras.",
+      p2: "Acompanhe esta reflexão e descubra o que este texto revela sobre Deus, a fé, a confiança, o sofrimento, a esperança e o relacionamento com o Criador.",
+      p3: "Este conteúdo faz parte da playlist Salmos e reflexões bíblicas, uma jornada de compreensão e reflexão sobre as mensagens presentes no livro dos Salmos.",
+      link: BASE + "cat-salmos", ass: "Palavra & Série — Salmos e reflexões bíblicas"
+    },
+    "Bíblia e direção de vida": {
+      tituloRot: "Título ou assunto do estudo", tituloPh: "Ex.: Como tomar decisões à luz da Bíblia",
+      assuntoRot: "Apresentação do tema", assuntoPh: "Ex.: o discernimento nas escolhas do dia a dia",
+      tit: "[TÍTULO OU ASSUNTO DO ESTUDO]", apr: "[apresentação do tema]",
+      a1: "Neste estudo, examinamos ",
+      a2: ", considerando os ensinamentos bíblicos e sua relação com as decisões, os desafios e os caminhos da vida cristã.",
+      p2: "Acompanhe esta reflexão e compreenda como os princípios das Escrituras contribuem para desenvolver discernimento, orientar escolhas e fortalecer uma caminhada fundamentada na Palavra de Deus.",
+      p3: "Este conteúdo faz parte da playlist Bíblia e direção de vida, dedicada ao exame dos ensinamentos bíblicos que orientam a vida cristã.",
+      link: BASE + "cat-direcao", ass: "Palavra & Série — Bíblia e direção de vida."
+    },
+    "Momentos de oração": {
+      tituloRot: "Título ou assunto da oração", tituloPh: "Ex.: Oração de gratidão pela manhã",
+      assuntoRot: "Apresentação do propósito da oração", assuntoPh: "Ex.: entregar o dia nas mãos de Deus",
+      tit: "[TÍTULO OU ASSUNTO DA ORAÇÃO]", apr: "[apresentação do propósito da oração]",
+      a1: "Neste momento de oração e meditação, somos conduzidos a ",
+      a2: ", tendo como fundamento os ensinamentos e as promessas das Escrituras.",
+      p2: "Acompanhe este momento de reflexão, aproxime seu coração da Palavra de Deus e encontre motivos para expressar sua fé, confiança, gratidão e dependência do Senhor.",
+      p3: "Este conteúdo faz parte da playlist Momentos de oração, dedicada a momentos de oração, meditação bíblica e aproximação com Deus.",
+      link: BASE + "cat-oracao", ass: "Palavra & Série — Momentos de oração"
+    },
+    "Tirando a mente do engano": {
+      tituloRot: "Título ou passagem bíblica", tituloPh: "Ex.: Mateus 19:24 — O rico e o reino dos céus",
+      assuntoRot: "Apresentação da passagem ou ensinamento", assuntoPh: "Ex.: a declaração de Jesus sobre o rico e o reino dos céus",
+      tit: "[TÍTULO OU PASSAGEM BÍBLICA]", apr: "[apresentação da passagem ou ensinamento]",
+      a1: "Neste estudo, examinamos ",
+      a2: ", investigando seu contexto histórico, literário e bíblico para compreender o significado apresentado pelas Escrituras.",
+      p2: "Acompanhe esta investigação e descubra o que o texto realmente comunica, examinando interpretações frequentemente difundidas e verificando sua coerência com o contexto e a mensagem bíblica.",
+      p3: "Este conteúdo faz parte da playlist Tirando a mente do engano, dedicada à análise de passagens cuja compreensão exige atenção ao contexto e rigor na interpretação das Escrituras.",
+      link: BASE + "cat-serie", ass: "Palavra & Série — Tirando a mente do engano"
+    },
+    "O Que a Bíblia Realmente Diz?": {
+      tituloRot: "Título ou assunto do estudo", tituloPh: "Ex.: 1 João 3:9 — Quem é nascido de Deus não peca?",
+      assuntoRot: "Apresentação da ideia, crença ou conceito", assuntoPh: "Ex.: a ideia de que o cristão nunca mais pode pecar",
+      tit: "[TÍTULO OU ASSUNTO DO ESTUDO]", apr: "[apresentação da ideia, crença ou conceito]",
+      a1: "Neste estudo, examinamos ",
+      a2: ", confrontando seus fundamentos com os ensinamentos das Escrituras.",
+      p2: "Acompanhe esta reflexão e investigue se aquilo que frequentemente se acredita ou se ensina encontra fundamento na Palavra de Deus. Uma análise que busca desenvolver discernimento, corrigir compreensões equivocadas e fortalecer uma fé fundamentada nas Escrituras.",
+      p3: "Este conteúdo faz parte da playlist O Que a Bíblia Realmente Diz?, dedicada ao exame crítico de ideias e convicções à luz da verdade bíblica.",
+      link: BASE + "cat-engano", ass: "Palavra & Série — O Que a Bíblia Realmente Diz?"
+    }
+  };
+  var NOMES = Object.keys(MODELOS);
+
   var liberado = false;
   var limpar = function(t){ return String(t || "").replace(/[<>]/g, "").replace(/[ \t]+/g, " ").trim(); };
   var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim(); };
@@ -11474,36 +11533,52 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   ficha.id = "fxFicha"; ficha.hidden = true;
   ficha.innerHTML =
     '<h4>Ficha de publicação (obrigatória)</h4>' +
-    '<p class="es-nota">Preencha os três campos para liberar a publicação no YouTube. O título e a descrição são montados a partir desta ficha.</p>' +
-    '<label>Título ou assunto do estudo<input id="fxTitulo" type="text" maxlength="100" placeholder="Ex.: Salmo 91 — Confiança em tempos difíceis"></label>' +
-    '<label>Apresentação breve do assunto<textarea id="fxAssunto" maxlength="300" placeholder="Complete a frase: Neste estudo, examinamos… Ex.: o que o Salmo 91 ensina sobre confiar em Deus nos dias difíceis"></textarea></label>' +
-    '<label>Nome da playlist<input id="fxPlaylist" type="text" maxlength="100" placeholder="Ex.: Salmos"></label>' +
-    '<p class="fx-fixo">Linhas fixas que entram sozinhas: o trecho sobre contexto bíblico e significado das Escrituras, o convite à reflexão e a assinatura “Palavra &amp; Série — Bíblia e direção de vida.”</p>' +
-    '<label>Descrição que será usada<textarea id="fxPrevia" readonly></textarea></label>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="fxConfirmar">CONFIRMAR FICHA E LIBERAR PUBLICAÇÃO</button></div>' +
+    '<p class="es-nota">Escolha a playlist a que este conteúdo pertence. A ficha daquela playlist abre sozinha. Preencha e confirme para liberar a publicação no YouTube.</p>' +
+    '<label>Playlist do conteúdo<select id="fxPlaylist"><option value="">Escolha a playlist…</option>' +
+      NOMES.map(function(n){ return '<option value="' + n + '">' + n + '</option>'; }).join("") + '</select></label>' +
+    '<div id="fxCampos" hidden>' +
+      '<label><span id="fxTituloRot">Título</span><input id="fxTitulo" type="text" maxlength="100"></label>' +
+      '<label><span id="fxAssuntoRot">Apresentação</span><textarea id="fxAssunto" maxlength="300"></textarea></label>' +
+      '<label>Descrição que será usada<textarea id="fxPrevia" readonly></textarea></label>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="fxConfirmar">CONFIRMAR FICHA E LIBERAR PUBLICAÇÃO</button></div>' +
+    '</div>' +
     '<p id="fxMsg" role="status"></p>';
   yt.insertAdjacentElement("beforebegin", ficha);
 
   function msg(t, erro){ var m = $("fxMsg"); m.textContent = t || ""; m.className = erro ? "erro" : ""; }
+  function modelo(){ return MODELOS[$("fxPlaylist").value] || null; }
 
-  /* pré-preenche o título com o do projeto (pode editar) */
   function preencherTitulo(){
     var t = $("esTitulo") ? $("esTitulo").value.trim() : "";
     if(t && !$("fxTitulo").value.trim()) $("fxTitulo").value = t.slice(0, 100);
   }
 
-  /* ---------- texto da descrição ---------- */
+  /* ---------- texto da descrição (segue o modelo da playlist) ---------- */
   function montar(){
-    var titulo = limpar($("fxTitulo").value) || "[TÍTULO OU ASSUNTO DO ESTUDO]";
-    var assunto = limpar($("fxAssunto").value).replace(/[.\s]+$/, "") || "[apresentação breve do assunto]";
-    var lista = limpar($("fxPlaylist").value) || "[NOME DA PLAYLIST]";
+    var m = modelo(); if(!m) return "";
+    var titulo = limpar($("fxTitulo").value) || m.tit;
+    var assunto = limpar($("fxAssunto").value).replace(/[.\s]+$/, "") || m.apr;
     return titulo + "\n\n" +
-      "Neste estudo, examinamos " + assunto + ", considerando o contexto bíblico e o significado das Escrituras.\n\n" +
-      "Acompanhe a reflexão e compreenda o que a Palavra de Deus ensina sobre este tema.\n\n" +
-      "Este conteúdo faz parte da playlist " + lista + ".\n\n" +
-      "Palavra & Série — Bíblia e direção de vida.";
+      m.a1 + assunto + m.a2 + "\n\n" +
+      m.p2 + "\n\n" +
+      m.p3 + "\n\n" +
+      FRASE_LINK + "\n\n" +
+      m.link + "\n\n" +
+      m.ass;
   }
   function atualizarPrevia(){ $("fxPrevia").value = montar(); }
+
+  /* mostra a ficha da playlist escolhida */
+  function abrirModelo(){
+    var m = modelo();
+    $("fxCampos").hidden = !m;
+    if(!m) return;
+    $("fxTituloRot").textContent = m.tituloRot;
+    $("fxTitulo").placeholder = m.tituloPh;
+    $("fxAssuntoRot").textContent = m.assuntoRot;
+    $("fxAssunto").placeholder = m.assuntoPh;
+    preencherTitulo(); atualizarPrevia();
+  }
 
   /* ---------- trava e destrava ---------- */
   function aplicarTrava(){
@@ -11514,7 +11589,6 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     liberado = false; aplicarTrava();
     if(motivo) msg(motivo);
   }
-
   function tentarPlaylist(){
     var sel = $("ytPl"); if(!sel || !liberado) return false;
     var alvo = norm($("fxPlaylist").value);
@@ -11525,13 +11599,14 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   }
 
   $("fxConfirmar").addEventListener("click", function(){
-    var campos = [["fxTitulo", 3], ["fxAssunto", 10], ["fxPlaylist", 2]], faltou = null;
+    if(!modelo()){ travar(); msg("Escolha a playlist primeiro.", true); return; }
+    var campos = [["fxTitulo", 3], ["fxAssunto", 10]], faltou = null;
     campos.forEach(function(c){
       var el = $(c[0]), ok = limpar(el.value).length >= c[1];
       el.classList.toggle("erro", !ok);
       if(!ok && !faltou) faltou = el;
     });
-    if(faltou){ travar(); msg("Preencha os três campos da ficha para liberar a publicação.", true); faltou.focus(); return; }
+    if(faltou){ travar(); msg("Preencha o título e a apresentação para liberar a publicação.", true); faltou.focus(); return; }
 
     $("ytTitulo").value = limpar($("fxTitulo").value).slice(0, 100);
     $("ytDesc").value = montar().slice(0, 5000);
@@ -11539,13 +11614,20 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
 
     var achou = tentarPlaylist();
     msg("Ficha confirmada. Título e descrição já estão no bloco do YouTube, logo abaixo." +
-      (achou ? " Playlist “" + $("fxPlaylist").value.trim() + "” selecionada." : " Para a playlist, entre com o Google na opção automática e escolha “" + limpar($("fxPlaylist").value) + "”; na opção manual, escolha-a no site do YouTube."));
+      (achou ? " Playlist “" + $("fxPlaylist").value + "” selecionada." : " Para a playlist, entre com o Google na opção automática e escolha “" + $("fxPlaylist").value + "”; na opção manual, escolha-a no site do YouTube."));
     yt.scrollIntoView({behavior: "smooth", block: "nearest"});
   });
 
-  /* mexeu na ficha depois de confirmar: trava de novo */
+  /* trocou de playlist: abre o outro modelo e trava de novo */
+  $("fxPlaylist").addEventListener("change", function(){
+    abrirModelo();
+    if(liberado) travar("Playlist trocada. Confirme a ficha de novo para liberar a publicação.");
+    else msg("");
+  });
+
+  /* mexeu no texto depois de confirmar: trava de novo */
   ficha.addEventListener("input", function(ev){
-    if(ev.target.id === "fxPrevia") return;
+    if(ev.target.id === "fxPrevia" || ev.target.id === "fxPlaylist") return;
     ev.target.classList.remove("erro");
     atualizarPrevia();
     if(liberado) travar("A ficha foi alterada. Confirme de novo para liberar a publicação.");
@@ -11560,11 +11642,11 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     var b = ev.target.closest && ev.target.closest("#ytEnviar,#ytLogin,#ytCopT,#ytCopD,#ytAbrir");
     if(!b || liberado) return;
     ev.stopImmediatePropagation(); ev.preventDefault();
-    msg("Preencha e confirme a ficha antes de publicar.", true);
+    msg("Escolha a playlist, preencha e confirme a ficha antes de publicar.", true);
     ficha.scrollIntoView({behavior: "smooth", block: "nearest"});
   }, true);
 
-  /* a ficha só aparece quando há vídeo pronto (mesmo critério do bloco do YouTube) */
+  /* a ficha só aparece quando há vídeo pronto */
   function sincronizar(){
     var temVideo = !yt.hidden;
     ficha.hidden = !temVideo;
@@ -11572,22 +11654,21 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   }
   new MutationObserver(sincronizar).observe(yt, {attributes: true, attributeFilter: ["hidden"]});
 
-  /* vídeo novo = ficha nova: precisa confirmar de novo */
+  /* vídeo novo = ficha nova */
   var ultimo = baixar.href;
   new MutationObserver(function(){
     if(baixar.href !== ultimo){
       ultimo = baixar.href;
-      $("fxAssunto").value = "";
-      $("fxTitulo").value = ""; preencherTitulo();
-      atualizarPrevia();
-      travar("Novo vídeo gerado. Preencha a ficha para liberar a publicação.");
+      $("fxPlaylist").value = ""; $("fxTitulo").value = ""; $("fxAssunto").value = "";
+      abrirModelo();
+      travar("Novo vídeo gerado. Escolha a playlist e preencha a ficha para liberar a publicação.");
     }
   }).observe(baixar, {attributes: true, attributeFilter: ["href"]});
 
-  aplicarTrava(); atualizarPrevia(); sincronizar();
+  aplicarTrava(); sincronizar();
 })();
 </script>
-<!-- ===== FIM: FICHA OBRIGATÓRIA ANTES DE PUBLICAR ===== -->
+<!-- ===== FIM: FICHA DE PUBLICAÇÃO POR PLAYLIST ===== -->
 
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
