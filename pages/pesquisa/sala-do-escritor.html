@@ -12186,8 +12186,19 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   function dividirPorPapeis(req, norm, segs, cursor){
     var R = normalizar(req).s.replace(/\s+$/, "");
     if(!R) return null;
+    var resto = "";
     var pos = norm.s.indexOf(R, cursor);
     if(pos < 0) pos = norm.s.indexOf(R);
+    if(pos < 0){
+      /* o fim do pedido pode ser o fecho falado (não está no texto): procura só o começo */
+      var pal = R.split(" ");
+      for(var n = pal.length - 1; n >= 3 && pos < 0; n--){
+        var P = pal.slice(0, n).join(" ");
+        var q = norm.s.indexOf(P, cursor);
+        if(q < 0) q = norm.s.indexOf(P);
+        if(q >= 0){ pos = q; resto = pal.slice(n).join(" "); R = P; }
+      }
+    }
     if(pos < 0) return null;
     var partes = [], ini = pos, atual = null, k;
     for(k = pos; k < pos + R.length; k++){
@@ -12197,6 +12208,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
     }
     partes.push({t: norm.s.slice(ini, pos + R.length), r: atual});
     partes = partes.map(function(p){ return {t: p.t.trim(), r: p.r}; }).filter(function(p){ return p.t; });
+    if(resto) partes.push({t: resto, r: ""});
     /* pontuação de fechamento no começo de um pedaço (. , ; : ! ? ” ) volta para o pedaço anterior */
     for(k = 1; k < partes.length; k++){
       var f = /^[.,;:!?\u2026\u201D\u2019)\u00BB\]]+/.exec(partes[k].t);
