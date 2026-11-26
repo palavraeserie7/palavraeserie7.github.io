@@ -8298,7 +8298,7 @@ var proj = montarProjeto(det), dims = TAM[det.formato] || TAM.f916, W = dims[0],
       var r = await fetch(URL_VOZ, {
         method: "POST",
         headers: {"Content-Type":"application/json", "Authorization":"Bearer " + s.access_token},
-        body: JSON.stringify({texto: texto, voz: selVp.value, velocidade: Number($("esVel").value)})
+       body: JSON.stringify({texto: texto, voz: selVp.value, velocidade: Number($("esVel").value), amostra: true})
       });
       if(!r.ok){
         var j = await r.json().catch(function(){ return {}; });
@@ -12285,7 +12285,7 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   sec.id = "vtSec";
   sec.innerHTML =
     '<h4>Vozes por trecho (opcional)</h4>' +
-    '<p class="es-nota">Escolha a voz de cada papel. Depois selecione um trecho do texto abaixo com o mouse e clique em APLICAR À SELEÇÃO no papel desejado. O trecho fica colorido. O que ficar sem cor usa a Voz profissional do campo acima. Vale para o MP3 e o MP4 finais, não para a prévia do passo 3.</p>' +
+    '<p class="es-nota">Escolha a voz de cada papel. Depois selecione um trecho do texto abaixo com o mouse e clique em APLICAR À SELEÇÃO no papel desejado. O trecho fica colorido.O que ficar sem cor usa a voz do Narrador. Marcar trechos é opcional. Vale para o MP3 e o MP4 finais, não para a prévia do passo 3.</p>' +
     '<div id="vtPapeis"></div>' +
     '<div class="vt-acoes"><button type="button" class="at-btn" data-vt="tirar">TIRAR O PAPEL DO TRECHO SELECIONADO</button><button type="button" class="at-btn" data-vt="limpar">LIMPAR TODOS OS TRECHOS</button></div>' +
     '<div id="vtTexto" class="vt-texto" tabindex="0" aria-label="Texto para marcar as vozes"></div>' +
