@@ -12395,8 +12395,10 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
   /* ---------- amostras de voz ---------- */
   var amostras = {}, tocador = null;
   function pararAmostra(){ if(tocador){ tocador.pause(); tocador = null; } }
-  async function ouvirAmostra(nome){
-    pararAmostra();
+  var senhaAmostra = 0;
+async function ouvirAmostra(nome){
+  pararAmostra();
+  var minhaVez = ++senhaAmostra;
     try{
       if(!amostras[nome]){
         msg("Gerando a amostra da voz " + nome + "…");
@@ -12409,6 +12411,8 @@ gn.gain.linearRampToValueAtTime(0, ac0 + total);
         if((r.headers.get("content-type") || "").indexOf("audio") !== 0) throw new Error("O Worker não devolveu áudio.");
         amostras[nome] = URL.createObjectURL(await r.blob());
       }
+     if(minhaVez !== senhaAmostra) return;
+pararAmostra();
       tocador = new Audio(amostras[nome]);
       tocador.onended = function(){ msg("Fim da amostra."); };
       await tocador.play();
