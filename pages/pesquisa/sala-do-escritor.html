@@ -12445,12 +12445,17 @@ pararAmostra();
 
   /* ---------- na hora de gerar o MP3/MP4: cada trecho vai com a voz do seu papel ---------- */
   async function falarPartes(partes, corpo, init){
+    var junto = [];
+    partes.forEach(function(p){
+      var r = p.r || "1", u = junto[junto.length - 1];
+      if(u && u.r === r) u.t += " " + p.t; else junto.push({t: p.t, r: r});
+    });
     var bufs = [];
-    for(var i = 0; i < partes.length; i++){
-      var p = partes[i], pp = p.r ? papelPor(p.r) : null;
+    for(var i = 0; i < junto.length; i++){
+      var pp = papelPor(junto[i].r) || papelPor("1");
       var voz = pp ? $("vtV" + pp.id).value : corpo.voz;
-      var r = await fetchOrig(URL_VOZ, Object.assign({}, init, {body: JSON.stringify(Object.assign({}, corpo, {texto: p.t, voz: voz}))}));
-      if(!r.ok) return r;                                              /* o erro segue para quem pediu */
+      var r = await fetchOrig(URL_VOZ, Object.assign({}, init, {body: JSON.stringify(Object.assign({}, corpo, {texto: junto[i].t, voz: voz}))}));
+      if(!r.ok) return r;
       if((r.headers.get("content-type") || "").indexOf("audio") !== 0) return r;
       bufs.push(await r.arrayBuffer());
     }
@@ -12459,14 +12464,20 @@ pararAmostra();
   }
   window.fetch = async function(input, init){
     var url = typeof input === "string" ? input : ((input && input.url) || "");
-    if(url === URL_VOZ && init && typeof init.body === "string" && segs.length){
+    if(url === URL_VOZ && init && typeof init.body === "string"){
       try{
-        if(ta.value !== textoVisto) aoMudarTexto();
         var corpo = JSON.parse(init.body);
-        var d = dividirPorPapeis(String(corpo.texto || ""), normAtual(), segs, cursor);
-        if(d && d.partes.some(function(p){ return p.r; })){
-          cursor = d.fim;
-          return await falarPartes(d.partes, corpo, init);
+        if(!corpo.amostra){
+          var nar = papelPor("1"), vozNar = nar && $("vtV" + nar.id) ? $("vtV" + nar.id).value : "";
+          if(segs.length){
+            if(ta.value !== textoVisto) aoMudarTexto();
+            var d = dividirPorPapeis(String(corpo.texto || ""), normAtual(), segs, cursor);
+            if(d && d.partes.length){
+              cursor = d.fim;
+              return await falarPartes(d.partes, corpo, init);
+            }
+          }
+          if(vozNar) return fetchOrig(input, Object.assign({}, init, {body: JSON.stringify(Object.assign({}, corpo, {voz: vozNar}))}));
         }
       }catch(e){ console.warn("Vozes por trecho: usando a voz padrão neste pedido.", e); }
     }
