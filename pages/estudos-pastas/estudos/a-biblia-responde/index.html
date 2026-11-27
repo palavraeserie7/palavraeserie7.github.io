@@ -1,1 +1,258 @@
 
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>a-biblia-responde · Palavra e Série</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0906; --panel:#151009; --panel-hover:#1d160d; --line:#3b2d18; --gold:#d8aa45; --gold-d:#a9822e;
+  --text:#f3eddf; --muted:#b7aa91; --ok:#d8aa45;
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --body:Georgia,"Times New Roman",serif;
+  --ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{min-height:100vh;display:flex;flex-direction:column;margin:0;background:radial-gradient(ellipse 80% 460px at 50% 0,#2a1d08 0,transparent 70%) no-repeat,var(--bg);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.7}
+a{color:var(--gold)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+header.top{border-bottom:1px solid var(--line);background:radial-gradient(ellipse 60% 100% at 25% 40%,rgba(212,161,50,.22),transparent 70%),linear-gradient(180deg,#1a1208,#0d0a06)}
+.wrap{width:100%;max-width:960px;margin:0 auto;padding:0 28px}
+.top .wrap{display:flex;gap:22px;align-items:center;padding-top:25px;padding-bottom:23px}
+.logo{flex:none;width:78px;height:78px;border-radius:50%;background:#000;border:2px solid var(--gold);box-shadow:0 0 20px rgba(212,161,50,.32);display:grid;place-items:center;font-family:"Times New Roman",serif;font-style:italic;font-weight:700;font-size:1.8rem;color:var(--gold);text-decoration:none;transition:box-shadow .2s ease,transform .2s ease}
+.brand{display:inline-block;font-family:"Times New Roman",Times,serif;font-size:2rem;font-weight:700;letter-spacing:.13em;color:var(--gold);text-decoration:none;line-height:1.1;padding-bottom:9px;border-bottom:1px solid var(--gold)}
+.brand-sub{font-family:"Times New Roman",Times,serif;font-size:1.05rem;margin:8px 0 2px;color:var(--text)}
+.brand-tag{font-family:"Times New Roman",Times,serif;font-size:.85rem;color:var(--gold-d);margin:0;filter:brightness(1.3)}
+nav.menu{border-bottom:1px solid var(--line);background:#0d0a06}
+nav.menu .wrap{display:flex;flex-wrap:wrap;gap:8px 26px;padding-top:11px;padding-bottom:11px}
+nav.menu a{font-family:var(--ui);font-size:.82rem;font-weight:600;color:var(--text);text-decoration:none;transition:color .18s ease}
+nav.menu a:hover{color:var(--gold)}
+nav.cats{background:#0a0804}
+nav.cats .wrap{gap:9px;padding-top:13px;padding-bottom:13px}
+nav.cats a{border:1px solid var(--line);padding:7px 13px;font-weight:600;transition:color .18s ease,border-color .18s ease,background .18s ease}
+nav.cats a:hover{border-color:var(--gold)}
+nav.cats a.on{background:var(--gold);border-color:var(--gold);color:#1a1208;border-bottom:1px solid var(--gold);padding-bottom:6px}
+nav.menu a.on{color:var(--gold);border-bottom:2px solid var(--gold);padding-bottom:2px}
+@media (max-width:640px){.wrap{padding-left:20px;padding-right:20px}.brand{font-size:1.45rem;letter-spacing:.09em}.logo{width:62px;height:62px;font-size:1.45rem}.top .wrap{gap:15px;padding-top:20px;padding-bottom:18px}nav.menu .wrap{gap:9px 18px}}
+main{flex:1;padding:42px 0 76px}
+h1,h2,h3{font-family:var(--serif);line-height:1.2;margin:0}
+h1{font-size:2.75rem;font-weight:700;letter-spacing:-.015em}
+h2{font-size:1.7rem;font-weight:600;color:var(--gold);margin:40px 0 12px}
+h3{font-size:1.25rem;font-weight:600;margin:0 0 4px}
+p{margin:0 0 14px}
+ul.pts{margin:0 0 14px;padding-left:22px}
+ul.pts li{margin-bottom:6px}
+.sub{font-family:var(--ui);font-size:.9rem;color:var(--muted);margin:9px 0 0;line-height:1.6}
+.aprof{margin-top:44px;border:1px solid var(--gold-d);background:var(--panel)}
+.aprof summary{cursor:pointer;padding:18px 20px;font-family:var(--serif);font-size:1.5rem;font-weight:600;color:var(--gold);list-style:none}
+.aprof summary::-webkit-details-marker{display:none}
+.aprof summary::after{content:"＋";float:right;font-family:var(--ui)}
+.aprof[open] summary::after{content:"－"}
+.aprof .inner{padding:0 20px 20px}
+.aprof h2{font-size:1.3rem;margin:26px 0 10px}
+.ouvir{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between;margin:28px 0;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:2px}
+.ouvir p{margin:0;flex:1 1 320px}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1a1208;margin:0}
+.player{position:relative;aspect-ratio:16/9;margin:0 0 24px;border:1px solid var(--line)}
+.player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.s3{font-family:var(--serif);font-size:1.3rem;font-weight:600;color:var(--text);margin:30px 0 8px;line-height:1.3}
+.tabw{overflow-x:auto;margin:0 0 16px}
+.tab{width:100%;border-collapse:collapse;font-size:.95rem}
+.tab td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+.tab tr:first-child td{color:var(--gold);font-weight:600;font-family:var(--ui);font-size:.85rem}
+.cta{margin-top:48px;padding:24px;background:var(--panel);border:1px solid var(--line);text-align:center}
+.cta p{margin-bottom:16px}
+.btn{display:inline-block;font-family:var(--ui);font-weight:700;font-size:.88rem;text-decoration:none;padding:12px 22px;margin:4px;border:1px solid var(--gold);transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}
+.btn.main{background:var(--gold);border-color:var(--gold);color:#1a1208}
+.btn.sec{color:var(--gold)}
+.btn:hover{filter:brightness(1.12)}
+.outros{margin-top:40px}
+.outros a{font-family:var(--ui);font-size:.95rem}
+.lista{display:grid;gap:12px;margin-top:24px}
+.card{display:block;background:var(--panel);border:1px solid var(--line);padding:20px 21px;text-decoration:none;color:var(--text);border-radius:2px;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.card:hover{background:var(--panel-hover);border-color:var(--gold);transform:translateY(-2px)}
+.card:focus-visible,.btn:focus-visible,.logo:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.card small{font-family:var(--ui);font-size:.8rem;color:var(--gold)}
+.card p{margin:4px 0 0;color:var(--muted);font-size:.95rem}
+.vazio{color:var(--muted);font-style:italic;margin-top:24px}
+.nf{padding:32px 0}
+footer{border-top:1px solid var(--line);padding:25px 0;font-family:var(--ui);font-size:.8rem;color:var(--muted);text-align:center;background:rgba(0,0,0,.12)}
+@media (max-width:560px){body{font-size:17px}main{padding:32px 0 56px}h1{font-size:2.2rem}.card{padding:18px}.brand-sub{font-size:.95rem}.brand-tag{font-size:.75rem}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="/" aria-label="Palavra e Série">PS</a>
+    <div>
+      <a class="brand" href="/">PALAVRA E SÉRIE</a>
+      <p class="brand-sub">Plataforma de Consulta e Estudo Bíblico</p>
+      <p class="brand-tag">Conhecimento bíblico &nbsp;•&nbsp; Pesquisa &nbsp;•&nbsp; Formação cristã</p>
+    </div>
+  </div>
+</header>
+<nav class="menu" aria-label="Principal">
+  <div class="wrap">
+    <a id="m-estudos" href="../redes-sociais-estudos.htm">Estudos</a>
+    <a href="/pages/pesquisa/matriz-pro.html">Plataforma de Pesquisa</a>
+    <a href="https://www.youtube.com/@Palavraeserie" target="_blank" rel="noopener">Ver no canal</a>
+  </div>
+</nav>
+<nav class="menu cats" aria-label="Categorias de estudos">
+  <div class="wrap" id="cats"></div>
+</nav>
+
+<main><div class="wrap" id="app"></div></main>
+<footer><div class="wrap">Palavra e Série · Conhecimento bíblico, pesquisa e formação cristã.</div></footer>
+
+<script>
+/* ==========================================================
+   PÁGINA DA PASTA: A Bíblia Responde
+
+   Para acrescentar outro estudo desta categoria, cole o estudo
+   dentro da lista ESTUDOS, no lugar marcado.
+   Entre um estudo e o próximo vai uma VÍRGULA.
+   Os textos ficam entre ACENTOS GRAVES ( ` ).
+   O "id" do estudo é o final do link e não deve mudar depois de divulgado:
+   .../tirando-a-mente-do-engano/#id-do-estudo
+   ========================================================== */
+
+const CANAL = "https://www.youtube.com/@Palavraeserie";
+const MATRIZ = "/pages/pesquisa/matriz-pro.html";
+const VOLTAR = "../redes-sociais-estudos.htm";
+const MINHA = "engano";
+
+const CATEGORIAS = [
+  { id: "serie",   pasta: "o-que-a-biblia-realmente-diz", nome: "Livro a Livro",     playlist: "https://www.youtube.com/playlist?list=PLMUW8wrJsx-s&playnext=1&index=1",
+    desc: "Estudo de um livro da Bíblia em sequência, do começo ao fim, passo a passo.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo desse trecho do livro. Se quiser ouvir de novo, o áudio está no canal.",
+    botao: "Ouvir de novo no canal" },
+  { id: "oracao",  pasta: "momentos-de-oracao", nome: "Momentos de oração",          playlist: "https://www.youtube.com/playlist?list=PLH3lq9vJzsio&playnext=1&index=1",
+    desc: "Orações e momentos de meditação baseados nas Escrituras.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo das Escrituras em que a oração se apoia. Se quiser orar de novo, o áudio está no canal.",
+    botao: "Orar de novo no canal" },
+  { id: "engano",  pasta: "tirando-a-mente-do-engano", nome: "A Bíblia Responde",   playlist: "https://www.youtube.com/playlist?list=PLNL8itelYU-E&playnext=1&index=1",
+    desc: "Estudos que examinam ideias muito repetidas, dentro e fora da igreja, e as comparam com o que está escrito.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo que compara a ideia com o que está escrito. Se quiser ouvir de novo, o áudio está no canal.",
+    botao: "Ouvir de novo no canal" },
+  { id: "direcao", pasta: "biblia-e-direcao-de-vida", nome: "Bíblia e direção de vida",    playlist: "https://www.youtube.com/playlist?list=PLQP9mSjlQCV0&playnext=1&index=1",
+    desc: "Esclarecimento de passagens bíblicas pouco compreendidas, para orientar a vida cristã.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo bíblico por trás do esclarecimento. Se quiser ouvir de novo, o áudio está no canal.",
+    botao: "Ouvir de novo no canal" },
+  { id: "salmos",  pasta: "salmos-e-reflexoes-biblicas", nome: "Salmos e reflexões bíblicas", playlist: "https://www.youtube.com/playlist?list=PLdXZVtjxhh18",
+    desc: "Estudo e reflexão sobre os Salmos: texto, contexto e aplicação à vida cristã.",
+    msg: "Se você acabou de ouvir {c}, este é o estudo. Se quiser se edificar ouvindo o áudio, ele está no canal.",
+    botao: "Ouvir no canal" }
+];
+
+const ESTUDOS = [
+
+
+
+];
+
+/* ---------- renderização (não precisa mexer) ---------- */
+const app = document.getElementById("app");
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const CAT = CATEGORIAS.find(c => c.id === MINHA);
+
+document.getElementById("cats").innerHTML = CATEGORIAS.map(c =>
+  `<a href="../${c.pasta}/"${c.id === MINHA ? ' class="on"' : ''}>${esc(c.nome)}</a>`).join("");
+
+const SUBT = /^(\d+(\.\d+)+\.?\s|Conclusão do capítulo$|Uma palavra do discipulador$|Os dois caminhos de Salmos 1$|O caminho do justo$|O caminho dos ímpios$)/;
+function blocos(t){
+  const linhas = String(t || "").split("\n").map(x => x.trim());
+  let out = "", par = [], lis = [], tab = [], atual = null;
+  const fecha = () => {
+    if (par.length) out += `<p>${par.map(esc).join("<br>")}</p>`;
+    if (lis.length) out += `<ul class="pts">${lis.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    if (tab.length) out += `<div class="tabw"><table class="tab">${tab.map(r => `<tr>${r.split("\t").map(c => `<td>${esc(c.trim())}</td>`).join("")}</tr>`).join("")}</table></div>`;
+    par = []; lis = []; tab = []; atual = null;
+  };
+  linhas.forEach(l => {
+    if (!l || l === "Copiar minhas reflexões") return fecha();
+    const tipo = SUBT.test(l) ? "h" : /^[•\-]\s/.test(l) ? "li" : l.includes("\t") ? "tab" : "p";
+    if (tipo === "h") { fecha(); out += `<h3 class="s3">${esc(l)}</h3>`; return; }
+    if (tipo !== atual) fecha();
+    atual = tipo;
+    if (tipo === "li") lis.push(l.replace(/^[•\-]\s/, ""));
+    else if (tipo === "tab") tab.push(l);
+    else par.push(l);
+  });
+  fecha();
+  return out;
+}
+const secao = s => `<h2>${esc(s.titulo)}</h2>${blocos(s.texto)}`;
+
+function categoria(){
+  document.title = CAT.nome + " · Palavra e Série";
+  app.innerHTML = `
+    <p class="sub"><a href="${VOLTAR}">Estudos</a></p>
+    <h1>${esc(CAT.nome)}</h1>
+    <p class="sub">${esc(CAT.desc)}</p>
+    ${ESTUDOS.length ? `<div class="lista">${ESTUDOS.map(e => `
+      <a class="card" href="#${esc(e.id)}">
+        <small>${esc(e.texto)}</small>
+        <h3>${esc(e.titulo)}</h3>
+        <p>${esc(e.resumo)}</p>
+      </a>`).join("")}</div>` : `<p class="vazio">Em breve. Nenhum estudo nesta categoria ainda.</p>`}
+    <div class="cta">
+      <p>Prefere ouvir? Veja esta playlist no canal.</p>
+      <a class="btn sec" href="${esc(CAT.playlist)}" target="_blank" rel="noopener">Ver playlist no YouTube</a>
+    </div>`;
+  window.scrollTo(0, 0);
+}
+
+function estudo(e){
+  document.title = e.titulo + " · Palavra e Série";
+  const c = CAT;
+  const secs = e.secoes || [];
+  const abertas = secs.filter(s => !s.aprofundamento);
+  const fundas = secs.filter(s => s.aprofundamento);
+  const outros = ESTUDOS.filter(x => x.id !== e.id);
+  const linkCanal = e.video ? "https://www.youtube.com/watch?v=" + esc(e.video) : esc(c.playlist);
+  app.innerHTML = `
+    <p class="sub"><a href="./">${esc(c.nome)}</a> · ${esc(e.texto)}</p>
+    <h1>${esc(e.titulo)}</h1>
+    <div class="ouvir">
+      <p>${(e.mensagem || c.msg || "Se você acabou de ouvir {c}, este é o estudo. O áudio está no canal.").replace("{c}", "<b>" + esc(e.conteudo || e.texto) + "</b>")}</p>
+      <a class="btn gold" href="${linkCanal}" target="_blank" rel="noopener">${esc(c.botao || "Ouvir no canal")}</a>
+    </div>
+    ${e.video ? `<div class="player"><iframe src="https://www.youtube.com/embed/${esc(e.video)}" title="${esc(e.titulo)}" loading="lazy" allowfullscreen></iframe></div>` : ""}
+    ${e.abertura ? blocos(e.abertura) : ""}
+    ${abertas.map(secao).join("")}
+    ${fundas.length ? `<details class="aprof"><summary>Aprofundamento</summary><div class="inner">${fundas.map(secao).join("")}</div></details>` : ""}
+    <div class="cta">
+      <p>Quer ir mais fundo em ${esc(e.texto)}? Abra a Matriz de Pesquisa.</p>
+      <a class="btn main" href="${MATRIZ}">Aprofundar ${esc(e.texto)}</a>
+      <a class="btn sec" href="${linkCanal}" target="_blank" rel="noopener">Voltar ao canal</a>
+      <a class="btn sec" href="${CANAL}?sub_confirmation=1" target="_blank" rel="noopener">Inscrever-se</a>
+    </div>
+    <div class="outros">
+      ${outros.length ? `<h2>Mais em ${esc(c.nome)}</h2>` + outros.map(o => `<p><a href="#${esc(o.id)}">${esc(o.titulo)}</a></p>`).join("") : ""}
+      <p><a href="./">Ver todos em ${esc(c.nome)}</a></p>
+    </div>`;
+  window.scrollTo(0, 0);
+}
+
+function rota(){
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return categoria();
+  const e = ESTUDOS.find(x => x.id === id);
+  if (e) return estudo(e);
+  document.title = "Estudo não encontrado · Palavra e Série";
+  app.innerHTML = `<div class="nf"><h1>Estudo não encontrado</h1>
+    <p>Esse link não corresponde a nenhum estudo publicado. <a href="./">Veja os estudos desta categoria.</a></p></div>`;
+}
+window.addEventListener("hashchange", rota);
+rota();
+</script>
+</body>
+</html>
