@@ -165,6 +165,38 @@ const CANAL = "https://www.youtube.com/@Palavraeserie";
 };
 const QTD = { serie:1, oracao:0, engano:0, direcao:0, salmos:1 };
 const MATRIZ = "pesquisa/matriz-pro.html";
+  const PLAYLISTS_TEMATICAS = [
+  {
+    numero: 6,
+    nome: "Milagres e Curas Realizados por Jesus",
+    url: "https://www.youtube.com/playlist?list=PLRrKJ19nFsbo"
+  },
+  {
+    numero: 7,
+    nome: "Os Milagres dos Apóstolos",
+    url: "https://www.youtube.com/playlist?list=PLYnvo-edxxKw"
+  },
+  {
+    numero: 8,
+    nome: "Parábolas de Jesus",
+    url: "https://www.youtube.com/playlist?list=PLcN6JMASIydo"
+  },
+  {
+    numero: 9,
+    nome: "Os Milagres dos Profetas",
+    url: "https://www.youtube.com/playlist?list=PLKnt8Ly-4b9Y"
+  },
+  {
+    numero: 10,
+    nome: "As Intervenções Extraordinárias de Deus",
+    url: "https://www.youtube.com/playlist?list=PLM0VJ21G0E94"
+  },
+  {
+    numero: 11,
+    nome: "Profecias Bíblicas e Seu Cumprimento",
+    url: "https://www.youtube.com/playlist?list=PLdzw2tgOqV5o"
+  }
+];
 
 /* As 5 categorias (playlists). O "id" é o que se escreve em "categoria" no estudo.
    "msg" é a mensagem do topo do estudo ({c} vira o conteúdo) e "botao" é o texto do botão.
@@ -244,16 +276,35 @@ const secao = s => `<h2>${esc(s.titulo)}</h2>${blocos(s.texto)}`;
 function indice(){
   document.title = "Estudos · Palavra e Série";
   marcar(null, true);
+
   app.innerHTML = `
     <h1>Estudos</h1>
-    <p class="sub">Ouviu no canal? Escolha a lista do conteúdo que você ouviu e encontre o estudo.</p>
-    <div class="grid">${CATEGORIAS.map(c => {
-    const n = QTD[c.id];
-      return `<a class="card" href="${PASTAS[c.id]}/">
-        <h3>${esc(c.nome)}</h3>
-        <p>${esc(c.desc)}</p>
-        <p><b>${n ? n + (n === 1 ? " estudo" : " estudos") : "Em breve"}</b></p>
-      </a>`;}).join("")}</div>`;
+    <p class="sub">
+      Ouviu no canal? Escolha a lista do conteúdo que você ouviu e encontre o estudo.
+    </p>
+
+    <div class="grid">
+      ${CATEGORIAS.map(c => {
+        const n = QTD[c.id];
+
+        return `<a class="card" href="${PASTAS[c.id]}/">
+          <h3>${esc(c.nome)}</h3>
+          <p>${esc(c.desc)}</p>
+          <p><b>${n ? n + (n === 1 ? " estudo" : " estudos") : "Em breve"}</b></p>
+        </a>`;
+      }).join("")}
+
+      ${PLAYLISTS_TEMATICAS.map(p => `
+        <a class="card"
+           href="${p.url}"
+           target="_blank"
+           rel="noopener">
+          <h3>${p.numero}. ${esc(p.nome)}</h3>
+          <p>Playlist de estudos bíblicos no canal Palavra e Série.</p>
+          <p><b>Ver playlist no YouTube</b></p>
+        </a>
+      `).join("")}
+    </div>`;
 }
 
 function categoria(c){
