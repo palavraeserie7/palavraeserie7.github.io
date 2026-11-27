@@ -12553,7 +12553,99 @@ pararAmostra();
 })();
 </script>
 <!-- ===== FIM: VOZES POR TRECHO + BIBLIOTECA DE VOZES ===== -->
+<!-- ===== INÍCIO: REFAZER FICHA DE UM VÍDEO JÁ GUARDADO ===== -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var painel = $("esPainel"), lista = $("cpLista"), baixar = $("f1Baixar");
+  if(!painel || !lista || !baixar || !$("ytCard") || !$("fxFicha")) return;
+  if(window.__rfBloco) return;
+  window.__rfBloco = true;
 
+  /* impede que o vídeo reaberto seja guardado de novo como cópia */
+  var fetchOrig = window.fetch.bind(window), bloqueio = null, urlAnterior = null;
+  window.fetch = function(input, init){
+    var u = typeof input === "string" ? input : ((input && input.url) || "");
+    if(bloqueio && u === bloqueio) return Promise.reject(new Error("cópia evitada"));
+    return fetchOrig(input, init);
+  };
+
+  /* botão em cada cartão de vídeo */
+  function marcar(){
+    Array.prototype.forEach.call(lista.querySelectorAll(".cp-card"), function(c){
+      if(c.querySelector("[data-cp2]") || !c.querySelector("video.cp-media")) return;
+      var bt = c.querySelector(".cp-bt"); if(!bt) return;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "at-btn"; b.setAttribute("data-cp2", "publicar");
+      b.textContent = "REFAZER FICHA E PUBLICAR";
+      bt.appendChild(b);
+    });
+  }
+  new MutationObserver(marcar).observe(lista, {childList: true});
+  marcar();
+
+  function aviso(t, erro){
+    var m = $("cpMsg"); if(!m) return;
+    m.textContent = t || ""; m.className = "cp-msg" + (erro ? " erro" : "");
+  }
+
+  lista.addEventListener("click", async function(ev){
+    var b = ev.target.closest("[data-cp2]"); if(!b) return;
+    var c = b.closest(".cp-card"), v = c.querySelector("video.cp-media");
+    var titulo = (c.querySelector("strong").textContent || "").trim() || "Palavra e Série";
+    var playlist = "";
+    Array.prototype.forEach.call(c.querySelectorAll("small"), function(s){
+      var m = /^Playlist:\s*(.+)$/.exec(s.textContent.trim()); if(m) playlist = m[1].trim();
+    });
+    try{
+      var blob = await (await fetchOrig(v.src)).blob();
+      var ext = /mp4/i.test(blob.type) ? "mp4" : "webm";
+      var u = URL.createObjectURL(blob);
+      if(urlAnterior) URL.revokeObjectURL(urlAnterior);
+      urlAnterior = u;
+
+      /* vai para o passo Exportar */
+      painel.setAttribute("data-fase", "caminho");
+      if($("f2Nome")) $("f2Nome").textContent = "Publicar vídeo guardado";
+      var p4 = painel.querySelector('.es-passos [data-p="4"]'); if(p4) p4.click();
+
+      /* coloca o vídeo guardado no lugar do vídeo recém-exportado */
+      bloqueio = u;
+      setTimeout(function(){ bloqueio = null; }, 1500);
+      baixar.setAttribute("download", titulo.replace(/[\\\/:*?"<>|]+/g, "") + "." + ext);
+      baixar.hidden = false; baixar.style.display = "inline-block";
+      baixar.href = u;
+
+      var info = $("f1Info"), cartao = info.parentElement;
+      cartao.hidden = false;
+      info.textContent = "Vídeo guardado: " + titulo + ". Preencha a ficha abaixo para publicar.";
+      info.className = "f1-info";
+      $("f1Prog").style.width = "100%";
+      var vv = $("f1Video"); vv.hidden = false; vv.src = u;
+
+      /* depois que os outros blocos zeram a ficha, preenche */
+      setTimeout(function(){
+        var av = $("cpAviso"); if(av){ av.hidden = true; av.textContent = ""; }
+        $("ytTitulo").value = titulo.slice(0, 100);
+        $("ytDesc").value = "";
+        var fp = $("fxPlaylist");
+        if(fp && playlist){
+          Array.prototype.forEach.call(fp.options, function(o){
+            if(o.value === playlist){ fp.value = playlist; fp.dispatchEvent(new Event("change", {bubbles: true})); }
+          });
+        }
+        var ft = $("fxTitulo");
+        if(ft){ ft.value = titulo.slice(0, 100); ft.dispatchEvent(new Event("input", {bubbles: true})); }
+        $("fxFicha").scrollIntoView({behavior: "smooth", block: "start"});
+      }, 200);
+    }catch(e){
+      console.error(e);
+      aviso("Não consegui abrir este vídeo para publicar. Use BAIXAR e envie pelo site do YouTube.", true);
+    }
+  });
+})();
+</script>
+<!-- ===== FIM: REFAZER FICHA DE UM VÍDEO JÁ GUARDADO ===== -->
  
 <!-- ===== FIM: TEMPO DA FALA (META + VELOCIDADE + AJUSTAR) ===== -->
  <!-- ===================================================================================================================== --> 
