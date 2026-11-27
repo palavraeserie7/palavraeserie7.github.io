@@ -11590,7 +11590,7 @@ await trab();
     '<label>Playlist do conteúdo<select id="fxPlaylist"><option value="">Escolha a playlist…</option>' +
       NOMES.map(function(n){ return '<option value="' + n + '">' + n + '</option>'; }).join("") + '</select></label>' +
     '<div id="fxCampos" hidden>' +
-      '<label><span id="fxTituloRot">Título</span><input id="fxTitulo" type="text" maxlength="100"></label>' +
+      '<label><span id="fxTituloRot">Título</span><input id="fxTitulo" type="text" maxlength="98"></label>' +
       '<label><span id="fxAssuntoRot">Apresentação</span><textarea id="fxAssunto" maxlength="300"></textarea></label>' +
      '<div class="yp" id="fxPrevia"><div class="yp-t"><small>Título (obrigatório)</small><div id="fxPrevTitulo"></div></div><div class="yp-d"><small>Descrição</small><div id="fxPrevDesc"></div><em id="fxContador"></em></div><p class="yp-nota">Em dourado: o que você preenche. O resto já vem pronto.</p></div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="at-btn gold" id="fxConfirmar">CONFIRMAR FICHA E LIBERAR PUBLICAÇÃO</button></div>' +
@@ -11623,7 +11623,8 @@ await trab();
     var m = modelo(); if(!m) return;
     var e = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
    var tOk = limpar($("fxTitulo").value), aOk = limpar($("fxAssunto").value).replace(/[.\s]+$/, "");
-    var vt = '<span class="v' + (tOk ? '' : ' vazio') + '">' + e(tOk || m.tit) + '</span>';
+  var tSem = tOk.replace(/^["“”]+|["“”]+$/g, "");
+var vt = '<span class="v' + (tSem ? '' : ' vazio') + '">&quot;' + e(tSem || m.tit) + '&quot;</span>';
     var va = '<span class="v' + (aOk ? '' : ' vazio') + '">' + e(aOk || m.apr) + '</span>';
     $("fxPrevTitulo").innerHTML = vt;
     $("fxPrevDesc").innerHTML = vt + "\n\n" + e(m.a1) + va + e(m.a2) + "\n\n" + e(m.p2) + "\n\n" + e(m.p3) + "\n\n" +
@@ -11671,7 +11672,7 @@ await trab();
     });
     if(faltou){ travar(); msg("Preencha o título e a apresentação para liberar a publicação.", true); faltou.focus(); return; }
 
-   $("ytTitulo").value = limpar($("fxTitulo").value).slice(0, 100);
+  $("ytTitulo").value = ("\"" + limpar($("fxTitulo").value).replace(/^["“”]+|["“”]+$/g, "") + "\"").slice(0, 100);
     $("ytDesc").value = montar().slice(0, 5000);
     liberado = true; aplicarTrava();
 
