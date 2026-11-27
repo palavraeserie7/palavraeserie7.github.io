@@ -11472,7 +11472,7 @@ await trab();
             method: "POST", headers: {"Content-Type": "application/json"},
             body: JSON.stringify({snippet: {playlistId: pl, resourceId: {kind: "youtube#video", videoId: video.id}}})
           });
-          extra = " Adicionado à playlist “" + ("ytPl").options[("ytPl").selectedIndex].textContent + "”.";
+         extra = " Adicionado à playlist “" + $("ytPl").options[$("ytPl").selectedIndex].textContent + "”.";
         }catch(e){ extra = " O vídeo foi enviado, mas não entrou na playlist: " + e.message; }
       }
       $("ytBarra").firstChild.style.width = "100%";
@@ -11621,7 +11621,7 @@ await trab();
  function atualizarPrevia(){
     var m = modelo(); if(!m) return;
     var e = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
-    var tOk = limpar(("fxTitulo").value),aOk=limpar(("fxAssunto").value).replace(/[.\s]+$/, "");
+   var tOk = limpar($("fxTitulo").value), aOk = limpar($("fxAssunto").value).replace(/[.\s]+$/, "");
     var vt = '<span class="v' + (tOk ? '' : ' vazio') + '">' + e(tOk || m.tit) + '</span>';
     var va = '<span class="v' + (aOk ? '' : ' vazio') + '">' + e(aOk || m.apr) + '</span>';
     $("fxPrevTitulo").innerHTML = vt;
@@ -11670,7 +11670,7 @@ await trab();
     });
     if(faltou){ travar(); msg("Preencha o título e a apresentação para liberar a publicação.", true); faltou.focus(); return; }
 
-    ("ytTitulo").value=limpar(("fxTitulo").value).slice(0, 100);
+   $("ytTitulo").value = limpar($("fxTitulo").value).slice(0, 100);
     $("ytDesc").value = montar().slice(0, 5000);
     liberado = true; aplicarTrava();
 
