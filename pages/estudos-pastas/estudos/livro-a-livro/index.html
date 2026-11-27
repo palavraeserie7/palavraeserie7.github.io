@@ -85,6 +85,100 @@ ul.pts li{margin-bottom:6px}
 footer{border-top:1px solid var(--line);padding:25px 0;font-family:var(--ui);font-size:.8rem;color:var(--muted);text-align:center;background:rgba(0,0,0,.12)}
 @media (max-width:560px){body{font-size:17px}main{padding:32px 0 56px}h1{font-size:2.2rem}.card{padding:18px}.brand-sub{font-size:.95rem}.brand-tag{font-size:.75rem}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+  
+/* ===== APRESENTAÇÃO DAS CATEGORIAS ===== */
+
+.capa-categoria{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:30px;
+  margin:28px 0 38px;
+  border:1px solid var(--line);
+  background:linear-gradient(120deg,#1b1208,#0c0905);
+  overflow:hidden;
+}
+
+.capa-categoria img{
+  width:100%;
+  height:330px;
+  object-fit:cover;
+  display:block;
+}
+
+.capa-texto{
+  padding:24px 28px 24px 0;
+}
+
+.capa-texto h1{
+  color:var(--gold);
+  font-size:2.8rem;
+}
+
+.capa-texto .ornamento{
+  color:var(--gold);
+  font-size:1.5rem;
+  margin:8px 0 14px;
+  letter-spacing:5px;
+}
+
+.capa-texto p{
+  color:var(--muted);
+  font-style:italic;
+  font-size:1.1rem;
+}
+
+.conhecimento{
+  margin:34px 0;
+  padding:28px;
+  background:var(--panel);
+  border:1px solid var(--line);
+}
+
+.conhecimento h2{
+  margin:0 0 18px;
+}
+
+.conhecimento h3{
+  color:var(--gold);
+  margin:24px 0 8px;
+}
+
+.conhecimento p{
+  color:var(--text);
+}
+
+.conhecimento .destaque{
+  border-left:3px solid var(--gold);
+  padding:12px 18px;
+  margin:20px 0;
+  background:rgba(216,170,69,.06);
+  font-style:italic;
+}
+
+@media(max-width:680px){
+  .capa-categoria{
+    grid-template-columns:1fr;
+    gap:0;
+  }
+
+  .capa-categoria img{
+    height:240px;
+  }
+
+  .capa-texto{
+    padding:22px;
+  }
+
+  .capa-texto h1{
+    font-size:2.2rem;
+  }
+
+  .conhecimento{
+    padding:20px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -868,6 +962,44 @@ A pessoa que nasceu de Deus não deve viver para o pecado, mas para aquele que a
 
 ];
 
+const CONHECIMENTO = {
+  serie: {
+    imagem: "./imagens/livro-a-livro.jpg",
+
+    apresentacao:
+      "Uma jornada pelas Escrituras, examinando cada livro da Bíblia em sua sequência, compreendendo sua mensagem, seu contexto e seu testemunho dentro da Palavra de Deus.",
+
+    titulo: "Por que estudar a Bíblia livro a livro?",
+
+    texto: `A Bíblia reúne diferentes livros, escritos em épocas, circunstâncias e contextos históricos distintos. Embora cada livro possua características próprias, todos fazem parte do conjunto das Escrituras.
+
+Estudar a Bíblia livro a livro permite observar como cada escrito apresenta sua mensagem, quais acontecimentos registra, a quem se dirige e como seu conteúdo se relaciona com o restante da revelação bíblica.
+
+Essa abordagem ajuda a evitar interpretações isoladas, nas quais uma passagem é retirada de seu contexto e recebe um significado que não corresponde à intenção do texto.
+
+O conhecimento de cada livro também permite acompanhar o desenvolvimento dos acontecimentos bíblicos, reconhecer os temas que percorrem as Escrituras e compreender melhor a mensagem de cada passagem.`,
+
+    topico: "O que devemos observar ao estudar um livro bíblico?",
+
+    pontos: `Contexto histórico
+É importante observar o período histórico, as circunstâncias e os acontecimentos relacionados ao livro.
+
+Contexto literário
+É necessário compreender o gênero do escrito, sua estrutura, organização e a relação entre suas partes.
+
+Mensagem central
+Cada livro possui uma contribuição própria. É preciso identificar o assunto desenvolvido e a mensagem apresentada pelo texto.
+
+Relação com o restante das Escrituras
+Uma passagem deve ser compreendida considerando seu contexto imediato e sua relação com o conjunto da Bíblia.
+
+Ensinamentos e significado
+O estudo deve identificar o que o texto efetivamente ensina, distinguindo sua mensagem original de aplicações posteriores.`,
+
+    encerramento: `Estudar livro a livro não significa apenas percorrer páginas em sequência. Significa desenvolver uma compreensão progressiva das Escrituras, respeitando o conteúdo, o contexto e a mensagem de cada escrito.`
+  }
+};
+
 /* ---------- renderização (não precisa mexer) ---------- */
 const app = document.getElementById("app");
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -901,24 +1033,82 @@ function blocos(t){
 }
 const secao = s => `<h2>${esc(s.titulo)}</h2>${blocos(s.texto)}`;
 
+
 function categoria(){
   document.title = CAT.nome + " · Palavra e Série";
+
+  const k = CONHECIMENTO[CAT.id];
+
   app.innerHTML = `
-    <p class="sub"><a href="${VOLTAR}">Estudos</a></p>
-    <h1>${esc(CAT.nome)}</h1>
-    <p class="sub">${esc(CAT.desc)}</p>
-    ${ESTUDOS.length ? `<div class="lista">${ESTUDOS.map(e => `
-      <a class="card" href="#${esc(e.id)}">
-        <small>${esc(e.texto)}</small>
-        <h3>${esc(e.titulo)}</h3>
-        <p>${esc(e.resumo)}</p>
-      </a>`).join("")}</div>` : `<p class="vazio">Em breve. Nenhum estudo nesta categoria ainda.</p>`}
+    <p class="sub">
+      <a href="${VOLTAR}">Estudos</a> &nbsp;›&nbsp; ${esc(CAT.nome)}
+    </p>
+
+    ${k ? `
+      <section class="capa-categoria">
+
+        <img
+          src="${esc(k.imagem)}"
+          alt="Gravura bíblica representando o estudo da Bíblia livro a livro"
+        >
+
+        <div class="capa-texto">
+          <h1>${esc(CAT.nome)}</h1>
+          <div class="ornamento">━━━━ ✧ ━━━━</div>
+          <p>${esc(k.apresentacao)}</p>
+        </div>
+
+      </section>
+
+      <section class="conhecimento">
+        <h2>${esc(k.titulo)}</h2>
+        ${blocos(k.texto)}
+
+        <h3>${esc(k.topico)}</h3>
+        ${blocos(k.pontos)}
+
+        <div class="destaque">
+          ${blocos(k.encerramento)}
+        </div>
+      </section>
+
+    ` : `
+      <h1>${esc(CAT.nome)}</h1>
+      <p class="sub">${esc(CAT.desc)}</p>
+    `}
+
+    <h2>Estudos desta seção</h2>
+
+    ${ESTUDOS.filter(e => e.categoria === CAT.id).length
+      ? `<div class="lista">${
+          ESTUDOS.filter(e => e.categoria === CAT.id).map(e => `
+            <a class="card" href="#${esc(e.id)}">
+              <small>${esc(e.texto)}</small>
+              <h3>${esc(e.titulo)}</h3>
+              <p>${esc(e.resumo)}</p>
+            </a>
+          `).join("")
+        }</div>`
+      : `<p class="vazio">
+          Os estudos desta seção serão apresentados aqui conforme forem publicados.
+        </p>`
+    }
+
     <div class="cta">
       <p>Prefere ouvir? Veja esta playlist no canal.</p>
-      <a class="btn sec" href="${esc(CAT.playlist)}" target="_blank" rel="noopener">Ver playlist no YouTube</a>
-    </div>`;
+      <a class="btn sec"
+         href="${esc(CAT.playlist)}"
+         target="_blank"
+         rel="noopener">
+         Ver playlist no YouTube
+      </a>
+    </div>
+
+  `;
+
   window.scrollTo(0, 0);
 }
+
 
 function estudo(e){
   document.title = e.titulo + " · Palavra e Série";
