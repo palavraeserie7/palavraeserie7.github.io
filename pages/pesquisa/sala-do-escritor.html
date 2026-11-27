@@ -11524,7 +11524,7 @@ await trab();
   /* um modelo para cada playlist */
   var MODELOS = {
     "Salmos e reflexões bíblicas": {
-      tituloRot: "Título ou assunto do estudo", tituloPh: "Ex.: Salmo 91 — Confiança em tempos difíceis",
+      tituloRot: "Título ou assunto do estudo", tituloPh: "Ex.: 91 | Confiança em tempos difíceis",
       assuntoRot: "Apresentação do Salmo ou trecho abordado", assuntoPh: "Ex.: o Salmo 91",
      tit: "[TÍTULO OU ASSUNTO DO ESTUDO]", apr: "[apresentação do Salmo ou trecho abordado]",
            a1: "Neste vídeo: ",
@@ -11579,6 +11579,14 @@ await trab();
 
   var liberado = false;
  var limpar = function(t){ return String(t || "").replace(/[<>]/g, "").replace(/\s*\|\s*/g, " — ").replace(/[ \t]+/g, " ").trim(); };
+ var traco = function(t){
+  t = String(t || "").trim();
+  var pl = document.getElementById("fxPlaylist");
+  if(!pl || pl.value !== "Salmos e reflexões bíblicas") return t;
+  var m = /^(?:Salmos?\s*)?(\d{1,3}(?::\d{1,3}(?:\s*[-–]\s*\d{1,3})?)?)\s*(?:[|:\-–—]\s*|\s+)?(.*)$/i.exec(t);
+  if(!m) return t;
+  return "Salmo " + m[1] + (m[2] ? " — " + m[2] : "");
+};
   var norm = function(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim(); };
 
   /* ---------- interface ---------- */
@@ -11609,7 +11617,7 @@ await trab();
   /* ---------- texto da descrição (segue o modelo da playlist) ---------- */
   function montar(){
   var m = modelo(); if(!m) return "";
-  var titulo = limpar($("fxTitulo").value).replace(/^["“”]+|["“”]+$/g, "") || m.tit;
+var titulo = traco(limpar($("fxTitulo").value).replace(/^["“”]+|["“”]+$/g, "")) || m.tit;
   var assunto = limpar($("fxAssunto").value).replace(/[.\s]+$/, "") || m.apr;
   return "\"" + titulo + "\"\n\n" +
     m.a1 + assunto + m.a2 + "\n\n" +
@@ -11624,6 +11632,7 @@ await trab();
     var e = function(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
    var tOk = limpar($("fxTitulo").value), aOk = limpar($("fxAssunto").value).replace(/[.\s]+$/, "");
   var tSem = tOk.replace(/^["“”]+|["“”]+$/g, "");
+var tSem = traco(tOk.replace(/^["“”]+|["“”]+$/g, ""));
 var vt = '<span class="v' + (tSem ? '' : ' vazio') + '">&quot;' + e(tSem || m.tit) + '&quot;</span>';
     var va = '<span class="v' + (aOk ? '' : ' vazio') + '">' + e(aOk || m.apr) + '</span>';
     $("fxPrevTitulo").innerHTML = vt;
@@ -11672,7 +11681,7 @@ var vt = '<span class="v' + (tSem ? '' : ' vazio') + '">&quot;' + e(tSem || m.ti
     });
     if(faltou){ travar(); msg("Preencha o título e a apresentação para liberar a publicação.", true); faltou.focus(); return; }
 
-  $("ytTitulo").value = ("\"" + limpar($("fxTitulo").value).replace(/^["“”]+|["“”]+$/g, "") + "\"").slice(0, 100);
+$("ytTitulo").value = ("\"" + traco(limpar($("fxTitulo").value).replace(/^["“”]+|["“”]+$/g, "")) + "\"").slice(0, 100);
     $("ytDesc").value = montar().slice(0, 5000);
     liberado = true; aplicarTrava();
 
