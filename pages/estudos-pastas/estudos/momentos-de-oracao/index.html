@@ -259,10 +259,10 @@ function estudo(e){
   app.innerHTML = `
     <p class="sub"><a href="./">${esc(c.nome)}</a> · ${esc(e.texto)}</p>
     <h1>${esc(e.titulo)}</h1>
-    <div class="ouvir">
+      ${e.video ? `<div class="ouvir">
       <p>${(e.mensagem || c.msg || "Se você acabou de ouvir {c}, este é o estudo. O áudio está no canal.").replace("{c}", "<b>" + esc(e.conteudo || e.texto) + "</b>")}</p>
       <a class="btn gold" href="${linkCanal}" target="_blank" rel="noopener">${esc(c.botao || "Ouvir no canal")}</a>
-    </div>
+    </div>` : ""}
     ${e.video ? `<div class="player"><iframe src="https://www.youtube.com/embed/${esc(e.video)}" title="${esc(e.titulo)}" loading="lazy" allowfullscreen></iframe></div>` : ""}
     ${e.abertura ? blocos(e.abertura) : ""}
     ${abertas.map(secao).join("")}
@@ -270,7 +270,7 @@ function estudo(e){
     <div class="cta">
       <p>Quer ir mais fundo em ${esc(e.texto)}? Abra a Matriz de Pesquisa.</p>
       <a class="btn main" href="${MATRIZ}">Aprofundar ${esc(e.texto)}</a>
-      <a class="btn sec" href="${linkCanal}" target="_blank" rel="noopener">Voltar ao canal</a>
+      ${e.video ? `<a class="btn sec" href="${linkCanal}" target="_blank" rel="noopener">Voltar ao canal</a>` : ""}
       <a class="btn sec" href="${CANAL}?sub_confirmation=1" target="_blank" rel="noopener">Inscrever-se</a>
     </div>
     <div class="outros">
