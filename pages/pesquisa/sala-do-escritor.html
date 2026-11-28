@@ -13853,7 +13853,8 @@ pararAmostra();
         '<option value="cap">Por capítulos (CAPÍTULO, CONCLUSÃO, REFERÊNCIAS, PARTE)</option>' +
         '<option value="corrido">Texto corrido (oração, Salmo, mensagem curta)</option>' +
       '</select></label>' +
-      '<label>Vídeo do YouTube (opcional)<input id="ecVideo" type="text" placeholder="https://youtu.be/..."></label>' +
+     '<label>Este estudo tem vídeo?<select id="ecTemVideo"><option value="nao">Não, só o texto por enquanto</option><option value="sim">Sim, já tenho o vídeo</option></select></label>' +
+'<label id="ecVideoBox" style="display:none">Link do vídeo no YouTube (obrigatório)<input id="ecVideo" type="text" placeholder="https://youtu.be/..."></label>' +
     '</div>' +
     '<label>Resumo (uma frase, aparece no cartão)<input id="ecResumo" type="text"></label>' +
     '<div class="ec-linha"><button type="button" class="at-btn gold" id="ecCopiar">COPIAR CÓDIGO</button><button type="button" class="at-btn" id="ecGerar">SÓ GERAR</button><button type="button" class="at-btn" id="ecFechar">FECHAR</button></div>' +
@@ -13905,8 +13906,11 @@ pararAmostra();
     if(!estudo){ msg("O editor está vazio. Volte ao modo TEXTO LIVRE e escreva o conteúdo.", true); return null; }
     if(!titulo){ msg("Escreva o título.", true); return null; }
     if(!pass){ msg("Escreva a passagem (ex.: Salmo 91 ou 1 João 3:9).", true); return null; }
-    var vid = videoId($("ecVideo").value);
-    if($("ecVideo").value.trim() && !vid){ msg("Não reconheci o link do vídeo. Use o link completo ou deixe em branco.", true); return null; }
+   var vid = "";
+if($("ecTemVideo").value === "sim"){
+  vid = videoId($("ecVideo").value);
+  if(!vid){ msg("Você marcou que tem vídeo. Cole o link completo do YouTube (ex.: https://youtu.be/43x1An7TpTw).", true); return null; }
+}
     var id = slug(titulo), d = dividir(estudo, $("ecModo").value);
     var cod = ' {\n' +
       '  id: ' + JSON.stringify(id) + ',\n' +
@@ -13938,6 +13942,10 @@ pararAmostra();
       p.scrollIntoView({behavior:"smooth", block:"nearest"});
     }
   });
+ $("ecTemVideo").addEventListener("change", function(){
+  $("ecVideoBox").style.display = this.value === "sim" ? "flex" : "none";
+  if(this.value !== "sim") $("ecVideo").value = "";
+});
   $("ecFechar").addEventListener("click", function(){ p.classList.remove("on"); });
   $("ecGerar").addEventListener("click", gerar);
   $("ecCopiar").addEventListener("click", function(){
