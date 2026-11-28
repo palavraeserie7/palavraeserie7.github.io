@@ -13798,7 +13798,162 @@ pararAmostra();
 </script>
 <!-- ===== FIM: ESTÚDIO — PEÇAS INSTRUMENTAIS (V3) ===== -->
 
+   /* =============================================== INÍCIO ============================================================== */
+<!-- ===== INÍCIO: ATELIÊ — ENVIAR PARA A CATEGORIA (11 PLAYLISTS) ===== -->
+<style>
+#ecPainel{display:none;margin:14px 0 6px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-card);color:var(--ink);padding:18px;flex-direction:column;gap:12px}
+#ecPainel.on{display:flex}
+#ecPainel h3{margin:0;font:600 18px Georgia,serif;letter-spacing:0;color:var(--ink)}
+#ecPainel label{display:flex;flex-direction:column;gap:5px;font:700 12px "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+#ecPainel input,#ecPainel select,#ecPainel textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:6px;background:#fff;color:var(--ink);font:14px "Segoe UI",Arial,sans-serif}
+#ecPainel #ecSaida{min-height:200px;font:12.5px/1.5 Consolas,monospace;background:#0f0f0f;color:#f1f1f1}
+#ecPainel .ec-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+#ecPainel .ec-linha{display:flex;gap:8px;flex-wrap:wrap}
+#ecPainel .ec-msg{margin:0;font:600 13.5px/1.5 "Segoe UI",Arial,sans-serif;color:var(--brass-deep);overflow-wrap:anywhere}
+#ecPainel .ec-msg.erro{color:#a14747}
+#ecPainel .ec-nota{margin:0;font:13px/1.5 "Segoe UI",Arial,sans-serif;color:var(--ink-soft)}
+</style>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var ta = $("atTexto"), ti = $("atTitulo"), modo = document.querySelector(".at-modo"), pai = $("ateliPainel");
+  if(!ta || !ti || !modo || !pai || $("ecPainel")) return;
+
+  var BASE = "https://palavraeserie7.github.io/pages/estudos-pastas/estudos/";
+  /* [id interno da página, pasta, nome igual ao da ficha de publicação] */
+  var CATS = [
+    ["serie","livro-a-livro","Livro a Livro"],
+    ["oracao","momentos-de-oracao","Momentos de oração"],
+    ["engano","a-biblia-responde","A Bíblia Responde"],
+    ["direcao","biblia-e-direcao-de-vida","Bíblia e direção de vida"],
+    ["salmos","salmos-e-reflexoes-biblicas","Salmos e reflexões bíblicas"],
+    ["milagres","milagres-e-curas-jesus","Milagres e Curas Realizados por Jesus"],
+    ["apostolos","milagres-dos-apostolos","Os Milagres dos Apóstolos"],
+    ["parabolas","parabolas-de-jesus","Parábolas de Jesus"],
+    ["profetas","milagres-dos-profetas","Os Milagres dos Profetas"],
+    ["intervencoes","intervencoes-extraordinarias-de-deus","As Intervenções Extraordinárias de Deus"],
+    ["profecias","profecias-biblicas-e-seu-cumprimento","Profecias Bíblicas e Seu Cumprimento"]
+  ];
+
+  var btn = document.createElement("button");
+  btn.type = "button"; btn.id = "ecBtn"; btn.className = "at-btn"; btn.textContent = "ENVIAR PARA A CATEGORIA";
+  modo.appendChild(btn);
+
+  var p = document.createElement("section");
+  p.id = "ecPainel";
+  p.innerHTML =
+    '<h3>Enviar este conteúdo para uma categoria</h3>' +
+    '<p class="ec-nota">Usa o título e o texto que estão no editor agora (modo TEXTO LIVRE). Gera o código que faz o conteúdo aparecer na página da categoria, com o endereço dele.</p>' +
+    '<div class="ec-grade">' +
+      '<label>Categoria (playlist)<select id="ecCat">' + CATS.map(function(c,i){ return '<option value="' + i + '">' + c[2] + '</option>'; }).join("") + '</select></label>' +
+      '<label>Título<input id="ecTitulo" type="text"></label>' +
+      '<label>Passagem (aparece no cartão)<input id="ecPassagem" type="text" placeholder="Ex.: 1 João 3:9"></label>' +
+      '<label>Como separar o texto<select id="ecModo">' +
+        '<option value="auto">Automático</option>' +
+        '<option value="cap">Por capítulos (CAPÍTULO, CONCLUSÃO, REFERÊNCIAS, PARTE)</option>' +
+        '<option value="corrido">Texto corrido (oração, Salmo, mensagem curta)</option>' +
+      '</select></label>' +
+      '<label>Vídeo do YouTube (opcional)<input id="ecVideo" type="text" placeholder="https://youtu.be/..."></label>' +
+    '</div>' +
+    '<label>Resumo (uma frase, aparece no cartão)<input id="ecResumo" type="text"></label>' +
+    '<div class="ec-linha"><button type="button" class="at-btn gold" id="ecCopiar">COPIAR CÓDIGO</button><button type="button" class="at-btn" id="ecGerar">SÓ GERAR</button><button type="button" class="at-btn" id="ecFechar">FECHAR</button></div>' +
+    '<p class="ec-msg" id="ecMsg" role="status"></p>' +
+    '<label>Código gerado<textarea id="ecSaida" readonly></textarea></label>';
+  pai.appendChild(p);
+
+  function msg(t, erro){ var m = $("ecMsg"); m.textContent = t || ""; m.className = "ec-msg" + (erro ? " erro" : ""); }
+  function slug(s){
+    return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()
+      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60).replace(/-+$/,"");
+  }
+  function crase(t){ return "`" + String(t).replace(/\\/g,"\\\\").replace(/`/g,"\\`").replace(/\$\{/g,"\\${") + "`"; }
+  function videoId(v){
+    v = String(v||"").trim(); if(!v) return "";
+    var m = /(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/.exec(v);
+    if(m) return m[1];
+    return /^[A-Za-z0-9_-]{11}$/.test(v) ? v : "";
+  }
+
+  var CAP = /^(CAP[ÍI]TULO|CONCLUS[ÃA]O|REFER[ÊE]NCIAS|PARTE)\b/i;
+  function ehMaiuscula(l){
+    l = l.trim();
+    return l.length >= 6 && l.length <= 120 && /[A-ZÀ-Ý]{3}/.test(l) && l === l.toUpperCase() && !/[a-zà-ý]/.test(l);
+  }
+  function dividirCom(texto, teste){
+    var abertura = [], secoes = [], atual = null;
+    texto.replace(/\r/g,"").split("\n").forEach(function(l){
+      if(teste(l)){ atual = {titulo:l.trim(), corpo:[]}; secoes.push(atual); }
+      else if(atual) atual.corpo.push(l);
+      else abertura.push(l);
+    });
+    return {abertura: abertura.join("\n").trim(),
+      secoes: secoes.map(function(s){ return {titulo:s.titulo, texto:s.corpo.join("\n").trim()}; })};
+  }
+  function dividir(texto, modoSel){
+    if(modoSel === "corrido") return {abertura: texto.trim(), secoes: [], como: "texto corrido"};
+    var d = dividirCom(texto, function(l){ return CAP.test(l.trim()); });
+    if(d.secoes.length || modoSel === "cap") { d.como = "capítulos"; return d; }
+    d = dividirCom(texto, ehMaiuscula);
+    if(d.secoes.length){ d.como = "títulos em maiúsculas"; return d; }
+    return {abertura: texto.trim(), secoes: [], como: "texto corrido"};
+  }
+
+  function gerar(){
+    var cat = CATS[Number($("ecCat").value)];
+    var titulo = $("ecTitulo").value.trim(), pass = $("ecPassagem").value.trim(),
+        resumo = $("ecResumo").value.trim(), estudo = ta.value.trim();
+    if(!estudo){ msg("O editor está vazio. Volte ao modo TEXTO LIVRE e escreva o conteúdo.", true); return null; }
+    if(!titulo){ msg("Escreva o título.", true); return null; }
+    if(!pass){ msg("Escreva a passagem (ex.: Salmo 91 ou 1 João 3:9).", true); return null; }
+    var vid = videoId($("ecVideo").value);
+    if($("ecVideo").value.trim() && !vid){ msg("Não reconheci o link do vídeo. Use o link completo ou deixe em branco.", true); return null; }
+    var id = slug(titulo), d = dividir(estudo, $("ecModo").value);
+    var cod = ' {\n' +
+      '  id: ' + JSON.stringify(id) + ',\n' +
+      '  categoria: ' + JSON.stringify(cat[0]) + ',\n' +
+      '  titulo: ' + JSON.stringify(titulo) + ',\n' +
+      '  texto: ' + JSON.stringify(pass) + ',\n' +
+      '  resumo: ' + JSON.stringify(resumo) + ',\n' +
+      '  conteudo: ' + JSON.stringify(pass) + ',\n' +
+      '  video: ' + crase(vid) + ',\n' +
+      '  abertura: ' + crase(d.abertura) + ',\n' +
+      '  secoes: [\n' +
+      d.secoes.map(function(s){ return '    { titulo: ' + crase(s.titulo) + ', texto: ' + crase(s.texto) + ' }'; }).join(",\n") + (d.secoes.length ? '\n' : '') +
+      '  ]\n' +
+      ' },\n';
+    $("ecSaida").value = cod;
+    msg("Separação: " + d.como + " (" + d.secoes.length + " seção(ões)). Cole em " + cat[1] + "/index.html, dentro de const ESTUDOS, antes do ];. Endereço: " + BASE + cat[1] + "/#" + id);
+    return cod;
+  }
+
+  btn.addEventListener("click", function(){
+    var abrir = !p.classList.contains("on");
+    p.classList.toggle("on", abrir);
+    if(abrir){
+      if(!$("ecTitulo").value.trim()) $("ecTitulo").value = ti.value.trim();
+      if(!$("ecPassagem").value.trim()){
+        var m = /((?:\d\s)?[A-Za-zÀ-ú]+\s\d+(?::\d+(?:\s*[-–]\s*\d+)?)?)/.exec(ti.value);
+        if(m) $("ecPassagem").value = m[1].trim();
+      }
+      p.scrollIntoView({behavior:"smooth", block:"nearest"});
+    }
+  });
+  $("ecFechar").addEventListener("click", function(){ p.classList.remove("on"); });
+  $("ecGerar").addEventListener("click", gerar);
+  $("ecCopiar").addEventListener("click", function(){
+    var c = gerar(); if(!c) return;
+    var aviso = $("ecMsg").textContent;
+    if(navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(c).then(function(){ msg("Código copiado. " + aviso); },
+        function(){ msg("Não consegui copiar. Selecione o código abaixo e use Ctrl+C.", true); });
+    else msg("Selecione o código abaixo e use Ctrl+C.", true);
+  });
+})();
+</script>
+<!-- ===== FIM: ATELIÊ — ENVIAR PARA A CATEGORIA (11 PLAYLISTS) ===== -->
+ 
 </body>
+ 
 </html>
  
  
